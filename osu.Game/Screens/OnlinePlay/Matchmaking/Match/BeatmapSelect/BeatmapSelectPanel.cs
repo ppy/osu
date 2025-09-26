@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -27,6 +28,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osuTK;
+using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
@@ -35,21 +37,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
     {
         public static readonly Vector2 SIZE = new Vector2(300, 70);
 
-        private const float corner_radius = 6;
-        private const float border_width = 3;
+        public bool AllowSelection { get; set; }
 
         public readonly MultiplayerPlaylistItem Item;
 
-        private readonly Container scaleContainer;
-        private readonly BeatmapPanel beatmapPanel;
-        private readonly AvatarOverlay selectionOverlay;
-        private readonly Container border;
+        public Action<MultiplayerPlaylistItem>? Action { private get; init; }
 
-        private readonly Drawable lighting;
+        private const float corner_radius = 6;
+        private const float border_width = 3;
 
-        public bool AllowSelection;
+        private Container scaleContainer = null!;
+        private BeatmapPanel beatmapPanel = null!;
+        private AvatarOverlay selectionOverlay = null!;
+        private Drawable lighting = null!;
 
-        public Action<MultiplayerPlaylistItem>? Action;
+        private Container border = null!;
 
         public override bool PropagatePositionalInputSubTree => AllowSelection;
 
@@ -57,49 +59,71 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         {
             Item = item;
             Size = SIZE;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(BeatmapLookupCache lookupCache, OverlayColourProvider colourProvider)
+        {
             InternalChild = scaleContainer = new Container
             {
-                Masking = true,
-                CornerRadius = 6,
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Children = new[]
                 {
-                    new HoverClickSounds(),
                     new Container
                     {
+                        Masking = true,
+                        CornerRadius = corner_radius,
+                        CornerExponent = 10,
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding(-border_width),
-                        Child = border = new Container
+                        Children = new[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            CornerRadius = corner_radius + border_width,
-                            Alpha = 0,
-                            Child = new Box { RelativeSizeAxes = Axes.Both },
+                            new HoverClickSounds(),
+                            beatmapPanel = new BeatmapPanel { RelativeSizeAxes = Axes.Both },
+                            lighting = new Box
+                            {
+                                Blending = BlendingParameters.Additive,
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0,
+                            },
+                            selectionOverlay = new AvatarOverlay
+                            {
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                            }
                         }
                     },
-                    beatmapPanel = new BeatmapPanel { RelativeSizeAxes = Axes.Both },
-                    lighting = new Box
+                    border = new Container
                     {
-                        Blending = BlendingParameters.Additive,
-                        RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
+                        Masking = true,
+                        CornerRadius = corner_radius,
+                        Blending = BlendingParameters.Additive,
+                        CornerExponent = 10,
+                        RelativeSizeAxes = Axes.Both,
+                        BorderThickness = border_width,
+                        BorderColour = colourProvider.Light1,
+                        EdgeEffect = new EdgeEffectParameters
+                        {
+                            Type = EdgeEffectType.Glow,
+                            Radius = 40,
+                            Roundness = 300,
+                            Colour = colourProvider.Light3.Opacity(0.1f),
+                        },
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                AlwaysPresent = true,
+                                Alpha = 0,
+                                Colour = Color4.Black,
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                        }
                     },
-                    selectionOverlay = new AvatarOverlay
-                    {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                    }
                 }
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(BeatmapLookupCache lookupCache)
-        {
             lookupCache.GetBeatmapAsync(Item.BeatmapID).ContinueWith(b => Schedule(() =>
             {
                 var beatmap = b.GetResultSafely()!;
@@ -159,9 +183,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             return true;
         }
 
-        public void ShowBorder() => border.Show();
+        public void ShowChosenBorder()
+        {
+            border.FadeTo(1, 1000, Easing.OutQuint);
+        }
 
-        public void HideBorder() => border.Hide();
+        public void ShowBorder()
+        {
+            border.FadeTo(1, 80, Easing.OutQuint)
+                  .Then()
+                  .FadeTo(0.7f, 800, Easing.OutQuint);
+        }
+
+        public void HideBorder()
+        {
+            border.FadeOut(500, Easing.OutQuint);
+        }
 
         public void FadeInAndEnterFromBelow(double duration = 500, double delay = 0, float distance = 200)
         {
