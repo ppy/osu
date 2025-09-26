@@ -24,7 +24,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         public const float TRANSITION_DURATION = 340;
         public const float CORNER_RADIUS = 8;
 
-        protected const float WIDTH = 345;
+        public const float WIDTH = 345;
 
         public IBindable<bool> Expanded { get; }
 
@@ -77,7 +77,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
             containingInputManager = GetContainingInputManager();
 
-            Action = () =>
+            Action ??= () =>
             {
                 if (containingInputManager?.CurrentState.Keyboard.ShiftPressed == true)
                 {
