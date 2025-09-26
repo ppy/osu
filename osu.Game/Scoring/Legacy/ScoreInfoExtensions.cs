@@ -54,7 +54,7 @@ namespace osu.Game.Scoring.Legacy
             switch (rulesetId)
             {
                 case 0:
-                    return (long)Math.Round((Math.Pow(objectCount, 2) * 32.57 + 100000) * standardisedTotalScore / ScoreProcessor.MAX_SCORE);
+                    return (long)Math.Round(GetOsuClassicScoreMultiplier(objectCount) * standardisedTotalScore);
 
                 case 1:
                     return (long)Math.Round((objectCount * 1109 + 100000) * standardisedTotalScore / ScoreProcessor.MAX_SCORE);
@@ -66,6 +66,11 @@ namespace osu.Game.Scoring.Legacy
                 default:
                     return standardisedTotalScore;
             }
+        }
+
+        public static double GetOsuClassicScoreMultiplier(int objectCount)
+        {
+            return (Math.Pow(objectCount, 2) * 32.57 + 100000) / ScoreProcessor.MAX_SCORE;
         }
 
         public static int? GetCountGeki(this ScoreInfo scoreInfo)
