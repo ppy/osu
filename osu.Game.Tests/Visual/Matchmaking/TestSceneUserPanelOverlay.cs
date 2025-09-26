@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 {
     public partial class TestSceneUserPanelOverlay : MultiplayerTestScene
     {
-        private UserPanelOverlay list = null!;
+        private PlayerPanelOverlay list = null!;
 
         public override void SetUpSteps()
         {
@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
                 Size = new Vector2(0.8f),
-                Child = list = new UserPanelOverlay()
+                Child = list = new PlayerPanelOverlay()
             });
         }
 

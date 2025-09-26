@@ -18,12 +18,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
     /// A component which maintains the layout of the players in a matchmaking room.
     /// Can be controlled to display the panels in a certain location and in multiple styles.
     /// </summary>
-    public partial class UserPanelOverlay : CompositeDrawable
+    public partial class PlayerPanelOverlay : CompositeDrawable
     {
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
-        private Container<MatchmakingUserPanel> panels = null!;
+        private Container<PlayerPanel> panels = null!;
         private PlayerPanelCellContainer gridLayout = null!;
         private PlayerPanelCellContainer splitLayoutLeft = null!;
         private PlayerPanelCellContainer splitLayoutRight = null!;
@@ -40,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 gridLayout = new PlayerPanelCellContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Spacing = new Vector2(20, 5),
+                    Spacing = new Vector2(20),
                 },
                 splitLayoutLeft = new PlayerPanelCellContainer
                 {
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(20, 5),
+                    Spacing = new Vector2(5),
                 },
                 splitLayoutRight = new PlayerPanelCellContainer
                 {
@@ -58,9 +58,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(20, 5),
+                    Spacing = new Vector2(5),
                 },
-                panels = new Container<MatchmakingUserPanel>
+                panels = new Container<PlayerPanel>
                 {
                     RelativeSizeAxes = Axes.Both
                 }
@@ -110,7 +110,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
         private void onUserJoined(MultiplayerRoomUser user) => Scheduler.Add(() =>
         {
-            panels.Add(new MatchmakingUserPanel(user)
+            panels.Add(new PlayerPanel(user)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -215,7 +215,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             [Resolved]
             private MultiplayerClient client { get; set; } = null!;
 
-            public void AcquirePanels(MatchmakingUserPanel[] panels)
+            public void AcquirePanels(PlayerPanel[] panels)
             {
                 while (Count < panels.Length)
                 {
@@ -259,10 +259,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
         private partial class PlayerPanelCell : Drawable
         {
-            private MatchmakingUserPanel? panel;
+            private PlayerPanel? panel;
             private bool isAnimating;
 
-            public void AcquirePanel(MatchmakingUserPanel panel)
+            public void AcquirePanel(PlayerPanel panel)
             {
                 this.panel = panel;
                 isAnimating = true;
@@ -280,7 +280,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 if (panel == null)
                     return;
 
-                Size = panel.Horizontal ? MatchmakingUserPanel.SIZE_HORIZONTAL : MatchmakingUserPanel.SIZE_VERTICAL;
+                Size = panel.Horizontal ? PlayerPanel.SIZE_HORIZONTAL : PlayerPanel.SIZE_VERTICAL;
                 Size *= panel.Scale;
 
                 var targetPos = getFinalPosition();
