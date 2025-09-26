@@ -262,14 +262,6 @@ namespace osu.Game.Rulesets.Edit
                                       .Select(t => new HitObjectCompositionToolButton(t, () => toolSelected(t)))
                                       .ToList();
 
-            foreach (var item in toolboxCollection.Items)
-            {
-                item.Selected.DisabledChanged += isDisabled =>
-                {
-                    item.TooltipText = isDisabled ? "Add at least one timing point first!" : ((HitObjectCompositionToolButton)item).TooltipText;
-                };
-            }
-
             togglesCollection.AddRange(CreateTernaryButtons().ToArray());
 
             sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates);

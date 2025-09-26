@@ -16,7 +16,10 @@ namespace osu.Game.Rulesets.Edit
         {
             Tool = tool;
 
-            TooltipText = tool.TooltipText;
+            Selected.BindDisabledChanged(isDisabled =>
+            {
+                TooltipText = isDisabled ? "Add at least one timing point first!" : Tool.TooltipText;
+            }, true);
         }
     }
 }
