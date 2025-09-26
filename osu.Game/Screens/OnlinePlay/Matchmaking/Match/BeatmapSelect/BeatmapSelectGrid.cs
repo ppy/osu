@@ -110,7 +110,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         {
             var panel = panelLookup[item.ID] = new BeatmapSelectPanel(item)
             {
-                Size = new Vector2(300, 70),
                 AllowSelection = allowSelection,
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
