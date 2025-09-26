@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -95,13 +95,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                                 }
                             }
                         },
-                        selectionOverlay = new AvatarOverlay
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Horizontal = 10 },
-                            Origin = Anchor.CentreLeft,
-                        },
+                        selectionOverlay = new AvatarOverlay()
                     }
                 },
                 new HoverClickSounds(),
@@ -358,36 +352,27 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
         private partial class AvatarOverlay : CompositeDrawable
         {
-            private readonly Dictionary<int, SelectionAvatar> avatars = new Dictionary<int, SelectionAvatar>();
-
-            private readonly Container<SelectionAvatar> avatarContainer;
+            private readonly Container<SelectionAvatar> avatars;
 
             private Sample? userAddedSample;
             private double? lastSamplePlayback;
 
-            public new Axes AutoSizeAxes
-            {
-                get => base.AutoSizeAxes;
-                set => base.AutoSizeAxes = value;
-            }
-
-            public new MarginPadding Padding
-            {
-                get => base.Padding;
-                set => base.Padding = value;
-            }
-
             public AvatarOverlay()
             {
-                InternalChild = avatarContainer = new Container<SelectionAvatar>();
+                InternalChild = avatars = new Container<SelectionAvatar>();
+
+                Padding = new MarginPadding(5);
+
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
-                avatarContainer.AutoSizeAxes = AutoSizeAxes;
-                avatarContainer.RelativeSizeAxes = RelativeSizeAxes;
+                avatars.RelativeSizeAxes = Axes.X;
+                avatars.AutoSizeAxes = Axes.Y;
             }
 
             [BackgroundDependencyLoader]
@@ -398,7 +383,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
             public bool AddUser(APIUser user, bool isOwnUser)
             {
-                if (avatars.ContainsKey(user.Id))
+                if (avatars.Any(a => a.User.Id == user.Id))
                     return false;
 
                 var avatar = new SelectionAvatar(user, isOwnUser)
@@ -407,7 +392,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                     Origin = Anchor.CentreRight,
                 };
 
-                avatarContainer.Add(avatars[user.Id] = avatar);
+                avatars.Add(avatar);
 
                 if (lastSamplePlayback == null || Time.Current - lastSamplePlayback > OsuGameBase.SAMPLE_DEBOUNCE_TIME)
                 {
@@ -424,11 +409,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
             public bool RemoveUser(int id)
             {
-                if (!avatars.Remove(id, out var avatar))
+                if (avatars.SingleOrDefault(a => a.User.Id == id) is not SelectionAvatar avatar)
                     return false;
 
                 avatar.PopOutAndExpire();
-                avatarContainer.ChangeChildDepth(avatar, float.MaxValue);
+                avatars.ChangeChildDepth(avatar, float.MaxValue);
 
                 updateLayout();
 
@@ -443,9 +428,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 double delay = 0;
                 float x = 0;
 
-                for (int i = avatarContainer.Count - 1; i >= 0; i--)
+                for (int i = avatars.Count - 1; i >= 0; i--)
                 {
-                    var avatar = avatarContainer[i];
+                    var avatar = avatars[i];
 
                     if (avatar.Expired)
                         continue;
@@ -460,12 +445,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
             public partial class SelectionAvatar : CompositeDrawable
             {
+                public APIUser User { get; }
+
                 public bool Expired { get; private set; }
 
                 private readonly Container content;
 
                 public SelectionAvatar(APIUser user, bool isOwnUser)
                 {
+                    User = user;
                     Size = new Vector2(30);
 
                     InternalChildren = new Drawable[]
