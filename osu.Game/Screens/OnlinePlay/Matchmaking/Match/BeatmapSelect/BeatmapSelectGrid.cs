@@ -330,7 +330,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 {
                     rollContainer.ChangeChildDepth(panel, float.MinValue);
 
-                    panel.ShowBorder();
+                    panel.ShowChosenBorder();
                     panel.MoveTo(Vector2.Zero, 1000, Easing.OutExpo)
                          .ScaleTo(1.5f, 1000, Easing.OutExpo);
 
