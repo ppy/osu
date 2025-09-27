@@ -20,6 +20,11 @@ namespace osu.Game.Localisation
         public static LocalisableString WaveformOpacity => new TranslatableString(getKey(@"waveform_opacity"), @"Waveform opacity");
 
         /// <summary>
+        /// "Timeline objects opacity"
+        /// </summary>
+        public static LocalisableString TimelineObjectsOpacity => new TranslatableString(getKey(@"timeline_objects_opacity"), @"Timeline objects opacity");
+
+        /// <summary>
         /// "Show hit markers"
         /// </summary>
         public static LocalisableString ShowHitMarkers => new TranslatableString(getKey(@"show_hit_markers"), @"Show hit markers");

@@ -84,6 +84,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private TimelineTimingChangeDisplay controlPoints = null!;
 
         private Bindable<float> waveformOpacity = null!;
+        private Bindable<float> objectsOpacity = null!;
+
         private Bindable<bool> controlPointsVisible = null!;
         private Bindable<bool> ticksVisible = null!;
 
@@ -155,6 +157,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             });
 
             waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
+            objectsOpacity = config.GetBindable<float>(OsuSetting.EditorTimelineObjectsOpacity);
+
             controlPointsVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTimingChanges);
             ticksVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTicks);
 
@@ -189,6 +193,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             base.LoadComplete();
 
             waveformOpacity.BindValueChanged(_ => updateWaveformOpacity(), true);
+            objectsOpacity.BindValueChanged(_ => updateObjectsOpacity(), true);
 
             ticksVisible.BindValueChanged(visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint), true);
 
@@ -203,6 +208,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void updateWaveformOpacity() =>
             waveform.FadeTo(waveformOpacity.Value, 200, Easing.OutQuint);
+
+        private void updateObjectsOpacity() =>
+            userContent.FadeTo(objectsOpacity.Value, 200, Easing.OutQuint);
 
         protected override void Update()
         {
