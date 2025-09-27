@@ -6,10 +6,10 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit
 {
-    internal class BackgroundDimMenuItem : GenericChangeOpacityMenuItem
+    internal class TimelineObjectsOpacityMenuItem : GenericChangeOpacityMenuItem
     {
-        public BackgroundDimMenuItem(Bindable<float> backgroundDim)
-            : base(backgroundDim, GameplaySettingsStrings.BackgroundDim, [0f, 0.25f, 0.5f, 0.75f])
+        public TimelineObjectsOpacityMenuItem(Bindable<float> timelineObjectsOpacity)
+            : base(timelineObjectsOpacity, EditorStrings.TimelineObjectsOpacity, [0.25f, 0.5f, 0.75f, 1f])
         {
         }
     }

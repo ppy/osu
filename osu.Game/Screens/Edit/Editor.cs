@@ -408,6 +408,7 @@ namespace osu.Game.Screens.Edit
                                                 Items =
                                                 [
                                                     new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
+                                                    new TimelineObjectsOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorTimelineObjectsOpacity)),
                                                     new ToggleMenuItem(EditorStrings.TimelineShowTimingChanges)
                                                     {
                                                         State = { BindTarget = editorTimelineShowTimingChanges }
