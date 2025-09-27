@@ -8,8 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Difficulty.Evaluators;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Strain;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
 using osu.Game.Rulesets.Mania.Difficulty.Skills;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
@@ -32,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         }
 
         /// <summary>
-        /// Main processing method that converts input data into a complete SunnyStrainData structure.
+        /// Main processing method that converts input data into a complete <see cref="SunnyStrainData"/> structure.
         /// </summary>
         /// <returns>Fully processed strain data ready for difficulty calculation</returns>
         public SunnyStrainData Process()
@@ -46,7 +45,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 
             processDifficultyHitObjects(data);
             organizeNotesByColumn(data);
-            calculateMaxTime(data);
+
+            data.MaxTime = (int)difficultyHitObjects.Last().EndTime;
 
             data.CornerData = new CornerData();
             data.CornerData.ComputeTimeCorners(data.AllNotes, data.MaxTime);
@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         }
 
         /// <summary>
-        /// Converts DifficultyHitObject instances to internal Note structures.
+        /// Converts DifficultyHitObject instances to internal ManiaDifficultyHitObject structures.
         /// This step extracts timing and column information while preserving original map timing.
         /// </summary>
         private void processDifficultyHitObjects(SunnyStrainData data)
@@ -84,32 +84,24 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 
             if (objectCount == 0)
             {
-                data.AllNotes = Array.Empty<Note>();
+                data.AllNotes = Array.Empty<ManiaDifficultyHitObject>();
                 return;
             }
 
-            // Convert each hit object to our internal Note format
-            // However this will probably change
-            var processedNotes = new Note[objectCount];
+            // Convert each hit object to ManiaDifficultyHitObject format
+            var processedNotes = new ManiaDifficultyHitObject[objectCount];
             int noteIndex = 0;
 
             foreach (var hitObject in difficultyHitObjects)
             {
                 var maniaHitObject = (ManiaDifficultyHitObject)hitObject;
-
-                int column = maniaHitObject.Column;
-                int startTime = (int)maniaHitObject.StartTime;
-                int endTime = (int)maniaHitObject.EndTime;
-
-                if (endTime <= startTime) endTime = -1;
-
-                processedNotes[noteIndex++] = new Note(column, startTime, endTime);
+                processedNotes[noteIndex++] = maniaHitObject;
             }
 
             if (noteIndex != processedNotes.Length)
                 Array.Resize(ref processedNotes, noteIndex);
 
-            Array.Sort(processedNotes, 0, noteIndex);
+            Array.Sort(processedNotes, (a, b) => a.CompareTo(b));
             data.AllNotes = processedNotes;
         }
 
@@ -129,11 +121,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
                     columnCounts[note.Column]++;
             }
 
-            data.NotesByColumn = new Note[keyCount][];
+            data.NotesByColumn = new ManiaDifficultyHitObject[keyCount][];
 
             for (int column = 0; column < keyCount; column++)
             {
-                data.NotesByColumn[column] = columnCounts[column] == 0 ? Array.Empty<Note>() : new Note[columnCounts[column]];
+                data.NotesByColumn[column] = columnCounts[column] == 0 ? Array.Empty<ManiaDifficultyHitObject>() : new ManiaDifficultyHitObject[columnCounts[column]];
             }
 
             int[] columnPositions = new int[keyCount];
@@ -154,7 +146,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         /// </summary>
         private void extractLongNotes(SunnyStrainData data)
         {
-            // Count long notes
             int longNoteCount = 0;
 
             foreach (var note in data.AllNotes)
@@ -164,12 +155,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 
             if (longNoteCount == 0)
             {
-                data.LongNotes = Array.Empty<Note>();
-                data.LongNoteTails = Array.Empty<Note>();
+                data.LongNotes = Array.Empty<ManiaDifficultyHitObject>();
+                data.LongNoteTails = Array.Empty<ManiaDifficultyHitObject>();
                 return;
             }
 
-            data.LongNotes = new Note[longNoteCount];
+            data.LongNotes = new ManiaDifficultyHitObject[longNoteCount];
             int longNoteIndex = 0;
 
             foreach (var note in data.AllNotes)
@@ -177,24 +168,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
                 if (note.IsLong) data.LongNotes[longNoteIndex++] = note;
             }
 
-            data.LongNoteTails = (Note[])data.LongNotes.Clone();
+            data.LongNoteTails = (ManiaDifficultyHitObject[])data.LongNotes.Clone();
             Array.Sort(data.LongNoteTails, (a, b) => a.EndTime.CompareTo(b.EndTime));
-        }
-
-        /// <summary>
-        /// Calculates the maximum time value in the beatmap for boundary calculations.
-        /// </summary>
-        private void calculateMaxTime(SunnyStrainData data)
-        {
-            int maxTime = 0;
-
-            foreach (var note in data.AllNotes)
-            {
-                maxTime = Math.Max(maxTime, note.StartTime);
-                if (note.IsLong) maxTime = Math.Max(maxTime, note.EndTime);
-            }
-
-            data.MaxTime = maxTime + 1;
         }
 
         /// <summary>
@@ -219,7 +194,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         private void computeSupplementaryMetrics(SunnyStrainData data)
         {
             // Get all note hit times for density calculations
-            int[] noteHitTimes = data.AllNotes.Select(note => note.StartTime).ToArray();
+            double[] noteHitTimes = data.AllNotes.Select(note => note.StartTime).ToArray();
             Array.Sort(noteHitTimes);
 
             // Calculate key usage patterns
@@ -248,15 +223,15 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         /// <summary>
         /// Counts notes within a time window around a center point.
         /// </summary>
-        private double countNotesInWindow(int[] sortedNoteTimes, double centerTime, double windowRadius)
+        private double countNotesInWindow(double[] sortedNoteTimes, double centerTime, double windowRadius)
         {
             double windowStart = centerTime - windowRadius;
             double windowEnd = centerTime + windowRadius;
 
-            int startIndex = Array.BinarySearch(sortedNoteTimes, (int)windowStart);
+            int startIndex = Array.BinarySearch(sortedNoteTimes, windowStart);
             if (startIndex < 0) startIndex = ~startIndex;
 
-            int endIndex = Array.BinarySearch(sortedNoteTimes, (int)windowEnd);
+            int endIndex = Array.BinarySearch(sortedNoteTimes, windowEnd);
             if (endIndex < 0) endIndex = ~endIndex;
 
             return endIndex - startIndex;
@@ -309,31 +284,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Will remove later
-        /// </summary>
-        public readonly struct Note : IComparable<Note>
-        {
-            public readonly int Column;
-            public readonly int StartTime;
-            public readonly int EndTime;
-
-            public Note(int column, int startTime, int endTime)
-            {
-                Column = column;
-                StartTime = startTime;
-                EndTime = endTime;
-            }
-
-            public bool IsLong => EndTime > StartTime;
-
-            public int CompareTo(Note other)
-            {
-                int timeComparison = StartTime.CompareTo(other.StartTime);
-                return timeComparison != 0 ? timeComparison : Column.CompareTo(other.Column);
-            }
         }
     }
 }

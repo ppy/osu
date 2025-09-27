@@ -4,8 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Density;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Strain;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
@@ -57,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
             {
                 return new LongNoteDensityData
                 {
-                    TimePoints = new[] { 0, data.MaxTime },
+                    TimePoints = new[] { 0.0, data.MaxTime },
                     DensityValues = new[] { 0.0 },
                     CumulativeSum = new[] { 0.0 }
                 };
@@ -66,7 +65,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
             int longNoteCount = data.LongNotes.Length;
             int estimatedEventCount = longNoteCount * 3 + 4; // Each long note creates ~3 events
 
-            int[] eventTimes = new int[estimatedEventCount];
+            double[] eventTimes = new double[estimatedEventCount];
             double[] densityDeltas = new double[estimatedEventCount];
             int eventPosition = 0;
 
@@ -75,8 +74,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
                 var longNote = data.LongNotes[i];
 
                 // Create density curve: ramp up quickly, then decay
-                int earlyPoint = Math.Min(longNote.StartTime + 60, longNote.EndTime);
-                int midPoint = Math.Min(longNote.StartTime + 120, longNote.EndTime);
+                double earlyPoint = Math.Min(longNote.StartTime + 60, longNote.EndTime);
+                double midPoint = Math.Min(longNote.StartTime + 120, longNote.EndTime);
 
                 // Add density at different points of the long note
                 eventTimes[eventPosition] = earlyPoint;
@@ -100,13 +99,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// <summary>
         /// Processes density events to create a continuous density function.
         /// </summary>
-        private static LongNoteDensityData processDensityEvents(int[] eventTimes, double[] densityDeltas, int eventCount)
+        private static LongNoteDensityData processDensityEvents(double[] eventTimes, double[] densityDeltas, int eventCount)
         {
             int[] eventIndices = new int[eventCount];
             for (int i = 0; i < eventCount; i++) eventIndices[i] = i;
             Array.Sort(eventIndices, 0, eventCount, Comparer<int>.Create((a, b) => eventTimes[a].CompareTo(eventTimes[b])));
 
-            var timePointsList = new List<int>(eventCount);
+            var timePointsList = new List<double>(eventCount);
             var densityValuesList = new List<double>(eventCount);
 
             double currentDensity = 0.0;
@@ -114,7 +113,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
 
             while (eventIndex < eventCount)
             {
-                int currentTime = eventTimes[eventIndices[eventIndex]];
+                double currentTime = eventTimes[eventIndices[eventIndex]];
 
                 // Apply all events at this time
                 while (eventIndex < eventCount && eventTimes[eventIndices[eventIndex]] == currentTime)
@@ -171,8 +170,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
             for (int noteIndex = 0; noteIndex < data.AllNotes.Length; noteIndex++)
             {
                 var note = data.AllNotes[noteIndex];
-                int noteStartTime = note.StartTime;
-                int noteEndTime = note.IsLong ? Math.Min(note.EndTime, data.MaxTime - 1) : note.StartTime;
+                int noteStartTime = (int)Math.Round(note.StartTime);
+                int noteEndTime = (int)Math.Round(note.EndTime); // note.IsLong ? (int)Math.Round(note.EndTime) : noteStartTime;
 
                 int leftWindow400Index = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners,
                     noteStartTime - data.Config.keyUsageWindowMs);
@@ -305,7 +304,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
                 double deltaTime = nextNote.StartTime - currentNote.StartTime;
 
                 // Handle simultaneous notes (chords)
-                //
                 if (deltaTime == 0)
                 {
                     processSimultaneousNotes(currentNote, data, pressingIntensityBase, timePoints);
@@ -323,7 +321,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// <summary>
         /// Processes simultaneous notes (chords), which create difficulty spikes.
         /// </summary>
-        private static void processSimultaneousNotes(SunnyPreprocessor.Note currentNote, SunnyStrainData data, double[] pressingIntensityBase, int timePoints)
+        private static void processSimultaneousNotes(ManiaDifficultyHitObject currentNote, SunnyStrainData data, double[] pressingIntensityBase, int timePoints)
         {
             // Calculate chord difficulty based on timing window
             double chordDifficulty = 1000.0 * Math.Pow(0.02 * (4.0 / data.HitLeniency - 24.0), 0.25);
@@ -336,7 +334,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// <summary>
         /// Processes a sequence of two consecutive notes to calculate pressing difficulty.
         /// </summary>
-        private static void processNoteSequence(SunnyPreprocessor.Note currentNote, SunnyPreprocessor.Note nextNote, double deltaTime, SunnyStrainData data, LongNoteDensityData longNoteDensity, double[] anchorValues, double[] pressingIntensityBase, int timePoints)
+        private static void processNoteSequence(ManiaDifficultyHitObject currentNote, ManiaDifficultyHitObject nextNote, double deltaTime, SunnyStrainData data, LongNoteDensityData longNoteDensity, double[] anchorValues, double[] pressingIntensityBase, int timePoints)
         {
             int startIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, currentNote.StartTime);
             int endIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, nextNote.StartTime);
@@ -356,9 +354,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// <summary>
         /// Calculates boost factor from long note density in the local area.
         /// </summary>
-        private static double calculateLongNoteBoost(SunnyPreprocessor.Note currentNote, SunnyPreprocessor.Note nextNote, LongNoteDensityData longNoteDensity)
+        private static double calculateLongNoteBoost(ManiaDifficultyHitObject currentNote, ManiaDifficultyHitObject nextNote, LongNoteDensityData longNoteDensity)
         {
-            double longNoteDensitySum = longNoteDensity.SumBetween(currentNote.StartTime, nextNote.StartTime);
+            double longNoteDensitySum = longNoteDensity.SumBetween((int)currentNote.StartTime, (int)nextNote.StartTime);
             return 1.0 + 6.0 * 0.001 * longNoteDensitySum;
         }
 

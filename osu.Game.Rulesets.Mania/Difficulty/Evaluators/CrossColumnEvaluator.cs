@@ -4,7 +4,7 @@
 using System;
 using System.Buffers;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Strain;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
@@ -130,14 +130,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         }
 
         /// <summary>
-        /// Gets the note arrays for the left and right columns of a boundary.
+        /// Gets the <see cref="ManiaDifficultyHitObject"/> arrays for the left and right columns of a boundary.
         /// </summary>
-        private static (SunnyPreprocessor.Note[] left, SunnyPreprocessor.Note[] right)
-            getBoundaryColumns(SunnyPreprocessor.Note[][] columns, int boundaryIndex, int keyCount)
+        private static (ManiaDifficultyHitObject[] left, ManiaDifficultyHitObject[] right)
+            getBoundaryColumns(ManiaDifficultyHitObject[][] columns, int boundaryIndex, int keyCount)
         {
             // start with empty arrays so we never return null
-            var left = Array.Empty<SunnyPreprocessor.Note>();
-            var right = Array.Empty<SunnyPreprocessor.Note>();
+            var left = Array.Empty<ManiaDifficultyHitObject>();
+            var right = Array.Empty<ManiaDifficultyHitObject>();
 
             if (boundaryIndex == 0)
             {
@@ -172,29 +172,28 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// <summary>
         /// Processes notes from two columns to calculate cross-column pressure at a boundary.
         /// </summary>
-        private static void processBoundaryNotes(SunnyPreprocessor.Note[] leftNotes, SunnyPreprocessor.Note[] rightNotes, int boundaryIndex, SunnyStrainData data, double[] crossIntensityBuffer, double[] fastPressureBuffer, byte[] activeByTime, double[] crossHandCoefficients, double[] baseTimeCorners, int timePointCount)
+        private static void processBoundaryNotes(ManiaDifficultyHitObject[] leftNotes, ManiaDifficultyHitObject[] rightNotes,
+                                                 int boundaryIndex, SunnyStrainData data, double[] crossIntensityBuffer, double[] fastPressureBuffer,
+                                                 byte[] activeByTime, double[] crossHandCoefficients, double[] baseTimeCorners, int timePointCount)
         {
             int leftIndex = 0, rightIndex = 0;
             int baseOffset = boundaryIndex * timePointCount;
             int searchIndex = 0;
 
-            bool hasPreviousNote = false;
-            SunnyPreprocessor.Note previousNote = default;
-
             int leftLength = leftNotes.Length;
             int rightLength = rightNotes.Length;
+
+            if (leftLength == 0 && rightLength == 0)
+                return;
+
+            // Initialize previousNote to the chronologically first note.
+            var previousNote = getNextChronologicalNote(leftNotes, rightNotes, ref leftIndex, ref rightIndex,
+                leftLength, rightLength);
 
             while (leftIndex < leftLength || rightIndex < rightLength)
             {
                 var currentNote = getNextChronologicalNote(leftNotes, rightNotes, ref leftIndex, ref rightIndex,
                     leftLength, rightLength);
-
-                if (!hasPreviousNote)
-                {
-                    previousNote = currentNote;
-                    hasPreviousNote = true;
-                    continue;
-                }
 
                 // Calculate difficulty for the interval between previous and current note
                 calculateIntervalDifficulty(previousNote, currentNote, boundaryIndex, data, crossIntensityBuffer,
@@ -208,7 +207,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// <summary>
         /// Gets the next note in chronological order from either the left or right column.
         /// </summary>
-        private static SunnyPreprocessor.Note getNextChronologicalNote(SunnyPreprocessor.Note[] leftNotes, SunnyPreprocessor.Note[] rightNotes, ref int leftIndex, ref int rightIndex, int leftLength, int rightLength)
+        private static ManiaDifficultyHitObject getNextChronologicalNote(ManiaDifficultyHitObject[] leftNotes, ManiaDifficultyHitObject[] rightNotes, ref int leftIndex, ref int rightIndex, int leftLength, int rightLength)
         {
             if (rightLength == 0)
                 return leftNotes[leftIndex++];
@@ -226,7 +225,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// <summary>
         /// Calculates the difficulty contribution for the time interval between two notes.
         /// </summary>
-        private static void calculateIntervalDifficulty(SunnyPreprocessor.Note previousNote, SunnyPreprocessor.Note currentNote, int boundaryIndex, SunnyStrainData data, double[] crossIntensityBuffer, double[] fastPressureBuffer, byte[] activeByTime, double[] crossHandCoefficients, double[] baseTimeCorners, int timePointCount, int baseOffset, ref int searchIndex)
+        private static void calculateIntervalDifficulty(ManiaDifficultyHitObject previousNote, ManiaDifficultyHitObject currentNote, int boundaryIndex, SunnyStrainData data, double[] crossIntensityBuffer, double[] fastPressureBuffer, byte[] activeByTime, double[] crossHandCoefficients, double[] baseTimeCorners, int timePointCount, int baseOffset, ref int searchIndex)
         {
             int startIndex = StrainArrayUtils.FindLeftBoundProgressive(baseTimeCorners, ref searchIndex, previousNote.StartTime);
             int endIndex = StrainArrayUtils.FindLeftBoundProgressive(baseTimeCorners, ref searchIndex, currentNote.StartTime);
@@ -390,13 +389,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
                 var note = data.AllNotes[noteIndex];
 
                 // Calculate the active window around this note
-                int windowStartTime = Math.Max(0, note.StartTime - (int)data.Config.columnActivityWindowMs);
-                int windowEndTime;
+                double windowStartTime = Math.Max(0, note.StartTime - data.Config.columnActivityWindowMs);
+                double windowEndTime;
 
                 if (note.IsLong)
-                    windowEndTime = Math.Min(data.MaxTime - 1, note.EndTime + (int)data.Config.columnActivityWindowMs);
+                    windowEndTime = Math.Min(data.MaxTime - 1, note.EndTime + data.Config.columnActivityWindowMs);
                 else
-                    windowEndTime = Math.Min(data.MaxTime - 1, note.StartTime + (int)data.Config.columnActivityWindowMs);
+                    windowEndTime = Math.Min(data.MaxTime - 1, note.StartTime + data.Config.columnActivityWindowMs);
 
                 int startIndex = Math.Max(0, StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, windowStartTime));
                 int endIndex = Math.Max(0, StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, windowEndTime));

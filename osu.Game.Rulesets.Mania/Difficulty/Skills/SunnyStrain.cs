@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Difficulty.Evaluators;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Strain;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 
@@ -70,14 +70,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
             double currentTime = maniaCurrent.StartTime;
 
-            double sameColumnDifficulty = SameColumnEvaluator.EvaluateDifficultyAt(currentTime, strainData);
-            double crossColumnDifficulty = CrossColumnEvaluator.EvaluateDifficultyAt(currentTime, strainData);
-            double pressingIntensityDifficulty = PressingIntensityEvaluator.EvaluateDifficultyAt(currentTime, strainData);
-            double unevennessDifficulty = UnevennessEvaluator.EvaluateDifficultyAt(currentTime, strainData);
-            double releaseDifficulty = ReleaseFactorEvaluator.EvaluateDifficultyAt(currentTime, strainData);
+            double sameColumnDifficulty = SameColumnEvaluator.EvaluateDifficultyAt(currentTime, strainData); // SAFE
+            double crossColumnDifficulty = CrossColumnEvaluator.EvaluateDifficultyAt(currentTime, strainData); //SAFE
+            double pressingIntensityDifficulty = PressingIntensityEvaluator.EvaluateDifficultyAt(currentTime, strainData); // IDK?
+            double unevennessDifficulty = UnevennessEvaluator.EvaluateDifficultyAt(currentTime, strainData); // IDK?
+            double releaseDifficulty = ReleaseFactorEvaluator.EvaluateDifficultyAt(currentTime, strainData); // SAFE
 
-            double localNoteCount = strainData.SampleFeatureAtTime(currentTime, strainData.LocalNoteCount);
-            double activeKeyCount = strainData.SampleFeatureAtTime(currentTime, strainData.ActiveKeyCount);
+            double localNoteCount = strainData.SampleFeatureAtTime(currentTime, strainData.LocalNoteCount); // SAFE
+            double activeKeyCount = strainData.SampleFeatureAtTime(currentTime, strainData.ActiveKeyCount); // SAFE
+
+            /*Console.WriteLine($"time={currentTime}, sameColumn={sameColumnDifficulty}, crossColumn={crossColumnDifficulty}, "
+                              + $"pressingIntensity={pressingIntensityDifficulty}, unevenessDifficulty={unevennessDifficulty}, releaseDifficulty={releaseDifficulty}, localNoteCount={localNoteCount}, "
+                              + $"activeKeyCount={activeKeyCount} \n");*/
 
             double clampedSameColumnDifficulty = Math.Min(sameColumnDifficulty, 8.0 + 0.85 * sameColumnDifficulty);
 

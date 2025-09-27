@@ -3,12 +3,12 @@
 
 using System;
 
-namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Density
+namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
 {
     public class LongNoteDensityData
     {
         /// <summary>Time points where density values change</summary>
-        public required int[] TimePoints;
+        public required double[] TimePoints;
 
         /// <summary>Density values at each time point</summary>
         public required double[] DensityValues;

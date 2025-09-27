@@ -2,24 +2,23 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner;
 using osu.Game.Rulesets.Mania.Difficulty.Skills;
 
-namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Strain
+namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
 {
     public class SunnyStrainData
     {
         /// <summary>All notes in the beatmap, sorted by start time</summary>
-        public SunnyPreprocessor.Note[] AllNotes { get; set; }
+        public ManiaDifficultyHitObject[] AllNotes { get; set; }
 
         /// <summary>Notes organized by column</summary>
-        public SunnyPreprocessor.Note[][] NotesByColumn { get; set; }
+        public ManiaDifficultyHitObject[][] NotesByColumn { get; set; }
 
         /// <summary>All long notes in the beatmap</summary>
-        public SunnyPreprocessor.Note[] LongNotes { get; set; }
+        public ManiaDifficultyHitObject[] LongNotes { get; set; }
 
         /// <summary>Long notes sorted by end time (for release timing calculations)</summary>
-        public SunnyPreprocessor.Note[] LongNoteTails { get; set; }
+        public ManiaDifficultyHitObject[] LongNoteTails { get; set; }
 
         /// <summary>Time corner data defining sampling points for difficulty calculation</summary>
         public CornerData CornerData { get; set; }

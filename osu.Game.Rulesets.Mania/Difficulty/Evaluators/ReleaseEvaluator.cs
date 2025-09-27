@@ -2,8 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Strain;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
@@ -53,7 +54,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
             double[] releaseFactorBase = new double[timePoints];
 
             // Build lookup tables for efficient note searching by column
-            int[][] startTimesByColumn = buildColumnStartTimeLookup(data);
+            double[][] startTimesByColumn = buildColumnStartTimeLookup(data);
 
             int longNoteTailCount = data.LongNoteTails.Length;
             if (longNoteTailCount == 0) return releaseFactorBase;
@@ -70,14 +71,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// <summary>
         /// Builds lookup tables of note start times organized by column for efficient searching.
         /// </summary>
-        private static int[][] buildColumnStartTimeLookup(SunnyStrainData data)
+        private static double[][] buildColumnStartTimeLookup(SunnyStrainData data)
         {
-            int[][] startTimesByColumn = new int[data.KeyCount][];
+            double[][] startTimesByColumn = new double[data.KeyCount][];
 
             for (int column = 0; column < data.KeyCount; column++)
             {
                 var columnNotes = data.NotesByColumn[column];
-                int[] startTimes = new int[columnNotes.Length];
+                double[] startTimes = new double[columnNotes.Length];
 
                 for (int i = 0; i < columnNotes.Length; i++)
                     startTimes[i] = columnNotes[i].StartTime;
@@ -92,7 +93,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// Calculates individual difficulty values for each long note release.
         /// This considers the note length and timing to the next note in the same column.
         /// </summary>
-        private static double[] calculateIndividualReleaseDifficulties(SunnyStrainData data, int[][] startTimesByColumn)
+        private static double[] calculateIndividualReleaseDifficulties(SunnyStrainData data, double[][] startTimesByColumn)
         {
             double[] releaseDifficulties = new double[data.LongNoteTails.Length];
 
@@ -103,15 +104,29 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
 
                 // Calculate difficulty components
                 double holdDuration = Math.Abs(tailNote.EndTime - tailNote.StartTime - 80.0);
-                double releaseToNextNote = Math.Abs(nextNoteInColumn.StartTime - tailNote.EndTime - 80.0);
+
+                // Handle case where there's no next note in the column
+                double releaseToNextNote;
+
+                if (nextNoteInColumn is not null)
+                {
+                    releaseToNextNote = Math.Abs(nextNoteInColumn.StartTime - tailNote.EndTime - 80.0);
+                }
+                else
+                {
+                    // If no next note, use a default large value or base it on hold duration
+                    releaseToNextNote = Math.Max(1000.0, holdDuration * 2.0);
+                }
 
                 // Normalize by hit leniency and scale
                 double holdDifficultyComponent = 0.001 * holdDuration / data.HitLeniency;
                 double timingDifficultyComponent = 0.001 * releaseToNextNote / data.HitLeniency;
 
-                // Combine using logistic function to create smooth difficulty curve
-                releaseDifficulties[i] = 2.0 / (2.0 + Math.Exp(-5.0 * (holdDifficultyComponent - 0.75)) +
-                                                Math.Exp(-5.0 * (timingDifficultyComponent - 0.75)));
+                double lh = DifficultyCalculationUtils.Logistic(holdDifficultyComponent, 0.75, 5.0); // logistic for hold
+                double lt = DifficultyCalculationUtils.Logistic(timingDifficultyComponent, 0.75, 5.0); // logistic for timing
+
+                // harmonic mean of the two logistic outputs (safe against repeated evaluation)
+                releaseDifficulties[i] = 2.0 * (lh * lt) / (lh + lt);
             }
 
             return releaseDifficulties;
@@ -149,14 +164,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
 
         /// <summary>
         /// Finds the next note in the same column as the given long note.
-        /// This is used to determine release timing difficulty.
+        /// Returns null if no next note is found, which should be handled by the caller.
         /// </summary>
-        private static SunnyPreprocessor.Note findNextNoteInColumn(SunnyPreprocessor.Note longNote, SunnyStrainData data, int[][] startTimesByColumn)
+        private static ManiaDifficultyHitObject? findNextNoteInColumn(ManiaDifficultyHitObject longNote, SunnyStrainData data, double[][] startTimesByColumn)
         {
             if (longNote.Column < 0 || longNote.Column >= data.KeyCount)
-                return new SunnyPreprocessor.Note(0, (int)1e9, (int)1e9); // Invalid note placeholder
+                return null; // Invalid column
 
-            int[] columnStartTimes = startTimesByColumn[longNote.Column];
+            double[] columnStartTimes = startTimesByColumn[longNote.Column];
             int searchIndex = Array.BinarySearch(columnStartTimes, longNote.StartTime);
             if (searchIndex < 0) searchIndex = ~searchIndex;
 
@@ -164,7 +179,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
             if (searchIndex + 1 < columnNotes.Length)
                 return columnNotes[searchIndex + 1];
 
-            return new SunnyPreprocessor.Note(0, (int)1e9, (int)1e9); // No next note found
+            return null; // No next note found
         }
     }
 }

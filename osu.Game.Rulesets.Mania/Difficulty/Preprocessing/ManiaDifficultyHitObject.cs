@@ -11,13 +11,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
     public class ManiaDifficultyHitObject : DifficultyHitObject
     {
         public new ManiaHitObject BaseObject => (ManiaHitObject)base.BaseObject;
-        public List<DifficultyHitObject> Objects { get; }
         public int Column => BaseObject.Column;
+        public bool IsLong => EndTime > StartTime;
 
         public ManiaDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
-            this.Objects = objects;
+        }
+
+        public int CompareTo(ManiaDifficultyHitObject other)
+        {
+            int timeComparison = StartTime.CompareTo(other.StartTime);
+            return timeComparison != 0 ? timeComparison : Column.CompareTo(other.Column);
         }
     }
 }

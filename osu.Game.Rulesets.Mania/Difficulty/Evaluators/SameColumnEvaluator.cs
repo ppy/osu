@@ -3,7 +3,7 @@
 
 using System;
 using System.Buffers;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Strain;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
 using osu.Game.Rulesets.Mania.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 
@@ -41,7 +41,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
 
             try
             {
-                // Initialize buffers
                 Array.Clear(sameColumnIntensityBuffer, 0, keyCount * arraySliceSize);
                 for (int i = 0; i < keyCount * arraySliceSize; i++)
                     deltaTimeBuffer[i] = 1e9; // Large value indicating no pattern
