@@ -788,9 +788,11 @@ namespace osu.Game.Screens.SelectV2
         private readonly DrawablePool<PanelBeatmapSet> setPanelPool = new DrawablePool<PanelBeatmapSet>(100);
         private readonly DrawablePool<PanelGroup> groupPanelPool = new DrawablePool<PanelGroup>(100);
         private readonly DrawablePool<PanelGroupStarDifficulty> starsGroupPanelPool = new DrawablePool<PanelGroupStarDifficulty>(11);
+        private readonly DrawablePool<PanelGroupRankDisplay> ranksGroupPanelPool = new DrawablePool<PanelGroupRankDisplay>(11);
 
         private void setupPools()
         {
+            AddInternal(ranksGroupPanelPool);
             AddInternal(starsGroupPanelPool);
             AddInternal(groupPanelPool);
             AddInternal(beatmapPanelPool);
@@ -828,6 +830,9 @@ namespace osu.Game.Screens.SelectV2
             {
                 case StarDifficultyGroupDefinition:
                     return starsGroupPanelPool.Get();
+
+                case RankDisplayGroupDefinition:
+                    return ranksGroupPanelPool.Get();
 
                 case GroupDefinition:
                     return groupPanelPool.Get();
@@ -1084,6 +1089,11 @@ namespace osu.Game.Screens.SelectV2
     /// Defines a grouping header for a set of carousel items grouped by star difficulty.
     /// </summary>
     public record StarDifficultyGroupDefinition(int Order, string Title, StarDifficulty Difficulty) : GroupDefinition(Order, Title);
+
+    /// <summary>
+    /// Defines a grouping header for a set of carousel items grouped by achieved rank.
+    /// </summary>
+    public record RankDisplayGroupDefinition(int Order, string Title, ScoreRank Rank) : GroupDefinition(Order, Title);
 
     /// <summary>
     /// Used to represent a portion of a <see cref="BeatmapSetInfo"/> under a <see cref="GroupDefinition"/>.
