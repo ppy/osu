@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 // Cap with Min to make sure that Oks and Mehs aren't penalized more than misses. This makes it reduce inaccuracy count starting from 11 Oks equivalent.
                 double rescaledInnacuracyCount = Math.Min(weightedInaccuracyCount, 10 * Math.Log(weightedInaccuracyCount + 1));
 
-                // As we're adding Oks and Mehs to an approximated number of combo breaks the result can be higher than total hits in specific scenarios (which breaks some calculations) so we need to clamp it.
+                // As we're adding rescaled inaccuracies to an approximated number of combo breaks the result can be higher than total hits in specific scenarios (which breaks some calculations) so we need to clamp it.
                 effectiveMissCount = Math.Min(effectiveMissCount + rescaledInnacuracyCount * okMultiplier, totalHits);
             }
 
