@@ -474,6 +474,29 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 changeHandler?.EndChange();
                 OnDragHandled?.Invoke(null);
             }
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                base.OnClick(e);
+
+                // Handle the click event here first for the double-click handler to be invoked.
+                return true;
+            }
+
+            protected override bool OnDoubleClick(DoubleClickEvent e)
+            {
+                base.OnDoubleClick(e);
+
+                if (hitObject is IHasPath hasPath && hitObject is IHasSliderVelocity hasSliderVelocity)
+                {
+                    // Adjust the velocity to match the actual distance of the path with the expected distance.
+                    hasSliderVelocity.SliderVelocityMultiplier *= hasPath.Path.CalculatedDistance / hasPath.Path.Distance;
+                    hasPath.Path.ExpectedDistance.Value = hasPath.Path.CalculatedDistance;
+                    beatmap.Update(hitObject);
+                }
+
+                return true;
+            }
         }
 
         public partial class Border : ExtendableCircle
