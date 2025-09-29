@@ -30,6 +30,7 @@ namespace osu.Game.Graphics
         public static IconUsage Logo => get(OsuIconMapping.Logo);
         public static IconUsage EditCircle => get(OsuIconMapping.EditCircle);
         public static IconUsage LeftCircle => get(OsuIconMapping.LeftCircle);
+        public static IconUsage RightCircle => get(OsuIconMapping.RightCircle);
 
         // icons
         public static IconUsage Audio => get(OsuIconMapping.Audio);
