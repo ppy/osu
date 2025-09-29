@@ -308,7 +308,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private void moveSelectionInBounds()
         {
-            Quad quad = GeometryUtils.GetSurroundingQuad(objectsInScale!.Keys);
+            Quad quad = GeometryUtils.GetSurroundingQuad(objectsInScale!.Keys, true);
 
             Vector2 delta = Vector2.Zero;
 
