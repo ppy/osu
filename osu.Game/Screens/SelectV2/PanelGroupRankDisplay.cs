@@ -16,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Scoring;
 using osuTK;
@@ -158,18 +159,18 @@ namespace osu.Game.Screens.SelectV2
             {
                 case ScoreRank.SH:
                 case ScoreRank.XH:
-                    starRatingText.Colour = ColourInfo.GradientVertical(Color4.White, Color4Extensions.FromHex("afdff0"));
+                    starRatingText.Colour = DrawableRank.GetRankNameColour(rank);
                     iconContainer.Colour = colourProvider.Background5;
                     break;
 
                 case ScoreRank.X:
                 case ScoreRank.S:
-                    starRatingText.Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex(@"ffe7a8"), Color4Extensions.FromHex(@"ffb800"));
+                    starRatingText.Colour = DrawableRank.GetRankNameColour(rank);
                     iconContainer.Colour = colourProvider.Background5;
                     break;
 
                 case ScoreRank.F:
-                    starRatingText.Colour = Color4Extensions.FromHex(@"CC3333");
+                    starRatingText.Colour = DrawableRank.GetRankNameColour(rank);
                     iconContainer.Colour = colourProvider.Content1;
                     break;
 
