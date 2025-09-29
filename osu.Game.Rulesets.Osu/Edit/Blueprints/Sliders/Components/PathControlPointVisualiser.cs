@@ -471,7 +471,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             {
                 Vector2 newControlPointPosition = Parent!.ToScreenSpace(e.MousePosition);
 
-                var result = positionSnapProvider?.TrySnapToNearbyObjects(newControlPointPosition, oldStartTime);
+                // Snapping inherited B-spline control points to nearby objects would be unintuitive, because snapping them does not equate to snapping the interpolated slider path.
+                bool shouldSnapToNearbyObjects = dragPathTypes[draggedControlPointIndex] is not null ||
+                                                 dragPathTypes[..draggedControlPointIndex].LastOrDefault(t => t is not null)?.Type != SplineType.BSpline;
+
+                SnapResult result = null;
+                if (shouldSnapToNearbyObjects)
+                    result = positionSnapProvider?.TrySnapToNearbyObjects(newControlPointPosition, oldStartTime);
                 if (positionSnapProvider?.TrySnapToPositionGrid(result?.ScreenSpacePosition ?? newControlPointPosition, result?.Time ?? oldStartTime) is SnapResult gridSnapResult)
                     result = gridSnapResult;
                 result ??= new SnapResult(newControlPointPosition, oldStartTime);
