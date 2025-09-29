@@ -16,7 +16,6 @@ namespace osu.Game.Graphics
 {
     public static class OsuIcon
     {
-
         public const string FONT_NAME = @"Icons";
 
         // ruleset icons in circles
@@ -232,6 +231,7 @@ namespace osu.Game.Graphics
 
             [Description(@"clock")]
             Clock,
+
             [Description(@"collections")]
             Collections,
 
@@ -246,8 +246,10 @@ namespace osu.Game.Graphics
 
             [Description(@"debug")]
             Debug,
+
             [Description(@"delete")]
             Delete,
+
             [Description(@"details")]
             Details,
 
@@ -691,6 +693,5 @@ namespace osu.Game.Graphics
                 textures.Dispose();
             }
         }
-
     }
 }
