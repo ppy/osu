@@ -440,26 +440,21 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             Vector2 oldPosition = hitObject.Position;
             double oldStartTime = hitObject.StartTime;
 
-            SnapResult snapControlPoint(Vector2 newScreenSpacePosition, bool trySnapToDistanceGrid)
-            {
-                var result = positionSnapProvider?.TrySnapToNearbyObjects(newScreenSpacePosition, oldStartTime);
-                if (trySnapToDistanceGrid)
-                    result ??= positionSnapProvider?.TrySnapToDistanceGrid(newScreenSpacePosition, limitedDistanceSnap.Value ? oldStartTime : null);
-                if (positionSnapProvider?.TrySnapToPositionGrid(result?.ScreenSpacePosition ?? newScreenSpacePosition, result?.Time ?? oldStartTime) is SnapResult gridSnapResult)
-                    result = gridSnapResult;
-                result ??= new SnapResult(newScreenSpacePosition, oldStartTime);
-                return result;
-            }
-
             if (selectedControlPoints.Contains(hitObject.Path.ControlPoints[0]))
             {
                 // Special handling for selections containing head control point - the position of the hit object changes which means the snapped position and time have to be taken into account
                 Vector2 newHeadPosition = Parent!.ToScreenSpace(e.MousePosition + (dragStartPositions[0] - dragStartPositions[draggedControlPointIndex]));
-                var snapResult = snapControlPoint(newHeadPosition, true);
-                Vector2 movementDelta = Parent!.ToLocalSpace(snapResult.ScreenSpacePosition) - hitObject.Position;
+
+                var result = positionSnapProvider?.TrySnapToNearbyObjects(newHeadPosition, oldStartTime);
+                result ??= positionSnapProvider?.TrySnapToDistanceGrid(newHeadPosition, limitedDistanceSnap.Value ? oldStartTime : null);
+                if (positionSnapProvider?.TrySnapToPositionGrid(result?.ScreenSpacePosition ?? newHeadPosition, result?.Time ?? oldStartTime) is SnapResult gridSnapResult)
+                    result = gridSnapResult;
+                result ??= new SnapResult(newHeadPosition, oldStartTime);
+
+                Vector2 movementDelta = Parent!.ToLocalSpace(result.ScreenSpacePosition) - hitObject.Position;
 
                 hitObject.Position += movementDelta;
-                hitObject.StartTime = snapResult.Time ?? hitObject.StartTime;
+                hitObject.StartTime = result.Time ?? hitObject.StartTime;
 
                 for (int i = 1; i < hitObject.Path.ControlPoints.Count; i++)
                 {
@@ -475,8 +470,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             else
             {
                 Vector2 newControlPointPosition = Parent!.ToScreenSpace(e.MousePosition);
-                var snapResult = snapControlPoint(newControlPointPosition, false);
-                Vector2 movementDelta = Parent!.ToLocalSpace(snapResult.ScreenSpacePosition) - dragStartPositions[draggedControlPointIndex] - hitObject.Position;
+
+                var result = positionSnapProvider?.TrySnapToNearbyObjects(newControlPointPosition, oldStartTime);
+                if (positionSnapProvider?.TrySnapToPositionGrid(result?.ScreenSpacePosition ?? newControlPointPosition, result?.Time ?? oldStartTime) is SnapResult gridSnapResult)
+                    result = gridSnapResult;
+                result ??= new SnapResult(newControlPointPosition, oldStartTime);
+
+                Vector2 movementDelta = Parent!.ToLocalSpace(result.ScreenSpacePosition) - dragStartPositions[draggedControlPointIndex] - hitObject.Position;
 
                 for (int i = 0; i < controlPoints.Count; ++i)
                 {
