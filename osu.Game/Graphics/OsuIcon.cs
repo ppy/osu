@@ -17,8 +17,6 @@ namespace osu.Game.Graphics
     public static class OsuIcon
     {
 
-        #region New single-file-based icons
-
         public const string FONT_NAME = @"Icons";
 
         // ruleset icons in circles
@@ -30,72 +28,19 @@ namespace osu.Game.Graphics
         // ruleset icons without circles
         public static IconUsage FilledCircle => get(OsuIconMapping.FilledCircle);
         public static IconUsage Logo => get(OsuIconMapping.Logo);
-        public static IconUsage ChevronDownCircle => get(OsuIconMapping.ChevronDownCircle);
         public static IconUsage EditCircle => get(OsuIconMapping.EditCircle);
         public static IconUsage LeftCircle => get(OsuIconMapping.LeftCircle);
-        public static IconUsage RightCircle => get(OsuIconMapping.RightCircle);
-        public static IconUsage Charts => get(OsuIconMapping.Charts);
-        public static IconUsage Solo => get(OsuIconMapping.Solo);
-        public static IconUsage Multi => get(OsuIconMapping.Multi);
-        public static IconUsage Gear => get(OsuIconMapping.Gear);
-
-        // misc icons
-        public static IconUsage Bat => get(OsuIconMapping.Bat);
-        public static IconUsage Bubble => get(OsuIconMapping.Bubble);
-        public static IconUsage BubblePop => get(OsuIconMapping.BubblePop);
-        public static IconUsage Dice => get(OsuIconMapping.Dice);
-        public static IconUsage HeartBreak => get(OsuIconMapping.HeartBreak);
-        public static IconUsage Hot => get(OsuIconMapping.Hot);
-        public static IconUsage ListSearch => get(OsuIconMapping.ListSearch);
-
-        // osu! playstyles
-        public static IconUsage PlayStyleTablet => get(OsuIconMapping.PlayStyleTablet);
-        public static IconUsage PlayStyleMouse => get(OsuIconMapping.PlayStyleMouse);
-        public static IconUsage PlayStyleKeyboard => get(OsuIconMapping.PlayStyleKeyboard);
-        public static IconUsage PlayStyleTouch => get(OsuIconMapping.PlayStyleTouch);
-
-        // osu! difficulties
-        public static IconUsage EasyOsu => get(OsuIconMapping.EasyOsu);
-        public static IconUsage NormalOsu => get(OsuIconMapping.NormalOsu);
-        public static IconUsage HardOsu => get(OsuIconMapping.HardOsu);
-        public static IconUsage InsaneOsu => get(OsuIconMapping.InsaneOsu);
-        public static IconUsage ExpertOsu => get(OsuIconMapping.ExpertOsu);
-
-        // taiko difficulties
-        public static IconUsage EasyTaiko => get(OsuIconMapping.EasyTaiko);
-        public static IconUsage NormalTaiko => get(OsuIconMapping.NormalTaiko);
-        public static IconUsage HardTaiko => get(OsuIconMapping.HardTaiko);
-        public static IconUsage InsaneTaiko => get(OsuIconMapping.InsaneTaiko);
-        public static IconUsage ExpertTaiko => get(OsuIconMapping.ExpertTaiko);
-
-        // fruits difficulties
-        public static IconUsage EasyFruits => get(OsuIconMapping.EasyFruits);
-        public static IconUsage NormalFruits => get(OsuIconMapping.NormalFruits);
-        public static IconUsage HardFruits => get(OsuIconMapping.HardFruits);
-        public static IconUsage InsaneFruits => get(OsuIconMapping.InsaneFruits);
-        public static IconUsage ExpertFruits => get(OsuIconMapping.ExpertFruits);
-
-        // mania difficulties
-        public static IconUsage EasyMania => get(OsuIconMapping.EasyMania);
-        public static IconUsage NormalMania => get(OsuIconMapping.NormalMania);
-        public static IconUsage HardMania => get(OsuIconMapping.HardMania);
-        public static IconUsage InsaneMania => get(OsuIconMapping.InsaneMania);
-        public static IconUsage ExpertMania => get(OsuIconMapping.ExpertMania);
 
         // icons
         public static IconUsage Audio => get(OsuIconMapping.Audio);
         public static IconUsage Beatmap => get(OsuIconMapping.Beatmap);
         public static IconUsage Calendar => get(OsuIconMapping.Calendar);
-        public static IconUsage ChangelogA => get(OsuIconMapping.ChangelogA);
         public static IconUsage ChangelogB => get(OsuIconMapping.ChangelogB);
         public static IconUsage Chat => get(OsuIconMapping.Chat);
-        public static IconUsage CheckCircle => get(OsuIconMapping.CheckCircle);
         public static IconUsage Clock => get(OsuIconMapping.Clock);
-        public static IconUsage CollapseA => get(OsuIconMapping.CollapseA);
         public static IconUsage Collections => get(OsuIconMapping.Collections);
         public static IconUsage Cross => get(OsuIconMapping.Cross);
         public static IconUsage CrossCircle => get(OsuIconMapping.CrossCircle);
-        public static IconUsage Crown => get(OsuIconMapping.Crown);
         public static IconUsage DailyChallenge => get(OsuIconMapping.DailyChallenge);
         public static IconUsage Debug => get(OsuIconMapping.Debug);
         public static IconUsage Delete => get(OsuIconMapping.Delete);
@@ -260,9 +205,6 @@ namespace osu.Game.Graphics
             [Description(@"FilledCircle")]
             FilledCircle,
 
-            [Description(@"ChevronDownCircle")]
-            ChevronDownCircle,
-
             [Description(@"EditCircle")]
             EditCircle,
 
@@ -271,111 +213,6 @@ namespace osu.Game.Graphics
 
             [Description(@"RightCircle")]
             RightCircle,
-
-            [Description(@"Charts")]
-            Charts,
-
-            [Description(@"Solo")]
-            Solo,
-
-            [Description(@"Multi")]
-            Multi,
-
-            [Description(@"Gear")]
-            Gear,
-
-            [Description(@"Bat")]
-            Bat,
-
-            [Description(@"Bubble")]
-            Bubble,
-
-            [Description(@"BubblePop")]
-            BubblePop,
-
-            [Description(@"Dice")]
-            Dice,
-
-            [Description(@"HeartBreak")]
-            HeartBreak,
-
-            [Description(@"Hot")]
-            Hot,
-
-            [Description(@"ListSearch")]
-            ListSearch,
-
-            [Description(@"PlayStyleTablet")]
-            PlayStyleTablet,
-
-            [Description(@"PlayStyleMouse")]
-            PlayStyleMouse,
-
-            [Description(@"PlayStyleKeyboard")]
-            PlayStyleKeyboard,
-
-            [Description(@"PlayStyleTouch")]
-            PlayStyleTouch,
-
-            [Description(@"EasyOsu")]
-            EasyOsu,
-
-            [Description(@"NormalOsu")]
-            NormalOsu,
-
-            [Description(@"HardOsu")]
-            HardOsu,
-
-            [Description(@"InsaneOsu")]
-            InsaneOsu,
-
-            [Description(@"ExpertOsu")]
-            ExpertOsu,
-
-            [Description(@"EasyTaiko")]
-            EasyTaiko,
-
-            [Description(@"NormalTaiko")]
-            NormalTaiko,
-
-            [Description(@"HardTaiko")]
-            HardTaiko,
-
-            [Description(@"InsaneTaiko")]
-            InsaneTaiko,
-
-            [Description(@"ExpertTaiko")]
-            ExpertTaiko,
-
-            [Description(@"EasyFruits")]
-            EasyFruits,
-
-            [Description(@"NormalFruits")]
-            NormalFruits,
-
-            [Description(@"HardFruits")]
-            HardFruits,
-
-            [Description(@"InsaneFruits")]
-            InsaneFruits,
-
-            [Description(@"ExpertFruits")]
-            ExpertFruits,
-
-            [Description(@"EasyMania")]
-            EasyMania,
-
-            [Description(@"NormalMania")]
-            NormalMania,
-
-            [Description(@"HardMania")]
-            HardMania,
-
-            [Description(@"InsaneMania")]
-            InsaneMania,
-
-            [Description(@"ExpertMania")]
-            ExpertMania,
 
             [Description(@"audio")]
             Audio,
@@ -386,24 +223,14 @@ namespace osu.Game.Graphics
             [Description(@"calendar")]
             Calendar,
 
-            [Description(@"changelog-a")]
-            ChangelogA,
-
             [Description(@"changelog-b")]
             ChangelogB,
 
             [Description(@"chat")]
             Chat,
 
-            [Description(@"check-circle")]
-            CheckCircle,
-
             [Description(@"clock")]
             Clock,
-
-            [Description(@"collapse-a")]
-            CollapseA,
-
             [Description(@"collections")]
             Collections,
 
@@ -413,18 +240,13 @@ namespace osu.Game.Graphics
             [Description(@"cross-circle")]
             CrossCircle,
 
-            [Description(@"crown")]
-            Crown,
-
             [Description(@"daily-challenge")]
             DailyChallenge,
 
             [Description(@"debug")]
             Debug,
-
             [Description(@"delete")]
             Delete,
-
             [Description(@"details")]
             Details,
 
@@ -869,6 +691,5 @@ namespace osu.Game.Graphics
             }
         }
 
-        #endregion
     }
 }
