@@ -13,8 +13,8 @@ using osu.Game.Online.Metadata;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.Menu;
+using osuTK.Graphics;
 using osuTK.Input;
-using Color4 = osuTK.Graphics.Color4;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {

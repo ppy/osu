@@ -302,7 +302,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             checkMatchedBeatmaps(2);
 
-            AddAssert("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.Not.EqualTo(hiddenBeatmap));
+            AddUntilStep("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.Not.EqualTo(hiddenBeatmap));
 
             AddStep("restore", () => Beatmaps.Restore(hiddenBeatmap!));
 
