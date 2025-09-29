@@ -637,12 +637,20 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (DrawableObject.SliderBody == null)
                 yield break;
 
-            PathType? currentPathType = DrawableObject.HitObject.Path.ControlPoints.FirstOrDefault()?.Type;
+            PathType? currentPathType = null;
 
-            // Skip the first control point because it is already covered by the slider head
             // Skip the last control point because its always either not on the slider path or exactly on the slider end
-            foreach (var controlPoint in DrawableObject.HitObject.Path.ControlPoints.Skip(1).SkipLast(1))
+            for (int i = 0; i < DrawableObject.HitObject.Path.ControlPoints.Count - 1; i++)
             {
+                var controlPoint = DrawableObject.HitObject.Path.ControlPoints[i];
+
+                // Skip the first control point because it is already covered by the slider head
+                if (i == 0)
+                {
+                    currentPathType = controlPoint.Type;
+                    continue;
+                }
+
                 if (controlPoint.Type is null && currentPathType != PathType.LINEAR)
                     continue;
 
