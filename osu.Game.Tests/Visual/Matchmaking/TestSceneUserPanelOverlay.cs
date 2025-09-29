@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
@@ -100,6 +101,26 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
                 userId++;
             }, 8);
+        }
+
+        [Test]
+        public void RemovePanels()
+        {
+            AddStep("join another user", () =>
+            {
+                MultiplayerClient.AddUser(new MultiplayerRoomUser(1)
+                {
+                    User = new APIUser
+                    {
+                        Username = "User 1"
+                    }
+                });
+            });
+
+            AddUntilStep("two panels displayed", () => this.ChildrenOfType<MatchmakingUserPanel>().Count(), () => Is.EqualTo(2));
+
+            AddStep("remove a user", () => MultiplayerClient.RemoveUser(new APIUser { Id = 1 }));
+            AddUntilStep("one panel displayed", () => this.ChildrenOfType<MatchmakingUserPanel>().Count(), () => Is.EqualTo(1));
         }
 
         [Test]
