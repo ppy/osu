@@ -24,7 +24,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         public const float TRANSITION_DURATION = 340;
         public const float CORNER_RADIUS = 8;
 
-        protected const float WIDTH = 345;
+        public const float WIDTH = 345;
 
         public IBindable<bool> Expanded { get; }
 
@@ -77,25 +77,27 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
             containingInputManager = GetContainingInputManager();
 
-            Action = () =>
-            {
-                if (containingInputManager?.CurrentState.Keyboard.ShiftPressed == true)
-                {
-                    switch (DownloadTracker.State.Value)
-                    {
-                        case DownloadState.NotDownloaded:
-                            if (!BeatmapSet.Availability.DownloadDisabled)
-                                beatmaps?.Download(BeatmapSet, preferNoVideo.Value);
-                            break;
+            if (Action == null)
+                throw new InvalidOperationException($"An action should be assigned to this {nameof(BeatmapCard)}. To use the default, assign {nameof(DefaultAction)}.");
+        }
 
-                        case DownloadState.LocallyAvailable:
-                            game?.PresentBeatmap(BeatmapSet);
-                            break;
-                    }
+        protected void DefaultAction()
+        {
+            if (containingInputManager?.CurrentState.Keyboard.ShiftPressed == true)
+            {
+                switch (DownloadTracker.State.Value)
+                {
+                    case DownloadState.NotDownloaded:
+                        if (!BeatmapSet.Availability.DownloadDisabled) beatmaps?.Download(BeatmapSet, preferNoVideo.Value);
+                        break;
+
+                    case DownloadState.LocallyAvailable:
+                        game?.PresentBeatmap(BeatmapSet);
+                        break;
                 }
-                else
-                    beatmapSetOverlay?.FetchAndShowBeatmapSet(BeatmapSet.OnlineID);
-            };
+            }
+            else
+                beatmapSetOverlay?.FetchAndShowBeatmapSet(BeatmapSet.OnlineID);
         }
 
         protected override bool OnHover(HoverEvent e)
