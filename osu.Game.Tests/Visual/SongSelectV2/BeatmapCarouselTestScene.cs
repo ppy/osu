@@ -72,6 +72,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             Scheduler.AddDelayed(updateStats, 100, true);
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Dependencies.Cache(Realm);
+        }
+
         protected void CreateCarousel()
         {
             AddStep("create components", () =>

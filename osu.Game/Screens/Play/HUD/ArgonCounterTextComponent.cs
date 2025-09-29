@@ -74,13 +74,13 @@ namespace osu.Game.Screens.Play.HUD
                     {
                         wireframesPart = new ArgonCounterSpriteText(wireframesLookup)
                         {
-                            Anchor = anchor,
-                            Origin = anchor,
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
                         },
                         textPart = new ArgonCounterSpriteText(textLookup)
                         {
-                            Anchor = anchor,
-                            Origin = anchor,
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
                         },
                     }
                 }
