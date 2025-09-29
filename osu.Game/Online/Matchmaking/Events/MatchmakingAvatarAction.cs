@@ -8,5 +8,6 @@ namespace osu.Game.Online.Matchmaking.Events
     /// </summary>
     public enum MatchmakingAvatarAction
     {
+        Jump
     }
 }
