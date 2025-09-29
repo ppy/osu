@@ -50,7 +50,7 @@ namespace osu.Desktop.Linux
             return null;
         }
 
-        private static void TryCreateLinuxSymlink(string filePath, string targetPath)
+        private static void tryCreateLinuxSymlink(string filePath, string targetPath)
         {
             Process symlinkProcess = new Process
             {
@@ -120,7 +120,7 @@ namespace osu.Desktop.Linux
             }
 
             Logger.LogPrint($"Trying to create a symlink: {defaultDiscordIpcPath} -> {discordFlatpakIpcPath}");
-            TryCreateLinuxSymlink(defaultDiscordIpcPath, discordFlatpakIpcPath);
+            tryCreateLinuxSymlink(defaultDiscordIpcPath, discordFlatpakIpcPath);
         }
     }
 }
