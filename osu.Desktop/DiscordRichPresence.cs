@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Runtime.InteropServices;
 using System.Text;
 using DiscordRPC;
 using DiscordRPC.Message;
 using Newtonsoft.Json;
+using osu.Desktop.Linux;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -70,6 +72,11 @@ namespace osu.Desktop
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, SessionStatics session)
         {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                DiscordFlatpak.TryCreateLinuxDiscordFlatpakSymlink();
+            }
+
             privacyMode = config.GetBindable<DiscordRichPresenceMode>(OsuSetting.DiscordRichPresence);
             userStatus = config.GetBindable<UserStatus>(OsuSetting.UserOnlineStatus);
             userActivity = session.GetBindable<UserActivity?>(Static.UserOnlineActivity);
