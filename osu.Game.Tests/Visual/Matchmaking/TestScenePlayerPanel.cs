@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Matchmaking.Events;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Rooms;
@@ -90,6 +91,12 @@ namespace osu.Game.Tests.Visual.Matchmaking
                     }
                 }
             }).WaitSafely());
+        }
+
+        [Test]
+        public void TestJump()
+        {
+            AddStep("jump", () => MultiplayerClient.SendUserMatchRequest(1, new MatchmakingAvatarActionRequest { Action = MatchmakingAvatarAction.Jump }).WaitSafely());
         }
     }
 }

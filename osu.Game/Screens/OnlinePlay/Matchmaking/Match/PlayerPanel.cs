@@ -9,6 +9,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
+using osu.Game.Online.Matchmaking.Events;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Users;
@@ -24,6 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
     {
         public static readonly Vector2 SIZE_HORIZONTAL = new Vector2(250, 100);
         public static readonly Vector2 SIZE_VERTICAL = new Vector2(150, 200);
+        private static readonly Vector2 avatar_size = new Vector2(80);
 
         public readonly MultiplayerRoomUser RoomUser;
 
@@ -36,6 +38,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         private OsuSpriteText rankText = null!;
         private OsuSpriteText scoreText = null!;
 
+        private Drawable avatarPositionTarget = null!;
+        private Drawable avatarJumpTarget = null!;
         private MatchmakingAvatar avatar = null!;
         private OsuSpriteText username = null!;
 
@@ -78,13 +82,25 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
-                        avatar = new MatchmakingAvatar(User, isOwnUser: User.Id == api.LocalUser.Value.Id)
+                        avatarPositionTarget = new Container
                         {
-                            Anchor = Anchor.TopLeft,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(80),
+                            Size = avatar_size,
+                            Child = avatarJumpTarget = new Container
+                            {
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.BottomCentre,
+                                RelativeSizeAxes = Axes.Both,
+                                Child = avatar = new MatchmakingAvatar(User, isOwnUser: User.Id == api.LocalUser.Value.Id)
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Size = Vector2.One
+                                }
+                            }
                         },
                         rankText = new OsuSpriteText
                         {
@@ -123,6 +139,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             updateLayout(true);
 
             client.MatchRoomStateChanged += onRoomStateChanged;
+            client.MatchEvent += onMatchEvent;
+
             onRoomStateChanged(client.Room!.MatchState);
 
             avatar.ScaleTo(0)
@@ -155,7 +173,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         {
             double duration = instant ? 0 : 1000;
 
-            avatar.MoveTo(avatarPosition, duration, Easing.OutPow10);
+            avatarPositionTarget.MoveTo(avatarPosition, duration, Easing.OutPow10);
             this.ResizeTo(horizontal ? SIZE_HORIZONTAL : SIZE_VERTICAL, duration, Easing.OutPow10);
 
             rankText.MoveTo(horizontal ? new Vector2(-40, -10) : new Vector2(-70, 0), duration, Easing.OutPow10);
@@ -176,16 +194,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             mainContent.ScaleTo(1, 750, Easing.OutPow10);
 
             mainContent.MoveTo(Vector2.Zero, 1250, Easing.OutPow10);
-            avatar.MoveTo(avatarPosition, 1250, Easing.OutPow10);
+            avatarPositionTarget.MoveTo(avatarPosition, 1250, Easing.OutPow10);
             base.OnHoverLost(e);
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            var offset = (avatar.ToLocalSpace(e.ScreenSpaceMousePosition) - avatar.DrawSize / 2) * 0.02f;
+            var offset = (avatarPositionTarget.ToLocalSpace(e.ScreenSpaceMousePosition) - avatarPositionTarget.DrawSize / 2) * 0.02f;
 
             mainContent.MoveTo(offset * 0.5f, 1000, Easing.OutPow10);
-            avatar.MoveTo(avatarPosition + offset, 400, Easing.OutPow10);
+            avatarPositionTarget.MoveTo(avatarPosition + offset, 400, Easing.OutPow10);
             return base.OnMouseMove(e);
         }
 
@@ -201,12 +219,38 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             scoreText.Text = $"{userScore.Points} pts";
         });
 
+        private void onMatchEvent(MatchServerEvent e)
+        {
+            switch (e)
+            {
+                case MatchmakingAvatarActionEvent action:
+                    if (action.UserId != RoomUser.UserID)
+                        break;
+
+                    switch (action.Action)
+                    {
+                        case MatchmakingAvatarAction.Jump:
+                            avatarJumpTarget.MoveToY(-10, 200, Easing.Out)
+                                            .Then().MoveToY(0, 200, Easing.In);
+                            avatarJumpTarget.ScaleTo(new Vector2(1, 1.05f), 200, Easing.Out)
+                                            .Then().ScaleTo(new Vector2(1, 0.95f), 200, Easing.In)
+                                            .Then().ScaleTo(Vector2.One, 800, Easing.OutElastic);
+                            break;
+                    }
+
+                    break;
+            }
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
             if (client.IsNotNull())
+            {
                 client.MatchRoomStateChanged -= onRoomStateChanged;
+                client.MatchEvent -= onMatchEvent;
+            }
         }
     }
 }
