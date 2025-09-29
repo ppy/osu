@@ -443,7 +443,7 @@ namespace osu.Game.Graphics
             [Description(@"expand-b")]
             ExpandB,
 
-            [Description(@"featured-artist")]
+            [Description(@"featured-artist-a")]
             FeaturedArtist,
 
             [Description(@"featured-artist-circle")]
