@@ -3,7 +3,6 @@
 
 using System;
 using NUnit.Framework;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -120,21 +119,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                                 {
                                     new PanelGroupRankDisplay
                                     {
-                                        Item = new CarouselItem(new RankDisplayGroupDefinition(0, $"{rank.GetDescription()}", rank))
+                                        Item = new CarouselItem(new RankDisplayGroupDefinition(rank))
                                     },
                                     new PanelGroupRankDisplay
                                     {
-                                        Item = new CarouselItem(new RankDisplayGroupDefinition(1, $"{rank.GetDescription()}", rank)),
+                                        Item = new CarouselItem(new RankDisplayGroupDefinition(rank)),
                                         KeyboardSelected = { Value = true },
                                     },
                                     new PanelGroupRankDisplay
                                     {
-                                        Item = new CarouselItem(new RankDisplayGroupDefinition(2, $"{rank.GetDescription()}", rank)),
+                                        Item = new CarouselItem(new RankDisplayGroupDefinition(rank)),
                                         Expanded = { Value = true },
                                     },
                                     new PanelGroupRankDisplay
                                     {
-                                        Item = new CarouselItem(new RankDisplayGroupDefinition(3, $"{rank.GetDescription()}", rank)),
+                                        Item = new CarouselItem(new RankDisplayGroupDefinition(rank)),
                                         Expanded = { Value = true },
                                         KeyboardSelected = { Value = true },
                                     },
