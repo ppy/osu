@@ -816,6 +816,11 @@ namespace osu.Game.Screens.SelectV2
             if (x is GroupedBeatmap groupedBeatmapX && y is GroupedBeatmap groupedBeatmapY)
                 return groupedBeatmapX.Equals(groupedBeatmapY);
 
+            // `BeatmapInfo` is no longer used directly in carousel items, but in rare circumstances still is used for model equality comparisons
+            // (see `beatmapSetsChanged()` deletion handling logic, which aims to find a beatmap close to the just-deleted one, disregarding grouping concerns)
+            if (x is BeatmapInfo beatmapInfoX && y is BeatmapInfo beatmapInfoY)
+                return beatmapInfoX.Equals(beatmapInfoY);
+
             if (x is GroupDefinition groupX && y is GroupDefinition groupY)
                 return groupX.Equals(groupY);
 
