@@ -12,7 +12,7 @@ using osu.Game.Tests.Visual.Multiplayer;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
-    public partial class TestSceneSelectionPanel : MultiplayerTestScene
+    public partial class TestSceneBeatmapSelectPanel : MultiplayerTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
@@ -20,9 +20,9 @@ namespace osu.Game.Tests.Visual.Matchmaking
         [Test]
         public void TestBeatmapPanel()
         {
-            SelectionPanel? panel = null;
+            BeatmapSelectPanel? panel = null;
 
-            AddStep("add panel", () => Child = panel = new SelectionPanel(new MultiplayerPlaylistItem())
+            AddStep("add panel", () => Child = panel = new BeatmapSelectPanel(new MultiplayerPlaylistItem())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
