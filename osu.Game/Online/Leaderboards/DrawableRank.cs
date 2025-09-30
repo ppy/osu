@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -65,7 +64,24 @@ namespace osu.Game.Online.Leaderboards
             };
         }
 
-        public static string GetRankLetter(ScoreRank rank) => rank.GetDescription().Replace("Silver ", "");
+        /// <summary>
+        /// Returns letters to be shown in places where ranks are shown on a badge or similar to the user.
+        /// </summary>
+        public static string GetRankLetter(ScoreRank rank)
+        {
+            switch (rank)
+            {
+                case ScoreRank.SH:
+                    return @"S";
+
+                case ScoreRank.X:
+                case ScoreRank.XH:
+                    return @"SS";
+
+                default:
+                    return rank.ToString();
+            }
+        }
 
         /// <summary>
         ///  Retrieves the grade text colour.
