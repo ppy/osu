@@ -144,7 +144,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                                         Width = 700,
                                         Height = 130,
                                         Padding = new MarginPadding { Bottom = row_padding },
-                                        Child = chat = new MatchChatDisplay(new Room(room))
+                                        Child = chat = new MatchmakingChatDisplay(new Room(room))
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                         }
