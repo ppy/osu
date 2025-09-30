@@ -644,18 +644,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             {
                 var controlPoint = DrawableObject.HitObject.Path.ControlPoints[i];
 
+                if (controlPoint.Type is not null)
+                    currentPathType = controlPoint.Type;
+
                 // Skip the first control point because it is already covered by the slider head
                 if (i == 0)
-                {
-                    currentPathType = controlPoint.Type;
                     continue;
-                }
 
                 if (controlPoint.Type is null && currentPathType != PathType.LINEAR)
                     continue;
-
-                if (controlPoint.Type is not null)
-                    currentPathType = controlPoint.Type;
 
                 var screenSpacePosition = DrawableObject.SliderBody.ToScreenSpace(DrawableObject.SliderBody.PathOffset + controlPoint.Position);
                 yield return screenSpacePosition;
