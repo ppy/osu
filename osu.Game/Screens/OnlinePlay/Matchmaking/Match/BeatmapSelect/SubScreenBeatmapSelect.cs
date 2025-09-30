@@ -16,7 +16,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         public override PanelDisplayStyle PlayersDisplayStyle => PanelDisplayStyle.Split;
         public override Drawable PlayersDisplayArea { get; }
 
-        private readonly SelectionGrid selectionGrid;
+        private readonly BeatmapSelectGrid beatmapSelectGrid;
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
@@ -29,7 +29,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Horizontal = 200 },
-                    Child = selectionGrid = new SelectionGrid
+                    Child = beatmapSelectGrid = new BeatmapSelectGrid
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
@@ -37,8 +37,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = 5 },
-                    Child = PlayersDisplayArea = Empty().With(d =>
+                    Child = PlayersDisplayArea = new Container().With(d =>
                     {
                         d.RelativeSizeAxes = Axes.Both;
                     })
@@ -55,7 +54,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             foreach (var item in client.Room!.Playlist)
                 onItemAdded(item);
 
-            selectionGrid.ItemSelected += item => client.MatchmakingToggleSelection(item.ID);
+            beatmapSelectGrid.ItemSelected += item => client.MatchmakingToggleSelection(item.ID);
 
             client.MatchmakingItemSelected += onItemSelected;
             client.MatchmakingItemDeselected += onItemDeselected;
@@ -66,22 +65,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             if (item.Expired)
                 return;
 
-            selectionGrid.AddItem(item);
+            beatmapSelectGrid.AddItem(item);
         });
 
         private void onItemSelected(int userId, long itemId)
         {
             var user = client.Room!.Users.First(it => it.UserID == userId).User!;
-            selectionGrid.SetUserSelection(user, itemId, true);
+            beatmapSelectGrid.SetUserSelection(user, itemId, true);
         }
 
         private void onItemDeselected(int userId, long itemId)
         {
             var user = client.Room!.Users.First(it => it.UserID == userId).User!;
-            selectionGrid.SetUserSelection(user, itemId, false);
+            beatmapSelectGrid.SetUserSelection(user, itemId, false);
         }
 
-        public void RollFinalBeatmap(long[] candidateItems, long finalItem) => selectionGrid.RollAndDisplayFinalBeatmap(candidateItems, finalItem);
+        public void RollFinalBeatmap(long[] candidateItems, long finalItem) => beatmapSelectGrid.RollAndDisplayFinalBeatmap(candidateItems, finalItem);
 
         protected override void Dispose(bool isDisposing)
         {

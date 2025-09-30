@@ -14,13 +14,14 @@ using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
 using osu.Game.Tests.Visual.Multiplayer;
+using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
     public partial class TestSceneUserPanelOverlay : MultiplayerTestScene
     {
-        private UserPanelOverlay list = null!;
+        private PlayerPanelOverlay list = null!;
 
         public override void SetUpSteps()
         {
@@ -35,7 +36,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
                 Size = new Vector2(0.8f),
-                Child = list = new UserPanelOverlay()
+                Child = list = new PlayerPanelOverlay()
             });
         }
 
@@ -117,10 +118,10 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 });
             });
 
-            AddUntilStep("two panels displayed", () => this.ChildrenOfType<MatchmakingUserPanel>().Count(), () => Is.EqualTo(2));
+            AddUntilStep("two panels displayed", () => this.ChildrenOfType<UserPanel>().Count(), () => Is.EqualTo(2));
 
             AddStep("remove a user", () => MultiplayerClient.RemoveUser(new APIUser { Id = 1 }));
-            AddUntilStep("one panel displayed", () => this.ChildrenOfType<MatchmakingUserPanel>().Count(), () => Is.EqualTo(1));
+            AddUntilStep("one panel displayed", () => this.ChildrenOfType<UserPanel>().Count(), () => Is.EqualTo(1));
         }
 
         [Test]
