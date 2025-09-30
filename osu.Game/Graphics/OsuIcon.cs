@@ -248,7 +248,6 @@ namespace osu.Game.Graphics
             [Description(@"collapse-a")]
             CollapseA,
 
-
             [Description(@"cross")]
             Cross,
 
