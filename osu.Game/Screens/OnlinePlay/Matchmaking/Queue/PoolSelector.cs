@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -28,7 +28,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         public readonly Bindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
 
         private FillFlowContainer<SelectorButton> poolFlow = null!;
-        private HoverClickSounds clickSounds = null!;
 
         public PoolSelector()
         {
@@ -38,20 +37,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            InternalChild = poolFlow = new FillFlowContainer<SelectorButton>
             {
-                poolFlow = new FillFlowContainer<SelectorButton>
-                {
-                    AutoSizeAxes = Axes.X,
-                    Height = icon_size * 1.2f,
-                    Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(5),
-                },
-                clickSounds = new HoverClickSounds(HoverSampleSet.TabSelect)
-                {
-                    // Click samples are played manually
-                    Alpha = 0
-                }
+                AutoSizeAxes = Axes.X,
+                Height = icon_size * 1.2f,
+                Direction = FillDirection.Horizontal,
+                Spacing = new Vector2(5),
             };
         }
 
@@ -77,37 +68,32 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.Key != Key.Left && e.Key != Key.Right)
-                return false;
-
-            clickSounds.PlayClickSample();
-
-            if (SelectedPool.Value == null)
-            {
-                SelectedPool.Value = AvailablePools.Value[0];
-                return true;
-            }
-
-            int currentPoolIndex = Array.IndexOf(AvailablePools.Value, SelectedPool.Value);
+            var currentSelection = poolFlow.SingleOrDefault(b => b.IsSelected);
 
             switch (e.Key)
             {
                 case Key.Left:
-                    SelectedPool.Value = currentPoolIndex == 0
-                        ? AvailablePools.Value[^1]
-                        : AvailablePools.Value[(currentPoolIndex - 1) % AvailablePools.Value.Length];
-                    break;
+                {
+                    var next = poolFlow.Reverse().SkipWhile(b => b != currentSelection).Skip(1).FirstOrDefault();
+                    (next ?? poolFlow.Last()).TriggerClickWithSound();
+                    return true;
+                }
 
                 case Key.Right:
-                    SelectedPool.Value = AvailablePools.Value[(currentPoolIndex + 1) % AvailablePools.Value.Length];
-                    break;
+                {
+                    var next = poolFlow.SkipWhile(b => b != currentSelection).Skip(1).FirstOrDefault();
+                    (next ?? poolFlow.First()).TriggerClickWithSound();
+                    return true;
+                }
             }
 
-            return true;
+            return false;
         }
 
         private partial class SelectorButton : OsuAnimatedButton
         {
+            public bool IsSelected => SelectedPool.Value?.Equals(pool) == true;
+
             public readonly Bindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
 
             [Resolved]
@@ -119,6 +105,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             private Box flashLayer = null!;
 
             public SelectorButton(MatchmakingPool pool)
+                : base(HoverSampleSet.ButtonSidebar)
             {
                 this.pool = pool;
 
@@ -171,23 +158,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             protected override bool OnHover(HoverEvent e)
             {
-                if (!isSelected)
+                if (!IsSelected)
                     flashLayer.FadeTo(0.05f, 200, Easing.OutQuint);
                 return base.OnHover(e);
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                if (!isSelected)
+                if (!IsSelected)
                     flashLayer.FadeTo(0f, 200, Easing.OutQuint);
                 base.OnHoverLost(e);
             }
 
-            private bool isSelected => SelectedPool.Value?.Equals(pool) == true;
-
             private void onSelectionChanged(ValueChangedEvent<MatchmakingPool?> selection)
             {
-                if (isSelected)
+                if (IsSelected)
                 {
                     this.ScaleTo(1.2f, 200, Easing.OutQuint);
                     iconSprite.FadeColour(Color4.Gold, 100, Easing.OutQuint);

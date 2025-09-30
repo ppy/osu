@@ -462,8 +462,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private partial class SelectionButton : ShearedButton, IKeyBindingHandler<GlobalAction>
         {
-            private HoverClickSounds clickSounds = null!;
-
             public SelectionButton(float? width = null, float height = DEFAULT_HEIGHT)
                 : base(width, height)
             {
@@ -471,22 +469,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {
-                if (e.Action != GlobalAction.Select)
-                    return false;
-
-                if (e.Repeat)
+                if (e.Action == GlobalAction.Select && !e.Repeat)
+                {
+                    TriggerClickWithSound();
                     return true;
+                }
 
-                clickSounds.PlayClickSample();
-                Action();
-                return true;
+                return false;
             }
 
             public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
             {
             }
-
-            protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => clickSounds = (HoverClickSounds)base.CreateHoverSounds(sampleSet);
         }
     }
 }
