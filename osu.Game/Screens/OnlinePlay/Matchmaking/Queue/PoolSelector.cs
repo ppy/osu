@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -15,6 +16,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 {
@@ -64,8 +66,34 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             }, true);
         }
 
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            var currentSelection = poolFlow.SingleOrDefault(b => b.IsSelected);
+
+            switch (e.Key)
+            {
+                case Key.Left:
+                {
+                    var next = poolFlow.Reverse().SkipWhile(b => b != currentSelection).Skip(1).FirstOrDefault();
+                    (next ?? poolFlow.Last()).TriggerClickWithSound();
+                    return true;
+                }
+
+                case Key.Right:
+                {
+                    var next = poolFlow.SkipWhile(b => b != currentSelection).Skip(1).FirstOrDefault();
+                    (next ?? poolFlow.First()).TriggerClickWithSound();
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private partial class SelectorButton : OsuAnimatedButton
         {
+            public bool IsSelected => SelectedPool.Value?.Equals(pool) == true;
+
             public readonly Bindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
 
             [Resolved]
@@ -77,6 +105,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             private Box flashLayer = null!;
 
             public SelectorButton(MatchmakingPool pool)
+                : base(HoverSampleSet.ButtonSidebar)
             {
                 this.pool = pool;
 
@@ -129,23 +158,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             protected override bool OnHover(HoverEvent e)
             {
-                if (!isSelected)
+                if (!IsSelected)
                     flashLayer.FadeTo(0.05f, 200, Easing.OutQuint);
                 return base.OnHover(e);
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                if (!isSelected)
+                if (!IsSelected)
                     flashLayer.FadeTo(0f, 200, Easing.OutQuint);
                 base.OnHoverLost(e);
             }
 
-            private bool isSelected => SelectedPool.Value?.Equals(pool) == true;
-
             private void onSelectionChanged(ValueChangedEvent<MatchmakingPool?> selection)
             {
-                if (isSelected)
+                if (IsSelected)
                 {
                     this.ScaleTo(1.2f, 200, Easing.OutQuint);
                     iconSprite.FadeColour(Color4.Gold, 100, Easing.OutQuint);

@@ -15,11 +15,14 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Matchmaking;
@@ -350,7 +353,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                 Text = "Found a match!",
                                 Font = OsuFont.GetFont(size: 32, weight: FontWeight.Regular, typeface: Typeface.TorusAlternate),
                             },
-                            new ShearedButton(200)
+                            new SelectionButton(200)
                             {
                                 DarkerColour = colours.YellowDark,
                                 LighterColour = colours.YellowLight,
@@ -440,7 +443,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             InRoom
         }
 
-        private partial class BeginQueueingButton : ShearedButton
+        private partial class BeginQueueingButton : SelectionButton
         {
             public readonly IBindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
 
@@ -454,6 +457,29 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 base.LoadComplete();
 
                 SelectedPool.BindValueChanged(p => Enabled.Value = p.NewValue != null, true);
+            }
+        }
+
+        private partial class SelectionButton : ShearedButton, IKeyBindingHandler<GlobalAction>
+        {
+            public SelectionButton(float? width = null, float height = DEFAULT_HEIGHT)
+                : base(width, height)
+            {
+            }
+
+            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+            {
+                if (e.Action == GlobalAction.Select && !e.Repeat)
+                {
+                    TriggerClickWithSound();
+                    return true;
+                }
+
+                return false;
+            }
+
+            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+            {
             }
         }
     }
