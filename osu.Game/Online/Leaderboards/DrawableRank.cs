@@ -53,9 +53,9 @@ namespace osu.Game.Online.Leaderboards
                             Origin = Anchor.Centre,
                             Spacing = new Vector2(-3, 0),
                             Padding = new MarginPadding { Top = 5 },
-                            Colour = GetRankNameColour(rank),
+                            Colour = GetRankLetterColour(rank),
                             Font = OsuFont.Numeric.With(size: 25),
-                            Text = GetRankName(rank),
+                            Text = GetRankLetter(rank),
                             ShadowColour = Color4.Black.Opacity(0.3f),
                             ShadowOffset = new Vector2(0, 0.08f),
                             Shadow = true,
@@ -65,12 +65,12 @@ namespace osu.Game.Online.Leaderboards
             };
         }
 
-        public static string GetRankName(ScoreRank rank) => rank.GetDescription().Replace("Silver ", "");
+        public static string GetRankLetter(ScoreRank rank) => rank.GetDescription().Replace("Silver ", "");
 
         /// <summary>
         ///  Retrieves the grade text colour.
         /// </summary>
-        public static ColourInfo GetRankNameColour(ScoreRank rank)
+        public static ColourInfo GetRankLetterColour(ScoreRank rank)
         {
             switch (rank)
             {
