@@ -277,7 +277,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             {
                 base.Update();
 
-                if (panel == null)
+                if (panel?.Parent == null)
                     return;
 
                 Size = panel.Horizontal ? PlayerPanel.SIZE_HORIZONTAL : PlayerPanel.SIZE_VERTICAL;
@@ -299,7 +299,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 isAnimating &= !Precision.AlmostEquals(panel.Position, targetPos, 0.5f);
 
                 Vector2 getFinalPosition()
-                    => panel.Parent!.ToLocalSpace(ScreenSpaceDrawQuad.Centre) - panel.AnchorPosition;
+                    => panel.Parent.ToLocalSpace(ScreenSpaceDrawQuad.Centre) - panel.AnchorPosition;
             }
         }
     }
