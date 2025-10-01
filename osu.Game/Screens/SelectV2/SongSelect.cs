@@ -987,6 +987,14 @@ namespace osu.Game.Screens.SelectV2
 
             switch (e.Action)
             {
+                case GlobalAction.Select:
+                    // in most circumstances this is handled already by the carousel itself, but there are cases where it will not be.
+                    // one of which is filtering out all visible beatmaps and attempting to start gameplay.
+                    // in that case, users still expect a `Select` press to advance to gameplay anyway, using the ambient selected beatmap if there is one,
+                    // which matches the behaviour resulting from clicking the osu! cookie in that scenario.
+                    SelectAndRun(Beatmap.Value.BeatmapInfo, OnStart);
+                    return true;
+
                 case GlobalAction.IncreaseModSpeed:
                     return modSpeedHotkeyHandler.ChangeSpeed(0.05, flattenedMods);
 
