@@ -182,6 +182,8 @@ namespace osu.Game.Graphics.UserInterface
                     }
                 }
 
+                protected new ItemContent Content => (ItemContent)base.Content;
+
                 private void updateColours()
                 {
                     BackgroundColour = BackgroundColourHover.Opacity(0);
@@ -221,13 +223,13 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     base.UpdateForegroundColour();
 
-                    if (Foreground.Children.FirstOrDefault() is Content content)
+                    if (Content is ItemContent content)
                         content.Hovering = IsHovered;
                 }
 
-                protected override Drawable CreateContent() => new Content();
+                protected override Drawable CreateContent() => new ItemContent();
 
-                protected new partial class Content : CompositeDrawable, IHasText
+                protected partial class ItemContent : CompositeDrawable, IHasText
                 {
                     public LocalisableString Text
                     {
@@ -240,7 +242,7 @@ namespace osu.Game.Graphics.UserInterface
 
                     private const float chevron_offset = -3;
 
-                    public Content()
+                    public ItemContent()
                     {
                         RelativeSizeAxes = Axes.X;
                         AutoSizeAxes = Axes.Y;

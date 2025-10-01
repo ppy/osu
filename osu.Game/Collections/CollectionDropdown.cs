@@ -270,7 +270,7 @@ namespace osu.Game.Collections
                 });
             }
 
-            protected override Drawable CreateContent() => (Content)base.CreateContent();
+            protected override Drawable CreateContent() => (ItemContent)base.CreateContent();
 
             private partial class NoFocusChangeIconButton : IconButton
             {
