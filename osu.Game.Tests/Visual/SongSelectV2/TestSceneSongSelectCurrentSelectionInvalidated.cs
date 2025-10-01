@@ -55,22 +55,26 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             waitForFiltering(6);
 
             BeatmapInfo? initiallySelected = null;
-            AddAssert("selected is taiko", () => (initiallySelected = selectedBeatmap)?.Ruleset.OnlineID, () => Is.EqualTo(1));
+            AddAssert("carousel beatmap is taiko", () => (initiallySelected = selectedBeatmap)?.Ruleset.OnlineID, () => Is.EqualTo(1));
+            AddUntilStep("global beatmap is taiko", () => Beatmap.Value.BeatmapInfo.Ruleset.OnlineID, () => Is.EqualTo(1));
 
             ChangeRuleset(0);
             waitForFiltering(7);
-            AddAssert("selected is osu", () => selectedBeatmap?.Ruleset.OnlineID, () => Is.EqualTo(0));
-            AddAssert("selected is same set as original", () => selectedBeatmap?.BeatmapSet, () => Is.EqualTo(initiallySelected!.BeatmapSet));
+            AddAssert("carousel beatmap is osu", () => selectedBeatmap?.Ruleset.OnlineID, () => Is.EqualTo(0));
+            AddUntilStep("global beatmap is osu", () => Beatmap.Value.BeatmapInfo.Ruleset.OnlineID, () => Is.EqualTo(0));
+            AddAssert("carousel beatmap is same set as original", () => selectedBeatmap?.BeatmapSet, () => Is.EqualTo(initiallySelected!.BeatmapSet));
 
             ChangeRuleset(1);
             waitForFiltering(8);
-            AddAssert("selected is taiko", () => selectedBeatmap?.Ruleset.OnlineID, () => Is.EqualTo(1));
-            AddAssert("selected is same set as original", () => selectedBeatmap?.BeatmapSet, () => Is.EqualTo(initiallySelected!.BeatmapSet));
+            AddAssert("carousel beatmap is taiko", () => selectedBeatmap?.Ruleset.OnlineID, () => Is.EqualTo(1));
+            AddUntilStep("global beatmap is taiko", () => Beatmap.Value.BeatmapInfo.Ruleset.OnlineID, () => Is.EqualTo(1));
+            AddAssert("carousel beatmap is same set as original", () => selectedBeatmap?.BeatmapSet, () => Is.EqualTo(initiallySelected!.BeatmapSet));
 
             ChangeRuleset(2);
             waitForFiltering(9);
-            AddAssert("selected is catch", () => selectedBeatmap?.Ruleset.OnlineID, () => Is.EqualTo(2));
-            AddAssert("selected is different set", () => selectedBeatmap?.BeatmapSet, () => Is.Not.EqualTo(initiallySelected!.BeatmapSet));
+            AddAssert("carousel beatmap is catch", () => selectedBeatmap?.Ruleset.OnlineID, () => Is.EqualTo(2));
+            AddUntilStep("global beatmap is catch", () => Beatmap.Value.BeatmapInfo.Ruleset.OnlineID, () => Is.EqualTo(2));
+            AddAssert("carousel beatmap is different set", () => selectedBeatmap?.BeatmapSet, () => Is.Not.EqualTo(initiallySelected!.BeatmapSet));
         }
 
         /// <summary>
