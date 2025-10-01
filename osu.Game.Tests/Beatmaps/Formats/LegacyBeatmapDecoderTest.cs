@@ -89,6 +89,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsFalse(beatmap.SamplesMatchPlaybackRate);
                 Assert.AreEqual(CountdownType.None, beatmap.Countdown);
                 Assert.AreEqual(0, beatmap.CountdownOffset);
+                Assert.IsTrue(beatmap.ComboFireInFrontOfStoryboard);
             }
         }
 
