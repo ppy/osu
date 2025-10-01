@@ -13,10 +13,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
+using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -1092,15 +1094,15 @@ namespace osu.Game.Screens.SelectV2
         /// <summary>
         /// The title of this group.
         /// </summary>
-        public string Title { get; }
+        public LocalisableString Title { get; }
 
         private readonly string uncasedTitle;
 
-        public GroupDefinition(int order, string title)
+        public GroupDefinition(int order, LocalisableString title)
         {
             Order = order;
             Title = title;
-            uncasedTitle = title.ToLowerInvariant();
+            uncasedTitle = title.ToLower().GetLocalised(LocalisationParameters.DEFAULT);
         }
 
         public virtual bool Equals(GroupDefinition? other) => uncasedTitle == other?.uncasedTitle;
@@ -1111,12 +1113,12 @@ namespace osu.Game.Screens.SelectV2
     /// <summary>
     /// Defines a grouping header for a set of carousel items grouped by star difficulty.
     /// </summary>
-    public record StarDifficultyGroupDefinition(int Order, string Title, StarDifficulty Difficulty) : GroupDefinition(Order, Title);
+    public record StarDifficultyGroupDefinition(int Order, LocalisableString Title, StarDifficulty Difficulty) : GroupDefinition(Order, Title);
 
     /// <summary>
     /// Defines a grouping header for a set of carousel items grouped by achieved rank.
     /// </summary>
-    public record RankDisplayGroupDefinition(ScoreRank Rank) : GroupDefinition(-(int)Rank, Rank.GetDescription());
+    public record RankDisplayGroupDefinition(ScoreRank Rank) : GroupDefinition(-(int)Rank, Rank.GetLocalisableDescription());
 
     /// <summary>
     /// Used to represent a portion of a <see cref="BeatmapSetInfo"/> under a <see cref="GroupDefinition"/>.

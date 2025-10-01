@@ -255,7 +255,7 @@ namespace osu.Game.Screens.SelectV2
 
             return groups.Values
                          .OrderBy(g => g.Group!.Order)
-                         .ThenBy(g => g.Group!.Title)
+                         .ThenBy(g => g.Group!.Title.ToString())
                          .ToList();
         }
 

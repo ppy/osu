@@ -159,18 +159,18 @@ namespace osu.Game.Screens.SelectV2
             {
                 case ScoreRank.SH:
                 case ScoreRank.XH:
-                    starRatingText.Colour = DrawableRank.GetRankNameColour(rank);
+                    starRatingText.Colour = DrawableRank.GetRankLetterColour(rank);
                     iconContainer.Colour = colourProvider.Background5;
                     break;
 
                 case ScoreRank.X:
                 case ScoreRank.S:
-                    starRatingText.Colour = DrawableRank.GetRankNameColour(rank);
+                    starRatingText.Colour = DrawableRank.GetRankLetterColour(rank);
                     iconContainer.Colour = colourProvider.Background5;
                     break;
 
                 case ScoreRank.F:
-                    starRatingText.Colour = DrawableRank.GetRankNameColour(rank);
+                    starRatingText.Colour = DrawableRank.GetRankLetterColour(rank);
                     iconContainer.Colour = colourProvider.Content1;
                     break;
 
