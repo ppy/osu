@@ -600,7 +600,9 @@ namespace osu.Game.Screens.SelectV2
 
                 if (validBeatmaps.Any())
                 {
-                    carousel.CurrentBeatmap = difficultyRecommender?.GetRecommendedBeatmap(validBeatmaps) ?? validBeatmaps.First();
+                    var beatmap = difficultyRecommender?.GetRecommendedBeatmap(validBeatmaps) ?? validBeatmaps.First();
+                    carousel.CurrentBeatmap = beatmap;
+                    debounceQueueSelection(beatmap);
                     return true;
                 }
             }
@@ -715,7 +717,7 @@ namespace osu.Game.Screens.SelectV2
 
             ensurePlayingSelected();
             updateBackgroundDim();
-            fetchOnlineInfo();
+            fetchOnlineInfo(force: true);
         }
 
         private void onLeavingScreen()
@@ -1056,11 +1058,11 @@ namespace osu.Game.Screens.SelectV2
         private CancellationTokenSource? onlineLookupCancellation;
         private Task<APIBeatmapSet?>? currentOnlineLookup;
 
-        private void fetchOnlineInfo()
+        private void fetchOnlineInfo(bool force = false)
         {
             var beatmapSetInfo = Beatmap.Value.BeatmapSetInfo;
 
-            if (lastLookupResult.Value?.Result?.OnlineID == beatmapSetInfo.OnlineID)
+            if (lastLookupResult.Value?.Result?.OnlineID == beatmapSetInfo.OnlineID && !force)
                 return;
 
             onlineLookupCancellation?.Cancel();

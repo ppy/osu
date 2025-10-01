@@ -144,8 +144,9 @@ namespace osu.Game.Utils
         /// Returns a gamefield-space quad surrounding the provided hit objects.
         /// </summary>
         /// <param name="hitObjects">The hit objects to calculate a quad for.</param>
-        public static Quad GetSurroundingQuad(IEnumerable<IHasPosition> hitObjects) =>
-            GetSurroundingQuad(enumerateStartAndEndPositions(hitObjects));
+        /// <param name="startAndEndOnly">Whether to only include the start and end positions of the slider, or include every control point in the slider.</param>
+        public static Quad GetSurroundingQuad(IEnumerable<IHasPosition> hitObjects, bool startAndEndOnly = false) =>
+            GetSurroundingQuad(startAndEndOnly ? enumerateStartAndEndPositions(hitObjects) : enumeratePositions(hitObjects));
 
         /// <summary>
         /// Returns the points that make up the convex hull of the provided points.
@@ -202,7 +203,7 @@ namespace osu.Game.Utils
         }
 
         public static List<Vector2> GetConvexHull(IEnumerable<IHasPosition> hitObjects) =>
-            GetConvexHull(enumerateStartAndEndPositions(hitObjects));
+            GetConvexHull(enumeratePositions(hitObjects));
 
         private static IEnumerable<Vector2> enumerateStartAndEndPositions(IEnumerable<IHasPosition> hitObjects) =>
             hitObjects.SelectMany(h =>
@@ -215,6 +216,17 @@ namespace osu.Game.Utils
                         // can't use EndPosition for reverse slider cases.
                         h.Position + path.Path.PositionAt(1)
                     };
+                }
+
+                return new[] { h.Position };
+            });
+
+        private static IEnumerable<Vector2> enumeratePositions(IEnumerable<IHasPosition> hitObjects) =>
+            hitObjects.SelectMany(h =>
+            {
+                if (h is IHasPath path)
+                {
+                    return path.Path.ControlPoints.Select(p => h.Position + p.Position);
                 }
 
                 return new[] { h.Position };

@@ -6,20 +6,20 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Screens.OnlinePlay.Matchmaking;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
     public partial class TestSceneMatchmakingCloud : OsuTestScene
     {
-        private MatchmakingCloud cloud = null!;
+        private CloudVisualisation cloud = null!;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Child = cloud = new MatchmakingCloud
+            Child = cloud = new CloudVisualisation
             {
                 RelativeSizeAxes = Axes.Both,
             };

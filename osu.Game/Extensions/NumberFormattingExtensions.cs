@@ -36,7 +36,7 @@ namespace osu.Game.Extensions
 
             string negativeSign = Math.Round(floatValue, significantDigits) < 0 ? "-" : string.Empty;
 
-            return FormattableString.Invariant($"{negativeSign}{Math.Abs(floatValue).ToString($"N{significantDigits}")}");
+            return $"{negativeSign}{Math.Abs(floatValue).ToString($"N{significantDigits}", CultureInfo.InvariantCulture)}";
         }
 
         /// <summary>
