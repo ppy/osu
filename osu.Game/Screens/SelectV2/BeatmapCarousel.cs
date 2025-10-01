@@ -1079,13 +1079,13 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         public LocalisableString Title { get; }
 
-        private readonly LocalisableString uncasedTitle;
+        private readonly string uncasedTitle;
 
         public GroupDefinition(int order, LocalisableString title)
         {
             Order = order;
             Title = title;
-            uncasedTitle = title.ToLower().ToString();
+            uncasedTitle = title.ToLower().GetLocalised(LocalisationParameters.DEFAULT);
         }
 
         public virtual bool Equals(GroupDefinition? other) => uncasedTitle == other?.uncasedTitle;
