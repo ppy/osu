@@ -9,6 +9,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -215,6 +216,26 @@ namespace osu.Game.Tests.Visual.Navigation
                 return Game.ScreenStack.CurrentScreen is Player;
             });
             AddAssert("leaderboard matches gameplay beatmap", () => Game.ChildrenOfType<LeaderboardManager>().Single().CurrentCriteria?.Beatmap, () => Is.EqualTo(beatmap().BeatmapInfo));
+        }
+
+        [Test]
+        public void TestEnterKeyProgressesToGameplayEvenIfCarouselFilteredOut()
+        {
+            PushAndConfirm(() => new SoloSongSelect());
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadOszIntoOsu(Game, virtualTrack: true).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("filter out active beatmap", () => this.ChildrenOfType<SearchTextBox>().First().Text = "abacadabadaeba");
+            AddUntilStep("wait for filter", () => this.ChildrenOfType<BeatmapCarousel>().Single().IsFiltering, () => Is.False);
+
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("player entered", () =>
+            {
+                DismissAnyNotifications();
+                return Game.ScreenStack.CurrentScreen is Player;
+            });
         }
 
         private Func<Player> playToResults()
