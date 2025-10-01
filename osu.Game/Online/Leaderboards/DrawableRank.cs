@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -53,9 +52,9 @@ namespace osu.Game.Online.Leaderboards
                             Origin = Anchor.Centre,
                             Spacing = new Vector2(-3, 0),
                             Padding = new MarginPadding { Top = 5 },
-                            Colour = GetRankNameColour(rank),
+                            Colour = GetRankLetterColour(rank),
                             Font = OsuFont.Numeric.With(size: 25),
-                            Text = GetRankName(rank),
+                            Text = GetRankLetter(rank),
                             ShadowColour = Color4.Black.Opacity(0.3f),
                             ShadowOffset = new Vector2(0, 0.08f),
                             Shadow = true,
@@ -65,12 +64,29 @@ namespace osu.Game.Online.Leaderboards
             };
         }
 
-        public static string GetRankName(ScoreRank rank) => rank.GetDescription().TrimEnd('+');
+        /// <summary>
+        /// Returns letters to be shown in places where ranks are shown on a badge or similar to the user.
+        /// </summary>
+        public static string GetRankLetter(ScoreRank rank)
+        {
+            switch (rank)
+            {
+                case ScoreRank.SH:
+                    return @"S";
+
+                case ScoreRank.X:
+                case ScoreRank.XH:
+                    return @"SS";
+
+                default:
+                    return rank.ToString();
+            }
+        }
 
         /// <summary>
         ///  Retrieves the grade text colour.
         /// </summary>
-        public static ColourInfo GetRankNameColour(ScoreRank rank)
+        public static ColourInfo GetRankLetterColour(ScoreRank rank)
         {
             switch (rank)
             {
