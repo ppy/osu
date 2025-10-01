@@ -453,8 +453,7 @@ namespace osu.Game.Graphics.Carousel
                 // matching with exact modifier consideration (so Ctrl+Enter would be ignored).
                 case Key.Enter:
                 case Key.KeypadEnter:
-                    activateSelection();
-                    return true;
+                    return activateSelection();
             }
 
             return base.OnKeyDown(e);
@@ -465,8 +464,7 @@ namespace osu.Game.Graphics.Carousel
             switch (e.Action)
             {
                 case GlobalAction.Select:
-                    activateSelection();
-                    return true;
+                    return activateSelection();
 
                 // the selection traversal handlers below are scheduled to avoid an issue
                 // wherein if the update frame rate is low, keeping one of the actions below pressed leads to selection moving back to the start / end.
@@ -560,10 +558,15 @@ namespace osu.Game.Graphics.Carousel
         {
         }
 
-        private void activateSelection()
+        private bool activateSelection()
         {
             if (currentKeyboardSelection.CarouselItem != null)
+            {
                 Activate(currentKeyboardSelection.CarouselItem);
+                return true;
+            }
+
+            return false;
         }
 
         private void traverseKeyboardSelection(int direction)
