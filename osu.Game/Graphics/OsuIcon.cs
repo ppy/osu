@@ -18,33 +18,30 @@ namespace osu.Game.Graphics
     {
         public const string FONT_NAME = @"Icons";
 
-        // ruleset icons in circles
+        // ruleset icons
         public static IconUsage RulesetOsu => get(OsuIconMapping.RulesetOsu);
         public static IconUsage RulesetMania => get(OsuIconMapping.RulesetMania);
         public static IconUsage RulesetCatch => get(OsuIconMapping.RulesetCatch);
         public static IconUsage RulesetTaiko => get(OsuIconMapping.RulesetTaiko);
 
-        // ruleset icons without circles
-        public static IconUsage FilledCircle => get(OsuIconMapping.FilledCircle);
         public static IconUsage Logo => get(OsuIconMapping.Logo);
         public static IconUsage EditCircle => get(OsuIconMapping.EditCircle);
         public static IconUsage LeftCircle => get(OsuIconMapping.LeftCircle);
         public static IconUsage RightCircle => get(OsuIconMapping.RightCircle);
 
-        // icons
         public static IconUsage Audio => get(OsuIconMapping.Audio);
         public static IconUsage Beatmap => get(OsuIconMapping.Beatmap);
         public static IconUsage Calendar => get(OsuIconMapping.Calendar);
-        public static IconUsage CollapseA => get(OsuIconMapping.CollapseA);
         public static IconUsage ChangelogA => get(OsuIconMapping.ChangelogA);
-
         public static IconUsage ChangelogB => get(OsuIconMapping.ChangelogB);
         public static IconUsage Chat => get(OsuIconMapping.Chat);
         public static IconUsage CheckCircle => get(OsuIconMapping.CheckCircle);
         public static IconUsage Clock => get(OsuIconMapping.Clock);
+        public static IconUsage CollapseA => get(OsuIconMapping.CollapseA);
         public static IconUsage Collections => get(OsuIconMapping.Collections);
         public static IconUsage Cross => get(OsuIconMapping.Cross);
         public static IconUsage CrossCircle => get(OsuIconMapping.CrossCircle);
+        public static IconUsage Crown => get(OsuIconMapping.Crown);
         public static IconUsage DailyChallenge => get(OsuIconMapping.DailyChallenge);
         public static IconUsage Debug => get(OsuIconMapping.Debug);
         public static IconUsage Delete => get(OsuIconMapping.Delete);
@@ -206,9 +203,6 @@ namespace osu.Game.Graphics
             [Description(@"RulesetTaiko")]
             RulesetTaiko,
 
-            [Description(@"FilledCircle")]
-            FilledCircle,
-
             [Description(@"EditCircle")]
             EditCircle,
 
@@ -242,17 +236,20 @@ namespace osu.Game.Graphics
             [Description(@"clock")]
             Clock,
 
-            [Description(@"collections")]
-            Collections,
-
             [Description(@"collapse-a")]
             CollapseA,
+
+            [Description(@"collections")]
+            Collections,
 
             [Description(@"cross")]
             Cross,
 
             [Description(@"cross-circle")]
             CrossCircle,
+
+            [Description(@"crown")]
+            Crown,
 
             [Description(@"daily-challenge")]
             DailyChallenge,
@@ -281,7 +278,7 @@ namespace osu.Game.Graphics
             [Description(@"expand-b")]
             ExpandB,
 
-            [Description(@"featured-artist-a")]
+            [Description(@"featured-artist")]
             FeaturedArtist,
 
             [Description(@"featured-artist-circle")]
