@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Ranking
     {
         public readonly Bindable<ScoreInfo?> Score = new Bindable<ScoreInfo?>();
         public ScoreInfo? AchievedScore { get; init; }
-
+        public readonly Bindable<string> Username = new Bindable<string>(lastOfflineUsername);
         private OsuTextBox? usernameTextBox;
         private Container? container;
 
@@ -92,6 +92,7 @@ namespace osu.Game.Screens.Ranking
                 if (usernameTextBox.Text != text)
                     usernameTextBox.Text = text;
 
+                Username.Value = text;
                 updateScoreUsername(text);
                 lastOfflineUsername = text;
             };
@@ -111,21 +112,21 @@ namespace osu.Game.Screens.Ranking
             bool shouldBeVisible = AchievedScore != null &&
                                    api != null &&
                                    api.State.Value == APIState.Offline &&
-                                   AchievedScore.User.Username == "Guest" &&
                                    AchievedScore.UserID == APIUser.SYSTEM_USER_ID;
             Alpha = shouldBeVisible ? 1 : 0;
         }
 
         private void commitIfPending()
         {
-            if (realm == null || AchievedScore == null) return;
+            if (api == null || realm == null || AchievedScore == null) return;
 
-            if (AchievedScore.User.Username == "Guest" && AchievedScore.UserID == APIUser.SYSTEM_USER_ID)
+            if (api.State.Value == APIState.Offline && AchievedScore.UserID == APIUser.SYSTEM_USER_ID)
             {
                 string text = string.IsNullOrWhiteSpace(usernameTextBox?.Text) ? "Guest" : usernameTextBox.Text;
 
                 if (text != "Guest")
                 {
+                    Username.Value = text;
                     updateScoreUsername(text);
                     lastOfflineUsername = text;
                 }

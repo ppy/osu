@@ -7,15 +7,17 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
-using osu.Framework.Extensions;
-using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
@@ -23,7 +25,6 @@ using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Resources;
-using osu.Game.Graphics.UserInterface;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Ranking
@@ -181,6 +182,36 @@ namespace osu.Game.Tests.Visual.Ranking
             OsuTextBox secondTextBox = null!;
             AddStep("get second textbox", () => secondTextBox = this.ChildrenOfType<OfflineUsernameInput>().Single().ChildrenOfType<OsuTextBox>().Single());
             AddAssert("prefilled with last username", () => secondTextBox.Text == "Alice");
+        }
+
+        [Test]
+        public void TestScorePanelUsernameUpdatesImmediatelyOnCommit()
+        {
+            TestResultsScreen screen = null!;
+            Guid dbScoreId = Guid.Empty;
+
+            AddStep("create and import guest score", () =>
+            {
+                var score = TestResources.CreateTestScoreInfo(importedBeatmap);
+                score.User = new GuestUser();
+                var live = scoreManager.Import(score)!;
+                dbScoreId = live.Value.ID;
+            });
+            AddStep("show results", () => loadResults(sc => screen = sc, Realm.Run(r => r.Find<ScoreInfo>(dbScoreId)!).Detach()));
+            AddUntilStep("results loaded", () => screen.IsLoaded);
+
+            AddUntilStep("panel present", () => this.ChildrenOfType<ScorePanel>().Any(p => p.Score.ID == dbScoreId));
+            AddAssert("panel initially guest", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.ID == dbScoreId).Score.User.Username == "Guest");
+
+            OsuTextBox textBox = null!;
+            AddStep("get username textbox", () => textBox = this.ChildrenOfType<OfflineUsernameInput>().Single().ChildrenOfType<OsuTextBox>().Single());
+            AddStep("focus textbox", () => ((IFocusManager)InputManager).ChangeFocus(textBox));
+            AddStep("change to PanelName", () => textBox.Text = "PanelName");
+            AddStep("commit", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("score model username updated", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.ID == dbScoreId).Score.User.Username == "PanelName");
+            AddUntilStep("panel text updated", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.ID == dbScoreId)
+                                                         .ChildrenOfType<OsuSpriteText>().Any(t => t.Text.ToString() == "PanelName"));
         }
 
         private void loadResults(Action<TestResultsScreen> onCreated, ScoreInfo score)
