@@ -52,10 +52,12 @@ namespace osu.Game.Overlays.Comments
         private FillFlowContainer pinnedContent;
         private NewCommentEditor newCommentEditor;
         private FillFlowContainer content;
-        private DeletedCommentsCounter deletedCommentsCounter;
+
         private CommentsShowMoreButton moreButton;
         private TotalCommentsCounter commentCounter;
         private UpdateableAvatar avatar;
+
+        // private DeletedCommentsCounter deletedCommentsCounter;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -149,15 +151,16 @@ namespace osu.Game.Overlays.Comments
                                     Margin = new MarginPadding { Bottom = 20 },
                                     Children = new Drawable[]
                                     {
-                                        deletedCommentsCounter = new DeletedCommentsCounter
-                                        {
-                                            ShowDeleted = { BindTarget = ShowDeleted },
-                                            Margin = new MarginPadding
-                                            {
-                                                Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING,
-                                                Vertical = 10
-                                            }
-                                        },
+                                        // TODO: This should eventually be visible for moderators.
+                                        // deletedCommentsCounter = new DeletedCommentsCounter
+                                        // {
+                                        //     ShowDeleted = { BindTarget = ShowDeleted },
+                                        //     Margin = new MarginPadding
+                                        //     {
+                                        //         Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING,
+                                        //         Vertical = 10
+                                        //     }
+                                        // },
                                         new Container
                                         {
                                             AutoSizeAxes = Axes.Y,
@@ -231,7 +234,7 @@ namespace osu.Game.Overlays.Comments
         protected void ClearComments()
         {
             currentPage = 1;
-            deletedCommentsCounter.Count.Value = 0;
+            // deletedCommentsCounter.Count.Value = 0;
             moreButton.Show();
             moreButton.IsLoading = true;
             pinnedContent.Clear();
@@ -244,7 +247,8 @@ namespace osu.Game.Overlays.Comments
         protected void OnSuccess(CommentBundle response)
         {
             commentCounter.Current.Value = response.Total;
-            newCommentEditor.CommentableMeta.Value = response.CommentableMeta.SingleOrDefault(m => m.Id == id.Value && string.Equals(m.Type, type.Value.ToString().ToSnakeCase(), StringComparison.OrdinalIgnoreCase));
+            newCommentEditor.CommentableMeta.Value =
+                response.CommentableMeta.SingleOrDefault(m => m.Id == id.Value && string.Equals(m.Type, type.Value.ToString().ToSnakeCase(), StringComparison.OrdinalIgnoreCase));
 
             if (!response.Comments.Any())
             {
@@ -284,7 +288,7 @@ namespace osu.Game.Overlays.Comments
                 {
                     pinnedContent.AddRange(loaded.Where(d => d.Comment.Pinned));
                     content.AddRange(loaded.Where(d => !d.Comment.Pinned));
-                    deletedCommentsCounter.Count.Value += topLevelComments.Select(d => d.Comment).Count(c => c.IsDeleted && c.IsTopLevel);
+                    // deletedCommentsCounter.Count.Value += topLevelComments.Select(d => d.Comment).Count(c => c.IsDeleted && c.IsTopLevel);
 
                     if (bundle.HasMore)
                     {
