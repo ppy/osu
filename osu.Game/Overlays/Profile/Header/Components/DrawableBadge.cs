@@ -31,6 +31,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             Child = new Sprite
             {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 FillMode = FillMode.Fit,
                 RelativeSizeAxes = Axes.Both,
                 Texture = textures.Get(badge.ImageUrl),

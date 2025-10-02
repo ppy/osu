@@ -4,7 +4,6 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
@@ -71,7 +70,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             CheckHasSelection();
             AddAssert("drawable selection non-null", () => selection, () => Is.Not.Null);
-            AddAssert("drawable selection matches carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
+            AddAssert("drawable selection matches carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentGroupedBeatmap));
 
             RemoveAllBeatmaps();
             AddUntilStep("no drawable selection", GetSelectedPanel, () => Is.Null);
@@ -82,9 +81,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             CheckHasSelection();
             AddAssert("no drawable selection", GetSelectedPanel, () => Is.Null);
 
-            AddStep("add previous selection", () => BeatmapSets.Add(((BeatmapInfo)selection!).BeatmapSet!));
+            AddStep("add previous selection", () => BeatmapSets.Add(((GroupedBeatmap)selection!).Beatmap.BeatmapSet!));
 
-            AddAssert("selection matches original carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
+            AddAssert("selection matches original carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentGroupedBeatmap));
             AddUntilStep("drawable selection restored", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(selection));
             AddAssert("carousel item is visible", () => GetSelectedPanel()?.Item?.IsVisible, () => Is.True);
 
@@ -121,7 +120,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             WaitForBeatmapSelection(0, 0);
             // Expanding a group will move keyboard selection to the selected beatmap if contained.
             AddAssert("keyboard selected panel is expanded", () => groupPanel?.Expanded.Value, () => Is.True);
-            AddAssert("keyboard selected panel is beatmap", () => GetKeyboardSelectedPanel()?.Item?.Model, Is.TypeOf<BeatmapInfo>);
+            AddAssert("keyboard selected panel is beatmap", () => GetKeyboardSelectedPanel()?.Item?.Model, Is.TypeOf<GroupedBeatmap>);
         }
 
         [Test]
@@ -199,7 +198,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         private void checkBeatmapIsKeyboardSelected() =>
-            AddUntilStep("check keyboard selected group is beatmap", () => GetKeyboardSelectedPanel()?.Item?.Model, () => Is.EqualTo(Carousel.CurrentSelection));
+            AddUntilStep("check keyboard selected group is beatmap", () => GetKeyboardSelectedPanel()?.Item?.Model, () => Is.EqualTo(Carousel.CurrentGroupedBeatmap));
 
         private void checkGroupKeyboardSelected(int index) => AddUntilStep($"check keyboard selected group is {index}", () => GetKeyboardSelectedPanel()?.Item?.Model, () =>
         {
@@ -337,6 +336,32 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             ApplyToFilterAndWaitForFilter("filter", c => c.SearchText = "Some");
 
             AddAssert("expanded group is still first", () => (Carousel.ExpandedGroup as StarDifficultyGroupDefinition)?.Difficulty.Stars, () => Is.EqualTo(0));
+        }
+
+        [Test]
+        public void TestExpandedGroupDoesNotExpandAgainOnRefilterIfManuallyCollapsed()
+        {
+            SelectPrevSet();
+
+            WaitForBeatmapSelection(2, 9);
+            AddAssert("expanded group is last", () => (Carousel.ExpandedGroup as StarDifficultyGroupDefinition)?.Difficulty.Stars, () => Is.EqualTo(6));
+
+            SelectNextPanel();
+            Select();
+
+            WaitForBeatmapSelection(2, 9);
+            AddAssert("expanded group is first", () => (Carousel.ExpandedGroup as StarDifficultyGroupDefinition)?.Difficulty.Stars, () => Is.EqualTo(0));
+
+            ToggleGroupCollapse();
+
+            // doesn't actually filter anything away, but triggers a filter.
+            ApplyToFilterAndWaitForFilter("filter", c => c.SearchText = "Some");
+            AddAssert("group didn't re-expand", () => (Carousel.ExpandedGroup as StarDifficultyGroupDefinition)?.Difficulty.Stars, () => Is.Null);
+
+            ToggleGroupCollapse();
+
+            ApplyToFilterAndWaitForFilter("filter", c => c.SearchText = "Som");
+            AddAssert("expanded group is first", () => (Carousel.ExpandedGroup as StarDifficultyGroupDefinition)?.Difficulty.Stars, () => Is.EqualTo(0));
         }
     }
 }
