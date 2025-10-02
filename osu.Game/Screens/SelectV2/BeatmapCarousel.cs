@@ -661,6 +661,24 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
+        protected override double? GetScrollTarget()
+        {
+            double? target = base.GetScrollTarget();
+
+            // if the base implementation returned null, it means that the keyboard selection has been filtered out and is no longer visible
+            // attempt a fallback to other possibly expanded panels (set first, then group)
+            if (target == null)
+            {
+                var items = GetCarouselItems();
+                var targetItem = items?.FirstOrDefault(i => CheckModelEquality(i.Model, ExpandedBeatmapSet))
+                                 ?? items?.FirstOrDefault(i => CheckModelEquality(i.Model, ExpandedGroup));
+
+                target = targetItem?.CarouselYPosition;
+            }
+
+            return target;
+        }
+
         #endregion
 
         #region Audio
