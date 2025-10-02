@@ -117,6 +117,8 @@ namespace osu.Game.Online.Multiplayer
 
         public event Action<MultiplayerCountdown>? CountdownStopped;
 
+        public event Action<MatchServerEvent>? MatchEvent;
+
         public event Action<MultiplayerRoomUser, MultiplayerUserState>? UserStateChanged;
 
         public event Action? MatchmakingQueueJoined;
@@ -704,7 +706,7 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
-        public Task MatchEvent(MatchServerEvent e)
+        Task IMultiplayerClient.MatchEvent(MatchServerEvent e)
         {
             handleRoomRequest(() =>
             {
@@ -737,6 +739,7 @@ namespace osu.Game.Online.Multiplayer
                         break;
                 }
 
+                MatchEvent?.Invoke(e);
                 RoomUpdated?.Invoke();
             });
 

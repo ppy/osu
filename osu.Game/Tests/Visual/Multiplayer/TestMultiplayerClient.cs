@@ -15,6 +15,7 @@ using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Matchmaking;
+using osu.Game.Online.Matchmaking.Events;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
@@ -386,7 +387,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
-        public override async Task SendMatchRequest(MatchUserRequest request)
+        public override Task SendMatchRequest(MatchUserRequest request)
+            => SendUserMatchRequest(api.LocalUser.Value.OnlineID, request);
+
+        public async Task SendUserMatchRequest(int userId, MatchUserRequest request)
         {
             request = clone(request);
 
@@ -404,7 +408,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     if (targetTeam != null)
                     {
                         userState.TeamID = targetTeam.ID;
-                        await ((IMultiplayerClient)this).MatchUserStateChanged(clone(LocalUser.UserID), clone(userState)).ConfigureAwait(false);
+                        await ((IMultiplayerClient)this).MatchUserStateChanged(userId, clone(userState)).ConfigureAwait(false);
                     }
 
                     break;
@@ -415,6 +419,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 case StopCountdownRequest stopCountdown:
                     await StopCountdown(ServerRoom.ActiveCountdowns.First(c => c.ID == stopCountdown.ID)).ConfigureAwait(false);
+                    break;
+
+                case MatchmakingAvatarActionRequest avatarAction:
+                    await ((IMultiplayerClient)this).MatchEvent(new MatchmakingAvatarActionEvent
+                    {
+                        UserId = userId,
+                        Action = avatarAction.Action
+                    }).ConfigureAwait(false);
                     break;
             }
         }
