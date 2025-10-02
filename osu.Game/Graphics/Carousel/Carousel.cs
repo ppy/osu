@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -79,7 +80,7 @@ namespace osu.Game.Graphics.Carousel
         /// <summary>
         /// The number of times filter operations have been triggered.
         /// </summary>
-        internal int FilterCount { get; private set; }
+        public int FilterCount { get; private set; }
 
         /// <summary>
         /// The number of displayable items currently being tracked (before filtering).
@@ -106,7 +107,7 @@ namespace osu.Game.Graphics.Carousel
         /// The selection is never reset due to not existing. It can be set to anything.
         /// If no matching carousel item exists, there will be no visually selected item while waiting for potential new item which matches.
         /// </remarks>
-        public object? CurrentSelection
+        protected object? CurrentSelection
         {
             get => currentSelection.Model;
             set
@@ -211,6 +212,12 @@ namespace osu.Game.Graphics.Carousel
         }
 
         /// <summary>
+        /// Called when <see cref="Items"/> changes in any way.
+        /// </summary>
+        /// <returns>Whether a re-filter is required.</returns>
+        protected virtual bool HandleItemsChanged(NotifyCollectionChangedEventArgs args) => true;
+
+        /// <summary>
         /// Fired after a filter operation completed.
         /// </summary>
         protected virtual void HandleFilterCompleted()
@@ -301,7 +308,11 @@ namespace osu.Game.Graphics.Carousel
                 RelativeSizeAxes = Axes.Both,
             };
 
-            Items.BindCollectionChanged((_, _) => filterAfterItemsChanged.Invalidate());
+            Items.BindCollectionChanged((_, args) =>
+            {
+                if (HandleItemsChanged(args))
+                    filterAfterItemsChanged.Invalidate();
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -442,8 +453,7 @@ namespace osu.Game.Graphics.Carousel
                 // matching with exact modifier consideration (so Ctrl+Enter would be ignored).
                 case Key.Enter:
                 case Key.KeypadEnter:
-                    activateSelection();
-                    return true;
+                    return activateSelection();
             }
 
             return base.OnKeyDown(e);
@@ -454,8 +464,7 @@ namespace osu.Game.Graphics.Carousel
             switch (e.Action)
             {
                 case GlobalAction.Select:
-                    activateSelection();
-                    return true;
+                    return activateSelection();
 
                 // the selection traversal handlers below are scheduled to avoid an issue
                 // wherein if the update frame rate is low, keeping one of the actions below pressed leads to selection moving back to the start / end.
@@ -549,10 +558,15 @@ namespace osu.Game.Graphics.Carousel
         {
         }
 
-        private void activateSelection()
+        private bool activateSelection()
         {
             if (currentKeyboardSelection.CarouselItem != null)
+            {
                 Activate(currentKeyboardSelection.CarouselItem);
+                return true;
+            }
+
+            return false;
         }
 
         private void traverseKeyboardSelection(int direction)
@@ -750,10 +764,10 @@ namespace osu.Game.Graphics.Carousel
                 updateItemYPosition(item, ref lastVisible, ref yPos);
 
                 if (CheckModelEquality(item.Model, currentKeyboardSelection.Model!))
-                    currentKeyboardSelection = new Selection(currentKeyboardSelection.Model, item, item.CarouselYPosition, i);
+                    currentKeyboardSelection = new Selection(currentKeyboardSelection.Model, item, item.CarouselYPosition + item.DrawHeight / 2, i);
 
                 if (CheckModelEquality(item.Model, currentSelection.Model!))
-                    currentSelection = new Selection(currentSelection.Model, item, item.CarouselYPosition, i);
+                    currentSelection = new Selection(currentSelection.Model, item, item.CarouselYPosition + item.DrawHeight / 2, i);
             }
 
             // Update the total height of all items (to make the scroll container scrollable through the full height even though

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -23,7 +24,9 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.SelectV2;
+using osu.Game.Tests.Resources;
 using osuTK.Input;
+using BeatmapCarousel = osu.Game.Screens.SelectV2.BeatmapCarousel;
 using FooterButtonMods = osu.Game.Screens.SelectV2.FooterButtonMods;
 using FooterButtonOptions = osu.Game.Screens.SelectV2.FooterButtonOptions;
 using FooterButtonRandom = osu.Game.Screens.SelectV2.FooterButtonRandom;
@@ -302,6 +305,29 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
         }
 
+        /// <summary>
+        /// Last played and rank achieved may have changed, so we want to make sure filtering runs on resume to song select.
+        /// </summary>
+        [Test]
+        public void TestFilteringRunsAfterReturningFromGameplay()
+        {
+            AddStep("import actual beatmap", () => Beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely());
+
+            LoadSongSelect();
+
+            AddUntilStep("wait for filtered", () => SongSelect.ChildrenOfType<BeatmapCarousel>().Single().FilterCount, () => Is.EqualTo(1));
+
+            AddStep("enter gameplay", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
+            AddUntilStep("wait for fail", () => ((Player)Stack.CurrentScreen).GameplayState.HasFailed);
+
+            AddStep("exit gameplay", () => Stack.CurrentScreen.Exit());
+
+            AddUntilStep("wait for song select", () => Stack.CurrentScreen is Screens.SelectV2.SongSelect);
+            AddUntilStep("wait for filtered", () => SongSelect.ChildrenOfType<BeatmapCarousel>().Single().FilterCount, () => Is.EqualTo(2));
+        }
+
         [Test]
         public void TestAutoplayShortcut()
         {
@@ -566,7 +592,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             LoadSongSelect();
 
             ImportBeatmapForRuleset(0);
-            AddAssert("options enabled", () => this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+            AddUntilStep("options enabled", () => this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
 
             AddStep("click", () => this.ChildrenOfType<FooterButtonOptions>().Single().TriggerClick());
             AddUntilStep("popover displayed", () => this.ChildrenOfType<FooterButtonOptions.Popover>().Any(p => p.IsPresent));
@@ -623,7 +649,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             ImportBeatmapForRuleset(0);
 
-            AddAssert("options enabled", () => this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+            AddUntilStep("options enabled", () => this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
             AddStep("delete all beatmaps", () => Beatmaps.Delete());
 
             AddAssert("beatmap selected", () => !Beatmap.IsDefault);
