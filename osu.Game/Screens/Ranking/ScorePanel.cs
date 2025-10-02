@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Contracted;
 using osu.Game.Screens.Ranking.Expanded;
@@ -115,6 +116,8 @@ namespace osu.Game.Screens.Ranking
 
         private DrawableSample? samplePanelFocus;
 
+        private Bindable<double?> lastSamplePlayback = null!;
+
         public ScorePanel(ScoreInfo score, bool isNewLocalScore = false)
         {
             Score = score;
@@ -124,7 +127,7 @@ namespace osu.Game.Screens.Ranking
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, SessionStatics statics)
         {
             // ScorePanel doesn't include the top extruding area in its own size.
             // Adding a manual offset here allows the expanded version to take on an "acceptable" vertical centre when at 100% UI scale.
@@ -186,6 +189,8 @@ namespace osu.Game.Screens.Ranking
                     samplePanelFocus = new DrawableSample(audio.Samples.Get(@"Results/score-panel-focus"))
                 }
             };
+
+            lastSamplePlayback = statics.GetBindable<double?>(Static.LastResultsScreenSamplePlaybackTime);
         }
 
         protected override void LoadComplete()
@@ -230,11 +235,18 @@ namespace osu.Game.Screens.Ranking
 
         private void playAppearSample()
         {
+            bool enoughSampleTimeElapsed = !lastSamplePlayback.Value.HasValue || Time.Current - lastSamplePlayback.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
+
+            if (!enoughSampleTimeElapsed)
+                return;
+
             var channel = samplePanelFocus?.GetChannel();
             if (channel == null) return;
 
             channel.Frequency.Value = 0.99 + RNG.NextDouble(0.2);
             channel.Play();
+
+            lastSamplePlayback.Value = Time.Current;
         }
 
         private void updateState()
