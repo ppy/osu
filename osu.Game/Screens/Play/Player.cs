@@ -99,6 +99,8 @@ namespace osu.Game.Screens.Play
 
         public Action<bool> PrepareLoaderForRestart;
 
+        protected static bool IsQuickRestart { get; private set; }
+
         private bool isRestarting;
         private bool skipExitTransition;
 
@@ -754,6 +756,7 @@ namespace osu.Game.Screens.Play
                 return false;
 
             isRestarting = true;
+            IsQuickRestart = quickRestart;
 
             // at the point of restarting the track should either already be paused or the volume should be zero.
             // stopping here is to ensure music doesn't become audible after exiting back to PlayerLoader.
@@ -1139,6 +1142,9 @@ namespace osu.Game.Screens.Play
 
             StartGameplay();
             OnGameplayStarted?.Invoke();
+
+            if (!isRestarting)
+                IsQuickRestart = false;
         }
 
         /// <summary>

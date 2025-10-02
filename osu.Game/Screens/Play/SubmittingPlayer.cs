@@ -154,7 +154,8 @@ namespace osu.Game.Screens.Play
                                 break;
 
                             case @"invalid or missing beatmap_hash":
-                                Logger.Log($"This beatmap does not match the online version. Please update or redownload it.\n\n{whatWillHappen}", level: LogLevel.Important);
+                                if (!IsQuickRestart)
+                                    Logger.Log($"This beatmap does not match the online version. Please update or redownload it.\n\n{whatWillHappen}", level: LogLevel.Important);
                                 break;
 
                             case @"expired token":
