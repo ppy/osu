@@ -390,7 +390,7 @@ namespace osu.Game.Screens.Menu
                     return false;
 
                 case ButtonSystemState.Multi:
-                    buttonsPlay.First().TriggerClick();
+                    buttonsMulti.First().TriggerClick();
                     return false;
 
                 case ButtonSystemState.Edit:
