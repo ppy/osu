@@ -13,12 +13,14 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online;
+using osu.Game.Online.Matchmaking.Events;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -28,6 +30,7 @@ using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.Gameplay;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Users;
+using osuTK.Input;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 {
@@ -144,7 +147,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                                         Width = 700,
                                         Height = 130,
                                         Padding = new MarginPadding { Bottom = row_padding },
-                                        Child = chat = new MatchChatDisplay(new Room(room))
+                                        Child = chat = new MatchmakingChatDisplay(new Room(room))
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                         }
@@ -288,6 +291,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
                     beatmapDownloader.Download(beatmapSet);
                 }));
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            switch (e.Key)
+            {
+                case Key.Space:
+                    if (e.Repeat)
+                        return true;
+
+                    client.SendMatchRequest(new MatchmakingAvatarActionRequest { Action = MatchmakingAvatarAction.Jump }).FireAndForget();
+                    return true;
+            }
+
+            return false;
         }
 
         private bool exitConfirmed;
