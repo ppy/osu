@@ -223,7 +223,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 swishSample = audio.Samples.Get(@"UI/overlay-pop-in");
                 swooshSample = audio.Samples.Get(@"UI/overlay-big-pop-out");
                 roundUpSample = audio.Samples.Get(@"Multiplayer/Matchmaking/round-up");
-
             }
 
             private int round;
@@ -257,10 +256,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     {
                         swooshChannel = swooshSample?.GetChannel();
 
-                        if (swooshChannel != null) {
-                            swooshChannel.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH;
-                            swooshChannel?.Play();
-                        }
+                        if (swooshChannel == null) return;
+
+                        swooshChannel.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH;
+                        swooshChannel?.Play();
                     }, 1250);
 
                     Scheduler.AddDelayed(() =>
