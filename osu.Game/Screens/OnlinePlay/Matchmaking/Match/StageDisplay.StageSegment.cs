@@ -39,8 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             private DateTimeOffset countdownEndTime;
             private SpriteIcon arrow = null!;
 
-            private Sample? countdownTickSample;
-            private double? lastSamplePlayback;
+            private Sample? segmentStartedSample;
 
             private Container mainContent = null!;
 
@@ -120,7 +119,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 };
 
                 Alpha = 0.5f;
-                countdownTickSample = audio.Samples.Get(@"Multiplayer/countdown-tick");
+                segmentStartedSample = audio.Samples.Get(@"Multiplayer/Matchmaking/stage-segment");
             }
 
             protected override void LoadComplete()
@@ -156,15 +155,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 }
 
                 progressBar.Width = (float)Math.Clamp(elapsed.TotalMilliseconds / total.TotalMilliseconds, 0, 1);
-
-                int secondsRemaining = Math.Max(0, (int)Math.Ceiling((total.TotalMilliseconds - elapsed.TotalMilliseconds) / 1000));
-
-                if (total.TotalMilliseconds - elapsed.TotalMilliseconds <= 3000
-                    && lastSamplePlayback != secondsRemaining)
-                {
-                    countdownTickSample?.Play();
-                    lastSamplePlayback = secondsRemaining;
-                }
             }
 
             private void onMatchRoomStateChanged(MatchRoomState? state) => Scheduler.Add(() =>
@@ -213,6 +203,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 arrow.FadeIn(500, Easing.OutQuint);
 
                 this.FadeIn(200);
+
+                segmentStartedSample?.Play();
             });
 
             private void onCountdownStopped(MultiplayerCountdown countdown) => Scheduler.Add(() =>
