@@ -104,6 +104,14 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             updateState();
         }
 
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (e.ShiftPressed)
+                return false;
+
+            return base.OnClick(e);
+        }
+
         private void updateState()
         {
             bool isHovered = IsHovered && Enabled.Value;

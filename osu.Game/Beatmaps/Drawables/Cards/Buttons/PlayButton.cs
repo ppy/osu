@@ -8,6 +8,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -85,6 +86,14 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                 progress.Value = previewTrack.CurrentTime / previewTrack.Length;
             else
                 progress.Value = 0;
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (e.ShiftPressed)
+                return false;
+
+            return base.OnClick(e);
         }
 
         private void updateState(ValueChangedEvent<bool> playing)
