@@ -30,6 +30,8 @@ namespace osu.Game.IO.Archives
         private readonly Stream archiveStream;
         private readonly ZipArchive archive;
 
+        private readonly Dictionary<string, ZipArchiveEntry> entries = new Dictionary<string, ZipArchiveEntry>();
+
         static ZipArchiveReader()
         {
             // Required to support rare code pages.
@@ -47,12 +49,18 @@ namespace osu.Game.IO.Archives
             {
                 ArchiveEncoding = DEFAULT_ENCODING
             });
+
+            // Cache all non-directory entries in the archive and store them in a dictionary for fast lookup
+            foreach (var entry in archive.Entries.Where(e => !e.IsDirectory))
+            {
+                if (entry.Key != null)
+                    entries[entry.Key] = entry;
+            }
         }
 
         public override Stream GetStream(string name)
         {
-            ZipArchiveEntry entry = archive.Entries.SingleOrDefault(e => e.Key == name);
-            if (entry == null)
+            if (!entries.TryGetValue(name, out var entry))
                 return null;
 
             using (Stream s = entry.OpenEntryStream())
