@@ -661,6 +661,19 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
+        public void ExpandGroupForCurrentSelection()
+        {
+            if (CurrentGroupedBeatmap?.Group == null)
+                return;
+
+            if (CheckModelEquality(ExpandedGroup, CurrentGroupedBeatmap.Group))
+                return;
+
+            var groupItem = GetCarouselItems()?.FirstOrDefault(i => CheckModelEquality(i.Model, CurrentGroupedBeatmap.Group));
+            if (groupItem != null)
+                HandleItemActivated(groupItem);
+        }
+
         #endregion
 
         #region Audio
@@ -845,6 +858,9 @@ namespace osu.Game.Screens.SelectV2
 
             if (x is StarDifficultyGroupDefinition starX && y is StarDifficultyGroupDefinition starY)
                 return starX.Equals(starY);
+
+            if (x is RankDisplayGroupDefinition rankX && y is RankDisplayGroupDefinition rankY)
+                return rankX.Equals(rankY);
 
             return base.CheckModelEquality(x, y);
         }
