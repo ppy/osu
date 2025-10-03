@@ -71,6 +71,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
+        [Resolved]
+        private MusicController musicController { get; set; } = null!;
+
         private readonly IBindable<MatchmakingScreenState> currentState = new Bindable<MatchmakingScreenState>();
 
         private readonly Bindable<MatchmakingPool[]> availablePools = new Bindable<MatchmakingPool[]>();
@@ -369,6 +372,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         }
                     };
                     matchFoundSample?.Play();
+                    musicController.DuckMomentarily(1250);
                     break;
 
                 case MatchmakingScreenState.AcceptedWaitingForRoom:
