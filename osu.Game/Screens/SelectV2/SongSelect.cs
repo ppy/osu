@@ -323,7 +323,13 @@ namespace osu.Game.Screens.SelectV2
             {
                 Hotkey = GlobalAction.ToggleModSelection,
                 Current = Mods,
-                RequestDeselectAllMods = () => Mods.Value = Array.Empty<Mod>()
+                RequestDeselectAllMods = () =>
+                {
+                    if (modSelectOverlay.State.Value == Visibility.Hidden)
+                        Mods.Value = Array.Empty<Mod>();
+                    else
+                        modSelectOverlay.DeselectAll();
+                }
             },
             new FooterButtonRandom
             {
