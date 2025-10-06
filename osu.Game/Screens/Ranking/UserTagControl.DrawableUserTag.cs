@@ -20,6 +20,12 @@ namespace osu.Game.Screens.Ranking
     {
         public partial class DrawableUserTag : OsuAnimatedButton
         {
+            /// <summary>
+            /// Minimum count of votes required to display a tag on the beatmap's page.
+            /// Should match value specified web-side as https://github.com/ppy/osu-web/blob/cae2fdf03cfb8c30c8e332cfb142e03188ceffef/config/osu.php#L59.
+            /// </summary>
+            public const int MIN_VOTES_DISPLAY = 5;
+
             public readonly UserTag UserTag;
 
             public Action<UserTag>? OnSelected { get; set; }
@@ -154,7 +160,7 @@ namespace osu.Game.Screens.Ranking
                 {
                     voteCount.BindValueChanged(_ =>
                     {
-                        confirmed.Value = voteCount.Value >= 10;
+                        confirmed.Value = voteCount.Value >= MIN_VOTES_DISPLAY;
                     }, true);
                     voted.BindValueChanged(v =>
                     {
