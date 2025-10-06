@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -43,7 +44,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         private MatchmakingAvatar avatar = null!;
         private OsuSpriteText username = null!;
 
-        private Container scaleContainer = null!;
         private Container mainContent = null!;
 
         public bool Horizontal
@@ -72,7 +72,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             CornerRadius = 10;
             CornerExponent = 10;
 
-            Add(scaleContainer = new Container
+            Add(new Container
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -219,6 +219,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             scoreText.Text = $"{userScore.Points} pts";
         });
 
+        private int consecutiveJumps;
+
         private void onMatchEvent(MatchServerEvent e)
         {
             switch (e)
@@ -230,11 +232,36 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     switch (action.Action)
                     {
                         case MatchmakingAvatarAction.Jump:
-                            avatarJumpTarget.MoveToY(-10, 200, Easing.Out)
-                                            .Then().MoveToY(0, 200, Easing.In);
-                            avatarJumpTarget.ScaleTo(new Vector2(1, 1.05f), 200, Easing.Out)
-                                            .Then().ScaleTo(new Vector2(1, 0.95f), 200, Easing.In)
-                                            .Then().ScaleTo(Vector2.One, 800, Easing.OutElastic);
+                            var movement = avatarJumpTarget.Delay(0);
+                            var scale = avatarJumpTarget.Delay(0);
+
+                            // only increase height if the user jumps again while in a "jumped" state.
+                            // this avoids building up large jumps from very quick spam, and adds a timing game.
+                            bool isConsecutive = avatarJumpTarget.Y < 0;
+
+                            if (isConsecutive)
+                            {
+                                consecutiveJumps++;
+
+                                if (avatarJumpTarget.Y > 0)
+                                    movement = movement.MoveToY(0);
+
+                                movement = movement.MoveToY(5, 100, Easing.Out);
+                                scale = scale.ScaleTo(new Vector2(1, 0.95f), 100, Easing.Out);
+                            }
+                            else
+                            {
+                                consecutiveJumps = 0;
+                            }
+
+                            float multiplier = 1 + 0.3f * Math.Min(10, consecutiveJumps);
+
+                            movement.Then().MoveToY(-10 * multiplier, 200, Easing.Out)
+                                    .Then().MoveToY(0, 200, Easing.In);
+
+                            scale.Then().ScaleTo(new Vector2(1, 1.05f), 200, Easing.Out)
+                                 .Then().ScaleTo(new Vector2(1, 0.95f), 200, Easing.In)
+                                 .Then().ScaleTo(Vector2.One, 800, Easing.OutElastic);
                             break;
                     }
 
