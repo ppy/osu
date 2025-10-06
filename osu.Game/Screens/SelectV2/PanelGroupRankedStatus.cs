@@ -154,6 +154,17 @@ namespace osu.Game.Screens.SelectV2
             contentBackground.Colour = statusColour.Darken(1f);
             glow.Colour = ColourInfo.GradientHorizontal(statusColour, statusColour.Opacity(0f));
 
+            switch (status)
+            {
+                case BeatmapOnlineStatus.Graveyard:
+                    iconContainer.Colour = Color4.White;
+                    break;
+
+                default:
+                    iconContainer.Colour = colourProvider.Background5;
+                    break;
+            }
+
             starRatingText.Text = group.Title;
 
             ColourInfo colour = ColourInfo.GradientHorizontal(statusColour.Darken(0.6f), statusColour.Darken(0.8f));
