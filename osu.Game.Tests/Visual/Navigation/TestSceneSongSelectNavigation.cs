@@ -9,6 +9,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
@@ -18,6 +19,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Footer;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.SelectV2;
@@ -236,6 +238,37 @@ namespace osu.Game.Tests.Visual.Navigation
                 DismissAnyNotifications();
                 return Game.ScreenStack.CurrentScreen is Player;
             });
+        }
+
+        [Test]
+        public void TestSelectionNotLostWithConvertedBeatmapsShown()
+        {
+            BeatmapSetInfo beatmapSet = null!;
+            BeatmapInfo selectedBeatmap = null!;
+
+            AddStep("import beatmap", () => beatmapSet = BeatmapImportHelper.LoadOszIntoOsu(Game).GetResultSafely());
+            PushAndConfirm(() => new SoloSongSelect());
+
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("change ruleset to taiko", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Number2);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddStep("show converts", () => Game.LocalConfig.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
+            AddStep("select osu! beatmap", () =>
+            {
+                selectedBeatmap = beatmapSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0);
+                Game.Beatmap.Value = Game.BeatmapManager.GetWorkingBeatmap(selectedBeatmap);
+            });
+
+            pushEscape();
+            AddUntilStep("went back to main menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
+            PushAndConfirm(() => new SoloSongSelect());
+
+            AddUntilStep("selected beatmap is still osu! ruleset", () => Game.Beatmap.Value.BeatmapInfo, () => Is.EqualTo(selectedBeatmap));
         }
 
         private Func<Player> playToResults()

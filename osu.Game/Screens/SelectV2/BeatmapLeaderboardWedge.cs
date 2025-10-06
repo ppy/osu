@@ -266,6 +266,12 @@ namespace osu.Game.Screens.SelectV2
 
             if (scores == null) return;
 
+            // because leaderboard refetches are debounced, it is technically possible for the global leaderboard manager
+            // to contain scores for a different beatmap than the ones the wedge is currently on.
+            // in this case, ignore the incoming scores to avoid briefly flashing the wrong leaderboard.
+            if (leaderboardManager.CurrentCriteria?.Beatmap?.Equals(beatmap.Value.BeatmapInfo) != true)
+                return;
+
             if (scores.FailState != null)
                 SetState((LeaderboardState)scores.FailState);
             else
