@@ -266,17 +266,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     {
                         progress.ProgressTo((float)round / round_count, 500, Easing.InOutQuart);
 
-                        roundUpChannel = roundUpSample?.GetChannel();
-
-                        if (roundUpChannel != null)
-                        {
-                            roundUpChannel.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH;
-                            roundUpChannel.Frequency.Value = 1f + round * 0.05f;
-                            roundUpChannel?.Play();
-                        }
-
                         Scheduler.AddDelayed(() =>
                         {
+                            roundUpChannel = roundUpSample?.GetChannel();
+
+                            if (roundUpChannel != null)
+                            {
+                                roundUpChannel.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH;
+                                roundUpChannel.Frequency.Value = 1f + round * 0.05f;
+                                roundUpChannel?.Play();
+                            }
+
                             innerCircle
                                 .FadeTo(1, 250, Easing.OutQuint)
                                 .Then()
