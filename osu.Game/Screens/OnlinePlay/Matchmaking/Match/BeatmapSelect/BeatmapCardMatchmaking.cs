@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -14,7 +13,6 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Beatmaps.Drawables.Cards;
-using osu.Game.Beatmaps.Drawables.Cards.Statistics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -41,8 +39,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
         private BeatmapCardThumbnail thumbnail = null!;
         private CollapsibleButtonContainer buttonContainer = null!;
-
-        private FillFlowContainer<BeatmapCardStatistic> statisticsContainer = null!;
 
         private FillFlowContainer idleBottomContent = null!;
         private BeatmapCardDownloadProgressBar downloadProgressBar = null!;
@@ -193,16 +189,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                                             AlwaysPresent = true,
                                             Children = new Drawable[]
                                             {
-                                                statisticsContainer = new FillFlowContainer<BeatmapCardStatistic>
-                                                {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    AutoSizeAxes = Axes.Y,
-                                                    Direction = FillDirection.Horizontal,
-                                                    Spacing = new Vector2(8, 0),
-                                                    Alpha = 0,
-                                                    AlwaysPresent = true,
-                                                    ChildrenEnumerable = createStatistics()
-                                                },
                                                 new Container
                                                 {
                                                     Masking = true,
@@ -218,23 +204,23 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                                                         },
                                                         new FillFlowContainer
                                                         {
-                                                            Padding = new MarginPadding(2),
+                                                            Padding = new MarginPadding(4),
                                                             RelativeSizeAxes = Axes.X,
                                                             AutoSizeAxes = Axes.Y,
                                                             Direction = FillDirection.Horizontal,
-                                                            Spacing = new Vector2(4, 0),
+                                                            Spacing = new Vector2(6, 0),
                                                             Children = new Drawable[]
                                                             {
                                                                 new StarRatingDisplay(new StarDifficulty(beatmap.StarRating, 0), StarRatingDisplaySize.Small, animated: true)
                                                                 {
                                                                     Origin = Anchor.CentreLeft,
                                                                     Anchor = Anchor.CentreLeft,
-                                                                    Scale = new Vector2(0.875f),
+                                                                    Scale = new Vector2(0.9f),
                                                                 },
                                                                 new TruncatingSpriteText
                                                                 {
                                                                     Text = beatmap.DifficultyName,
-                                                                    Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold),
+                                                                    Font = OsuFont.Style.Caption1.With(weight: FontWeight.Bold),
                                                                     Anchor = Anchor.CentreLeft,
                                                                     Origin = Anchor.CentreLeft,
                                                                 }
@@ -305,24 +291,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             return BeatmapsetsStrings.ShowDetailsByArtist(romanisableArtist);
         }
 
-        private IEnumerable<BeatmapCardStatistic> createStatistics()
-        {
-            var hypesStatistic = HypesStatistic.CreateFor(BeatmapSet);
-            if (hypesStatistic != null)
-                yield return hypesStatistic;
-
-            var nominationsStatistic = NominationsStatistic.CreateFor(BeatmapSet);
-            if (nominationsStatistic != null)
-                yield return nominationsStatistic;
-
-            yield return new FavouritesStatistic(BeatmapSet) { Current = FavouriteState };
-            yield return new PlayCountStatistic(BeatmapSet);
-
-            var dateStatistic = BeatmapCardDateStatistic.CreateFor(BeatmapSet);
-            if (dateStatistic != null)
-                yield return dateStatistic;
-        }
-
         protected override void UpdateState()
         {
             base.UpdateState();
@@ -331,8 +299,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
             buttonContainer.ShowDetails.Value = showDetails;
             thumbnail.Dimmed.Value = showDetails;
-
-            statisticsContainer.FadeTo(showDetails ? 1 : 0, TRANSITION_DURATION, Easing.OutQuint);
         }
 
         public override MenuItem[] ContextMenuItems
