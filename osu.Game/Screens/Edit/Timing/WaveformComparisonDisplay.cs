@@ -320,7 +320,7 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     new Box
                     {
-                        Colour = colourProvider.Background3,
+                        Colour = colourProvider.Background2,
                         Alpha = isMainRow ? 1 : 0,
                         RelativeSizeAxes = Axes.Both,
                     },
