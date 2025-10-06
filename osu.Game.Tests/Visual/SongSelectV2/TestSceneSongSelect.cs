@@ -144,8 +144,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             void onScreenPushed(IScreen lastScreen, IScreen newScreen) => screensPushed.Add(lastScreen);
         }
 
-        [Test]
-        public void TestHoveringLeftSideReexpandsGroupSelectionIsIn()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestHoveringLeftSideReexpandsGroupSelectionIsIn(bool mouseOverPanel)
         {
             ImportBeatmapForRuleset(0);
 
@@ -168,7 +169,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 () => (Carousel.ChildrenOfType<PanelGroupStarDifficulty>().SingleOrDefault(p => p.Expanded.Value)?.Item?.Model as StarDifficultyGroupDefinition)?.Difficulty.Stars,
                 () => Is.EqualTo(3));
 
-            AddStep("move mouse to left side container", () => InputManager.MoveMouseTo(this.ChildrenOfType<Screens.Select.SongSelect.LeftSideInteractionContainer>().Single()));
+            if (mouseOverPanel)
+                AddStep("move mouse over left panel", () => InputManager.MoveMouseTo(this.ChildrenOfType<BeatmapTitleWedge>().Single()));
+            else
+                AddStep("move mouse to left side container", () => InputManager.MoveMouseTo(this.ChildrenOfType<Screens.Select.SongSelect.LeftSideInteractionContainer>().Single()));
+
             AddUntilStep("expanded group is below 1 star",
                 () => (Carousel.ChildrenOfType<PanelGroupStarDifficulty>().Single(p => p.Expanded.Value).Item?.Model as StarDifficultyGroupDefinition)?.Difficulty.Stars,
                 () => Is.EqualTo(0));
