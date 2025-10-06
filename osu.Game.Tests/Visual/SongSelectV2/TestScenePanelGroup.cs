@@ -145,6 +145,64 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             }
         }
 
+        [Test]
+        public void TestStatuses()
+        {
+            for (int i = -4; i <= 4; i++)
+            {
+                BeatmapOnlineStatus status = (BeatmapOnlineStatus)i;
+
+                AddStep($"display {status} status", () =>
+                {
+                    ContentContainer.Child = new DependencyProvidingContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        CachedDependencies = new (Type, object)[]
+                        {
+                            (typeof(OverlayColourProvider), new OverlayColourProvider(OverlayColourScheme.Aquamarine))
+                        },
+                        Child = new OsuContextMenuContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = new FillFlowContainer
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Width = 0.5f,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(0f, 5f),
+                                Children = new[]
+                                {
+                                    new PanelGroupRankedStatus
+                                    {
+                                        Item = new CarouselItem(new RankedStatusGroupDefinition(0, status))
+                                    },
+                                    new PanelGroupRankedStatus
+                                    {
+                                        Item = new CarouselItem(new RankedStatusGroupDefinition(1, status)),
+                                        KeyboardSelected = { Value = true },
+                                    },
+                                    new PanelGroupRankedStatus
+                                    {
+                                        Item = new CarouselItem(new RankedStatusGroupDefinition(2, status)),
+                                        Expanded = { Value = true },
+                                    },
+                                    new PanelGroupRankedStatus
+                                    {
+                                        Item = new CarouselItem(new RankedStatusGroupDefinition(3, status)),
+                                        Expanded = { Value = true },
+                                        KeyboardSelected = { Value = true },
+                                    },
+                                },
+                            }
+                        }
+                    };
+                });
+            }
+        }
+
         protected override Drawable CreateContent()
         {
             return new OsuContextMenuContainer
