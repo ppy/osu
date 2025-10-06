@@ -41,10 +41,5 @@ namespace osu.Game.Skinning
             )
         {
         }
-
-        public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
-        {
-            return base.GetTexture(componentName, wrapModeS, wrapModeT);
-        }
     }
 }
