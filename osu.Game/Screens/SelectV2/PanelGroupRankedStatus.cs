@@ -149,14 +149,15 @@ namespace osu.Game.Screens.SelectV2
 
             statusColour = OsuColour.ForBeatmapSetOnlineStatus(status) ?? Color4.White;
 
-            AccentColour = statusColour;
-            backgroundBorder.Colour = statusColour;
-            contentBackground.Colour = statusColour.Darken(1f);
-            glow.Colour = ColourInfo.GradientHorizontal(statusColour, statusColour.Opacity(0f));
-
+            //Switch was moved before setting the colours, due to the existence of graveyard section.
+            //Down bellow, I'll explain better the exact reasoning for this
             switch (status)
             {
+                //Graveyard pill was set to be fully black with some gray text.
+                //As long as it works for this case, this looks too bad on the coloured panel. (See -> https://github.com/ppy/osu/discussions/35148#discussioncomment-14609389)
+                //So my and OPs decision was to lighten it up, to make it look better
                 case BeatmapOnlineStatus.Graveyard:
+                    statusColour = new Color4(statusColour.R + 0.1f, statusColour.G + 0.1f, statusColour.B + 0.1f, 1); //That's quite the hacky way to achieve the needed result, but I haven't come up with a better decision. Lighten doesn't work at all.
                     iconContainer.Colour = Color4.White;
                     break;
 
@@ -164,6 +165,11 @@ namespace osu.Game.Screens.SelectV2
                     iconContainer.Colour = colourProvider.Background5;
                     break;
             }
+
+            AccentColour = statusColour;
+            backgroundBorder.Colour = statusColour;
+            contentBackground.Colour = statusColour.Darken(1f);
+            glow.Colour = ColourInfo.GradientHorizontal(statusColour, statusColour.Opacity(0f));
 
             starRatingText.Text = group.Title;
 
