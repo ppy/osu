@@ -69,7 +69,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 flowAimRating *= 1.0 - magnetisedStrength;
             }
 
-            aimRating = double.Lerp(aimRating, snapAimRating + flowAimRating, AIM_VERSATILITY_BONUS);
+            // We consider that average map has ratio of summed ratings to total to be equal to 1.7x
+            double baseVersatilityBonus = double.Lerp(1, 1.7, AIM_VERSATILITY_BONUS);
+
+            aimRating = double.Lerp(aimRating, snapAimRating + flowAimRating, AIM_VERSATILITY_BONUS) / baseVersatilityBonus;
 
             return computeRawAimRating(aimRating);
         }
