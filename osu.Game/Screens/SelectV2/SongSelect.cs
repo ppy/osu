@@ -325,10 +325,10 @@ namespace osu.Game.Screens.SelectV2
                 Current = Mods,
                 RequestDeselectAllMods = () =>
                 {
-                    if (modSelectOverlay.State.Value == Visibility.Hidden)
-                        Mods.Value = Array.Empty<Mod>();
-                    else
+                    if (modSelectOverlay.State.Value == Visibility.Visible)
                         modSelectOverlay.DeselectAll();
+                    else
+                        Mods.Value = Array.Empty<Mod>();
                 }
             },
             new FooterButtonRandom
