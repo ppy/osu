@@ -3,6 +3,7 @@
 
 using System;
 using MessagePack;
+using osu.Game.Online.Matchmaking.Events;
 using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 
@@ -17,6 +18,7 @@ namespace osu.Game.Online.Multiplayer
     [Union(0, typeof(ChangeTeamRequest))]
     [Union(1, typeof(StartMatchCountdownRequest))]
     [Union(2, typeof(StopCountdownRequest))]
+    [Union(3, typeof(MatchmakingAvatarActionRequest))]
     public abstract class MatchUserRequest
     {
     }

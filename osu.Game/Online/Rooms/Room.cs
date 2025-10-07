@@ -358,6 +358,7 @@ namespace osu.Game.Online.Rooms
         public Room(MultiplayerRoom room)
         {
             RoomID = room.RoomID;
+            ChannelId = room.ChannelID;
             Name = room.Settings.Name;
             Password = room.Settings.Password;
             Type = room.Settings.MatchType;

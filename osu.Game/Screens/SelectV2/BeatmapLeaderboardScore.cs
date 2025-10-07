@@ -392,9 +392,9 @@ namespace osu.Game.Screens.SelectV2
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
                                         Spacing = new Vector2(-2),
-                                        Colour = DrawableRank.GetRankNameColour(Score.Rank),
+                                        Colour = DrawableRank.GetRankLetterColour(Score.Rank),
                                         Font = OsuFont.Numeric.With(size: 14),
-                                        Text = DrawableRank.GetRankName(Score.Rank),
+                                        Text = DrawableRank.GetRankLetter(Score.Rank),
                                         ShadowColour = Color4.Black.Opacity(0.3f),
                                         ShadowOffset = new Vector2(0, 0.08f),
                                         Shadow = true,
@@ -652,7 +652,7 @@ namespace osu.Game.Screens.SelectV2
                 Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold);
             }
 
-            protected override string Format() => Date.ToShortRelativeTime(TimeSpan.FromSeconds(30));
+            protected override LocalisableString Format() => Date.ToShortRelativeTime(TimeSpan.FromSeconds(30));
         }
 
         private partial class ScoreComponentLabel : Container

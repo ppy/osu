@@ -14,8 +14,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Matchmaking;
+using osu.Game.Online.Matchmaking.Events;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.Countdown;
+using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
@@ -72,6 +75,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private int currentIndex;
         private long lastPlaylistItemId;
         private int lastCountdownId;
+
+        private readonly Dictionary<int, long> matchmakingUserPicks = new Dictionary<int, long>();
 
         private readonly TestRoomRequestsHandler apiRequestHandler;
 
@@ -245,6 +250,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Host = localUser
             };
 
+            await changeMatchType(ServerRoom.Settings.MatchType).ConfigureAwait(false);
             await updatePlaylistOrder(ServerRoom).ConfigureAwait(false);
             await updateCurrentItem(ServerRoom, false).ConfigureAwait(false);
 
@@ -257,10 +263,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected override void OnRoomJoined()
         {
             Debug.Assert(ServerRoom != null);
-
-            // emulate the server sending this after the join room. scheduler required to make sure the join room event is fired first (in Join).
-            changeMatchType(ServerRoom.Settings.MatchType).WaitSafely();
-
             RoomJoined = true;
         }
 
@@ -385,7 +387,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
-        public override async Task SendMatchRequest(MatchUserRequest request)
+        public override Task SendMatchRequest(MatchUserRequest request)
+            => SendUserMatchRequest(api.LocalUser.Value.OnlineID, request);
+
+        public async Task SendUserMatchRequest(int userId, MatchUserRequest request)
         {
             request = clone(request);
 
@@ -403,26 +408,55 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     if (targetTeam != null)
                     {
                         userState.TeamID = targetTeam.ID;
-                        await ((IMultiplayerClient)this).MatchUserStateChanged(clone(LocalUser.UserID), clone(userState)).ConfigureAwait(false);
+                        await ((IMultiplayerClient)this).MatchUserStateChanged(userId, clone(userState)).ConfigureAwait(false);
                     }
 
                     break;
 
                 case StartMatchCountdownRequest startCountdown:
-                    ServerRoom.ActiveCountdowns.Add(new MatchStartCountdown
-                    {
-                        ID = ++lastCountdownId,
-                        TimeRemaining = startCountdown.Duration
-                    });
-
-                    await ((IMultiplayerClient)this).MatchEvent(clone(new CountdownStartedEvent(ServerRoom.ActiveCountdowns[^1]))).ConfigureAwait(false);
+                    await StartCountdown(new MatchStartCountdown { TimeRemaining = startCountdown.Duration }).ConfigureAwait(false);
                     break;
 
                 case StopCountdownRequest stopCountdown:
-                    ServerRoom.ActiveCountdowns.Remove(ServerRoom.ActiveCountdowns.First(c => c.ID == stopCountdown.ID));
-                    await ((IMultiplayerClient)this).MatchEvent(clone(new CountdownStoppedEvent(stopCountdown.ID))).ConfigureAwait(false);
+                    await StopCountdown(ServerRoom.ActiveCountdowns.First(c => c.ID == stopCountdown.ID)).ConfigureAwait(false);
+                    break;
+
+                case MatchmakingAvatarActionRequest avatarAction:
+                    await ((IMultiplayerClient)this).MatchEvent(new MatchmakingAvatarActionEvent
+                    {
+                        UserId = userId,
+                        Action = avatarAction.Action
+                    }).ConfigureAwait(false);
                     break;
             }
+        }
+
+        public async Task StartCountdown(MultiplayerCountdown countdown)
+        {
+            countdown.ID = ++lastCountdownId;
+            countdown = clone(countdown);
+
+            Debug.Assert(ServerRoom != null);
+            Debug.Assert(LocalUser != null);
+
+            if (countdown.IsExclusive)
+            {
+                MultiplayerCountdown? existingCountdown = ServerRoom.ActiveCountdowns.FirstOrDefault(c => c.GetType() == countdown.GetType());
+                if (existingCountdown != null)
+                    await StopCountdown(existingCountdown).ConfigureAwait(false);
+            }
+
+            ServerRoom.ActiveCountdowns.Add(countdown);
+            await ((IMultiplayerClient)this).MatchEvent(clone(new CountdownStartedEvent(ServerRoom.ActiveCountdowns[^1]))).ConfigureAwait(false);
+        }
+
+        public async Task StopCountdown(MultiplayerCountdown countdown)
+        {
+            Debug.Assert(ServerRoom != null);
+            Debug.Assert(LocalUser != null);
+
+            ServerRoom.ActiveCountdowns.Remove(ServerRoom.ActiveCountdowns.First(c => c.ID == countdown.ID));
+            await ((IMultiplayerClient)this).MatchEvent(clone(new CountdownStoppedEvent(countdown.ID))).ConfigureAwait(false);
         }
 
         public override Task StartMatch()
@@ -565,6 +599,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     foreach (var user in ServerRoom.Users)
                     {
                         user.MatchState = new TeamVersusUserState();
+                        await ((IMultiplayerClient)this).MatchUserStateChanged(clone(user.UserID), clone(user.MatchState)).ConfigureAwait(false);
+                    }
+
+                    break;
+
+                case MatchType.Matchmaking:
+                    ServerRoom.MatchState = new MatchmakingRoomState();
+                    await ((IMultiplayerClient)this).MatchRoomStateChanged(clone(ServerRoom.MatchState)).ConfigureAwait(false);
+
+                    foreach (var user in ServerRoom.Users)
+                    {
+                        user.MatchState = null;
                         await ((IMultiplayerClient)this).MatchUserStateChanged(clone(user.UserID), clone(user.MatchState)).ConfigureAwait(false);
                     }
 
@@ -716,6 +762,97 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             isConnected.Value = false;
             return Task.CompletedTask;
+        }
+
+        public async Task ChangeMatchRoomState(MatchRoomState state)
+        {
+            Debug.Assert(ServerRoom != null);
+
+            ServerRoom.MatchState = state;
+            await ((IMultiplayerClient)this).MatchRoomStateChanged(clone(ServerRoom.MatchState)).ConfigureAwait(false);
+        }
+
+        public override Task<MatchmakingPool[]> GetMatchmakingPools()
+        {
+            return Task.FromResult<MatchmakingPool[]>(
+            [
+                new MatchmakingPool { Id = 0, RulesetId = 0 },
+                new MatchmakingPool { Id = 1, RulesetId = 1 },
+                new MatchmakingPool { Id = 2, RulesetId = 2 },
+                new MatchmakingPool { Id = 3, RulesetId = 3, Variant = 4 },
+                new MatchmakingPool { Id = 4, RulesetId = 3, Variant = 7 },
+            ]);
+        }
+
+        public override Task MatchmakingJoinLobby()
+        {
+            return Task.CompletedTask;
+        }
+
+        public override Task MatchmakingLeaveLobby()
+        {
+            return Task.CompletedTask;
+        }
+
+        public override async Task MatchmakingJoinQueue(int poolId)
+        {
+            await ((IMatchmakingClient)this).MatchmakingQueueJoined().ConfigureAwait(false);
+            await ((IMatchmakingClient)this).MatchmakingQueueStatusChanged(new MatchmakingQueueStatus.Searching()).ConfigureAwait(false);
+        }
+
+        public override async Task MatchmakingLeaveQueue()
+        {
+            await ((IMatchmakingClient)this).MatchmakingQueueLeft().ConfigureAwait(false);
+        }
+
+        public override Task MatchmakingAcceptInvitation()
+        {
+            return Task.CompletedTask;
+        }
+
+        public override Task MatchmakingDeclineInvitation()
+        {
+            return Task.CompletedTask;
+        }
+
+        public override Task MatchmakingToggleSelection(long playlistItemId)
+            => MatchmakingToggleUserSelection(api.LocalUser.Value.OnlineID, playlistItemId);
+
+        public override Task MatchmakingSkipToNextStage()
+            => Task.CompletedTask;
+
+        public async Task MatchmakingToggleUserSelection(int userId, long playlistItemId)
+        {
+            if (matchmakingUserPicks.TryGetValue(userId, out long existingId))
+            {
+                if (existingId == playlistItemId)
+                    return;
+
+                await ((IMatchmakingClient)this).MatchmakingItemDeselected(clone(userId), clone(existingId)).ConfigureAwait(false);
+            }
+
+            matchmakingUserPicks[userId] = playlistItemId;
+
+            await ((IMatchmakingClient)this).MatchmakingItemSelected(clone(userId), clone(playlistItemId)).ConfigureAwait(false);
+        }
+
+        public async Task MatchmakingChangeStage(MatchmakingStage stage, Action<MatchmakingRoomState>? prepare = null)
+        {
+            MatchmakingRoomState state = clone((MatchmakingRoomState)ServerRoom!.MatchState!);
+
+            state.Stage = stage;
+
+            if (stage == MatchmakingStage.RoundWarmupTime)
+                state.CurrentRound++;
+
+            prepare?.Invoke(state);
+
+            await ChangeMatchRoomState(state).ConfigureAwait(false);
+            await StartCountdown(new MatchmakingStageCountdown
+            {
+                Stage = stage,
+                TimeRemaining = TimeSpan.FromSeconds(10)
+            }).ConfigureAwait(false);
         }
 
         #region API Room Handling

@@ -245,7 +245,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             GroupBy(GroupMode.RankAchieved);
             WaitForFiltering();
 
-            assertGroupPresent("S+", () => new[] { beatmapSets[0] });
+            assertGroupPresent("Silver S", () => new[] { beatmapSets[0] });
             assertGroupPresent("A", () => new[] { beatmapSets[1] });
             assertGroupPresent("C", () => new[] { beatmapSets[2] });
             assertGroupPresent("Unplayed", () => new[] { beatmapSets[3], beatmapSets[4] });
@@ -316,7 +316,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         {
             AddAssert($"\"{name}\" present", () =>
             {
-                var group = grouping.GroupItems.Single(g => g.Key.Title == name);
+                var group = grouping.GroupItems.Single(g => g.Key.Title.ToString() == name);
                 var actualBeatmaps = group.Value.Select(i => i.Model).OfType<GroupedBeatmap>().Select(gb => gb.Beatmap).OrderBy(b => b.ID);
                 var expectedBeatmaps = getBeatmaps().SelectMany(s => s.Beatmaps).OrderBy(b => b.ID);
                 return actualBeatmaps.SequenceEqual(expectedBeatmaps);
