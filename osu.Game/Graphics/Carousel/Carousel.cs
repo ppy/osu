@@ -876,12 +876,17 @@ namespace osu.Game.Graphics.Carousel
 
             if (!scrollToSelection.IsValid)
             {
-                if (currentKeyboardSelection.YPosition != null)
-                    Scroll.ScrollTo(currentKeyboardSelection.YPosition.Value - visibleHalfHeight + BleedTop);
+                if (GetScrollTarget() is double scrollTarget)
+                    Scroll.ScrollTo(scrollTarget - visibleHalfHeight + BleedTop);
 
                 scrollToSelection.Validate();
             }
         }
+
+        /// <summary>
+        /// Returns the Y position to scroll to in order to show the most relevant carousel item(s).
+        /// </summary>
+        protected virtual double? GetScrollTarget() => currentKeyboardSelection.YPosition;
 
         protected virtual float GetPanelXOffset(Drawable panel)
         {

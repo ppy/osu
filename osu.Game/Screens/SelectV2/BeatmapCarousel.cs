@@ -661,6 +661,37 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
+        public void ExpandGroupForCurrentSelection()
+        {
+            if (CurrentGroupedBeatmap?.Group == null)
+                return;
+
+            if (CheckModelEquality(ExpandedGroup, CurrentGroupedBeatmap.Group))
+                return;
+
+            var groupItem = GetCarouselItems()?.FirstOrDefault(i => CheckModelEquality(i.Model, CurrentGroupedBeatmap.Group));
+            if (groupItem != null)
+                HandleItemActivated(groupItem);
+        }
+
+        protected override double? GetScrollTarget()
+        {
+            double? target = base.GetScrollTarget();
+
+            // if the base implementation returned null, it means that the keyboard selection has been filtered out and is no longer visible
+            // attempt a fallback to other possibly expanded panels (set first, then group)
+            if (target == null)
+            {
+                var items = GetCarouselItems();
+                var targetItem = items?.FirstOrDefault(i => CheckModelEquality(i.Model, ExpandedBeatmapSet))
+                                 ?? items?.FirstOrDefault(i => CheckModelEquality(i.Model, ExpandedGroup));
+
+                target = targetItem?.CarouselYPosition;
+            }
+
+            return target;
+        }
+
         #endregion
 
         #region Audio
@@ -845,6 +876,9 @@ namespace osu.Game.Screens.SelectV2
 
             if (x is StarDifficultyGroupDefinition starX && y is StarDifficultyGroupDefinition starY)
                 return starX.Equals(starY);
+
+            if (x is RankDisplayGroupDefinition rankX && y is RankDisplayGroupDefinition rankY)
+                return rankX.Equals(rankY);
 
             return base.CheckModelEquality(x, y);
         }

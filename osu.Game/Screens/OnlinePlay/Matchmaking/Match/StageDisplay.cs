@@ -3,6 +3,8 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -138,8 +140,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             private Circle innerCircle = null!;
             private CircularProgress progress = null!;
 
+            private Sample? swishSample;
+            private Sample? swooshSample;
+            private Sample? roundUpSample;
+            private SampleChannel? swishChannel;
+            private SampleChannel? swooshChannel;
+            private SampleChannel? roundUpChannel;
+
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colours)
+            private void load(OverlayColourProvider colours, AudioManager audio)
             {
                 Size = new Vector2(76);
 
@@ -210,6 +219,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                         Text = $"{round_count}"
                     },
                 };
+
+                swishSample = audio.Samples.Get(@"UI/overlay-pop-in");
+                swooshSample = audio.Samples.Get(@"UI/overlay-big-pop-out");
+                roundUpSample = audio.Samples.Get(@"Multiplayer/Matchmaking/round-up");
             }
 
             private int round;
@@ -231,11 +244,39 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                         .MoveToY(0, 500, Easing.InQuart)
                         .ScaleTo(1, 500, Easing.InQuart);
 
+                    swishChannel = swishSample?.GetChannel();
+
+                    if (swishChannel != null)
+                    {
+                        swishChannel.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH;
+                        swishChannel?.Play();
+                    }
+
+                    Scheduler.AddDelayed(() =>
+                    {
+                        swooshChannel = swooshSample?.GetChannel();
+
+                        if (swooshChannel == null) return;
+
+                        swooshChannel.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH;
+                        swooshChannel?.Play();
+                    }, 1250);
+
                     Scheduler.AddDelayed(() =>
                     {
                         progress.ProgressTo((float)round / round_count, 500, Easing.InOutQuart);
+
                         Scheduler.AddDelayed(() =>
                         {
+                            roundUpChannel = roundUpSample?.GetChannel();
+
+                            if (roundUpChannel != null)
+                            {
+                                roundUpChannel.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH;
+                                roundUpChannel.Frequency.Value = 1f + round * 0.05f;
+                                roundUpChannel?.Play();
+                            }
+
                             innerCircle
                                 .FadeTo(1, 250, Easing.OutQuint)
                                 .Then()

@@ -155,6 +155,7 @@ namespace osu.Game.Screens.SelectV2
         private readonly RealmPopulatingOnlineLookupSource onlineLookupSource = new RealmPopulatingOnlineLookupSource();
 
         private Bindable<bool> configBackgroundBlur = null!;
+        private Bindable<bool> showConvertedBeatmaps = null!;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)
@@ -212,7 +213,11 @@ namespace osu.Game.Screens.SelectV2
                                                         // Pad enough to only reset scroll when well into the left wedge areas.
                                                         Padding = new MarginPadding { Right = 40 },
                                                         RelativeSizeAxes = Axes.Both,
-                                                        Child = new Select.SongSelect.LeftSideInteractionContainer(() => carousel.ScrollToSelection())
+                                                        Child = new Select.SongSelect.LeftSideInteractionContainer(() =>
+                                                        {
+                                                            carousel.ExpandGroupForCurrentSelection();
+                                                            carousel.ScrollToSelection();
+                                                        })
                                                         {
                                                             RelativeSizeAxes = Axes.Both,
                                                         },
@@ -302,6 +307,8 @@ namespace osu.Game.Screens.SelectV2
 
                 updateBackgroundDim();
             });
+
+            showConvertedBeatmaps = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
         }
 
         private void requestRecommendedSelection(IEnumerable<GroupedBeatmap> groupedBeatmaps)
@@ -522,7 +529,7 @@ namespace osu.Game.Screens.SelectV2
             if (!this.IsCurrentScreen())
                 return;
 
-            if (!checkBeatmapValidForSelection(beatmap, carousel.Criteria))
+            if (!checkBeatmapValidForSelection(beatmap))
                 return;
 
             // To ensure sanity, cancel any pending selection as we are about to force a selection.
@@ -573,7 +580,7 @@ namespace osu.Game.Screens.SelectV2
 
             // Refetch to be confident that the current selection is still valid. It may have been deleted or hidden.
             var currentBeatmap = beatmaps.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo, true);
-            bool validSelection = checkBeatmapValidForSelection(currentBeatmap.BeatmapInfo, filterControl.CreateCriteria());
+            bool validSelection = checkBeatmapValidForSelection(currentBeatmap.BeatmapInfo);
 
             if (validSelection)
             {
@@ -594,9 +601,8 @@ namespace osu.Game.Screens.SelectV2
             {
                 // In the case a difficulty was hidden or removed, prefer selecting another difficulty from the same set.
                 var activeSet = currentBeatmap.BeatmapSetInfo;
-                var criteria = filterControl.CreateCriteria();
 
-                var validBeatmaps = activeSet.Beatmaps.Where(b => checkBeatmapValidForSelection(b, criteria)).ToArray();
+                var validBeatmaps = activeSet.Beatmaps.Where(checkBeatmapValidForSelection).ToArray();
 
                 if (validBeatmaps.Any())
                 {
@@ -614,12 +620,9 @@ namespace osu.Game.Screens.SelectV2
             return validSelection;
         }
 
-        private bool checkBeatmapValidForSelection(BeatmapInfo beatmap, FilterCriteria? criteria)
+        private bool checkBeatmapValidForSelection(BeatmapInfo beatmap)
         {
-            if (criteria == null)
-                return false;
-
-            if (!beatmap.AllowGameplayWithRuleset(Ruleset.Value, criteria.AllowConvertedBeatmaps))
+            if (!beatmap.AllowGameplayWithRuleset(Ruleset.Value, showConvertedBeatmaps.Value))
                 return false;
 
             if (beatmap.Hidden)
@@ -777,7 +780,7 @@ namespace osu.Game.Screens.SelectV2
             // This avoids a flicker of a placeholder or invalid beatmap before a proper selection.
             //
             // After the carousel finishes filtering, it will attempt a selection then call this method again.
-            if (!CarouselItemsPresented && !checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo, filterControl.CreateCriteria()))
+            if (!CarouselItemsPresented && !checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo))
                 return;
 
             if (carousel.VisuallyFocusSelected)
@@ -834,7 +837,7 @@ namespace osu.Game.Screens.SelectV2
             bool isFirstFilter = filterDebounce == null;
 
             // Criteria change may have included a ruleset change which made the current selection invalid.
-            bool isSelectionValid = checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo, criteria);
+            bool isSelectionValid = checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo);
 
             filterDebounce = Scheduler.AddDelayed(() => carousel.Filter(criteria, !isSelectionValid), isFirstFilter || !isSelectionValid ? 0 : filter_delay);
         }
