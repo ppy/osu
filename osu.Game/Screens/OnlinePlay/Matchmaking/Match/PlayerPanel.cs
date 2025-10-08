@@ -68,9 +68,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         [BackgroundDependencyLoader]
         private void load()
         {
-            Masking = true;
-            CornerRadius = 10;
-            CornerExponent = 10;
+            Content.CornerRadius = 10;
+            Content.CornerExponent = 10;
 
             Add(new Container
             {
@@ -128,6 +127,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     }
                 }
             });
+
+            // Allow avatar to exist outside of masking for when it jumps around and stuff.
+            AddInternal(avatar.CreateProxy());
         }
 
         protected override Drawable CreateLayout() => Empty();

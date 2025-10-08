@@ -86,7 +86,7 @@ namespace osu.Game.Users
         [BackgroundDependencyLoader]
         private void load()
         {
-            Masking = true;
+            Content.Masking = true;
 
             Add(new Box
             {
