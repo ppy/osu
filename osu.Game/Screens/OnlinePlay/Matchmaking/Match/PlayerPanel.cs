@@ -24,8 +24,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
     /// </summary>
     public partial class PlayerPanel : UserPanel
     {
-        public static readonly Vector2 SIZE_HORIZONTAL = new Vector2(250, 100);
-        public static readonly Vector2 SIZE_VERTICAL = new Vector2(150, 200);
+        private static readonly Vector2 size_horizontal = new Vector2(250, 100);
+        private static readonly Vector2 size_vertical = new Vector2(150, 200);
         private static readonly Vector2 avatar_size = new Vector2(80);
 
         public readonly MultiplayerRoomUser RoomUser;
@@ -46,18 +46,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
         private Container mainContent = null!;
 
-        public bool Horizontal
+        private PlayerPanelDisplayMode displayMode = PlayerPanelDisplayMode.Horizontal;
+
+        public PlayerPanelDisplayMode DisplayMode
         {
-            get => horizontal;
+            get => displayMode;
             set
             {
-                horizontal = value;
+                displayMode = value;
                 if (IsLoaded)
                     updateLayout(false);
             }
         }
-
-        private bool horizontal;
 
         public PlayerPanel(MultiplayerRoomUser user)
             : base(user.User!)
@@ -105,6 +105,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                         },
                         rankText = new OsuSpriteText
                         {
+                            Alpha = 0,
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomCentre,
                             Blending = BlendingParameters.Additive,
@@ -113,6 +114,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                         },
                         username = new OsuSpriteText
                         {
+                            Alpha = 0,
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
                             Text = User.Username,
@@ -120,6 +122,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                         },
                         scoreText = new OsuSpriteText
                         {
+                            Alpha = 0,
                             Margin = new MarginPadding(10),
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
@@ -150,39 +153,80 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             avatar.ScaleTo(0)
                   .ScaleTo(1, 500, Easing.OutElasticHalf)
                   .FadeIn(200);
+        }
 
-            rankText.Hide();
-            scoreText.Hide();
-            username.Hide();
+        private bool horizontal => displayMode == PlayerPanelDisplayMode.Horizontal;
 
-            using (BeginDelayedSequence(100))
+        private Vector2 avatarPosition
+        {
+            get
             {
-                username.FadeInFromZero(600);
-
-                using (BeginDelayedSequence(100))
+                switch (displayMode)
                 {
-                    scoreText.FadeInFromZero(600);
+                    case PlayerPanelDisplayMode.AvatarOnly:
+                        return avatar_size / 2;
 
-                    using (BeginDelayedSequence(100))
-                    {
-                        rankText.FadeTo(0.6f, 600);
-                    }
+                    case PlayerPanelDisplayMode.Horizontal:
+                        return new Vector2(50);
+
+                    case PlayerPanelDisplayMode.Vertical:
+                        return new Vector2(75, 50);
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
         }
-
-        private Vector2 avatarPosition => horizontal ? new Vector2(50) : new Vector2(75, 50);
 
         private void updateLayout(bool instant)
         {
             double duration = instant ? 0 : 1000;
 
             avatarPositionTarget.MoveTo(avatarPosition, duration, Easing.OutPow10);
-            this.ResizeTo(horizontal ? SIZE_HORIZONTAL : SIZE_VERTICAL, duration, Easing.OutPow10);
 
-            rankText.MoveTo(horizontal ? new Vector2(-40, -10) : new Vector2(-70, 0), duration, Easing.OutPow10);
-            username.MoveTo(horizontal ? new Vector2(0, -46) : new Vector2(0, -86), duration, Easing.OutPow10);
-            scoreText.MoveTo(horizontal ? new Vector2(0, -16) : new Vector2(0, -56), duration, Easing.OutPow10);
+            switch (displayMode)
+            {
+                case PlayerPanelDisplayMode.AvatarOnly:
+                    rankText.Hide();
+                    scoreText.Hide();
+                    username.Hide();
+
+                    Background.FadeOut(200, Easing.OutQuint);
+                    SolidBackgroundLayer.FadeOut(200, Easing.OutQuint);
+
+                    this.ResizeTo(avatar_size, duration, Easing.OutPow10);
+                    break;
+
+                case PlayerPanelDisplayMode.Horizontal:
+                case PlayerPanelDisplayMode.Vertical:
+                    Background.FadeIn(200);
+                    SolidBackgroundLayer.FadeIn(200);
+
+                    using (BeginDelayedSequence(100))
+                    {
+                        username.FadeIn(600);
+
+                        using (BeginDelayedSequence(100))
+                        {
+                            scoreText.FadeIn(600);
+
+                            using (BeginDelayedSequence(100))
+                            {
+                                rankText.FadeTo(0.6f, 600);
+                            }
+                        }
+                    }
+
+                    this.ResizeTo(horizontal ? size_horizontal : size_vertical, duration, Easing.OutPow10);
+
+                    rankText.MoveTo(horizontal ? new Vector2(-40, -10) : new Vector2(-70, 0), duration, Easing.OutPow10);
+                    username.MoveTo(horizontal ? new Vector2(0, -46) : new Vector2(0, -86), duration, Easing.OutPow10);
+                    scoreText.MoveTo(horizontal ? new Vector2(0, -16) : new Vector2(0, -56), duration, Easing.OutPow10);
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -283,5 +327,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 client.MatchEvent -= onMatchEvent;
             }
         }
+    }
+
+    public enum PlayerPanelDisplayMode
+    {
+        AvatarOnly,
+        Horizontal,
+        Vertical
     }
 }

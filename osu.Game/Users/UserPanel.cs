@@ -43,7 +43,9 @@ namespace osu.Game.Users
 
         protected Action ViewProfile { get; private set; } = null!;
 
-        protected Drawable Background { get; private set; } = null!;
+        public Box SolidBackgroundLayer { get; private set; } = null!;
+
+        protected Drawable? Background { get; private set; }
 
         protected UserPanel(APIUser user)
             : base(HoverSampleSet.Button)
@@ -88,15 +90,15 @@ namespace osu.Game.Users
         {
             Content.Masking = true;
 
-            Add(new Box
+            Add(SolidBackgroundLayer = new Box
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = ColourProvider?.Background5 ?? Colours.Gray1
             });
 
-            var background = CreateBackground();
-            if (background != null)
-                Add(background);
+            Background = CreateBackground();
+            if (Background != null)
+                Add(Background);
 
             Add(CreateLayout());
 
@@ -107,14 +109,14 @@ namespace osu.Game.Users
             };
         }
 
-        // TODO: this whole api is messy. half these Create methods are expected to by the implementation and half are implictly called.
+        // TODO: this whole api is messy. half these Create methods are expected to by the implementation and half are implicitly called.
 
         protected abstract Drawable CreateLayout();
 
         /// <summary>
-        /// Panel background container. Can be null if a panel doesn't want a background under it's layout
+        /// Panel background container. Can be null if a panel doesn't want a background under its layout
         /// </summary>
-        protected virtual Drawable? CreateBackground() => Background = new UserCoverBackground
+        protected virtual Drawable? CreateBackground() => new UserCoverBackground
         {
             RelativeSizeAxes = Axes.Both,
             Anchor = Anchor.Centre,
