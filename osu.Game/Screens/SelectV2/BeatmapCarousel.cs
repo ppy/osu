@@ -371,7 +371,7 @@ namespace osu.Game.Screens.SelectV2
 
                         if (userCollapsedGroup)
                         {
-                            if (grouping.BeatmapSetsGroupedTogether && CurrentGroupedBeatmap != null)
+                            if (grouping.BeatmapSetsGroupedTogether && CurrentGroupedBeatmap != null && CheckModelEquality(group, CurrentGroupedBeatmap.Group))
                                 setExpandedSet(new GroupedBeatmapSet(CurrentGroupedBeatmap.Group, CurrentGroupedBeatmap.Beatmap.BeatmapSet!));
                             userCollapsedGroup = false;
                         }
