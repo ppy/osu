@@ -16,6 +16,7 @@ using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Localisation;
+using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
@@ -67,6 +68,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             AddInternal(DownloadTracker);
         }
 
+        private bool shiftActivated => containingInputManager?.CurrentState.Keyboard.ShiftPressed == true;
+
+        protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) => base.ReceivePositionalInputAtSubTree(screenSpacePos) && !shiftActivated;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -79,7 +84,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
             Action = () =>
             {
-                if (containingInputManager?.CurrentState.Keyboard.ShiftPressed == true)
+                if (shiftActivated)
                 {
                     switch (DownloadTracker.State.Value)
                     {

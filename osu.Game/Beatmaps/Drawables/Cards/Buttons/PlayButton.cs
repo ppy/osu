@@ -88,13 +88,13 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                 progress.Value = 0;
         }
 
-        protected override bool OnClick(ClickEvent e)
-        {
-            if (e.ShiftPressed)
-                return false;
+        // protected override bool OnClick(ClickEvent e)
+        // {
+        //     if (e.ShiftPressed)
+        //         return false;
 
-            return base.OnClick(e);
-        }
+        //     return base.OnClick(e);
+        // }
 
         private void updateState(ValueChangedEvent<bool> playing)
         {

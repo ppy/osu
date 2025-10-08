@@ -104,13 +104,13 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             updateState();
         }
 
-        protected override bool OnClick(ClickEvent e)
-        {
-            if (e.ShiftPressed)
-                return false;
+        // protected override bool OnClick(ClickEvent e)
+        // {
+        //     if (e.ShiftPressed)
+        //         return false;
 
-            return base.OnClick(e);
-        }
+        //     return base.OnClick(e);
+        // }
 
         private void updateState()
         {
