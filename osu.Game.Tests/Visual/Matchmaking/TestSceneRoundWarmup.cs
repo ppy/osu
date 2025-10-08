@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
-    public partial class TestSceneIdleScreen : MultiplayerTestScene
+    public partial class TestSceneRoundWarmup : MultiplayerTestScene
     {
         private const int user_count = 8;
 
