@@ -155,6 +155,7 @@ namespace osu.Game.Screens.SelectV2
         private readonly RealmPopulatingOnlineLookupSource onlineLookupSource = new RealmPopulatingOnlineLookupSource();
 
         private Bindable<bool> configBackgroundBlur = null!;
+        private Bindable<bool> showConvertedBeatmaps = null!;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)
@@ -212,7 +213,11 @@ namespace osu.Game.Screens.SelectV2
                                                         // Pad enough to only reset scroll when well into the left wedge areas.
                                                         Padding = new MarginPadding { Right = 40 },
                                                         RelativeSizeAxes = Axes.Both,
-                                                        Child = new Select.SongSelect.LeftSideInteractionContainer(() => carousel.ScrollToSelection())
+                                                        Child = new Select.SongSelect.LeftSideInteractionContainer(() =>
+                                                        {
+                                                            carousel.ExpandGroupForCurrentSelection();
+                                                            carousel.ScrollToSelection();
+                                                        })
                                                         {
                                                             RelativeSizeAxes = Axes.Both,
                                                         },
@@ -302,6 +307,8 @@ namespace osu.Game.Screens.SelectV2
 
                 updateBackgroundDim();
             });
+
+            showConvertedBeatmaps = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
         }
 
         private void requestRecommendedSelection(IEnumerable<GroupedBeatmap> groupedBeatmaps)
@@ -323,7 +330,13 @@ namespace osu.Game.Screens.SelectV2
             {
                 Hotkey = GlobalAction.ToggleModSelection,
                 Current = Mods,
-                RequestDeselectAllMods = () => Mods.Value = Array.Empty<Mod>()
+                RequestDeselectAllMods = () =>
+                {
+                    if (modSelectOverlay.State.Value == Visibility.Visible)
+                        modSelectOverlay.DeselectAll();
+                    else
+                        Mods.Value = Array.Empty<Mod>();
+                }
             },
             new FooterButtonRandom
             {
@@ -522,7 +535,7 @@ namespace osu.Game.Screens.SelectV2
             if (!this.IsCurrentScreen())
                 return;
 
-            if (!checkBeatmapValidForSelection(beatmap, carousel.Criteria))
+            if (!checkBeatmapValidForSelection(beatmap))
                 return;
 
             // To ensure sanity, cancel any pending selection as we are about to force a selection.
@@ -573,7 +586,7 @@ namespace osu.Game.Screens.SelectV2
 
             // Refetch to be confident that the current selection is still valid. It may have been deleted or hidden.
             var currentBeatmap = beatmaps.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo, true);
-            bool validSelection = checkBeatmapValidForSelection(currentBeatmap.BeatmapInfo, filterControl.CreateCriteria());
+            bool validSelection = checkBeatmapValidForSelection(currentBeatmap.BeatmapInfo);
 
             if (validSelection)
             {
@@ -594,13 +607,14 @@ namespace osu.Game.Screens.SelectV2
             {
                 // In the case a difficulty was hidden or removed, prefer selecting another difficulty from the same set.
                 var activeSet = currentBeatmap.BeatmapSetInfo;
-                var criteria = filterControl.CreateCriteria();
 
-                var validBeatmaps = activeSet.Beatmaps.Where(b => checkBeatmapValidForSelection(b, criteria)).ToArray();
+                var validBeatmaps = activeSet.Beatmaps.Where(checkBeatmapValidForSelection).ToArray();
 
                 if (validBeatmaps.Any())
                 {
-                    carousel.CurrentBeatmap = difficultyRecommender?.GetRecommendedBeatmap(validBeatmaps) ?? validBeatmaps.First();
+                    var beatmap = difficultyRecommender?.GetRecommendedBeatmap(validBeatmaps) ?? validBeatmaps.First();
+                    carousel.CurrentBeatmap = beatmap;
+                    debounceQueueSelection(beatmap);
                     return true;
                 }
             }
@@ -612,12 +626,9 @@ namespace osu.Game.Screens.SelectV2
             return validSelection;
         }
 
-        private bool checkBeatmapValidForSelection(BeatmapInfo beatmap, FilterCriteria? criteria)
+        private bool checkBeatmapValidForSelection(BeatmapInfo beatmap)
         {
-            if (criteria == null)
-                return false;
-
-            if (!beatmap.AllowGameplayWithRuleset(Ruleset.Value, criteria.AllowConvertedBeatmaps))
+            if (!beatmap.AllowGameplayWithRuleset(Ruleset.Value, showConvertedBeatmaps.Value))
                 return false;
 
             if (beatmap.Hidden)
@@ -715,7 +726,7 @@ namespace osu.Game.Screens.SelectV2
 
             ensurePlayingSelected();
             updateBackgroundDim();
-            fetchOnlineInfo();
+            fetchOnlineInfo(force: true);
         }
 
         private void onLeavingScreen()
@@ -775,7 +786,7 @@ namespace osu.Game.Screens.SelectV2
             // This avoids a flicker of a placeholder or invalid beatmap before a proper selection.
             //
             // After the carousel finishes filtering, it will attempt a selection then call this method again.
-            if (!CarouselItemsPresented && !checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo, filterControl.CreateCriteria()))
+            if (!CarouselItemsPresented && !checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo))
                 return;
 
             if (carousel.VisuallyFocusSelected)
@@ -832,7 +843,7 @@ namespace osu.Game.Screens.SelectV2
             bool isFirstFilter = filterDebounce == null;
 
             // Criteria change may have included a ruleset change which made the current selection invalid.
-            bool isSelectionValid = checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo, criteria);
+            bool isSelectionValid = checkBeatmapValidForSelection(Beatmap.Value.BeatmapInfo);
 
             filterDebounce = Scheduler.AddDelayed(() => carousel.Filter(criteria, !isSelectionValid), isFirstFilter || !isSelectionValid ? 0 : filter_delay);
         }
@@ -985,6 +996,14 @@ namespace osu.Game.Screens.SelectV2
 
             switch (e.Action)
             {
+                case GlobalAction.Select:
+                    // in most circumstances this is handled already by the carousel itself, but there are cases where it will not be.
+                    // one of which is filtering out all visible beatmaps and attempting to start gameplay.
+                    // in that case, users still expect a `Select` press to advance to gameplay anyway, using the ambient selected beatmap if there is one,
+                    // which matches the behaviour resulting from clicking the osu! cookie in that scenario.
+                    SelectAndRun(Beatmap.Value.BeatmapInfo, OnStart);
+                    return true;
+
                 case GlobalAction.IncreaseModSpeed:
                     return modSpeedHotkeyHandler.ChangeSpeed(0.05, flattenedMods);
 
@@ -1056,11 +1075,11 @@ namespace osu.Game.Screens.SelectV2
         private CancellationTokenSource? onlineLookupCancellation;
         private Task<APIBeatmapSet?>? currentOnlineLookup;
 
-        private void fetchOnlineInfo()
+        private void fetchOnlineInfo(bool force = false)
         {
             var beatmapSetInfo = Beatmap.Value.BeatmapSetInfo;
 
-            if (lastLookupResult.Value?.Result?.OnlineID == beatmapSetInfo.OnlineID)
+            if (lastLookupResult.Value?.Result?.OnlineID == beatmapSetInfo.OnlineID && !force)
                 return;
 
             onlineLookupCancellation?.Cancel();

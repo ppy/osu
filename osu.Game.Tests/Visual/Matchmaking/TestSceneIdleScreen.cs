@@ -10,7 +10,8 @@ using osu.Framework.Screens;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
-using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Idle;
+using osu.Game.Online.Rooms;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Match.RoundWarmup;
 using osu.Game.Tests.Visual.Multiplayer;
 using osuTK;
 
@@ -26,7 +27,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             base.SetUpSteps();
 
-            AddStep("join room", () => JoinRoom(CreateDefaultRoom()));
+            AddStep("join room", () => JoinRoom(CreateDefaultRoom(MatchType.Matchmaking)));
             WaitForJoined();
 
             AddStep("add list", () =>
@@ -44,7 +45,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                     return (user, 0);
                 }).ToArray();
 
-                Child = new ScreenStack(new IdleScreen())
+                Child = new ScreenStack(new SubScreenRoundWarmup())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

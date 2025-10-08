@@ -5,9 +5,11 @@ using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Matchmaking.Events;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
-using osu.Game.Screens.OnlinePlay.Matchmaking;
+using osu.Game.Online.Rooms;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
 using osu.Game.Tests.Visual.Multiplayer;
 using osu.Game.Users;
 
@@ -21,7 +23,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             base.SetUpSteps();
 
-            AddStep("join room", () => JoinRoom(CreateDefaultRoom()));
+            AddStep("join room", () => JoinRoom(CreateDefaultRoom(MatchType.Matchmaking)));
             WaitForJoined();
 
             AddStep("add panel", () => Child = panel = new PlayerPanel(new MultiplayerRoomUser(1)
@@ -89,6 +91,12 @@ namespace osu.Game.Tests.Visual.Matchmaking
                     }
                 }
             }).WaitSafely());
+        }
+
+        [Test]
+        public void TestJump()
+        {
+            AddStep("jump", () => MultiplayerClient.SendUserMatchRequest(1, new MatchmakingAvatarActionRequest { Action = MatchmakingAvatarAction.Jump }).WaitSafely());
         }
     }
 }

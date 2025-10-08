@@ -13,9 +13,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
+using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -342,6 +345,12 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
+        /// <summary>
+        /// Tracks whether the user has manually requested to collapse an open group.
+        /// In this case, refilters should not forcibly expand groups until the user expands a group again themselves.
+        /// </summary>
+        private bool userCollapsedGroup;
+
         protected override void HandleItemActivated(CarouselItem item)
         {
             try
@@ -354,10 +363,18 @@ namespace osu.Game.Screens.SelectV2
                         {
                             setExpansionStateOfGroup(ExpandedGroup, false);
                             ExpandedGroup = null;
+                            userCollapsedGroup = true;
                             return;
                         }
 
                         setExpandedGroup(group);
+
+                        if (userCollapsedGroup)
+                        {
+                            if (grouping.BeatmapSetsGroupedTogether && CurrentGroupedBeatmap != null)
+                                setExpandedSet(new GroupedBeatmapSet(CurrentGroupedBeatmap.Group, CurrentGroupedBeatmap.Beatmap.BeatmapSet!));
+                            userCollapsedGroup = false;
+                        }
 
                         // If the active selection is within this group, it should get keyboard focus immediately.
                         if (CurrentSelectionItem?.IsVisible == true && CurrentSelection is GroupedBeatmap gb)
@@ -397,6 +414,9 @@ namespace osu.Game.Screens.SelectV2
                     throw new InvalidOperationException("Groups should never become selected");
 
                 case GroupedBeatmap groupedBeatmap:
+                    if (userCollapsedGroup)
+                        break;
+
                     setExpandedGroup(groupedBeatmap.Group);
 
                     if (grouping.BeatmapSetsGroupedTogether)
@@ -641,6 +661,37 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
+        public void ExpandGroupForCurrentSelection()
+        {
+            if (CurrentGroupedBeatmap?.Group == null)
+                return;
+
+            if (CheckModelEquality(ExpandedGroup, CurrentGroupedBeatmap.Group))
+                return;
+
+            var groupItem = GetCarouselItems()?.FirstOrDefault(i => CheckModelEquality(i.Model, CurrentGroupedBeatmap.Group));
+            if (groupItem != null)
+                HandleItemActivated(groupItem);
+        }
+
+        protected override double? GetScrollTarget()
+        {
+            double? target = base.GetScrollTarget();
+
+            // if the base implementation returned null, it means that the keyboard selection has been filtered out and is no longer visible
+            // attempt a fallback to other possibly expanded panels (set first, then group)
+            if (target == null)
+            {
+                var items = GetCarouselItems();
+                var targetItem = items?.FirstOrDefault(i => CheckModelEquality(i.Model, ExpandedBeatmapSet))
+                                 ?? items?.FirstOrDefault(i => CheckModelEquality(i.Model, ExpandedGroup));
+
+                target = targetItem?.CarouselYPosition;
+            }
+
+            return target;
+        }
+
         #endregion
 
         #region Audio
@@ -788,9 +839,11 @@ namespace osu.Game.Screens.SelectV2
         private readonly DrawablePool<PanelBeatmapSet> setPanelPool = new DrawablePool<PanelBeatmapSet>(100);
         private readonly DrawablePool<PanelGroup> groupPanelPool = new DrawablePool<PanelGroup>(100);
         private readonly DrawablePool<PanelGroupStarDifficulty> starsGroupPanelPool = new DrawablePool<PanelGroupStarDifficulty>(11);
+        private readonly DrawablePool<PanelGroupRankDisplay> ranksGroupPanelPool = new DrawablePool<PanelGroupRankDisplay>(9);
 
         private void setupPools()
         {
+            AddInternal(ranksGroupPanelPool);
             AddInternal(starsGroupPanelPool);
             AddInternal(groupPanelPool);
             AddInternal(beatmapPanelPool);
@@ -813,11 +866,19 @@ namespace osu.Game.Screens.SelectV2
             if (x is GroupedBeatmap groupedBeatmapX && y is GroupedBeatmap groupedBeatmapY)
                 return groupedBeatmapX.Equals(groupedBeatmapY);
 
+            // `BeatmapInfo` is no longer used directly in carousel items, but in rare circumstances still is used for model equality comparisons
+            // (see `beatmapSetsChanged()` deletion handling logic, which aims to find a beatmap close to the just-deleted one, disregarding grouping concerns)
+            if (x is BeatmapInfo beatmapInfoX && y is BeatmapInfo beatmapInfoY)
+                return beatmapInfoX.Equals(beatmapInfoY);
+
             if (x is GroupDefinition groupX && y is GroupDefinition groupY)
                 return groupX.Equals(groupY);
 
             if (x is StarDifficultyGroupDefinition starX && y is StarDifficultyGroupDefinition starY)
                 return starX.Equals(starY);
+
+            if (x is RankDisplayGroupDefinition rankX && y is RankDisplayGroupDefinition rankY)
+                return rankX.Equals(rankY);
 
             return base.CheckModelEquality(x, y);
         }
@@ -828,6 +889,9 @@ namespace osu.Game.Screens.SelectV2
             {
                 case StarDifficultyGroupDefinition:
                     return starsGroupPanelPool.Get();
+
+                case RankDisplayGroupDefinition:
+                    return ranksGroupPanelPool.Get();
 
                 case GroupDefinition:
                     return groupPanelPool.Get();
@@ -1064,15 +1128,15 @@ namespace osu.Game.Screens.SelectV2
         /// <summary>
         /// The title of this group.
         /// </summary>
-        public string Title { get; }
+        public LocalisableString Title { get; }
 
         private readonly string uncasedTitle;
 
-        public GroupDefinition(int order, string title)
+        public GroupDefinition(int order, LocalisableString title)
         {
             Order = order;
             Title = title;
-            uncasedTitle = title.ToLowerInvariant();
+            uncasedTitle = title.ToLower().GetLocalised(LocalisationParameters.DEFAULT);
         }
 
         public virtual bool Equals(GroupDefinition? other) => uncasedTitle == other?.uncasedTitle;
@@ -1083,7 +1147,12 @@ namespace osu.Game.Screens.SelectV2
     /// <summary>
     /// Defines a grouping header for a set of carousel items grouped by star difficulty.
     /// </summary>
-    public record StarDifficultyGroupDefinition(int Order, string Title, StarDifficulty Difficulty) : GroupDefinition(Order, Title);
+    public record StarDifficultyGroupDefinition(int Order, LocalisableString Title, StarDifficulty Difficulty) : GroupDefinition(Order, Title);
+
+    /// <summary>
+    /// Defines a grouping header for a set of carousel items grouped by achieved rank.
+    /// </summary>
+    public record RankDisplayGroupDefinition(ScoreRank Rank) : GroupDefinition(-(int)Rank, Rank.GetLocalisableDescription());
 
     /// <summary>
     /// Used to represent a portion of a <see cref="BeatmapSetInfo"/> under a <see cref="GroupDefinition"/>.
