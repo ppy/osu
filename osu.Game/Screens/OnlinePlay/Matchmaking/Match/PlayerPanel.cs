@@ -70,6 +70,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         {
             Content.CornerRadius = 10;
             Content.CornerExponent = 10;
+            Content.Anchor = Anchor.Centre;
+            Content.Origin = Anchor.Centre;
 
             Add(new Container
             {
@@ -185,14 +187,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
         protected override bool OnHover(HoverEvent e)
         {
-            scaleContainer.ScaleTo(1.03f, 750, Easing.OutPow10);
-            mainContent.ScaleTo(1.03f, 750, Easing.OutPow10);
+            Content.ScaleTo(1.03f, 2000, Easing.OutPow10);
+            mainContent.ScaleTo(1.03f, 2000, Easing.OutPow10);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            scaleContainer.ScaleTo(1f, 750, Easing.OutPow10);
+            Content.ScaleTo(1f, 750, Easing.OutPow10);
             mainContent.ScaleTo(1, 750, Easing.OutPow10);
 
             mainContent.MoveTo(Vector2.Zero, 1250, Easing.OutPow10);
@@ -204,8 +206,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         {
             var offset = (avatarPositionTarget.ToLocalSpace(e.ScreenSpaceMousePosition) - avatarPositionTarget.DrawSize / 2) * 0.02f;
 
-            mainContent.MoveTo(offset * 0.5f, 1000, Easing.OutPow10);
-            avatarPositionTarget.MoveTo(avatarPosition + offset, 400, Easing.OutPow10);
+            mainContent.MoveTo(offset * 0.5f, 2000, Easing.OutPow10);
+            avatarPositionTarget.MoveTo(avatarPosition + offset, 2000, Easing.OutPow10);
             return base.OnMouseMove(e);
         }
 
