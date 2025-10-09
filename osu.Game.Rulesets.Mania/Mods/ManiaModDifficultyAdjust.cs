@@ -12,8 +12,8 @@ namespace osu.Game.Rulesets.Mania.Mods
             Precision = 0.1f,
             MinValue = 0,
             MaxValue = 10,
-            ExtendedMaxValue = 13.61f,
-            ExtendedMinValue = -14.93f,
+            ExtendedMaxValue = 15,
+            ExtendedMinValue = -15,
             ReadCurrentFromDifficulty = diff => diff.OverallDifficulty,
         };
     }
