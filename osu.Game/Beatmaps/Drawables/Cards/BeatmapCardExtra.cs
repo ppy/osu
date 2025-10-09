@@ -280,8 +280,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             }
 
             createStatistics();
-
-            Action = () => beatmapSetOverlay?.FetchAndShowBeatmapSet(BeatmapSet.OnlineID);
         }
 
         private LocalisableString createArtistText()
