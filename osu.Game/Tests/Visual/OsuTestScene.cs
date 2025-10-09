@@ -332,6 +332,9 @@ namespace osu.Game.Tests.Visual
             if (MusicController?.TrackLoaded == true)
                 MusicController.Stop();
 
+            if (realm?.IsValueCreated == true)
+                Realm.Dispose();
+
             RecycleLocalStorage(true);
         }
 

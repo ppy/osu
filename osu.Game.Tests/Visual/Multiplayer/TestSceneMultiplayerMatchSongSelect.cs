@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
@@ -168,6 +169,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                           .ChildrenOfType<ModPanel>()
                           .Where(panel => panel.Visible)
                           .All(b => b.Mod.GetType() != type));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
         }
 
         private partial class TestMultiplayerMatchSongSelect : MultiplayerMatchSongSelect
