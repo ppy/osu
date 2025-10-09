@@ -183,6 +183,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("Show all judgements", () => counterDisplay.Mode.Value = ArgonJudgementCounterDisplay.DisplayMode.All);
             AddWaitStep("wait some", 2);
             AddAssert("Check all visible", () => counterDisplay.CounterFlow.ChildrenOfType<ArgonJudgementCounter>().Last().Alpha == 1);
+            AddToggleStep("toggle wireframe display", t => counterDisplay.WireframeOpacity.Value = t ? 0.3f : 0);
+            AddStep("Set direction vertical", () => counterDisplay.FlowDirection.Value = Direction.Vertical);
+            AddStep("Set direction horizontal", () => counterDisplay.FlowDirection.Value = Direction.Horizontal);
         }
 
         private int hiddenCount()
