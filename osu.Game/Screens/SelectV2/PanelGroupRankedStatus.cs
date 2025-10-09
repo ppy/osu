@@ -29,9 +29,6 @@ namespace osu.Game.Screens.SelectV2
         public const float HEIGHT = PanelGroup.HEIGHT;
 
         [Resolved]
-        private OsuColour colours { get; set; } = null!;
-
-        [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
         private Drawable iconContainer = null!;
