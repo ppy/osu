@@ -108,9 +108,14 @@ namespace osu.Game.Online.API
         void Login(string username, string password);
 
         /// <summary>
+        /// The <see cref="SessionVerificationMethod"/> requested by the server to complete verification.
+        /// </summary>
+        SessionVerificationMethod? SessionVerificationMethod { get; }
+
+        /// <summary>
         /// Provide a second-factor authentication code for authentication.
         /// </summary>
-        /// <param name="code">The 2FA code.</param>
+        /// <paramref name="code">The 2FA code.</paramref>
         void AuthenticateSecondFactor(string code);
 
         /// <summary>
