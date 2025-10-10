@@ -35,13 +35,13 @@ namespace osu.Game.Users
             : base(user)
         {
             AutoSizeAxes = Axes.Y;
-            CornerRadius = 10;
+            Content.CornerRadius = 10;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            BorderColour = ColourProvider?.Light1 ?? Colours.GreyVioletLighter;
+            Content.BorderColour = ColourProvider?.Light1 ?? Colours.GreyVioletLighter;
         }
 
         [Resolved]
@@ -219,13 +219,13 @@ namespace osu.Game.Users
 
         protected override bool OnHover(HoverEvent e)
         {
-            BorderThickness = 2;
+            Content.BorderThickness = 2;
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            BorderThickness = 0;
+            Content.BorderThickness = 0;
             base.OnHoverLost(e);
         }
 
