@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -148,10 +149,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestStatuses()
         {
-            for (int i = -4; i <= 4; i++)
+            foreach (var status in Enum.GetValues<BeatmapOnlineStatus>().Where(s => s != BeatmapOnlineStatus.Approved))
             {
-                BeatmapOnlineStatus status = (BeatmapOnlineStatus)i;
-
                 AddStep($"display {status} status", () =>
                 {
                     ContentContainer.Child = new DependencyProvidingContainer
