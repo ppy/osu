@@ -147,15 +147,10 @@ namespace osu.Game.Screens.SelectV2
             var group = (RankedStatusGroupDefinition)Item.Model;
             BeatmapOnlineStatus status = group.Status;
 
-            statusColour = OsuColour.ForBeatmapSetOnlineStatus(status) ?? Color4.White; // Since Enum ForBeatmapSetOnlineStatus can be null, it was heavily needed to have some fallback. If you don't like White, change it to another one, please
+            statusColour = OsuColour.ForBeatmapSetOnlineStatus(status) ?? Color4.White;
 
-            //Switch was moved before setting the colours, due to the existence of graveyard section.
-            //Down bellow, I'll explain better the exact reasoning for this
             switch (status)
             {
-                //Graveyard pill was set to be fully black with some gray text.
-                //As long as it works for this case, this looks too bad on the coloured panel. (See -> https://github.com/ppy/osu/discussions/35148#discussioncomment-14609389)
-                //So my and OPs decision was to lighten it up, by using the colour from GRAVEYARD text, to make it look better
                 case BeatmapOnlineStatus.Graveyard:
                     statusColour = new Color4(colourProvider.Background3.R, colourProvider.Background3.R, colourProvider.Background3.R, 1); //I don't like this way, but it just works, so I can't complain
                     iconContainer.Colour = Color4.White;
