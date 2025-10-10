@@ -147,7 +147,7 @@ namespace osu.Game.Screens.SelectV2
             var group = (RankedStatusGroupDefinition)Item.Model;
             BeatmapOnlineStatus status = group.Status;
 
-            statusColour = OsuColour.ForBeatmapSetOnlineStatus(status) ?? Color4.White;
+            statusColour = OsuColour.ForBeatmapSetOnlineStatus(status) ?? throw new ArgumentOutOfRangeException(nameof(status), status, null);
 
             switch (status)
             {
