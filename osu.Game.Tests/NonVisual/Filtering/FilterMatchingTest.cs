@@ -351,6 +351,41 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
+        public void TestCriteriaMatchingTagExcluded()
+        {
+            var beatmap = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                UserTags =
+                [
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"song representation/simple\"!", ExcludeTerm = true },
+                ]
+            };
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            Assert.AreEqual(true, carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        public void TestCriteriaOneTagIncludedAndOneTagExcluded()
+        {
+            var beatmap = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                UserTags =
+                [
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"song representation/simple\"!" },
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"style/clean\"!", ExcludeTerm = true }
+                ]
+            };
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            Assert.AreEqual(true, carouselItem.Filtered.Value);
+        }
+
+        [Test]
         public void TestBeatmapMustHaveAtLeastOneTagIfUserTagFilterActive()
         {
             var beatmap = getExampleBeatmap();
