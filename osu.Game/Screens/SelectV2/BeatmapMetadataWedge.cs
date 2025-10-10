@@ -415,6 +415,9 @@ namespace osu.Game.Screens.SelectV2
 
             Task.Run(() =>
             {
+                if (token.IsCancellationRequested)
+                    return;
+
                 string[] tags = realm.Run(r =>
                 {
                     // need to refetch because `beatmap.Value.BeatmapInfo` is not going to have the latest tags
