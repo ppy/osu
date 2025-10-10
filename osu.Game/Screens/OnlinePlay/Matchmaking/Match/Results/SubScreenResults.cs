@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -56,21 +57,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
                             Origin = Anchor.TopCentre,
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(grid_spacing),
+                            Spacing = new Vector2(16),
                             Children = new[]
                             {
                                 new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    Text = "Placement",
-                                    Font = OsuFont.Default.With(size: 12)
+                                    Text = "Your final placement",
+                                    Font = OsuFont.Style.Heading2.With(size: 36),
                                 },
                                 placementText = new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    Font = OsuFont.Default.With(size: 72),
+                                    Font = OsuFont.Style.Heading1.With(size: 72),
                                     UseFullGlyphHeight = false
                                 }
                             }
@@ -103,13 +104,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
                                             {
                                                 Anchor = Anchor.TopCentre,
                                                 Origin = Anchor.TopCentre,
-                                                Text = "Breakdown",
-                                                Font = OsuFont.Default.With(size: 12)
+                                                Text = "How you played",
+                                                Font = OsuFont.Style.Heading2,
                                             },
                                             userStatistics = new FillFlowContainer<PanelUserStatistic>
                                             {
-                                                Anchor = Anchor.TopCentre,
-                                                Origin = Anchor.TopCentre,
+                                                Anchor = Anchor.TopLeft,
+                                                Origin = Anchor.TopLeft,
                                                 AutoSizeAxes = Axes.Both,
                                                 Direction = FillDirection.Vertical,
                                                 Spacing = new Vector2(grid_spacing)
@@ -180,31 +181,33 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
             if (state.Users[client.LocalUser!.UserID].Rounds.Count == 0)
             {
                 placementText.Text = "-";
-                addStatistic("No rounds played");
                 return;
             }
 
+            placementText.Text = state.Users[client.LocalUser!.UserID].Placement.Ordinalize();
+
             int overallPlacement = state.Users[client.LocalUser!.UserID].Placement;
             int overallPoints = state.Users[client.LocalUser!.UserID].Points;
-            int bestPlacement = state.Users[client.LocalUser!.UserID].Rounds.Min(r => r.Placement);
-            var accuracyPlacement = state.Users.Select(u => (user: u, avgAcc: u.Rounds.Select(r => r.Accuracy).DefaultIfEmpty(0).Average()))
-                                         .OrderByDescending(t => t.avgAcc)
-                                         .Select((t, i) => (info: t, index: i))
-                                         .Single(t => t.info.user.UserId == client.LocalUser!.UserID);
+            addStatistic(overallPlacement, $"Overall position ({overallPoints} points)");
 
-            placementText.Text = $"#{state.Users[client.LocalUser!.UserID].Placement}";
-            addStatistic($"#{overallPlacement} overall ({overallPoints}pts)");
-            addStatistic($"#{bestPlacement} best placement");
-            addStatistic($"#{accuracyPlacement.index + 1} accuracy ({accuracyPlacement.info.avgAcc.FormatAccuracy()})");
+            var accuracyOrderedUsers = state.Users.Select(u => (user: u, avgAcc: u.Rounds.Select(r => r.Accuracy).DefaultIfEmpty(0).Average()))
+                                            .OrderByDescending(t => t.avgAcc)
+                                            .Select((t, i) => (info: t, index: i))
+                                            .Single(t => t.info.user.UserId == client.LocalUser!.UserID);
+            int accuracyPlacement = accuracyOrderedUsers.index + 1;
+            addStatistic(accuracyPlacement, $"Overall accuracy ({accuracyOrderedUsers.info.avgAcc.FormatAccuracy()})");
 
-            void addStatistic(string text)
-            {
-                userStatistics.Add(new PanelUserStatistic(text)
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
-                });
-            }
+            var maxComboOrderedUsers = state.Users.Select(u => (user: u, maxCombo: u.Rounds.Max(r => r.MaxCombo)))
+                                            .OrderByDescending(t => t.maxCombo)
+                                            .Select((t, i) => (info: t, index: i))
+                                            .Single(t => t.info.user.UserId == client.LocalUser!.UserID);
+            int maxComboPlacement = maxComboOrderedUsers.index + 1;
+            addStatistic(maxComboPlacement, $"Best max combo ({maxComboOrderedUsers.info.maxCombo}x)");
+
+            var bestPlacement = state.Users[client.LocalUser!.UserID].Rounds.MinBy(r => r.Placement);
+            addStatistic(bestPlacement!.Placement, $"Best round placement (round {bestPlacement.Round})");
+
+            void addStatistic(int position, string text) => userStatistics.Add(new PanelUserStatistic(position, text));
         }
 
         private void populateRoomStatistics(MatchmakingRoomState state)

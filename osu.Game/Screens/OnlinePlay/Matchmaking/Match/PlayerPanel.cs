@@ -192,6 +192,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                             Origin = Anchor.BottomCentre,
                             Blending = BlendingParameters.Additive,
                             Margin = new MarginPadding(4),
+                            Text = "-",
                             Font = OsuFont.Style.Title.With(size: 70),
                         },
                         username = new OsuSpriteText
