@@ -11,11 +11,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Tests.Resources;
@@ -64,8 +66,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestEmptyCollectionFilterContainsAllBeatmaps()
         {
-            assertCollectionDropdownContains("All beatmaps");
-            assertCollectionHeaderDisplays("All beatmaps");
+            assertCollectionDropdownContains(CollectionsStrings.AllBeatmaps);
+            assertCollectionHeaderDisplays(CollectionsStrings.AllBeatmaps);
         }
 
         [Test]
@@ -84,11 +86,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "2"))));
             AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "3"))));
 
-            AddAssert("check count 5", () => dropdown.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(5));
+            AddUntilStep("check count 5", () => dropdown.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(5));
 
             AddStep("delete all collections", () => writeAndRefresh(r => r.RemoveAll<BeatmapCollection>()));
 
-            AddAssert("check count 2", () => dropdown.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(2));
+            AddUntilStep("check count 2", () => dropdown.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(2));
         }
 
         [Test]
@@ -183,11 +185,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             assertFirstButtonIs(FontAwesome.Solid.PlusSquare);
 
             addClickAddOrRemoveButtonStep(1);
-            AddAssert("collection contains beatmap", () => getFirstCollection().BeatmapMD5Hashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
+            AddUntilStep("collection contains beatmap", () => getFirstCollection().BeatmapMD5Hashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
             assertFirstButtonIs(FontAwesome.Solid.MinusSquare);
 
             addClickAddOrRemoveButtonStep(1);
-            AddAssert("collection does not contain beatmap", () => !getFirstCollection().BeatmapMD5Hashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
+            AddUntilStep("collection does not contain beatmap", () => !getFirstCollection().BeatmapMD5Hashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
             assertFirstButtonIs(FontAwesome.Solid.PlusSquare);
         }
 
@@ -235,13 +237,13 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private BeatmapCollection getFirstCollection() => Realm.Run(r => r.All<BeatmapCollection>().First());
 
-        private void assertCollectionHeaderDisplays(string collectionName, bool shouldDisplay = true)
+        private void assertCollectionHeaderDisplays(LocalisableString collectionName, bool shouldDisplay = true)
             => AddUntilStep($"collection dropdown header displays '{collectionName}'",
                 () => shouldDisplay == dropdown.ChildrenOfType<CollectionDropdown.OsuDropdownHeader>().Any(h => h.ChildrenOfType<SpriteText>().Any(t => t.Text == collectionName)));
 
         private void assertFirstButtonIs(IconUsage icon) => AddUntilStep($"button is {icon.Icon.ToString()}", () => getAddOrRemoveButton(1).Icon.Equals(icon));
 
-        private void assertCollectionDropdownContains(string collectionName, bool shouldContain = true) =>
+        private void assertCollectionDropdownContains(LocalisableString collectionName, bool shouldContain = true) =>
             AddUntilStep($"collection dropdown {(shouldContain ? "contains" : "does not contain")} '{collectionName}'",
                 // A bit of a roundabout way of going about this, see: https://github.com/ppy/osu-framework/issues/3871 + https://github.com/ppy/osu-framework/issues/3872
                 () => shouldContain == dropdown.ChildrenOfType<Menu.DrawableMenuItem>().Any(i => i.ChildrenOfType<CompositeDrawable>().OfType<IHasText>().First().Text == collectionName));
