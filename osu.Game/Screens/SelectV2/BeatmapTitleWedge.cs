@@ -309,7 +309,6 @@ namespace osu.Game.Screens.SelectV2
                     // which prevents working beatmap refetches caused by changes to the realm model of perceived low importance).
                     var status = realm.Run(r =>
                     {
-                        r.Refresh();
                         var refetchedBeatmap = r.Find<BeatmapInfo>(working.Value.BeatmapInfo.ID);
                         return refetchedBeatmap?.Status;
                     });
