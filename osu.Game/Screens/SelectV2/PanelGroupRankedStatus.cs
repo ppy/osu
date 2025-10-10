@@ -40,6 +40,9 @@ namespace osu.Game.Screens.SelectV2
         private TrianglesV2 triangles = null!;
         private Box glow = null!;
 
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -152,7 +155,8 @@ namespace osu.Game.Screens.SelectV2
             switch (status)
             {
                 case BeatmapOnlineStatus.Graveyard:
-                    statusColour = new Color4(colourProvider.Background3.R, colourProvider.Background3.R, colourProvider.Background3.R, 1); //I don't like this way, but it just works, so I can't complain
+                    // special override - the colour returned by `ForBeatmapSetOnlineStatus()` for graveyard is pitch black and doesn't allow for any contrast
+                    statusColour = colours.Gray5;
                     iconContainer.Colour = Color4.White;
                     break;
 
