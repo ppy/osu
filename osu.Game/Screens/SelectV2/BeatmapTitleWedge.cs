@@ -326,5 +326,12 @@ namespace osu.Game.Screens.SelectV2
                 }, token);
             }
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            onlineDisplayCancellationSource?.Dispose();
+            onlineDisplayCancellationSource = null;
+            base.Dispose(isDisposing);
+        }
     }
 }
