@@ -7,10 +7,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Utils;
 using osuTK;
@@ -25,16 +27,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
         private const float grid_spacing = 5;
 
         public override PanelDisplayStyle PlayersDisplayStyle => PanelDisplayStyle.Grid;
-        public override Drawable PlayersDisplayArea { get; }
+
+        public override Drawable PlayersDisplayArea { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
-        private readonly OsuSpriteText placementText;
-        private readonly FillFlowContainer<PanelUserStatistic> userStatistics;
-        private readonly FillFlowContainer<PanelRoomAward> roomStatistics;
+        private OsuSpriteText placementText = null!;
+        private FillFlowContainer<PanelUserStatistic> userStatistics = null!;
+        private FillFlowContainer<PanelRoomAward> roomAwards = null!;
 
-        public SubScreenResults()
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
             InternalChild = new GridContainer
             {
@@ -91,37 +98,63 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
                             Content = new Drawable?[][]
                             {
                                 [
-                                    new FillFlowContainer
+                                    new Container
                                     {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        AutoSizeAxes = Axes.Both,
-                                        Direction = FillDirection.Vertical,
-                                        Spacing = new Vector2(grid_spacing),
+                                        AutoSizeAxes = Axes.X,
+                                        RelativeSizeAxes = Axes.Y,
+                                        Masking = true,
+                                        CornerRadius = 5,
                                         Children = new Drawable[]
                                         {
-                                            new OsuSpriteText
+                                            new Box
                                             {
-                                                Anchor = Anchor.TopCentre,
-                                                Origin = Anchor.TopCentre,
-                                                Text = "How you played",
-                                                Font = OsuFont.Style.Heading2,
+                                                Colour = colourProvider.Background3,
+                                                RelativeSizeAxes = Axes.Both,
                                             },
-                                            userStatistics = new FillFlowContainer<PanelUserStatistic>
+                                            new FillFlowContainer
                                             {
-                                                Anchor = Anchor.TopLeft,
-                                                Origin = Anchor.TopLeft,
                                                 AutoSizeAxes = Axes.Both,
                                                 Direction = FillDirection.Vertical,
-                                                Spacing = new Vector2(grid_spacing)
-                                            }
+                                                Padding = new MarginPadding(5),
+                                                Spacing = new Vector2(grid_spacing),
+                                                Children = new Drawable[]
+                                                {
+                                                    new OsuSpriteText
+                                                    {
+                                                        Anchor = Anchor.TopCentre,
+                                                        Origin = Anchor.TopCentre,
+                                                        Text = "How you played",
+                                                        Font = OsuFont.Style.Heading2,
+                                                        Margin = new MarginPadding { Vertical = 15 },
+                                                    },
+                                                    userStatistics = new FillFlowContainer<PanelUserStatistic>
+                                                    {
+                                                        Anchor = Anchor.TopLeft,
+                                                        Origin = Anchor.TopLeft,
+                                                        AutoSizeAxes = Axes.Both,
+                                                        Direction = FillDirection.Vertical,
+                                                        Spacing = new Vector2(grid_spacing)
+                                                    },
+                                                    new OsuSpriteText
+                                                    {
+                                                        Anchor = Anchor.TopCentre,
+                                                        Origin = Anchor.TopCentre,
+                                                        Text = "Room Awards",
+                                                        Font = OsuFont.Style.Heading2,
+                                                        Margin = new MarginPadding { Vertical = 15 },
+                                                    },
+                                                    roomAwards = new FillFlowContainer<PanelRoomAward>
+                                                    {
+                                                        RelativeSizeAxes = Axes.X,
+                                                        AutoSizeAxes = Axes.Y,
+                                                        Spacing = new Vector2(grid_spacing)
+                                                    }
+                                                }
+                                            },
                                         }
                                     },
                                     null,
-                                    PlayersDisplayArea = Empty().With(d =>
-                                    {
-                                        d.RelativeSizeAxes = Axes.Both;
-                                    })
+                                    PlayersDisplayArea,
                                 ]
                             }
                         }
@@ -136,19 +169,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
                             Spacing = new Vector2(grid_spacing),
                             Children = new Drawable[]
                             {
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    Text = "Statistics",
-                                    Font = OsuFont.Default.With(size: 12)
-                                },
-                                roomStatistics = new FillFlowContainer<PanelRoomAward>
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Spacing = new Vector2(grid_spacing)
-                                }
                             }
                         },
                     ],
@@ -212,7 +232,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
 
         private void populateRoomStatistics(MatchmakingRoomState state)
         {
-            roomStatistics.Clear();
+            roomAwards.Clear();
 
             long maxScore = long.MinValue;
             int maxScoreUserId = 0;
@@ -305,34 +325,27 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
             }
 
             // Highest score - highest score across all rounds.
-            addStatistic(maxScoreUserId, "Highest score");
+            addAward(maxScoreUserId, "Highest score");
 
             // Most accurate - highest accuracy across all rounds.
-            addStatistic(maxAccuracyUserId, "Most accurate");
+            addAward(maxAccuracyUserId, "Most accurate");
 
             // Most combo - highest combo across all rounds.
-            addStatistic(maxComboUserId, "Most combo");
+            addAward(maxComboUserId, "Most combo");
 
             // Most bonus - most bonus score across all rounds.
             if (maxBonusScoreUserId > 0)
-                addStatistic(maxBonusScoreUserId, "Most bonus");
+                addAward(maxBonusScoreUserId, "Most bonus");
 
             // Most clutch - smallest victory in any round.
             if (smallestScoreDifferenceUserId > 0)
-                addStatistic(smallestScoreDifferenceUserId, "Most clutch");
+                addAward(smallestScoreDifferenceUserId, "Most clutch");
 
             // Best finish - largest victory in any round.
             if (largestScoreDifferenceUserId > 0)
-                addStatistic(largestScoreDifferenceUserId, "Best finish");
+                addAward(largestScoreDifferenceUserId, "Best finish");
 
-            void addStatistic(int userId, string text)
-            {
-                roomStatistics.Add(new PanelRoomAward(text, userId)
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
-                });
-            }
+            void addAward(int userId, string text) => roomAwards.Add(new PanelRoomAward(text, userId));
         }
 
         protected override void Dispose(bool isDisposing)
