@@ -283,5 +283,18 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             CheckHasSelection();
         }
+
+        [Test]
+        public void TestManuallyCollapsingCurrentGroupAndOpeningAnother()
+        {
+            SelectNextSet();
+            ToggleGroupCollapse();
+            SelectNextGroup();
+            AddUntilStep("no beatmap panels visible", () => GetVisiblePanels<PanelBeatmap>().Count(), () => Is.Zero);
+
+            SelectNextSet();
+            SelectNextSet();
+            AddUntilStep("no beatmap panels visible", () => GetVisiblePanels<PanelBeatmap>().Count(), () => Is.Zero);
+        }
     }
 }
