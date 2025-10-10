@@ -1,12 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Globalization;
 using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
@@ -15,6 +17,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Utils;
 using osuTK;
 
@@ -188,12 +191,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
             if (state.Users[client.LocalUser!.UserID].Rounds.Count == 0)
             {
                 placementText.Text = "-";
+                placementText.Colour = OsuColour.Gray(1f);
                 return;
             }
 
-            placementText.Text = state.Users[client.LocalUser!.UserID].Placement.Ordinalize(CultureInfo.CurrentCulture);
-
             int overallPlacement = state.Users[client.LocalUser!.UserID].Placement;
+
+            placementText.Text = overallPlacement.Ordinalize(CultureInfo.CurrentCulture);
+            placementText.Colour = ColourForPlacement(overallPlacement);
+
             int overallPoints = state.Users[client.LocalUser!.UserID].Points;
             addStatistic(overallPlacement, $"Overall position ({overallPoints} points)");
 
@@ -215,6 +221,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
             addStatistic(bestPlacement!.Placement, $"Best round placement (round {bestPlacement.Round})");
 
             void addStatistic(int position, string text) => userStatistics.Add(new PanelUserStatistic(position, text));
+        }
+
+        public static ColourInfo ColourForPlacement(int overallPlacement)
+        {
+            return OsuColour.ForRankingTier((RankingTier)Math.Max(0, (int)RankingTier.Lustrous - (overallPlacement - 1)));
         }
 
         private void populateRoomStatistics(MatchmakingRoomState state)
