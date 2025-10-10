@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
@@ -39,7 +41,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         private Container border = null!;
         private Container mainContent = null!;
 
-        private BeatmapCardMatchmaking card = null!;
+        private readonly List<APIUser> users = new List<APIUser>();
+
+        private BeatmapCardMatchmaking? card;
 
         public override bool PropagatePositionalInputSubTree => AllowSelection;
 
@@ -107,6 +111,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             };
             lookupCache.GetBeatmapAsync(Item.BeatmapID).ContinueWith(b => Schedule(() =>
             {
+                Debug.Assert(card == null);
+
                 var beatmap = b.GetResultSafely()!;
                 beatmap.StarRating = Item.StarRating;
 
@@ -115,11 +121,23 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                     Depth = float.MaxValue,
                     Action = () => Action?.Invoke(Item),
                 });
+
+                foreach (var user in users)
+                    card.SelectionOverlay.AddUser(user);
             }));
         }
 
-        public bool AddUser(APIUser user, bool isOwnUser = false) => card.SelectionOverlay.AddUser(user, isOwnUser);
-        public bool RemoveUser(APIUser user) => card.SelectionOverlay.RemoveUser(user.Id);
+        public void AddUser(APIUser user)
+        {
+            users.Add(user);
+            card?.SelectionOverlay.AddUser(user);
+        }
+
+        public void RemoveUser(APIUser user)
+        {
+            users.Remove(user);
+            card?.SelectionOverlay.RemoveUser(user.Id);
+        }
 
         protected override bool OnHover(HoverEvent e)
         {

@@ -19,6 +19,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
@@ -333,6 +334,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             private Sample? userAddedSample;
             private double? lastSamplePlayback;
 
+            [Resolved]
+            private IAPIProvider api { get; set; } = null!;
+
             public AvatarOverlay()
             {
                 AutoSizeAxes = Axes.Both;
@@ -352,12 +356,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 userAddedSample = audio.Samples.Get(@"Multiplayer/player-ready");
             }
 
-            public bool AddUser(APIUser user, bool isOwnUser)
+            public bool AddUser(APIUser user)
             {
                 if (avatars.Any(a => a.User.Id == user.Id))
                     return false;
 
-                var avatar = new SelectionAvatar(user, isOwnUser);
+                var avatar = new SelectionAvatar(user, user.Equals(api.LocalUser.Value));
 
                 avatars.Add(avatar);
 
