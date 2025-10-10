@@ -301,6 +301,9 @@ namespace osu.Game.Screens.SelectV2
 
                 Task.Run(() =>
                 {
+                    if (token.IsCancellationRequested)
+                        return;
+
                     // the online fetch may have also updated the beatmap's status.
                     // this needs to be checked against the *local* beatmap model rather than the online one, because it's not known here whether the status change has occurred or not
                     // (think scenarios like the beatmap being locally modified).
