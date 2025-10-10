@@ -62,8 +62,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double velocityChangeBonus = 0;
             double wiggleBonus = 0;
 
-            double aimStrain = 0;
-
             // Evaluate angle bonuses for circles
             if (osuCurrObj.Angle != null && osuLastObj.Angle != null)
             {
@@ -122,6 +120,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Evaluate acute angle bonus for sliders
             // Wide angle bonus is skipped since wide slider angles just are not hard in the way they are for circles
+            // This ensures maps like /b/4172054 don't break from wide angles
             if (osuLastObj.BaseObject is Slider && withSliderTravelDistance && osuCurrObj.CurrSliderAngle != null && osuCurrObj.PrevSliderAngle != null)
             {
                 double currAngle = osuCurrObj.CurrSliderAngle.Value;
@@ -168,15 +167,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
             }
 
-            aimStrain += wiggleBonus * wiggle_multiplier;
-            aimStrain += velocityChangeBonus * velocity_change_multiplier;
-
-            // Add in acute angle bonus or wide angle bonus, whichever is larger.
-            aimStrain += Math.Max(
+            // The base of strain is current velocity, but complications arise due to angle bonus.
+            // We use either the base velocity + wide/acute angle bonus or the slider velocity + acute angle bonus, whichever is larger
+            double aimStrain = Math.Max(
                 currVelocity +
                 Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier),
-                Math.Max(travelVelocity, movementVelocity) +
-                acuteSliderAngleBonus * acute_angle_multiplier);
+                Math.Max(travelVelocity, movementVelocity) + acuteSliderAngleBonus * acute_angle_multiplier);
+
+            aimStrain += wiggleBonus * wiggle_multiplier;
+            aimStrain += velocityChangeBonus * velocity_change_multiplier;
 
             // Apply high circle size bonus
             aimStrain *= osuCurrObj.SmallCircleBonus;
