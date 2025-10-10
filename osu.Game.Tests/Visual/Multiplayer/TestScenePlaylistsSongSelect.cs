@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
@@ -31,6 +32,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestScenePlaylistsSongSelect : OnlinePlayTestScene
     {
+        private RulesetStore rulesets = null!;
         private BeatmapManager manager = null!;
         private TestPlaylistsSongSelect songSelect = null!;
         private Room room = null!;
@@ -40,7 +42,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             BeatmapStore beatmapStore;
 
-            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.CacheAs(beatmapStore = new RealmDetachedBeatmapStore());
             Dependencies.Cache(Realm);
@@ -187,6 +189,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("mod select visible", () => this.ChildrenOfType<FreeModSelectOverlay>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
         }
 
         private partial class TestPlaylistsSongSelect : PlaylistsSongSelect

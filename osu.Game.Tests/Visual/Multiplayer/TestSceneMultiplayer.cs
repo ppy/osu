@@ -51,6 +51,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneMultiplayer : ScreenTestScene
     {
+        private RulesetStore rulesets = null!;
         private BeatmapManager beatmaps = null!;
         private BeatmapSetInfo importedSet = null!;
         private BeatmapSetInfo importedSet2 = null!;
@@ -67,7 +68,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             BeatmapStore beatmapStore;
 
-            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
             Dependencies.CacheAs(beatmapStore = new RealmDetachedBeatmapStore());
             Dependencies.Cache(Realm);
@@ -1246,6 +1247,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
 
             AddUntilStep("wait for join", () => multiplayerClient.RoomJoined);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
         }
     }
 }

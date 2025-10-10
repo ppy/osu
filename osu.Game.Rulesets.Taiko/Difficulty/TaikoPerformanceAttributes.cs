@@ -15,9 +15,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         [JsonProperty("accuracy")]
         public double Accuracy { get; set; }
 
-        [JsonProperty("effective_miss_count")]
-        public double EffectiveMissCount { get; set; }
-
         [JsonProperty("estimated_unstable_rate")]
         public double? EstimatedUnstableRate { get; set; }
 
