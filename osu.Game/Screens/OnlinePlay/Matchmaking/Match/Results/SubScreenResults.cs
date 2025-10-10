@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Globalization;
 using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
@@ -45,133 +46,119 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
         {
             InternalChild = new GridContainer
             {
+                Padding = new MarginPadding(5),
                 RelativeSizeAxes = Axes.Both,
-                RowDimensions =
-                [
+                ColumnDimensions = new[]
+                {
                     new Dimension(GridSizeMode.AutoSize),
                     new Dimension(GridSizeMode.Absolute, grid_spacing),
                     new Dimension(),
-                    new Dimension(GridSizeMode.Absolute, grid_spacing),
-                    new Dimension(GridSizeMode.AutoSize),
-                    new Dimension(GridSizeMode.Absolute, 75)
-                ],
-                Content = new Drawable[]?[]
+                },
+                Content = new[]
                 {
-                    [
-                        new FillFlowContainer
+                    new[]
+                    {
+                        new Container
                         {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(16),
-                            Children = new[]
+                            AutoSizeAxes = Axes.X,
+                            RelativeSizeAxes = Axes.Y,
+                            Masking = true,
+                            CornerRadius = 5,
+                            Children = new Drawable[]
                             {
-                                new OsuSpriteText
+                                new Box
                                 {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    Text = "Your final placement",
-                                    Font = OsuFont.Style.Heading2.With(size: 36),
+                                    Colour = colourProvider.Background3,
+                                    RelativeSizeAxes = Axes.Both,
                                 },
-                                placementText = new OsuSpriteText
+                                new FillFlowContainer
                                 {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    Font = OsuFont.Style.Heading1.With(size: 72),
-                                    UseFullGlyphHeight = false
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Vertical,
+                                    Padding = new MarginPadding(6),
+                                    Spacing = new Vector2(grid_spacing),
+                                    Children = new Drawable[]
+                                    {
+                                        new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                            Text = "How you played",
+                                            Font = OsuFont.Style.Heading2,
+                                            Margin = new MarginPadding { Vertical = 15 },
+                                        },
+                                        userStatistics = new FillFlowContainer<PanelUserStatistic>
+                                        {
+                                            Anchor = Anchor.TopLeft,
+                                            Origin = Anchor.TopLeft,
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Vertical,
+                                            Spacing = new Vector2(grid_spacing)
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                            Text = "Room Awards",
+                                            Font = OsuFont.Style.Heading2,
+                                            Margin = new MarginPadding { Vertical = 15 },
+                                        },
+                                        roomAwards = new FillFlowContainer<PanelRoomAward>
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Spacing = new Vector2(grid_spacing)
+                                        }
+                                    }
                                 }
-                            }
-                        }
-                    ],
-                    null,
-                    [
+                            },
+                        },
+                        Empty(),
                         new GridContainer
                         {
                             RelativeSizeAxes = Axes.Both,
-                            ColumnDimensions =
+                            RowDimensions =
                             [
                                 new Dimension(GridSizeMode.AutoSize),
                                 new Dimension(GridSizeMode.Absolute, grid_spacing),
-                                new Dimension()
+                                new Dimension(),
                             ],
-                            Content = new Drawable?[][]
+                            Content = new Drawable[]?[]
                             {
                                 [
-                                    new Container
+                                    new FillFlowContainer
                                     {
-                                        AutoSizeAxes = Axes.X,
-                                        RelativeSizeAxes = Axes.Y,
-                                        Masking = true,
-                                        CornerRadius = 5,
-                                        Children = new Drawable[]
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                        AutoSizeAxes = Axes.Both,
+                                        Direction = FillDirection.Vertical,
+                                        Spacing = new Vector2(16),
+                                        Children = new[]
                                         {
-                                            new Box
+                                            new OsuSpriteText
                                             {
-                                                Colour = colourProvider.Background3,
-                                                RelativeSizeAxes = Axes.Both,
+                                                Anchor = Anchor.TopCentre,
+                                                Origin = Anchor.TopCentre,
+                                                Text = "Your final placement",
+                                                Font = OsuFont.Style.Heading2.With(size: 36),
                                             },
-                                            new FillFlowContainer
+                                            placementText = new OsuSpriteText
                                             {
-                                                AutoSizeAxes = Axes.Both,
-                                                Direction = FillDirection.Vertical,
-                                                Padding = new MarginPadding(5),
-                                                Spacing = new Vector2(grid_spacing),
-                                                Children = new Drawable[]
-                                                {
-                                                    new OsuSpriteText
-                                                    {
-                                                        Anchor = Anchor.TopCentre,
-                                                        Origin = Anchor.TopCentre,
-                                                        Text = "How you played",
-                                                        Font = OsuFont.Style.Heading2,
-                                                        Margin = new MarginPadding { Vertical = 15 },
-                                                    },
-                                                    userStatistics = new FillFlowContainer<PanelUserStatistic>
-                                                    {
-                                                        Anchor = Anchor.TopLeft,
-                                                        Origin = Anchor.TopLeft,
-                                                        AutoSizeAxes = Axes.Both,
-                                                        Direction = FillDirection.Vertical,
-                                                        Spacing = new Vector2(grid_spacing)
-                                                    },
-                                                    new OsuSpriteText
-                                                    {
-                                                        Anchor = Anchor.TopCentre,
-                                                        Origin = Anchor.TopCentre,
-                                                        Text = "Room Awards",
-                                                        Font = OsuFont.Style.Heading2,
-                                                        Margin = new MarginPadding { Vertical = 15 },
-                                                    },
-                                                    roomAwards = new FillFlowContainer<PanelRoomAward>
-                                                    {
-                                                        RelativeSizeAxes = Axes.X,
-                                                        AutoSizeAxes = Axes.Y,
-                                                        Spacing = new Vector2(grid_spacing)
-                                                    }
-                                                }
-                                            },
+                                                Anchor = Anchor.TopCentre,
+                                                Origin = Anchor.TopCentre,
+                                                Font = OsuFont.Style.Heading1.With(size: 72),
+                                                UseFullGlyphHeight = false
+                                            }
                                         }
-                                    },
-                                    null,
+                                    }
+                                ],
+                                null,
+                                [
                                     PlayersDisplayArea,
-                                ]
-                            }
-                        }
-                    ],
-                    null,
-                    [
-                        new FillFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(grid_spacing),
-                            Children = new Drawable[]
-                            {
+                                ],
                             }
                         },
-                    ],
+                    },
                 }
             };
         }
@@ -204,7 +191,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
                 return;
             }
 
-            placementText.Text = state.Users[client.LocalUser!.UserID].Placement.Ordinalize();
+            placementText.Text = state.Users[client.LocalUser!.UserID].Placement.Ordinalize(CultureInfo.CurrentCulture);
 
             int overallPlacement = state.Users[client.LocalUser!.UserID].Placement;
             int overallPoints = state.Users[client.LocalUser!.UserID].Points;
