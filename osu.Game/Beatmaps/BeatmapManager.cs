@@ -284,6 +284,7 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
+        /// IMPORTANT: This should not be used outside of tests. Consider using <see cref="RealmDetachedBeatmapStore"/> instead.
         /// </summary>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
         public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
