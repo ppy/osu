@@ -65,14 +65,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
                         {
                             AutoSizeAxes = Axes.X,
                             RelativeSizeAxes = Axes.Y,
-                            Masking = true,
-                            CornerRadius = 5,
                             Children = new Drawable[]
                             {
-                                new Box
+                                new Container
                                 {
-                                    Colour = colourProvider.Background3,
+                                    Masking = true,
+                                    CornerRadius = 5,
                                     RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            Colour = colourProvider.Background4,
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                    }
                                 },
                                 new FillFlowContainer
                                 {

@@ -3,10 +3,15 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Database;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
@@ -14,10 +19,13 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
 {
-    public partial class PanelRoomAward : CompositeDrawable
+    public partial class PanelRoomAward : OsuClickableContainer
     {
         private readonly string text;
         private readonly int userId;
+
+        private Box glossLayer = null!;
+        private Container scaleContainer = null!;
 
         public PanelRoomAward(string text, int userId)
         {
@@ -26,6 +34,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
 
             Height = 40;
             RelativeSizeAxes = Axes.X;
+
+            // Just make hover sounds work for now.
+            Action = () => { };
         }
 
         [BackgroundDependencyLoader]
@@ -34,8 +45,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
             // Should be cached by this point.
             APIUser user = userLookupCache.GetUserAsync(userId).GetResultSafely()!;
 
-            InternalChild = new Container
+            Child = scaleContainer = new Container
             {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
                 CornerRadius = 5,
@@ -44,7 +57,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background2,
+                        Colour = colourProvider.Background3,
                     },
                     new FillFlowContainer
                     {
@@ -59,16 +72,61 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                             },
-                            new OsuSpriteText
+                            new FillFlowContainer
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Text = text
-                            }
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Vertical,
+                                Children = new Drawable[]
+                                {
+                                    new OsuSpriteText
+                                    {
+                                        Font = OsuFont.Style.Caption1,
+                                        Text = user.Username
+                                    },
+                                    new OsuSpriteText
+                                    {
+                                        Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold),
+                                        Text = text
+                                    }
+                                }
+                            },
                         }
+                    },
+                    glossLayer = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.CentreRight,
+                        Rotation = 30,
+                        Scale = new Vector2(0.1f, 3),
+                        Colour = ColourInfo.GradientHorizontal(
+                            colourProvider.Background2.Opacity(0),
+                            colourProvider.Background2),
+                        Alpha = 0.1f,
+                        Blending = BlendingParameters.Additive,
                     },
                 }
             };
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            scaleContainer.ScaleTo(1.15f, 2000, Easing.OutPow10);
+            glossLayer
+                .FadeTo(0.05f, 2000, Easing.OutPow10)
+                .MoveToX(-8, 2000, Easing.OutPow10);
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            scaleContainer.ScaleTo(1f, 500, Easing.OutQuint);
+            glossLayer
+                .FadeTo(0.1f, 500, Easing.OutQuint)
+                .MoveToX(0, 500, Easing.OutQuint);
+            base.OnHoverLost(e);
         }
     }
 }
