@@ -27,6 +27,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
+using static osu.Game.Audio.DecibelScaling;
 
 namespace osu.Game.Overlays.Volume
 {
@@ -37,7 +38,7 @@ namespace osu.Game.Overlays.Volume
 
         protected static readonly Vector2 LABEL_SIZE = new Vector2(120, 20);
 
-        public BindableDouble Bindable { get; } = new BindableDouble { MinValue = 0, MaxValue = 1, Precision = 0.01 };
+        public BindableDouble Bindable { get; } = new BindableDouble { MinValue = 0, MaxValue = 1 };
 
         protected readonly float CircleSize;
 
@@ -237,28 +238,37 @@ namespace osu.Game.Overlays.Volume
                 }
             };
 
-            Bindable.BindValueChanged(volume => { this.TransformTo(nameof(DisplayVolume), volume.NewValue, 400, Easing.OutQuint); }, true);
+            Bindable.BindValueChanged(volume =>
+            {
+                decibel = DecibelFromLinear(volume.NewValue);
+                this.TransformTo(nameof(DisplayVolume), decibel, 400, Easing.OutQuint);
+            }, true);
 
             bgProgress.Progress = 0.75f;
         }
 
-        private int? displayVolumeInt;
+        private int currentStep;
+        private const int step_min = (int)(DB_MIN / DB_PRECISION);
+        private const int step_max = (int)(DB_MAX / DB_PRECISION);
 
+        private double decibel;
         private double displayVolume;
+        private double normalizedVolume;
 
         protected double DisplayVolume
         {
             get => displayVolume;
             set
             {
-                displayVolume = value;
+                normalizedVolume = (value - DB_MIN) / (DB_MAX - DB_MIN);
 
-                int intValue = (int)Math.Round(displayVolume * 100);
-                bool intVolumeChanged = intValue != displayVolumeInt;
+                int step = (int)Math.Round(value / DB_PRECISION);
+                bool stepChanged = step != currentStep;
 
-                displayVolumeInt = intValue;
+                currentStep = step;
+                displayVolume = currentStep * DB_PRECISION;
 
-                if (displayVolume >= 0.995f)
+                if (currentStep >= step_max)
                 {
                     text.Text = "MAX";
                     maxGlow.EffectColour = meterColour.Opacity(2f);
@@ -266,13 +276,13 @@ namespace osu.Game.Overlays.Volume
                 else
                 {
                     maxGlow.EffectColour = Color4.Transparent;
-                    text.Text = intValue.ToString(CultureInfo.CurrentCulture);
+                    text.Text = currentStep <= step_min ? "-INF" : displayVolume.ToString("N1", CultureInfo.CurrentCulture);
                 }
 
-                volumeCircle.Progress = displayVolume * 0.75f;
-                volumeCircleGlow.Progress = displayVolume * 0.75f;
+                volumeCircle.Progress = normalizedVolume * 0.75f;
+                volumeCircleGlow.Progress = normalizedVolume * 0.75f;
 
-                if (intVolumeChanged && IsLoaded)
+                if (stepChanged && IsLoaded)
                     Scheduler.AddOnce(playTickSound);
             }
         }
@@ -286,10 +296,10 @@ namespace osu.Game.Overlays.Volume
 
             var channel = notchSample.GetChannel();
 
-            channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + displayVolume * 0.1f;
+            channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + (normalizedVolume * 0.1f);
 
             // intentionally pitched down, even when hitting max.
-            if (displayVolumeInt == 0 || displayVolumeInt == 100)
+            if (currentStep == step_min || currentStep == step_max)
                 channel.Frequency.Value -= 0.5f;
 
             channel.Play();
@@ -301,8 +311,6 @@ namespace osu.Game.Overlays.Volume
             get => Bindable.Value;
             private set => Bindable.Value = value;
         }
-
-        private const double adjust_step = 0.01;
 
         public void Increase(double amount = 1, bool isPrecise = false) => adjust(amount, isPrecise);
         public void Decrease(double amount = 1, bool isPrecise = false) => adjust(-amount, isPrecise);
@@ -336,13 +344,13 @@ namespace osu.Game.Overlays.Volume
 
         private void adjustFromDrag(Vector2 delta)
         {
-            const float mouse_drag_divisor = 200;
+            const float mouse_drag_divisor = (float)(2 / DB_PRECISION);
 
             dragDelta += delta.Y / mouse_drag_divisor;
 
-            if (Math.Abs(dragDelta) < 0.01) return;
+            if (Math.Abs(dragDelta) < DB_PRECISION) return;
 
-            Volume -= dragDelta;
+            Volume = LinearFromDecibel(decibel - dragDelta);
             dragDelta = 0;
         }
 
@@ -359,22 +367,25 @@ namespace osu.Game.Overlays.Volume
             delta *= accelerationModifier;
             accelerationModifier = Math.Min(max_acceleration, accelerationModifier * acceleration_multiplier);
 
-            double precision = Bindable.Precision;
+            double dB = decibel;
+            const double precision = DB_PRECISION;
 
             if (isPrecise)
             {
-                scrollAccumulation += delta * adjust_step;
+                scrollAccumulation += delta * precision;
 
                 while (Precision.AlmostBigger(Math.Abs(scrollAccumulation), precision))
                 {
-                    Volume += Math.Sign(scrollAccumulation) * precision;
+                    dB += Math.Sign(scrollAccumulation) * precision;
                     scrollAccumulation = scrollAccumulation < 0 ? Math.Min(0, scrollAccumulation + precision) : Math.Max(0, scrollAccumulation - precision);
                 }
             }
             else
             {
-                Volume += Math.Sign(delta) * Math.Max(precision, Math.Abs(delta * adjust_step));
+                dB += Math.Sign(delta) * Math.Max(precision, Math.Abs(delta * precision));
             }
+
+            Volume = LinearFromDecibel(dB);
         }
 
         protected override bool OnScroll(ScrollEvent e)
