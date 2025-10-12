@@ -7,6 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -29,6 +30,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public partial class TestSceneCollectionDropdown : OsuManualInputManagerTestScene
     {
+        private RulesetStore rulesets = null!;
         private BeatmapManager beatmapManager = null!;
         private CollectionDropdown dropdown = null!;
 
@@ -38,7 +40,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
-            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, Audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
 
@@ -259,6 +261,14 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             // todo: we should be able to use Items, but apparently that's not guaranteed to be ordered... see: https://github.com/ppy/osu-framework/pull/6079
             CollectionFilterMenuItem item = dropdown.ChildrenOfType<CollectionDropdown>().Single().ItemSource.ElementAt(index);
             return dropdown.ChildrenOfType<Menu.DrawableMenuItem>().Single(i => i.Item.Text.Value == item.CollectionName);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
         }
     }
 }
