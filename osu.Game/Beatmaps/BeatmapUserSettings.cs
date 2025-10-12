@@ -14,5 +14,12 @@ namespace osu.Game.Beatmaps
         /// An audio offset that can be used for timing adjustments.
         /// </summary>
         public double Offset { get; set; }
+
+
+        /// <summary>
+        /// Determines if hitsounds for beatmap are enabled, disabled, or use the global setting.
+        /// </summary>
+        public int Hitsounds { get; set; }
+
     }
 }
