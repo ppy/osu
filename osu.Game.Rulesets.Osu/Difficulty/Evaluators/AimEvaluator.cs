@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
-            double currDistance = adjustSnapDistance(osuCurrObj.LazyJumpDistance, osuCurrObj, osuLastObj);
+            double currDistance = osuCurrObj.LazyJumpDistance + calculateSnappingDifficulty(osuCurrObj.LazyJumpDistance, osuCurrObj, osuLastObj);
             double currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
             double sliderlessCurrVelocity = currVelocity;
 
@@ -49,7 +49,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
             {
                 double travelVelocity = osuLastObj.TravelDistance / osuLastObj.TravelTime; // calculate the slider velocity from slider head to slider end.
-                double movementVelocity = adjustSnapDistance(osuCurrObj.MinimumJumpDistance, osuCurrObj, osuLastObj) / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
+
+                double movement = osuCurrObj.MinimumJumpDistance + calculateSnappingDifficulty(osuCurrObj.MinimumJumpDistance, osuCurrObj, osuLastObj);
+                double movementVelocity = movement / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
 
                 currVelocity = Math.Max(currVelocity, movementVelocity + travelVelocity); // take the larger total combined velocity.
             }
@@ -203,8 +205,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return aimStrain;
         }
 
-        // Adjusting minimal distance of snap evaluator to account for fact that the snapping difficulty itself have it's own difficulty
-        private static double adjustSnapDistance(double currDistance, OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuLastObj)
+        private static double calculateSnappingDifficulty(double currDistance, OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuLastObj)
         {
             const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
@@ -230,7 +231,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double snapThreshold = diameter * (1 + 1.3 * DifficultyCalculationUtils.ReverseLerp(bpm, 200, 250));
 
             // Jumps need to have some spacing to be snapped
-            double result = currDistance < snapThreshold ? snapThreshold * 0.65 + currDistance * 0.35 : currDistance;
+            double distanceSnapDifficultyBonus = currDistance < snapThreshold ? (snapThreshold * 0.65 + currDistance * 0.35) - currDistance : 0;
 
             // Don't buff doubles jumps as you don't snap in this case (except very close to itself doubles, that need to have some distance bonus to be calculated as flow)
             double lowSpacingFactor = DifficultyCalculationUtils.ReverseLerp(currDistance, radius * 2, radius);
@@ -244,8 +245,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // And don't nerf bursts with this
             bigDistanceDifferenceFactor *= DifficultyCalculationUtils.ReverseLerpTwoDirectional(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime, 1.95, 1.5);
 
-            double totalBonus = result + angleSnapDifficultyBonus - currDistance;
-            return currDistance + totalBonus * (1 - bigDistanceDifferenceFactor);
+            return (distanceSnapDifficultyBonus + angleSnapDifficultyBonus) * (1 - bigDistanceDifferenceFactor);
         }
 
         public static double CalcWideAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(40), double.DegreesToRadians(140));

@@ -210,8 +210,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double angleChangeBonus = Math.Pow(Math.Sin((currAngle - lastAngle) / 2), 2) * baseVelocity;
 
             // Remove angle change if previous 2 notes were slower
-            // IMPORTANT INFORMATION: removing this limitation significantly buffs almost all tech, alt, underweight maps in general
-            // BUT it also very significantly buffs ReLief. So it's should be explored how to keep this buff for actually hard patterns but not for ReLief
             angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.AdjustedDeltaTime, osuLast0Obj.AdjustedDeltaTime * 0.55, osuLast0Obj.AdjustedDeltaTime * 0.75);
             angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.AdjustedDeltaTime, osuLast1Obj.AdjustedDeltaTime * 0.55, osuLast1Obj.AdjustedDeltaTime * 0.75);
 
