@@ -205,7 +205,7 @@ namespace osu.Game.Screens.Select
 
                 // search term is guaranteed to be non-empty, so if the string we're comparing is empty, it's not matching
                 if (string.IsNullOrEmpty(value))
-                    return false;
+                    return ExcludeTerm;
 
                 bool result;
 
