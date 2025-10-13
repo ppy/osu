@@ -434,7 +434,7 @@ namespace osu.Game.Screens.SelectV2
                     }
 
                     userTags.FadeIn(transition_duration, Easing.OutQuint);
-                    userTags.Tags = (tags, t => songSelect?.Search($@"tag=""{t}""!"));
+                    userTags.Tags = (tags, tag => songSelect?.Search($@"tag=""{tag}""!"));
                 });
             }, token);
         }
