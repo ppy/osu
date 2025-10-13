@@ -230,7 +230,6 @@ namespace osu.Game.Screens.Play
                 if (realmBeatmap != null)
                     realmBeatmap.LastPlayed = DateTimeOffset.Now;
             });
-            Beatmap.Value.BeatmapInfo.LastPlayed = DateTimeOffset.Now;
 
             spectatorClient.BeginPlaying(token, GameplayState, Score);
         }
