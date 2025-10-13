@@ -77,10 +77,23 @@ namespace osu.Game.Screens.Select.Carousel
             if (!match) return false;
 
             match &= !criteria.Creator.HasFilter || criteria.Creator.Matches(BeatmapInfo.Metadata.Author.Username);
-            match &= !criteria.Artist.HasFilter || criteria.Artist.Matches(BeatmapInfo.Metadata.Artist) ||
-                     criteria.Artist.Matches(BeatmapInfo.Metadata.ArtistUnicode);
-            match &= !criteria.Title.HasFilter || criteria.Title.Matches(BeatmapInfo.Metadata.Title) ||
-                     criteria.Title.Matches(BeatmapInfo.Metadata.TitleUnicode);
+
+            if (criteria.Artist.HasFilter)
+            {
+                if (criteria.Artist.ExcludeTerm)
+                    match &= criteria.Artist.Matches(BeatmapInfo.Metadata.Artist) && criteria.Artist.Matches(BeatmapInfo.Metadata.ArtistUnicode);
+                else
+                    match &= criteria.Artist.Matches(BeatmapInfo.Metadata.Artist) || criteria.Artist.Matches(BeatmapInfo.Metadata.ArtistUnicode);
+            }
+
+            if (criteria.Title.HasFilter)
+            {
+                if (criteria.Title.ExcludeTerm)
+                    match &= criteria.Title.Matches(BeatmapInfo.Metadata.Title) && criteria.Title.Matches(BeatmapInfo.Metadata.TitleUnicode);
+                else
+                    match &= criteria.Title.Matches(BeatmapInfo.Metadata.Title) || criteria.Title.Matches(BeatmapInfo.Metadata.TitleUnicode);
+            }
+
             match &= !criteria.DifficultyName.HasFilter || criteria.DifficultyName.Matches(BeatmapInfo.DifficultyName);
             match &= !criteria.Source.HasFilter || criteria.Source.Matches(BeatmapInfo.Metadata.Source);
 
