@@ -4,11 +4,11 @@
 using System;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
@@ -413,17 +413,14 @@ namespace osu.Game.Screens.SelectV2
 
             var token = userTagsCancellationSource.Token;
 
-            Task.Run(() =>
+            realm.RunAsync(r =>
             {
-                if (token.IsCancellationRequested)
-                    return;
-
-                string[] tags = realm.Run(r =>
-                {
-                    // need to refetch because `beatmap.Value.BeatmapInfo` is not going to have the latest tags
-                    var refetchedBeatmap = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID);
-                    return refetchedBeatmap?.Metadata.UserTags.ToArray() ?? [];
-                });
+                // need to refetch because `beatmap.Value.BeatmapInfo` is not going to have the latest tags
+                var refetchedBeatmap = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID);
+                return refetchedBeatmap?.Metadata.UserTags.ToArray() ?? [];
+            }, token).ContinueWith(t =>
+            {
+                string[] tags = t.GetResultSafely();
 
                 Schedule(() =>
                 {
