@@ -299,6 +299,23 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual(filtered, carouselItem.Filtered.Value);
         }
 
+        [Test]
+        [TestCase("artist")]
+        [TestCase("unicode")]
+        public void TestCriteriaNotMatchingArtist(string excludedTerm)
+        {
+            var beatmap = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                Artist = new FilterCriteria.OptionalTextFilter { SearchTerm = excludedTerm, ExcludeTerm = true }
+            };
+
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            Assert.True(carouselItem.Filtered.Value);
+        }
+
         [TestCase("simple", false)]
         [TestCase("\"style/clean\"", false)]
         [TestCase("\"style/clean\"!", false)]
