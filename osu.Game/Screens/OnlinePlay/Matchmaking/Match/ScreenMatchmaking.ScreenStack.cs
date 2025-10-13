@@ -36,9 +36,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding(10)
+                        Padding = new MarginPadding(6)
                         {
-                            Bottom = StageDisplay.HEIGHT,
+                            Bottom = StageDisplay.HEIGHT + 6,
                         },
                         Children = new Drawable[]
                         {

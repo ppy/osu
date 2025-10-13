@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -27,6 +29,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osuTK;
@@ -192,7 +195,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                             Origin = Anchor.BottomCentre,
                             Blending = BlendingParameters.Additive,
                             Margin = new MarginPadding(4),
-                            Font = OsuFont.Style.Title.With(size: 70),
+                            Text = "-",
+                            Font = OsuFont.Style.Title.With(size: 55),
                         },
                         username = new OsuSpriteText
                         {
@@ -292,7 +296,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
                             using (BeginDelayedSequence(100))
                             {
-                                rankText.FadeTo(0.6f, 600);
+                                rankText.FadeTo(1, 600);
                             }
                         }
                     }
@@ -343,7 +347,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             if (!matchmakingState.Users.UserDictionary.TryGetValue(User.Id, out MatchmakingUser? userScore))
                 return;
 
-            rankText.Text = $"#{userScore.Placement}";
+            rankText.Text = userScore.Placement.Ordinalize(CultureInfo.CurrentCulture);
+            rankText.FadeColour(SubScreenResults.ColourForPlacement(userScore.Placement));
             scoreText.Text = $"{userScore.Points} pts";
         });
 
