@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -22,14 +23,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
     public partial class PanelRoomAward : OsuClickableContainer
     {
         private readonly string text;
+        private readonly string description;
         private readonly int userId;
 
         private Box glossLayer = null!;
         private Container scaleContainer = null!;
 
-        public PanelRoomAward(string text, int userId)
+        public PanelRoomAward(string text, string description, int userId)
         {
             this.text = text;
+            this.description = description;
             this.userId = userId;
 
             Height = 40;
@@ -128,5 +131,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
                 .MoveToX(0, 500, Easing.OutQuint);
             base.OnHoverLost(e);
         }
+
+        public override LocalisableString TooltipText => description;
     }
 }

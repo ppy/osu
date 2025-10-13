@@ -344,28 +344,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
                 }
             }
 
-            // Highest score - highest score across all rounds.
-            addAward(maxScoreUserId, "Highest score");
+            addAward(maxScoreUserId, "Score champ", "Highest score in a single round");
 
-            // Most accurate - highest accuracy across all rounds.
-            addAward(maxAccuracyUserId, "Most accurate");
+            addAward(maxAccuracyUserId, "Most accurate", "Highest accuracy in a single round");
 
-            // Most combo - highest combo across all rounds.
-            addAward(maxComboUserId, "Most combo");
+            addAward(maxComboUserId, "Top combo", "Highest combo in a single round");
 
-            // Most bonus - most bonus score across all rounds.
             if (maxBonusScoreUserId > 0)
-                addAward(maxBonusScoreUserId, "Most bonus");
+                addAward(maxBonusScoreUserId, "Biggest bonus", "Biggest bonus score across all rounds");
 
-            // Most clutch - smallest victory in any round.
             if (smallestScoreDifferenceUserId > 0)
-                addAward(smallestScoreDifferenceUserId, "Most clutch");
+                addAward(smallestScoreDifferenceUserId, "Most clutch", "Smallest winning score difference in a single round");
 
-            // Best finish - largest victory in any round.
             if (largestScoreDifferenceUserId > 0)
-                addAward(largestScoreDifferenceUserId, "Best finish");
+                addAward(largestScoreDifferenceUserId, "Best finish", "Largest score difference in a single round");
 
-            void addAward(int userId, string text) => roomAwards.Add(new PanelRoomAward(text, userId));
+            void addAward(int userId, string text, string description) => roomAwards.Add(new PanelRoomAward(text, description, userId));
         }
 
         protected override void Dispose(bool isDisposing)
