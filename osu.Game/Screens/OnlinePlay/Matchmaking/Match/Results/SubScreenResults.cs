@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Globalization;
 using System.Linq;
 using Humanizer;
@@ -232,7 +231,23 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
 
         public static ColourInfo ColourForPlacement(int overallPlacement)
         {
-            return OsuColour.ForRankingTier((RankingTier)Math.Max(0, (int)RankingTier.Lustrous - (overallPlacement - 1)));
+            // for top 3 placements use special colours.
+            // don't for the rest.
+
+            switch (overallPlacement)
+            {
+                case 1:
+                    return OsuColour.ForRankingTier(RankingTier.Gold);
+
+                case 2:
+                    return OsuColour.ForRankingTier(RankingTier.Silver);
+
+                case 3:
+                    return OsuColour.ForRankingTier(RankingTier.Bronze);
+
+                default:
+                    return OsuColour.ForRankingTier(RankingTier.Iron);
+            }
         }
 
         private void populateRoomStatistics(MatchmakingRoomState state)
