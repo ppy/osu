@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private IconButton pausePlay = null!;
 
         public PlaybackSettings()
-            : base(PlayerSettingsStrings.PlaybackTitle)
+            : base(PlayerSettingsOverlayStrings.PlaybackTitle)
         {
         }
 

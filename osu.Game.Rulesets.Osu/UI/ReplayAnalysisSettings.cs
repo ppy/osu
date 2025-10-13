@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.UI
         };
 
         public ReplayAnalysisSettings(OsuRulesetConfigManager config)
-            : base(PlayerSettingsStrings.AnalysisSettingsTitle)
+            : base(PlayerSettingsOverlayStrings.AnalysisSettingsTitle)
         {
             this.config = config;
         }
