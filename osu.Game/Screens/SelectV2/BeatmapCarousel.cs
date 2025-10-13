@@ -103,7 +103,7 @@ namespace osu.Game.Screens.SelectV2
 
             Filters = new ICarouselFilter[]
             {
-                new BeatmapCarouselFilterMatching(() => Criteria!),
+                new BeatmapCarouselFilterMatching(() => Criteria!, GetBeatmapInfoGuidToTopRankAccuracyMapping),
                 new BeatmapCarouselFilterSorting(() => Criteria!),
                 grouping = new BeatmapCarouselFilterGrouping(() => Criteria!, GetAllCollections, GetBeatmapInfoGuidToTopRankMapping)
             };
@@ -825,6 +825,28 @@ namespace osu.Game.Screens.SelectV2
                     continue;
 
                 topRankMapping[score.BeatmapInfo.ID] = score.Rank;
+            }
+
+            return topRankMapping;
+        });
+
+        protected virtual Dictionary<Guid, double> GetBeatmapInfoGuidToTopRankAccuracyMapping(FilterCriteria criteria) => realm.Run(r =>
+        {
+            var topRankMapping = new Dictionary<Guid, double>();
+
+            var allLocalScores = r.GetAllLocalScoresForUser(criteria.LocalUserId)
+                                  .Filter($@"{nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $0", criteria.Ruleset?.ShortName)
+                                  .OrderByDescending(s => s.TotalScore)
+                                  .ThenBy(s => s.Date);
+
+            foreach (var score in allLocalScores)
+            {
+                Debug.Assert(score.BeatmapInfo != null);
+
+                if (topRankMapping.ContainsKey(score.BeatmapInfo.ID))
+                    continue;
+
+                topRankMapping[score.BeatmapInfo.ID] = score.Accuracy;
             }
 
             return topRankMapping;

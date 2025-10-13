@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Screens.Select;
@@ -17,12 +16,14 @@ namespace osu.Game.Screens.SelectV2
     public class BeatmapCarouselFilterMatching : ICarouselFilter
     {
         private readonly Func<FilterCriteria> getCriteria;
+        private readonly Func<FilterCriteria, IReadOnlyDictionary<Guid, double>> getLocalUserTopRanksAccuracy;
 
         public int BeatmapItemsCount { get; private set; }
 
-        public BeatmapCarouselFilterMatching(Func<FilterCriteria> getCriteria)
+        public BeatmapCarouselFilterMatching(Func<FilterCriteria> getCriteria, Func<FilterCriteria, IReadOnlyDictionary<Guid, double>> getLocalUserTopRanksAccuracy)
         {
             this.getCriteria = getCriteria;
+            this.getLocalUserTopRanksAccuracy = getLocalUserTopRanksAccuracy;
         }
 
         public async Task<List<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken) => await Task.Run(() =>
@@ -34,6 +35,8 @@ namespace osu.Game.Screens.SelectV2
 
         private IEnumerable<CarouselItem> matchItems(IEnumerable<CarouselItem> items, FilterCriteria criteria)
         {
+            // Load every map top scores before iterating over the beatmaps
+            IReadOnlyDictionary<Guid, double> beatmapsIdsToTopRanksAccuracies = getLocalUserTopRanksAccuracy(criteria);
             int countMatching = 0;
 
             foreach (var item in items)
@@ -43,7 +46,7 @@ namespace osu.Game.Screens.SelectV2
                 if (beatmap.Hidden)
                     continue;
 
-                if (!checkCriteriaMatch(beatmap, criteria))
+                if (!checkCriteriaMatch(beatmap, criteria, beatmapsIdsToTopRanksAccuracies))
                     continue;
 
                 countMatching++;
@@ -53,7 +56,7 @@ namespace osu.Game.Screens.SelectV2
             BeatmapItemsCount = countMatching;
         }
 
-        private static bool checkCriteriaMatch(BeatmapInfo beatmap, FilterCriteria criteria)
+        private static bool checkCriteriaMatch(BeatmapInfo beatmap, FilterCriteria criteria, IReadOnlyDictionary<Guid, double> beatmapsIdsToTopRanksAccuracies)
         {
             bool match = criteria.Ruleset == null || beatmap.AllowGameplayWithRuleset(criteria.Ruleset!, criteria.AllowConvertedBeatmaps);
 
@@ -82,10 +85,10 @@ namespace osu.Game.Screens.SelectV2
 
             match &= !criteria.StarDifficulty.HasFilter || criteria.StarDifficulty.IsInRange(beatmap.StarRating.FloorToDecimalDigits(2));
             match &= !criteria.ApproachRate.HasFilter || criteria.ApproachRate.IsInRange(beatmap.Difficulty.ApproachRate);
-            match &= !criteria.Accuracy.HasFilter || (criteria.Accuracy.IsInRange(90f));
 
-            Logger.Log($"Passing on the beatmap [{beatmap.GetDisplayTitle()}]");
-            if (beatmap.Scores.Any()) Logger.Log($"Applying Beatmap Carousel Filter matching : max acc found for map : {beatmap.GetDisplayTitle()} is {beatmap.Scores.Max(info => info.Accuracy)}");
+            // If a user searches for acc > X, we only want maps they already played.
+            // If a user searches for acc < X, we accept maps with less than X accuracy and maps they didn't play yet.
+            match &= !criteria.Accuracy.HasFilter || criteria.Accuracy.IsInRange(beatmapsIdsToTopRanksAccuracies.GetValueOrDefault(beatmap.ID, 0d));
 
             match &= !criteria.DrainRate.HasFilter || criteria.DrainRate.IsInRange(beatmap.Difficulty.DrainRate);
             match &= !criteria.CircleSize.HasFilter || criteria.CircleSize.IsInRange(beatmap.Difficulty.CircleSize);

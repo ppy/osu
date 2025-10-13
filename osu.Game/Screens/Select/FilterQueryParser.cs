@@ -43,9 +43,21 @@ namespace osu.Game.Screens.Select
                 case "sr":
                     return TryUpdateCriteriaRange(ref criteria.StarDifficulty, op, value, 0);
 
-
                 case "acc":
-                    return TryUpdateCriteriaRange(ref criteria.Accuracy, op, value);
+                case "accuracy":
+                    // Allowed accuracy formats are :
+                    // - 90%
+                    // - 0.90
+                    // - 90
+                    // So users can write `acc>90`, `acc>0.90` and `acc>90%` and the same goes for other comparison operators.
+                    if (value.EndsWith('%'))
+                        value = value.TrimEnd('%');
+
+                    if (double.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double parsedAcc) && parsedAcc > 1)
+                        parsedAcc /= 100;
+
+                    return TryUpdateCriteriaRange(ref criteria.Accuracy, op, parsedAcc.ToString(CultureInfo.InvariantCulture), 0);
+
                 case "ar":
                     return TryUpdateCriteriaRange(ref criteria.ApproachRate, op, value);
 
