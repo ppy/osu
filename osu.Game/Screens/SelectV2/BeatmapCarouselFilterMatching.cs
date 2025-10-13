@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Screens.Select;
@@ -81,11 +82,17 @@ namespace osu.Game.Screens.SelectV2
 
             match &= !criteria.StarDifficulty.HasFilter || criteria.StarDifficulty.IsInRange(beatmap.StarRating.FloorToDecimalDigits(2));
             match &= !criteria.ApproachRate.HasFilter || criteria.ApproachRate.IsInRange(beatmap.Difficulty.ApproachRate);
+            match &= !criteria.Accuracy.HasFilter || (criteria.Accuracy.IsInRange(90f));
+
+            Logger.Log($"Passing on the beatmap [{beatmap.GetDisplayTitle()}]");
+            if (beatmap.Scores.Any()) Logger.Log($"Applying Beatmap Carousel Filter matching : max acc found for map : {beatmap.GetDisplayTitle()} is {beatmap.Scores.Max(info => info.Accuracy)}");
+
             match &= !criteria.DrainRate.HasFilter || criteria.DrainRate.IsInRange(beatmap.Difficulty.DrainRate);
             match &= !criteria.CircleSize.HasFilter || criteria.CircleSize.IsInRange(beatmap.Difficulty.CircleSize);
             match &= !criteria.OverallDifficulty.HasFilter || criteria.OverallDifficulty.IsInRange(beatmap.Difficulty.OverallDifficulty);
             match &= !criteria.Length.HasFilter || criteria.Length.IsInRange(beatmap.Length);
             match &= !criteria.LastPlayed.HasFilter || criteria.LastPlayed.IsInRange(beatmap.LastPlayed ?? DateTimeOffset.MinValue);
+
             match &= !criteria.DateRanked.HasFilter || (beatmap.BeatmapSet?.DateRanked != null && criteria.DateRanked.IsInRange(beatmap.BeatmapSet.DateRanked.Value));
             match &= !criteria.DateSubmitted.HasFilter || (beatmap.BeatmapSet?.DateSubmitted != null && criteria.DateSubmitted.IsInRange(beatmap.BeatmapSet.DateSubmitted.Value));
             match &= !criteria.BPM.HasFilter || criteria.BPM.IsInRange(beatmap.BPM);

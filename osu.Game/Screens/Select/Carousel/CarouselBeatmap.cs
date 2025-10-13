@@ -3,7 +3,9 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Scoring;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Utils;
 
@@ -62,6 +64,14 @@ namespace osu.Game.Screens.Select.Carousel
 
             match &= !criteria.StarDifficulty.HasFilter || criteria.StarDifficulty.IsInRange(BeatmapInfo.StarRating.FloorToDecimalDigits(2));
             match &= !criteria.ApproachRate.HasFilter || criteria.ApproachRate.IsInRange(BeatmapInfo.Difficulty.ApproachRate);
+            match &= !criteria.Accuracy.HasFilter || (criteria.Accuracy.IsInRange(90d));
+
+            Logger.Log($"Passing on the beatmap [{BeatmapInfo.GetDisplayTitle()}]");
+            if (BeatmapInfo.Scores.Any())
+            {
+                Logger.Log($"Applying Beatmap Carousel Filter matching : max acc found for map : {BeatmapInfo.GetDisplayTitle()} is {BeatmapInfo.Scores.Max(info => info.Accuracy)}");
+            }
+
             match &= !criteria.DrainRate.HasFilter || criteria.DrainRate.IsInRange(BeatmapInfo.Difficulty.DrainRate);
             match &= !criteria.CircleSize.HasFilter || criteria.CircleSize.IsInRange(BeatmapInfo.Difficulty.CircleSize);
             match &= !criteria.OverallDifficulty.HasFilter || criteria.OverallDifficulty.IsInRange(BeatmapInfo.Difficulty.OverallDifficulty);
