@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Play.HUD
                 performanceCalculator = gameplayState.Ruleset.CreatePerformanceCalculator();
                 clonedMods = gameplayState.Mods.Select(m => m.DeepClone()).ToArray();
 
-                scoreInfo = new ScoreInfo(gameplayState.Score.ScoreInfo.BeatmapInfo, gameplayState.Score.ScoreInfo.Ruleset) { Mods = clonedMods };
+                scoreInfo = new ScoreInfo(gameplayState.Score.ScoreInfo.BeatmapInfo, gameplayState.Score.ScoreInfo.Ruleset) { Mods = clonedMods, IsLegacyScore = gameplayState.Score.ScoreInfo.IsLegacyScore };
 
                 var gameplayWorkingBeatmap = new GameplayWorkingBeatmap(gameplayState.Beatmap);
                 difficultyCache.GetTimedDifficultyAttributesAsync(gameplayWorkingBeatmap, gameplayState.Ruleset, clonedMods, loadCancellationSource.Token)
