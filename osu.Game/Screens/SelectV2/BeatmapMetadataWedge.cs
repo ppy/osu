@@ -3,10 +3,12 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
@@ -402,24 +404,46 @@ namespace osu.Game.Screens.SelectV2
             updateSubWedgeVisibility();
         }
 
+        private CancellationTokenSource? userTagsCancellationSource;
+
         private void updateUserTags()
         {
-            string[] tags = realm.Run(r =>
+            userTagsCancellationSource?.Cancel();
+            userTagsCancellationSource = new CancellationTokenSource();
+
+            var token = userTagsCancellationSource.Token;
+
+            realm.RunAsync(r =>
             {
                 // need to refetch because `beatmap.Value.BeatmapInfo` is not going to have the latest tags
-                r.Refresh();
                 var refetchedBeatmap = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID);
                 return refetchedBeatmap?.Metadata.UserTags.ToArray() ?? [];
-            });
-
-            if (tags.Length == 0)
+            }, token).ContinueWith(t =>
             {
-                userTags.FadeOut(transition_duration, Easing.OutQuint);
-                return;
-            }
+                string[] tags = t.GetResultSafely();
 
-            userTags.FadeIn(transition_duration, Easing.OutQuint);
-            userTags.Tags = (tags, t => songSelect?.Search($@"tag=""{t}""!"));
+                Schedule(() =>
+                {
+                    if (token.IsCancellationRequested)
+                        return;
+
+                    if (tags.Length == 0)
+                    {
+                        userTags.FadeOut(transition_duration, Easing.OutQuint);
+                        return;
+                    }
+
+                    userTags.FadeIn(transition_duration, Easing.OutQuint);
+                    userTags.Tags = (tags, tag => songSelect?.Search($@"tag=""{tag}""!"));
+                });
+            }, token);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            userTagsCancellationSource?.Cancel();
+            userTagsCancellationSource = null;
+            base.Dispose(isDisposing);
         }
     }
 }
