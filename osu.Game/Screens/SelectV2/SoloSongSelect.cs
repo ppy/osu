@@ -81,7 +81,7 @@ namespace osu.Game.Screens.SelectV2
             foreach (var i in CreateCollectionMenuActions(beatmap))
                 yield return i;
 
-            if (beatmap.LastPlayed == null || beatmap.LastPlayed == DateTimeOffset.MinValue)
+            if (beatmap.LastPlayed == null)
             {
                 yield return new OsuMenuItem(SongSelectStrings.MarkAsPlayed, MenuItemType.Standard, () =>
                 {
