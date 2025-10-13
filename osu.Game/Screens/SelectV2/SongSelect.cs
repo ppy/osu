@@ -43,6 +43,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Volume;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Footer;
@@ -63,7 +64,7 @@ namespace osu.Game.Screens.SelectV2
     /// This will be gradually built upon and ultimately replace <see cref="Select.SongSelect"/> once everything is in place.
     /// </summary>
     [Cached(typeof(ISongSelect))]
-    public abstract partial class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, ISongSelect
+    public abstract partial class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, ISongSelect, IHandlePresentBeatmap
     {
         /// <summary>
         /// A debounce that governs how long after a panel is selected before the rest of song select (and the game at large)
@@ -330,7 +331,13 @@ namespace osu.Game.Screens.SelectV2
             {
                 Hotkey = GlobalAction.ToggleModSelection,
                 Current = Mods,
-                RequestDeselectAllMods = () => Mods.Value = Array.Empty<Mod>()
+                RequestDeselectAllMods = () =>
+                {
+                    if (modSelectOverlay.State.Value == Visibility.Visible)
+                        modSelectOverlay.DeselectAll();
+                    else
+                        Mods.Value = Array.Empty<Mod>();
+                }
             },
             new FooterButtonRandom
             {
@@ -1113,6 +1120,36 @@ namespace osu.Game.Screens.SelectV2
             Debug.Assert(Ruleset.Value.Equals(score.Ruleset));
 
             this.Push(new SoloResultsScreen(score));
+        }
+
+        #endregion
+
+        #region IHandlePresentBeatmap
+
+        void IHandlePresentBeatmap.PresentBeatmap(WorkingBeatmap workingBeatmap, RulesetInfo ruleset)
+        {
+            cancelDebounceSelection();
+
+            var beatmapInfo = workingBeatmap.BeatmapInfo;
+
+            // Don't change the local ruleset if the user is on another ruleset and is showing converted beatmaps.
+            // Eventually we probably want to check whether conversion is actually possible for the current ruleset.
+            bool requiresRulesetSwitch = !beatmapInfo.Ruleset.Equals(Ruleset.Value)
+                                         && (beatmapInfo.Ruleset.OnlineID > 0 || !showConvertedBeatmaps.Value);
+
+            if (requiresRulesetSwitch)
+            {
+                Ruleset.Value = beatmapInfo.Ruleset;
+                Beatmap.Value = workingBeatmap;
+
+                Logger.Log($"Completing {nameof(IHandlePresentBeatmap.PresentBeatmap)} with beatmap {workingBeatmap} ruleset {beatmapInfo.Ruleset}");
+            }
+            else
+            {
+                Beatmap.Value = workingBeatmap;
+
+                Logger.Log($"Completing {nameof(IHandlePresentBeatmap.PresentBeatmap)} with beatmap {workingBeatmap} (maintaining ruleset)");
+            }
         }
 
         #endregion
