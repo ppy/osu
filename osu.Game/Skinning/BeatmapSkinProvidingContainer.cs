@@ -8,6 +8,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Storyboards;
 
 namespace osu.Game.Skinning
@@ -61,19 +62,28 @@ namespace osu.Game.Skinning
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
-        private int beatmapHitsoundsState;
+        private HitsoundsSetting beatmapHitsoundsState;
 
         protected override bool AllowSampleLookup(ISampleInfo sampleInfo)
         {
             if (beatmapSkins == null)
                 throw new InvalidOperationException($"{nameof(BeatmapSkinProvidingContainer)} needs to be loaded before being consumed.");
 
-            bool useHitsounds = beatmapHitsoundsState switch
+            bool useHitsounds;
+
+            switch (beatmapHitsoundsState)
             {
-                0 => beatmapHitsounds.Value,
-                1 => true,
-                _ => false
-            };
+                case HitsoundsSetting.HitsoundsOn:
+                    useHitsounds = true;
+                    break;
+                case HitsoundsSetting.HitsoundsOff:
+                    useHitsounds = false;
+                    break;
+                case HitsoundsSetting.UseGlobalSetting:
+                default:
+                    useHitsounds = beatmapHitsounds.Value;
+                    break;
+            }
 
             return sampleInfo is StoryboardSampleInfo || useHitsounds;
         }
@@ -114,10 +124,12 @@ namespace osu.Game.Skinning
 
             beatmapHitsoundsSubscription = realm.SubscribeToPropertyChanged(
                 r => r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)?.UserSettings,
-                settings => settings.Hitsounds,
+                settings => settings.HitsoundsStateString,
                 val =>
                 {
-                    beatmapHitsoundsState = val;
+                    beatmapHitsoundsState = Enum.TryParse(val, out HitsoundsSetting parsed)
+                        ? parsed
+                        : HitsoundsSetting.UseGlobalSetting;
                     TriggerSourceChanged();
                 });
 

@@ -90,11 +90,11 @@ namespace osu.Game.Tests.Visual.Gameplay
                 hitsoundsControl.TriggerEvent(new MouseDownEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), osuTK.Input.MouseButton.Left));
             });
             AddStep("change the current value", () => hitsoundsControl.Current.Value = false);
-            AddAssert("beatmaps hitsound value is false", () => Beatmap.Value.BeatmapInfo.UserSettings.Hitsounds == 2);
+            AddAssert("beatmaps hitsound value is false", () => Beatmap.Value.BeatmapInfo.UserSettings.Hitsounds == HitsoundsSetting.HitsoundsOff);
 
 
             AddStep("change the current value", () => hitsoundsControl.Current.Value = true);
-            AddAssert("beatmaps hitsound value is true", () => Beatmap.Value.BeatmapInfo.UserSettings.Hitsounds == 1);
+            AddAssert("beatmaps hitsound value is true", () => Beatmap.Value.BeatmapInfo.UserSettings.Hitsounds == HitsoundsSetting.HitsoundsOn);
 
 
         }

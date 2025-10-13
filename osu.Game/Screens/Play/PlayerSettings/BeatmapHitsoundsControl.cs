@@ -24,7 +24,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        private IDisposable? beatmapHitsoundsSubscription;
         private Task? realmWriteTask;
         private bool isFollowingGlobal { get; set; }
 
@@ -38,21 +37,18 @@ namespace osu.Game.Screens.Play.PlayerSettings
         {
             base.LoadComplete();
 
-            var info = realm.Realm.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)
-                ?? beatmap.Value.BeatmapInfo; // use in-memory beatmap for tests
-            int val = info.UserSettings.Hitsounds;
+            HitsoundsSetting hitsoundsState = beatmap.Value.BeatmapInfo.UserSettings.Hitsounds;
 
-            if (val == 0) // 0 == global
+            if (hitsoundsState == HitsoundsSetting.UseGlobalSetting)
             {
                 Current.Value = globalHitsounds.Value;
                 isFollowingGlobal = true;
             }
             else
             {
-                Current.Value = val == 1; // 1 == On; 2 == Off
+                Current.Value = hitsoundsState == HitsoundsSetting.HitsoundsOn;
                 isFollowingGlobal = false;
             }
-
 
             Current.Disabled = false;
             ShowsDefaultIndicator = false;
@@ -67,8 +63,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 Current.Value = globalHitsounds.Value;
 
         }
-
-
 
         private void onCurrentChanged(ValueChangedEvent<bool> hitsounds)
         {
@@ -93,33 +87,17 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             realmWriteTask = realm.WriteAsync(r =>
             {
-                var setInfo = r.Find<BeatmapSetInfo>(beatmap.Value.BeatmapSetInfo.ID);
+                var beatmapInfo = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID);
 
-                if (setInfo == null) // only the case for tests.
+                if (beatmapInfo == null) // only the case for tests.
                 {
-                    beatmap.Value.BeatmapInfo.UserSettings.Hitsounds = Current.Value ? 1 : 2;
+                    beatmap.Value.BeatmapInfo.UserSettings.Hitsounds = Current.Value ? HitsoundsSetting.HitsoundsOn : HitsoundsSetting.HitsoundsOff;
                     return;
                 }
 
-                // Apply to all difficulties in a beatmap set if they have the same audio
-                // (they generally always share hitsounds).
-                foreach (var b in setInfo.Beatmaps)
-                {
-                    BeatmapUserSettings userSettings = b.UserSettings;
-                    int val = Current.Value ? 1 : 2; // 1 == On; 2 == Off
-
-                    if (userSettings.Hitsounds != val && b.AudioEquals(beatmap.Value.BeatmapInfo))
-                    {
-                        userSettings.Hitsounds = val; // once value is changed (to On/Off) it will never return to global (same as osu!stable)
-                    }
-                }
+                beatmapInfo.UserSettings.Hitsounds = Current.Value ? HitsoundsSetting.HitsoundsOn : HitsoundsSetting.HitsoundsOff;
+                // once value is changed (to On/Off) it will never return to global (same as osu!stable)
             });
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            beatmapHitsoundsSubscription?.Dispose();
         }
     }
 }
