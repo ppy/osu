@@ -14,12 +14,11 @@ using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
 using osu.Game.Tests.Visual.Multiplayer;
-using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
-    public partial class TestSceneUserPanelOverlay : MultiplayerTestScene
+    public partial class TestScenePlayerPanelOverlay : MultiplayerTestScene
     {
         private PlayerPanelOverlay list = null!;
 
@@ -118,10 +117,10 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 });
             });
 
-            AddUntilStep("two panels displayed", () => this.ChildrenOfType<UserPanel>().Count(), () => Is.EqualTo(2));
+            AddUntilStep("two panels displayed", () => this.ChildrenOfType<PlayerPanel>().Count(), () => Is.EqualTo(2));
 
             AddStep("remove a user", () => MultiplayerClient.RemoveUser(new APIUser { Id = 1 }));
-            AddUntilStep("one panel displayed", () => this.ChildrenOfType<UserPanel>().Count(), () => Is.EqualTo(1));
+            AddUntilStep("one panel displayed", () => this.ChildrenOfType<PlayerPanel>().Count(), () => Is.EqualTo(1));
         }
 
         [Test]
