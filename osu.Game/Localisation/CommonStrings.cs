@@ -195,9 +195,9 @@ namespace osu.Game.Localisation
         public static LocalisableString Details => new TranslatableString(getKey(@"details"), @"Details...");
 
         /// <summary>
-        /// "Creator"
+        /// "Mapper"
         /// </summary>
-        public static LocalisableString Creator => new TranslatableString(getKey(@"creator"), @"Creator");
+        public static LocalisableString Mapper => new TranslatableString(getKey(@"mapper"), @"Mapper");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

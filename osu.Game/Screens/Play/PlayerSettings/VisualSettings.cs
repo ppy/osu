@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private readonly PlayerCheckbox beatmapColorsToggle;
 
         public VisualSettings()
-            : base(PlayerSettingsStrings.VisualSettingsTitle)
+            : base(PlayerSettingsOverlayStrings.VisualSettingsTitle)
         {
             Children = new Drawable[]
             {
