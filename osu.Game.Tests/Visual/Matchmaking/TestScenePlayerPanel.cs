@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -66,7 +67,10 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 }
             }).WaitSafely());
 
-            AddToggleStep("toggle horizontal", h => panel.Horizontal = h);
+            foreach (var layout in Enum.GetValues<PlayerPanelDisplayMode>())
+            {
+                AddStep($"set layout to {layout}", () => panel.DisplayMode = layout);
+            }
         }
 
         [Test]

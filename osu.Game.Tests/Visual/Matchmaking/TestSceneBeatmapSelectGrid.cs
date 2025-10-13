@@ -10,6 +10,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect;
@@ -86,9 +87,9 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             AddStep("add selection 1", () => grid.ChildrenOfType<BeatmapSelectPanel>().First().AddUser(new APIUser
             {
-                Id = 6411631,
+                Id = DummyAPIAccess.DUMMY_USER_ID,
                 Username = "Maarvin",
-            }, isOwnUser: true));
+            }));
             AddStep("add selection 2", () => grid.ChildrenOfType<BeatmapSelectPanel>().Skip(5).First().AddUser(new APIUser
             {
                 Id = 2,

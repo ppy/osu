@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osuTK;
@@ -33,9 +32,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         private const float panel_spacing = 4;
 
         public event Action<MultiplayerPlaylistItem>? ItemSelected;
-
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
 
         private readonly Dictionary<long, BeatmapSelectPanel> panelLookup = new Dictionary<long, BeatmapSelectPanel>();
 
@@ -134,7 +130,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 return;
 
             if (selected)
-                panel.AddUser(user, user.Equals(api.LocalUser.Value));
+                panel.AddUser(user);
             else
                 panel.RemoveUser(user);
         }
