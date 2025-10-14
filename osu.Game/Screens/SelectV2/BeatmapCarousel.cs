@@ -832,7 +832,7 @@ namespace osu.Game.Screens.SelectV2
 
         protected virtual Dictionary<Guid, double> GetBeatmapInfoGuidToTopRankAccuracyMapping(FilterCriteria criteria) => realm.Run(r =>
         {
-            var topRankMapping = new Dictionary<Guid, double>();
+            var topRankAccuracyMapping = new Dictionary<Guid, double>();
 
             var allLocalScores = r.GetAllLocalScoresForUser(criteria.LocalUserId)
                                   .Filter($@"{nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $0", criteria.Ruleset?.ShortName)
@@ -843,13 +843,13 @@ namespace osu.Game.Screens.SelectV2
             {
                 Debug.Assert(score.BeatmapInfo != null);
 
-                if (topRankMapping.ContainsKey(score.BeatmapInfo.ID))
+                if (topRankAccuracyMapping.ContainsKey(score.BeatmapInfo.ID))
                     continue;
 
-                topRankMapping[score.BeatmapInfo.ID] = score.Accuracy;
+                topRankAccuracyMapping[score.BeatmapInfo.ID] = score.Accuracy;
             }
 
-            return topRankMapping;
+            return topRankAccuracyMapping;
         });
 
         #endregion
