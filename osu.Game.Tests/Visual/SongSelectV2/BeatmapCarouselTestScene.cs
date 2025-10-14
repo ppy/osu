@@ -454,6 +454,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             public Func<List<BeatmapCollection>> AllCollections { get; set; } = () => [];
             public Func<FilterCriteria, Dictionary<Guid, ScoreRank>> BeatmapInfoGuidToTopRankMapping { get; set; } = _ => new Dictionary<Guid, ScoreRank>();
+            public Func<FilterCriteria, Dictionary<Guid, double>> BeatmapInfoGuidToTopRankAccuracyMapping { get; set; } = _ => new Dictionary<Guid, double>();
 
             public TestBeatmapCarousel()
             {
@@ -479,6 +480,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             protected override List<BeatmapCollection> GetAllCollections() => AllCollections.Invoke();
             protected override Dictionary<Guid, ScoreRank> GetBeatmapInfoGuidToTopRankMapping(FilterCriteria criteria) => BeatmapInfoGuidToTopRankMapping.Invoke(criteria);
+            protected override Dictionary<Guid, double> GetBeatmapInfoGuidToTopRankAccuracyMapping(FilterCriteria criteria) => BeatmapInfoGuidToTopRankAccuracyMapping.Invoke(criteria);
         }
     }
 }
