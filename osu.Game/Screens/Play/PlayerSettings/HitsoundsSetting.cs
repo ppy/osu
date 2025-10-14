@@ -8,10 +8,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
     public enum HitsoundsSetting
     {
         [Description("Global")]
-        UseGlobalSetting,
+        UseGlobalSetting = 0,
+
         [Description("On")]
-        HitsoundsOn,
+        HitsoundsOn = 1,
+
         [Description("Off")]
-        HitsoundsOff,
+        HitsoundsOff = 2,
     }
 }

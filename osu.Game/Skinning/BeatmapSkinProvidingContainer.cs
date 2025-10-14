@@ -62,6 +62,7 @@ namespace osu.Game.Skinning
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
+
         private HitsoundsSetting beatmapHitsoundsState;
 
         protected override bool AllowSampleLookup(ISampleInfo sampleInfo)
@@ -76,9 +77,11 @@ namespace osu.Game.Skinning
                 case HitsoundsSetting.HitsoundsOn:
                     useHitsounds = true;
                     break;
+
                 case HitsoundsSetting.HitsoundsOff:
                     useHitsounds = false;
                     break;
+
                 case HitsoundsSetting.UseGlobalSetting:
                 default:
                     useHitsounds = beatmapHitsounds.Value;
@@ -113,6 +116,7 @@ namespace osu.Game.Skinning
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
+
         private IDisposable? beatmapHitsoundsSubscription;
 
         [BackgroundDependencyLoader]
@@ -124,12 +128,10 @@ namespace osu.Game.Skinning
 
             beatmapHitsoundsSubscription = realm.SubscribeToPropertyChanged(
                 r => r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)?.UserSettings,
-                settings => settings.HitsoundsStateString,
+                settings => settings.HitsoundsInt,
                 val =>
                 {
-                    beatmapHitsoundsState = Enum.TryParse(val, out HitsoundsSetting parsed)
-                        ? parsed
-                        : HitsoundsSetting.UseGlobalSetting;
+                    beatmapHitsoundsState = (HitsoundsSetting)val;
                     TriggerSourceChanged();
                 });
 

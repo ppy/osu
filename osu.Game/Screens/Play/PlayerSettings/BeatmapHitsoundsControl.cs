@@ -13,9 +13,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
 {
     public partial class BeatmapHitsoundsControl : PlayerCheckbox
     {
-
         private Bindable<bool> globalHitsounds = new Bindable<bool>();
-
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
@@ -53,14 +51,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
             ShowsDefaultIndicator = false;
             globalHitsounds.BindValueChanged(onGlobalChanged);
             Current.BindValueChanged(onCurrentChanged);
-
         }
 
         private void onGlobalChanged(ValueChangedEvent<bool> hitsounds)
         {
             if (isFollowingGlobal) // set current based on global hitsound setting, in case the settings overlay is open when loading beatmap and changing the global setting
                 Current.Value = globalHitsounds.Value;
-
         }
 
         private void onCurrentChanged(ValueChangedEvent<bool> hitsounds)

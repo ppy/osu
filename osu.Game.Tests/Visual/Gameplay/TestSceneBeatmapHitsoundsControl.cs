@@ -3,14 +3,11 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Database;
 using osu.Game.Localisation;
 using osu.Game.Screens.Play.PlayerSettings;
 
@@ -18,15 +15,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public partial class TestSceneBeatmapHitsoundsControl : OsuTestScene
     {
-
         private BeatmapHitsoundsControl hitsoundsControl = null!;
         private OsuConfigManager localConfig = null!;
-
-        [Resolved]
-        private RealmAccess realmAccess { get; set; } = null!;
-        [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
-
 
         [BackgroundDependencyLoader]
         private void load()
@@ -47,7 +37,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             recreateControl();
         }
 
-
         [Test]
         public void TestLocalConfigSyncsWithControl()
         {
@@ -58,11 +47,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("control shows hitsounds enabled", () => hitsoundsControl.Current.Value);
         }
 
-
         [Test]
         public void TestLocalConfigNoLongerSyncsWithControlAfterChange()
         {
-
             AddStep("disable beatmap hitsounds globally", () => localConfig.SetValue(OsuSetting.BeatmapHitsounds, true));
             AddAssert("control shows hitsounds enabled", () => hitsoundsControl.Current.Value);
 
@@ -73,15 +60,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("disable beatmap hitsounds globally", () => localConfig.SetValue(OsuSetting.BeatmapHitsounds, false));
             AddAssert("control shows hitsounds disabled", () => hitsoundsControl.Current.Value);
-
-
-
         }
 
         [Test]
         public void TestBeatmapHitsoundValueChangesInBeatmap()
         {
-
             AddStep("disable beatmap hitsounds globally", () => localConfig.SetValue(OsuSetting.BeatmapHitsounds, true));
             AddAssert("control shows hitsounds enabled", () => hitsoundsControl.Current.Value);
 
@@ -92,17 +75,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("change the current value", () => hitsoundsControl.Current.Value = false);
             AddAssert("beatmaps hitsound value is false", () => Beatmap.Value.BeatmapInfo.UserSettings.Hitsounds == HitsoundsSetting.HitsoundsOff);
 
-
             AddStep("change the current value", () => hitsoundsControl.Current.Value = true);
             AddAssert("beatmaps hitsound value is true", () => Beatmap.Value.BeatmapInfo.UserSettings.Hitsounds == HitsoundsSetting.HitsoundsOn);
-
-
         }
-
 
         private void recreateControl()
         {
-            AddStep("Create control", () =>
+            AddStep("create control", () =>
             {
                 Child = new PlayerSettingsGroup("Some settings")
                 {
@@ -115,6 +94,5 @@ namespace osu.Game.Tests.Visual.Gameplay
                 };
             });
         }
-
     }
 }
