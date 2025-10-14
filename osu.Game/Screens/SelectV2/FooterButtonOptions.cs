@@ -57,7 +57,7 @@ namespace osu.Game.Screens.SelectV2
                 beatmap = realm.Run(r => r.Find<BeatmapInfo>(workingBeatmap.Value.BeatmapInfo.ID)!.ToLive(realm));
         }
 
-        public Framework.Graphics.UserInterface.Popover GetPopover() => new Popover(this, beatmap.Value)
+        public Framework.Graphics.UserInterface.Popover GetPopover() => new Popover(this, beatmap.Value.Detach())
         {
             ColourProvider = colourProvider,
             SongSelect = songSelect
