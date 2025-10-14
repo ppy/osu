@@ -6,6 +6,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Screens;
 using osu.Game.Online.Spectator;
 using osu.Game.Scoring;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
@@ -14,10 +15,13 @@ namespace osu.Game.Screens.Play
     {
         private readonly Score score;
 
+        [Cached(typeof(IGameplayLeaderboardProvider))]
+        private SoloGameplayLeaderboardProvider leaderboardProvider = new SoloGameplayLeaderboardProvider();
+
         protected override UserActivity InitialActivity => new UserActivity.SpectatingUser(Score.ScoreInfo);
 
         public SoloSpectatorPlayer(Score score)
-            : base(score, new PlayerConfiguration { AllowUserInteraction = false })
+            : base(score, new PlayerConfiguration { AllowUserInteraction = false, ShowLeaderboard = true })
         {
             this.score = score;
         }
@@ -26,6 +30,8 @@ namespace osu.Game.Screens.Play
         private void load()
         {
             SpectatorClient.OnUserBeganPlaying += userBeganPlaying;
+
+            AddInternal(leaderboardProvider);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
