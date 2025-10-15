@@ -20,10 +20,11 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Timing;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -189,7 +190,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             private LabelledDropdown<string> bank = null!;
             private LabelledDropdown<string> additionBank = null!;
+            private FillFlowContainer<SampleSetTernaryButton>? sampleSetsFlow;
+            private LabelledDropdown<EditorBeatmapSkin.SampleSet>? sampleSetDropdown;
             private IndeterminateSliderWithTextBoxInput<int> volume = null!;
+            private SkinnableSound demoSample = null!;
 
             private FillFlowContainer togglesCollection = null!;
 
@@ -244,7 +248,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         Direction = FillDirection.Vertical,
                         AutoSizeAxes = Axes.Y,
                         Spacing = new Vector2(0, 10),
-                        Children = new Drawable[]
+                        Children = new[]
                         {
                             togglesCollection = new FillFlowContainer
                             {
@@ -263,12 +267,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 Label = "Addition Bank",
                                 Items = HitSampleInfo.ALL_BANKS,
                             },
+                            createSampleSetContent(),
                             volume = new IndeterminateSliderWithTextBoxInput<int>("Volume", new BindableInt(100)
                             {
                                 MinValue = DrawableHitObject.MINIMUM_SAMPLE_VOLUME,
                                 MaxValue = 100,
                             })
                         }
+                    },
+                    new EditorSkinProvidingContainer(beatmap)
+                    {
+                        Child = demoSample = new SkinnableSound()
                     }
                 };
 
@@ -292,6 +301,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                     setBank(val.NewValue);
                     updatePrimaryBankState();
+                    playDemoSample();
                 });
 
                 updateAdditionBankState();
@@ -302,7 +312,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                     setAdditionBank(val.NewValue);
                     updateAdditionBankState();
+                    playDemoSample();
                 });
+
+                updateSampleSetState();
 
                 volume.Current.BindValueChanged(val =>
                 {
@@ -313,6 +326,58 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 createStateBindables();
                 updateTernaryStates();
                 togglesCollection.AddRange(createTernaryButtons());
+            }
+
+            private Drawable createSampleSetContent()
+            {
+                if (beatmap.BeatmapSkin == null)
+                    return Empty();
+
+                var sampleSets = beatmap.BeatmapSkin.GetAvailableSampleSets().ToList();
+
+                if (sampleSets.Count == 0)
+                    return Empty();
+
+                sampleSets.Insert(0, new EditorBeatmapSkin.SampleSet(0, "User skin"));
+
+                if (sampleSets.Count < 20)
+                {
+                    sampleSetsFlow = new FillFlowContainer<SampleSetTernaryButton>
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Spacing = new Vector2(5),
+                        ChildrenEnumerable = sampleSets.Select(set => new SampleSetTernaryButton(set) { Description = set.Name }),
+                    };
+
+                    foreach (var ternary in sampleSetsFlow)
+                    {
+                        ternary.Current.BindValueChanged(val =>
+                        {
+                            if (val.NewValue == TernaryState.True)
+                                setSampleSet(ternary.SampleSet);
+
+                            updateSampleSetState();
+                            playDemoSample();
+                        });
+                    }
+
+                    return sampleSetsFlow;
+                }
+
+                sampleSetDropdown = new LabelledDropdown<EditorBeatmapSkin.SampleSet>(padded: false)
+                {
+                    Label = "Sample Set",
+                    Items = sampleSets,
+                };
+                sampleSetDropdown.Current.BindValueChanged(val =>
+                {
+                    setSampleSet(val.NewValue);
+                    updateSampleSetState();
+                    playDemoSample();
+                });
+
+                return sampleSetDropdown;
             }
 
             private string? getCommonBank() => allRelevantSamples.Select(h => GetBankValue(h.samples)).Distinct().Count() == 1
@@ -345,6 +410,40 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     additionBank.Show();
                 else
                     additionBank.Hide();
+            }
+
+            private void updateSampleSetState()
+            {
+                HashSet<int> activeSets = new HashSet<int>();
+
+                foreach (var sample in allRelevantSamples.SelectMany(h => h.samples))
+                {
+                    if (sample.Suffix == null)
+                        activeSets.Add(sample.UseBeatmapSamples ? 1 : 0);
+                    else if (int.TryParse(sample.Suffix, out int suffix))
+                        activeSets.Add(suffix);
+                }
+
+                if (sampleSetsFlow != null)
+                {
+                    var onState = activeSets.Count > 1 ? TernaryState.Indeterminate : TernaryState.True;
+
+                    foreach (var ternary in sampleSetsFlow)
+                        ternary.Current.Value = activeSets.Contains(ternary.SampleSet.SampleSetIndex) ? onState : TernaryState.False;
+                }
+
+                if (sampleSetDropdown != null)
+                {
+                    sampleSetDropdown.Current.Value = activeSets.Count == 1
+                        ? sampleSetDropdown.Items.Single(i => i.SampleSetIndex == activeSets.Single())
+                        : new EditorBeatmapSkin.SampleSet(-1, "(multiple)");
+                }
+            }
+
+            private void playDemoSample()
+            {
+                demoSample.Samples = allRelevantSamples.First().samples.Cast<ISampleInfo>().ToArray();
+                demoSample.Play();
             }
 
             /// <summary>
@@ -400,6 +499,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 });
             }
 
+            private void setSampleSet(EditorBeatmapSkin.SampleSet newSampleSet)
+            {
+                updateAllRelevantSamples((_, relevantSamples) =>
+                {
+                    for (int i = 0; i < relevantSamples.Count; i++)
+                    {
+                        relevantSamples[i] = relevantSamples[i].With(
+                            newSuffix: newSampleSet.SampleSetIndex >= 2 ? newSampleSet.SampleSetIndex.ToString() : null,
+                            newUseBeatmapSamples: newSampleSet.SampleSetIndex >= 1);
+                    }
+                });
+            }
+
             private void setVolume(int newVolume)
             {
                 updateAllRelevantSamples((_, relevantSamples) =>
@@ -438,6 +550,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 addHitSample(sampleName);
                                 break;
                         }
+
+                        playDemoSample();
                     };
 
                     selectionSampleStates[sampleName] = bindable;
