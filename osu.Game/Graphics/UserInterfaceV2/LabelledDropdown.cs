@@ -31,6 +31,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
             d.RelativeSizeAxes = Axes.X;
         });
 
-        protected virtual OsuDropdown<TItem> CreateDropdown() => new OsuDropdown<TItem>();
+        protected virtual OsuDropdown<TItem> CreateDropdown() => new Dropdown();
+
+        private partial class Dropdown : OsuDropdown<TItem>
+        {
+            protected override DropdownMenu CreateMenu() => base.CreateMenu().With(menu => menu.MaxHeight = 200);
+        }
     }
 }
