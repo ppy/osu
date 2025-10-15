@@ -49,7 +49,8 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
 
         public Drawable Icon { get; private set; } = null!;
 
-        public DrawableTernaryButton()
+        public DrawableTernaryButton(HoverSampleSet? hoverSampleSet = HoverSampleSet.Button)
+            : base(hoverSampleSet)
         {
             RelativeSizeAxes = Axes.X;
         }
@@ -79,10 +80,10 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
 
             current.BindValueChanged(_ => updateSelectionState(), true);
 
-            Action = onAction;
+            Action = OnAction;
         }
 
-        private void onAction()
+        protected void OnAction()
         {
             if (!Enabled.Value)
                 return;
