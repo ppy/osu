@@ -142,10 +142,10 @@ namespace osu.Game.Database
                 {
                     var convertedPoint = convertedToBezier[i];
 
-                    // Truncate control points to integer positions
+                    // Round control points to integer positions
                     var position = new Vector2(
-                        (float)Math.Floor(convertedPoint.Position.X),
-                        (float)Math.Floor(convertedPoint.Position.Y));
+                        (float)Math.Round(convertedPoint.Position.X),
+                        (float)Math.Round(convertedPoint.Position.Y));
 
                     // stable only supports a single curve type specification per slider.
                     // we exploit the fact that the converted-to-Bézier path only has Bézier segments,
