@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Scoring
     /// A <see cref="HealthProcessor"/> which continuously drains health.<br />
     /// At HP=0, the minimum health reached for a perfect play is 95%.<br />
     /// At HP=5, the minimum health reached for a perfect play is 70%.<br />
-    /// At HP=10, the minimum health reached for a perfect play is 30%.
+    /// At HP=10, the minimum health reached for a perfect play is 40%.
     /// </summary>
     public partial class DrainingHealthProcessor : HealthProcessor
     {
