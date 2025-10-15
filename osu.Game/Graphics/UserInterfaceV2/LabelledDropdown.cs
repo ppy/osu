@@ -9,8 +9,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 {
     public partial class LabelledDropdown<TItem> : LabelledComponent<OsuDropdown<TItem>, TItem>
     {
-        public LabelledDropdown()
-            : base(true)
+        public LabelledDropdown(bool padded)
+            : base(padded)
         {
         }
 
@@ -20,10 +20,15 @@ namespace osu.Game.Graphics.UserInterfaceV2
             set => Component.Items = value;
         }
 
+        public float DropdownWidth
+        {
+            get => Component.Width;
+            set => Component.Width = value;
+        }
+
         protected sealed override OsuDropdown<TItem> CreateComponent() => CreateDropdown().With(d =>
         {
             d.RelativeSizeAxes = Axes.X;
-            d.Width = 0.5f;
         });
 
         protected virtual OsuDropdown<TItem> CreateDropdown() => new OsuDropdown<TItem>();
