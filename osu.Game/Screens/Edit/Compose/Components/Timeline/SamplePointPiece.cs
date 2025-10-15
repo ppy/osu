@@ -187,8 +187,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             private readonly HitObject hitObject;
 
-            private LabelledTextBox bank = null!;
-            private LabelledTextBox additionBank = null!;
+            private LabelledDropdown<string> bank = null!;
+            private LabelledDropdown<string> additionBank = null!;
             private IndeterminateSliderWithTextBoxInput<int> volume = null!;
 
             private FillFlowContainer togglesCollection = null!;
@@ -240,7 +240,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     flow = new FillFlowContainer
                     {
-                        Width = 200,
+                        Width = 220,
                         Direction = FillDirection.Vertical,
                         AutoSizeAxes = Axes.Y,
                         Spacing = new Vector2(0, 10),
@@ -253,15 +253,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 Direction = FillDirection.Horizontal,
                                 Spacing = new Vector2(5, 5),
                             },
-                            bank = new LabelledTextBox
+                            bank = new LabelledDropdown<string>(padded: false)
                             {
-                                Label = "Bank Name",
-                                SelectAllOnFocus = true,
+                                Label = "Normal Bank",
+                                Items = HitSampleInfo.ALL_BANKS,
                             },
-                            additionBank = new LabelledTextBox
+                            additionBank = new LabelledDropdown<string>(padded: false)
                             {
                                 Label = "Addition Bank",
-                                SelectAllOnFocus = true,
+                                Items = HitSampleInfo.ALL_BANKS,
                             },
                             volume = new IndeterminateSliderWithTextBoxInput<int>("Volume", new BindableInt(100)
                             {
@@ -272,8 +272,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     }
                 };
 
-                bank.TabbableContentContainer = flow;
-                additionBank.TabbableContentContainer = flow;
                 volume.TabbableContentContainer = flow;
 
                 // if the piece belongs to a currently selected object, assume that the user wants to change all selected objects.
@@ -295,9 +293,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     setBank(val.NewValue);
                     updatePrimaryBankState();
                 });
-                // on commit, ensure that the value is correct by sourcing it from the objects' samples again.
-                // this ensures that committing empty text causes a revert to the previous value.
-                bank.OnCommit += (_, _) => updatePrimaryBankState();
 
                 updateAdditionBankState();
                 additionBank.Current.BindValueChanged(val =>
@@ -308,7 +303,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     setAdditionBank(val.NewValue);
                     updateAdditionBankState();
                 });
-                additionBank.OnCommit += (_, _) => updateAdditionBankState();
 
                 volume.Current.BindValueChanged(val =>
                 {
@@ -338,15 +332,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private void updatePrimaryBankState()
             {
                 string? commonBank = getCommonBank();
-                bank.Current.Value = commonBank;
-                bank.PlaceholderText = string.IsNullOrEmpty(commonBank) ? "(multiple)" : string.Empty;
+                bank.Current.Value = !string.IsNullOrEmpty(commonBank) ? commonBank : "(multiple)";
             }
 
             private void updateAdditionBankState()
             {
                 string? commonAdditionBank = getCommonAdditionBank();
-                additionBank.PlaceholderText = string.IsNullOrEmpty(commonAdditionBank) ? "(multiple)" : string.Empty;
-                additionBank.Current.Value = commonAdditionBank;
+                additionBank.Current.Value = !string.IsNullOrEmpty(commonAdditionBank) ? commonAdditionBank : "(multiple)";
 
                 bool anyAdditions = allRelevantSamples.Any(o => o.samples.Any(s => s.Name != HitSampleInfo.HIT_NORMAL));
                 if (anyAdditions)
