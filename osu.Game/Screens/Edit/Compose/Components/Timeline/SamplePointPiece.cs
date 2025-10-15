@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void updateText()
         {
-            Label.Text = $"{abbreviateBank(GetBankValue(GetSamples()))} {GetVolumeValue(GetSamples())}";
+            Label.Text = $"{abbreviateBank(GetBankValue(GetSamples()))}{GetSuffix(GetSamples())} {GetVolumeValue(GetSamples())}";
 
             if (!contracted.Value)
                 LabelContainer.ResizeWidthTo(Label.Width, 200, Easing.OutQuint);
@@ -147,6 +147,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public static string? GetBankValue(IEnumerable<HitSampleInfo> samples)
         {
             return samples.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL)?.Bank;
+        }
+
+        public static string GetSuffix(IEnumerable<HitSampleInfo> samples)
+        {
+            var suffixes = samples.Select(o => o.Suffix).Distinct().ToList();
+
+            // having multiple values should never happen, but just for safety...
+            if (suffixes.Count != 1 || suffixes.Single() is not string commonSuffix)
+                return string.Empty;
+
+            return $@":{commonSuffix}";
         }
 
         public static string? GetAdditionBankValue(IEnumerable<HitSampleInfo> samples)
