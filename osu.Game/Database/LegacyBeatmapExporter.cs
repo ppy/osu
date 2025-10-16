@@ -132,7 +132,19 @@ namespace osu.Game.Database
                     hasPath.Path.ControlPoints[^1].Type = null;
 
                 if (BezierConverter.CountSegments(hasPath.Path.ControlPoints) <= 1
-                    && hasPath.Path.ControlPoints[0].Type!.Value.Degree == null) continue;
+                    && hasPath.Path.ControlPoints[0].Type!.Value.Degree == null)
+                {
+                    // Round every control point to integer positions before skipping to the next hit object
+                    for (int i = 0; i < hasPath.Path.ControlPoints.Count; i++)
+                    {
+                        var position = new Vector2(
+                            (float)Math.Round(hasPath.Path.ControlPoints[i].Position.X),
+                            (float)Math.Round(hasPath.Path.ControlPoints[i].Position.Y));
+
+                        hasPath.Path.ControlPoints[i].Position = position;
+                    }
+                    continue;
+                }
 
                 var convertedToBezier = BezierConverter.ConvertToModernBezier(hasPath.Path.ControlPoints);
 
