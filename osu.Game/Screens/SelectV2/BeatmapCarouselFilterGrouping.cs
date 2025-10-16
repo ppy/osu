@@ -192,7 +192,7 @@ namespace osu.Game.Screens.SelectV2
                     {
                         var date = b.LastPlayed;
 
-                        if (date == null || date == DateTimeOffset.MinValue)
+                        if (date == null)
                             return new GroupDefinition(int.MaxValue, "Never").Yield();
 
                         return defineGroupByDate(date.Value);

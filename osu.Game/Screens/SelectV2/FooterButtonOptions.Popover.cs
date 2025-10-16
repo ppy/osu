@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -31,14 +32,14 @@ namespace osu.Game.Screens.SelectV2
             private FillFlowContainer buttonFlow = null!;
             private readonly FooterButtonOptions footerButton;
 
-            private readonly WorkingBeatmap beatmap;
+            private readonly BeatmapInfo beatmap;
 
             // Can't use DI for these due to popover being initialised from a footer button which ends up being on the global
             // PopoverContainer.
             public ISongSelect? SongSelect { get; init; }
             public required OverlayColourProvider ColourProvider { get; init; }
 
-            public Popover(FooterButtonOptions footerButton, WorkingBeatmap beatmap)
+            public Popover(FooterButtonOptions footerButton, BeatmapInfo beatmap)
             {
                 this.footerButton = footerButton;
                 this.beatmap = beatmap;
@@ -59,14 +60,15 @@ namespace osu.Game.Screens.SelectV2
                 addHeader(CommonStrings.General);
                 addButton(CollectionsStrings.ManageCollections, FontAwesome.Solid.Book, () => SongSelect?.ManageCollections());
 
-                addHeader(SongSelectStrings.ForAllDifficulties, beatmap.BeatmapSetInfo.ToString());
-                addButton(SongSelectStrings.DeleteBeatmap, FontAwesome.Solid.Trash, () => SongSelect?.Delete(beatmap.BeatmapSetInfo), colours.Red1);
+                Debug.Assert(beatmap.BeatmapSet != null);
+                addHeader(SongSelectStrings.ForAllDifficulties, beatmap.BeatmapSet.ToString());
+                addButton(SongSelectStrings.DeleteBeatmap, FontAwesome.Solid.Trash, () => SongSelect?.Delete(beatmap.BeatmapSet), colours.Red1);
 
-                addHeader(SongSelectStrings.ForSelectedDifficulty, beatmap.BeatmapInfo.DifficultyName);
+                addHeader(SongSelectStrings.ForSelectedDifficulty, beatmap.DifficultyName);
 
                 if (SongSelect == null) return;
 
-                foreach (OsuMenuItem item in SongSelect.GetForwardActions(beatmap.BeatmapInfo))
+                foreach (OsuMenuItem item in SongSelect.GetForwardActions(beatmap))
                 {
                     // We can't display menus with child items here, so just ignore them.
                     if (item.Items.Any())
