@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 double wideVelocityBase = Math.Min(sliderlessCurrVelocity, prevVelocity); // Don't reward wide angle bonus to sliders
 
-                // Nerf high spaced wide angles to compensate part of wide angled bonus being in snapping difficulty
+                // Rescale wide angle bonus to reward lower spacing more
                 double velocityThreshold = diameter * 2.3 / osuCurrObj.AdjustedDeltaTime;
                 wideVelocityBase = Math.Min(wideVelocityBase, velocityThreshold + 0.4 * (wideVelocityBase - velocityThreshold));
 
@@ -218,9 +218,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 double bpmFactor = Math.Pow((deltaTimeThreshold - osuCurrObj.AdjustedDeltaTime) * 0.015, 2.5);
 
-                angleSnapDifficultyBonus = OsuDifficultyHitObject.NORMALISED_DIAMETER * bpmFactor;
+                angleSnapDifficultyBonus = diameter * bpmFactor;
 
-                // Shift starting point of "uncomfy" from square to wide-angle patterns if spacing is too big, becvause big spacing is already buffed enough by wide angle bonus
+                // We want to start reward from 60 degrees to 90 degrees on lower spacing, and form 90 degrees to 120 degrees on higher spacing
                 double highSpacingAdjust = Math.PI / 6;
                 highSpacingAdjust *= DifficultyCalculationUtils.ReverseLerp(currDistance, diameter * 2, diameter * 4);
 
