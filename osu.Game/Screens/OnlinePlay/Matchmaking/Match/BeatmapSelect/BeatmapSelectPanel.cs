@@ -2,10 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.Diagnostics;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -37,11 +36,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         private const float border_width = 3;
 
         private Container scaleContainer = null!;
-        private AvatarOverlay selectionOverlay = null!;
         private Drawable lighting = null!;
 
         private Container border = null!;
         private Container mainContent = null!;
+
+        private readonly List<APIUser> users = new List<APIUser>();
+
+        private BeatmapCardMatchmaking? card;
 
         public override bool PropagatePositionalInputSubTree => AllowSelection;
 
@@ -75,11 +77,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                                 RelativeSizeAxes = Axes.Both,
                                 Alpha = 0,
                             },
-                            selectionOverlay = new AvatarOverlay
-                            {
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                            }
                         }
                     },
                     border = new Container
@@ -114,19 +111,33 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             };
             lookupCache.GetBeatmapAsync(Item.BeatmapID).ContinueWith(b => Schedule(() =>
             {
+                Debug.Assert(card == null);
+
                 var beatmap = b.GetResultSafely()!;
                 beatmap.StarRating = Item.StarRating;
 
-                mainContent.Add(new BeatmapCardMatchmaking(beatmap)
+                mainContent.Add(card = new BeatmapCardMatchmaking(beatmap)
                 {
                     Depth = float.MaxValue,
                     Action = () => Action?.Invoke(Item),
                 });
+
+                foreach (var user in users)
+                    card.SelectionOverlay.AddUser(user);
             }));
         }
 
-        public bool AddUser(APIUser user, bool isOwnUser = false) => selectionOverlay.AddUser(user, isOwnUser);
-        public bool RemoveUser(APIUser user) => selectionOverlay.RemoveUser(user.Id);
+        public void AddUser(APIUser user)
+        {
+            users.Add(user);
+            card?.SelectionOverlay.AddUser(user);
+        }
+
+        public void RemoveUser(APIUser user)
+        {
+            users.Remove(user);
+            card?.SelectionOverlay.RemoveUser(user.Id);
+        }
 
         protected override bool OnHover(HoverEvent e)
         {
@@ -211,131 +222,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                           .FadeOut(duration);
 
             this.Delay(delay + duration).FadeOut().Expire();
-        }
-
-        private partial class AvatarOverlay : CompositeDrawable
-        {
-            private readonly Container<SelectionAvatar> avatars;
-
-            private Sample? userAddedSample;
-            private double? lastSamplePlayback;
-
-            public AvatarOverlay()
-            {
-                AutoSizeAxes = Axes.Both;
-
-                InternalChild = avatars = new Container<SelectionAvatar>
-                {
-                    AutoSizeAxes = Axes.X,
-                    Height = SelectionAvatar.AVATAR_SIZE,
-                };
-
-                Padding = new MarginPadding(5);
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(AudioManager audio)
-            {
-                userAddedSample = audio.Samples.Get(@"Multiplayer/player-ready");
-            }
-
-            public bool AddUser(APIUser user, bool isOwnUser)
-            {
-                if (avatars.Any(a => a.User.Id == user.Id))
-                    return false;
-
-                var avatar = new SelectionAvatar(user, isOwnUser);
-
-                avatars.Add(avatar);
-
-                if (lastSamplePlayback == null || Time.Current - lastSamplePlayback > OsuGameBase.SAMPLE_DEBOUNCE_TIME)
-                {
-                    userAddedSample?.Play();
-                    lastSamplePlayback = Time.Current;
-                }
-
-                updateAvatarLayout();
-
-                avatar.FinishTransforms();
-
-                return true;
-            }
-
-            public bool RemoveUser(int id)
-            {
-                if (avatars.SingleOrDefault(a => a.User.Id == id) is not SelectionAvatar avatar)
-                    return false;
-
-                avatar.PopOutAndExpire();
-                avatars.ChangeChildDepth(avatar, float.MaxValue);
-
-                updateAvatarLayout();
-
-                return true;
-            }
-
-            private void updateAvatarLayout()
-            {
-                const double stagger = 30;
-                const float spacing = 4;
-
-                double delay = 0;
-                float x = 0;
-
-                for (int i = avatars.Count - 1; i >= 0; i--)
-                {
-                    var avatar = avatars[i];
-
-                    if (avatar.Expired)
-                        continue;
-
-                    avatar.Delay(delay).MoveToX(x, 500, Easing.OutElasticQuarter);
-
-                    x -= avatar.LayoutSize.X + spacing;
-
-                    delay += stagger;
-                }
-            }
-
-            public partial class SelectionAvatar : CompositeDrawable
-            {
-                public const float AVATAR_SIZE = 30;
-
-                public APIUser User { get; }
-
-                public bool Expired { get; private set; }
-
-                private readonly MatchmakingAvatar avatar;
-
-                public SelectionAvatar(APIUser user, bool isOwnUser)
-                {
-                    User = user;
-                    Size = new Vector2(AVATAR_SIZE);
-
-                    InternalChild = avatar = new MatchmakingAvatar(user, isOwnUser)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    };
-                }
-
-                protected override void LoadComplete()
-                {
-                    base.LoadComplete();
-
-                    avatar.ScaleTo(0)
-                          .ScaleTo(1, 500, Easing.OutElasticHalf)
-                          .FadeIn(200);
-                }
-
-                public void PopOutAndExpire()
-                {
-                    avatar.ScaleTo(0, 400, Easing.OutExpo);
-
-                    this.FadeOut(100).Expire();
-                    Expired = true;
-                }
-            }
         }
     }
 }

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
@@ -315,28 +314,28 @@ namespace osu.Game.Screens.SelectV2
             {
                 case BeatmapOnlineStatus.Ranked:
                 case BeatmapOnlineStatus.Approved:
-                    return new GroupDefinition(0, BeatmapOnlineStatus.Ranked.GetDescription()).Yield();
+                    return new RankedStatusGroupDefinition(0, BeatmapOnlineStatus.Ranked).Yield();
 
                 case BeatmapOnlineStatus.Qualified:
-                    return new GroupDefinition(1, status.GetDescription()).Yield();
+                    return new RankedStatusGroupDefinition(1, status).Yield();
 
                 case BeatmapOnlineStatus.WIP:
-                    return new GroupDefinition(2, status.GetDescription()).Yield();
+                    return new RankedStatusGroupDefinition(2, status).Yield();
 
                 case BeatmapOnlineStatus.Pending:
-                    return new GroupDefinition(3, status.GetDescription()).Yield();
+                    return new RankedStatusGroupDefinition(3, status).Yield();
 
                 case BeatmapOnlineStatus.Graveyard:
-                    return new GroupDefinition(4, status.GetDescription()).Yield();
+                    return new RankedStatusGroupDefinition(4, status).Yield();
 
                 case BeatmapOnlineStatus.LocallyModified:
-                    return new GroupDefinition(5, status.GetDescription()).Yield();
+                    return new RankedStatusGroupDefinition(5, status).Yield();
 
                 case BeatmapOnlineStatus.None:
-                    return new GroupDefinition(6, status.GetDescription()).Yield();
+                    return new RankedStatusGroupDefinition(6, status).Yield();
 
                 case BeatmapOnlineStatus.Loved:
-                    return new GroupDefinition(7, status.GetDescription()).Yield();
+                    return new RankedStatusGroupDefinition(7, status).Yield();
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(status), status, null);

@@ -18,14 +18,49 @@ namespace osu.Game.Tests.Visual.Matchmaking
 {
     public partial class TestSceneResultsScreen : MultiplayerTestScene
     {
-        private const int invalid_user_id = 1;
-
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
             AddStep("join room", () => JoinRoom(CreateDefaultRoom(MatchType.Matchmaking)));
             WaitForJoined();
+
+            AddStep("set initial results", () =>
+            {
+                var state = new MatchmakingRoomState
+                {
+                    CurrentRound = 6,
+                    Stage = MatchmakingStage.Ended
+                };
+
+                int localUserId = API.LocalUser.Value.OnlineID;
+
+                // Overall state.
+                state.Users[localUserId].Placement = 1;
+                state.Users[localUserId].Points = 8;
+                for (int round = 1; round <= state.CurrentRound; round++)
+                    state.Users[localUserId].Rounds[round].Placement = round;
+
+                // Highest score.
+                state.Users[localUserId].Rounds[1].TotalScore = 1000;
+
+                // Highest accuracy.
+                state.Users[localUserId].Rounds[2].Accuracy = 0.9995;
+
+                // Highest combo.
+                state.Users[localUserId].Rounds[3].MaxCombo = 100;
+
+                // Most bonus score.
+                state.Users[localUserId].Rounds[4].Statistics[HitResult.LargeBonus] = 50;
+
+                // Smallest score difference.
+                state.Users[localUserId].Rounds[5].TotalScore = 1000;
+
+                // Largest score difference.
+                state.Users[localUserId].Rounds[6].TotalScore = 1000;
+
+                MultiplayerClient.ChangeMatchRoomState(state).WaitSafely();
+            });
 
             AddStep("add results screen", () =>
             {
@@ -36,7 +71,18 @@ namespace osu.Game.Tests.Visual.Matchmaking
                     Size = new Vector2(0.8f)
                 };
             });
+        }
 
+        [Test]
+        public void TestBasic()
+        {
+            AddStep("do nothing", () => { });
+        }
+
+        [Test]
+        public void TestInvalidUser()
+        {
+            const int invalid_user_id = 1;
             AddStep("join another user", () => MultiplayerClient.AddUser(new MultiplayerRoomUser(invalid_user_id)
             {
                 User = new APIUser
@@ -45,11 +91,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                     Username = "Invalid user"
                 }
             }));
-        }
 
-        [Test]
-        public void TestResults()
-        {
             AddStep("set results stage", () =>
             {
                 var state = new MatchmakingRoomState

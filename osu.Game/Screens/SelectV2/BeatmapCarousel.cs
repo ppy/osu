@@ -840,9 +840,11 @@ namespace osu.Game.Screens.SelectV2
         private readonly DrawablePool<PanelGroup> groupPanelPool = new DrawablePool<PanelGroup>(100);
         private readonly DrawablePool<PanelGroupStarDifficulty> starsGroupPanelPool = new DrawablePool<PanelGroupStarDifficulty>(11);
         private readonly DrawablePool<PanelGroupRankDisplay> ranksGroupPanelPool = new DrawablePool<PanelGroupRankDisplay>(9);
+        private readonly DrawablePool<PanelGroupRankedStatus> statusGroupPanelPool = new DrawablePool<PanelGroupRankedStatus>(8);
 
         private void setupPools()
         {
+            AddInternal(statusGroupPanelPool);
             AddInternal(ranksGroupPanelPool);
             AddInternal(starsGroupPanelPool);
             AddInternal(groupPanelPool);
@@ -880,6 +882,9 @@ namespace osu.Game.Screens.SelectV2
             if (x is RankDisplayGroupDefinition rankX && y is RankDisplayGroupDefinition rankY)
                 return rankX.Equals(rankY);
 
+            if (x is RankedStatusGroupDefinition statusX && y is RankedStatusGroupDefinition statusY)
+                return statusX.Equals(statusY);
+
             return base.CheckModelEquality(x, y);
         }
 
@@ -887,6 +892,9 @@ namespace osu.Game.Screens.SelectV2
         {
             switch (item.Model)
             {
+                case RankedStatusGroupDefinition:
+                    return statusGroupPanelPool.Get();
+
                 case StarDifficultyGroupDefinition:
                     return starsGroupPanelPool.Get();
 
@@ -1153,6 +1161,11 @@ namespace osu.Game.Screens.SelectV2
     /// Defines a grouping header for a set of carousel items grouped by achieved rank.
     /// </summary>
     public record RankDisplayGroupDefinition(ScoreRank Rank) : GroupDefinition(-(int)Rank, Rank.GetLocalisableDescription());
+
+    /// <summary>
+    /// Defines a grouping header for a set of carousel items grouped by ranked status.
+    /// </summary>
+    public record RankedStatusGroupDefinition(int Order, BeatmapOnlineStatus Status) : GroupDefinition(Order, Status.GetLocalisableDescription());
 
     /// <summary>
     /// Used to represent a portion of a <see cref="BeatmapSetInfo"/> under a <see cref="GroupDefinition"/>.

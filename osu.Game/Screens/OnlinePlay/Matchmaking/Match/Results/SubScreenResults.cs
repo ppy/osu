@@ -1,16 +1,22 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Globalization;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Utils;
 using osuTK;
 
@@ -24,133 +30,144 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
         private const float grid_spacing = 5;
 
         public override PanelDisplayStyle PlayersDisplayStyle => PanelDisplayStyle.Grid;
-        public override Drawable PlayersDisplayArea { get; }
+
+        public override Drawable PlayersDisplayArea { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
-        private readonly OsuSpriteText placementText;
-        private readonly FillFlowContainer<PanelUserStatistic> userStatistics;
-        private readonly FillFlowContainer<PanelRoomAward> roomStatistics;
+        private OsuSpriteText placementText = null!;
+        private FillFlowContainer<PanelUserStatistic> userStatistics = null!;
+        private FillFlowContainer<PanelRoomAward> roomAwards = null!;
 
-        public SubScreenResults()
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
             InternalChild = new GridContainer
             {
+                Padding = new MarginPadding(5),
                 RelativeSizeAxes = Axes.Both,
-                RowDimensions =
-                [
+                ColumnDimensions = new[]
+                {
                     new Dimension(GridSizeMode.AutoSize),
                     new Dimension(GridSizeMode.Absolute, grid_spacing),
                     new Dimension(),
-                    new Dimension(GridSizeMode.Absolute, grid_spacing),
-                    new Dimension(GridSizeMode.AutoSize),
-                    new Dimension(GridSizeMode.Absolute, 75)
-                ],
-                Content = new Drawable[]?[]
+                },
+                Content = new[]
                 {
-                    [
-                        new FillFlowContainer
+                    new[]
+                    {
+                        new Container
                         {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(grid_spacing),
-                            Children = new[]
+                            AutoSizeAxes = Axes.X,
+                            RelativeSizeAxes = Axes.Y,
+                            Children = new Drawable[]
                             {
-                                new OsuSpriteText
+                                new Container
                                 {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    Text = "Placement",
-                                    Font = OsuFont.Default.With(size: 12)
+                                    Masking = true,
+                                    CornerRadius = 5,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            Colour = colourProvider.Background4,
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                    }
                                 },
-                                placementText = new OsuSpriteText
+                                new FillFlowContainer
                                 {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    Font = OsuFont.Default.With(size: 72),
-                                    UseFullGlyphHeight = false
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Vertical,
+                                    Padding = new MarginPadding(6),
+                                    Spacing = new Vector2(grid_spacing),
+                                    Children = new Drawable[]
+                                    {
+                                        new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                            Text = "How you played",
+                                            Font = OsuFont.Style.Heading2,
+                                            Margin = new MarginPadding { Vertical = 15 },
+                                        },
+                                        userStatistics = new FillFlowContainer<PanelUserStatistic>
+                                        {
+                                            Anchor = Anchor.TopLeft,
+                                            Origin = Anchor.TopLeft,
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Vertical,
+                                            Spacing = new Vector2(grid_spacing)
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                            Text = "Room Awards",
+                                            Font = OsuFont.Style.Heading2,
+                                            Margin = new MarginPadding { Vertical = 15 },
+                                        },
+                                        roomAwards = new FillFlowContainer<PanelRoomAward>
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Spacing = new Vector2(grid_spacing)
+                                        }
+                                    }
                                 }
-                            }
-                        }
-                    ],
-                    null,
-                    [
+                            },
+                        },
+                        Empty(),
                         new GridContainer
                         {
                             RelativeSizeAxes = Axes.Both,
-                            ColumnDimensions =
+                            RowDimensions =
                             [
                                 new Dimension(GridSizeMode.AutoSize),
                                 new Dimension(GridSizeMode.Absolute, grid_spacing),
-                                new Dimension()
+                                new Dimension(),
                             ],
-                            Content = new Drawable?[][]
+                            Content = new Drawable[]?[]
                             {
                                 [
                                     new FillFlowContainer
                                     {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
                                         AutoSizeAxes = Axes.Both,
                                         Direction = FillDirection.Vertical,
-                                        Spacing = new Vector2(grid_spacing),
-                                        Children = new Drawable[]
+                                        Spacing = new Vector2(16),
+                                        Children = new[]
                                         {
                                             new OsuSpriteText
                                             {
                                                 Anchor = Anchor.TopCentre,
                                                 Origin = Anchor.TopCentre,
-                                                Text = "Breakdown",
-                                                Font = OsuFont.Default.With(size: 12)
+                                                Text = "Your final placement",
+                                                Font = OsuFont.Style.Heading2.With(size: 36),
                                             },
-                                            userStatistics = new FillFlowContainer<PanelUserStatistic>
+                                            placementText = new OsuSpriteText
                                             {
                                                 Anchor = Anchor.TopCentre,
                                                 Origin = Anchor.TopCentre,
-                                                AutoSizeAxes = Axes.Both,
-                                                Direction = FillDirection.Vertical,
-                                                Spacing = new Vector2(grid_spacing)
+                                                Font = OsuFont.Style.Heading1.With(size: 72),
+                                                UseFullGlyphHeight = false
                                             }
                                         }
-                                    },
-                                    null,
-                                    PlayersDisplayArea = Empty().With(d =>
-                                    {
-                                        d.RelativeSizeAxes = Axes.Both;
-                                    })
-                                ]
-                            }
-                        }
-                    ],
-                    null,
-                    [
-                        new FillFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(grid_spacing),
-                            Children = new Drawable[]
-                            {
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    Text = "Statistics",
-                                    Font = OsuFont.Default.With(size: 12)
-                                },
-                                roomStatistics = new FillFlowContainer<PanelRoomAward>
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Spacing = new Vector2(grid_spacing)
-                                }
+                                    }
+                                ],
+                                null,
+                                [
+                                    PlayersDisplayArea,
+                                ],
                             }
                         },
-                    ],
+                    },
                 }
             };
         }
@@ -180,36 +197,62 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
             if (state.Users[client.LocalUser!.UserID].Rounds.Count == 0)
             {
                 placementText.Text = "-";
-                addStatistic("No rounds played");
+                placementText.Colour = OsuColour.Gray(1f);
                 return;
             }
 
             int overallPlacement = state.Users[client.LocalUser!.UserID].Placement;
+
+            placementText.Text = overallPlacement.Ordinalize(CultureInfo.CurrentCulture);
+            placementText.Colour = ColourForPlacement(overallPlacement);
+
             int overallPoints = state.Users[client.LocalUser!.UserID].Points;
-            int bestPlacement = state.Users[client.LocalUser!.UserID].Rounds.Min(r => r.Placement);
-            var accuracyPlacement = state.Users.Select(u => (user: u, avgAcc: u.Rounds.Select(r => r.Accuracy).DefaultIfEmpty(0).Average()))
-                                         .OrderByDescending(t => t.avgAcc)
-                                         .Select((t, i) => (info: t, index: i))
-                                         .Single(t => t.info.user.UserId == client.LocalUser!.UserID);
+            addStatistic(overallPlacement, $"Overall position ({overallPoints} points)");
 
-            placementText.Text = $"#{state.Users[client.LocalUser!.UserID].Placement}";
-            addStatistic($"#{overallPlacement} overall ({overallPoints}pts)");
-            addStatistic($"#{bestPlacement} best placement");
-            addStatistic($"#{accuracyPlacement.index + 1} accuracy ({accuracyPlacement.info.avgAcc.FormatAccuracy()})");
+            var accuracyOrderedUsers = state.Users.Select(u => (user: u, avgAcc: u.Rounds.Select(r => r.Accuracy).DefaultIfEmpty(0).Average()))
+                                            .OrderByDescending(t => t.avgAcc)
+                                            .Select((t, i) => (info: t, index: i))
+                                            .Single(t => t.info.user.UserId == client.LocalUser!.UserID);
+            int accuracyPlacement = accuracyOrderedUsers.index + 1;
+            addStatistic(accuracyPlacement, $"Overall accuracy ({accuracyOrderedUsers.info.avgAcc.FormatAccuracy()})");
 
-            void addStatistic(string text)
+            var maxComboOrderedUsers = state.Users.Select(u => (user: u, maxCombo: u.Rounds.Max(r => r.MaxCombo)))
+                                            .OrderByDescending(t => t.maxCombo)
+                                            .Select((t, i) => (info: t, index: i))
+                                            .Single(t => t.info.user.UserId == client.LocalUser!.UserID);
+            int maxComboPlacement = maxComboOrderedUsers.index + 1;
+            addStatistic(maxComboPlacement, $"Best max combo ({maxComboOrderedUsers.info.maxCombo}x)");
+
+            var bestPlacement = state.Users[client.LocalUser!.UserID].Rounds.MinBy(r => r.Placement);
+            addStatistic(bestPlacement!.Placement, $"Best round placement (round {bestPlacement.Round})");
+
+            void addStatistic(int position, string text) => userStatistics.Add(new PanelUserStatistic(position, text));
+        }
+
+        public static ColourInfo ColourForPlacement(int overallPlacement)
+        {
+            // for top 3 placements use special colours.
+            // don't for the rest.
+
+            switch (overallPlacement)
             {
-                userStatistics.Add(new PanelUserStatistic(text)
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
-                });
+                case 1:
+                    return OsuColour.ForRankingTier(RankingTier.Gold);
+
+                case 2:
+                    return OsuColour.ForRankingTier(RankingTier.Silver);
+
+                case 3:
+                    return OsuColour.ForRankingTier(RankingTier.Bronze);
+
+                default:
+                    return OsuColour.ForRankingTier(RankingTier.Iron);
             }
         }
 
         private void populateRoomStatistics(MatchmakingRoomState state)
         {
-            roomStatistics.Clear();
+            roomAwards.Clear();
 
             long maxScore = long.MinValue;
             int maxScoreUserId = 0;
@@ -301,35 +344,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
                 }
             }
 
-            // Highest score - highest score across all rounds.
-            addStatistic(maxScoreUserId, "Highest score");
+            addAward(maxScoreUserId, "Score champ", "Highest score in a single round");
 
-            // Most accurate - highest accuracy across all rounds.
-            addStatistic(maxAccuracyUserId, "Most accurate");
+            addAward(maxAccuracyUserId, "Most accurate", "Highest accuracy in a single round");
 
-            // Most combo - highest combo across all rounds.
-            addStatistic(maxComboUserId, "Most combo");
+            addAward(maxComboUserId, "Top combo", "Highest combo in a single round");
 
-            // Most bonus - most bonus score across all rounds.
             if (maxBonusScoreUserId > 0)
-                addStatistic(maxBonusScoreUserId, "Most bonus");
+                addAward(maxBonusScoreUserId, "Biggest bonus", "Biggest bonus score across all rounds");
 
-            // Most clutch - smallest victory in any round.
             if (smallestScoreDifferenceUserId > 0)
-                addStatistic(smallestScoreDifferenceUserId, "Most clutch");
+                addAward(smallestScoreDifferenceUserId, "Most clutch", "Smallest winning score difference in a single round");
 
-            // Best finish - largest victory in any round.
             if (largestScoreDifferenceUserId > 0)
-                addStatistic(largestScoreDifferenceUserId, "Best finish");
+                addAward(largestScoreDifferenceUserId, "Best finish", "Largest score difference in a single round");
 
-            void addStatistic(int userId, string text)
-            {
-                roomStatistics.Add(new PanelRoomAward(text, userId)
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
-                });
-            }
+            void addAward(int userId, string text, string description) => roomAwards.Add(new PanelRoomAward(text, description, userId));
         }
 
         protected override void Dispose(bool isDisposing)
