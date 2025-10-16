@@ -312,11 +312,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
         public override bool OnExiting(ScreenExitEvent e)
         {
-            if (base.OnExiting(e))
-                return true;
-
             if (exitConfirmed)
             {
+                if (base.OnExiting(e))
+                {
+                    exitConfirmed = false;
+                    return true;
+                }
+
                 client.LeaveRoom().FireAndForget();
                 return false;
             }
