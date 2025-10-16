@@ -813,7 +813,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.True(filterCriteria.Accuracy.IsLowerInclusive);
             Assert.IsNull(filterCriteria.Accuracy.Max);
         }
-        
+
         [TestCase("0.9097")]
         [TestCase("90.97%")]
         [TestCase("90.97")]
