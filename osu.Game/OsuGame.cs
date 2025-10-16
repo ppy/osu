@@ -189,19 +189,14 @@ namespace osu.Game
         /// </summary>
         public readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
-        /// <summary>
-        /// Whether the back button is currently displayed.
-        /// </summary>
-        private readonly IBindable<bool> backButtonVisibility = new BindableBool();
-
         IBindable<LocalUserPlayingState> ILocalUserPlayInfo.PlayingState => UserPlayingState;
 
         protected readonly Bindable<LocalUserPlayingState> UserPlayingState = new Bindable<LocalUserPlayingState>();
 
         protected OsuScreenStack ScreenStack;
 
-        protected BackButton BackButton;
-        protected ScreenFooter ScreenFooter;
+        protected BackButton BackButton => screenStackFooter.BackButton;
+        protected ScreenFooter ScreenFooter => screenStackFooter.Footer;
 
         protected SettingsOverlay Settings;
 
@@ -232,6 +227,8 @@ namespace osu.Game
         private Bindable<string> configSkin;
 
         private RealmDetachedBeatmapStore detachedBeatmapStore;
+
+        private ScreenStackFooter screenStackFooter;
 
         private readonly string[] args;
 
@@ -1132,12 +1129,6 @@ namespace osu.Game
                             {
                                 backReceptor = new ScreenFooter.BackReceptor(),
                                 ScreenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
-                                BackButton = new BackButton(backReceptor)
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    Action = handleBackButton,
-                                },
                                 logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                                 // TODO: what is this? why is this?
                                 // TODO: this is being screen scaled even though it's probably AN OVERLAY.
@@ -1150,7 +1141,7 @@ namespace osu.Game
                                 {
                                     Depth = -1,
                                     RelativeSizeAxes = Axes.Both,
-                                    Child = ScreenFooter = new ScreenFooter(backReceptor)
+                                    Child = screenStackFooter = new ScreenStackFooter(ScreenStack, backReceptor)
                                     {
                                         // TODO: this is really really weird and should not exist.
                                         RequestLogoInFront = inFront => ScreenContainer.ChangeChildDepth(logoContainer, inFront ? float.MinValue : 0),
@@ -1322,14 +1313,6 @@ namespace osu.Game
             OverlayActivationMode.ValueChanged += mode =>
             {
                 if (mode.NewValue != OverlayActivation.All) CloseAllOverlays();
-            };
-
-            backButtonVisibility.ValueChanged += visible =>
-            {
-                if (visible.NewValue)
-                    BackButton.Show();
-                else
-                    BackButton.Hide();
             };
 
             // Importantly, this should be run after binding PostNotification to the import handlers so they can present the import after game startup.
@@ -1723,13 +1706,12 @@ namespace osu.Game
 
             if (current != null)
             {
-                backButtonVisibility.UnbindFrom(current.BackButtonVisibility);
                 OverlayActivationMode.UnbindFrom(current.OverlayActivationMode);
                 configUserActivity.UnbindFrom(current.Activity);
             }
 
             // Bind to new screen.
-            if (newScreen != null)
+            if (newScreen is OsuScreen newOsuScreen)
             {
                 OverlayActivationMode.BindTo(newScreen.OverlayActivationMode);
                 configUserActivity.BindTo(newScreen.Activity);
@@ -1741,45 +1723,6 @@ namespace osu.Game
                     CloseAllOverlays();
                 else
                     Toolbar.Show();
-
-                var newOsuScreen = (OsuScreen)newScreen;
-
-                if (newScreen.ShowFooter)
-                {
-                    // the legacy back button should never display while the new footer is in use, as it
-                    // contains its own local back button.
-                    ((BindableBool)backButtonVisibility).Value = false;
-
-                    BackButton.Hide();
-                    ScreenFooter.Show();
-
-                    if (newOsuScreen.IsLoaded)
-                        updateFooterButtons();
-                    else
-                    {
-                        // ensure the current buttons are immediately disabled on screen change (so they can't be pressed).
-                        ScreenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
-
-                        newOsuScreen.OnLoadComplete += _ => updateFooterButtons();
-                    }
-
-                    void updateFooterButtons()
-                    {
-                        var buttons = newScreen.CreateFooterButtons();
-
-                        newOsuScreen.LoadComponentsAgainstScreenDependencies(buttons);
-
-                        ScreenFooter.SetButtons(buttons);
-                        ScreenFooter.Show();
-                    }
-                }
-                else
-                {
-                    backButtonVisibility.BindTo(newScreen.BackButtonVisibility);
-
-                    ScreenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
-                    ScreenFooter.Hide();
-                }
 
                 skinEditor.SetTarget(newOsuScreen);
             }
