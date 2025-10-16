@@ -117,8 +117,6 @@ namespace osu.Game.Screens
 
         internal void CreateLeasedDependencies(IReadOnlyDependencyContainer dependencies) => createDependencies(dependencies);
 
-        internal void LoadComponentsAgainstScreenDependencies(IEnumerable<Drawable> components) => LoadComponents(components);
-
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             if (screenDependencies == null)

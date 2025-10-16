@@ -352,7 +352,7 @@ namespace osu.Game.Screens.SelectV2
                         errorSample?.Play();
                 }
             },
-            new FooterButtonOptions
+            new FooterButtonOptions(this)
             {
                 Hotkey = GlobalAction.ToggleBeatmapOptions,
             }
