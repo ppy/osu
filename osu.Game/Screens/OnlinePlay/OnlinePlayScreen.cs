@@ -152,10 +152,12 @@ namespace osu.Game.Screens.OnlinePlay
             while (screenStack.CurrentScreen != null && screenStack.CurrentScreen is not LoungeSubScreen)
             {
                 var subScreen = (Screen)screenStack.CurrentScreen;
-                if (subScreen.IsLoaded && subScreen.OnExiting(e))
-                    return true;
 
                 subScreen.Exit();
+
+                // If it's still current after calling Exit(), it must have blocked OnExiting().
+                if (subScreen.IsCurrentScreen())
+                    return true;
             }
 
             waves.Hide();
