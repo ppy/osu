@@ -117,11 +117,7 @@ namespace osu.Game.Screens.Footer
 
                 void updateFooterButtons()
                 {
-                    var buttons = osuScreen.CreateFooterButtons();
-
-                    osuScreen.LoadComponentsAgainstScreenDependencies(buttons);
-
-                    Footer.SetButtons(buttons);
+                    Footer.SetButtons(osuScreen.CreateFooterButtons());
                     Footer.Show();
                 }
             }
