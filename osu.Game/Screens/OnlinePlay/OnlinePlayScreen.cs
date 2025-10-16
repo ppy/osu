@@ -106,6 +106,8 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
+            base.OnEntering(e);
+
             this.FadeIn();
             waves.Show();
 
@@ -135,6 +137,8 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
+            base.OnSuspending(e);
+
             this.ScaleTo(1.1f, 250, Easing.InSine);
             this.FadeOut(250);
 
