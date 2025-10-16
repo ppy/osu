@@ -121,6 +121,8 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
+            base.OnResuming(e);
+
             this.FadeIn(250);
             this.ScaleTo(1, 250, Easing.OutSine);
 
@@ -131,8 +133,6 @@ namespace osu.Game.Screens.OnlinePlay
             // to work around this, do not proxy resume to screens that haven't loaded yet.
             if ((screenStack.CurrentScreen as Drawable)?.IsLoaded == true)
                 screenStack.CurrentScreen.OnResuming(e);
-
-            base.OnResuming(e);
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
@@ -168,8 +168,7 @@ namespace osu.Game.Screens.OnlinePlay
 
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
 
-            base.OnExiting(e);
-            return false;
+            return base.OnExiting(e);
         }
 
         public override bool OnBackButton()
