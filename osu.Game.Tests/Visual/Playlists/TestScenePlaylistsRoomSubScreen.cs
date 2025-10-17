@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
@@ -38,6 +39,7 @@ namespace osu.Game.Tests.Visual.Playlists
 {
     public partial class TestScenePlaylistsRoomSubScreen : OnlinePlayTestScene
     {
+        private RulesetStore rulesets = null!;
         private BeatmapManager beatmaps = null!;
         private BeatmapSetInfo importedSet = null!;
 
@@ -46,7 +48,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             BeatmapStore beatmapStore;
 
-            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
             Dependencies.CacheAs(beatmapStore = new RealmDetachedBeatmapStore());
             Dependencies.Cache(Realm);
@@ -577,6 +579,14 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("select second playlist item", () => screen.SelectedItem.Value = room.Playlist[1]);
             AddUntilStep("user mods validated", () => screen.UserMods.Value.Count == 1 && screen.UserMods.Value.OfType<OsuModDoubleTime>().Any());
             AddUntilStep("mods set", () => SelectedMods.Value.Count == 1 && SelectedMods.Value.OfType<OsuModDoubleTime>().Any());
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
         }
 
         private partial class TestPlaylistsScreen : OsuScreen
