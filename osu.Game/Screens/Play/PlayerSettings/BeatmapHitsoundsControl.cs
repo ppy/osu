@@ -85,10 +85,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 var beatmapInfo = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID);
 
                 if (beatmapInfo == null) // only the case for tests.
-                {
-                    beatmap.Value.BeatmapInfo.UserSettings.Hitsounds = Current.Value ? HitsoundsSetting.HitsoundsOn : HitsoundsSetting.HitsoundsOff;
                     return;
-                }
 
                 beatmapInfo.UserSettings.Hitsounds = Current.Value ? HitsoundsSetting.HitsoundsOn : HitsoundsSetting.HitsoundsOff;
                 // once value is changed (to On/Off) it will never return to global (same as osu!stable)
