@@ -21,7 +21,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsSongSelectV2 : SongSelect, IOnlinePlaySubScreen
+    public partial class PlaylistsSongSelectV2 : SongSelect, IOnlinePlaySubScreen
     {
         public string ShortTitle => "song selection";
 
