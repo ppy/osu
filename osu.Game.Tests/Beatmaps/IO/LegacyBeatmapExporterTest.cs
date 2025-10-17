@@ -59,7 +59,15 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             // Ensure importer encoding is correct
             AddStep("import beatmap", () => beatmap = importBeatmapFromArchives(@"fractional-coordinates.olz"));
-            AddAssert("hit object has fractional position", () => ((IHasYPosition)beatmap.Beatmap.HitObjects[1]).Y, () => Is.EqualTo(383.99997).Within(0.00001));
+            AddAssert("second slider has fractional position",
+                () => ((IHasXPosition)beatmap.Beatmap.HitObjects[1]).X,
+                () => Is.EqualTo(-3.0517578E-05).Within(0.00001));
+            AddAssert("second slider path has fractional coordinates",
+                () => ((IHasPath)beatmap.Beatmap.HitObjects[1]).Path.ControlPoints[1].Position.X,
+                () => Is.EqualTo(191.999939).Within(0.00001));
+            AddAssert("second hit circle has fractional position",
+                () => ((IHasYPosition)beatmap.Beatmap.HitObjects[3]).Y,
+                () => Is.EqualTo(383.99997).Within(0.00001));
 
             // Ensure exporter legacy conversion is correct
             AddStep("export", () =>
@@ -71,7 +79,15 @@ namespace osu.Game.Tests.Beatmaps.IO
             });
 
             AddStep("import beatmap again", () => beatmap = importBeatmapFromStream(outStream));
-            AddAssert("hit object is snapped", () => ((IHasYPosition)beatmap.Beatmap.HitObjects[1]).Y, () => Is.EqualTo(384).Within(0.00001));
+            AddAssert("second slider is snapped",
+                () => ((IHasXPosition)beatmap.Beatmap.HitObjects[1]).X,
+                () => Is.EqualTo(0).Within(0.00001));
+            AddAssert("second slider path is snapped",
+                () => ((IHasPath)beatmap.Beatmap.HitObjects[1]).Path.ControlPoints[1].Position.X,
+                () => Is.EqualTo(192).Within(0.00001));
+            AddAssert("second hit circle is snapped",
+                () => ((IHasYPosition)beatmap.Beatmap.HitObjects[3]).Y,
+                () => Is.EqualTo(384).Within(0.00001));
         }
 
         [Test]
