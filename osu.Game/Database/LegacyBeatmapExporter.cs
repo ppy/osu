@@ -143,6 +143,7 @@ namespace osu.Game.Database
 
                         hasPath.Path.ControlPoints[i].Position = position;
                     }
+
                     continue;
                 }
 
