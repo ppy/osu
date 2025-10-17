@@ -138,8 +138,8 @@ namespace osu.Game.Database
                     for (int i = 0; i < hasPath.Path.ControlPoints.Count; i++)
                     {
                         var position = new Vector2(
-                            (float)Math.Round(hasPath.Path.ControlPoints[i].Position.X),
-                            (float)Math.Round(hasPath.Path.ControlPoints[i].Position.Y));
+                            MathF.Round(hasPath.Path.ControlPoints[i].Position.X),
+                            MathF.Round(hasPath.Path.ControlPoints[i].Position.Y));
 
                         hasPath.Path.ControlPoints[i].Position = position;
                     }
@@ -157,8 +157,8 @@ namespace osu.Game.Database
 
                     // Round control points to integer positions
                     var position = new Vector2(
-                        (float)Math.Round(convertedPoint.Position.X),
-                        (float)Math.Round(convertedPoint.Position.Y));
+                        MathF.Round(convertedPoint.Position.X),
+                        MathF.Round(convertedPoint.Position.Y));
 
                     // stable only supports a single curve type specification per slider.
                     // we exploit the fact that the converted-to-Bézier path only has Bézier segments,
