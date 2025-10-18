@@ -67,13 +67,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         private IDialogOverlay? dialogOverlay { get; set; }
 
         [Resolved]
-        protected OverlayColourProvider? ColourProvider { get; private set; }
+        private OverlayColourProvider? colourProvider { get; set; }
 
         [Resolved]
         private IPerformFromScreenRunner? performer { get; set; }
 
         [Resolved]
-        protected OsuColour Colours { get; private set; } = null!;
+        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
         private MultiplayerClient? multiplayerClient { get; set; }
@@ -133,7 +133,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             Add(SolidBackgroundLayer = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = ColourProvider?.Background5 ?? Colours.Gray1
+                Colour = colourProvider?.Background5 ?? colours.Gray1
             });
 
             Background = new UserCoverBackground
@@ -141,6 +141,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                Colour = colours.Gray7,
                 User = User
             };
             if (Background != null)
@@ -303,7 +304,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
                     this.ResizeTo(horizontal ? size_horizontal : size_vertical, duration, Easing.OutPow10);
 
-                    rankText.MoveTo(horizontal ? new Vector2(-40, -10) : new Vector2(-70, 0), duration, Easing.OutPow10);
+                    rankText.MoveTo(horizontal ? new Vector2(-40, -20) : new Vector2(-70, 0), duration, Easing.OutPow10);
                     username.MoveTo(horizontal ? new Vector2(0, -46) : new Vector2(0, -86), duration, Easing.OutPow10);
                     scoreText.MoveTo(horizontal ? new Vector2(0, -16) : new Vector2(0, -56), duration, Easing.OutPow10);
                     break;
