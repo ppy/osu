@@ -21,6 +21,12 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
             {
                 new SettingsCheckbox
                 {
+                    LabelText = UserInterfaceStrings.SeparateAllDifficulties,
+                    Current = config.GetBindable<bool>(OsuSetting.SeparateAllDifficulties),
+                    Keywords = new[] { "separate" }
+                },
+                new SettingsCheckbox
+                {
                     LabelText = UserInterfaceStrings.ShowConvertedBeatmaps,
                     Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
                     Keywords = new[] { "converts", "converted" }
