@@ -9,6 +9,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Changes;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Beatmaps
@@ -21,8 +23,8 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
         /// </summary>
         public const int STACK_DISTANCE = 3;
 
-        public OsuBeatmapProcessor(IBeatmap beatmap)
-            : base(beatmap)
+        public OsuBeatmapProcessor(IBeatmap beatmap, IBeatmapEditorChangeHandler? changeHandler = null)
+            : base(beatmap, changeHandler)
         {
         }
 
@@ -34,8 +36,8 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
             // This is normally enforced by the legacy decoder, but is not enforced by the editor.
             foreach (var obj in Beatmap.HitObjects.OfType<IHasComboInformation>())
             {
-                if (obj is not Spinner && (lastObj == null || lastObj is Spinner))
-                    obj.NewCombo = true;
+                if (obj is not Spinner && (lastObj == null || lastObj is Spinner) && !obj.NewCombo)
+                    new NewComboChange(obj, true).Apply(ChangeHandler);
                 lastObj = obj;
             }
 
