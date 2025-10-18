@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                     Id = 2,
                     Colour = "99EB47",
                     CountryCode = CountryCode.AU,
-                    CoverUrl = @"https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
+                    CoverUrl = @"https://assets.ppy.sh/user-profile-covers/2/baba245ef60834b769694178f8f6d4f6166c5188c740de084656ad2b80f1eea7.jpeg",
                     Statistics = new UserStatistics { GlobalRank = null, CountryRank = null }
                 }
             })
