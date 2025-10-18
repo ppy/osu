@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected ExpandingToolboxContainer LeftToolbox { get; private set; }
 
-        protected ExpandingToolboxContainer RightToolbox { get; private set; }
+        protected ContextualExpandingToolboxContainer RightToolbox { get; private set; }
 
         private DrawableEditorRulesetWrapper<TObject> drawableRulesetWrapper;
 
@@ -247,7 +247,7 @@ namespace osu.Game.Rulesets.Edit
                             Colour = colourProvider.Background5,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        RightToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_RIGHT, 250)
+                        RightToolbox = new ContextualExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_RIGHT, 250)
                         {
                             Child = new EditorToolboxGroup("inspector")
                             {
@@ -518,6 +518,8 @@ namespace osu.Game.Rulesets.Edit
 
             if (!(tool is SelectTool))
                 EditorBeatmap.SelectedHitObjects.Clear();
+
+            RightToolbox.ContextualToolboxGroup = BlueprintContainer.CurrentPlacement?.CreateToolboxGroup();
         }
 
         #endregion
