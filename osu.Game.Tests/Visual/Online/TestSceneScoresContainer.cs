@@ -223,6 +223,33 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
+        [Test]
+        public void TestPinnableScore()
+        {
+            AddStep("Load unpinned score", () =>
+            {
+                var allScores = createScores();
+
+                allScores.Scores[0].CurrentUserAttributes = new SoloScoreInfo.ScoreCurrentUserAttributes
+                {
+                    Pin = new SoloScoreInfo.ScorePinAttributes(),
+                };
+
+                scoresContainer.Scores = allScores;
+            });
+            AddStep("Load pinned score", () =>
+            {
+                var allScores = createScores();
+
+                allScores.Scores[0].CurrentUserAttributes = new SoloScoreInfo.ScoreCurrentUserAttributes
+                {
+                    Pin = new SoloScoreInfo.ScorePinAttributes { IsPinned = true },
+                };
+
+                scoresContainer.Scores = allScores;
+            });
+        }
+
         private ulong onlineID = 1;
 
         private APIScoresCollection createScores()
