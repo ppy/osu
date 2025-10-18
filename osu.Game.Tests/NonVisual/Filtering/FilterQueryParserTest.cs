@@ -787,5 +787,44 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.That(filterCriteria.UserTags[1].SearchTerm, Is.EqualTo("clean"));
             Assert.That(filterCriteria.UserTags[1].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.FullPhrase));
         }
+
+        [TestCase("acc")]
+        [TestCase("accuracy")]
+        public void TestApplyAccuracyQueries(string variant)
+        {
+            string query = $"{variant}<90 easy";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("easy", filterCriteria.SearchText.Trim());
+            Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
+            Assert.IsNotNull(filterCriteria.Accuracy.Max);
+            Assert.AreEqual(filterCriteria.Accuracy.Max, 0.90d);
+            Assert.IsNull(filterCriteria.Accuracy.Min);
+        }
+
+        [TestCase("acc")]
+        [TestCase("accuracy")]
+        public void TestAccuracyQueriesInclusive(string variant)
+        {
+            string query = $"{variant}>=90.97";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(filterCriteria.Accuracy.Min, 0.9097d);
+            Assert.True(filterCriteria.Accuracy.IsLowerInclusive);
+            Assert.IsNull(filterCriteria.Accuracy.Max);
+        }
+
+        [TestCase("0.9097")]
+        [TestCase("90.97%")]
+        [TestCase("90.97")]
+        public void TestParseAccuracyQueriesFormatVariants(string parameter)
+        {
+            string query = $"acc>={parameter}";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(filterCriteria.Accuracy.Min, 0.9097d);
+            Assert.True(filterCriteria.Accuracy.IsLowerInclusive);
+            Assert.IsNull(filterCriteria.Accuracy.Max);
+        }
     }
 }

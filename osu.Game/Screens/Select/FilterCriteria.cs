@@ -23,6 +23,7 @@ namespace osu.Game.Screens.Select
         public BeatmapSetInfo? SelectedBeatmapSet;
 
         public OptionalRange<double> StarDifficulty;
+        public OptionalRange<double> Accuracy;
         public OptionalRange<float> ApproachRate;
         public OptionalRange<float> DrainRate;
         public OptionalRange<float> CircleSize;
