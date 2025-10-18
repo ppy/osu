@@ -140,9 +140,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ClearAllLocalScores => new TranslatableString(getKey(@"clear_all_local_scores"), @"Clear all local scores");
 
         /// <summary>
-        /// "Delete beatmap"
+        /// "Delete..."
         /// </summary>
-        public static LocalisableString DeleteBeatmap => new TranslatableString(getKey(@"delete_beatmap"), @"Delete beatmap");
+        public static LocalisableString Delete => new TranslatableString(getKey(@"delete"), @"Delete...");
 
         /// <summary>
         /// "Restore all hidden"
