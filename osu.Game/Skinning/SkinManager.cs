@@ -66,6 +66,8 @@ namespace osu.Game.Skinning
 
         private Skin retroSkin { get; }
 
+        private Skin streamSkin { get; }
+
         public override bool PauseImports
         {
             get => base.PauseImports;
@@ -94,6 +96,7 @@ namespace osu.Game.Skinning
             var defaultSkins = new[]
             {
                 retroSkin = new RetroSkin(this),
+                streamSkin = new StreamSkin(this),
                 DefaultClassicSkin = new DefaultLegacySkin(this),
                 trianglesSkin = new TrianglesSkin(this),
                 argonSkin = new ArgonSkin(this),
@@ -375,6 +378,9 @@ namespace osu.Game.Skinning
 
                 if (guid == SkinInfo.RETRO_SKIN)
                     skinInfo = retroSkin.SkinInfo;
+
+                if (guid == SkinInfo.STREAM_SKIN)
+                    skinInfo = streamSkin.SkinInfo;
             }
 
             CurrentSkinInfo.Value = skinInfo ?? trianglesSkin.SkinInfo;
