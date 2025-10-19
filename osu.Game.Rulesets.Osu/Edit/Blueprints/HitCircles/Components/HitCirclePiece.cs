@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
         {
             Origin = Anchor.Centre;
 
-            Size = OsuHitObject.OBJECT_DIMENSIONS;
+            Size = OsuHitObject.VISUAL_OBJECT_DIMENSIONS;
 
             CornerRadius = Size.X / 2;
             CornerExponent = 2;
