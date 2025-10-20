@@ -80,7 +80,8 @@ namespace osu.Game.Screens.Play.HUD
 
             if (scoreProcessor != null)
             {
-                // Setup legacy score processor for legacy scores
+                // Legacy score may be necessary for correct pp calculation of legacy scores depending on the ruleset.
+                // If it's not necessary - method CreateLegacyScoreProcessor will return null and legacy score calculation will be skipped.
                 if (clonedMods.OfType<ModClassic>().Any())
                 {
                     legacyScoreProcessor = gameplayState.Ruleset.CreateLegacyScoreProcessor();
