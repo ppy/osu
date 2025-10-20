@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -13,7 +14,6 @@ using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Tests.Gameplay;
-using osu.Game.Tests.Visual.Gameplay;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private readonly Bindable<int?> position = new Bindable<int?>(8);
 
-        private TestSceneGameplayLeaderboard.TestGameplayLeaderboardProvider leaderboardProvider = null!;
+        private TestGameplayLeaderboardProvider leaderboardProvider = null!;
         private MultiplayerPositionDisplay display = null!;
         private GameplayState gameplayState = null!;
 
@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         RelativeSizeAxes = Axes.Both,
                         CachedDependencies =
                         [
-                            (typeof(IGameplayLeaderboardProvider), leaderboardProvider = new TestSceneGameplayLeaderboard.TestGameplayLeaderboardProvider()),
+                            (typeof(IGameplayLeaderboardProvider), leaderboardProvider = new TestGameplayLeaderboardProvider()),
                             (typeof(GameplayState), gameplayState = TestGameplayState.Create(new OsuRuleset()))
                         ],
                         Child = display = new MultiplayerPositionDisplay
@@ -85,6 +85,56 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("change local user", () => ((DummyAPIAccess)API).LocalUser.Value = new GuestUser());
             AddUntilStep("display hidden", () => display.Alpha, () => Is.EqualTo(0));
+        }
+
+        [Test]
+        public void TestTwoPlayers()
+        {
+            AddStep("create content", () =>
+            {
+                Children = new Drawable[]
+                {
+                    new DependencyProvidingContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        CachedDependencies =
+                        [
+                            (typeof(IGameplayLeaderboardProvider), leaderboardProvider = new TestGameplayLeaderboardProvider()),
+                            (typeof(GameplayState), gameplayState = TestGameplayState.Create(new OsuRuleset()))
+                        ],
+                        Child = display = new MultiplayerPositionDisplay
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        }
+                    }
+                };
+
+                score = leaderboardProvider.CreateLeaderboardScore(new BindableLong(), API.LocalUser.Value, true);
+                score.Position.BindTo(position);
+
+                var r = leaderboardProvider.CreateRandomScore(new APIUser());
+                r.Position.Value = 1;
+            });
+
+            AddStep("first place", () => position.Value = 1);
+            AddStep("second place", () => position.Value = 2);
+        }
+
+        public class TestGameplayLeaderboardProvider : IGameplayLeaderboardProvider
+        {
+            public BindableList<GameplayLeaderboardScore> Scores { get; } = new BindableList<GameplayLeaderboardScore>();
+
+            public GameplayLeaderboardScore CreateRandomScore(APIUser user) => CreateLeaderboardScore(new BindableLong(RNG.Next(0, 5_000_000)), user);
+
+            public GameplayLeaderboardScore CreateLeaderboardScore(BindableLong totalScore, APIUser user, bool isTracked = false)
+            {
+                var score = new GameplayLeaderboardScore(user, isTracked, totalScore);
+                Scores.Add(score);
+                return score;
+            }
+
+            IBindableList<GameplayLeaderboardScore> IGameplayLeaderboardProvider.Scores => Scores;
         }
     }
 }

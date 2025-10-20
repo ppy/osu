@@ -4,8 +4,6 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
-using osu.Game.Graphics.Carousel;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
 using osuTK;
@@ -83,7 +81,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(10);
             WaitForDrawablePanels();
 
-            SelectNextGroup();
+            SelectNextSet();
 
             object? selection = null;
 
@@ -91,7 +89,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             CheckHasSelection();
             AddAssert("drawable selection non-null", () => selection, () => Is.Not.Null);
-            AddAssert("drawable selection matches carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
+            AddAssert("drawable selection matches carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentGroupedBeatmap));
 
             RemoveAllBeatmaps();
             AddUntilStep("no drawable selection", GetSelectedPanel, () => Is.Null);
@@ -102,9 +100,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             CheckHasSelection();
             AddAssert("no drawable selection", GetSelectedPanel, () => Is.Null);
 
-            AddStep("add previous selection", () => BeatmapSets.Add(((BeatmapInfo)selection!).BeatmapSet!));
+            AddStep("add previous selection", () => BeatmapSets.Add(((GroupedBeatmap)selection!).Beatmap.BeatmapSet!));
 
-            AddAssert("selection matches original carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentSelection));
+            AddAssert("selection matches original carousel selection", () => selection, () => Is.EqualTo(Carousel.CurrentGroupedBeatmap));
             AddUntilStep("drawable selection restored", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(selection));
             AddAssert("carousel item is visible", () => GetSelectedPanel()?.Item?.IsVisible, () => Is.True);
         }
@@ -117,10 +115,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(total_set_count);
             WaitForDrawablePanels();
 
-            SelectNextGroup();
-            WaitForSelection(0, 0);
-            SelectPrevGroup();
-            WaitForSelection(total_set_count - 1, 0);
+            SelectNextSet();
+            WaitForSetSelection(0, 0);
+            SelectPrevSet();
+            WaitForSetSelection(total_set_count - 1, 0);
         }
 
         [Test]
@@ -131,10 +129,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(total_set_count);
             WaitForDrawablePanels();
 
-            SelectPrevGroup();
-            WaitForSelection(total_set_count - 1, 0);
-            SelectNextGroup();
-            WaitForSelection(0, 0);
+            SelectPrevSet();
+            WaitForSetSelection(total_set_count - 1, 0);
+            SelectNextSet();
+            WaitForSetSelection(0, 0);
         }
 
         [Test]
@@ -143,17 +141,49 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(10, 3);
             WaitForDrawablePanels();
 
-            SelectNextGroup();
-            SelectNextGroup();
-            WaitForSelection(1, 0);
+            SelectNextSet();
+            SelectNextSet();
+            WaitForSetSelection(1, 0);
 
             SelectPrevPanel();
-            SelectPrevGroup();
-            WaitForSelection(1, 0);
+            SelectPrevSet();
+            WaitForSetSelection(1, 0);
 
             SelectPrevPanel();
-            SelectNextGroup();
-            WaitForSelection(1, 0);
+            SelectNextSet();
+            WaitForSetSelection(1, 0);
+        }
+
+        [Test]
+        public void TestMultipleKeyboardOperationsPerFrame()
+        {
+            AddBeatmaps(10, 3);
+            WaitForDrawablePanels();
+
+            SelectNextSet();
+            WaitForSetSelection(0, 0);
+
+            SelectNextPanel();
+            SelectNextPanel();
+            SelectNextPanel();
+
+            AddStep("Press two keys at once", () =>
+            {
+                InputManager.Key(Key.Down);
+                InputManager.Key(Key.Right);
+            });
+
+            // Second key is respected, so only set selection changes.
+            WaitForSetSelection(1, 0);
+
+            AddStep("Press two keys at once", () =>
+            {
+                InputManager.Key(Key.Left);
+                InputManager.Key(Key.Up);
+            });
+
+            // Second key is respected, so only keyboard selection changes.
+            WaitForSetSelection(1, 0);
         }
 
         [Test]
@@ -169,25 +199,68 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             CheckNoSelection();
 
             Select();
-            WaitForSelection(3, 0);
+            WaitForSetSelection(3, 0);
 
             SelectNextPanel();
-            WaitForSelection(3, 0);
-
-            Select();
-            WaitForSelection(3, 1);
+            WaitForSetSelection(3, 1);
 
             SelectNextPanel();
-            WaitForSelection(3, 1);
-
-            Select();
-            WaitForSelection(3, 2);
+            WaitForSetSelection(3, 2);
 
             SelectNextPanel();
-            WaitForSelection(3, 2);
+            WaitForSetSelection(3, 2);
 
             Select();
-            WaitForSelection(4, 0);
+            WaitForSetSelection(4, 0);
+        }
+
+        [Test]
+        public void TestSingleItemTraversal()
+        {
+            CheckNoSelection();
+            AddBeatmaps(1, 3);
+
+            WaitForSetSelection(0, 0);
+            CheckActivationCount(0);
+
+            SelectNextSet();
+            WaitForSetSelection(0, 0);
+
+            CheckActivationCount(0);
+            CheckRequestPresentCount(0);
+
+            SelectPrevSet();
+            WaitForSetSelection(0, 0);
+
+            CheckActivationCount(0);
+            CheckRequestPresentCount(0);
+        }
+
+        [Test]
+        public void TestSingleItemTraversal_DifficultySplit()
+        {
+            SortBy(SortMode.Difficulty);
+
+            CheckNoSelection();
+            AddBeatmaps(1, 1);
+
+            WaitForSetSelection(0, 0);
+            CheckActivationCount(0);
+
+            SelectNextSet();
+            WaitForSetSelection(0, 0);
+
+            // In the case of a grouped beatmap set, the header gets activated and re-selects the recommended difficulty.
+            // This is probably fine.
+            CheckActivationCount(0);
+            // We don't want it to request present though, which would start gameplay.
+            CheckRequestPresentCount(0);
+
+            SelectPrevSet();
+            WaitForSetSelection(0, 0);
+
+            CheckActivationCount(0);
+            CheckRequestPresentCount(0);
         }
 
         [Test]
@@ -196,13 +269,13 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             SelectNextPanel();
             CheckNoSelection();
 
-            SelectNextGroup();
+            SelectNextSet();
             CheckNoSelection();
 
             SelectPrevPanel();
             CheckNoSelection();
 
-            SelectPrevGroup();
+            SelectPrevSet();
             CheckNoSelection();
         }
 
@@ -214,8 +287,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddAssert("no beatmaps visible", () => !GetVisiblePanels<PanelBeatmap>().Any());
 
-            // Clicks just above the first group panel should not actuate any action.
-            ClickVisiblePanelWithOffset<PanelBeatmapSet>(0, new Vector2(0, -(PanelBeatmapSet.HEIGHT / 2 + 1)));
+            ClickVisiblePanelWithOffset<PanelBeatmapSet>(0, new Vector2(0, -(PanelBeatmapSet.HEIGHT / 2 + BeatmapCarousel.SPACING + 1)));
 
             AddAssert("no beatmaps visible", () => !GetVisiblePanels<PanelBeatmap>().Any());
 
@@ -223,18 +295,20 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             ClickVisiblePanelWithOffset<PanelBeatmapSet>(0, new Vector2(0, -(PanelBeatmapSet.HEIGHT / 2 - 1)));
 
             AddUntilStep("wait for beatmaps visible", () => GetVisiblePanels<PanelBeatmap>().Any());
-            WaitForSelection(0, 0);
+            WaitForSetSelection(0, 0);
 
             // Beatmap panels expand their selection area to cover holes from spacing.
-            ClickVisiblePanelWithOffset<PanelBeatmap>(1, new Vector2(0, -(CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
-            WaitForSelection(0, 0);
+            ClickVisiblePanelWithOffset<PanelBeatmap>(0, new Vector2(0, -(PanelBeatmap.HEIGHT / 2 + 1)));
+            WaitForSetSelection(0, 0);
 
-            // Panels with higher depth will handle clicks in the gutters for simplicity.
-            ClickVisiblePanelWithOffset<PanelBeatmap>(2, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
-            WaitForSelection(0, 2);
+            ClickVisiblePanelWithOffset<PanelBeatmap>(2, new Vector2(0, (PanelBeatmap.HEIGHT / 2 + 1)));
+            WaitForSetSelection(0, 2);
 
-            ClickVisiblePanelWithOffset<PanelBeatmap>(3, new Vector2(0, (CarouselItem.DEFAULT_HEIGHT / 2 + 1)));
-            WaitForSelection(0, 3);
+            ClickVisiblePanelWithOffset<PanelBeatmap>(2, new Vector2(0, -(PanelBeatmap.HEIGHT / 2 + 1)));
+            WaitForSetSelection(0, 2);
+
+            ClickVisiblePanelWithOffset<PanelBeatmap>(3, new Vector2(0, (PanelBeatmap.HEIGHT / 2 + 1)));
+            WaitForSetSelection(0, 3);
         }
 
         [Test]
@@ -243,35 +317,87 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddBeatmaps(2, 3);
             WaitForDrawablePanels();
 
-            SortAndGroupBy(SortMode.Difficulty, GroupMode.All);
-            WaitForFiltering();
+            SortAndGroupBy(SortMode.Difficulty, GroupMode.None);
 
             AddUntilStep("standalone panels displayed", () => GetVisiblePanels<PanelBeatmapStandalone>().Any());
 
-            SelectNextGroup();
+            SelectNextSet();
             // both sets have a difficulty with 0.00* star rating.
             // in the case of a tie when sorting, the first tie-breaker is `DateAdded` descending, which will pick the last set added (see `TestResources.CreateTestBeatmapSetInfo()`).
-            WaitForSelection(1, 0);
+            WaitForSetSelection(1, 0);
 
-            SelectNextGroup();
-            WaitForSelection(0, 0);
+            SelectNextSet();
+            WaitForSetSelection(0, 0);
 
             SelectNextPanel();
             Select();
-            WaitForSelection(1, 1);
+            WaitForSetSelection(1, 1);
+        }
+
+        [Test]
+        public void TestPanelChangesFromStandaloneToNormal()
+        {
+            AddBeatmaps(1, 3);
+            WaitForDrawablePanels();
+
+            SortBy(SortMode.Difficulty);
+
+            AddUntilStep("standalone panels displayed", () => GetVisiblePanels<PanelBeatmapStandalone>().Count(), () => Is.EqualTo(3));
+
+            WaitForSetSelection(0, 0);
+
+            SortBy(SortMode.Title);
+
+            AddUntilStep("set panel displayed", () => GetVisiblePanels<PanelBeatmapSet>().Count(), () => Is.EqualTo(1));
+            AddUntilStep("normal panels displayed", () => GetVisiblePanels<PanelBeatmap>().Count(), () => Is.EqualTo(3));
+            AddUntilStep("standalone panels not displayed", () => GetVisiblePanels<PanelBeatmapStandalone>().Count(), () => Is.EqualTo(0));
+        }
+
+        [Test]
+        public void TestRecommendedSelection()
+        {
+            AddBeatmaps(5, 3);
+            WaitForDrawablePanels();
+
+            AddStep("set recommendation algorithm", () => BeatmapRecommendationFunction = beatmaps => beatmaps.Last());
+
+            SelectPrevSet();
+
+            // check recommended was selected
+            SelectNextSet();
+            WaitForSetSelection(0, 2);
+
+            // change away from recommended
+            SelectPrevPanel();
+            Select();
+            WaitForSetSelection(0, 1);
+
+            // next set, check recommended
+            SelectNextSet();
+            WaitForSetSelection(1, 2);
+
+            // next set, check recommended
+            SelectNextSet();
+            WaitForSetSelection(2, 2);
+
+            // go back to first set and ensure user selection was retained
+            // todo: we don't do that yet. not sure if we will continue to have this.
+            // SelectPrevSet();
+            // SelectPrevSet();
+            // WaitForSetSelection(0, 1);
         }
 
         private void checkSelectionIterating(bool isIterating)
         {
-            object? selection = null;
+            GroupedBeatmap? selection = null;
 
             for (int i = 0; i < 3; i++)
             {
-                AddStep("store selection", () => selection = Carousel.CurrentSelection);
+                AddStep("store selection", () => selection = Carousel.CurrentGroupedBeatmap);
                 if (isIterating)
-                    AddUntilStep("selection changed", () => Carousel.CurrentSelection != selection);
+                    AddUntilStep("selection changed", () => Carousel.CurrentGroupedBeatmap != selection);
                 else
-                    AddUntilStep("selection not changed", () => Carousel.CurrentSelection == selection);
+                    AddUntilStep("selection not changed", () => Carousel.CurrentGroupedBeatmap == selection);
             }
         }
     }

@@ -51,7 +51,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         private bool animationBegan;
 
-        private IBindable<StarDifficulty?> starDifficulty = null!;
+        private IBindable<StarDifficulty> starDifficulty = null!;
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
@@ -316,11 +316,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             };
 
             starDifficulty = difficultyCache.GetBindableDifficulty(beatmap);
-            starDifficulty.BindValueChanged(star =>
-            {
-                if (star.NewValue != null)
-                    starRatingDisplay.Current.Value = star.NewValue.Value;
-            }, true);
+            starDifficulty.BindValueChanged(star => starRatingDisplay.Current.Value = star.NewValue, true);
 
             LoadComponentAsync(new OnlineBeatmapSetCover(beatmap.BeatmapSet as IBeatmapSetOnlineInfo)
             {

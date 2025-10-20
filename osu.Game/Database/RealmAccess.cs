@@ -98,13 +98,18 @@ namespace osu.Game.Database
         /// 46   2024-12-26    Change beat snap divisor bindings to match stable directionality ¯\_(ツ)_/¯.
         /// 47   2025-01-21    Remove right mouse button binding for absolute scroll. Never use mouse buttons (or scroll) for global actions.
         /// 48   2025-03-19    Clear online status for all qualified beatmaps (some were stuck in a qualified state due to local caching issues).
+        /// 49   2025-06-10    Reset the LegacyOnlineID to -1 for all scores that have it set to 0 (which is semantically the same) for consistency of handling with OnlineID.
+        /// 50   2025-07-11    Add UserTags to BeatmapMetadata.
+        /// 51   2025-07-22    Add ScoreInfo.Pauses.
         /// </summary>
-        private const int schema_version = 48;
+        private const int schema_version = 51;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
         /// </summary>
         private readonly SemaphoreSlim realmRetrievalLock = new SemaphoreSlim(1);
+
+        private readonly CountdownEvent pendingAsyncOperations = new CountdownEvent(0);
 
         /// <summary>
         /// <c>true</c> when the current thread has already entered the <see cref="realmRetrievalLock"/>.
@@ -465,6 +470,30 @@ namespace osu.Game.Database
         }
 
         /// <summary>
+        /// Run work on realm on a TPL thread, in a way that ensures that the realm isn't disposed before the work is done.
+        /// </summary>
+        public Task<T> RunAsync<T>(Func<Realm, T> action, CancellationToken token = default)
+        {
+            ObjectDisposedException.ThrowIf(isDisposed, this);
+
+            // Required to ensure the read is tracked and accounted for before disposal.
+            // Can potentially be avoided if we have a need to do so in the future.
+            if (!ThreadSafety.IsUpdateThread)
+                throw new InvalidOperationException($@"{nameof(RunAsync)} must be called from the update thread.");
+
+            // CountdownEvent will fail if already at zero.
+            if (!pendingAsyncOperations.TryAddCount())
+                pendingAsyncOperations.Reset(1);
+
+            return Task.Run(() =>
+            {
+                var result = Run(action);
+                pendingAsyncOperations.Signal();
+                return result;
+            }, token);
+        }
+
+        /// <summary>
         /// Write changes to realm.
         /// </summary>
         /// <param name="action">The work to run.</param>
@@ -504,8 +533,6 @@ namespace osu.Game.Database
             }
         }
 
-        private readonly CountdownEvent pendingAsyncWrites = new CountdownEvent(0);
-
         /// <summary>
         /// Write changes to realm asynchronously, guaranteeing order of execution.
         /// </summary>
@@ -520,8 +547,8 @@ namespace osu.Game.Database
                 throw new InvalidOperationException(@$"{nameof(WriteAsync)} must be called from the update thread.");
 
             // CountdownEvent will fail if already at zero.
-            if (!pendingAsyncWrites.TryAddCount())
-                pendingAsyncWrites.Reset(1);
+            if (!pendingAsyncOperations.TryAddCount())
+                pendingAsyncOperations.Reset(1);
 
             // Regardless of calling Realm.GetInstance or Realm.GetInstanceAsync, there is a blocking overhead on retrieval.
             // Adding a forced Task.Run resolves this.
@@ -536,7 +563,45 @@ namespace osu.Game.Database
                     // ReSharper disable once AccessToDisposedClosure (WriteAsync should be marked as [InstantHandle]).
                     await realm.WriteAsync(() => action(realm)).ConfigureAwait(false);
 
-                pendingAsyncWrites.Signal();
+                pendingAsyncOperations.Signal();
+            });
+
+            return writeTask;
+        }
+
+        /// <summary>
+        /// Write changes to realm asynchronously, guaranteeing order of execution.
+        /// </summary>
+        /// <param name="action">The work to run.</param>
+        public Task<T> WriteAsync<T>(Func<Realm, T> action)
+        {
+            ObjectDisposedException.ThrowIf(isDisposed, this);
+
+            // Required to ensure the write is tracked and accounted for before disposal.
+            // Can potentially be avoided if we have a need to do so in the future.
+            if (!ThreadSafety.IsUpdateThread)
+                throw new InvalidOperationException(@$"{nameof(WriteAsync)} must be called from the update thread.");
+
+            // CountdownEvent will fail if already at zero.
+            if (!pendingAsyncOperations.TryAddCount())
+                pendingAsyncOperations.Reset(1);
+
+            // Regardless of calling Realm.GetInstance or Realm.GetInstanceAsync, there is a blocking overhead on retrieval.
+            // Adding a forced Task.Run resolves this.
+            var writeTask = Task.Run(async () =>
+            {
+                T result;
+                total_writes_async.Value++;
+
+                // Not attempting to use Realm.GetInstanceAsync as there's seemingly no benefit to us (for now) and it adds complexity due to locking
+                // concerns in getRealmInstance(). On a quick check, it looks to be more suited to cases where realm is connecting to an online sync
+                // server, which we don't use. May want to report upstream or revisit in the future.
+                using (var realm = getRealmInstance())
+                    // ReSharper disable once AccessToDisposedClosure (WriteAsync should be marked as [InstantHandle]).
+                    result = await realm.WriteAsync(() => action(realm)).ConfigureAwait(false);
+
+                pendingAsyncOperations.Signal();
+                return result;
             });
 
             return writeTask;
@@ -1255,6 +1320,12 @@ namespace osu.Game.Database
                     foreach (var beatmap in beatmaps)
                         beatmap.ResetOnlineInfo(resetOnlineId: false);
                     break;
+
+                case 49:
+                    foreach (var score in migration.NewRealm.All<ScoreInfo>().Where(s => s.LegacyOnlineID == 0))
+                        score.LegacyOnlineID = -1;
+
+                    break;
             }
 
             Logger.Log($"Migration completed in {stopwatch.ElapsedMilliseconds}ms");
@@ -1447,7 +1518,7 @@ namespace osu.Game.Database
 
         public void Dispose()
         {
-            if (!pendingAsyncWrites.Wait(10000))
+            if (!pendingAsyncOperations.Wait(10000))
                 Logger.Log("Realm took too long waiting on pending async writes", level: LogLevel.Error);
 
             updateRealm?.Dispose();

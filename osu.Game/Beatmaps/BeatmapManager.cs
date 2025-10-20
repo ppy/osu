@@ -218,23 +218,36 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Delete a beatmap difficulty.
+        /// Hide a beatmap difficulty.
+        /// Will fail if all difficulties are about to be hidden.
         /// </summary>
         /// <param name="beatmapInfo">The beatmap difficulty to hide.</param>
-        public void Hide(BeatmapInfo beatmapInfo)
+        public bool Hide(BeatmapInfo beatmapInfo)
         {
-            Realm.Run(r =>
+            return Realm.Run(r =>
             {
                 using (var transaction = r.BeginWrite())
                 {
                     if (!beatmapInfo.IsManaged)
                         beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
 
+                    if (!CanHide(beatmapInfo))
+                        return false;
+
                     beatmapInfo.Hidden = true;
                     transaction.Commit();
+                    return true;
                 }
             });
         }
+
+        public bool CanHide(BeatmapInfo beatmapInfo) => Realm.Run(r =>
+        {
+            if (!beatmapInfo.IsManaged)
+                beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
+
+            return beatmapInfo.BeatmapSet!.Beatmaps.Count(b => !b.Hidden) > 1;
+        });
 
         /// <summary>
         /// Restore a beatmap difficulty.
@@ -271,6 +284,7 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
+        /// IMPORTANT: This should not be used outside of tests. Consider using <see cref="RealmDetachedBeatmapStore"/> instead.
         /// </summary>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
         public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
@@ -550,6 +564,16 @@ namespace osu.Game.Beatmaps
 
             var beatmap = r.Find<BeatmapInfo>(beatmapSetInfo.ID)!;
             beatmap.LastPlayed = DateTimeOffset.Now;
+
+            transaction.Commit();
+        });
+
+        public void MarkNotPlayed(BeatmapInfo beatmapSetInfo) => Realm.Run(r =>
+        {
+            using var transaction = r.BeginWrite();
+
+            var beatmap = r.Find<BeatmapInfo>(beatmapSetInfo.ID)!;
+            beatmap.LastPlayed = null;
 
             transaction.Commit();
         });

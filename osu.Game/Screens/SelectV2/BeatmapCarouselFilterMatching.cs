@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Screens.Select;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -16,9 +17,6 @@ namespace osu.Game.Screens.SelectV2
     {
         private readonly Func<FilterCriteria> getCriteria;
 
-        /// <summary>
-        /// The total number of beatmap difficulties displayed post filter.
-        /// </summary>
         public int BeatmapItemsCount { get; private set; }
 
         public BeatmapCarouselFilterMatching(Func<FilterCriteria> getCriteria)
@@ -41,21 +39,22 @@ namespace osu.Game.Screens.SelectV2
             {
                 var beatmap = (BeatmapInfo)item.Model;
 
-                if (checkMatch(beatmap, criteria))
-                {
-                    countMatching++;
-                    yield return item;
-                }
+                if (beatmap.Hidden)
+                    continue;
+
+                if (!checkCriteriaMatch(beatmap, criteria))
+                    continue;
+
+                countMatching++;
+                yield return item;
             }
 
             BeatmapItemsCount = countMatching;
         }
 
-        private static bool checkMatch(BeatmapInfo beatmap, FilterCriteria criteria)
+        private static bool checkCriteriaMatch(BeatmapInfo beatmap, FilterCriteria criteria)
         {
-            bool match = criteria.Ruleset == null ||
-                         beatmap.Ruleset.ShortName == criteria.Ruleset.ShortName ||
-                         (beatmap.Ruleset.OnlineID == 0 && criteria.Ruleset.OnlineID != 0 && criteria.AllowConvertedBeatmaps);
+            bool match = criteria.Ruleset == null || beatmap.AllowGameplayWithRuleset(criteria.Ruleset!, criteria.AllowConvertedBeatmaps);
 
             if (beatmap.BeatmapSet?.Equals(criteria.SelectedBeatmapSet) == true)
             {
@@ -80,7 +79,7 @@ namespace osu.Game.Screens.SelectV2
 
             if (!match) return false;
 
-            match &= !criteria.StarDifficulty.HasFilter || criteria.StarDifficulty.IsInRange(beatmap.StarRating);
+            match &= !criteria.StarDifficulty.HasFilter || criteria.StarDifficulty.IsInRange(beatmap.StarRating.FloorToDecimalDigits(2));
             match &= !criteria.ApproachRate.HasFilter || criteria.ApproachRate.IsInRange(beatmap.Difficulty.ApproachRate);
             match &= !criteria.DrainRate.HasFilter || criteria.DrainRate.IsInRange(beatmap.Difficulty.DrainRate);
             match &= !criteria.CircleSize.HasFilter || criteria.CircleSize.IsInRange(beatmap.Difficulty.CircleSize);
@@ -97,12 +96,51 @@ namespace osu.Game.Screens.SelectV2
             if (!match) return false;
 
             match &= !criteria.Creator.HasFilter || criteria.Creator.Matches(beatmap.Metadata.Author.Username);
-            match &= !criteria.Artist.HasFilter || criteria.Artist.Matches(beatmap.Metadata.Artist) ||
-                     criteria.Artist.Matches(beatmap.Metadata.ArtistUnicode);
-            match &= !criteria.Title.HasFilter || criteria.Title.Matches(beatmap.Metadata.Title) ||
-                     criteria.Title.Matches(beatmap.Metadata.TitleUnicode);
+
+            if (criteria.Artist.HasFilter)
+            {
+                if (criteria.Artist.ExcludeTerm)
+                    match &= criteria.Artist.Matches(beatmap.Metadata.Artist) && criteria.Artist.Matches(beatmap.Metadata.ArtistUnicode);
+                else
+                    match &= criteria.Artist.Matches(beatmap.Metadata.Artist) || criteria.Artist.Matches(beatmap.Metadata.ArtistUnicode);
+            }
+
+            if (criteria.Title.HasFilter)
+            {
+                if (criteria.Title.ExcludeTerm)
+                    match &= criteria.Title.Matches(beatmap.Metadata.Title) && criteria.Title.Matches(beatmap.Metadata.TitleUnicode);
+                else
+                    match &= criteria.Title.Matches(beatmap.Metadata.Title) || criteria.Title.Matches(beatmap.Metadata.TitleUnicode);
+            }
+
             match &= !criteria.DifficultyName.HasFilter || criteria.DifficultyName.Matches(beatmap.DifficultyName);
             match &= !criteria.Source.HasFilter || criteria.Source.Matches(beatmap.Metadata.Source);
+
+            if (criteria.UserTags.Any())
+            {
+                foreach (var tagFilter in criteria.UserTags)
+                {
+                    if (tagFilter.ExcludeTerm)
+                    {
+                        // if `ExcludeTerm` is true, `Matches()` will return true if a user tag *doesn't match* the excluded term.
+                        // thus, every user tag must pass this filter.
+                        foreach (string tag in beatmap.Metadata.UserTags)
+                            match &= tagFilter.Matches(tag);
+                    }
+                    else
+                    {
+                        // if `ExcludeTerm` is false, `Matches()` will return true if a user tag *matches* the expected term.
+                        // the expected behaviour is that a beatmap should be displayed if at least one of the user tags passes the filter.
+                        bool anyTagMatched = false;
+
+                        foreach (string tag in beatmap.Metadata.UserTags)
+                            anyTagMatched |= tagFilter.Matches(tag);
+
+                        match &= anyTagMatched;
+                    }
+                }
+            }
+
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(beatmap.StarRating);
 
             if (!match) return false;

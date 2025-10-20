@@ -40,19 +40,27 @@ namespace osu.Game.Rulesets.Taiko.Tests
         public void TestRecording()
         {
             seekTo(0);
-            AddStep("press D", () => InputManager.Key(Key.D));
+            AddStep("press D", () => InputManager.PressKey(Key.D));
+            seekTo(15);
+            AddStep("release D", () => InputManager.ReleaseKey(Key.D));
             AddAssert("left rim press recorded to replay", () => Player.Score.Replay.Frames.OfType<TaikoReplayFrame>().Any(f => f.Actions.SequenceEqual([TaikoAction.LeftRim])));
 
             seekTo(5000);
-            AddStep("press F", () => InputManager.Key(Key.F));
+            AddStep("press F", () => InputManager.PressKey(Key.F));
+            seekTo(5015);
+            AddStep("release F", () => InputManager.ReleaseKey(Key.F));
             AddAssert("left centre press recorded to replay", () => Player.Score.Replay.Frames.OfType<TaikoReplayFrame>().Any(f => f.Actions.SequenceEqual([TaikoAction.LeftCentre])));
 
             seekTo(10000);
-            AddStep("press J", () => InputManager.Key(Key.J));
+            AddStep("press J", () => InputManager.PressKey(Key.J));
+            seekTo(10015);
+            AddStep("release J", () => InputManager.ReleaseKey(Key.J));
             AddAssert("right centre press recorded to replay", () => Player.Score.Replay.Frames.OfType<TaikoReplayFrame>().Any(f => f.Actions.SequenceEqual([TaikoAction.RightCentre])));
 
-            seekTo(10000);
-            AddStep("press K", () => InputManager.Key(Key.K));
+            seekTo(15000);
+            AddStep("press K", () => InputManager.PressKey(Key.K));
+            seekTo(15015);
+            AddStep("release K", () => InputManager.ReleaseKey(Key.K));
             AddAssert("right rim press recorded to replay", () => Player.Score.Replay.Frames.OfType<TaikoReplayFrame>().Any(f => f.Actions.SequenceEqual([TaikoAction.RightRim])));
         }
 

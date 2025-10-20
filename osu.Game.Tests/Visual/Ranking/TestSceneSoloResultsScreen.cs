@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -90,13 +91,14 @@ namespace osu.Game.Tests.Visual.Ranking
                 localScore = TestResources.CreateTestScoreInfo(importedBeatmap);
                 localScore.TotalScore = 151_000;
                 localScore.Position = null;
+                localScore.User = API.LocalUser.Value;
                 scoreManager.Import(localScore);
                 localScore = localScore.Detach();
             });
 
             AddStep("show results", () => LoadScreen(new SoloResultsScreen(localScore)));
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
-            AddAssert("local score is #16", () => this.ChildrenOfType<ScorePanelList>().Single().GetPanelForScore(localScore).ScorePosition.Value, () => Is.EqualTo(16));
+            AddUntilStep("local score is #16", () => this.ChildrenOfType<ScorePanelList>().Single().GetPanelForScore(localScore).ScorePosition.Value, () => Is.EqualTo(16));
         }
 
         [Test]
@@ -119,13 +121,14 @@ namespace osu.Game.Tests.Visual.Ranking
                 localScore.TotalScore = 151_000;
                 localScore.OnlineID = 30;
                 localScore.Position = null;
+                localScore.User = API.LocalUser.Value;
                 scoreManager.Import(localScore);
                 localScore = localScore.Detach();
             });
 
             AddStep("show results", () => LoadScreen(new SoloResultsScreen(localScore)));
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
-            AddAssert("local score is #16", () => this.ChildrenOfType<ScorePanelList>().Single().GetPanelForScore(localScore).ScorePosition.Value, () => Is.EqualTo(16));
+            AddUntilStep("local score is #16", () => this.ChildrenOfType<ScorePanelList>().Single().GetPanelForScore(localScore).ScorePosition.Value, () => Is.EqualTo(16));
         }
 
         [Test]
@@ -161,10 +164,11 @@ namespace osu.Game.Tests.Visual.Ranking
                 localScore = TestResources.CreateTestScoreInfo(importedBeatmap);
                 localScore.TotalScore = 151_000;
                 localScore.Position = null;
+                localScore.User = API.LocalUser.Value;
                 LoadScreen(new SoloResultsScreen(localScore));
             });
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
-            AddAssert("local score is #16", () => this.ChildrenOfType<ScorePanelList>().Single().GetPanelForScore(localScore).ScorePosition.Value, () => Is.EqualTo(16));
+            AddUntilStep("local score is #16", () => this.ChildrenOfType<ScorePanelList>().Single().GetPanelForScore(localScore).ScorePosition.Value, () => Is.EqualTo(16));
         }
 
         [Test]
@@ -211,11 +215,69 @@ namespace osu.Game.Tests.Visual.Ranking
                 localScore = TestResources.CreateTestScoreInfo(importedBeatmap);
                 localScore.TotalScore = 151_000;
                 localScore.Position = null;
+                localScore.User = API.LocalUser.Value;
                 LoadScreen(new SoloResultsScreen(localScore));
             });
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
-            AddAssert("local score is #16", () => this.ChildrenOfType<ScorePanelList>().Single().GetPanelForScore(localScore).ScorePosition.Value, () => Is.EqualTo(16));
+            AddUntilStep("local score is #16", () => this.ChildrenOfType<ScorePanelList>().Single().GetPanelForScore(localScore).ScorePosition.Value, () => Is.EqualTo(16));
             AddAssert("previous user best not shown", () => this.ChildrenOfType<ScorePanel>().All(p => p.Score.OnlineID != 123456));
+        }
+
+        [Test]
+        public void TestOnlineLeaderboardWithLessThan50Scores_ShowingAnotherUserScore()
+        {
+            var scores = new List<ScoreInfo>();
+            var soloScores = new List<SoloScoreInfo>();
+
+            AddStep("set leaderboard to global", () => leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(importedBeatmap, importedBeatmap.Ruleset, BeatmapLeaderboardScope.Global, null)));
+            AddStep("set up request handling", () =>
+            {
+                for (int i = 0; i < 30; ++i)
+                {
+                    var score = TestResources.CreateTestScoreInfo(importedBeatmap);
+                    score.TotalScore = 10_000 * (30 - i);
+                    score.Position = i + 1;
+                    score.User = new APIUser { Id = i };
+                    score.BeatmapInfo = new BeatmapInfo
+                    {
+                        OnlineID = 123123,
+                        Status = BeatmapOnlineStatus.Ranked,
+                    };
+                    score.OnlineID = i;
+                    scores.Add(score);
+
+                    var soloScore = SoloScoreInfo.ForSubmission(score);
+                    soloScore.ID = (ulong)i;
+                    soloScores.Add(soloScore);
+                }
+
+                scores[^1].User = API.LocalUser.Value;
+                soloScores[^1].UserID = API.LocalUser.Value.OnlineID;
+
+                dummyAPI.HandleRequest = req =>
+                {
+                    switch (req)
+                    {
+                        case GetScoresRequest getScoresRequest:
+                            getScoresRequest.TriggerSuccess(new APIScoresCollection
+                            {
+                                Scores = soloScores,
+                                UserScore = new APIScoreWithPosition
+                                {
+                                    Score = soloScores[^1],
+                                    Position = 30
+                                }
+                            });
+                            return true;
+                    }
+
+                    return false;
+                };
+            });
+
+            AddStep("show results", () => LoadScreen(new SoloResultsScreen(scores[0])));
+            AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
+            AddAssert("local user best shown", () => this.ChildrenOfType<ScorePanel>().Any(p => p.Score.UserID == API.LocalUser.Value.Id));
         }
 
         [Test]
@@ -251,10 +313,11 @@ namespace osu.Game.Tests.Visual.Ranking
                 localScore = TestResources.CreateTestScoreInfo(importedBeatmap);
                 localScore.TotalScore = 151_000;
                 localScore.Position = null;
+                localScore.User = API.LocalUser.Value;
                 LoadScreen(new SoloResultsScreen(localScore));
             });
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
-            AddAssert("local score is #31", () => this.ChildrenOfType<ScorePanelList>().Single().GetPanelForScore(localScore).ScorePosition.Value, () => Is.EqualTo(31));
+            AddUntilStep("local score is #31", () => this.ChildrenOfType<ScorePanelList>().Single().GetPanelForScore(localScore).ScorePosition.Value, () => Is.EqualTo(31));
         }
 
         [Test]
@@ -302,11 +365,12 @@ namespace osu.Game.Tests.Visual.Ranking
                 localScore = TestResources.CreateTestScoreInfo(importedBeatmap);
                 localScore.TotalScore = 31_000;
                 localScore.Position = null;
+                localScore.User = API.LocalUser.Value;
                 LoadScreen(new SoloResultsScreen(localScore));
             });
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
             AddAssert("local score has no position", () => this.ChildrenOfType<ScorePanelList>().Single().GetPanelForScore(localScore).ScorePosition.Value, () => Is.Null);
-            AddAssert("previous user best shown at same position", () => this.ChildrenOfType<ScorePanel>().Any(p => p.Score.OnlineID == 123456 && p.ScorePosition.Value == 133_337));
+            AddUntilStep("previous user best shown at same position", () => this.ChildrenOfType<ScorePanel>().Any(p => p.Score.OnlineID == 123456 && p.ScorePosition.Value == 133_337));
         }
 
         [Test]
@@ -355,6 +419,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 localScore = TestResources.CreateTestScoreInfo(importedBeatmap);
                 localScore.TotalScore = 151_000;
                 localScore.Position = null;
+                localScore.User = API.LocalUser.Value;
                 LoadScreen(new SoloResultsScreen(localScore));
             });
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
@@ -408,10 +473,11 @@ namespace osu.Game.Tests.Visual.Ranking
                 localScore = TestResources.CreateTestScoreInfo(importedBeatmap);
                 localScore.TotalScore = 651_000;
                 localScore.Position = null;
+                localScore.User = API.LocalUser.Value;
                 LoadScreen(new SoloResultsScreen(localScore));
             });
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
-            AddAssert("local score is #36", () => this.ChildrenOfType<ScorePanelList>().Single().GetPanelForScore(localScore).ScorePosition.Value, () => Is.EqualTo(36));
+            AddUntilStep("local score is #36", () => this.ChildrenOfType<ScorePanelList>().Single().GetPanelForScore(localScore).ScorePosition.Value, () => Is.EqualTo(36));
             AddAssert("previous user best not shown", () => this.ChildrenOfType<ScorePanel>().All(p => p.Score.OnlineID != 123456));
         }
 
@@ -459,11 +525,20 @@ namespace osu.Game.Tests.Visual.Ranking
                 localScore.TotalScore = 151_000;
                 localScore.OnlineID = 12345;
                 localScore.Position = null;
+                localScore.User = API.LocalUser.Value;
                 LoadScreen(new SoloResultsScreen(localScore));
             });
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
             AddAssert("only one score with ID 12345", () => this.ChildrenOfType<ScorePanel>().Count(s => s.Score.OnlineID == 12345), () => Is.EqualTo(1));
-            AddAssert("user best position preserved", () => this.ChildrenOfType<ScorePanel>().Any(p => p.ScorePosition.Value == 133_337));
+            AddUntilStep("user best position preserved", () => this.ChildrenOfType<ScorePanel>().Any(p => p.ScorePosition.Value == 133_337));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesetStore.IsNotNull())
+                rulesetStore.Dispose();
         }
     }
 }

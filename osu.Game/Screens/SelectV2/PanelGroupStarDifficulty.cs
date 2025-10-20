@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -10,13 +11,15 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Beatmaps;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -31,6 +34,7 @@ namespace osu.Game.Screens.SelectV2
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
         private Drawable iconContainer = null!;
+        private Box backgroundBorder = null!;
         private Box contentBackground = null!;
         private OsuSpriteText starRatingText = null!;
         private CircularContainer countPill = null!;
@@ -47,6 +51,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 AlwaysPresent = true,
                 RelativeSizeAxes = Axes.Y,
+                Alpha = 0f,
                 Child = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
@@ -55,31 +60,33 @@ namespace osu.Game.Screens.SelectV2
                     Size = new Vector2(12),
                 },
             };
-            Background = new Container
+
+            Background = backgroundBorder = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    contentBackground = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    triangles = new TrianglesV2
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Thickness = 0.02f,
-                        SpawnRatio = 0.6f,
-                    },
-                    glow = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Width = 0.5f,
-                    },
-                },
+                Colour = colourProvider.Highlight1,
             };
+
             AccentColour = colourProvider.Highlight1;
             Content.Children = new Drawable[]
             {
+                contentBackground = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
+                triangles = new TrianglesV2
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Thickness = 0.02f,
+                    SpawnRatio = 0.6f,
+                    Colour = ColourInfo.GradientHorizontal(colourProvider.Background6, colourProvider.Background5)
+                },
+                glow = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 0.5f,
+                    Colour = ColourInfo.GradientHorizontal(colourProvider.Highlight1, colourProvider.Highlight1.Opacity(0f)),
+                },
                 new FillFlowContainer
                 {
                     Anchor = Anchor.CentreLeft,
@@ -139,13 +146,13 @@ namespace osu.Game.Screens.SelectV2
 
             Debug.Assert(Item != null);
 
-            var group = (GroupDefinition)Item.Model;
-            var stars = (StarDifficulty)group.Data;
-            int starNumber = (int)stars.Stars;
+            var group = (StarDifficultyGroupDefinition)Item.Model;
+            int starNumber = (int)group.Difficulty.Stars;
 
             ratingColour = starNumber >= 9 ? OsuColour.Gray(0.2f) : colours.ForStarDifficulty(starNumber);
 
             AccentColour = ratingColour;
+            backgroundBorder.Colour = ratingColour;
             contentBackground.Colour = ratingColour.Darken(1f);
             glow.Colour = ColourInfo.GradientHorizontal(ratingColour, ratingColour.Opacity(0f));
 
@@ -198,6 +205,20 @@ namespace osu.Game.Screens.SelectV2
 
             // Move the count pill in the opposite direction to keep it pinned to the screen regardless of the X position of TopLevelContent.
             countPill.X = -TopLevelContent.X;
+        }
+
+        public override MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                if (Item == null)
+                    return Array.Empty<MenuItem>();
+
+                return new MenuItem[]
+                {
+                    new OsuMenuItem(Expanded.Value ? WebCommonStrings.ButtonsCollapse.ToSentence() : WebCommonStrings.ButtonsExpand.ToSentence(), MenuItemType.Highlighted, () => TriggerClick())
+                };
+            }
         }
     }
 }

@@ -1,21 +1,26 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -42,6 +47,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 AlwaysPresent = true,
                 RelativeSizeAxes = Axes.Y,
+                Alpha = 0f,
                 Child = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
@@ -51,34 +57,34 @@ namespace osu.Game.Screens.SelectV2
                     Colour = colourProvider.Background3,
                 },
             };
-            Background = new Container
+
+            Background = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background5,
-                    },
-                    triangles = new TrianglesV2
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Thickness = 0.02f,
-                        SpawnRatio = 0.6f,
-                        Colour = ColourInfo.GradientHorizontal(colourProvider.Background6, colourProvider.Background5)
-                    },
-                    glow = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Width = 0.5f,
-                        Colour = ColourInfo.GradientHorizontal(colourProvider.Highlight1, colourProvider.Highlight1.Opacity(0f)),
-                    },
-                },
+                Colour = colourProvider.Highlight1,
             };
+
             AccentColour = colourProvider.Highlight1;
             Content.Children = new Drawable[]
             {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background5,
+                },
+                triangles = new TrianglesV2
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Thickness = 0.02f,
+                    SpawnRatio = 0.6f,
+                    Colour = ColourInfo.GradientHorizontal(colourProvider.Background6, colourProvider.Background5)
+                },
+                glow = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 0.5f,
+                    Colour = ColourInfo.GradientHorizontal(colourProvider.Highlight1, colourProvider.Highlight1.Opacity(0f)),
+                },
                 titleText = new OsuSpriteText
                 {
                     Anchor = Anchor.CentreLeft,
@@ -147,12 +153,26 @@ namespace osu.Game.Screens.SelectV2
             countText.Text = Item.NestedItemCount.ToString("N0");
         }
 
-        protected override void Update()
+        protected override void UpdateAfterChildren()
         {
-            base.Update();
+            base.UpdateAfterChildren();
 
             // Move the count pill in the opposite direction to keep it pinned to the screen regardless of the X position of TopLevelContent.
             countPill.X = -TopLevelContent.X;
+        }
+
+        public override MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                if (Item == null)
+                    return Array.Empty<MenuItem>();
+
+                return new MenuItem[]
+                {
+                    new OsuMenuItem(Expanded.Value ? WebCommonStrings.ButtonsCollapse.ToSentence() : WebCommonStrings.ButtonsExpand.ToSentence(), MenuItemType.Highlighted, () => TriggerClick())
+                };
+            }
         }
     }
 }

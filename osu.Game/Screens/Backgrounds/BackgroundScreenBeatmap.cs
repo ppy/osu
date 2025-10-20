@@ -113,9 +113,7 @@ namespace osu.Game.Screens.Backgrounds
             }
 
             b.Depth = newDepth;
-            b.Anchor = b.Origin = Anchor.Centre;
             b.FadeInFromZero(500, Easing.OutQuint);
-            b.ScaleTo(1.02f).ScaleTo(1, 3500, Easing.OutQuint);
             dimmable.Background = Background = b;
         }
 

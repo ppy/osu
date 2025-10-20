@@ -469,5 +469,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Ruleset = rulesets.GetRuleset(3).AsNonNull()
             }
         };
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
+        }
     }
 }

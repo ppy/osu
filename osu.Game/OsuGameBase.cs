@@ -83,8 +83,6 @@ namespace osu.Game
 
         public const string OSU_PROTOCOL = "osu://";
 
-        public const string CLIENT_STREAM_NAME = @"lazer";
-
         /// <summary>
         /// The filename of the main client database.
         /// </summary>
@@ -92,7 +90,7 @@ namespace osu.Game
 
         public const int SAMPLE_CONCURRENCY = 6;
 
-        public const double SFX_STEREO_STRENGTH = 0.75;
+        public const double SFX_STEREO_STRENGTH = 0.6;
 
         /// <summary>
         /// Length of debounce (in milliseconds) for commonly occuring sample playbacks that could stack.
@@ -120,8 +118,6 @@ namespace osu.Game
 
         public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
-        internal const string BUILD_SUFFIX = "lazer";
-
         public virtual string Version
         {
             get
@@ -129,8 +125,16 @@ namespace osu.Game
                 if (!IsDeployedBuild)
                     return @"local " + (DebugUtils.IsDebugBuild ? @"debug" : @"release");
 
-                var version = AssemblyVersion;
-                return $@"{version.Major}.{version.Minor}.{version.Build}-{BUILD_SUFFIX}";
+                string informationalVersion = Assembly.GetEntryAssembly()?
+                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+                    .InformationalVersion;
+
+                // Example: [assembly: AssemblyInformationalVersion("2025.613.0-tachyon+d934e574b2539e8787956c3c9ecce9dadebb10ee")]
+                if (!string.IsNullOrEmpty(informationalVersion))
+                    return informationalVersion.Split('+').First();
+
+                Version version = AssemblyVersion;
+                return $@"{version.Major}.{version.Minor}.{version.Build}-lazer";
             }
         }
 
@@ -437,20 +441,21 @@ namespace osu.Game
 
         private void addFilesWarning()
         {
-            var realmStore = new RealmFileStore(realm, Storage);
-
             const string filename = "IMPORTANT READ ME.txt";
 
-            if (!realmStore.Storage.Exists(filename))
+            if (!Storage.Exists(filename))
             {
-                using (var stream = realmStore.Storage.CreateFileSafely(filename))
+                using (var stream = Storage.CreateFileSafely(filename))
                 using (var textWriter = new StreamWriter(stream))
                 {
-                    textWriter.WriteLine(@"This folder contains all your user files (beatmaps, skins, replays etc.)");
-                    textWriter.WriteLine(@"Please do not touch or delete this folder!!");
+                    textWriter.WriteLine(@"This folder contains all your user files and configuration.");
+                    textWriter.WriteLine(@"Please DO NOT make manual changes to this folder.");
                     textWriter.WriteLine();
-                    textWriter.WriteLine(@"If you are really looking to completely delete user data, please delete");
-                    textWriter.WriteLine(@"the parent folder including all other files and directories");
+                    textWriter.WriteLine(@"- If you want to back up your game files, please back up THE ENTIRETY OF THIS DIRECTORY.");
+                    textWriter.WriteLine(@"- If you want to delete all of your game files, please delete THE ENTIRETY OF THIS DIRECTORY.");
+                    textWriter.WriteLine();
+                    textWriter.WriteLine(@"To be very clear, the ""files/"" directory inside this directory stores all the raw pieces of your beatmaps, skins, and replays.");
+                    textWriter.WriteLine(@"Importantly, it is NOT the only directory you need a backup of to avoid losing data. If you copy only the ""files/"" directory, YOU WILL LOSE DATA.");
                     textWriter.WriteLine();
                     textWriter.WriteLine(@"For more information on how these files are organised,");
                     textWriter.WriteLine(@"see https://github.com/ppy/osu/wiki/User-file-storage");
@@ -462,8 +467,6 @@ namespace osu.Game
 
         protected virtual void InitialiseFonts()
         {
-            AddFont(Resources, @"Fonts/osuFont");
-
             AddFont(Resources, @"Fonts/Torus/Torus-Regular");
             AddFont(Resources, @"Fonts/Torus/Torus-Light");
             AddFont(Resources, @"Fonts/Torus/Torus-SemiBold");
@@ -484,9 +487,10 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Inter/Inter-BoldItalic");
 
             AddFont(Resources, @"Fonts/Noto/Noto-Basic");
-            AddFont(Resources, @"Fonts/Noto/Noto-Hangul");
+            AddFont(Resources, @"Fonts/Noto/Noto-Bopomofo");
             AddFont(Resources, @"Fonts/Noto/Noto-CJK-Basic");
             AddFont(Resources, @"Fonts/Noto/Noto-CJK-Compatibility");
+            AddFont(Resources, @"Fonts/Noto/Noto-Hangul");
             AddFont(Resources, @"Fonts/Noto/Noto-Thai");
 
             AddFont(Resources, @"Fonts/Venera/Venera-Light");

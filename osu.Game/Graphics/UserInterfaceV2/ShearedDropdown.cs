@@ -190,6 +190,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         }
                     },
                 };
+
+                AddInternal(new HoverClickSounds());
             }
 
             [BackgroundDependencyLoader]
@@ -234,8 +236,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 var hoveredColour = colourProvider.Light4;
                 var unhoveredColour = colourProvider.Background5;
 
-                Colour = Color4.White;
-                Alpha = Enabled.Value ? 1 : 0.3f;
+                Colour = Enabled.Value ? Color4.White : OsuColour.Gray(0.6f);
 
                 if (SearchBar.State.Value == Visibility.Visible)
                 {

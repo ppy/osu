@@ -15,8 +15,10 @@ namespace osu.Game.Beatmaps
         /// Once in this state, online status changes should be ignored unless the beatmap is reverted or submitted.
         /// </summary>
         [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.LocallyModified))]
+        [Description("Local")]
         LocallyModified = -4,
 
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.StatusUnknown))]
         [Description("Unknown")]
         None = -3,
 

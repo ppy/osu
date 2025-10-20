@@ -18,6 +18,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
@@ -440,6 +441,11 @@ namespace osu.Game.Graphics.UserInterface
 
                 private partial class DropdownSearchTextBox : OsuTextBox
                 {
+                    public DropdownSearchTextBox()
+                    {
+                        PlaceholderText = HomeStrings.SearchPlaceholder;
+                    }
+
                     [BackgroundDependencyLoader]
                     private void load(OverlayColourProvider? colourProvider)
                     {
