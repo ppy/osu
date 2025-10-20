@@ -70,25 +70,25 @@ namespace osu.Game.Skinning
             if (beatmapSkins == null)
                 throw new InvalidOperationException($"{nameof(BeatmapSkinProvidingContainer)} needs to be loaded before being consumed.");
 
-            bool useHitsounds;
+            bool useBeatmapHitsounds;
 
             switch (beatmapHitsoundsState)
             {
                 case HitsoundsSetting.HitsoundsOn:
-                    useHitsounds = true;
+                    useBeatmapHitsounds = true;
                     break;
 
                 case HitsoundsSetting.HitsoundsOff:
-                    useHitsounds = false;
+                    useBeatmapHitsounds = false;
                     break;
 
                 case HitsoundsSetting.UseGlobalSetting:
                 default:
-                    useHitsounds = beatmapHitsounds.Value;
+                    useBeatmapHitsounds = beatmapHitsounds.Value;
                     break;
             }
 
-            return sampleInfo is StoryboardSampleInfo || useHitsounds;
+            return sampleInfo is StoryboardSampleInfo || useBeatmapHitsounds;
         }
 
         private readonly ISkin skin;
