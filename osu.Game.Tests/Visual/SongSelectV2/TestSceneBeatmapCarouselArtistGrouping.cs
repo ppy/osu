@@ -285,6 +285,32 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestSetDoesExpandAgainWhenGroupingTurnedOff()
+        {
+            ApplyToFilterAndWaitForFilter("filter", c => c.SearchText = BeatmapSets[2].Metadata.Title);
+
+            CheckDisplayedGroupsCount(1);
+            CheckDisplayedBeatmapSetsCount(1);
+            CheckDisplayedBeatmapsCount(3);
+
+            CheckHasSelection();
+
+            ApplyToFilterAndWaitForFilter("remove filter", c => c.SearchText = string.Empty);
+            CheckDisplayedGroupsCount(5);
+            CheckDisplayedBeatmapSetsCount(10);
+            CheckDisplayedBeatmapsCount(30);
+
+            ToggleGroupCollapse();
+
+            ApplyToFilterAndWaitForFilter("apply no-op filter", c => c.AllowConvertedBeatmaps = !c.AllowConvertedBeatmaps);
+            AddAssert("group didn't re-expand", () => Carousel.ExpandedGroup, () => Is.Null);
+            AddAssert("beatmap set didn't re-expand", () => Carousel.GetCarouselItems()!.Count(item => item.Model is GroupedBeatmap && item.IsVisible), () => Is.Zero);
+
+            SortAndGroupBy(SortMode.Title, GroupMode.None);
+            AddAssert("beatmap set did re-expand", () => Carousel.GetCarouselItems()!.Count(item => item.Model is GroupedBeatmap && item.IsVisible), () => Is.Not.Zero);
+        }
+
+        [Test]
         public void TestManuallyCollapsingCurrentGroupAndOpeningAnother()
         {
             SelectNextSet();
