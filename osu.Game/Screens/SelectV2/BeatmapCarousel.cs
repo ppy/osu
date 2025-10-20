@@ -31,6 +31,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Filter;
 using Realms;
 
 namespace osu.Game.Screens.SelectV2
@@ -771,6 +772,9 @@ namespace osu.Game.Screens.SelectV2
             bool resetDisplay = grouping.BeatmapSetsGroupedTogether != BeatmapCarouselFilterGrouping.ShouldGroupBeatmapsTogether(criteria);
 
             Criteria = criteria;
+
+            if (criteria.Group == GroupMode.None)
+                userCollapsedGroup = false;
 
             loadingDebounce ??= Scheduler.AddDelayed(() =>
             {
