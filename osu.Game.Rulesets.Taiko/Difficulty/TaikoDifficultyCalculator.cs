@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
     public class TaikoDifficultyCalculator : DifficultyCalculator
     {
         private const double difficulty_multiplier = 0.084375;
-        private const double rhythm_skill_multiplier = 0.65 * difficulty_multiplier;
+        private const double rhythm_skill_multiplier = 0.750 * difficulty_multiplier;
         private const double reading_skill_multiplier = 0.100 * difficulty_multiplier;
         private const double colour_skill_multiplier = 0.375 * difficulty_multiplier;
         private const double stamina_skill_multiplier = 0.445 * difficulty_multiplier;
@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private double strainLengthBonus;
         private double patternMultiplier;
 
+        private bool isRelax;
         private bool isConvert;
 
         public override int Version => 20250306;
@@ -46,6 +47,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
 
             isConvert = beatmap.BeatmapInfo.Ruleset.OnlineID == 0;
+            isRelax = mods.Any(h => h is TaikoModRelax);
 
             return new Skill[]
             {
@@ -100,8 +102,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new TaikoDifficultyAttributes { Mods = mods };
 
-            bool isRelax = mods.Any(h => h is TaikoModRelax);
-
             var rhythm = skills.OfType<Rhythm>().Single();
             var reading = skills.OfType<Reading>().Single();
             var colour = skills.OfType<Colour>().Single();
@@ -120,11 +120,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             // As we don't have pattern integration in osu!taiko, we apply the other two skills relative to rhythm.
             patternMultiplier = Math.Pow(staminaSkill * colourSkill, 0.10);
 
-            strainLengthBonus = 1
-                                + Math.Min(Math.Max((staminaDifficultStrains - 1000) / 3700, 0), 0.15)
-                                + Math.Min(Math.Max((staminaSkill - 7.0) / 1.0, 0), 0.05);
+            strainLengthBonus = 1 + 0.15 * DifficultyCalculationUtils.ReverseLerp(staminaDifficultStrains, 1000, 1555);
 
-            double combinedRating = combinedDifficultyValue(rhythm, reading, colour, stamina, isRelax, isConvert, out double consistencyFactor);
+            double combinedRating = combinedDifficultyValue(rhythm, reading, colour, stamina, out double consistencyFactor);
             double starRating = rescale(combinedRating * 1.4);
 
             // Calculate proportional contribution of each skill to the combinedRating.
@@ -161,14 +159,59 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// For each section, the peak strains of all separate skills are combined into a single peak strain for the section.
         /// The resulting partial rating of the beatmap is a weighted sum of the combined peaks (higher peaks are weighted more).
         /// </remarks>
-        private double combinedDifficultyValue(Rhythm rhythm, Reading reading, Colour colour, Stamina stamina, bool isRelax, bool isConvert, out double consistencyFactor)
+        private double combinedDifficultyValue(Rhythm rhythm, Reading reading, Colour colour, Stamina stamina, out double consistencyFactor)
         {
-            List<double> peaks = new List<double>();
+            List<double> peaks = combinePeaks(
+                rhythm.GetCurrentStrainPeaks().ToList(),
+                reading.GetCurrentStrainPeaks().ToList(),
+                colour.GetCurrentStrainPeaks().ToList(),
+                stamina.GetCurrentStrainPeaks().ToList()
+            );
 
-            var rhythmPeaks = rhythm.GetCurrentStrainPeaks().ToList();
-            var readingPeaks = reading.GetCurrentStrainPeaks().ToList();
-            var colourPeaks = colour.GetCurrentStrainPeaks().ToList();
-            var staminaPeaks = stamina.GetCurrentStrainPeaks().ToList();
+            if (peaks.Count == 0)
+            {
+                consistencyFactor = 0;
+                return 0;
+            }
+
+            double difficulty = 0;
+            double weight = 1;
+
+            foreach (double strain in peaks.OrderDescending())
+            {
+                difficulty += strain * weight;
+                weight *= 0.9;
+            }
+
+            List<double> hitObjectStrainPeaks = combinePeaks(
+                rhythm.GetObjectStrains().ToList(),
+                reading.GetObjectStrains().ToList(),
+                colour.GetObjectStrains().ToList(),
+                stamina.GetObjectStrains().ToList()
+            );
+
+            if (hitObjectStrainPeaks.Count == 0)
+            {
+                consistencyFactor = 0;
+                return 0;
+            }
+
+            // The average of the top 5% of strain peaks from hit objects.
+            double topAverageHitObjectStrain = hitObjectStrainPeaks.OrderDescending().Take(1 + hitObjectStrainPeaks.Count / 20).Average();
+
+            // Calculates a consistency factor as the sum of difficulty from hit objects compared to if every object were as hard as the hardest.
+            // The top average strain is used instead of the very hardest to prevent exceptionally hard objects lowering the factor.
+            consistencyFactor = hitObjectStrainPeaks.Sum() / (topAverageHitObjectStrain * hitObjectStrainPeaks.Count);
+
+            return difficulty;
+        }
+
+        /// <summary>
+        /// Combines lists of peak strains from multiple skills into a list of single peak strains for each section.
+        /// </summary>
+        private List<double> combinePeaks(List<double> rhythmPeaks, List<double> readingPeaks, List<double> colourPeaks, List<double> staminaPeaks)
+        {
+            var combinedPeaks = new List<double>();
 
             for (int i = 0; i < colourPeaks.Count; i++)
             {
@@ -183,45 +226,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
                 // These sections will not contribute to the difficulty.
                 if (peak > 0)
-                    peaks.Add(peak);
+                    combinedPeaks.Add(peak);
             }
 
-            double difficulty = 0;
-            double weight = 1;
-
-            foreach (double strain in peaks.OrderDescending())
-            {
-                difficulty += strain * weight;
-                weight *= 0.9;
-            }
-
-            consistencyFactor = calculateConsistencyFactor(peaks);
-
-            return difficulty;
-        }
-
-        /// <summary>
-        /// Calculates a consistency factor based on how 'spiked' the strain peaks are.
-        /// Higher values indicate more consistent difficulty, lower values indicate diff-spike heavy maps.
-        /// </summary>
-        private double calculateConsistencyFactor(List<double> peaks)
-        {
-            // If there are too few sections in a map, assume it is consistent.
-            if (peaks.Count < 3)
-                return 1.0;
-
-            List<double> sorted = peaks.OrderDescending().ToList();
-
-            double topPeak = sorted[0];
-            double secondTopPeak = sorted.Count > 1 ? sorted[1] : topPeak;
-
-            // Compute the average of the middle 50% of strain values.
-            double midAvg = sorted.Skip(sorted.Count / 4).Take(sorted.Count / 2).Average();
-
-            // A higher ratio means the top sections are much harder than the average, indicating inconsistency.
-            double spikeSeverity = (topPeak + secondTopPeak) / 2.0 / midAvg;
-
-            return 1.0 / spikeSeverity;
+            return combinedPeaks;
         }
 
         /// <summary>

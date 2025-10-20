@@ -32,7 +32,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// This beatmap's difficulty settings.
         /// </summary>
-        public BeatmapDifficulty Difficulty { get; set; }
+        BeatmapDifficulty Difficulty { get; set; }
 
         /// <summary>
         /// The control points in this beatmap.

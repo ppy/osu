@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Logging;
 using Realms;
 
 namespace osu.Game.Database
@@ -29,6 +30,7 @@ namespace osu.Game.Database
                 // It may be that we access this from the update thread before a refresh has taken place.
                 // To ensure that behaviour matches what we'd expect (the object generally *should be* available), force
                 // a refresh to bring in any off-thread changes immediately.
+                Logger.Log($"{nameof(FindWithRefresh)} triggered a realm refresh because it couldn't find the requested guid {id}");
                 realm.Refresh();
                 found = realm.Find<T>(id);
             }

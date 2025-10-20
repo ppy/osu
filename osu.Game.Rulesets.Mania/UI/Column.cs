@@ -58,7 +58,10 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Black);
 
-        private IBindable<ManiaMobileLayout> mobilePlayStyle = null!;
+        private IBindable<bool> touchOverlay = null!;
+
+        private float leftColumnSpacing;
+        private float rightColumnSpacing;
 
         public Column(int index, bool isSpecial)
         {
@@ -120,12 +123,20 @@ namespace osu.Game.Rulesets.Mania.UI
             RegisterPool<HoldNoteBody, DrawableHoldNoteBody>(10, 50);
 
             if (rulesetConfig != null)
-                mobilePlayStyle = rulesetConfig.GetBindable<ManiaMobileLayout>(ManiaRulesetSetting.MobileLayout);
+                touchOverlay = rulesetConfig.GetBindable<bool>(ManiaRulesetSetting.TouchOverlay);
         }
 
         private void onSourceChanged()
         {
             AccentColour.Value = skin.GetManiaSkinConfig<Color4>(LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour, Index)?.Value ?? Color4.Black;
+
+            leftColumnSpacing = skin.GetConfig<ManiaSkinConfigurationLookup, float>(
+                                        new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.LeftColumnSpacing, Index))
+                                    ?.Value ?? Stage.COLUMN_SPACING;
+
+            rightColumnSpacing = skin.GetConfig<ManiaSkinConfigurationLookup, float>(
+                                         new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.RightColumnSpacing, Index))
+                                     ?.Value ?? Stage.COLUMN_SPACING;
         }
 
         protected override void LoadComplete()
@@ -187,8 +198,11 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
-            // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
-            => DrawRectangle.Inflate(new Vector2(Stage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
+        {
+            // Extend input coverage to the gaps close to this column.
+            var spacingInflation = new MarginPadding { Left = leftColumnSpacing, Right = rightColumnSpacing };
+            return DrawRectangle.Inflate(spacingInflation).Contains(ToLocalSpace(screenSpacePos));
+        }
 
         #region Touch Input
 
@@ -200,7 +214,7 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override bool OnTouchDown(TouchDownEvent e)
         {
             // if touch overlay is visible, disallow columns from handling touch directly.
-            if (mobilePlayStyle.Value == ManiaMobileLayout.LandscapeWithOverlay)
+            if (touchOverlay.Value)
                 return false;
 
             maniaInputManager?.KeyBindingContainer.TriggerPressed(Action.Value);

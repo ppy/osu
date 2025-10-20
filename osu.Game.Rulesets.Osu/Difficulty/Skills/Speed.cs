@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : OsuStrainSkill
     {
-        protected override double SkillMultiplier => 1.46;
+        protected override double SkillMultiplier => 1.47;
         protected override double StrainDecayBase => 0.3;
 
         private double currentRhythm;
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            CurrentStrain *= StrainDecay(((OsuDifficultyHitObject)current).StrainTime);
+            CurrentStrain *= StrainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
             CurrentStrain += StrainValueOf(current) * SkillMultiplier;
 
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);

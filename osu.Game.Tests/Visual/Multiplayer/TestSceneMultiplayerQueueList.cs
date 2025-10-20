@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
@@ -26,6 +27,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public partial class TestSceneMultiplayerQueueList : MultiplayerTestScene
     {
         private MultiplayerQueueList playlist = null!;
+        private RulesetStore rulesets = null!;
         private BeatmapManager beatmaps = null!;
         private BeatmapSetInfo importedSet = null!;
         private BeatmapInfo importedBeatmap = null!;
@@ -34,7 +36,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
         }
@@ -49,12 +51,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create playlist", () =>
             {
-                Child = playlist = new MultiplayerQueueList(room)
+                Child = playlist = new MultiplayerQueueList
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(500, 300),
+                    Size = new Vector2(500, 300)
                 };
+
+                playlist.Items.ReplaceRange(0, playlist.Items.Count, MultiplayerClient.ClientAPIRoom!.Playlist);
 
                 MultiplayerClient.ClientAPIRoom!.PropertyChanged += (_, e) =>
                 {
@@ -132,6 +136,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
             assertDeleteButtonVisibility(1, false);
         }
 
+        [Test]
+        public void TestChangeExistingItem()
+        {
+            AddStep("change beatmap", () => MultiplayerClient.EditPlaylistItem(new MultiplayerPlaylistItem
+            {
+                ID = playlist.Items[0].ID,
+                BeatmapID = 1337
+            }).WaitSafely());
+
+            AddUntilStep("first playlist item has new beatmap", () => playlist.Items[0].Beatmap.OnlineID, () => Is.EqualTo(1337));
+        }
+
         private void addPlaylistItem(Func<int> userId)
         {
             long itemId = -1;
@@ -154,5 +170,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var button = playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAtOrDefault(index);
                 return (button?.Alpha > 0) == visible;
             });
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
+        }
     }
 }

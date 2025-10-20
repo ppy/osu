@@ -34,7 +34,6 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
-using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Users;
@@ -57,6 +56,11 @@ namespace osu.Game.Screens.Play
         public event Action OnGameplayStarted;
 
         public override bool AllowUserExit => false; // handled by HoldForMenuButton
+
+        /// <summary>
+        /// Raised after all gameplay has finished.
+        /// </summary>
+        public event Action OnShowingResults;
 
         protected override bool PlayExitSound => !isRestarting;
 
@@ -112,6 +116,12 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public IBindable<bool> ShowingOverlayComponents = new Bindable<bool>();
 
+        /// <summary>
+        /// A flag which can be checked to decide whether we are in a state where settings that affect
+        /// game balance should be allowed to be applied at the current point in time.
+        /// </summary>
+        public virtual bool AllowCriticalSettingsAdjustment { get; } = true;
+
         // Should match PlayerLoader for consistency. Cached here for the rare case we push a Player
         // without the loading screen (one such usage is the skin editor's scene library).
         [Cached]
@@ -134,6 +144,8 @@ namespace osu.Game.Screens.Play
         private Ruleset ruleset;
 
         public BreakOverlay BreakOverlay;
+
+        private LetterboxOverlay letterboxOverlay;
 
         /// <summary>
         /// Whether the gameplay is currently in a break.
@@ -277,6 +289,12 @@ namespace osu.Game.Screens.Play
             var rulesetSkinProvider = new RulesetSkinProvidingContainer(ruleset, playableBeatmap, Beatmap.Value.Skin);
             GameplayClockContainer.Add(new GameplayScrollWheelHandling());
 
+            // needs to exist in frame stable content, but is used by underlay layers so make sure assigned early.
+            breakTracker = new BreakTracker(DrawableRuleset.GameplayStartTime, ScoreProcessor)
+            {
+                Breaks = Beatmap.Value.Beatmap.Breaks
+            };
+
             // load the skinning hierarchy first.
             // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
             GameplayClockContainer.Add(rulesetSkinProvider);
@@ -292,7 +310,7 @@ namespace osu.Game.Screens.Play
                     Children = new[]
                     {
                         // underlay and gameplay should have access to the skinning sources.
-                        createUnderlayComponents(),
+                        createUnderlayComponents(Beatmap.Value),
                         createGameplayComponents(Beatmap.Value)
                     }
                 },
@@ -335,10 +353,13 @@ namespace osu.Game.Screens.Play
             dependencies.CacheAs(DrawableRuleset.FrameStableClock);
             dependencies.CacheAs<IGameplayClock>(DrawableRuleset.FrameStableClock);
 
+            letterboxOverlay.Clock = DrawableRuleset.FrameStableClock;
+            letterboxOverlay.ProcessCustomClock = false;
+
             // add the overlay components as a separate step as they proxy some elements from the above underlay/gameplay components.
             // also give the overlays the ruleset skin provider to allow rulesets to potentially override HUD elements (used to disable combo counters etc.)
             // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
-            failAnimationContainer.Add(createOverlayComponents(Beatmap.Value));
+            failAnimationContainer.Add(createOverlayComponents());
 
             if (!DrawableRuleset.AllowGameplayOverlays)
             {
@@ -403,20 +424,26 @@ namespace osu.Game.Screens.Play
 
             IsBreakTime.BindTo(breakTracker.IsBreakTime);
             IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
-
-            loadLeaderboard();
         }
 
         protected virtual GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart);
 
-        private Drawable createUnderlayComponents()
+        private Drawable createUnderlayComponents(WorkingBeatmap working)
         {
             var container = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    DimmableStoryboard = new DimmableStoryboard(GameplayState.Storyboard, GameplayState.Mods) { RelativeSizeAxes = Axes.Both },
+                    DimmableStoryboard = new DimmableStoryboard(GameplayState.Storyboard, GameplayState.Mods)
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    },
+                    letterboxOverlay = new LetterboxOverlay
+                    {
+                        BreakTracker = breakTracker,
+                        Alpha = working.Beatmap.LetterboxInBreaks ? 1 : 0,
+                    },
                     new KiaiGameplayFountains(),
                 },
             };
@@ -434,15 +461,12 @@ namespace osu.Game.Screens.Play
                         ScoreProcessor,
                         HealthProcessor,
                         new ComboEffects(ScoreProcessor),
-                        breakTracker = new BreakTracker(DrawableRuleset.GameplayStartTime, ScoreProcessor)
-                        {
-                            Breaks = working.Beatmap.Breaks
-                        }
+                        breakTracker,
                     }),
             }
         };
 
-        private Drawable createOverlayComponents(IWorkingBeatmap working)
+        private Drawable createOverlayComponents()
         {
             var container = new Container
             {
@@ -450,14 +474,7 @@ namespace osu.Game.Screens.Play
                 Children = new[]
                 {
                     DimmableStoryboard.OverlayLayerContainer.CreateProxy(),
-                    new LetterboxOverlay
-                    {
-                        Clock = DrawableRuleset.FrameStableClock,
-                        ProcessCustomClock = false,
-                        BreakTracker = breakTracker,
-                        Alpha = working.Beatmap.LetterboxInBreaks ? 1 : 0,
-                    },
-                    HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods, Configuration.AlwaysShowLeaderboard)
+                    HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods)
                     {
                         HoldToQuit =
                         {
@@ -858,6 +875,7 @@ namespace osu.Game.Screens.Play
                     // This player instance may already be in the process of exiting.
                     return;
 
+                OnShowingResults?.Invoke();
                 this.Push(CreateResults(prepareScoreForDisplayTask.GetResultSafely()));
             }, Time.Current + delay, 50);
 
@@ -912,49 +930,7 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        #region Gameplay leaderboard
-
-        protected readonly Bindable<bool> LeaderboardExpandedState = new BindableBool();
-
-        private void loadLeaderboard()
-        {
-            HUDOverlay.HoldingForHUD.BindValueChanged(_ => updateLeaderboardExpandedState());
-            LocalUserPlaying.BindValueChanged(_ => updateLeaderboardExpandedState(), true);
-
-            var gameplayLeaderboard = CreateGameplayLeaderboard();
-
-            if (gameplayLeaderboard != null)
-            {
-                LoadComponentAsync(gameplayLeaderboard, leaderboard =>
-                {
-                    if (!LoadedBeatmapSuccessfully)
-                        return;
-
-                    leaderboard.Expanded.BindTo(LeaderboardExpandedState);
-
-                    AddLeaderboardToHUD(leaderboard);
-                });
-            }
-        }
-
-        [CanBeNull]
-        protected virtual GameplayLeaderboard CreateGameplayLeaderboard() => null;
-
-        protected virtual void AddLeaderboardToHUD(GameplayLeaderboard leaderboard) => HUDOverlay.LeaderboardFlow.Add(leaderboard);
-
-        private void updateLeaderboardExpandedState() =>
-            LeaderboardExpandedState.Value = !LocalUserPlaying.Value || HUDOverlay.HoldingForHUD.Value;
-
-        #endregion
-
         #region Fail Logic
-
-        /// <summary>
-        /// Invoked when gameplay has permanently failed.
-        /// </summary>
-        protected virtual void OnFail()
-        {
-        }
 
         protected FailOverlay FailOverlay { get; private set; }
 
@@ -969,48 +945,55 @@ namespace osu.Game.Screens.Play
             if (!CheckModsAllowFailure())
                 return false;
 
-            if (Configuration.AllowFailAnimation)
-            {
-                Debug.Assert(!GameplayState.HasFailed);
-                Debug.Assert(!GameplayState.HasPassed);
-                Debug.Assert(!GameplayState.HasQuit);
-
-                GameplayState.HasFailed = true;
-
-                updateGameplayState();
-
-                // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
-                // could process an extra frame after the GameplayClock is stopped.
-                // In such cases we want the fail state to precede a user triggered pause.
-                if (PauseOverlay.State.Value == Visibility.Visible)
-                    PauseOverlay.Hide();
-
-                bool restartOnFail = GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail);
-                if (!restartOnFail)
-                    failAnimationContainer.Start();
-
-                // Failures can be triggered either by a judgement, or by a mod.
-                //
-                // For the case of a judgement, due to ordering considerations, ScoreProcessor will not have received
-                // the final judgement which triggered the failure yet (see DrawableRuleset.NewResult handling above).
-                //
-                // A schedule here ensures that any lingering judgements from the current frame are applied before we
-                // finalise the score as "failed".
-                Schedule(() =>
-                {
-                    ScoreProcessor.FailScore(Score.ScoreInfo);
-                    OnFail();
-
-                    if (restartOnFail)
-                        Restart(true);
-                });
-            }
-            else
-            {
-                ScoreProcessor.FailScore(Score.ScoreInfo);
-            }
-
+            PerformFail();
             return true;
+        }
+
+        /// <summary>
+        /// Called when the player is determined to have failed.
+        /// </summary>
+        protected virtual void PerformFail()
+        {
+            Debug.Assert(!GameplayState.HasFailed);
+            Debug.Assert(!GameplayState.HasPassed);
+            Debug.Assert(!GameplayState.HasQuit);
+
+            GameplayState.HasFailed = true;
+
+            updateGameplayState();
+
+            // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
+            // could process an extra frame after the GameplayClock is stopped.
+            // In such cases we want the fail state to precede a user triggered pause.
+            if (PauseOverlay.State.Value == Visibility.Visible)
+                PauseOverlay.Hide();
+
+            bool restartOnFail = GameplayState.Mods.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail);
+            if (!restartOnFail)
+                failAnimationContainer.Start();
+
+            // Failures can be triggered either by a judgement, or by a mod.
+            //
+            // For the case of a judgement, due to ordering considerations, ScoreProcessor will not have received
+            // the final judgement which triggered the failure yet (see DrawableRuleset.NewResult handling above).
+            //
+            // A schedule here ensures that any lingering judgements from the current frame are applied before we
+            // finalise the score as "failed".
+            Schedule(() =>
+            {
+                ConcludeFailedScore(Score);
+
+                if (restartOnFail)
+                    Restart(true);
+            });
+        }
+
+        /// <summary>
+        /// Performs last operations on the supplied <paramref name="score"/> before this <see cref="Player"/> is definitively exited due to failing.
+        /// </summary>
+        protected virtual void ConcludeFailedScore(Score score)
+        {
+            ScoreProcessor.FailScore(score.ScoreInfo);
         }
 
         /// <summary>
@@ -1063,7 +1046,7 @@ namespace osu.Game.Screens.Play
             // already resuming
             && !IsResuming;
 
-        public bool Pause()
+        public virtual bool Pause()
         {
             if (!pausingSupportedByCurrentState) return false;
 

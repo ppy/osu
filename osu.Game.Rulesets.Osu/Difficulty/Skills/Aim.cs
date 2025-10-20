@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : OsuStrainSkill
     {
-        protected override double SkillMultiplier => 25.6;
+        protected override double SkillMultiplier => 26;
         protected override double StrainDecayBase => 0.15;
         public readonly bool IncludeSliders;
 

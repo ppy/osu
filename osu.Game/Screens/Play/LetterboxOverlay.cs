@@ -18,8 +18,6 @@ namespace osu.Game.Screens.Play
 
         private readonly IBindable<Period?> currentPeriod = new Bindable<Period?>();
 
-        private static readonly Color4 transparent_black = new Color4(0, 0, 0, 0);
-
         public LetterboxOverlay()
         {
             RelativeSizeAxes = Axes.Both;
@@ -59,10 +57,11 @@ namespace osu.Game.Screens.Play
             currentPeriod.BindValueChanged(updateDisplay, true);
         }
 
+        public override bool RemoveCompletedTransforms => false;
+
         private void updateDisplay(ValueChangedEvent<Period?> period)
         {
             FinishTransforms(true);
-            Scheduler.CancelDelayedTasks();
 
             if (period.NewValue == null)
                 return;
@@ -71,7 +70,7 @@ namespace osu.Game.Screens.Play
 
             using (BeginAbsoluteSequence(b.Start))
             {
-                fadeContainer.FadeIn(BreakOverlay.BREAK_FADE_DURATION);
+                fadeContainer.FadeInFromZero(BreakOverlay.BREAK_FADE_DURATION);
                 using (BeginDelayedSequence(b.Duration - BreakOverlay.BREAK_FADE_DURATION))
                     fadeContainer.FadeOut(BreakOverlay.BREAK_FADE_DURATION);
             }
