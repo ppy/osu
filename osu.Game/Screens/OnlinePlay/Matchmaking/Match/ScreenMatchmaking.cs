@@ -231,19 +231,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             // Update global gameplay state to correspond to the new selection.
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             var localBeatmap = beatmapManager.QueryBeatmap($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}", item.BeatmapID);
-            Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
-            Ruleset.Value = ruleset;
-            Mods.Value = item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
 
-            if (Beatmap.Value is DummyWorkingBeatmap)
+            if (localBeatmap != null)
             {
-                if (client.LocalUser!.State == MultiplayerUserState.Ready)
-                    client.ChangeState(MultiplayerUserState.Idle).FireAndForget();
+                Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
+                Ruleset.Value = ruleset;
+                Mods.Value = item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+
+                // Notify the server that the beatmap has been set and that we are ready to start gameplay.
+                if (client.LocalUser!.State == MultiplayerUserState.Idle)
+                    client.ChangeState(MultiplayerUserState.Ready).FireAndForget();
             }
             else
             {
-                if (client.LocalUser!.State == MultiplayerUserState.Idle)
-                    client.ChangeState(MultiplayerUserState.Ready).FireAndForget();
+                // Notify the server that we don't have the beatmap.
+                if (client.LocalUser!.State == MultiplayerUserState.Ready)
+                    client.ChangeState(MultiplayerUserState.Idle).FireAndForget();
             }
 
             client.ChangeBeatmapAvailability(beatmapAvailabilityTracker.Availability.Value).FireAndForget();
