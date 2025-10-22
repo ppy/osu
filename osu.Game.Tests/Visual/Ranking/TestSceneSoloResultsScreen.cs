@@ -352,7 +352,8 @@ namespace osu.Game.Tests.Visual.Ranking
                             {
                                 Score = userBest,
                                 Position = 133_337,
-                            }
+                            },
+                            ScoresCount = 200_000,
                         });
                         return true;
                 }
@@ -406,7 +407,8 @@ namespace osu.Game.Tests.Visual.Ranking
                             {
                                 Score = userBest,
                                 Position = 133_337,
-                            }
+                            },
+                            ScoresCount = 200_000,
                         });
                         return true;
                 }
@@ -511,7 +513,8 @@ namespace osu.Game.Tests.Visual.Ranking
                             {
                                 Score = userBest,
                                 Position = 133_337,
-                            }
+                            },
+                            ScoresCount = 200_000,
                         });
                         return true;
                 }
