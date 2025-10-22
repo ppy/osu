@@ -17,6 +17,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online;
@@ -74,6 +75,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
         [Resolved]
         private AudioManager audio { get; set; } = null!;
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
         private readonly MultiplayerRoom room;
 
@@ -290,7 +294,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     if (beatmapSet == null)
                         return;
 
-                    beatmapDownloader.Download(beatmapSet);
+                    beatmapDownloader.Download(beatmapSet, config.Get<bool>(OsuSetting.PreferNoVideo));
                 }));
         }
 
