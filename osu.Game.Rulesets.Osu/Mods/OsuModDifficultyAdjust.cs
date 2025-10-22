@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Globalization;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -51,7 +52,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 return string.Empty;
 
-                string format(string acronym, DifficultyBindable bindable) => $"{acronym}{bindable.Value!.Value.ToStandardFormattedString(1)}";
+                string format(string acronym, DifficultyBindable bindable)
+                    => $"{acronym}{bindable.Value!.Value.ToStandardFormattedString(1, cultureInfo: CultureInfo.InvariantCulture)}";
             }
         }
 
