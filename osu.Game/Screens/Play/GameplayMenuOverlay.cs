@@ -23,7 +23,6 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Utils;
-using osu.Game.Localisation.HUD;
 
 namespace osu.Game.Screens.Play
 {
@@ -233,10 +232,12 @@ namespace osu.Game.Screens.Play
                 playInfoText.AddText(GameplayMenuOverlayStrings.SongProgress);
                 playInfoText.AddText($"{progress}%", cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
             }
+
             if (gameplayState != null)
             {
                 playInfoText.NewLine();
-                playInfoText.AddText("Accuracy: ");
+                playInfoText.AddText(SongSelectStrings.Accuracy);
+                playInfoText.AddText(": ");
                 playInfoText.AddText(gameplayState!.ScoreProcessor.Accuracy.Value.FormatAccuracy(), cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
             }
         }
