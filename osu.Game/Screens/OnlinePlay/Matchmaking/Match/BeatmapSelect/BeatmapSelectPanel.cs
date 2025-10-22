@@ -157,16 +157,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
+
             lighting.FadeOut(200);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             if (AllowSelection && e.Button == MouseButton.Left)
-            {
                 scaleContainer.ScaleTo(0.95f, 400, Easing.OutExpo);
-                return true;
-            }
 
             return base.OnMouseDown(e);
         }
@@ -174,6 +172,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         protected override void OnMouseUp(MouseUpEvent e)
         {
             base.OnMouseUp(e);
+
             if (e.Button == MouseButton.Left)
                 scaleContainer.ScaleTo(1f, 500, Easing.OutElasticHalf);
         }
