@@ -280,7 +280,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
             downloadCheckCancellation?.Cancel();
 
-            if (beatmapManager.IsAvailableLocally(new BeatmapInfo { OnlineID = item.BeatmapID }))
+            if (beatmapManager.IsAvailableLocally(new APIBeatmap { OnlineID = item.BeatmapID }))
                 return;
 
             // In a perfect world we'd use BeatmapAvailability, but there's no event-driven flow for when a selection changes.

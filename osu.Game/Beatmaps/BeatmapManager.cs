@@ -644,7 +644,7 @@ namespace osu.Game.Beatmaps
 
         public override bool IsAvailableLocally(BeatmapSetInfo model) => Realm.Run(realm => realm.All<BeatmapSetInfo>().Any(s => s.OnlineID == model.OnlineID && !s.DeletePending));
 
-        public bool IsAvailableLocally(BeatmapInfo model)
+        public bool IsAvailableLocally(IBeatmapInfo model)
         {
             return Realm.Run(r => r.All<BeatmapInfo>()
                                    .Filter($@"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false")
