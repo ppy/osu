@@ -16,9 +16,12 @@ namespace osu.Game.Extensions
         /// <param name="value">The numeric value.</param>
         /// <param name="maxDecimalDigits">The maximum number of decimals to be considered in the original value.</param>
         /// <param name="asPercentage">Whether the output should be a percentage. For integer types, 0-100 is mapped to 0-100%; for other types 0-1 is mapped to 0-100%.</param>
+        /// <param name="cultureInfo">The culture to use when formatting the value. Defaults to <see cref="CultureInfo.CurrentCulture"/> if not specified.</param>
         /// <returns>The formatted output.</returns>
-        public static string ToStandardFormattedString<T>(this T value, int maxDecimalDigits, bool asPercentage = false) where T : struct, INumber<T>, IMinMaxValue<T>
+        public static string ToStandardFormattedString<T>(this T value, int maxDecimalDigits, bool asPercentage = false, CultureInfo? cultureInfo = null) where T : struct, INumber<T>, IMinMaxValue<T>
         {
+            cultureInfo ??= CultureInfo.CurrentCulture;
+
             double floatValue = double.CreateTruncating(value);
 
             decimal decimalPrecision = normalise(decimal.CreateTruncating(value), maxDecimalDigits);
@@ -31,12 +34,12 @@ namespace osu.Game.Extensions
                 if (value is int)
                     floatValue /= 100;
 
-                return floatValue.ToString($@"0.{new string('0', Math.Max(0, significantDigits - 2))}%", CultureInfo.InvariantCulture);
+                return floatValue.ToString($@"0.{new string('0', Math.Max(0, significantDigits - 2))}%", cultureInfo);
             }
 
             string negativeSign = Math.Round(floatValue, significantDigits) < 0 ? "-" : string.Empty;
 
-            return $"{negativeSign}{Math.Abs(floatValue).ToString($"N{significantDigits}", CultureInfo.InvariantCulture)}";
+            return $"{negativeSign}{Math.Abs(floatValue).ToString($"N{significantDigits}", cultureInfo)}";
         }
 
         /// <summary>

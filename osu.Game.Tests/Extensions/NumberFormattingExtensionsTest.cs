@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Globalization;
 using NUnit.Framework;
 using osu.Game.Extensions;
 
@@ -19,7 +20,7 @@ namespace osu.Game.Tests.Extensions
         [TestCase(50, true, 0, ExpectedResult = "50%")]
         public string TestInteger(int input, bool percent, int decimalDigits)
         {
-            return input.ToStandardFormattedString(decimalDigits, percent);
+            return input.ToStandardFormattedString(decimalDigits, percent, CultureInfo.InvariantCulture);
         }
 
         [TestCase(-1, false, 0, ExpectedResult = "-1")]
@@ -41,6 +42,16 @@ namespace osu.Game.Tests.Extensions
         [TestCase(1, true, 0, ExpectedResult = "100%")]
         public string TestDouble(double input, bool percent, int decimalDigits)
         {
+            return input.ToStandardFormattedString(decimalDigits, percent, CultureInfo.InvariantCulture);
+        }
+
+        [Test]
+        [SetCulture("fr-FR")]
+        [TestCase(0.4, true, 2, ExpectedResult = "40%")]
+        [TestCase(1e-6, false, 6, ExpectedResult = "0,000001")]
+        [TestCase(0.48333, true, 4, ExpectedResult = "48,33%")]
+        public string TestCultureSensitivityWhenNoneSpecified(double input, bool percent, int decimalDigits)
+        {
             return input.ToStandardFormattedString(decimalDigits, percent);
         }
 
@@ -49,9 +60,9 @@ namespace osu.Game.Tests.Extensions
         [TestCase(0.4, true, 2, ExpectedResult = "40%")]
         [TestCase(1e-6, false, 6, ExpectedResult = "0.000001")]
         [TestCase(0.48333, true, 4, ExpectedResult = "48.33%")]
-        public string TestCultureInsensitivity(double input, bool percent, int decimalDigits)
+        public string TestCultureInsensitivityWhenInvariantSpecified(double input, bool percent, int decimalDigits)
         {
-            return input.ToStandardFormattedString(decimalDigits, percent);
+            return input.ToStandardFormattedString(decimalDigits, percent, CultureInfo.InvariantCulture);
         }
     }
 }
