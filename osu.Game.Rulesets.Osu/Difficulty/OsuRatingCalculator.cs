@@ -35,6 +35,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             this.mechanicalDifficultyRating = mechanicalDifficultyRating;
             this.sliderFactor = sliderFactor;
         }
+
+        public static double ComputeAimRatingWithVersatility(double aimRating, double snapAimRating, double flowAimRating)
+        {
+            // We consider that average map has ratio of summed ratings to total to be equal to 1.7x
+            double baseVersatilityBonus = double.Lerp(1, 1.7, AIM_VERSATILITY_BONUS);
+            return double.Lerp(aimRating, snapAimRating + flowAimRating, AIM_VERSATILITY_BONUS) / baseVersatilityBonus;
+        }
+
         public double ComputeTotalAimRating(double aimDifficultyValue, double snapAimDifficultyValue, double flowAimDifficultyValue)
         {
             if (mods.Any(m => m is OsuModAutopilot))
@@ -61,10 +69,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimRating = double.Lerp(snapAimRating, aimRating, 0.5);
             }
 
-            // We consider that average map has ratio of summed ratings to total to be equal to 1.7x
-            double baseVersatilityBonus = double.Lerp(1, 1.7, AIM_VERSATILITY_BONUS);
-
-            aimRating = double.Lerp(aimRating, snapAimRating + flowAimRating, AIM_VERSATILITY_BONUS) / baseVersatilityBonus;
+            aimRating = ComputeAimRatingWithVersatility(aimRating, snapAimRating, flowAimRating);
 
             return computeRawAimRating(aimRating);
         }
