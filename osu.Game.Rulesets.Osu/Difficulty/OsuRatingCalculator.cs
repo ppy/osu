@@ -61,14 +61,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimRating = double.Lerp(snapAimRating, aimRating, 0.5);
             }
 
-            if (mods.Any(m => m is OsuModMagnetised))
-            {
-                float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
-                aimRating *= 1.0 - magnetisedStrength;
-                snapAimRating *= 1.0 - magnetisedStrength;
-                flowAimRating *= 1.0 - magnetisedStrength;
-            }
-
             // We consider that average map has ratio of summed ratings to total to be equal to 1.7x
             double baseVersatilityBonus = double.Lerp(1, 1.7, AIM_VERSATILITY_BONUS);
 
@@ -91,12 +83,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModRelax))
                 snapAimRating *= relax_multiplier;
 
-            if (mods.Any(m => m is OsuModMagnetised))
-            {
-                float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
-                snapAimRating *= 1.0 - magnetisedStrength;
-            }
-
             return computeRawAimRating(snapAimRating);
         }
 
@@ -111,23 +97,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModTouchDevice))
                 flowAimRating = Math.Pow(flowAimRating, 0.83);
 
-            if (mods.Any(m => m is OsuModMagnetised))
-            {
-                float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
-                flowAimRating *= 1.0 - magnetisedStrength;
-            }
-
             return computeRawAimRating(flowAimRating);
         }
 
         private double computeRawAimRating(double aimRating)
         {
-            if (mods.Any(m => m is OsuModMagnetised))
-            {
-                float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
-                aimRating *= 1.0 - magnetisedStrength;
-            }
-
             double ratingMultiplier = 1.0;
 
             double approachRateLengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
@@ -152,6 +126,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // It is important to consider accuracy difficulty when scaling with accuracy.
             ratingMultiplier *= 0.98 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 2500;
+
+            if (mods.Any(m => m is OsuModMagnetised))
+            {
+                float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
+                aimRating *= 1.0 - magnetisedStrength;
+            }
 
             return aimRating * Math.Cbrt(ratingMultiplier);
         }
