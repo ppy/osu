@@ -75,6 +75,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("speed_difficult_strain_count")]
         public double SpeedDifficultStrainCount { get; set; }
 
+        [JsonProperty("snap_aim")]
+        public double SnapAimDifficulty { get; set; }
+
+        [JsonProperty("flow_aim")]
+        public double FlowAimDifficulty { get; set; }
+        
         [JsonProperty("nested_score_per_object")]
         public double NestedScorePerObject { get; set; }
 
@@ -127,6 +133,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (ATTRIB_ID_NESTED_SCORE_PER_OBJECT, NestedScorePerObject);
             yield return (ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER, LegacyScoreBaseMultiplier);
             yield return (ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE, MaximumLegacyComboScore);
+            yield return (ATTRIB_ID_SNAP_AIM_DIFFICULTY, SnapAimDifficulty);
+            yield return (ATTRIB_ID_FLOW_AIM_DIFFICULTY, FlowAimDifficulty);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
@@ -147,6 +155,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             NestedScorePerObject = values[ATTRIB_ID_NESTED_SCORE_PER_OBJECT];
             LegacyScoreBaseMultiplier = values[ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER];
             MaximumLegacyComboScore = values[ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE];
+            SnapAimDifficulty = values[ATTRIB_ID_SNAP_AIM_DIFFICULTY];
+            FlowAimDifficulty = values[ATTRIB_ID_FLOW_AIM_DIFFICULTY];
             DrainRate = onlineInfo.DrainRate;
             HitCircleCount = onlineInfo.CircleCount;
             SliderCount = onlineInfo.SliderCount;
