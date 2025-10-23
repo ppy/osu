@@ -366,13 +366,39 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         #endregion
 
-        private static async Task<List<CarouselItem>> runGrouping(GroupMode group, List<BeatmapSetInfo> beatmapSets)
+        #region Favourites grouping
+
+        [Test]
+        public async Task TestFavouritesGrouping()
+        {
+            int total = 0;
+
+            var beatmapSets = new List<BeatmapSetInfo>();
+            addBeatmapSet(s => s.OnlineID = 1, beatmapSets, out _);
+            addBeatmapSet(s => s.OnlineID = 21, beatmapSets, out var firstFavourite);
+            addBeatmapSet(s => s.OnlineID = 321, beatmapSets, out _);
+            addBeatmapSet(s => s.OnlineID = 4321, beatmapSets, out _);
+            addBeatmapSet(s => s.OnlineID = 54321, beatmapSets, out var secondFavourite);
+
+            favouriteBeatmapSets = [21, 54321];
+
+            var results = await runGrouping(GroupMode.Favourites, beatmapSets);
+            assertGroup(results, 0, "Favourites", firstFavourite.Beatmaps.Concat(secondFavourite.Beatmaps), ref total);
+            assertTotal(results, total);
+        }
+
+        #endregion
+
+        private HashSet<int> favouriteBeatmapSets = [];
+
+        private async Task<List<CarouselItem>> runGrouping(GroupMode group, List<BeatmapSetInfo> beatmapSets)
         {
             var groupingFilter = new BeatmapCarouselFilterGrouping
             {
                 GetCriteria = () => new FilterCriteria { Group = group },
                 GetCollections = () => new List<BeatmapCollection>(),
-                GetLocalUserTopRanks = _ => new Dictionary<Guid, ScoreRank>()
+                GetLocalUserTopRanks = _ => new Dictionary<Guid, ScoreRank>(),
+                GetFavouriteBeatmapSets = () => favouriteBeatmapSets,
             };
 
             return await groupingFilter.Run(beatmapSets.SelectMany(s => s.Beatmaps.Select(b => new CarouselItem(b))).ToList(), CancellationToken.None);
