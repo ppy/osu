@@ -75,6 +75,7 @@ namespace osu.Game.Online.API
                 localUser.Value = createGuestUser();
                 configSupporter.Value = false;
                 friends.Clear();
+                blocks.Clear();
             });
         }
 
