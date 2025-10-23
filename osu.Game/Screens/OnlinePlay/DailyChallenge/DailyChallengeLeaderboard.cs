@@ -164,7 +164,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
                         if (s.UserID == api.LocalUser.Value.Id)
                             highlightType = BeatmapLeaderboardScore.HighlightType.Own;
-                        else if (api.Friends.Any(r => r.TargetID == s.UserID))
+                        else if (api.LocalUserState.Friends.Any(r => r.TargetID == s.UserID))
                             highlightType = BeatmapLeaderboardScore.HighlightType.Friend;
 
                         return new BeatmapLeaderboardScore(s, sheared: false)

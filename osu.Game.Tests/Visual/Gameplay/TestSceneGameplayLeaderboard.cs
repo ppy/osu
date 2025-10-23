@@ -90,8 +90,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 var api = (DummyAPIAccess)API;
 
-                api.Friends.Clear();
-                api.Friends.Add(new APIRelation
+                api.LocalUserState.Friends.Clear();
+                api.LocalUserState.Friends.Add(new APIRelation
                 {
                     Mutual = true,
                     RelationType = RelationType.Friend,
@@ -129,8 +129,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 var api = (DummyAPIAccess)API;
 
-                api.Friends.Clear();
-                api.Friends.Add(new APIRelation
+                api.LocalUserState.Friends.Clear();
+                api.LocalUserState.Friends.Add(new APIRelation
                 {
                     Mutual = true,
                     RelationType = RelationType.Friend,
