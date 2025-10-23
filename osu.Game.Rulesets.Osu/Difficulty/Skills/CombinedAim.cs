@@ -8,9 +8,9 @@ using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
-    public class TotalAim : Aim
+    public class CombinedAim : Aim
     {
-        public TotalAim(Mod[] mods, bool includeSliders)
+        public CombinedAim(Mod[] mods, bool includeSliders)
             : base(mods, includeSliders)
         {
         }

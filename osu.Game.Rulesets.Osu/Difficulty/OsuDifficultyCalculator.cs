@@ -51,8 +51,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods };
 
-            var aim = skills.OfType<TotalAim>().Single(a => a.IncludeSliders);
-            var aimWithoutSliders = skills.OfType<TotalAim>().Single(a => !a.IncludeSliders);
+            var aim = skills.OfType<CombinedAim>().Single(a => a.IncludeSliders);
+            var aimWithoutSliders = skills.OfType<CombinedAim>().Single(a => !a.IncludeSliders);
             var speed = skills.OfType<Speed>().Single();
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
 
@@ -93,8 +93,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             var osuRatingCalculator = new OsuRatingCalculator(mods, totalHits, approachRate, overallDifficulty, mechanicalDifficultyRating, sliderFactor);
 
-            double aimRating = osuRatingCalculator.ComputeTotalAimRating(aimDifficultyValue, snapAimDifficultyValue, flowAimDifficultyValue);
-            double aimRatingNoSliders = osuRatingCalculator.ComputeTotalAimRating(aimNoSlidersDifficultyValue, snapAimDifficultyValue, flowAimDifficultyValue);
+            double aimRating = osuRatingCalculator.ComputeCombinedAimRating(aimDifficultyValue, snapAimDifficultyValue, flowAimDifficultyValue);
+            double aimRatingNoSliders = osuRatingCalculator.ComputeCombinedAimRating(aimNoSlidersDifficultyValue, snapAimDifficultyValue, flowAimDifficultyValue);
             double speedRating = osuRatingCalculator.ComputeSpeedRating(speedDifficultyValue);
 
             double snapAimRating = osuRatingCalculator.ComputeSnapAimRating(snapAimDifficultyValue);
@@ -221,8 +221,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             var skills = new List<Skill>
             {
-                new TotalAim(mods, true),
-                new TotalAim(mods, false),
+                new CombinedAim(mods, true),
+                new CombinedAim(mods, false),
                 new Speed(mods),
                 new SnapAim(mods),
                 new FlowAim(mods),

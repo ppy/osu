@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class FlowAimEvaluator
     {
         // The reason why this exist in evaluator instead of FlowAim skill - it's because it's very important to keep flowaim in the same scaling as snapaim on evaluator level
-        private static double flowMultiplier => 1.12;
+        private const double flow_multiplier = 1.12;
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
@@ -43,12 +43,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Rescale the distance to make it closer d/t
             if (osuCurrObj.LazyJumpDistance > diameter)
             {
-                // Change those 2 power coeficients to control amount of buff high spaced flow aim has for comfy/uncomfy patterns
+                // Controls distance scaling for high spaced flow aim
                 flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.4);
             }
             else
             {
-                // Decrease power here if you want to buff low-spaced flow aim
+                // Controls distance scaling for low spaced flow aim
                 flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.8);
             }
 
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             flowDifficulty += angleBonus;
 
-            flowDifficulty *= flowMultiplier;
+            flowDifficulty *= flow_multiplier;
 
             if (osuLast0Obj.BaseObject is Slider && withSliderTravelDistance)
             {
