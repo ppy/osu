@@ -93,8 +93,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             var osuRatingCalculator = new OsuRatingCalculator(mods, totalHits, approachRate, overallDifficulty, mechanicalDifficultyRating, sliderFactor);
 
-            double aimRating = osuRatingCalculator.ComputeAimRating(aimDifficultyValue);
+            double aimRating = osuRatingCalculator.ComputeTotalAimRating(aimDifficultyValue, snapAimDifficultyValue, flowAimDifficultyValue);
+            double aimRatingNoSliders = osuRatingCalculator.ComputeTotalAimRating(aimNoSlidersDifficultyValue, snapAimDifficultyValue, flowAimDifficultyValue);
             double speedRating = osuRatingCalculator.ComputeSpeedRating(speedDifficultyValue);
+
+            double snapAimRating = osuRatingCalculator.ComputeSnapAimRating(snapAimDifficultyValue);
+            double flowAimRating = osuRatingCalculator.ComputeFlowAimRating(flowAimDifficultyValue);
 
             double flashlightRating = 0.0;
 
@@ -141,7 +145,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SpinnerCount = spinnerCount,
                 NestedScorePerObject = sliderNestedScorePerObject,
                 LegacyScoreBaseMultiplier = legacyScoreBaseMultiplier,
-                MaximumLegacyComboScore = scoreAttributes.ComboScore
+                MaximumLegacyComboScore = scoreAttributes.ComboScore,
+                SnapAimDifficulty = snapAimRating,
+                FlowAimDifficulty = flowAimRating
             };
 
             return attributes;
