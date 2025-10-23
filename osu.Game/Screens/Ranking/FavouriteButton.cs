@@ -109,6 +109,7 @@ namespace osu.Game.Screens.Ranking
 
                 Enabled.Value = true;
                 loading.Hide();
+                api.LocalUserState.UpdateFavouriteBeatmapSets();
             };
             favouriteRequest.Failure += e =>
             {
