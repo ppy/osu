@@ -42,6 +42,7 @@ namespace osu.Game.Screens.SelectV2
         public required Func<FilterCriteria> GetCriteria { get; init; }
         public required Func<List<BeatmapCollection>> GetCollections { get; init; }
         public required Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> GetLocalUserTopRanks { get; init; }
+        public required Func<HashSet<int>> GetFavouriteBeatmapSets { get; init; }
 
         public async Task<List<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken)
         {
@@ -220,9 +221,11 @@ namespace osu.Game.Screens.SelectV2
                     return getGroupsBy(b => defineGroupByRankAchieved(b, topRankMapping), items);
                 }
 
-                // TODO: need implementation
-                // case GroupMode.Favourites:
-                //     goto case GroupMode.None;
+                case GroupMode.Favourites:
+                {
+                    var favouriteBeatmapSets = GetFavouriteBeatmapSets();
+                    return getGroupsBy(b => defineGroupByFavourites(b, favouriteBeatmapSets), items);
+                }
 
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -427,6 +430,14 @@ namespace osu.Game.Screens.SelectV2
                 return new RankDisplayGroupDefinition(rank).Yield();
 
             return new GroupDefinition(int.MaxValue, "Unplayed").Yield();
+        }
+
+        private IEnumerable<GroupDefinition> defineGroupByFavourites(BeatmapInfo beatmap, HashSet<int> favouriteBeatmapSets)
+        {
+            if (beatmap.BeatmapSet?.OnlineID > 0 && favouriteBeatmapSets.Contains(beatmap.BeatmapSet.OnlineID))
+                return new GroupDefinition(0, "Favourites").Yield();
+
+            return [];
         }
 
         private record GroupMapping(GroupDefinition? Group, List<CarouselItem> ItemsInGroup);
