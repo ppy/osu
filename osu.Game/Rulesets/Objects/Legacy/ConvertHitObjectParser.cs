@@ -608,7 +608,16 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         public class LegacyHitSampleInfo : HitSampleInfo, IEquatable<LegacyHitSampleInfo>
         {
-            public readonly int CustomSampleBank;
+            public int CustomSampleBank
+            {
+                get
+                {
+                    if (Suffix != null)
+                        return int.Parse(Suffix);
+
+                    return UseBeatmapSamples ? 1 : 0;
+                }
+            }
 
             /// <summary>
             /// Whether this hit sample is layered.
@@ -626,16 +635,33 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public bool BankSpecified;
 
             public LegacyHitSampleInfo(string name, string? bank = null, int volume = 0, bool editorAutoBank = false, int customSampleBank = 0, bool isLayered = false)
-                : base(name, bank ?? SampleControlPoint.DEFAULT_BANK, customSampleBank >= 2 ? customSampleBank.ToString() : null, volume, editorAutoBank)
+                : base(
+                    name,
+                    bank ?? SampleControlPoint.DEFAULT_BANK,
+                    suffix: customSampleBank >= 2 ? customSampleBank.ToString() : null,
+                    volume,
+                    editorAutoBank,
+                    useBeatmapSamples: customSampleBank >= 1)
             {
-                CustomSampleBank = customSampleBank;
                 BankSpecified = !string.IsNullOrEmpty(bank);
                 IsLayered = isLayered;
             }
 
             public sealed override HitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default,
-                                                      Optional<bool> newEditorAutoBank = default)
-                => With(newName, newBank, newVolume, newEditorAutoBank);
+                                                      Optional<bool> newEditorAutoBank = default, Optional<bool> newUseBeatmapSamples = default)
+            {
+                string? suffix = newSuffix.GetOr(Suffix);
+                bool useBeatmapSamples = newUseBeatmapSamples.GetOr(UseBeatmapSamples);
+                int newCustomSampleBank = 0;
+
+                if (suffix != null)
+                    _ = int.TryParse(suffix, out newCustomSampleBank);
+
+                if (newCustomSampleBank == 0 && useBeatmapSamples)
+                    newCustomSampleBank = 1;
+
+                return With(newName, newBank, newVolume, newEditorAutoBank, newCustomSampleBank);
+            }
 
             public virtual LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<int> newVolume = default,
                                                     Optional<bool> newEditorAutoBank = default, Optional<int> newCustomSampleBank = default, Optional<bool> newIsLayered = default)

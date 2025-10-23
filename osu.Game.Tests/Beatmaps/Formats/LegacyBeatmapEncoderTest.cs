@@ -11,6 +11,7 @@ using NUnit.Framework;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
@@ -234,6 +235,31 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decodedSlider = (Slider)decodedAfterEncode.beatmap.HitObjects[0];
             Assert.That(decodedSlider.Path.ControlPoints.Select(p => p.Position),
                 Is.EquivalentTo(originalSlider.Path.ControlPoints.Select(p => p.Position)));
+        }
+
+        [Test]
+        public void TestEncodeCustomSampleBanks()
+        {
+            var beatmap = new Beatmap
+            {
+                HitObjects =
+                {
+                    new HitCircle { StartTime = 100, Samples = [new HitSampleInfo(HitSampleInfo.HIT_NORMAL)] },
+                    new HitCircle { StartTime = 200, Samples = [new HitSampleInfo(HitSampleInfo.HIT_NORMAL, useBeatmapSamples: true)] },
+                    new HitCircle { StartTime = 300, Samples = [new HitSampleInfo(HitSampleInfo.HIT_NORMAL, suffix: "3", useBeatmapSamples: true)] },
+                }
+            };
+
+            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy((beatmap, new TestLegacySkin(beatmaps_resource_store, string.Empty))), string.Empty);
+
+            Assert.That(decodedAfterEncode.beatmap.HitObjects[0].Samples[0].Suffix, Is.Null);
+            Assert.That(decodedAfterEncode.beatmap.HitObjects[0].Samples[0].UseBeatmapSamples, Is.False);
+
+            Assert.That(decodedAfterEncode.beatmap.HitObjects[1].Samples[0].Suffix, Is.Null);
+            Assert.That(decodedAfterEncode.beatmap.HitObjects[1].Samples[0].UseBeatmapSamples, Is.True);
+
+            Assert.That(decodedAfterEncode.beatmap.HitObjects[2].Samples[0].Suffix, Is.EqualTo("3"));
+            Assert.That(decodedAfterEncode.beatmap.HitObjects[2].Samples[0].UseBeatmapSamples, Is.True);
         }
 
         private bool areComboColoursEqual(IHasComboColours a, IHasComboColours b)
