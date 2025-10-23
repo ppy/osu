@@ -39,17 +39,9 @@ namespace osu.Game.Screens.SelectV2
         private Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>> setMap = new Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>>();
         private Dictionary<GroupDefinition, HashSet<CarouselItem>> groupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>();
 
-        private readonly Func<FilterCriteria> getCriteria;
-        private readonly Func<List<BeatmapCollection>> getCollections;
-        private readonly Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> getLocalUserTopRanks;
-
-        public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria, Func<List<BeatmapCollection>> getCollections,
-                                             Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> getLocalUserTopRanks)
-        {
-            this.getCriteria = getCriteria;
-            this.getCollections = getCollections;
-            this.getLocalUserTopRanks = getLocalUserTopRanks;
-        }
+        public required Func<FilterCriteria> GetCriteria { get; init; }
+        public required Func<List<BeatmapCollection>> GetCollections { get; init; }
+        public required Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> GetLocalUserTopRanks { get; init; }
 
         public async Task<List<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken)
         {
@@ -59,7 +51,7 @@ namespace osu.Game.Screens.SelectV2
                 var newSetMap = new Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>>(setMap.Count);
                 var newGroupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>(groupMap.Count);
 
-                var criteria = getCriteria();
+                var criteria = GetCriteria();
                 var newItems = new List<CarouselItem>();
 
                 BeatmapSetsGroupedTogether = ShouldGroupBeatmapsTogether(criteria);
@@ -215,7 +207,7 @@ namespace osu.Game.Screens.SelectV2
 
                 case GroupMode.Collections:
                 {
-                    var collections = getCollections();
+                    var collections = GetCollections();
                     return getGroupsBy(b => defineGroupByCollection(b, collections), items);
                 }
 
@@ -224,7 +216,7 @@ namespace osu.Game.Screens.SelectV2
 
                 case GroupMode.RankAchieved:
                 {
-                    var topRankMapping = getLocalUserTopRanks(criteria);
+                    var topRankMapping = GetLocalUserTopRanks(criteria);
                     return getGroupsBy(b => defineGroupByRankAchieved(b, topRankMapping), items);
                 }
 

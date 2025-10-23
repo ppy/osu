@@ -368,10 +368,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private static async Task<List<CarouselItem>> runGrouping(GroupMode group, List<BeatmapSetInfo> beatmapSets)
         {
-            var groupingFilter = new BeatmapCarouselFilterGrouping(
-                () => new FilterCriteria { Group = group },
-                () => new List<BeatmapCollection>(),
-                _ => new Dictionary<Guid, ScoreRank>());
+            var groupingFilter = new BeatmapCarouselFilterGrouping
+            {
+                GetCriteria = () => new FilterCriteria { Group = group },
+                GetCollections = () => new List<BeatmapCollection>(),
+                GetLocalUserTopRanks = _ => new Dictionary<Guid, ScoreRank>()
+            };
 
             return await groupingFilter.Run(beatmapSets.SelectMany(s => s.Beatmaps.Select(b => new CarouselItem(b))).ToList(), CancellationToken.None);
         }
