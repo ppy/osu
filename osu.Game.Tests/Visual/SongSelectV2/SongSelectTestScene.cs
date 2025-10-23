@@ -190,5 +190,13 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         protected void WaitForSuspension() => AddUntilStep("wait for not current", () => !SongSelect.AsNonNull().IsCurrentScreen());
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (Rulesets.IsNotNull())
+                Rulesets.Dispose();
+        }
     }
 }

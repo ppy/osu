@@ -9,6 +9,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
@@ -24,6 +25,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private readonly AudioAdjustments clockAdjustmentsFromMods = new AudioAdjustments();
         private readonly SpectatorPlayerClock spectatorPlayerClock;
+
+        // purposefully cached as empty - the multi spectator screen already has one leaderboard, on the left of all the player instances
+        [Cached(typeof(IGameplayLeaderboardProvider))]
+        private readonly EmptyGameplayLeaderboardProvider leaderboardProvider = new EmptyGameplayLeaderboardProvider();
 
         /// <summary>
         /// Creates a new <see cref="MultiSpectatorPlayer"/>.

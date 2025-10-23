@@ -140,7 +140,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     foreach (var panel in panels)
                     {
                         panel.FadeTo(1, 200);
-                        panel.Horizontal = false;
+                        panel.DisplayMode = PlayerPanelDisplayMode.Vertical;
                     }
 
                     gridLayout.AcquirePanels(panels.ToArray());
@@ -150,7 +150,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     foreach (var panel in panels)
                     {
                         panel.FadeTo(1, 200);
-                        panel.Horizontal = true;
+                        panel.DisplayMode = PlayerPanelDisplayMode.Horizontal;
                     }
 
                     int leftCount = (int)Math.Ceiling(panels.Count / 2f);
@@ -280,8 +280,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 if (panel?.Parent == null)
                     return;
 
-                Size = panel.Horizontal ? PlayerPanel.SIZE_HORIZONTAL : PlayerPanel.SIZE_VERTICAL;
-                Size *= panel.Scale;
+                Size = panel.Size * panel.Scale;
 
                 var targetPos = getFinalPosition();
 

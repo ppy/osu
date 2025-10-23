@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -30,9 +31,9 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             AddStep("add maarvin", () => panel!.AddUser(new APIUser
             {
-                Id = 6411631,
+                Id = DummyAPIAccess.DUMMY_USER_ID,
                 Username = "Maarvin",
-            }, isOwnUser: true));
+            }));
             AddStep("add peppy", () => panel!.AddUser(new APIUser
             {
                 Id = 2,

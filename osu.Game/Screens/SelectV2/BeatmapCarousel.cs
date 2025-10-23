@@ -31,6 +31,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Filter;
 using Realms;
 
 namespace osu.Game.Screens.SelectV2
@@ -371,7 +372,7 @@ namespace osu.Game.Screens.SelectV2
 
                         if (userCollapsedGroup)
                         {
-                            if (grouping.BeatmapSetsGroupedTogether && CurrentGroupedBeatmap != null)
+                            if (grouping.BeatmapSetsGroupedTogether && CurrentGroupedBeatmap != null && CheckModelEquality(group, CurrentGroupedBeatmap.Group))
                                 setExpandedSet(new GroupedBeatmapSet(CurrentGroupedBeatmap.Group, CurrentGroupedBeatmap.Beatmap.BeatmapSet!));
                             userCollapsedGroup = false;
                         }
@@ -772,6 +773,9 @@ namespace osu.Game.Screens.SelectV2
 
             Criteria = criteria;
 
+            if (criteria.Group == GroupMode.None)
+                userCollapsedGroup = false;
+
             loadingDebounce ??= Scheduler.AddDelayed(() =>
             {
                 if (loading.State.Value == Visibility.Visible)
@@ -840,9 +844,11 @@ namespace osu.Game.Screens.SelectV2
         private readonly DrawablePool<PanelGroup> groupPanelPool = new DrawablePool<PanelGroup>(100);
         private readonly DrawablePool<PanelGroupStarDifficulty> starsGroupPanelPool = new DrawablePool<PanelGroupStarDifficulty>(11);
         private readonly DrawablePool<PanelGroupRankDisplay> ranksGroupPanelPool = new DrawablePool<PanelGroupRankDisplay>(9);
+        private readonly DrawablePool<PanelGroupRankedStatus> statusGroupPanelPool = new DrawablePool<PanelGroupRankedStatus>(8);
 
         private void setupPools()
         {
+            AddInternal(statusGroupPanelPool);
             AddInternal(ranksGroupPanelPool);
             AddInternal(starsGroupPanelPool);
             AddInternal(groupPanelPool);
@@ -880,6 +886,9 @@ namespace osu.Game.Screens.SelectV2
             if (x is RankDisplayGroupDefinition rankX && y is RankDisplayGroupDefinition rankY)
                 return rankX.Equals(rankY);
 
+            if (x is RankedStatusGroupDefinition statusX && y is RankedStatusGroupDefinition statusY)
+                return statusX.Equals(statusY);
+
             return base.CheckModelEquality(x, y);
         }
 
@@ -887,6 +896,9 @@ namespace osu.Game.Screens.SelectV2
         {
             switch (item.Model)
             {
+                case RankedStatusGroupDefinition:
+                    return statusGroupPanelPool.Get();
+
                 case StarDifficultyGroupDefinition:
                     return starsGroupPanelPool.Get();
 
@@ -1012,13 +1024,13 @@ namespace osu.Game.Screens.SelectV2
 
         private bool nextRandomSet()
         {
-            ICollection<GroupedBeatmapSet> visibleGroupedSets = ExpandedGroup != null
+            ICollection<GroupedBeatmapSet> visibleGroupedSets = ExpandedGroup != null && grouping.GroupItems.TryGetValue(ExpandedGroup, out var groupItems)
                 // In the case of grouping, users expect random to only operate on the expanded group.
                 // This is going to incur some overhead as we don't have a group-beatmapset mapping currently.
                 //
                 // If this becomes an issue, we could either store a mapping, or run the random algorithm many times
                 // using the `SetItems` method until we get a group HIT.
-                ? grouping.GroupItems[ExpandedGroup].Select(i => i.Model).OfType<GroupedBeatmapSet>().ToArray()
+                ? groupItems.Select(i => i.Model).OfType<GroupedBeatmapSet>().ToArray()
                 // This is the fastest way to retrieve sets for randomisation.
                 : grouping.SetItems.Keys;
 
@@ -1153,6 +1165,11 @@ namespace osu.Game.Screens.SelectV2
     /// Defines a grouping header for a set of carousel items grouped by achieved rank.
     /// </summary>
     public record RankDisplayGroupDefinition(ScoreRank Rank) : GroupDefinition(-(int)Rank, Rank.GetLocalisableDescription());
+
+    /// <summary>
+    /// Defines a grouping header for a set of carousel items grouped by ranked status.
+    /// </summary>
+    public record RankedStatusGroupDefinition(int Order, BeatmapOnlineStatus Status) : GroupDefinition(Order, Status.GetLocalisableDescription());
 
     /// <summary>
     /// Used to represent a portion of a <see cref="BeatmapSetInfo"/> under a <see cref="GroupDefinition"/>.

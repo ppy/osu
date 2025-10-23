@@ -213,7 +213,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("mods selected", () => SelectedMods.Value, () => Has.Count.EqualTo(1));
             AddStep("right click mod button", () =>
             {
-                InputManager.MoveMouseTo(Footer.ChildrenOfType<FooterButtonMods>().Single());
+                InputManager.MoveMouseTo(ScreenFooter.ChildrenOfType<FooterButtonMods>().Single());
                 InputManager.Click(MouseButton.Right);
             });
             AddAssert("not mods selected", () => SelectedMods.Value, () => Has.Count.EqualTo(0));
@@ -620,7 +620,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("previous random invoked", () => previousRandomCalled && !nextRandomCalled);
         }
 
-        private FooterButtonRandom randomButton => Footer.ChildrenOfType<FooterButtonRandom>().Single();
+        private FooterButtonRandom randomButton => ScreenFooter.ChildrenOfType<FooterButtonRandom>().Single();
 
         [Test]
         public void TestFooterOptions()

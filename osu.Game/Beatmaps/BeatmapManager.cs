@@ -284,6 +284,7 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
+        /// IMPORTANT: This should not be used outside of tests. Consider using <see cref="RealmDetachedBeatmapStore"/> instead.
         /// </summary>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
         public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
@@ -563,6 +564,16 @@ namespace osu.Game.Beatmaps
 
             var beatmap = r.Find<BeatmapInfo>(beatmapSetInfo.ID)!;
             beatmap.LastPlayed = DateTimeOffset.Now;
+
+            transaction.Commit();
+        });
+
+        public void MarkNotPlayed(BeatmapInfo beatmapSetInfo) => Realm.Run(r =>
+        {
+            using var transaction = r.BeginWrite();
+
+            var beatmap = r.Find<BeatmapInfo>(beatmapSetInfo.ID)!;
+            beatmap.LastPlayed = null;
 
             transaction.Commit();
         });
