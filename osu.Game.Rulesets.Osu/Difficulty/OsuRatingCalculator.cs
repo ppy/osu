@@ -74,7 +74,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModAutopilot))
                 return 0;
 
-            double snapAimRating = Math.Sqrt(snapAimDifficultyValue) * difficulty_multiplier;
             double snapAimRating = CalculateDifficultyRating(snapAimDifficultyValue);
 
             if (mods.Any(m => m is OsuModTouchDevice))
