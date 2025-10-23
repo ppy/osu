@@ -75,6 +75,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0;
 
             double snapAimRating = Math.Sqrt(snapAimDifficultyValue) * difficulty_multiplier;
+            double snapAimRating = CalculateDifficultyRating(snapAimDifficultyValue);
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 snapAimRating = Math.Pow(snapAimRating, touch_device_multiplier);
@@ -91,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModAutopilot) || mods.Any(m => m is OsuModRelax))
                 return 0;
 
-            double flowAimRating = Math.Sqrt(flowAimDifficultyValue) * difficulty_multiplier;
+            double flowAimRating = CalculateDifficultyRating(flowAimDifficultyValue);
 
             // To ensure that result would not be bigger than normal aim difficulty rating
             if (mods.Any(m => m is OsuModTouchDevice))
