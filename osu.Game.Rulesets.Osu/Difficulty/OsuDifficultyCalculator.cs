@@ -51,8 +51,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods };
 
-            var aim = skills.OfType<Aim>().Single(a => a.IncludeSliders);
-            var aimWithoutSliders = skills.OfType<Aim>().Single(a => !a.IncludeSliders);
+            var aim = skills.OfType<TotalAim>().Single(a => a.IncludeSliders);
+            var aimWithoutSliders = skills.OfType<TotalAim>().Single(a => !a.IncludeSliders);
             var speed = skills.OfType<Speed>().Single();
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
 
@@ -84,6 +84,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimDifficultyValue = aim.DifficultyValue();
             double aimNoSlidersDifficultyValue = aimWithoutSliders.DifficultyValue();
+            double snapAimDifficultyValue = skills.OfType<SnapAim>().Single().DifficultyValue();
+            double flowAimDifficultyValue = skills.OfType<FlowAim>().Single().DifficultyValue();
             double speedDifficultyValue = speed.DifficultyValue();
 
             double mechanicalDifficultyRating = calculateMechanicalDifficultyRating(aimDifficultyValue, speedDifficultyValue);
@@ -181,9 +183,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             var skills = new List<Skill>
             {
-                new Aim(mods, true),
-                new Aim(mods, false),
-                new Speed(mods)
+                new TotalAim(mods, true),
+                new TotalAim(mods, false),
+                new Speed(mods),
+                new SnapAim(mods),
+                new FlowAim(mods),
             };
 
             if (mods.Any(h => h is OsuModFlashlight))
