@@ -88,7 +88,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double flowAimDifficultyValue = skills.OfType<FlowAim>().Single().DifficultyValue();
             double speedDifficultyValue = speed.DifficultyValue();
 
-            double mechanicalDifficultyRating = calculateMechanicalDifficultyRating(aimDifficultyValue, speedDifficultyValue);
+            double totalAimDifficultyValue = double.Lerp(aimDifficultyValue, snapAimDifficultyValue + flowAimDifficultyValue, OsuRatingCalculator.AIM_VERSATILITY_BONUS);
+            double mechanicalDifficultyRating = calculateMechanicalDifficultyRating(totalAimDifficultyValue, speedDifficultyValue);
             double sliderFactor = aimDifficultyValue > 0 ? OsuRatingCalculator.CalculateDifficultyRating(aimNoSlidersDifficultyValue) / OsuRatingCalculator.CalculateDifficultyRating(aimDifficultyValue) : 1;
 
             var osuRatingCalculator = new OsuRatingCalculator(mods, totalHits, approachRate, overallDifficulty, mechanicalDifficultyRating, sliderFactor);
@@ -117,8 +118,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double basePerformance =
                 Math.Pow(
-                    Math.Pow(baseAimPerformance, 1.1) +
-                    Math.Pow(baseSpeedPerformance, 1.1) +
+                    Math.Pow(SumMechanicalDifficulty(baseAimPerformance, baseSpeedPerformance), 1.1) +
                     Math.Pow(baseFlashlightPerformance, 1.1), 1.0 / 1.1
                 );
 
@@ -151,6 +151,33 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             };
 
             return attributes;
+        }
+
+        // Summation for aim and speed, reducing reward for mixed maps
+        public static double SumMechanicalDifficulty(double aim, double speed)
+        {
+            const double addition_portion = 0.1;
+
+            // We take this min to max ratio as a basepoint to be not changed when addition_portion is changed
+            const double balance_base_point = 0.2;
+            const double power = 1.1;
+
+            // This is automatically-computed multiplier to avoid manual multiplier balancing when addition_portion is changed
+            double multiplier = Math.Pow(1 + Math.Pow(balance_base_point, power), 1.0 / power) /
+                Math.Pow(
+                    Math.Pow(1 + addition_portion, power) +
+                    Math.Pow(balance_base_point + addition_portion, power), 1.0 / power
+                );
+
+            double max = Math.Max(aim, speed);
+
+            double difficulty =
+                Math.Pow(
+                    Math.Pow(aim + addition_portion * max, power) +
+                    Math.Pow(speed + addition_portion * max, power), 1.0 / power
+                );
+
+            return difficulty * multiplier;
         }
 
         private double calculateMechanicalDifficultyRating(double aimDifficultyValue, double speedDifficultyValue)
