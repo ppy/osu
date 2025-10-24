@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Globalization;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -36,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 return string.Empty;
 
                 string format(string acronym, DifficultyBindable bindable, int digits)
-                    => $"{acronym}{bindable.Value!.Value.ToStandardFormattedString(digits, cultureInfo: CultureInfo.InvariantCulture)}";
+                    => $"{acronym}{bindable.Value!.Value.ToStandardFormattedString(digits)}";
             }
         }
 
