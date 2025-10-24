@@ -107,7 +107,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 flow.Add(new StageSegment(i, MatchmakingStage.ResultsDisplaying, "Results"));
             }
 
-            flow.Add(new StageSegment(null, MatchmakingStage.Ended, "Match End"));
+            flow.Add(new StageSegment(round_count, MatchmakingStage.Ended, "Match End"));
         }
 
         protected override void Update()
