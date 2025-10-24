@@ -86,8 +86,7 @@ namespace osu.Game.Screens.SelectV2
             }
             else
             {
-                // `CurrentSelectionItem` cannot be used here because it may not be correctly set yet.
-                if (CurrentSelection != null && (CheckModelEquality(top.Model, CurrentSelection) || CheckModelEquality(bottom.Model, CurrentSelection)))
+                if (CurrentSelection != null && (top == CurrentSelectionItem || bottom == CurrentSelectionItem))
                     return SPACING * 2;
             }
 
