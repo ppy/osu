@@ -40,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
     /// <summary>
     /// The main matchmaking screen which houses a custom <see cref="ScreenStack"/> through the life cycle of a single session.
     /// </summary>
-    public partial class ScreenMatchmaking : OsuScreen, IPreviewTrackOwner
+    public partial class ScreenMatchmaking : OsuScreen, IPreviewTrackOwner, IHandlePresentBeatmap
     {
         /// <summary>
         /// Padding between rows of the content.
@@ -419,6 +419,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
             beatmap.NewValue.PrepareTrackForPreview(true);
             music.EnsurePlayingSomething();
+        }
+
+        public void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset)
+        {
+            // Do nothing to prevent the user from potentially being kicked out
+            // of gameplay due to the screen performer's internal processes.
         }
 
         protected override void Dispose(bool isDisposing)
