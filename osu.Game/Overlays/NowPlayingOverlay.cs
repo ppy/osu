@@ -121,6 +121,7 @@ namespace osu.Game.Overlays
                                         Origin = Anchor.Centre,
                                     },
                                     NonOverflowingContentAnchor = Anchor.Centre,
+                                    Padding = new MarginPadding { Horizontal = 15 },
                                 },
                                 artist = new MarqueeContainer
                                 {
@@ -136,6 +137,7 @@ namespace osu.Game.Overlays
                                         Origin = Anchor.Centre,
                                     },
                                     NonOverflowingContentAnchor = Anchor.Centre,
+                                    Padding = new MarginPadding { Horizontal = 15 },
                                 },
                                 new Container
                                 {
