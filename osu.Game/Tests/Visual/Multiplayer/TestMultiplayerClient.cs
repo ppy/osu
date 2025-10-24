@@ -851,7 +851,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             await StartCountdown(new MatchmakingStageCountdown
             {
                 Stage = stage,
-                TimeRemaining = TimeSpan.FromSeconds(10)
+                TimeRemaining = TimeSpan.FromSeconds(stage == MatchmakingStage.UserBeatmapSelect ? 30 : 10)
             }).ConfigureAwait(false);
         }
 
