@@ -49,8 +49,15 @@ namespace osu.Game.Overlays
 
         private Func<Drawable>? createContent;
 
+        public new MarginPadding Padding
+        {
+            get => base.Padding;
+            set => base.Padding = value;
+        }
+
+        public float OverflowSpacing { get; init; } = 15;
+
         private const float pixels_per_second = 50;
-        private const float padding = 15;
 
         private Drawable mainContent = null!;
         private Drawable fillerContent = null!;
@@ -71,8 +78,7 @@ namespace osu.Game.Overlays
                 Direction = FillDirection.Horizontal,
                 Anchor = NonOverflowingContentAnchor,
                 Origin = NonOverflowingContentAnchor,
-                Spacing = new Vector2(padding),
-                Padding = new MarginPadding { Horizontal = padding },
+                Spacing = new Vector2(OverflowSpacing),
             };
         }
 
@@ -105,7 +111,7 @@ namespace osu.Game.Overlays
                 flow.Anchor = Anchor.TopLeft;
                 flow.Origin = Anchor.TopLeft;
 
-                float targetX = mainContent.DrawWidth + padding;
+                float targetX = mainContent.DrawWidth + OverflowSpacing;
 
                 flow.MoveToX(0)
                     .Delay(InitialMoveDelay)
