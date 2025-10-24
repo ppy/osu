@@ -18,9 +18,11 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Matchmaking.Events;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -74,6 +76,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
         [Resolved]
         private AudioManager audio { get; set; } = null!;
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; } = null!;
@@ -285,21 +290,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
             downloadCheckCancellation?.Cancel();
 
+            if (beatmapManager.IsAvailableLocally(new APIBeatmap { OnlineID = item.BeatmapID }))
+                return;
+
             // In a perfect world we'd use BeatmapAvailability, but there's no event-driven flow for when a selection changes.
             // ie. if selection changes from "not downloaded" to another "not downloaded" we wouldn't get a value changed raised.
             beatmapLookupCache
                 .GetBeatmapAsync(item.BeatmapID, (downloadCheckCancellation = new CancellationTokenSource()).Token)
                 .ContinueWith(resolved => Schedule(() =>
                 {
-                    var beatmapSet = resolved.GetResultSafely()?.BeatmapSet;
+                    APIBeatmapSet? beatmapSet = resolved.GetResultSafely()?.BeatmapSet;
 
                     if (beatmapSet == null)
                         return;
 
-                    if (beatmapManager.IsAvailableLocally(new BeatmapSetInfo { OnlineID = beatmapSet.OnlineID }))
-                        return;
-
-                    beatmapDownloader.Download(beatmapSet);
+                    beatmapDownloader.Download(beatmapSet, config.Get<bool>(OsuSetting.PreferNoVideo));
                 }));
         }
 
