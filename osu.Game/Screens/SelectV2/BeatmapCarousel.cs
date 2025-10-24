@@ -809,7 +809,15 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        protected virtual List<BeatmapCollection> GetAllCollections() => realm.Run(r => r.All<BeatmapCollection>().AsEnumerable().Detach());
+        /// <remarks>
+        /// FOOTGUN WARNING: this being sorted on the realm side before detaching is IMPORTANT.
+        /// realm supports sorting as an internal operation, and realm's implementation of string sorting does NOT match dotnet's
+        /// with respect to treatment of punctuation characters like <c>-</c> or <c>_</c>, among others.
+        /// All other places that show lists of collections also use the realm-side sorting implementation,
+        /// because they use the sorting operation inside subscription queries for efficient drawable management,
+        /// so this usage kind of has to follow suit.
+        /// </remarks>
+        protected virtual List<BeatmapCollection> GetAllCollections() => realm.Run(r => r.All<BeatmapCollection>().OrderBy(c => c.Name).AsEnumerable().Detach());
 
         protected virtual Dictionary<Guid, ScoreRank> GetBeatmapInfoGuidToTopRankMapping(FilterCriteria criteria) => realm.Run(r =>
         {
