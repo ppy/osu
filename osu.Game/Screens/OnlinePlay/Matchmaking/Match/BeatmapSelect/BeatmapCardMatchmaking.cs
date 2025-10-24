@@ -317,7 +317,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         {
             get
             {
-                List<MenuItem> items = [new OsuMenuItem(ContextMenuStrings.ViewBeatmap, MenuItemType.Highlighted, DefaultAction)];
+                List<MenuItem> items = new List<MenuItem>
+                {
+                    new OsuMenuItem(ContextMenuStrings.ViewBeatmap, MenuItemType.Highlighted, DefaultAction)
+                };
 
                 foreach (var button in buttonContainer.Buttons)
                 {
