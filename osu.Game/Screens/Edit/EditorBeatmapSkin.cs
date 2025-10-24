@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Edit
 
         public IEnumerable<SampleSet> GetAvailableSampleSets()
         {
-            string[] possibleSounds = [HitSampleInfo.HIT_NORMAL, ..HitSampleInfo.ALL_ADDITIONS];
+            string[] possibleSounds = HitSampleInfo.ALL_ADDITIONS.Prepend(HitSampleInfo.HIT_NORMAL).ToArray();
             string[] possibleBanks = HitSampleInfo.ALL_BANKS;
 
             string[] possiblePrefixes = possibleSounds.SelectMany(sound => possibleBanks.Select(bank => $@"{bank}-{sound}")).ToArray();
