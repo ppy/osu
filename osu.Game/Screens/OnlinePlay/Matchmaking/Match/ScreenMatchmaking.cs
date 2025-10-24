@@ -16,10 +16,13 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Matchmaking.Events;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -37,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
     /// <summary>
     /// The main matchmaking screen which houses a custom <see cref="ScreenStack"/> through the life cycle of a single session.
     /// </summary>
-    public partial class ScreenMatchmaking : OsuScreen
+    public partial class ScreenMatchmaking : OsuScreen, IPreviewTrackOwner
     {
         /// <summary>
         /// Padding between rows of the content.
@@ -73,6 +76,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
         [Resolved]
         private AudioManager audio { get; set; } = null!;
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; } = null!;
+
+        [Resolved]
+        private MusicController music { get; set; } = null!;
 
         private readonly MultiplayerRoom room;
 
@@ -224,19 +236,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             // Update global gameplay state to correspond to the new selection.
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             var localBeatmap = beatmapManager.QueryBeatmap($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}", item.BeatmapID);
-            Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
-            Ruleset.Value = ruleset;
-            Mods.Value = item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
 
-            if (Beatmap.Value is DummyWorkingBeatmap)
+            if (localBeatmap != null)
             {
-                if (client.LocalUser!.State == MultiplayerUserState.Ready)
-                    client.ChangeState(MultiplayerUserState.Idle).FireAndForget();
+                Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
+                Ruleset.Value = ruleset;
+                Mods.Value = item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+
+                // Notify the server that the beatmap has been set and that we are ready to start gameplay.
+                if (client.LocalUser!.State == MultiplayerUserState.Idle)
+                    client.ChangeState(MultiplayerUserState.Ready).FireAndForget();
             }
             else
             {
-                if (client.LocalUser!.State == MultiplayerUserState.Idle)
-                    client.ChangeState(MultiplayerUserState.Ready).FireAndForget();
+                // Notify the server that we don't have the beatmap.
+                if (client.LocalUser!.State == MultiplayerUserState.Ready)
+                    client.ChangeState(MultiplayerUserState.Idle).FireAndForget();
             }
 
             client.ChangeBeatmapAvailability(beatmapAvailabilityTracker.Availability.Value).FireAndForget();
@@ -275,21 +290,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
             downloadCheckCancellation?.Cancel();
 
+            if (beatmapManager.IsAvailableLocally(new APIBeatmap { OnlineID = item.BeatmapID }))
+                return;
+
             // In a perfect world we'd use BeatmapAvailability, but there's no event-driven flow for when a selection changes.
             // ie. if selection changes from "not downloaded" to another "not downloaded" we wouldn't get a value changed raised.
             beatmapLookupCache
                 .GetBeatmapAsync(item.BeatmapID, (downloadCheckCancellation = new CancellationTokenSource()).Token)
                 .ContinueWith(resolved => Schedule(() =>
                 {
-                    var beatmapSet = resolved.GetResultSafely()?.BeatmapSet;
+                    APIBeatmapSet? beatmapSet = resolved.GetResultSafely()?.BeatmapSet;
 
                     if (beatmapSet == null)
                         return;
 
-                    if (beatmapManager.IsAvailableLocally(new BeatmapSetInfo { OnlineID = beatmapSet.OnlineID }))
-                        return;
-
-                    beatmapDownloader.Download(beatmapSet);
+                    beatmapDownloader.Download(beatmapSet, config.Get<bool>(OsuSetting.PreferNoVideo));
                 }));
         }
 
@@ -308,6 +323,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             return false;
         }
 
+        public override void OnEntering(ScreenTransitionEvent e)
+        {
+            base.OnEntering(e);
+            beginHandlingTrack();
+        }
+
+        public override void OnSuspending(ScreenTransitionEvent e)
+        {
+            onLeaving();
+            base.OnSuspending(e);
+        }
+
         private bool exitConfirmed;
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -320,6 +347,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     return true;
                 }
 
+                onLeaving();
                 client.LeaveRoom().FireAndForget();
                 return false;
             }
@@ -342,6 +370,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
+            beginHandlingTrack();
 
             if (e.Last is not MultiplayerPlayerLoader playerLoader)
                 return;
@@ -353,6 +382,43 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             }
 
             client.ChangeState(MultiplayerUserState.Idle);
+        }
+
+        private void onLeaving()
+        {
+            endHandlingTrack();
+        }
+
+        /// <summary>
+        /// Handles changes in the track to keep it looping while active.
+        /// </summary>
+        private void beginHandlingTrack()
+        {
+            Beatmap.BindValueChanged(applyLoopingToTrack, true);
+        }
+
+        /// <summary>
+        /// Stops looping the current track and stops handling further changes to the track.
+        /// </summary>
+        private void endHandlingTrack()
+        {
+            Beatmap.ValueChanged -= applyLoopingToTrack;
+            Beatmap.Value.Track.Looping = false;
+
+            previewTrackManager.StopAnyPlaying(this);
+        }
+
+        /// <summary>
+        /// Invoked on changes to the beatmap to loop the track. See: <see cref="beginHandlingTrack"/>.
+        /// </summary>
+        /// <param name="beatmap">The beatmap change event.</param>
+        private void applyLoopingToTrack(ValueChangedEvent<WorkingBeatmap> beatmap)
+        {
+            if (!this.IsCurrentScreen())
+                return;
+
+            beatmap.NewValue.PrepareTrackForPreview(true);
+            music.EnsurePlayingSomething();
         }
 
         protected override void Dispose(bool isDisposing)

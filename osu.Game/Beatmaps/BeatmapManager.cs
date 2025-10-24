@@ -644,6 +644,14 @@ namespace osu.Game.Beatmaps
 
         public override bool IsAvailableLocally(BeatmapSetInfo model) => Realm.Run(realm => realm.All<BeatmapSetInfo>().Any(s => s.OnlineID == model.OnlineID && !s.DeletePending));
 
+        public bool IsAvailableLocally(IBeatmapInfo model)
+        {
+            return Realm.Run(r => r.All<BeatmapInfo>()
+                                   .Filter($@"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false")
+                                   .Filter($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}", model.OnlineID)
+                                   .Any());
+        }
+
         #endregion
 
         #region Implementation of IPostImports<out BeatmapSetInfo>
