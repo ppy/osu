@@ -186,7 +186,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
             beatmapAvailabilityTracker.Availability.BindValueChanged(onBeatmapAvailabilityChanged, true);
 
-            Footer?.Add(chat);
+            Footer?.Add(new ChatContainer(chat));
         }
 
         private void onRoomUpdated()
@@ -443,6 +443,33 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 client.UserStateChanged -= onUserStateChanged;
                 client.SettingsChanged -= onSettingsChanged;
                 client.LoadRequested -= onLoadRequested;
+            }
+        }
+
+        // Contains the chat display and a context menu container for it. Shared lifetime with the chat display (expires along with it).
+        private partial class ChatContainer : CompositeDrawable
+        {
+            public override double LifetimeStart => chat.LifetimeStart;
+            public override double LifetimeEnd => chat.LifetimeEnd;
+
+            private readonly MatchmakingChatDisplay chat;
+
+            public ChatContainer(MatchmakingChatDisplay chat)
+            {
+                this.chat = chat;
+
+                Anchor = Anchor.BottomRight;
+                Origin = Anchor.BottomRight;
+
+                // This component is added to the screen footer which is only about 50px high.
+                // Therefore, it's given a large absolute size to give the context menu enough space to display correctly.
+                Size = new Vector2(700);
+
+                InternalChild = new OsuContextMenuContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = chat
+                };
             }
         }
     }
