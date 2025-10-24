@@ -240,7 +240,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         private class LegacyTaikoSampleInfo : HitSampleInfo
         {
             public LegacyTaikoSampleInfo(HitSampleInfo sampleInfo)
-                : base(sampleInfo.Name, sampleInfo.Bank, sampleInfo.Suffix, sampleInfo.Volume)
+                : base(sampleInfo.Name, sampleInfo.Bank, sampleInfo.Suffix, sampleInfo.Volume, sampleInfo.EditorAutoBank, sampleInfo.UseBeatmapSamples)
 
             {
             }

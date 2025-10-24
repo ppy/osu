@@ -303,7 +303,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            isFriend = User != null && api.Friends.Any(u => User.OnlineID == u.TargetID);
+            isFriend = User != null && api.LocalUserState.Friends.Any(u => User.OnlineID == u.TargetID);
 
             scoreDisplayMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
             scoreDisplayMode.BindValueChanged(_ => updateScore());
