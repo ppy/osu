@@ -29,10 +29,10 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
-using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.Gameplay;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Users;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
@@ -87,12 +87,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         private MusicController music { get; set; } = null!;
 
         private readonly MultiplayerRoom room;
+        private readonly MatchmakingChatDisplay chat;
 
         private Sample? sampleStart;
         private CancellationTokenSource? downloadCheckCancellation;
         private int? lastDownloadCheckedBeatmapId;
-
-        private MatchChatDisplay chat = null!;
 
         public ScreenMatchmaking(MultiplayerRoom room)
         {
@@ -100,6 +99,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
             Activity.Value = new UserActivity.InLobby(room);
             Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
+
+            chat = new MatchmakingChatDisplay(new Room(room))
+            {
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
+                Size = new Vector2(700, 130),
+                Margin = new MarginPadding { Bottom = 10, Right = WaveOverlayContainer.WIDTH_PADDING - HORIZONTAL_OVERFLOW_PADDING },
+                Alpha = 0
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -156,13 +164,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                                     {
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
-                                        Width = 700,
-                                        Height = 130,
-                                        Padding = new MarginPadding { Bottom = row_padding },
-                                        Child = chat = new MatchmakingChatDisplay(new Room(room))
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                        }
+                                        Size = new Vector2(700, 130),
+                                        Margin = new MarginPadding { Bottom = row_padding }
                                     }
                                 ]
                             }
@@ -183,7 +186,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
             beatmapAvailabilityTracker.Availability.BindValueChanged(onBeatmapAvailabilityChanged, true);
 
-            Footer!.Add(chat.CreateProxy());
+            Footer?.Add(new ChatContainer(chat));
         }
 
         private void onRoomUpdated()
@@ -326,12 +329,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         public override void OnEntering(ScreenTransitionEvent e)
         {
             base.OnEntering(e);
+
+            chat.Appear();
             beginHandlingTrack();
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
-            onLeaving();
+            chat.Disappear();
+            endHandlingTrack();
+
             base.OnSuspending(e);
         }
 
@@ -347,7 +354,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     return true;
                 }
 
-                onLeaving();
+                chat.Disappear().Expire();
+                endHandlingTrack();
+
                 client.LeaveRoom().FireAndForget();
                 return false;
             }
@@ -370,6 +379,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
+
+            chat.Appear();
             beginHandlingTrack();
 
             if (e.Last is not MultiplayerPlayerLoader playerLoader)
@@ -382,11 +393,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             }
 
             client.ChangeState(MultiplayerUserState.Idle);
-        }
-
-        private void onLeaving()
-        {
-            endHandlingTrack();
         }
 
         /// <summary>
@@ -437,6 +443,33 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 client.UserStateChanged -= onUserStateChanged;
                 client.SettingsChanged -= onSettingsChanged;
                 client.LoadRequested -= onLoadRequested;
+            }
+        }
+
+        // Contains the chat display and a context menu container for it. Shared lifetime with the chat display (expires along with it).
+        private partial class ChatContainer : CompositeDrawable
+        {
+            public override double LifetimeStart => chat.LifetimeStart;
+            public override double LifetimeEnd => chat.LifetimeEnd;
+
+            private readonly MatchmakingChatDisplay chat;
+
+            public ChatContainer(MatchmakingChatDisplay chat)
+            {
+                this.chat = chat;
+
+                Anchor = Anchor.BottomRight;
+                Origin = Anchor.BottomRight;
+
+                // This component is added to the screen footer which is only about 50px high.
+                // Therefore, it's given a large absolute size to give the context menu enough space to display correctly.
+                Size = new Vector2(700);
+
+                InternalChild = new OsuContextMenuContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = chat
+                };
             }
         }
     }
