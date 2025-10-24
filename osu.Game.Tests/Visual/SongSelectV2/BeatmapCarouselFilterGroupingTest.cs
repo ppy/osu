@@ -271,12 +271,19 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             addBeatmapSet(applyStars(2), beatmapSets, out var beatmap2);
             addBeatmapSet(applyStars(2.1), beatmapSets, out var beatmapAbove2);
             addBeatmapSet(applyStars(7), beatmapSets, out var beatmap7);
+            addBeatmapSet(applyStars(13), beatmapSets, out var beatmap13);
+            addBeatmapSet(applyStars(14.996), beatmapSets, out var beatmapAlmost15);
+            addBeatmapSet(applyStars(15), beatmapSets, out var beatmap15);
+            addBeatmapSet(applyStars(22), beatmapSets, out var beatmap22);
 
             var results = await runGrouping(GroupMode.Difficulty, beatmapSets);
             assertGroup(results, 0, "Below 1 Star", beatmapBelow1.Beatmaps, ref total);
             assertGroup(results, 1, "1 Star", (beatmapAbove1.Beatmaps.Concat(beatmapAlmost2.Beatmaps)), ref total);
             assertGroup(results, 2, "2 Stars", (beatmap2.Beatmaps.Concat(beatmapAbove2.Beatmaps)), ref total);
             assertGroup(results, 3, "7 Stars", beatmap7.Beatmaps, ref total);
+            assertGroup(results, 4, "13 Stars", beatmap13.Beatmaps, ref total);
+            assertGroup(results, 5, "14 Stars", beatmapAlmost15.Beatmaps, ref total);
+            assertGroup(results, 6, "Over 15 Stars", beatmap15.Beatmaps.Concat(beatmap22.Beatmaps), ref total);
             assertTotal(results, total);
         }
 

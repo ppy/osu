@@ -169,7 +169,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 else
                 {
                     applySuggestion.Enabled.Value = true;
-                    hintText.Text = AudioSettingsStrings.SuggestedOffsetValueReceived(averageHitErrorHistory.Count, SuggestedOffset.Value.Value.ToStandardFormattedString(0, false));
+                    hintText.Text = AudioSettingsStrings.SuggestedOffsetValueReceived(averageHitErrorHistory.Count, SuggestedOffset.Value.Value.ToStandardFormattedString(0));
                 }
             }
 
