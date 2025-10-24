@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
@@ -18,7 +17,7 @@ using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
-using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
@@ -26,11 +25,10 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Notifications.WebSocket;
-using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
-    public partial class APIAccess : Component, IAPIProvider
+    public partial class APIAccess : CompositeComponent, IAPIProvider
     {
         private readonly OsuGameBase game;
         private readonly OsuConfigManager config;
@@ -53,29 +51,22 @@ namespace osu.Game.Online.API
 
         public string ProvidedUsername { get; private set; }
 
-        public SessionVerificationMethod? SessionVerificationMethod { get; set; }
+        public SessionVerificationMethod? SessionVerificationMethod { get; private set; }
 
         public string SecondFactorCode { get; private set; }
 
         private string password;
 
-        public IBindable<APIUser> LocalUser => localUser;
-        public IBindableList<APIRelation> Friends => friends;
-        public IBindableList<APIRelation> Blocks => blocks;
+        public IBindable<APIUser> LocalUser => localUserState.User;
+
+        public ILocalUserState LocalUserState => localUserState;
+        private readonly LocalUserState localUserState;
 
         public INotificationsClient NotificationsClient { get; }
 
         public Language Language => game.CurrentLanguage.Value;
 
-        private Bindable<APIUser> localUser { get; } = new Bindable<APIUser>(createGuestUser());
-
-        private BindableList<APIRelation> friends { get; } = new BindableList<APIRelation>();
-        private BindableList<APIRelation> blocks { get; } = new BindableList<APIRelation>();
-
         protected bool HasLogin => authentication.Token.Value != null || (!string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password));
-
-        private readonly Bindable<UserStatus> configStatus = new Bindable<UserStatus>();
-        private readonly Bindable<bool> configSupporter = new Bindable<bool>();
 
         private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
         private readonly Logger log;
@@ -108,13 +99,12 @@ namespace osu.Game.Online.API
             authentication.TokenString = config.Get<string>(OsuSetting.Token);
             authentication.Token.ValueChanged += onTokenChanged;
 
-            config.BindWith(OsuSetting.UserOnlineStatus, configStatus);
-            config.BindWith(OsuSetting.WasSupporter, configSupporter);
+            AddInternal(localUserState = new LocalUserState(this, config));
 
             if (HasLogin)
             {
                 // Early call to ensure the local user / "logged in" state is correct immediately.
-                setPlaceholderLocalUser();
+                localUserState.SetPlaceholderLocalUser(ProvidedUsername);
 
                 // This is required so that Queue() requests during startup sequence don't fail due to "not logged in".
                 state.Value = APIState.Connecting;
@@ -249,8 +239,8 @@ namespace osu.Game.Online.API
         /// <returns>Whether the connection attempt was successful.</returns>
         private void attemptConnect()
         {
-            if (localUser.IsDefault)
-                Scheduler.Add(setPlaceholderLocalUser, false);
+            if (LocalUser.IsDefault)
+                Scheduler.Add(localUserState.SetPlaceholderLocalUser, ProvidedUsername, false);
 
             // save the username at this point, if the user requested for it to be.
             config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
@@ -348,8 +338,7 @@ namespace osu.Game.Online.API
                     {
                         Debug.Assert(ThreadSafety.IsUpdateThread);
 
-                        localUser.Value = me;
-                        configSupporter.Value = me.IsSupporter;
+                        localUserState.SetLocalUser(me);
                         SessionVerificationMethod = me.SessionVerificationMethod;
                         state.Value = SessionVerificationMethod == null ? APIState.Online : APIState.RequiresSecondFactorAuth;
                         failureCount = 0;
@@ -365,30 +354,11 @@ namespace osu.Game.Online.API
                 }
             }
 
-            UpdateLocalFriends();
-
             // The Success callback event is fired on the main thread, so we should wait for that to run before proceeding.
             // Without this, we will end up circulating this Connecting loop multiple times and queueing up many web requests
             // before actually going online.
             while (State.Value == APIState.Connecting && !cancellationToken.IsCancellationRequested)
                 Thread.Sleep(500);
-        }
-
-        /// <summary>
-        /// Show a placeholder user if saved credentials are available.
-        /// This is useful for storing local scores and showing a placeholder username after starting the game,
-        /// until a valid connection has been established.
-        /// </summary>
-        private void setPlaceholderLocalUser()
-        {
-            if (!localUser.IsDefault)
-                return;
-
-            localUser.Value = new APIUser
-            {
-                Username = ProvidedUsername,
-                IsSupporter = configSupporter.Value,
-            };
         }
 
         public void Perform(APIRequest request)
@@ -619,77 +589,11 @@ namespace osu.Game.Online.API
             SecondFactorCode = null;
             authentication.Clear();
 
-            // Reset the status to be broadcast on the next login, in case multiple players share the same system.
-            configStatus.Value = UserStatus.Online;
-
-            // Scheduled prior to state change such that the state changed event is invoked with the correct user and their friends present
-            Schedule(() =>
-            {
-                localUser.Value = createGuestUser();
-                configSupporter.Value = false;
-                friends.Clear();
-            });
+            localUserState.ClearLocalUser();
 
             state.Value = APIState.Offline;
             flushQueue();
         }
-
-        public void UpdateLocalFriends()
-        {
-            if (!IsLoggedIn)
-                return;
-
-            var friendsReq = new GetFriendsRequest();
-            friendsReq.Failure += ex =>
-            {
-                if (ex is not WebRequestFlushedException)
-                    state.Value = APIState.Failing;
-            };
-            friendsReq.Success += res =>
-            {
-                var existingFriends = friends.Select(f => f.TargetID).ToHashSet();
-                var updatedFriends = res.Select(f => f.TargetID).ToHashSet();
-
-                // Add new friends into local list.
-                friends.AddRange(res.Where(r => !existingFriends.Contains(r.TargetID)));
-
-                // Remove non-friends from local list.
-                friends.RemoveAll(f => !updatedFriends.Contains(f.TargetID));
-            };
-
-            Queue(friendsReq);
-        }
-
-        public void UpdateLocalBlocks()
-        {
-            if (!IsLoggedIn)
-                return;
-
-            var blocksReq = new GetBlocksRequest();
-            blocksReq.Failure += ex =>
-            {
-                if (ex is not WebRequestFlushedException)
-                    state.Value = APIState.Failing;
-            };
-            blocksReq.Success += res =>
-            {
-                var existingBlocks = blocks.Select(f => f.TargetID).ToHashSet();
-                var updatedBlocks = res.Select(f => f.TargetID).ToHashSet();
-
-                // Add new blocked users to local list.
-                blocks.AddRange(res.Where(r => !existingBlocks.Contains(r.TargetID)));
-
-                // Remove non-blocked users from local list.
-                blocks.RemoveAll(b => !updatedBlocks.Contains(b.TargetID));
-
-                // Remove friends who got blocked since last check.
-                friends.RemoveAll(f => updatedBlocks.Contains(f.TargetID));
-            };
-
-            Queue(blocksReq);
-        }
-
-        private static APIUser createGuestUser() => new GuestUser();
 
         protected override void Dispose(bool isDisposing)
         {
