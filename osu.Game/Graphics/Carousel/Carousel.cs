@@ -761,13 +761,26 @@ namespace osu.Game.Graphics.Carousel
             {
                 var item = carouselItems[i];
 
+                bool isKeyboardSelection = CheckModelEquality(item.Model, currentKeyboardSelection.Model!);
+                bool isSelection = CheckModelEquality(item.Model, currentSelection.Model!);
+
+                // while we don't know the Y position of the item yet, as it's about to be updated,
+                // consumers (specifically `BeatmapCarousel.GetSpacingBetweenPanels()`) benefit from `CurrentSelectionItem` already pointing
+                // at the correct item to avoid redundant local equality checks.
+                // the Y positions will be filled in after they're computed.
+                if (isKeyboardSelection)
+                    currentKeyboardSelection = new Selection(currentKeyboardSelection.Model, item, null, i);
+
+                if (isSelection)
+                    currentSelection = new Selection(currentSelection.Model, item, null, i);
+
                 updateItemYPosition(item, ref lastVisible, ref yPos);
 
-                if (CheckModelEquality(item.Model, currentKeyboardSelection.Model!))
-                    currentKeyboardSelection = new Selection(currentKeyboardSelection.Model, item, item.CarouselYPosition + item.DrawHeight / 2, i);
+                if (isKeyboardSelection)
+                    currentKeyboardSelection = currentKeyboardSelection with { YPosition = item.CarouselYPosition + item.DrawHeight / 2 };
 
-                if (CheckModelEquality(item.Model, currentSelection.Model!))
-                    currentSelection = new Selection(currentSelection.Model, item, item.CarouselYPosition + item.DrawHeight / 2, i);
+                if (isSelection)
+                    currentSelection = currentSelection with { YPosition = item.CarouselYPosition + item.DrawHeight / 2 };
             }
 
             // Update the total height of all items (to make the scroll container scrollable through the full height even though
