@@ -53,7 +53,7 @@ namespace osu.Game.Online
 
             config.BindWith(OsuSetting.NotifyOnFriendPresenceChange, notifyOnFriendPresenceChange);
 
-            friends.BindTo(api.Friends);
+            friends.BindTo(api.LocalUserState.Friends);
             friends.BindCollectionChanged(onFriendsChanged, true);
 
             friendPresences.BindTo(metadataClient.FriendPresences);

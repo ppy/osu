@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.Components
             };
 
             for (int i = 1; i <= 100; i++)
-                ((DummyAPIAccess)API).Friends.Add(new APIRelation { TargetID = i, TargetUser = new APIUser { Username = $"Friend {i}" } });
+                ((DummyAPIAccess)API).LocalUserState.Friends.Add(new APIRelation { TargetID = i, TargetUser = new APIUser { Username = $"Friend {i}" } });
         });
 
         [Test]
@@ -75,7 +75,9 @@ namespace osu.Game.Tests.Visual.Components
             });
 
             AddUntilStep("chat overlay opened", () => chatOverlay.State.Value, () => Is.EqualTo(Visibility.Visible));
-            AddUntilStep("user channel selected", () => channelManager.CurrentChannel.Value.Name, () => Is.EqualTo(((DummyAPIAccess)API).Friends[0].TargetUser!.Username));
+            AddUntilStep("user channel selected",
+                () => channelManager.CurrentChannel.Value.Name,
+                () => Is.EqualTo(((DummyAPIAccess)API).LocalUserState.Friends[0].TargetUser!.Username));
         }
 
         [Test]

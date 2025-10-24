@@ -186,7 +186,7 @@ namespace osu.Game.Users
 
                 bool isUserOnline() => metadataClient?.GetPresence(User.OnlineID) != null;
                 bool canInviteUser() => isUserOnline() && multiplayerClient?.Room?.Users.All(u => u.UserID != User.Id) == true;
-                bool isUserBlocked() => api.Blocks.Any(b => b.TargetID == User.OnlineID);
+                bool isUserBlocked() => api.LocalUserState.Blocks.Any(b => b.TargetID == User.OnlineID);
             }
         }
 
