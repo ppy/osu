@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             Action = () =>
             {
                 OnAction();
-                demoSample?.Play();
+                demoSample.Play();
             };
         }
     }
