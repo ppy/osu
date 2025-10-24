@@ -363,7 +363,10 @@ namespace osu.Game.Screens.SelectV2
             if (starInt == 1)
                 return new StarDifficultyGroupDefinition(1, "1 Star", starDifficulty).Yield();
 
-            return new StarDifficultyGroupDefinition(starInt, $"{starInt} Stars", starDifficulty).Yield();
+            if (starInt < 15)
+                return new StarDifficultyGroupDefinition(starInt, $"{starInt} Stars", starDifficulty).Yield();
+
+            return new StarDifficultyGroupDefinition(15, "Over 15 Stars", new StarDifficulty(15, 0)).Yield();
         }
 
         private IEnumerable<GroupDefinition> defineGroupByLength(double length)
@@ -393,15 +396,20 @@ namespace osu.Game.Screens.SelectV2
             return new GroupDefinition(0, source).Yield();
         }
 
-        private IEnumerable<GroupDefinition> defineGroupByCollection(BeatmapInfo beatmap, IEnumerable<BeatmapCollection> collections)
+        private IEnumerable<GroupDefinition> defineGroupByCollection(BeatmapInfo beatmap, List<BeatmapCollection> collections)
         {
             bool anyCollections = false;
 
-            foreach (var collection in collections)
+            for (int i = 0; i < collections.Count; i++)
             {
+                var collection = collections[i];
+
                 if (collection.BeatmapMD5Hashes.Contains(beatmap.MD5Hash))
                 {
-                    yield return new GroupDefinition(0, collection.Name);
+                    // NOTE: the ordering of the incoming collection list is significant and needs to be preserved.
+                    // the fallback to ordering by name cannot be relied on.
+                    // see xmldoc of `BeatmapCarousel.GetAllCollections()`.
+                    yield return new GroupDefinition(i, collection.Name);
 
                     anyCollections = true;
                 }
@@ -410,7 +418,7 @@ namespace osu.Game.Screens.SelectV2
             if (anyCollections)
                 yield break;
 
-            yield return new GroupDefinition(1, "Not in collection");
+            yield return new GroupDefinition(int.MaxValue, "Not in collection");
         }
 
         private IEnumerable<GroupDefinition> defineGroupByOwnMaps(BeatmapInfo beatmap, int? localUserId, string? localUserUsername)
