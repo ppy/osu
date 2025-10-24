@@ -368,7 +368,10 @@ namespace osu.Game.Screens.SelectV2
             if (starInt == 1)
                 return new StarDifficultyGroupDefinition(1, "1 Star", starDifficulty).Yield();
 
-            return new StarDifficultyGroupDefinition(starInt, $"{starInt} Stars", starDifficulty).Yield();
+            if (starInt < 15)
+                return new StarDifficultyGroupDefinition(starInt, $"{starInt} Stars", starDifficulty).Yield();
+
+            return new StarDifficultyGroupDefinition(15, "Over 15 Stars", new StarDifficulty(15, 0)).Yield();
         }
 
         private IEnumerable<GroupDefinition> defineGroupByLength(double length)
