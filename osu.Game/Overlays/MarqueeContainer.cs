@@ -3,8 +3,10 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Layout;
 using osuTK;
 
 namespace osu.Game.Overlays
@@ -21,7 +23,7 @@ namespace osu.Game.Overlays
             set
             {
                 allowScrolling = value;
-                ScheduleAfterChildren(updateScrolling);
+                scrollCached.Invalidate();
             }
         }
 
@@ -63,8 +65,13 @@ namespace osu.Game.Overlays
         private Drawable fillerContent = null!;
         private FillFlowContainer flow = null!;
 
+        private readonly Cached scrollCached = new Cached();
+        private readonly LayoutValue drawSizeLayout = new LayoutValue(Invalidation.DrawSize);
+
         public MarqueeContainer()
         {
+            AddLayout(drawSizeLayout);
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
         }
@@ -72,13 +79,14 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = flow = new FillFlowContainer
+            InternalChild = flow = new MarqueeFlow
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Horizontal,
                 Anchor = NonOverflowingContentAnchor,
                 Origin = NonOverflowingContentAnchor,
                 Spacing = new Vector2(OverflowSpacing),
+                OnRequiredParentSizeInvalidated = () => scrollCached.Invalidate(),
             };
         }
 
@@ -98,12 +106,17 @@ namespace osu.Game.Overlays
 
             flow.Add(mainContent = createContent());
             flow.Add(fillerContent = createContent().With(d => d.Alpha = 0));
-            ScheduleAfterChildren(updateScrolling);
+            scrollCached.Invalidate();
         }
 
-        private void updateScrolling()
+        protected override void UpdateAfterChildren()
         {
-            float overflowWidth = mainContent.DrawWidth + padding - DrawWidth;
+            base.UpdateAfterChildren();
+
+            if (scrollCached.IsValid && drawSizeLayout.IsValid)
+                return;
+
+            float overflowWidth = mainContent.DrawWidth - DrawWidth;
 
             if (overflowWidth > 0 && AllowScrolling)
             {
@@ -125,6 +138,22 @@ namespace osu.Game.Overlays
                 flow.MoveToX(0, 300, Easing.OutQuint);
                 flow.Anchor = NonOverflowingContentAnchor;
                 flow.Origin = NonOverflowingContentAnchor;
+            }
+
+            scrollCached.Validate();
+            drawSizeLayout.Validate();
+        }
+
+        private partial class MarqueeFlow : FillFlowContainer
+        {
+            public required Action OnRequiredParentSizeInvalidated { get; init; }
+
+            protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+            {
+                if (invalidation.HasFlag(Invalidation.RequiredParentSizeToFit))
+                    OnRequiredParentSizeInvalidated.Invoke();
+
+                return base.OnInvalidate(invalidation, source);
             }
         }
     }
