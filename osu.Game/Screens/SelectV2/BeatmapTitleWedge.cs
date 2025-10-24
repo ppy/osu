@@ -55,8 +55,8 @@ namespace osu.Game.Screens.SelectV2
         private OsuHoverContainer artistLink = null!;
         private MarqueeContainer artistLabel = null!;
 
-        internal string DisplayedTitle { get; private set; }
-        internal string DisplayedArtist { get; private set; }
+        internal string DisplayedTitle { get; private set; } = string.Empty;
+        internal string DisplayedArtist { get; private set; } = string.Empty;
 
         private StatisticPlayCount playCount = null!;
         private FavouriteButton favouriteButton = null!;
