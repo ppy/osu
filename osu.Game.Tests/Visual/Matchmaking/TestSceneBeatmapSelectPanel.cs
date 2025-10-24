@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
@@ -23,10 +24,17 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             BeatmapSelectPanel? panel = null;
 
-            AddStep("add panel", () => Child = panel = new BeatmapSelectPanel(new MultiplayerPlaylistItem())
+            AddStep("add panel", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
+                Child = new OsuContextMenuContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = panel = new BeatmapSelectPanel(new MultiplayerPlaylistItem())
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                };
             });
 
             AddStep("add maarvin", () => panel!.AddUser(new APIUser
