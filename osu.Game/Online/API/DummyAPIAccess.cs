@@ -238,16 +238,22 @@ namespace osu.Game.Online.API
 
             public BindableList<APIRelation> Friends { get; } = new BindableList<APIRelation>();
             public BindableList<APIRelation> Blocks { get; } = new BindableList<APIRelation>();
+            public BindableList<int> FavouriteBeatmapSets { get; } = new BindableList<int>();
 
             IBindable<APIUser> ILocalUserState.User => User;
             IBindableList<APIRelation> ILocalUserState.Friends => Friends;
             IBindableList<APIRelation> ILocalUserState.Blocks => Blocks;
+            IBindableList<int> ILocalUserState.FavouriteBeatmapSets => FavouriteBeatmapSets;
 
             public void UpdateFriends()
             {
             }
 
             public void UpdateBlocks()
+            {
+            }
+
+            public void UpdateFavouriteBeatmapSets()
             {
             }
         }

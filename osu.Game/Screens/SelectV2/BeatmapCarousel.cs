@@ -28,6 +28,7 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select;
@@ -105,7 +106,13 @@ namespace osu.Game.Screens.SelectV2
             {
                 new BeatmapCarouselFilterMatching(() => Criteria!),
                 new BeatmapCarouselFilterSorting(() => Criteria!),
-                grouping = new BeatmapCarouselFilterGrouping(() => Criteria!, GetAllCollections, GetBeatmapInfoGuidToTopRankMapping)
+                grouping = new BeatmapCarouselFilterGrouping
+                {
+                    GetCriteria = () => Criteria!,
+                    GetCollections = GetAllCollections,
+                    GetLocalUserTopRanks = GetBeatmapInfoGuidToTopRankMapping,
+                    GetFavouriteBeatmapSets = GetFavouriteBeatmapSets,
+                }
             };
 
             AddInternal(loading = new LoadingLayer());
@@ -804,10 +811,13 @@ namespace osu.Game.Screens.SelectV2
 
         #endregion
 
-        #region Database fetches for grouping support
+        #region Fetches for grouping support
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         /// <remarks>
         /// FOOTGUN WARNING: this being sorted on the realm side before detaching is IMPORTANT.
@@ -840,6 +850,13 @@ namespace osu.Game.Screens.SelectV2
 
             return topRankMapping;
         });
+
+        /// <remarks>
+        /// Note that calling <c>.ToHashSet()</c> below has two purposes:
+        /// one being performance of contain checks in filtering code,
+        /// another being slightly better thread safety (as <see cref="ILocalUserState.FavouriteBeatmapSets"/> could be mutated during async filtering).
+        /// </remarks>
+        protected HashSet<int> GetFavouriteBeatmapSets() => api.LocalUserState.FavouriteBeatmapSets.ToHashSet();
 
         #endregion
 
