@@ -6,20 +6,24 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Components.TernaryButtons
 {
-    public partial class DrawableTernaryButton : OsuButton, IHasTooltip, IHasCurrentValue<TernaryState>
+    public partial class DrawableTernaryButton : OsuButton, IHasTooltip, IHasCurrentValue<TernaryState>, ITabbableContainer
     {
         public Bindable<TernaryState> Current
         {
@@ -54,6 +58,8 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             RelativeSizeAxes = Axes.X;
         }
 
+        private FocusRing focusRing = null!;
+
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
@@ -62,6 +68,15 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
 
             defaultIconColour = defaultBackgroundColour.Darken(0.5f);
             selectedIconColour = selectedBackgroundColour.Lighten(0.5f);
+
+            AddInternal(focusRing = new FocusRing
+            {
+                RelativeSizeAxes = Axes.Both,
+                CornerRadius = Content.CornerRadius,
+                Depth = float.MaxValue,
+                Alpha = 0.5f,
+                Colour = colourProvider.Background1,
+            });
 
             Add(Icon = (CreateIcon?.Invoke() ?? new Circle()).With(b =>
             {
@@ -136,5 +151,38 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             Anchor = Anchor.CentreLeft,
             X = 40f
         };
+
+        public bool CanBeTabbedTo { get; init; }
+
+        public override bool AcceptsFocus => CanBeTabbedTo;
+
+        protected override void OnFocus(FocusEvent e)
+        {
+            base.OnFocus(e);
+
+            focusRing.Show();
+        }
+
+        protected override void OnFocusLost(FocusLostEvent e)
+        {
+            base.OnFocusLost(e);
+
+            focusRing.Hide();
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (!HasFocus)
+                return false;
+
+            switch (e.Key)
+            {
+                case Key.Enter:
+                    Toggle();
+                    return true;
+            }
+
+            return false;
+        }
     }
 }
