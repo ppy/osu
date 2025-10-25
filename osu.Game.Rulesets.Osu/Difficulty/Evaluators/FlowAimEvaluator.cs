@@ -78,6 +78,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuCurrObj.AngleSigned != null && osuLast0Obj.AngleSigned != null && osuLast1Obj.AngleSigned != null)
             {
                 double acuteAngleBonus = CalculateFlowAcuteAngleBonus(current);
+                double angleChangeBonus = CalculateFlowAngleChangeBonus(current);
 
                 double overlappedNotesWeight = 1;
 
@@ -90,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     overlappedNotesWeight = 1 - o1 * o2 * o3;
                 }
 
-                angleBonus = acuteAngleBonus * overlappedNotesWeight;
+                angleBonus = Math.Max(acuteAngleBonus, angleChangeBonus) * overlappedNotesWeight;
             }
 
             flowDifficulty += angleBonus;
@@ -135,6 +136,30 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double acuteAngleBonus = currVelocity * currAngleBonus;
 
             return acuteAngleBonus;
+        }
+
+        // This bonus accounts for flow aim being harder when angle is changing.
+        public static double CalculateFlowAngleChangeBonus(DifficultyHitObject current)
+        {
+            if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
+                return 0;
+
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+            var osuLast0Obj = (OsuDifficultyHitObject)current.Previous(0);
+
+            if (osuCurrObj.AngleSigned == null || osuLast0Obj.AngleSigned == null)
+                return 0;
+
+            double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.AdjustedDeltaTime;
+            double prevVelocity = osuLast0Obj.LazyJumpDistance / osuLast0Obj.AdjustedDeltaTime;
+
+            double currAngle = osuCurrObj.AngleSigned.Value;
+            double lastAngle = osuLast0Obj.AngleSigned.Value;
+
+            double baseVelocity = Math.Min(currVelocity, prevVelocity);
+            double angleChangeBonus = Math.Pow(Math.Sin((currAngle - lastAngle) / 2), 2) * baseVelocity;
+
+            return angleChangeBonus;
         }
     }
 }
