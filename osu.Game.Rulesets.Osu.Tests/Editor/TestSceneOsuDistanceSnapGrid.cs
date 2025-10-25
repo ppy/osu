@@ -36,6 +36,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         [Cached(typeof(EditorBeatmap))]
         [Cached(typeof(IBeatSnapProvider))]
+        [Cached(typeof(IBeatmapEditorChangeHandler))]
         private readonly EditorBeatmap editorBeatmap;
 
         [Cached]
