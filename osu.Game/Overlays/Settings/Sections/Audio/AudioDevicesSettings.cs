@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 Add(wasapiExperimental = new SettingsCheckbox
                 {
                     LabelText = "Use experimental audio mode",
-                    TooltipText = "This will attempt to initialise the WASAPI engine in a lower latency mode.",
+                    TooltipText = "This will attempt to initialise the audio engine in a lower latency mode.",
                     Current = audio.UseExperimentalWasapi,
                     Keywords = new[] { "wasapi", "latency", "exclusive" }
                 });
