@@ -7,6 +7,8 @@ using System.Globalization;
 using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,6 +17,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -93,6 +96,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
         private PlayerPanelDisplayMode displayMode = PlayerPanelDisplayMode.Horizontal;
 
+        private Sample? jumpSample;
+        private SampleChannel? jumpSampleChannel;
+        private double samplePitch;
+
         public PlayerPanelDisplayMode DisplayMode
         {
             get => displayMode;
@@ -128,7 +135,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             Add(SolidBackgroundLayer = new Box
             {
@@ -222,6 +229,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
             // Allow avatar to exist outside of masking for when it jumps around and stuff.
             AddInternal(avatar.CreateProxy());
+
+            jumpSample = audio.Samples.Get(@"Multiplayer/Matchmaking/player-jump");
         }
 
         protected override void LoadComplete()
@@ -238,6 +247,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             avatar.ScaleTo(0)
                   .ScaleTo(1, 500, Easing.OutElasticHalf)
                   .FadeIn(200);
+
+            // pick a random pitch to be used by the player for duration of this session
+            samplePitch = 0.75f + RNG.NextDouble(0f, 0.5f);
         }
 
         private bool horizontal => displayMode == PlayerPanelDisplayMode.Horizontal;
@@ -396,11 +408,33 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                             scale.Then().ScaleTo(new Vector2(1, 1.05f), 200, Easing.Out)
                                  .Then().ScaleTo(new Vector2(1, 0.95f), 200, Easing.In)
                                  .Then().ScaleTo(Vector2.One, 800, Easing.OutElastic);
+
+                            // only play jump sample if panel is visible
+                            if (Alpha > 0)
+                                playJumpSample();
+
                             break;
                     }
 
                     break;
             }
+        }
+
+        private void playJumpSample()
+        {
+            jumpSampleChannel?.Stop();
+            jumpSampleChannel = jumpSample?.GetChannel();
+
+            if (jumpSampleChannel == null)
+                return;
+
+            float horizontalPos = BoundingBox.Centre.X / Parent!.ToLocalSpace(Parent!.ScreenSpaceDrawQuad).Width;
+            // rescale balance from 0..1 to -1..1
+            float balance = -1f + horizontalPos * 2f;
+
+            jumpSampleChannel.Frequency.Value = samplePitch;
+            jumpSampleChannel.Balance.Value = balance * OsuGameBase.SFX_STEREO_STRENGTH;
+            jumpSampleChannel?.Play();
         }
 
         protected override void Dispose(bool isDisposing)
