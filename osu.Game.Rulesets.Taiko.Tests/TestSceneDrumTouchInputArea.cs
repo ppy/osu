@@ -18,12 +18,14 @@ namespace osu.Game.Rulesets.Taiko.Tests
         private DrumTouchInputArea drumTouchInputArea = null!;
 
         private readonly Bindable<TaikoTouchControlScheme> controlScheme = new Bindable<TaikoTouchControlScheme>();
+        private readonly Bindable<float> drumSize = new Bindable<float>();
 
         [BackgroundDependencyLoader]
         private void load()
         {
             var config = (TaikoRulesetConfigManager)RulesetConfigs.GetConfigFor(Ruleset.Value.CreateInstance()).AsNonNull();
             config.BindWith(TaikoRulesetSetting.TouchControlScheme, controlScheme);
+            config.BindWith(TaikoRulesetSetting.DrumTouchSize, drumSize);
         }
 
         private void createDrum()
@@ -57,6 +59,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
             AddStep("change scheme (kddk)", () => controlScheme.Value = TaikoTouchControlScheme.KDDK);
             AddStep("change scheme (kkdd)", () => controlScheme.Value = TaikoTouchControlScheme.KKDD);
             AddStep("change scheme (ddkk)", () => controlScheme.Value = TaikoTouchControlScheme.DDKK);
+
+            AddStep("set drum size (small)", () => drumSize.Value = 0.5f);
+            AddStep("set drum size (normal)", () => drumSize.Value = 1.0f);
+            AddStep("set drum size (large)", () => drumSize.Value = 1.5f);
+            AddStep("set drum size (extra large)", () => drumSize.Value = 2.0f);
         }
 
         protected override Ruleset CreateRuleset() => new TaikoRuleset();
