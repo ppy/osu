@@ -155,7 +155,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         // Summation for aim and speed, reducing reward for mixed maps
         public static double SumMechanicalDifficulty(double aim, double speed)
         {
-            const double addition_portion = 0.1;
+            const double addition_portion = 0.13;
 
             // We take this min to max ratio as a basepoint to be not changed when addition_portion is changed
             const double balance_base_point = 0.2;
