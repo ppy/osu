@@ -70,7 +70,7 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public double TotalBreakTime => Breaks.Sum(b => b.Duration);
 
-        [JsonConverter(typeof(TypedListConverter<HitObject>))]
+        [JsonConverter(typeof(TypedListConverter))]
         public List<T> HitObjects { get; set; } = new List<T>();
 
         IReadOnlyList<T> IBeatmap<T>.HitObjects => HitObjects;
