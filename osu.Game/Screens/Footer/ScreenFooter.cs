@@ -250,8 +250,6 @@ namespace osu.Game.Screens.Footer
 
             moveHiddenButtonsToFlow();
 
-            Debug.Assert(hiddenButtonsContainer.Count == 0);
-
             var targetButton = buttonsFlow.SingleOrDefault(b => b.Overlay == overlay);
 
             temporarilyHiddenButtons.AddRange(targetButton != null
@@ -332,6 +330,7 @@ namespace osu.Game.Screens.Footer
                 buttonsFlow.Add(button);
             }
 
+            hiddenButtonsContainer.Clear();
             temporarilyHiddenButtons.Clear();
         }
 
