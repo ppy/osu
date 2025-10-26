@@ -94,6 +94,7 @@ namespace osu.Game.Screens.Footer
                     ColumnDimensions = new[]
                     {
                         new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.Absolute, 0),
                         new Dimension(),
                     },
                     Content = new[]
@@ -107,6 +108,13 @@ namespace osu.Game.Screens.Footer
                                 Y = ScreenFooterButton.CORNER_RADIUS,
                                 Direction = FillDirection.Horizontal,
                                 Spacing = new Vector2(7, 0),
+                                AutoSizeAxes = Axes.Both,
+                            },
+                            hiddenButtonsContainer = new Container<ScreenFooterButton>
+                            {
+                                Anchor = Anchor.BottomLeft,
+                                Origin = Anchor.BottomLeft,
+                                Y = ScreenFooterButton.CORNER_RADIUS,
                                 AutoSizeAxes = Axes.Both,
                             },
                             footerContentContainer = new Container
@@ -123,14 +131,6 @@ namespace osu.Game.Screens.Footer
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Action = onBackPressed,
-                },
-                hiddenButtonsContainer = new Container<ScreenFooterButton>
-                {
-                    Margin = new MarginPadding { Left = OsuGame.SCREEN_EDGE_MARGIN + ScreenBackButton.BUTTON_WIDTH + padding },
-                    Y = ScreenFooterButton.CORNER_RADIUS,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    AutoSizeAxes = Axes.Both,
                 },
                 (logoTrackingContainer = new LogoTrackingContainer
                 {
@@ -262,10 +262,14 @@ namespace osu.Game.Screens.Footer
             {
                 var button = temporarilyHiddenButtons[i];
                 buttonsFlow.Remove(button, false);
-                hiddenButtonsContainer.Add(button);
 
                 makeButtonDisappearToBottom(button, 0, 0, false);
             }
+
+            hiddenButtonsContainer.X = -buttonsFlow.Width;
+
+            for (int i = 0; i < temporarilyHiddenButtons.Count; i++)
+                hiddenButtonsContainer.Add(temporarilyHiddenButtons[i]);
 
             updateColourScheme(overlay.ColourProvider.Hue);
 
