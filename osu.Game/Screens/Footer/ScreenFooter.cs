@@ -248,6 +248,8 @@ namespace osu.Game.Screens.Footer
 
             ActiveOverlay = overlay;
 
+            moveHiddenButtonsToFlow();
+
             Debug.Assert(temporarilyHiddenButtons.Count == 0);
 
             var targetButton = buttonsFlow.SingleOrDefault(b => b.Overlay == overlay);
@@ -295,19 +297,38 @@ namespace osu.Game.Screens.Footer
             for (int i = 0; i < temporarilyHiddenButtons.Count; i++)
             {
                 var button = temporarilyHiddenButtons[i];
-                hiddenButtonsContainer.Remove(button, false);
-                buttonsFlow.Add(button);
 
                 makeButtonAppearFromBottom(button, 0);
             }
 
-            temporarilyHiddenButtons.Clear();
-
             updateColourScheme(OverlayColourScheme.Aquamarine.GetHue());
 
-            activeFooterContent.Delay(timeUntilRun).Expire();
-            activeFooterContent = null;
+            var footerContent = activeFooterContent;
+            this.Delay(timeUntilRun).Schedule(() =>
+            {
+                footerContent.Expire();
+
+                if (activeFooterContent == footerContent)
+                    activeFooterContent = null;
+
+                if (activeFooterContent == null)
+                    moveHiddenButtonsToFlow();
+            });
+
             ActiveOverlay = null;
+        }
+
+        private void moveHiddenButtonsToFlow()
+        {
+            for (int i = 0; i < temporarilyHiddenButtons.Count; i++)
+            {
+                var button = temporarilyHiddenButtons[i];
+
+                hiddenButtonsContainer.Remove(button, false);
+                buttonsFlow.Add(button);
+            }
+
+            temporarilyHiddenButtons.Clear();
         }
 
         private void updateColourScheme(int hue)
