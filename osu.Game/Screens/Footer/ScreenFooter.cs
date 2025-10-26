@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Footer
 
         public void SetButtons(IReadOnlyList<ScreenFooterButton> buttons)
         {
-            temporarilyHiddenButtons.Clear();
+            moveHiddenButtonsToFlow();
             overlays.Clear();
 
             this.HidePopover();
@@ -250,7 +250,7 @@ namespace osu.Game.Screens.Footer
 
             moveHiddenButtonsToFlow();
 
-            Debug.Assert(temporarilyHiddenButtons.Count == 0);
+            Debug.Assert(hiddenButtonsContainer.Count == 0);
 
             var targetButton = buttonsFlow.SingleOrDefault(b => b.Overlay == overlay);
 
