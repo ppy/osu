@@ -561,8 +561,19 @@ namespace osu.Game.Screens.SelectV2
 
             var beatmaps = items.Select(i => i.Model).OfType<GroupedBeatmap>();
 
-            if (beatmaps.Any(b => b.Equals(CurrentSelection as GroupedBeatmap)))
+            // do not request recommended selection if the user already had selected a difficulty within the single filtered beatmap set,
+            // as it could change the difficulty that will be selected
+            var preexistingSelection = beatmaps.FirstOrDefault(b => b.Equals(CurrentSelection as GroupedBeatmap));
+
+            if (preexistingSelection != null)
+            {
+                // the selection might not have an item associated with it, if it was fully filtered away previously
+                // in this case, request to reselect it
+                if (CurrentSelectionItem == null)
+                    RequestSelection(preexistingSelection);
+
                 return;
+            }
 
             RequestRecommendedSelection(beatmaps);
         }
