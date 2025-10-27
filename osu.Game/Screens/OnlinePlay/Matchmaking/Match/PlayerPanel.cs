@@ -95,7 +95,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
         private Drawable avatarPositionTarget = null!;
         private Drawable avatarJumpTarget = null!;
-        private MatchmakingAvatar avatar = null!;
+        private Drawable avatar = null!;
         private OsuSpriteText username = null!;
 
         private Container mainContent = null!;
@@ -103,7 +103,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         private Box solidBackgroundLayer = null!;
         private Drawable background = null!;
 
+        private OsuSpriteText quitText = null!;
+        private BufferedContainer backgroundQuitTarget = null!;
+        private BufferedContainer avatarQuitTarget = null!;
+
         private PlayerPanelDisplayMode displayMode = PlayerPanelDisplayMode.Horizontal;
+        private bool hasQuit;
 
         public PlayerPanel(MultiplayerRoomUser user)
             : base(HoverSampleSet.Button)
@@ -129,77 +134,99 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             Content.Anchor = Anchor.Centre;
             Content.Origin = Anchor.Centre;
 
-            Children = new[]
+            Child = backgroundQuitTarget = new BufferedContainer
             {
-                solidBackgroundLayer = new Box
+                RelativeSizeAxes = Axes.Both,
+                Children = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider?.Background5 ?? colours.Gray1
-                },
-                background = new UserCoverBackground
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Colour = colours.Gray7,
-                    User = User
-                },
-                new Container
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Child = mainContent = new Container
+                    solidBackgroundLayer = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = colourProvider?.Background5 ?? colours.Gray1
+                    },
+                    background = new UserCoverBackground
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Colour = colours.Gray7,
+                        User = User
+                    },
+                    new Container
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
-                        Children = new[]
+                        Child = mainContent = new Container
                         {
-                            avatarPositionTarget = new Container
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new[]
                             {
-                                Origin = Anchor.Centre,
-                                Size = avatar_size,
-                                Child = avatarJumpTarget = new Container
+                                quitText = new OsuSpriteText
                                 {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Text = "QUIT",
+                                    Font = OsuFont.Default.With(weight: "Bold", size: 70),
+                                    Rotation = -22.5f,
+                                    Colour = OsuColour.Gray(0.3f),
+                                    Blending = BlendingParameters.Additive
+                                },
+                                avatarPositionTarget = new Container
+                                {
+                                    Origin = Anchor.Centre,
+                                    Size = avatar_size,
+                                    Child = avatarJumpTarget = new Container
+                                    {
+                                        Anchor = Anchor.BottomCentre,
+                                        Origin = Anchor.BottomCentre,
+                                        RelativeSizeAxes = Axes.Both,
+                                        Child = avatar = new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Child = avatarQuitTarget = new BufferedContainer
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Child = new MatchmakingAvatar(User, isOwnUser: User.Id == api.LocalUser.Value.Id)
+                                                {
+                                                    Anchor = Anchor.Centre,
+                                                    Origin = Anchor.Centre,
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Size = Vector2.One
+                                                }
+                                            }
+                                        },
+                                    }
+                                },
+                                rankText = new OsuSpriteText
+                                {
+                                    Alpha = 0,
+                                    Anchor = Anchor.BottomRight,
+                                    Origin = Anchor.BottomCentre,
+                                    Blending = BlendingParameters.Additive,
+                                    Margin = new MarginPadding(4),
+                                    Text = "-",
+                                    Font = OsuFont.Style.Title.With(size: 55),
+                                },
+                                username = new OsuSpriteText
+                                {
+                                    Alpha = 0,
                                     Anchor = Anchor.BottomCentre,
                                     Origin = Anchor.BottomCentre,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Child = avatar = new MatchmakingAvatar(User, isOwnUser: User.Id == api.LocalUser.Value.Id)
-                                    {
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        RelativeSizeAxes = Axes.Both,
-                                        Size = Vector2.One
-                                    }
+                                    Text = User.Username,
+                                    Font = OsuFont.Style.Heading1,
+                                },
+                                scoreText = new OsuSpriteText
+                                {
+                                    Alpha = 0,
+                                    Margin = new MarginPadding(10),
+                                    Anchor = Anchor.BottomCentre,
+                                    Origin = Anchor.BottomCentre,
+                                    Font = OsuFont.Style.Heading2,
+                                    Text = "0 pts"
                                 }
-                            },
-                            rankText = new OsuSpriteText
-                            {
-                                Alpha = 0,
-                                Anchor = Anchor.BottomRight,
-                                Origin = Anchor.BottomCentre,
-                                Blending = BlendingParameters.Additive,
-                                Margin = new MarginPadding(4),
-                                Text = "-",
-                                Font = OsuFont.Style.Title.With(size: 55),
-                            },
-                            username = new OsuSpriteText
-                            {
-                                Alpha = 0,
-                                Anchor = Anchor.BottomCentre,
-                                Origin = Anchor.BottomCentre,
-                                Text = User.Username,
-                                Font = OsuFont.Style.Heading1,
-                            },
-                            scoreText = new OsuSpriteText
-                            {
-                                Alpha = 0,
-                                Margin = new MarginPadding(10),
-                                Anchor = Anchor.BottomCentre,
-                                Origin = Anchor.BottomCentre,
-                                Font = OsuFont.Style.Heading2,
-                                Text = "0 pts"
                             }
                         }
                     }
@@ -232,6 +259,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             set
             {
                 displayMode = value;
+                if (IsLoaded)
+                    updateLayout(false);
+            }
+        }
+
+        public bool HasQuit
+        {
+            get => hasQuit;
+            set
+            {
+                hasQuit = value;
                 if (IsLoaded)
                     updateLayout(false);
             }
@@ -304,10 +342,24 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     rankText.MoveTo(horizontal ? new Vector2(-40, -20) : new Vector2(-70, 0), duration, Easing.OutPow10);
                     username.MoveTo(horizontal ? new Vector2(0, -46) : new Vector2(0, -86), duration, Easing.OutPow10);
                     scoreText.MoveTo(horizontal ? new Vector2(0, -16) : new Vector2(0, -56), duration, Easing.OutPow10);
+                    quitText.MoveTo(horizontal ? new Vector2(40, 0) : new Vector2(0, 40), duration, Easing.OutPow10);
                     break;
 
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+
+            if (HasQuit)
+            {
+                backgroundQuitTarget.GrayscaleTo(1, duration, Easing.OutPow10);
+                avatarQuitTarget.GrayscaleTo(1, duration, Easing.OutPow10);
+                quitText.FadeIn(duration, Easing.OutPow10);
+            }
+            else
+            {
+                backgroundQuitTarget.GrayscaleTo(0, duration, Easing.OutPow10);
+                avatarQuitTarget.GrayscaleTo(0, duration, Easing.OutPow10);
+                quitText.FadeOut(duration, Easing.OutPow10);
             }
         }
 
