@@ -310,13 +310,11 @@ namespace osu.Game.Screens.Footer
             {
                 footerContent.Expire();
 
-                if (activeFooterContent == footerContent)
-                    activeFooterContent = null;
-
                 if (activeFooterContent == null)
                     moveHiddenButtonsToFlow();
             });
 
+            activeFooterContent = null;
             ActiveOverlay = null;
         }
 
