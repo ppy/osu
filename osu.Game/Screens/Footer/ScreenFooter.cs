@@ -330,11 +330,15 @@ namespace osu.Game.Screens.Footer
 
             updateColourScheme(OverlayColourScheme.Aquamarine.GetHue());
 
+            // Only move buttons back to the flow after the transition has completed.
+            // This avoids buttonsFlow's size expanding prematurely and squishing the footer content.
             var footerContent = activeFooterContent;
             this.Delay(timeUntilRun).Schedule(() =>
             {
                 footerContent.Expire();
 
+                // if you switch overlays quickly, we may have already started showing another.
+                // in this case, don't move buttons back to the flow.
                 if (activeFooterContent == null)
                     moveHiddenButtonsToFlow();
             });
