@@ -49,6 +49,7 @@ namespace osu.Game.Screens.Footer
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
         private Box background = null!;
+        private Container positionPreservingContainer = null!;
         private FillFlowContainer<ScreenFooterButton> buttonsFlow = null!;
         private Container footerContentContainer = null!;
         private Container<ScreenFooterButton> hiddenButtonsContainer = null!;
@@ -93,6 +94,7 @@ namespace osu.Game.Screens.Footer
                     Padding = new MarginPadding { Left = OsuGame.SCREEN_EDGE_MARGIN + ScreenBackButton.BUTTON_WIDTH + padding },
                     ColumnDimensions = new[]
                     {
+                        new Dimension(GridSizeMode.Absolute, 0),
                         new Dimension(GridSizeMode.AutoSize),
                         new Dimension(GridSizeMode.Absolute, 0),
                         new Dimension(),
@@ -101,6 +103,13 @@ namespace osu.Game.Screens.Footer
                     {
                         new Drawable[]
                         {
+                            positionPreservingContainer = new Container
+                            {
+                                Anchor = Anchor.BottomLeft,
+                                Origin = Anchor.BottomLeft,
+                                Y = ScreenFooterButton.CORNER_RADIUS,
+                                AutoSizeAxes = Axes.Both,
+                            },
                             buttonsFlow = new FillFlowContainer<ScreenFooterButton>
                             {
                                 Anchor = Anchor.BottomLeft,
@@ -198,7 +207,7 @@ namespace osu.Game.Screens.Footer
                 oldButton.Enabled.Value = false;
 
                 buttonsFlow.Remove(oldButton, false);
-                hiddenButtonsContainer.Add(oldButton);
+                positionPreservingContainer.Add(oldButton);
 
                 if (buttons.Count > 0)
                     makeButtonDisappearToRight(oldButton, i, oldButtons.Length, true);
