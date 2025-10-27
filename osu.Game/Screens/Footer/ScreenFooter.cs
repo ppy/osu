@@ -121,6 +121,7 @@ namespace osu.Game.Screens.Footer
                             },
                             hiddenButtonsContainer = new Container<ScreenFooterButton>
                             {
+                                Margin = new MarginPadding { Left = 7 },
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,
                                 Y = ScreenFooterButton.CORNER_RADIUS,
@@ -265,6 +266,14 @@ namespace osu.Game.Screens.Footer
                 ? buttonsFlow.SkipWhile(b => b != targetButton).Skip(1)
                 : buttonsFlow);
 
+            // hiddenButtonsContainer is still at the right of the buttonsFlow,
+            // So we have to compensate for the change in position before the grid readjusts
+            float hiddenButtonsContainerPositionX = hiddenButtonsContainer.ScreenSpaceDrawQuad.TopLeft.X;
+            float removedWidth = temporarilyHiddenButtons
+                .Select(b => hiddenButtonsContainerPositionX - b.ScreenSpaceDrawQuad.TopLeft.X)
+                .DefaultIfEmpty(0)
+                .Max();
+
             for (int i = temporarilyHiddenButtons.Count - 1; i >= 0; i--)
             {
                 var button = temporarilyHiddenButtons[i];
@@ -273,10 +282,17 @@ namespace osu.Game.Screens.Footer
                 makeButtonDisappearToBottom(button, 0, 0, false);
             }
 
-            hiddenButtonsContainer.X = -buttonsFlow.Width;
-
             for (int i = 0; i < temporarilyHiddenButtons.Count; i++)
-                hiddenButtonsContainer.Add(temporarilyHiddenButtons[i]);
+            {
+                var button = temporarilyHiddenButtons[i];
+                hiddenButtonsContainer.Add(button);
+                var buttonScreenPos = buttonsFlow.ToScreenSpace(button.Position);
+
+                // reposition to the original screen-space position to avoid visual jump.
+                button.X = hiddenButtonsContainer.ToLocalSpace(buttonScreenPos + new Vector2(removedWidth, 0)).X;
+            }
+
+            _ = buttonsFlow.Width; // trigger a layout immediately, sometimes the grid container doesn't update fast enough.
 
             updateColourScheme(overlay.ColourProvider.Hue);
 
