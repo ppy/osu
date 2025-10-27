@@ -155,10 +155,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         // Summation for aim and speed, reducing reward for mixed maps
         public static double SumMechanicalDifficulty(double aim, double speed)
         {
+            // Increase this to nerf maps that mix aim and speed
             const double addition_portion = 0.13;
 
             // We take this min to max ratio as a basepoint to be not changed when addition_portion is changed
             const double balance_base_point = 0.2;
+
+            // Base power for the summation
             const double power = 1.1;
 
             // This is automatically-computed multiplier to avoid manual multiplier balancing when addition_portion is changed
@@ -168,6 +171,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     Math.Pow(balance_base_point + addition_portion, power), 1.0 / power
                 );
 
+            // This is the actual summation formula. Max between aim and speed is added with weight to decrease the reward for mixed maps
             double max = Math.Max(aim, speed);
 
             double difficulty =

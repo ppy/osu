@@ -16,9 +16,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private const double relax_multiplier = 0.87;
         private const double touch_device_multiplier = 0.83;
 
-        // Increasing this multiplier buffs versatile aim+flow maps
-        public const double AIM_VERSATILITY_BONUS = 0.1;
-
         private readonly Mod[] mods;
         private readonly int totalHits;
         private readonly double approachRate;
@@ -38,9 +35,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         public static double ComputeAimRatingWithVersatility(double aimRating, double snapAimRating, double flowAimRating)
         {
+            // Increasing this multiplier buffs versatile aim+flow maps
+            const double aim_versatility_bonus = 0.1;
+
             // We consider that average map has ratio of summed ratings to total to be equal to 1.7x
-            double baseVersatilityBonus = double.Lerp(1, 1.7, AIM_VERSATILITY_BONUS);
-            return double.Lerp(aimRating, snapAimRating + flowAimRating, AIM_VERSATILITY_BONUS) / baseVersatilityBonus;
+            double baseVersatilityBonus = double.Lerp(1, 1.7, aim_versatility_bonus);
+            return double.Lerp(aimRating, snapAimRating + flowAimRating, aim_versatility_bonus) / baseVersatilityBonus;
         }
 
         public double ComputeCombinedAimRating(double aimDifficultyValue, double snapAimDifficultyValue, double flowAimDifficultyValue)
@@ -84,7 +84,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModTouchDevice))
                 snapAimRating = Math.Pow(snapAimRating, touch_device_multiplier);
 
-            // To ensure that result would not be bigger than normal aim difficulty rating
             if (mods.Any(m => m is OsuModRelax))
                 snapAimRating *= relax_multiplier;
 
@@ -98,9 +97,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double flowAimRating = CalculateDifficultyRating(flowAimDifficultyValue);
 
-            // To ensure that result would not be bigger than normal aim difficulty rating
             if (mods.Any(m => m is OsuModTouchDevice))
-                flowAimRating = Math.Pow(flowAimRating, 0.83);
+                flowAimRating = Math.Pow(flowAimRating, touch_device_multiplier);
 
             return computeRawAimRating(flowAimRating);
         }

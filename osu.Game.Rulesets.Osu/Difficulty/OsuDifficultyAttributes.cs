@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         [JsonProperty("flow_aim")]
         public double FlowAimDifficulty { get; set; }
-        
+
         [JsonProperty("nested_score_per_object")]
         public double NestedScorePerObject { get; set; }
 
