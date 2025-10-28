@@ -185,6 +185,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                                         RelativeSizeAxes = Axes.Both,
                                         Child = avatar = new Container
                                         {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
                                             RelativeSizeAxes = Axes.Both,
                                             Child = avatarQuitTarget = new BufferedContainer
                                             {
