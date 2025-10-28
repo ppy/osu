@@ -414,6 +414,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             if (!matchmakingState.Users.UserDictionary.TryGetValue(User.Id, out MatchmakingUser? userScore))
                 return;
 
+            if (userScore.Placement == 0)
+                return;
+
             rankText.Text = userScore.Placement.Ordinalize(CultureInfo.CurrentCulture);
             rankText.FadeColour(SubScreenResults.ColourForPlacement(userScore.Placement));
             scoreText.Text = $"{userScore.Points} pts";
