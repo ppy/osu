@@ -81,7 +81,6 @@ namespace osu.Game.Overlays.SkinEditor
 
         private Bindable<HUDVisibilityMode> configVisibilityMode;
         private LeasedBindable<HUDVisibilityMode>? leasedVisibilityMode;
-        private HUDVisibilityMode previousHUDVisibility;
 
         public SkinEditorOverlay(ScalingContainer scalingContainer)
         {
@@ -363,18 +362,13 @@ namespace osu.Game.Overlays.SkinEditor
             // Make HUD visible while editing skin layout
             if (State.Value == Visibility.Visible)
             {
-                previousHUDVisibility = configVisibilityMode.Value;
-
-                leasedVisibilityMode = configVisibilityMode.BeginLease(false);
+                leasedVisibilityMode = configVisibilityMode.BeginLease(true);
                 // only when HUD visibility mode is not set to Always.
                 if (leasedVisibilityMode.Value != HUDVisibilityMode.Always)
                     leasedVisibilityMode.Value = HUDVisibilityMode.Always;
             }
             else
             {
-                if (leasedVisibilityMode != null)
-                    leasedVisibilityMode.Value = previousHUDVisibility;
-
                 leasedVisibilityMode?.Return();
                 leasedVisibilityMode = null;
             }
