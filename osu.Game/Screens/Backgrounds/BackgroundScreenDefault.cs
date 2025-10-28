@@ -194,7 +194,7 @@ namespace osu.Game.Screens.Backgrounds
             {
                 case IntroSequence.Welcome:
                     return @"Intro/Welcome/menu-background";
-                    
+
                 case IntroSequence.Circles:
                     return $@"Intro/Circles/menu-circles-background-{currentDisplay % circles_background_count + 1}";
 
