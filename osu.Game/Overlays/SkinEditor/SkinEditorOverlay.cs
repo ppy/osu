@@ -363,9 +363,9 @@ namespace osu.Game.Overlays.SkinEditor
             if (State.Value == Visibility.Visible)
             {
                 leasedVisibilityMode = configVisibilityMode?.BeginLease(true);
-                // only when HUD visibility mode is not set to Always.
                 if (leasedVisibilityMode != null)
                 {
+                    // only when HUD visibility mode is not set to Always.
                     if (leasedVisibilityMode.Value != HUDVisibilityMode.Always)
                         leasedVisibilityMode.Value = HUDVisibilityMode.Always;
                 }
