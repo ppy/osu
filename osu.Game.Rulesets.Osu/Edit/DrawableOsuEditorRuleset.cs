@@ -3,9 +3,11 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit;
@@ -26,14 +28,20 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private partial class OsuEditorPlayfield : OsuPlayfield
         {
+            private readonly BindableBool showCursor = new BindableBool();
+
             [Resolved]
             private EditorBeatmap editorBeatmap { get; set; } = null!;
-
-            protected override GameplayCursorContainer? CreateCursor() => null;
 
             public OsuEditorPlayfield()
             {
                 HitPolicy = new AnyOrderHitPolicy();
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuRulesetConfigManager config)
+            {
+                config.BindWith(OsuRulesetSetting.EditorShowGameplayCursor, showCursor);
             }
 
             protected override void LoadComplete()
@@ -41,6 +49,8 @@ namespace osu.Game.Rulesets.Osu.Edit
                 base.LoadComplete();
 
                 editorBeatmap.BeatmapReprocessed += onBeatmapReprocessed;
+
+                showCursor.BindValueChanged(visible => Cursor!.Alpha = visible.NewValue ? 1 : 0, true);
             }
 
             private void onBeatmapReprocessed() => ApplyCircleSizeToPlayfieldBorder(editorBeatmap);
