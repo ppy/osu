@@ -354,18 +354,30 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     throw new ArgumentOutOfRangeException();
             }
 
+            // quit text doesn't fit on avataronly mode.
+            if (HasQuit && displayMode != PlayerPanelDisplayMode.AvatarOnly)
+                quitText.FadeIn(duration, Easing.OutPow10);
+            else
+                quitText.FadeOut(duration, Easing.OutPow10);
+
             if (HasQuit)
             {
                 backgroundQuitTarget.GrayscaleTo(1, duration, Easing.OutPow10);
                 avatarQuitTarget.GrayscaleTo(1, duration, Easing.OutPow10);
-                quitText.FadeIn(duration, Easing.OutPow10);
             }
             else
             {
                 backgroundQuitTarget.GrayscaleTo(0, duration, Easing.OutPow10);
                 avatarQuitTarget.GrayscaleTo(0, duration, Easing.OutPow10);
-                quitText.FadeOut(duration, Easing.OutPow10);
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Not sure why this is required but it is.
+            avatarQuitTarget.Alpha = Alpha;
         }
 
         protected override bool OnHover(HoverEvent e)
