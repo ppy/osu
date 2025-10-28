@@ -136,6 +136,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
             Child = backgroundQuitTarget = new BufferedContainer
             {
+                FrameBufferScale = new Vector2(1.5f),
                 RelativeSizeAxes = Axes.Both,
                 Children = new[]
                 {
@@ -188,8 +189,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             RelativeSizeAxes = Axes.Both,
+                                            // Needs to be re-buffered as the avatar is proxied outside of the parent buffered container.
                                             Child = avatarQuitTarget = new BufferedContainer
                                             {
+                                                FrameBufferScale = new Vector2(1.5f),
                                                 RelativeSizeAxes = Axes.Both,
                                                 Child = new MatchmakingAvatar(User, isOwnUser: User.Id == api.LocalUser.Value.Id)
                                                 {
