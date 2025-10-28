@@ -50,11 +50,11 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 wasapiExperimental.Current.ValueChanged += _ => onDeviceChanged(string.Empty);
             }
 
-            updateItems();
-
             audio.OnNewDevice += onDeviceChanged;
             audio.OnLostDevice += onDeviceChanged;
             dropdown.Current = audio.AudioDevice;
+
+            onDeviceChanged(string.Empty);
         }
 
         private void onDeviceChanged(string _)
