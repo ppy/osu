@@ -19,6 +19,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -113,6 +114,9 @@ namespace osu.Game.Screens.Play
         /// </summary>
         internal readonly Drawable PlayfieldSkinLayer;
 
+        [CanBeNull]
+        private SkinEditorOverlay skinEditor;
+
         public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
             Container rightSettings;
@@ -194,7 +198,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, RealmKeyBindingStore keyBindingStore, INotificationOverlay notificationOverlay)
+        private void load(OsuConfigManager config, RealmKeyBindingStore keyBindingStore, INotificationOverlay notificationOverlay, [CanBeNull] SkinEditorOverlay skinEditor)
         {
             if (drawableRuleset != null)
             {
@@ -206,6 +210,9 @@ namespace osu.Game.Screens.Play
             configVisibilityMode = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode);
             configLeaderboardVisibility = config.GetBindable<bool>(OsuSetting.GameplayLeaderboard);
             configSettingsOverlay = config.GetBindable<bool>(OsuSetting.ReplaySettingsOverlay);
+
+            skinEditor?.State.BindValueChanged(_ => updateVisibility());
+            this.skinEditor = skinEditor;
 
             if (configVisibilityMode.Value == HUDVisibilityMode.Never && !hasShownNotificationOnce)
             {
@@ -346,6 +353,16 @@ namespace osu.Game.Screens.Play
         {
             if (ShowHud.Disabled)
                 return;
+
+            // Always show HUD while editing skin layout.
+            if (skinEditor != null)
+            {
+                if (skinEditor.State.Value == Visibility.Visible)
+                {
+                    ShowHud.Value = true;
+                    return;
+                }
+            }
 
             if (holdingForHUD.Value)
             {
