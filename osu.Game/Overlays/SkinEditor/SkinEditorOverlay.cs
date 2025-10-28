@@ -79,6 +79,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         private readonly LayoutValue drawSizeLayout;
 
+        private Bindable<HUDVisibilityMode> configVisibilityMode;
+        private HUDVisibilityMode previousHUDVisibility;
+
         public SkinEditorOverlay(ScalingContainer scalingContainer)
         {
             this.scalingContainer = scalingContainer;
@@ -91,6 +94,8 @@ namespace osu.Game.Overlays.SkinEditor
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.BeatmapSkins, beatmapSkins);
+
+            configVisibilityMode = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode);
         }
 
         protected override void LoadComplete()
@@ -98,6 +103,8 @@ namespace osu.Game.Overlays.SkinEditor
             base.LoadComplete();
 
             externalEditOverlayRegistration = overlayManager?.RegisterBlockingOverlay(externalEditOverlay);
+
+            State.BindValueChanged(_ => saveAndRestoreHUDVisibility());
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -348,6 +355,24 @@ namespace osu.Game.Overlays.SkinEditor
         {
             leasedBeatmapSkins?.Return();
             leasedBeatmapSkins = null;
+        }
+
+        private void saveAndRestoreHUDVisibility()
+        {
+            // Make HUD visible while editing skin layout
+            if (State.Value == Visibility.Visible)
+            {
+                previousHUDVisibility = configVisibilityMode.Value;
+                // only when HUD visibility mode is set to Never.
+                if (configVisibilityMode.Value == HUDVisibilityMode.Never)
+                    configVisibilityMode.Value = HUDVisibilityMode.Always;
+            }
+            else
+            {
+                // and restore it to Never after closing editor.
+                if (previousHUDVisibility == HUDVisibilityMode.Never)
+                    configVisibilityMode.Value = HUDVisibilityMode.Never;
+            }
         }
 
         public new void ToggleVisibility()
