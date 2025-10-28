@@ -201,13 +201,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
                 return;
             }
 
-            int overallPlacement = state.Users[client.LocalUser!.UserID].Placement;
+            int? overallPlacement = state.Users[client.LocalUser!.UserID].Placement;
 
-            placementText.Text = overallPlacement.Ordinalize(CultureInfo.CurrentCulture);
-            placementText.Colour = ColourForPlacement(overallPlacement);
+            if (overallPlacement != null)
+            {
+                placementText.Text = overallPlacement.Value.Ordinalize(CultureInfo.CurrentCulture);
+                placementText.Colour = ColourForPlacement(overallPlacement.Value);
 
-            int overallPoints = state.Users[client.LocalUser!.UserID].Points;
-            addStatistic(overallPlacement, $"Overall position ({overallPoints} points)");
+                int overallPoints = state.Users[client.LocalUser!.UserID].Points;
+                addStatistic(overallPlacement.Value, $"Overall position ({overallPoints} points)");
+            }
 
             var accuracyOrderedUsers = state.Users.Select(u => (user: u, avgAcc: u.Rounds.Select(r => r.Accuracy).DefaultIfEmpty(0).Average()))
                                             .OrderByDescending(t => t.avgAcc)
