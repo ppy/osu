@@ -344,11 +344,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
                 }
             }
 
-            addAward(maxScoreUserId, "Score champ", "Highest score in a single round");
+            if (maxScoreUserId > 0)
+                addAward(maxScoreUserId, "Score champ", "Highest score in a single round");
 
-            addAward(maxAccuracyUserId, "Most accurate", "Highest accuracy in a single round");
+            if (maxAccuracyUserId > 0)
+                addAward(maxAccuracyUserId, "Most accurate", "Highest accuracy in a single round");
 
-            addAward(maxComboUserId, "Top combo", "Highest combo in a single round");
+            if (maxComboUserId > 0)
+                addAward(maxComboUserId, "Top combo", "Highest combo in a single round");
 
             if (maxBonusScoreUserId > 0)
                 addAward(maxBonusScoreUserId, "Biggest bonus", "Biggest bonus score across all rounds");
