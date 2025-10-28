@@ -167,7 +167,7 @@ namespace osu.Game.Overlays
             }
             else
             {
-                LoadDisplay(articlePage = new WikiArticlePage($@"{api.WebsiteRootUrl}/wiki/{path.Value}/", response.Markdown));
+                LoadDisplay(articlePage = new WikiArticlePage($@"{api.Endpoints.WebsiteUrl}/wiki/{path.Value}/", response.Markdown));
             }
         }
 
@@ -176,7 +176,7 @@ namespace osu.Game.Overlays
             wikiData.Value = null;
             path.Value = "error";
 
-            LoadDisplay(articlePage = new WikiArticlePage($@"{api.WebsiteRootUrl}/wiki/",
+            LoadDisplay(articlePage = new WikiArticlePage($@"{api.Endpoints.WebsiteUrl}/wiki/",
                 $"Something went wrong when trying to fetch page \"{originalPath}\".\n\n[Return to the main page]({INDEX_PATH})."));
         }
 

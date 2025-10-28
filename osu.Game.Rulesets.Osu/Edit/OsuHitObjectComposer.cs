@@ -23,12 +23,14 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -250,13 +252,17 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         [CanBeNull]
-        public SnapResult TrySnapToDistanceGrid(Vector2 screenSpacePosition)
+        public SnapResult TrySnapToDistanceGrid(Vector2 screenSpacePosition, double? fixedTime = null)
         {
-            if (DistanceSnapProvider.DistanceSnapToggle.Value != TernaryState.True || distanceSnapGrid == null)
+            if (DistanceSnapProvider.DistanceSnapToggle.Value != TernaryState.True || distanceSnapGrid?.IsLoaded != true)
                 return null;
 
             var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
-            (Vector2 pos, double time) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(screenSpacePosition));
+            (Vector2 pos, double time) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(screenSpacePosition), fixedTime);
+
+            if (pos.X < 0 || pos.X > OsuPlayfield.BASE_SIZE.X || pos.Y < 0 || pos.Y > OsuPlayfield.BASE_SIZE.Y)
+                return null;
+
             return new SnapResult(distanceSnapGrid.ToScreenSpace(pos), time, playfield);
         }
 
@@ -273,7 +279,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             pos = Vector2.Clamp(pos, Vector2.Zero, OsuPlayfield.BASE_SIZE);
 
             var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
-            return new SnapResult(positionSnapGrid.ToScreenSpace(pos), null, playfield);
+            return new SnapResult(positionSnapGrid.ToScreenSpace(pos), fallbackTime, playfield);
         }
 
         private bool snapToVisibleBlueprints(Vector2 screenSpacePosition, out SnapResult snapResult)
@@ -350,6 +356,35 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
         }
 
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            // Why is this logic here and not in `OsuSelectionHandler`?
+            // Because we only want to handle this toggle after all other right-click handling completes.
+            //
+            // Consider that input is handled from the most nested child first:
+            //
+            // ComposeScreen
+            //  |- OsuContextMenuContainer                 // right click for context
+            //     |- TimelineBlueprintContainer
+            //        |- TimelineSelectionHandler
+            //     |- (Osu)HitObjectComposer               // right click for toggle new combo
+            //        |- (Osu)EditorBlueprintContainer     // right click for select
+            //           |- (Osu)EditorSelectionHandler    // right click for delete
+            if (e.Button == MouseButton.Right)
+            {
+                var osuSelectionHandler = (OsuSelectionHandler)BlueprintContainer.SelectionHandler;
+
+                if (!osuSelectionHandler.SelectedItems.Any())
+                {
+                    osuSelectionHandler.SelectionNewComboState.Value =
+                        osuSelectionHandler.SelectionNewComboState.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
+                    return true;
+                }
+            }
+
+            return base.OnMouseDown(e);
+        }
+
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (e.Repeat)
@@ -406,22 +441,26 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(targetOffset);
 
-            int sourceIndex = -1;
+            int positionSourceObjectIndex = -1;
+            IHasSliderVelocity sliderVelocitySource = null;
 
             for (int i = 0; i < EditorBeatmap.HitObjects.Count; i++)
             {
                 if (!sourceSelector(EditorBeatmap.HitObjects[i]))
                     break;
 
-                sourceIndex = i;
+                positionSourceObjectIndex = i;
+
+                if (EditorBeatmap.HitObjects[i] is IHasSliderVelocity hasSliderVelocity)
+                    sliderVelocitySource = hasSliderVelocity;
             }
 
-            if (sourceIndex == -1)
+            if (positionSourceObjectIndex == -1)
                 return null;
 
-            HitObject sourceObject = EditorBeatmap.HitObjects[sourceIndex];
+            HitObject sourceObject = EditorBeatmap.HitObjects[positionSourceObjectIndex];
 
-            int targetIndex = sourceIndex + targetOffset;
+            int targetIndex = positionSourceObjectIndex + targetOffset;
             HitObject targetObject = null;
 
             // Keep advancing the target object while its start time falls before the end time of the source object
@@ -442,7 +481,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (sourceObject is Spinner)
                 return null;
 
-            return new OsuDistanceSnapGrid((OsuHitObject)sourceObject, (OsuHitObject)targetObject);
+            return new OsuDistanceSnapGrid((OsuHitObject)sourceObject, (OsuHitObject)targetObject, sliderVelocitySource);
         }
     }
 }

@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -15,7 +16,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "NM";
         public override LocalisableString Description => "No mods applied.";
         public override double ScoreMultiplier => 1;
-        public override IconUsage? Icon => FontAwesome.Solid.Ban;
+        public override IconUsage? Icon => OsuIcon.ModNoMod;
         public override ModType Type => ModType.System;
     }
 }

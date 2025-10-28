@@ -319,11 +319,25 @@ namespace osu.Game.Beatmaps.Formats
                 SampleControlPoint createSampleControlPointFor(double time, IList<HitSampleInfo> samples)
                 {
                     int volume = samples.Max(o => o.Volume);
-                    int customIndex = samples.Any(o => o is ConvertHitObjectParser.LegacyHitSampleInfo)
-                        ? samples.OfType<ConvertHitObjectParser.LegacyHitSampleInfo>().Max(o => o.CustomSampleBank)
-                        : -1;
+                    string bank = samples.Where(s => s.Name == HitSampleInfo.HIT_NORMAL).Select(s => s.Bank).FirstOrDefault()
+                                  ?? samples.Select(s => s.Bank).First();
 
-                    return new LegacyBeatmapDecoder.LegacySampleControlPoint { Time = time, SampleVolume = volume, CustomSampleBank = customIndex };
+                    int customIndex = samples.Max(s =>
+                    {
+                        switch (s)
+                        {
+                            case ConvertHitObjectParser.LegacyHitSampleInfo legacy:
+                                return legacy.CustomSampleBank;
+
+                            default:
+                                if (int.TryParse(s.Suffix, out int index))
+                                    return index;
+
+                                return s.UseBeatmapSamples ? 1 : -1;
+                        }
+                    });
+
+                    return new LegacyBeatmapDecoder.LegacySampleControlPoint { Time = time, SampleVolume = volume, SampleBank = bank, CustomSampleBank = customIndex };
                 }
             }
 
@@ -349,7 +363,7 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine("[Colours]");
 
-            for (int i = 0; i < colours.Count; i++)
+            for (int i = 0; i < Math.Min(colours.Count, LegacyBeatmapDecoder.MAX_COMBO_COLOUR_COUNT); i++)
             {
                 var comboColour = colours[i];
 
@@ -447,60 +461,31 @@ namespace osu.Game.Beatmaps.Formats
 
         private void addPathData(TextWriter writer, IHasPath pathData, Vector2 position)
         {
-            PathType? lastType = null;
-
             for (int i = 0; i < pathData.Path.ControlPoints.Count; i++)
             {
                 PathControlPoint point = pathData.Path.ControlPoints[i];
 
+                // Note that lazer's encoding format supports specifying multiple curve types for a slider path, which is not supported by stable.
+                // Backwards compatibility with stable is handled by `LegacyBeatmapExporter` and `BezierConverter.ConvertToModernBezier()`.
                 if (point.Type != null)
                 {
-                    // We've reached a new (explicit) segment!
-
-                    // Explicit segments have a new format in which the type is injected into the middle of the control point string.
-                    // To preserve compatibility with osu-stable as much as possible, explicit segments with the same type are converted to use implicit segments by duplicating the control point.
-                    // One exception are consecutive perfect curves, which aren't supported in osu!stable and can lead to decoding issues if encoded as implicit segments
-                    bool needsExplicitSegment = point.Type != lastType || point.Type == PathType.PERFECT_CURVE || i == pathData.Path.ControlPoints.Count - 1;
-
-                    // Another exception to this is when the last two control points of the last segment were duplicated. This is not a scenario supported by osu!stable.
-                    // Lazer does not add implicit segments for the last two control points of _any_ explicit segment, so an explicit segment is forced in order to maintain consistency with the decoder.
-                    if (i > 1)
+                    switch (point.Type?.Type)
                     {
-                        // We need to use the absolute control point position to determine equality, otherwise floating point issues may arise.
-                        Vector2 p1 = position + pathData.Path.ControlPoints[i - 1].Position;
-                        Vector2 p2 = position + pathData.Path.ControlPoints[i - 2].Position;
+                        case SplineType.BSpline:
+                            writer.Write(point.Type.Value.Degree > 0 ? $"B{point.Type.Value.Degree}|" : "B|");
+                            break;
 
-                        if ((int)p1.X == (int)p2.X && (int)p1.Y == (int)p2.Y)
-                            needsExplicitSegment = true;
-                    }
+                        case SplineType.Catmull:
+                            writer.Write("C|");
+                            break;
 
-                    if (needsExplicitSegment)
-                    {
-                        switch (point.Type?.Type)
-                        {
-                            case SplineType.BSpline:
-                                writer.Write(point.Type.Value.Degree > 0 ? $"B{point.Type.Value.Degree}|" : "B|");
-                                break;
+                        case SplineType.PerfectCurve:
+                            writer.Write("P|");
+                            break;
 
-                            case SplineType.Catmull:
-                                writer.Write("C|");
-                                break;
-
-                            case SplineType.PerfectCurve:
-                                writer.Write("P|");
-                                break;
-
-                            case SplineType.Linear:
-                                writer.Write("L|");
-                                break;
-                        }
-
-                        lastType = point.Type;
-                    }
-                    else
-                    {
-                        // New segment with the same type - duplicate the control point
-                        writer.Write(FormattableString.Invariant($"{position.X + point.Position.X}:{position.Y + point.Position.Y}|"));
+                        case SplineType.Linear:
+                            writer.Write("L|");
+                            break;
                     }
                 }
 

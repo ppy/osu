@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -37,7 +38,10 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 new Drawable[]
                 {
-                    new ControlPointList(),
+                    new ControlPointList
+                    {
+                        SelectClosestTimingPoint = selectClosestTimingPoint,
+                    },
                     new ControlPointSettings(),
                 },
             }
@@ -70,8 +74,18 @@ namespace osu.Game.Screens.Edit.Timing
             if (editorClock == null)
                 return;
 
-            var nearestTimingPoint = EditorBeatmap.ControlPointInfo.TimingPointAt(editorClock.CurrentTime);
-            SelectedGroup.Value = EditorBeatmap.ControlPointInfo.GroupAt(nearestTimingPoint.Time);
+            double accurateTime = editorClock.CurrentTimeAccurate;
+
+            var activeTimingPoint = EditorBeatmap.ControlPointInfo.TimingPointAt(accurateTime);
+            var activeEffectPoint = EditorBeatmap.ControlPointInfo.EffectPointAt(accurateTime);
+
+            if (activeEffectPoint.Equals(EffectControlPoint.DEFAULT))
+                SelectedGroup.Value = EditorBeatmap.ControlPointInfo.GroupAt(activeTimingPoint.Time);
+            else
+            {
+                double latestActiveTime = Math.Max(activeTimingPoint.Time, activeEffectPoint.Time);
+                SelectedGroup.Value = EditorBeatmap.ControlPointInfo.GroupAt(latestActiveTime);
+            }
         }
 
         protected override void ConfigureTimeline(TimelineArea timelineArea)

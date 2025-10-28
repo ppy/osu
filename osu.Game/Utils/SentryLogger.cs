@@ -41,7 +41,7 @@ namespace osu.Game.Utils
         {
             this.game = game;
 
-            if (!game.IsDeployedBuild || !game.CreateEndpoints().WebsiteRootUrl.EndsWith(@".ppy.sh", StringComparison.Ordinal))
+            if (!game.IsDeployedBuild || !game.CreateEndpoints().WebsiteUrl.EndsWith(@".ppy.sh", StringComparison.Ordinal))
                 return;
 
             sentrySession = SentrySdk.Init(options =>
@@ -52,13 +52,16 @@ namespace osu.Game.Utils
                 options.IsGlobalModeEnabled = true;
                 options.CacheDirectoryPath = storage?.GetFullPath(string.Empty);
                 // The reported release needs to match version as reported to Sentry in .github/workflows/sentry-release.yml
-                options.Release = $"osu@{game.Version.Replace($@"-{OsuGameBase.BUILD_SUFFIX}", string.Empty)}";
+                options.Release = $"osu@{game.Version.Split('-').First()}";
             });
 
             Logger.NewEntry += processLogEntry;
         }
 
-        ~SentryLogger() => Dispose(false);
+        ~SentryLogger()
+        {
+            Dispose(false);
+        }
 
         public void AttachUser(IBindable<APIUser> user)
         {

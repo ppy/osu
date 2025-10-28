@@ -5,10 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -49,9 +51,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         [Resolved]
         private FreehandSliderToolboxGroup? freehandToolboxGroup { get; set; }
 
+        [Resolved]
+        private EditorClock? editorClock { get; set; }
+
+        private Bindable<bool> limitedDistanceSnap { get; set; } = null!;
+
         private readonly IncrementalBSplineBuilder bSplineBuilder = new IncrementalBSplineBuilder { Degree = 4 };
 
-        protected override bool IsValidForPlacement => HitObject.Path.HasValidLength;
+        protected override bool IsValidForPlacement => HitObject.Path.HasValidLengthForPlacement;
 
         public SliderPlacementBlueprint()
             : base(new Slider())
@@ -63,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
             InternalChildren = new Drawable[]
             {
@@ -74,6 +81,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             };
 
             state = SliderPlacementState.Initial;
+            limitedDistanceSnap = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
         }
 
         protected override void LoadComplete()
@@ -109,7 +117,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime)
         {
             var result = composer?.TrySnapToNearbyObjects(screenSpacePosition, fallbackTime);
-            result ??= composer?.TrySnapToDistanceGrid(screenSpacePosition);
+            result ??= composer?.TrySnapToDistanceGrid(screenSpacePosition, limitedDistanceSnap.Value && editorClock != null ? editorClock.CurrentTime : null);
             if (composer?.TrySnapToPositionGrid(result?.ScreenSpacePosition ?? screenSpacePosition, result?.Time ?? fallbackTime) is SnapResult gridSnapResult)
                 result = gridSnapResult;
             result ??= new SnapResult(screenSpacePosition, fallbackTime);
@@ -426,7 +434,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (state == SliderPlacementState.Drawing)
                 HitObject.Path.ExpectedDistance.Value = (float)HitObject.Path.CalculatedDistance;
             else
-                HitObject.Path.ExpectedDistance.Value = distanceSnapProvider?.FindSnappedDistance(HitObject, (float)HitObject.Path.CalculatedDistance, DistanceSnapTarget.Start) ?? (float)HitObject.Path.CalculatedDistance;
+                HitObject.Path.ExpectedDistance.Value = distanceSnapProvider?.FindSnappedDistance((float)HitObject.Path.CalculatedDistance, HitObject.StartTime, HitObject) ?? (float)HitObject.Path.CalculatedDistance;
 
             bodyPiece.UpdateFrom(HitObject);
             headCirclePiece.UpdateFrom(HitObject.HeadCircle);

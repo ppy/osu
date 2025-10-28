@@ -31,7 +31,8 @@ namespace osu.Game.Tests.Visual.Online
                         Title = "JUSTadICE (TV Size)",
                         Artist = "Oomori Seiko",
                     },
-                    DifficultyName = "Extreme"
+                    DifficultyName = "Extreme",
+                    Status = BeatmapOnlineStatus.Ranked,
                 },
                 EndedAt = DateTimeOffset.Now,
                 Mods = new[]
@@ -42,6 +43,8 @@ namespace osu.Game.Tests.Visual.Online
                 },
                 Accuracy = 0.9813,
                 Ranked = true,
+                Preserve = true,
+                Processed = true,
             };
 
             var secondScore = new SoloScoreInfo
@@ -55,7 +58,8 @@ namespace osu.Game.Tests.Visual.Online
                         Title = "Triumph & Regret",
                         Artist = "typeMARS",
                     },
-                    DifficultyName = "[4K] Regret"
+                    DifficultyName = "[4K] Regret",
+                    Status = BeatmapOnlineStatus.Ranked,
                 },
                 EndedAt = DateTimeOffset.Now,
                 Mods = new[]
@@ -65,6 +69,8 @@ namespace osu.Game.Tests.Visual.Online
                 },
                 Accuracy = 0.998546,
                 Ranked = true,
+                Preserve = true,
+                Processed = true,
             };
 
             var thirdScore = new SoloScoreInfo
@@ -78,11 +84,14 @@ namespace osu.Game.Tests.Visual.Online
                         Title = "Idolize",
                         Artist = "Creo",
                     },
-                    DifficultyName = "Insane"
+                    DifficultyName = "Insane",
+                    Status = BeatmapOnlineStatus.Ranked,
                 },
                 EndedAt = DateTimeOffset.Now,
                 Accuracy = 0.9726,
                 Ranked = true,
+                Preserve = true,
+                Processed = true,
             };
 
             var noPPScore = new SoloScoreInfo
@@ -95,11 +104,14 @@ namespace osu.Game.Tests.Visual.Online
                         Title = "C18H27NO3(extend)",
                         Artist = "Team Grimoire",
                     },
-                    DifficultyName = "[4K] Cataclysmic Hypernova"
+                    DifficultyName = "[4K] Cataclysmic Hypernova",
+                    Status = BeatmapOnlineStatus.Ranked,
                 },
                 EndedAt = DateTimeOffset.Now,
                 Accuracy = 0.55879,
                 Ranked = true,
+                Preserve = true,
+                Processed = true,
             };
 
             var lovedScore = new SoloScoreInfo
@@ -118,6 +130,8 @@ namespace osu.Game.Tests.Visual.Online
                 EndedAt = DateTimeOffset.Now,
                 Accuracy = 0.55879,
                 Ranked = true,
+                Preserve = true,
+                Processed = true,
             };
 
             var unprocessedPPScore = new SoloScoreInfo
@@ -136,6 +150,8 @@ namespace osu.Game.Tests.Visual.Online
                 EndedAt = DateTimeOffset.Now,
                 Accuracy = 0.55879,
                 Ranked = true,
+                Preserve = true,
+                Processed = false,
             };
 
             var unrankedPPScore = new SoloScoreInfo
@@ -153,7 +169,31 @@ namespace osu.Game.Tests.Visual.Online
                 },
                 EndedAt = DateTimeOffset.Now,
                 Accuracy = 0.55879,
+                PP = 96.83,
                 Ranked = false,
+                Preserve = true,
+                Processed = true,
+            };
+
+            var notPreservedPPScore = new SoloScoreInfo
+            {
+                Rank = ScoreRank.B,
+                Beatmap = new APIBeatmap
+                {
+                    BeatmapSet = new APIBeatmapSet
+                    {
+                        Title = "C18H27NO3(extend)",
+                        Artist = "Team Grimoire",
+                    },
+                    DifficultyName = "[4K] Cataclysmic Hypernova",
+                    Status = BeatmapOnlineStatus.Ranked,
+                },
+                EndedAt = DateTimeOffset.Now,
+                Accuracy = 0.55879,
+                PP = 96.83,
+                Ranked = true,
+                Preserve = false,
+                Processed = true,
             };
 
             Add(new FillFlowContainer
@@ -172,6 +212,7 @@ namespace osu.Game.Tests.Visual.Online
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileScore(lovedScore)),
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileScore(unprocessedPPScore)),
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileScore(unrankedPPScore)),
+                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileScore(notPreservedPPScore)),
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(firstScore, 0.97)),
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(secondScore, 0.85)),
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(thirdScore, 0.66)),

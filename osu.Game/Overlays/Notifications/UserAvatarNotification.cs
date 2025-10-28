@@ -3,72 +3,43 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users.Drawables;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public partial class UserAvatarNotification : Notification
+    public abstract partial class UserAvatarNotification : SimpleNotification
     {
-        private LocalisableString text;
+        private readonly APIUser? user;
 
-        public override LocalisableString Text
-        {
-            get => text;
-            set
-            {
-                text = value;
-                if (textDrawable != null)
-                    textDrawable.Text = text;
-            }
-        }
+        protected DrawableAvatar Avatar { get; private set; } = null!;
 
-        private TextFlowContainer? textDrawable;
-
-        private readonly APIUser user;
-
-        public UserAvatarNotification(APIUser user, LocalisableString text)
+        protected UserAvatarNotification(APIUser? user, LocalisableString text = default)
         {
             this.user = user;
+
+            Icon = default;
             Text = text;
         }
 
-        protected override IconUsage CloseButtonIcon => FontAwesome.Solid.Times;
-
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OverlayColourProvider colourProvider)
+        private void load()
         {
-            Light.Colour = colours.Orange2;
-
-            Content.Add(textDrawable = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 14, weight: FontWeight.Medium))
-            {
-                AutoSizeAxes = Axes.Y,
-                RelativeSizeAxes = Axes.X,
-                Text = text
-            });
-
             IconContent.Masking = true;
             IconContent.CornerRadius = CORNER_RADIUS;
+            IconContent.ChangeChildDepth(IconDrawable, float.MinValue);
 
-            IconContent.AddRange(new Drawable[]
-            {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
-                },
-            });
-
-            LoadComponentAsync(new DrawableAvatar(user)
+            LoadComponentAsync(Avatar = new DrawableAvatar(user)
             {
                 FillMode = FillMode.Fill,
             }, IconContent.Add);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            IconContent.Width = IconContent.DrawHeight;
         }
     }
 }

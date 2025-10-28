@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
@@ -16,7 +17,6 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Resources.Localisation.Web;
-using SharpCompress;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -62,8 +62,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, INotificationOverlay? notifications)
+        private void load(INotificationOverlay? notifications)
         {
             localUser.BindTo(api.LocalUser);
 
@@ -72,15 +75,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 updateIcon();
                 updateColor();
             });
-
-            User.BindValueChanged(u =>
-            {
-                followerCount = u.NewValue?.User.FollowerCount ?? 0;
-                updateStatus();
-            }, true);
-
-            apiFriends.BindTo(api.Friends);
-            apiFriends.BindCollectionChanged((_, _) => Schedule(updateStatus));
 
             Action += () =>
             {
@@ -107,7 +101,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         status.Value = FriendStatus.None;
                     }
 
-                    api.UpdateLocalFriends();
+                    api.LocalUserState.UpdateFriends();
                     HideLoadingLayer();
                 };
 
@@ -124,6 +118,20 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
                 api.Queue(req);
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            apiFriends.BindTo(api.LocalUserState.Friends);
+            apiFriends.BindCollectionChanged((_, _) => Schedule(updateStatus));
+
+            User.BindValueChanged(u =>
+            {
+                followerCount = u.NewValue?.User.FollowerCount ?? 0;
+                updateStatus();
+            }, true);
         }
 
         protected override bool OnHover(HoverEvent e)

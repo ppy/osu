@@ -9,6 +9,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Game.Extensions;
+using osu.Game.Online.Metadata;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
@@ -21,7 +22,8 @@ namespace osu.Game.Online.API.Requests.Responses
         /// </summary>
         public const int SYSTEM_USER_ID = 0;
 
-        [JsonProperty(@"id")]
+        // In osu-web, deleted users have a null ID. When deserializing, we ignore the null value and use 1 instead.
+        [JsonProperty(@"id", NullValueHandling = NullValueHandling.Ignore)]
         public int Id { get; set; } = 1;
 
         [JsonProperty(@"join_date")]
@@ -54,6 +56,10 @@ namespace osu.Game.Online.API.Requests.Responses
             get => Enum.TryParse(countryCodeString, out CountryCode result) ? result : CountryCode.Unknown;
             set => countryCodeString = value.ToString();
         }
+
+        [JsonProperty(@"team")]
+        [CanBeNull]
+        public APITeam Team { get; set; }
 
         [JsonProperty(@"profile_colour")]
         public string Colour;
@@ -107,8 +113,13 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"is_active")]
         public bool Active;
 
+        /// <summary>
+        /// From osu-web's perspective, whether a user was recently online.
+        /// This doesn't imply the user is online in a lazer client (may be updated from stable or web browser).
+        /// Use <see cref="MetadataClient.GetPresence"/> for real-time lazer online status checks.
+        /// </summary>
         [JsonProperty(@"is_online")]
-        public bool IsOnline;
+        public bool WasRecentlyOnline;
 
         [JsonProperty(@"pm_friends_only")]
         public bool PMFriendsOnly;

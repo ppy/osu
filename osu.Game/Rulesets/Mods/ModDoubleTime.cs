@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
@@ -30,6 +31,18 @@ namespace osu.Game.Rulesets.Mods
 
         [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
         public virtual BindableBool AdjustPitch { get; } = new BindableBool();
+
+        public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
+        {
+            get
+            {
+                foreach (var description in base.SettingDescription)
+                    yield return description;
+
+                if (!AdjustPitch.IsDefault)
+                    yield return ("Adjust pitch", AdjustPitch.Value ? "On" : "Off");
+            }
+        }
 
         private readonly RateAdjustModHelper rateAdjustHelper;
 
