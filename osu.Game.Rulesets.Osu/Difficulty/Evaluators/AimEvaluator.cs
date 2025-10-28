@@ -103,13 +103,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double velocityThreshold = diameter * 2.3 / osuCurrObj.AdjustedDeltaTime;
                 double wideVelocityBase = Math.Min(angleBonus, velocityThreshold + 0.4 * (angleBonus - velocityThreshold));
 
-                wideAngleBonus = calcWideAngleBonus(currAngle);
+                wideAngleBonus = wideVelocityBase * calcWideAngleBonus(currAngle);
 
                 // Penalize angle repetition.
                 wideAngleBonus *= 1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3));
-
-                // Apply full wide angle bonus for distance more than one diameter
-                wideAngleBonus *= wideVelocityBase * DifficultyCalculationUtils.Smootherstep(currDistance, 0, diameter);
 
                 // Apply wiggle bonus for jumps that are [radius, 3*diameter] in distance, with < 110 angle
                 // https://www.desmos.com/calculator/dp0v0nvowc
