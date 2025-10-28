@@ -414,11 +414,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             if (!matchmakingState.Users.UserDictionary.TryGetValue(User.Id, out MatchmakingUser? userScore))
                 return;
 
-            if (userScore.Placement == 0)
+            if (userScore.Placement == null)
                 return;
 
-            rankText.Text = userScore.Placement.Ordinalize(CultureInfo.CurrentCulture);
-            rankText.FadeColour(SubScreenResults.ColourForPlacement(userScore.Placement));
+            rankText.Text = userScore.Placement.Value.Ordinalize(CultureInfo.CurrentCulture);
+            rankText.FadeColour(SubScreenResults.ColourForPlacement(userScore.Placement.Value));
             scoreText.Text = $"{userScore.Points} pts";
         });
 
