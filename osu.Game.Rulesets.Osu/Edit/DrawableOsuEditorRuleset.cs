@@ -9,6 +9,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit;
 using osuTK;
@@ -29,6 +30,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         private partial class OsuEditorPlayfield : OsuPlayfield
         {
             private readonly BindableBool showCursor = new BindableBool();
+
+            protected override GameplayCursorContainer CreateCursor() => new OsuEditorCursorContainer();
 
             [Resolved]
             private EditorBeatmap editorBeatmap { get; set; } = null!;
@@ -61,6 +64,37 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 if (editorBeatmap.IsNotNull())
                     editorBeatmap.BeatmapReprocessed -= onBeatmapReprocessed;
+            }
+        }
+
+        // Seeking in the timeline will rapidly move the cursor which will create ugly trails, which is why they get disabled when doing so
+        private partial class OsuEditorCursorContainer : OsuCursorContainer
+        {
+            private IBindable<bool> seekingOrPaused = null!;
+
+            [BackgroundDependencyLoader]
+            private void load(EditorClock clock)
+            {
+                seekingOrPaused = clock.SeekingOrStopped.GetBoundCopy();
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                seekingOrPaused.BindValueChanged(e =>
+                {
+                    if (e.NewValue && CursorTrail.Drawable is CursorTrail trail)
+                        SchedulerAfterChildren.Add(() => trail.ClearParts());
+                }, true);
+            }
+
+            protected override void UpdateAfterChildren()
+            {
+                base.UpdateAfterChildren();
+
+                if (CursorTrail.Drawable is CursorTrail trail)
+                    trail.Enabled = !seekingOrPaused.Value;
             }
         }
     }
