@@ -34,10 +34,13 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         protected override bool IncreasesCombo(JudgementResult result)
         {
+            if (!base.IncreasesCombo(result))
+                return false;
+
             if (result is OsuSliderJudgementResult sliderJudgementResult)
                 return sliderJudgementResult.AwardsCombo;
 
-            return base.IncreasesCombo(result);
+            return true;
         }
 
         protected override HitEvent CreateHitEvent(JudgementResult result)
