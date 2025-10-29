@@ -23,7 +23,7 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
         /// The aggregate room placement (1-based).
         /// </summary>
         [Key(1)]
-        public int Placement { get; set; }
+        public int? Placement { get; set; }
 
         /// <summary>
         /// The aggregate points.

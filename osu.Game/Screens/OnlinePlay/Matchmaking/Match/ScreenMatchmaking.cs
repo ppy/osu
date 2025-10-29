@@ -392,7 +392,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 return;
             }
 
-            client.ChangeState(MultiplayerUserState.Idle);
+            client.ChangeState(MultiplayerUserState.Idle).FireAndForget();
         }
 
         /// <summary>

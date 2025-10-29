@@ -239,8 +239,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     if (client.Room?.MatchState is not MatchmakingRoomState matchmakingState)
                         continue;
 
-                    if (matchmakingState.Users.UserDictionary.TryGetValue(panels[i].User.Id, out MatchmakingUser? user))
-                        SetLayoutPosition(Children[i], user.Placement);
+                    if (matchmakingState.Users.UserDictionary.TryGetValue(panels[i].User.Id, out MatchmakingUser? user) && user.Placement != null)
+                        SetLayoutPosition(Children[i], user.Placement.Value);
                     else
                         SetLayoutPosition(Children[i], float.MaxValue);
                 }
