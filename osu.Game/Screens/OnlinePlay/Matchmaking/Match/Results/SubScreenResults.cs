@@ -255,27 +255,27 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
             roomAwards.Clear();
 
             long maxScore = long.MinValue;
-            int maxScoreUserId = 0;
+            int maxScoreUserId = -1;
 
             double maxAccuracy = double.MinValue;
-            int maxAccuracyUserId = 0;
+            int maxAccuracyUserId = -1;
 
             int maxCombo = int.MinValue;
-            int maxComboUserId = 0;
+            int maxComboUserId = -1;
 
             long maxBonusScore = 0;
-            int maxBonusScoreUserId = 0;
+            int maxBonusScoreUserId = -1;
 
             long largestScoreDifference = long.MinValue;
-            int largestScoreDifferenceUserId = 0;
+            int largestScoreDifferenceUserId = -1;
 
             long smallestScoreDifference = long.MaxValue;
-            int smallestScoreDifferenceUserId = 0;
+            int smallestScoreDifferenceUserId = -1;
 
             for (int round = 1; round <= state.CurrentRound; round++)
             {
                 long roundHighestScore = long.MinValue;
-                int roundHighestScoreUserId = 0;
+                int roundHighestScoreUserId = -1;
 
                 long roundLowestScore = long.MaxValue;
 
