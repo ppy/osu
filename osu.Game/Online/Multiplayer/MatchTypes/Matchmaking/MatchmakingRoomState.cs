@@ -81,10 +81,10 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
 
                 foreach (var score in scoreGroup)
                 {
-                    MatchmakingUser mmUser = Users[score.UserID];
+                    MatchmakingUser mmUser = Users.GetOrAdd(score.UserID);
                     mmUser.Points += placementPoints[placement - 1];
 
-                    MatchmakingRound mmRound = mmUser.Rounds[CurrentRound];
+                    MatchmakingRound mmRound = mmUser.Rounds.GetOrAdd(CurrentRound);
                     mmRound.Placement = placement;
                     mmRound.TotalScore = score.TotalScore;
                     mmRound.Accuracy = score.Accuracy;
