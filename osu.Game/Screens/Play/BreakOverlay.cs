@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Play
 
                 remainingTimeAdjustmentBox
                     .ResizeWidthTo(remaining_time_container_max_size, BREAK_FADE_DURATION, Easing.OutQuint)
-                    .Delay(b.Duration - BREAK_FADE_DURATION)
+                    .Delay(b.Duration)
                     .ResizeWidthTo(0);
 
                 remainingTimeBox.ResizeWidthTo(remainingTimeForCurrentPeriod);
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Play
                 info.MoveToX(50)
                     .MoveToX(0, BREAK_FADE_DURATION, Easing.OutQuint);
 
-                using (BeginDelayedSequence(b.Duration - BREAK_FADE_DURATION))
+                using (BeginDelayedSequence(b.Duration))
                 {
                     fadeContainer.FadeOut(BREAK_FADE_DURATION);
                     breakArrows.Hide(BREAK_FADE_DURATION);
