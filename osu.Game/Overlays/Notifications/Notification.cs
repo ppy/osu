@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Notifications
         /// <summary>
         /// Critical notifications show even during gameplay or other scenarios where notifications would usually be suppressed.
         /// </summary>
-        public bool IsCritical { get; init; } = false;
+        public bool IsCritical { get; init; }
 
         /// <summary>
         /// Transient notifications only show as a toast, and do not linger in notification history.
