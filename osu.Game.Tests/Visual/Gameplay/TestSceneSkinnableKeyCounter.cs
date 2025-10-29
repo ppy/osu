@@ -35,7 +35,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
 
-        protected override Drawable CreateDefaultImplementation() => new ArgonKeyCounterDisplay();
+        protected override Drawable CreateArgonImplementation() => new ArgonKeyCounterDisplay();
+
+        protected override Drawable CreateDefaultImplementation() => new DefaultKeyCounterDisplay();
 
         protected override Drawable CreateLegacyImplementation() => new LegacyKeyCounterDisplay();
     }
