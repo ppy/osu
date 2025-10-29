@@ -7,7 +7,10 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
+using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -200,7 +203,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             public partial class MatchFoundNotification : ProgressCompletionNotification
             {
-                // for future use.
+                protected override IconUsage CloseButtonIcon => FontAwesome.Solid.Times;
+
+                public MatchFoundNotification()
+                {
+                    IsCritical = true;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
+                {
+                    Icon = FontAwesome.Solid.Bolt;
+                    IconContent.Colour = ColourInfo.GradientVertical(colours.YellowDark, colours.YellowLight);
+                }
             }
         }
     }
