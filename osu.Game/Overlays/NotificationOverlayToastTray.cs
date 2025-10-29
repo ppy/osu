@@ -91,7 +91,12 @@ namespace osu.Game.Overlays
         public void FlushAllToasts()
         {
             foreach (var notification in toastFlow.ToArray())
+            {
+                if (notification.IsCritical)
+                    continue;
+
                 forwardNotification(notification);
+            }
         }
 
         public void Post(Notification notification)
