@@ -45,7 +45,7 @@ namespace osu.Game.Online.Matchmaking
         /// <summary>
         /// Raise a candidate playlist item to be played in the current round.
         /// </summary>
-        /// <param name="playlistItemId">The playlist item.</param>
+        /// <param name="playlistItemId">The playlist item, or -1 to indicate a random selection.</param>
         Task MatchmakingToggleSelection(long playlistItemId);
 
         /// <summary>
