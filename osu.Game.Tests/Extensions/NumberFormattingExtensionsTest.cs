@@ -46,9 +46,12 @@ namespace osu.Game.Tests.Extensions
 
         [Test]
         [SetCulture("fr-FR")]
-        public void TestCultureInsensitivity()
+        [TestCase(0.4, true, 2, ExpectedResult = "40%")]
+        [TestCase(1e-6, false, 6, ExpectedResult = "0.000001")]
+        [TestCase(0.48333, true, 4, ExpectedResult = "48.33%")]
+        public string TestCultureInsensitivity(double input, bool percent, int decimalDigits)
         {
-            Assert.That(0.4.ToStandardFormattedString(maxDecimalDigits: 2, asPercentage: true), Is.EqualTo("40%"));
+            return input.ToStandardFormattedString(decimalDigits, percent);
         }
     }
 }

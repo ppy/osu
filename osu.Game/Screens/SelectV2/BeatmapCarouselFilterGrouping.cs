@@ -255,7 +255,7 @@ namespace osu.Game.Screens.SelectV2
 
             return groups.Values
                          .OrderBy(g => g.Group!.Order)
-                         .ThenBy(g => g.Group!.Title)
+                         .ThenBy(g => g.Group!.Title.ToString())
                          .ToList();
         }
 
@@ -433,7 +433,7 @@ namespace osu.Game.Screens.SelectV2
         private IEnumerable<GroupDefinition> defineGroupByRankAchieved(BeatmapInfo beatmap, IReadOnlyDictionary<Guid, ScoreRank> topRankMapping)
         {
             if (topRankMapping.TryGetValue(beatmap.ID, out var rank))
-                return new GroupDefinition(-(int)rank, rank.GetDescription()).Yield();
+                return new RankDisplayGroupDefinition(rank).Yield();
 
             return new GroupDefinition(int.MaxValue, "Unplayed").Yield();
         }
