@@ -205,6 +205,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             {
                 protected override IconUsage CloseButtonIcon => FontAwesome.Solid.Times;
 
+                public MatchFoundNotification()
+                {
+                    IsCritical = true;
+                }
+
                 [BackgroundDependencyLoader]
                 private void load(OsuColour colours)
                 {
