@@ -221,7 +221,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
             int accuracyPlacement = accuracyOrderedUsers.index + 1;
             addStatistic(accuracyPlacement, $"Overall accuracy ({accuracyOrderedUsers.info.avgAcc.FormatAccuracy()})");
 
-            var maxComboOrderedUsers = state.Users.Select(u => (user: u, maxCombo: u.Rounds.Max(r => r.MaxCombo)))
+            var maxComboOrderedUsers = state.Users.Select(u => (user: u, maxCombo: u.Rounds.Select(r => r.MaxCombo).DefaultIfEmpty(0).Max()))
                                             .OrderByDescending(t => t.maxCombo)
                                             .Select((t, i) => (info: t, index: i))
                                             .Single(t => t.info.user.UserId == client.LocalUser!.UserID);
@@ -229,7 +229,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
             addStatistic(maxComboPlacement, $"Best max combo ({maxComboOrderedUsers.info.maxCombo}x)");
 
             var bestPlacement = localUserState.Rounds.MinBy(r => r.Placement);
-            addStatistic(bestPlacement!.Placement, $"Best round placement (round {bestPlacement.Round})");
+            if (bestPlacement != null)
+                addStatistic(bestPlacement.Placement, $"Best round placement (round {bestPlacement.Round})");
 
             void addStatistic(int position, string text) => userStatistics.Add(new PanelUserStatistic(position, text));
         }
