@@ -203,13 +203,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
                 return;
             }
 
-            int overallPlacement = localUserState.Placement;
+            int? overallPlacement = localUserState.Placement;
 
-            placementText.Text = overallPlacement.Ordinalize(CultureInfo.CurrentCulture);
-            placementText.Colour = ColourForPlacement(overallPlacement);
+            if (overallPlacement != null)
+            {
+                placementText.Text = overallPlacement.Value.Ordinalize(CultureInfo.CurrentCulture);
+                placementText.Colour = ColourForPlacement(overallPlacement.Value);
 
-            int overallPoints = localUserState.Points;
-            addStatistic(overallPlacement, $"Overall position ({overallPoints} points)");
+                int overallPoints = localUserState.Points;
+                addStatistic(overallPlacement.Value, $"Overall position ({overallPoints} points)");
+            }
 
             var accuracyOrderedUsers = state.Users.Select(u => (user: u, avgAcc: u.Rounds.Select(r => r.Accuracy).DefaultIfEmpty(0).Average()))
                                             .OrderByDescending(t => t.avgAcc)
@@ -257,27 +260,27 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
             roomAwards.Clear();
 
             long maxScore = long.MinValue;
-            int maxScoreUserId = 0;
+            int maxScoreUserId = -1;
 
             double maxAccuracy = double.MinValue;
-            int maxAccuracyUserId = 0;
+            int maxAccuracyUserId = -1;
 
             int maxCombo = int.MinValue;
-            int maxComboUserId = 0;
+            int maxComboUserId = -1;
 
             long maxBonusScore = 0;
-            int maxBonusScoreUserId = 0;
+            int maxBonusScoreUserId = -1;
 
             long largestScoreDifference = long.MinValue;
-            int largestScoreDifferenceUserId = 0;
+            int largestScoreDifferenceUserId = -1;
 
             long smallestScoreDifference = long.MaxValue;
-            int smallestScoreDifferenceUserId = 0;
+            int smallestScoreDifferenceUserId = -1;
 
             for (int round = 1; round <= state.CurrentRound; round++)
             {
                 long roundHighestScore = long.MinValue;
-                int roundHighestScoreUserId = 0;
+                int roundHighestScoreUserId = -1;
 
                 long roundLowestScore = long.MaxValue;
 
@@ -346,11 +349,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
                 }
             }
 
-            addAward(maxScoreUserId, "Score champ", "Highest score in a single round");
+            if (maxScoreUserId > 0)
+                addAward(maxScoreUserId, "Score champ", "Highest score in a single round");
 
-            addAward(maxAccuracyUserId, "Most accurate", "Highest accuracy in a single round");
+            if (maxAccuracyUserId > 0)
+                addAward(maxAccuracyUserId, "Most accurate", "Highest accuracy in a single round");
 
-            addAward(maxComboUserId, "Top combo", "Highest combo in a single round");
+            if (maxComboUserId > 0)
+                addAward(maxComboUserId, "Top combo", "Highest combo in a single round");
 
             if (maxBonusScoreUserId > 0)
                 addAward(maxBonusScoreUserId, "Biggest bonus", "Biggest bonus score across all rounds");
