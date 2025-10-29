@@ -69,6 +69,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                     Masking = true,
                 },
             };
+
+            // Special item denoting a random selection.
+            AddItem(new MultiplayerPlaylistItem { ID = -1 });
         }
 
         [BackgroundDependencyLoader]
@@ -116,14 +119,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             panelGridContainer.SetLayoutPosition(panel, (float)item.StarRating);
         }
 
-        public void RemoveItem(long id)
-        {
-            if (!panelLookup.Remove(id, out var panel))
-                return;
-
-            panel.Expire();
-        }
-
         public void SetUserSelection(APIUser user, long itemId, bool selected)
         {
             if (!panelLookup.TryGetValue(itemId, out var panel))
@@ -133,6 +128,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 panel.AddUser(user);
             else
                 panel.RemoveUser(user);
+        }
+
+        public void RevealRandomItem(MultiplayerPlaylistItem item)
+        {
+            if (!panelLookup.TryGetValue(-1, out var panel))
+                return;
+
+            panel.DisplayItem(item);
         }
 
         public void RollAndDisplayFinalBeatmap(long[] candidateItemIds, long finalItemId)

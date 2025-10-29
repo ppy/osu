@@ -197,6 +197,23 @@ namespace osu.Game.Tests.Visual.Matchmaking
             });
         }
 
+        [Test]
+        public void TestPresentRandomItem()
+        {
+            AddStep("present random item panel", () =>
+            {
+                grid.TransferCandidatePanelsToRollContainer(pickRandomItems(4).candidateItems.Append(-1).ToArray(), duration: 0);
+                grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
+                grid.PlayRollAnimation(-1, duration: 0);
+
+                Scheduler.AddDelayed(() => grid.PresentUnanimouslyChosenBeatmap(-1), 500);
+            });
+
+            AddWaitStep("wait for animation", 5);
+
+            AddStep("reveal beatmap", () => grid.RevealRandomItem(new MultiplayerPlaylistItem()));
+        }
+
         private (long[] candidateItems, long finalItem) pickRandomItems(int count)
         {
             long[] candidateItems = items.Select(it => it.ID).ToArray();
