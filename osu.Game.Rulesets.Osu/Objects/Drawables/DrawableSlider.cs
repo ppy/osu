@@ -311,6 +311,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     {
                         double hitFraction = (double)hitTicks / totalTicks;
                         r.Type = hitFraction >= 0.5 ? HitResult.Ok : HitResult.Meh;
+
+                        ((OsuSliderJudgementResult)r).AwardsCombo = false;
                     }
                 });
             }

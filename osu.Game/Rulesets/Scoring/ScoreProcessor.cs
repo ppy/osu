@@ -232,7 +232,7 @@ namespace osu.Game.Rulesets.Scoring
 
             ScoreResultCounts[result.Type] = ScoreResultCounts.GetValueOrDefault(result.Type) + 1;
 
-            if (result.Type.IncreasesCombo())
+            if (IncreasesCombo(result))
                 Combo.Value++;
             else if (result.Type.BreaksCombo())
                 Combo.Value = 0;
@@ -269,6 +269,12 @@ namespace osu.Game.Rulesets.Scoring
                 updateScore();
             }
         }
+
+        /// <summary>
+        /// Whether a <see cref="JudgementResult"/> increases combo.
+        /// </summary>
+        protected virtual bool IncreasesCombo(JudgementResult result)
+            => result.Type.IncreasesCombo();
 
         /// <summary>
         /// Creates the <see cref="HitEvent"/> that describes a <see cref="JudgementResult"/>.

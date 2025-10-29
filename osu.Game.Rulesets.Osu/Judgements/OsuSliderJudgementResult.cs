@@ -11,6 +11,8 @@ namespace osu.Game.Rulesets.Osu.Judgements
     {
         public readonly Stack<(double time, bool tracking)> TrackingHistory = new Stack<(double, bool)>();
 
+        public bool AwardsCombo { get; set; } = true;
+
         public OsuSliderJudgementResult(HitObject hitObject, Judgement judgement)
             : base(hitObject, judgement)
         {

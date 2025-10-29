@@ -32,6 +32,14 @@ namespace osu.Game.Rulesets.Osu.Scoring
             return rank;
         }
 
+        protected override bool IncreasesCombo(JudgementResult result)
+        {
+            if (result is OsuSliderJudgementResult sliderJudgementResult)
+                return sliderJudgementResult.AwardsCombo;
+
+            return base.IncreasesCombo(result);
+        }
+
         protected override HitEvent CreateHitEvent(JudgementResult result)
             => base.CreateHitEvent(result).With((result as OsuHitCircleJudgementResult)?.CursorPositionAtHit);
     }
