@@ -25,22 +25,25 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
         /// Creates or retrieves the score for the given round.
         /// </summary>
         /// <param name="round">The round.</param>
-        public MatchmakingRound this[int round]
-        {
-            get
-            {
-                if (RoundsDictionary.TryGetValue(round, out MatchmakingRound? score))
-                    return score;
-
-                return RoundsDictionary[round] = new MatchmakingRound { Round = round };
-            }
-        }
+        public MatchmakingRound this[int round] => GetOrAdd(round);
 
         /// <summary>
         /// The total number of rounds.
         /// </summary>
         [IgnoreMember]
         public int Count => RoundsDictionary.Count;
+
+        /// <summary>
+        /// Retrieves or adds a <see cref="MatchmakingRound"/> entry to this list.
+        /// </summary>
+        /// <param name="round">The round.</param>
+        public MatchmakingRound GetOrAdd(int round)
+        {
+            if (RoundsDictionary.TryGetValue(round, out MatchmakingRound? score))
+                return score;
+
+            return RoundsDictionary[round] = new MatchmakingRound { Round = round };
+        }
 
         public IEnumerator<MatchmakingRound> GetEnumerator() => RoundsDictionary.Values.GetEnumerator();
 
