@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -20,6 +21,24 @@ namespace osu.Game.Tests.Visual.Matchmaking
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+
+            AddStep("join room", () =>
+            {
+                var room = CreateDefaultRoom(MatchType.Matchmaking);
+                room.Playlist = Enumerable.Range(1, 50).Select(i => new PlaylistItem(new MultiplayerPlaylistItem
+                {
+                    ID = i,
+                    BeatmapID = 0,
+                    StarRating = i / 10.0,
+                })).ToArray();
+
+                JoinRoom(room);
+            });
+        }
 
         [Test]
         public void TestBeatmapPanel()
@@ -58,11 +77,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
             AddStep("remove peppy", () => panel!.RemoveUser(new APIUser { Id = 2 }));
             AddStep("remove maarvin", () => panel!.RemoveUser(new APIUser { Id = 6411631 }));
 
-            AddToggleStep("allow selection", value =>
-            {
-                if (panel != null)
-                    panel.AllowSelection = value;
-            });
+            AddToggleStep("allow selection", value => panel!.AllowSelection = value);
         }
 
         [Test]
@@ -99,6 +114,29 @@ namespace osu.Game.Tests.Visual.Matchmaking
                     }
                 };
             });
+        }
+
+        [Test]
+        public void TestRandomPanel()
+        {
+            BeatmapSelectPanel? panel = null;
+
+            AddStep("add panel", () =>
+            {
+                Child = new OsuContextMenuContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = panel = new BeatmapSelectPanel(new MultiplayerPlaylistItem { ID = -1 })
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                };
+            });
+
+            AddToggleStep("allow selection", value => panel!.AllowSelection = value);
+
+            AddStep("reveal beatmap", () => panel!.DisplayItem(new MultiplayerPlaylistItem()));
         }
     }
 }

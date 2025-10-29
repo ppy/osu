@@ -2,10 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,7 +10,6 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Drawables.Cards;
-using osu.Game.Database;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -37,13 +33,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
         private Container scaleContainer = null!;
         private Drawable lighting = null!;
-
         private Container border = null!;
-        private Container mainContent = null!;
-
-        private readonly List<APIUser> users = new List<APIUser>();
-
-        private BeatmapCardMatchmaking? card;
+        private BeatmapCardMatchmaking card = null!;
 
         public BeatmapSelectPanel(MultiplayerPlaylistItem item)
         {
@@ -52,7 +43,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapLookupCache lookupCache, OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider)
         {
             InternalChild = scaleContainer = new Container
             {
@@ -61,7 +52,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 Origin = Anchor.Centre,
                 Children = new[]
                 {
-                    mainContent = new Container
+                    new Container
                     {
                         Masking = true,
                         CornerRadius = BeatmapCard.CORNER_RADIUS,
@@ -69,6 +60,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                         RelativeSizeAxes = Axes.Both,
                         Children = new[]
                         {
+                            card = new BeatmapCardMatchmaking
+                            {
+                                Action = () =>
+                                {
+                                    if (AllowSelection)
+                                        Action?.Invoke(Item);
+                                },
+                            },
                             lighting = new Box
                             {
                                 Blending = BlendingParameters.Additive,
@@ -107,48 +106,26 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                     },
                 }
             };
-            lookupCache.GetBeatmapAsync(Item.BeatmapID).ContinueWith(b => Schedule(() =>
-            {
-                Debug.Assert(card == null);
 
-                APIBeatmap beatmap = b.GetResultSafely() ?? new APIBeatmap
-                {
-                    BeatmapSet = new APIBeatmapSet
-                    {
-                        Title = "unknown beatmap",
-                        TitleUnicode = "unknown beatmap",
-                        Artist = "unknown artist",
-                        ArtistUnicode = "unknown artist",
-                    }
-                };
-
-                beatmap.StarRating = Item.StarRating;
-
-                mainContent.Add(card = new BeatmapCardMatchmaking(beatmap)
-                {
-                    Depth = float.MaxValue,
-                    Action = () =>
-                    {
-                        if (AllowSelection)
-                            Action?.Invoke(Item);
-                    },
-                });
-
-                foreach (var user in users)
-                    card.SelectionOverlay.AddUser(user);
-            }));
+            if (Item.ID == -1)
+                card.DisplayRandom();
+            else
+                card.DisplayItem(Item);
         }
 
         public void AddUser(APIUser user)
         {
-            users.Add(user);
-            card?.SelectionOverlay.AddUser(user);
+            card.AddUser(user);
         }
 
         public void RemoveUser(APIUser user)
         {
-            users.Remove(user);
-            card?.SelectionOverlay.RemoveUser(user.Id);
+            card.RemoveUser(user);
+        }
+
+        public void DisplayItem(MultiplayerPlaylistItem item)
+        {
+            card.DisplayItem(item);
         }
 
         protected override bool OnHover(HoverEvent e)
