@@ -194,19 +194,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
         {
             userStatistics.Clear();
 
-            if (state.Users[client.LocalUser!.UserID].Rounds.Count == 0)
+            var localUserState = state.Users.GetOrAdd(client.LocalUser!.UserID);
+
+            if (localUserState.Rounds.Count == 0)
             {
                 placementText.Text = "-";
                 placementText.Colour = OsuColour.Gray(1f);
                 return;
             }
 
-            int overallPlacement = state.Users[client.LocalUser!.UserID].Placement;
+            int overallPlacement = localUserState.Placement;
 
             placementText.Text = overallPlacement.Ordinalize(CultureInfo.CurrentCulture);
             placementText.Colour = ColourForPlacement(overallPlacement);
 
-            int overallPoints = state.Users[client.LocalUser!.UserID].Points;
+            int overallPoints = localUserState.Points;
             addStatistic(overallPlacement, $"Overall position ({overallPoints} points)");
 
             var accuracyOrderedUsers = state.Users.Select(u => (user: u, avgAcc: u.Rounds.Select(r => r.Accuracy).DefaultIfEmpty(0).Average()))
@@ -223,7 +225,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
             int maxComboPlacement = maxComboOrderedUsers.index + 1;
             addStatistic(maxComboPlacement, $"Best max combo ({maxComboOrderedUsers.info.maxCombo}x)");
 
-            var bestPlacement = state.Users[client.LocalUser!.UserID].Rounds.MinBy(r => r.Placement);
+            var bestPlacement = localUserState.Rounds.MinBy(r => r.Placement);
             addStatistic(bestPlacement!.Placement, $"Best round placement (round {bestPlacement.Round})");
 
             void addStatistic(int position, string text) => userStatistics.Add(new PanelUserStatistic(position, text));

@@ -22,12 +22,6 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
         public IDictionary<int, MatchmakingUser> UserDictionary { get; set; } = new Dictionary<int, MatchmakingUser>();
 
         /// <summary>
-        /// Creates or retrieves the user for the given id.
-        /// </summary>
-        /// <param name="userId">The user id.</param>
-        public MatchmakingUser this[int userId] => GetOrAdd(userId);
-
-        /// <summary>
         /// The total number of users.
         /// </summary>
         [IgnoreMember]
