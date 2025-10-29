@@ -493,6 +493,8 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task RemovePlaylistItem(long playlistItemId);
 
+        public abstract Task VoteToSkip();
+
         Task IMultiplayerClient.RoomStateChanged(MultiplayerRoomState state)
         {
             handleRoomRequest(() =>
@@ -914,6 +916,16 @@ namespace osu.Game.Online.Multiplayer
             });
 
             return Task.CompletedTask;
+        }
+
+        Task IMultiplayerClient.UserVotedToSkip(int userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task IMultiplayerClient.VoteToSkipPassed()
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>

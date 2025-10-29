@@ -561,6 +561,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public override Task RemovePlaylistItem(long playlistItemId) => RemoveUserPlaylistItem(api.LocalUser.Value.OnlineID, clone(playlistItemId));
 
+        public override Task VoteToSkip()
+        {
+            throw new NotImplementedException();
+        }
+
         protected override Task<MultiplayerRoom> CreateRoomInternal(MultiplayerRoom room)
         {
             Room apiRoom = new Room(room)
