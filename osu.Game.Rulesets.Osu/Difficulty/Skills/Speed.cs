@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// <summary>
     /// Represents the skill required to press keys with regards to keeping up with the speed at which objects need to be hit.
     /// </summary>
-    public class Speed : OsuStrainSkill
+    public class Speed : OsuVariableLengthStrainSkill
     {
         private double skillMultiplier => 1.47;
         private double strainDecayBase => 0.3;
