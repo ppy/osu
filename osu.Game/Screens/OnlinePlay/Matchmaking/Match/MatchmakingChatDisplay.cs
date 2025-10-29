@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Input;
@@ -65,6 +67,24 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+        }
+
+        public void Appear()
+        {
+            FinishTransforms();
+
+            this.MoveToY(150f)
+                .FadeOut()
+                .MoveToY(0f, 240, Easing.OutCubic)
+                .FadeIn(240, Easing.OutCubic);
+        }
+
+        public TransformSequence<MatchmakingChatDisplay> Disappear()
+        {
+            FinishTransforms();
+
+            return this.FadeOut(240, Easing.InOutCubic)
+                       .MoveToY(150f, 240, Easing.InOutCubic);
         }
     }
 }

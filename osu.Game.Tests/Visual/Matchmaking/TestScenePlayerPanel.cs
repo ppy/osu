@@ -102,5 +102,11 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             AddStep("jump", () => MultiplayerClient.SendUserMatchRequest(1, new MatchmakingAvatarActionRequest { Action = MatchmakingAvatarAction.Jump }).WaitSafely());
         }
+
+        [Test]
+        public void TestQuit()
+        {
+            AddToggleStep("toggle quit", quit => panel.HasQuit = quit);
+        }
     }
 }
