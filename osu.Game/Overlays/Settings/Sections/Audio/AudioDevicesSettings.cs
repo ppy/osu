@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
@@ -19,9 +19,11 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         protected override LocalisableString Header => AudioSettingsStrings.AudioDevicesHeader;
 
         [Resolved]
-        private AudioManager audio { get; set; }
+        private AudioManager audio { get; set; } = null!;
 
-        private SettingsDropdown<string> dropdown;
+        private SettingsDropdown<string> dropdown = null!;
+
+        private SettingsCheckbox? wasapiExperimental;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -32,17 +34,44 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 {
                     LabelText = AudioSettingsStrings.OutputDevice,
                     Keywords = new[] { "speaker", "headphone", "output" }
-                }
+                },
             };
 
-            updateItems();
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+            {
+                Add(wasapiExperimental = new SettingsCheckbox
+                {
+                    LabelText = "Use experimental audio mode",
+                    TooltipText = "This will attempt to initialise the audio engine in a lower latency mode.",
+                    Current = audio.UseExperimentalWasapi,
+                    Keywords = new[] { "wasapi", "latency", "exclusive" }
+                });
+
+                wasapiExperimental.Current.ValueChanged += _ => onDeviceChanged(string.Empty);
+            }
 
             audio.OnNewDevice += onDeviceChanged;
             audio.OnLostDevice += onDeviceChanged;
             dropdown.Current = audio.AudioDevice;
+
+            onDeviceChanged(string.Empty);
         }
 
-        private void onDeviceChanged(string name) => updateItems();
+        private void onDeviceChanged(string _)
+        {
+            updateItems();
+
+            if (wasapiExperimental != null)
+            {
+                if (wasapiExperimental.Current.Value)
+                {
+                    wasapiExperimental.SetNoticeText(
+                        "Due to reduced latency, your audio offset will need to be adjusted when enabling this setting. Generally expect to subtract 20 - 60 ms from your known value.", true);
+                }
+                else
+                    wasapiExperimental.ClearNoticeText();
+            }
+        }
 
         private void updateItems()
         {
@@ -61,7 +90,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             // functionality would require involved OS-specific code.
             dropdown.Items = deviceItems
                              // Dropdown doesn't like null items. Somehow we are seeing some arrive here (see https://github.com/ppy/osu/issues/21271)
-                             .Where(i => i != null)
+                             .Where(i => i.IsNotNull())
                              .Distinct()
                              .ToList();
         }
@@ -70,7 +99,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         {
             base.Dispose(isDisposing);
 
-            if (audio != null)
+            if (audio.IsNotNull())
             {
                 audio.OnNewDevice -= onDeviceChanged;
                 audio.OnLostDevice -= onDeviceChanged;

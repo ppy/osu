@@ -74,6 +74,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 {
                     favourited.Toggle();
                     loading.Hide();
+                    api.LocalUserState.UpdateFavouriteBeatmapSets();
                 };
 
                 request.Failure += e =>

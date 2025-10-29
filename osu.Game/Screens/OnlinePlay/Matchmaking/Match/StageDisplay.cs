@@ -72,6 +72,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                                 Direction = FillDirection.Horizontal,
                             },
                         },
+                        new TimerText
+                        {
+                            Y = -38,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre
+                        },
                         new StatusText
                         {
                             Y = 32,

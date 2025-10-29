@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -32,11 +34,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         [Resolved]
         private INotificationOverlay? notifications { get; set; }
 
-        [Resolved]
-        private IPerformFromScreenRunner? performer { get; set; }
-
-        private ProgressNotification? backgroundNotification;
-        private Notification? readyNotification;
+        private BackgroundQueueNotification? backgroundNotification;
         private bool isBackgrounded;
 
         protected override void LoadComplete()
@@ -118,27 +116,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             if (backgroundNotification != null)
                 return;
 
-            notifications?.Post(backgroundNotification = new ProgressNotification
-            {
-                Text = "Searching for opponents...",
-                CompletionTarget = n => notifications.Post(readyNotification = n),
-                CompletionText = "Your match is ready! Click to join.",
-                CompletionClickAction = () =>
-                {
-                    client.MatchmakingAcceptInvitation().FireAndForget();
-                    performer?.PerformFromScreen(s => s.Push(new IntroScreen()));
-
-                    closeNotifications();
-                    return true;
-                },
-                CancelRequested = () =>
-                {
-                    client.MatchmakingLeaveQueue().FireAndForget();
-
-                    closeNotifications();
-                    return true;
-                }
-            });
+            notifications?.Post(backgroundNotification = new BackgroundQueueNotification());
         }
 
         private void closeNotifications()
@@ -146,13 +124,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             if (backgroundNotification != null)
             {
                 backgroundNotification.State = ProgressNotificationState.Cancelled;
-                backgroundNotification.Close(false);
+                backgroundNotification.CloseAll();
+                backgroundNotification = null;
             }
-
-            readyNotification?.Close(false);
-
-            backgroundNotification = null;
-            readyNotification = null;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -166,6 +140,67 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 client.MatchmakingQueueLeft -= onMatchmakingQueueLeft;
                 client.MatchmakingRoomInvited -= onMatchmakingRoomInvited;
                 client.MatchmakingRoomReady -= onMatchmakingRoomReady;
+            }
+        }
+
+        private partial class BackgroundQueueNotification : ProgressNotification
+        {
+            [Resolved]
+            private IPerformFromScreenRunner? performer { get; set; }
+
+            [Resolved]
+            private MultiplayerClient client { get; set; } = null!;
+
+            private Notification? foundNotification;
+            private Sample? matchFoundSample;
+
+            [BackgroundDependencyLoader]
+            private void load(AudioManager audio)
+            {
+                Text = "Searching for opponents...";
+
+                CompletionClickAction = () =>
+                {
+                    client.MatchmakingAcceptInvitation().FireAndForget();
+                    performer?.PerformFromScreen(s => s.Push(new IntroScreen()));
+
+                    Close(false);
+                    return true;
+                };
+
+                CancelRequested = () =>
+                {
+                    client.MatchmakingLeaveQueue().FireAndForget();
+                    return true;
+                };
+
+                matchFoundSample = audio.Samples.Get(@"Multiplayer/Matchmaking/match-found");
+            }
+
+            protected override Notification CreateCompletionNotification()
+            {
+                // Playing here means it will play even if notification overlay is hidden.
+                //
+                // If we add support for the completion notification to be processed during gameplay,
+                // this can be moved inside the `MatchFoundNotification` implementation.
+                matchFoundSample?.Play();
+
+                return foundNotification = new MatchFoundNotification
+                {
+                    Activated = CompletionClickAction,
+                    Text = "Your match is ready! Click to join.",
+                };
+            }
+
+            public void CloseAll()
+            {
+                foundNotification?.Close(false);
+                Close(false);
+            }
+
+            public partial class MatchFoundNotification : ProgressCompletionNotification
+            {
+                // for future use.
             }
         }
     }
