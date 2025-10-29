@@ -153,7 +153,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 MatchmakingRoomState state = new MatchmakingRoomState();
 
                 for (int i = 0; i < room.Users.Count; i++)
-                    state.Users[room.Users[i].UserID].Placement = placements[i];
+                    state.Users.GetOrAdd(room.Users[i].UserID).Placement = placements[i];
 
                 MultiplayerClient.ChangeMatchRoomState(state).WaitSafely();
             });

@@ -22,12 +22,6 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
         public IDictionary<int, MatchmakingRound> RoundsDictionary { get; set; } = new Dictionary<int, MatchmakingRound>();
 
         /// <summary>
-        /// Creates or retrieves the score for the given round.
-        /// </summary>
-        /// <param name="round">The round.</param>
-        public MatchmakingRound this[int round] => GetOrAdd(round);
-
-        /// <summary>
         /// The total number of rounds.
         /// </summary>
         [IgnoreMember]
