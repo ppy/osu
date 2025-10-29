@@ -137,5 +137,20 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 MultiplayerClient.ChangeMatchRoomState(state).WaitSafely();
             });
         }
+
+        [Test]
+        public void TestNoUsers()
+        {
+            AddStep("show results with no users", () =>
+            {
+                var state = new MatchmakingRoomState
+                {
+                    CurrentRound = 6,
+                    Stage = MatchmakingStage.Ended
+                };
+
+                MultiplayerClient.ChangeMatchRoomState(state).WaitSafely();
+            });
+        }
     }
 }
