@@ -201,7 +201,7 @@ namespace osu.Game.Online.Multiplayer
                 if (!connected.NewValue)
                 {
                     if (Room != null)
-                        LeaveRoom();
+                        LeaveRoom().FireAndForget();
 
                     MatchmakingQueueLeft?.Invoke();
                 }
@@ -560,7 +560,7 @@ namespace osu.Game.Online.Multiplayer
                     return;
 
                 if (user.Equals(LocalUser))
-                    LeaveRoom();
+                    LeaveRoom().FireAndForget();
 
                 handleUserLeft(user, UserKicked);
             });

@@ -161,7 +161,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.LocalUser?.State == MultiplayerUserState.Loaded)
             {
                 loadingDisplay.Show();
-                client.ChangeState(MultiplayerUserState.ReadyForGameplay);
+                client.ChangeState(MultiplayerUserState.ReadyForGameplay).FireAndForget();
             }
 
             // This will pause the clock, pending the gameplay started callback from the server.
