@@ -502,7 +502,7 @@ namespace osu.Game.Screens.Play
                     DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                     skipIntroOverlay = new SkipOverlay(DrawableRuleset.GameplayStartTime)
                     {
-                        RequestSkip = performUserRequestedSkip
+                        RequestSkip = RequestIntroSkip
                     },
                     skipOutroOverlay = new SkipOverlay(GameplayState.Storyboard.LatestEventTime ?? 0)
                     {
@@ -701,7 +701,12 @@ namespace osu.Game.Screens.Play
             return true;
         }
 
-        private void performUserRequestedSkip()
+        protected virtual void RequestIntroSkip()
+        {
+            PerformIntroSkip();
+        }
+
+        protected void PerformIntroSkip()
         {
             // user requested skip
             // disable sample playback to stop currently playing samples and perform skip
