@@ -689,7 +689,7 @@ namespace osu.Game.Screens.SelectV2
 
             var groupItem = GetCarouselItems()?.FirstOrDefault(i => CheckModelEquality(i.Model, CurrentGroupedBeatmap.Group));
             if (groupItem != null)
-                HandleItemActivated(groupItem);
+                Activate(groupItem);
         }
 
         protected override double? GetScrollTarget()
