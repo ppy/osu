@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -75,7 +76,7 @@ namespace osu.Game.Screens.Edit.Components
                 }
             };
 
-            Track.BindValueChanged(tr => tr.NewValue?.AddAdjustment(AdjustableProperty.Tempo, tempoAdjustment), true);
+            editorClock.AudioAdjustments.AddAdjustment(AdjustableProperty.Tempo, tempoAdjustment);
 
             if (editor != null)
                 currentScreenMode.BindTo(editor.Mode);
@@ -105,7 +106,8 @@ namespace osu.Game.Screens.Edit.Components
 
         protected override void Dispose(bool isDisposing)
         {
-            Track.Value?.RemoveAdjustment(AdjustableProperty.Tempo, tempoAdjustment);
+            if (editorClock.IsNotNull())
+                editorClock.AudioAdjustments.RemoveAdjustment(AdjustableProperty.Tempo, tempoAdjustment);
 
             base.Dispose(isDisposing);
         }
@@ -148,7 +150,7 @@ namespace osu.Game.Screens.Edit.Components
             public LocalisableString TooltipText { get; set; }
         }
 
-        private partial class PlaybackTabControl : OsuTabControl<double>
+        public partial class PlaybackTabControl : OsuTabControl<double>
         {
             private static readonly double[] tempo_values = { 0.25, 0.5, 0.75, 1 };
 

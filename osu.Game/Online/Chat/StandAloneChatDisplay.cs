@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -21,18 +20,18 @@ using osuTK.Input;
 namespace osu.Game.Online.Chat
 {
     /// <summary>
-    /// Display a chat channel in an insolated region.
+    /// Display a chat channel in an isolated region.
     /// </summary>
     public partial class StandAloneChatDisplay : CompositeDrawable
     {
         [Cached]
-        public readonly Bindable<Channel> Channel = new Bindable<Channel>();
+        public readonly Bindable<Channel?> Channel = new Bindable<Channel?>();
 
-        protected readonly ChatTextBox TextBox;
+        protected readonly ChatTextBox? TextBox;
 
-        private ChannelManager channelManager;
+        private ChannelManager? channelManager;
 
-        private StandAloneDrawableChannel drawableChannel;
+        private StandAloneDrawableChannel? drawableChannel;
 
         private readonly bool postingTextBox;
 
@@ -93,6 +92,8 @@ namespace osu.Game.Online.Chat
 
         private void postMessage(TextBox sender, bool newText)
         {
+            Debug.Assert(TextBox != null);
+
             string text = TextBox.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(text))
@@ -106,9 +107,9 @@ namespace osu.Game.Online.Chat
             TextBox.Text = string.Empty;
         }
 
-        protected virtual ChatLine CreateMessage(Message message) => new StandAloneMessage(message);
+        protected virtual ChatLine? CreateMessage(Message message) => new StandAloneMessage(message);
 
-        private void channelChanged(ValueChangedEvent<Channel> e)
+        private void channelChanged(ValueChangedEvent<Channel?> e)
         {
             drawableChannel?.Expire();
 
@@ -128,8 +129,8 @@ namespace osu.Game.Online.Chat
 
         public partial class ChatTextBox : HistoryTextBox
         {
-            public Action Focus;
-            public Action FocusLost;
+            public Action? Focus;
+            public Action? FocusLost;
 
             protected override bool OnKeyDown(KeyDownEvent e)
             {
@@ -171,14 +172,14 @@ namespace osu.Game.Online.Chat
 
         public partial class StandAloneDrawableChannel : DrawableChannel
         {
-            public Func<Message, ChatLine> CreateChatLineAction;
+            public Func<Message, ChatLine?>? CreateChatLineAction;
 
             public StandAloneDrawableChannel(Channel channel)
                 : base(channel)
             {
             }
 
-            protected override ChatLine CreateChatLine(Message m) => CreateChatLineAction(m);
+            protected override ChatLine? CreateChatLine(Message m) => CreateChatLineAction?.Invoke(m) ?? null;
 
             protected override DaySeparator CreateDaySeparator(DateTimeOffset time) => new StandAloneDaySeparator(time);
         }

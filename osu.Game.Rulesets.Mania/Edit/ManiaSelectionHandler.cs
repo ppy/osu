@@ -54,9 +54,8 @@ namespace osu.Game.Rulesets.Mania.Edit
                     int firstColumn = flipOverOrigin ? 0 : selectedObjects.Min(ho => ho.Column);
                     int lastColumn = flipOverOrigin ? (int)EditorBeatmap.BeatmapInfo.Difficulty.CircleSize - 1 : selectedObjects.Max(ho => ho.Column);
 
-                    EditorBeatmap.PerformOnSelection(hitObject =>
+                    performOnSelection(maniaObject =>
                     {
-                        var maniaObject = (ManiaHitObject)hitObject;
                         maniaPlayfield.Remove(maniaObject);
                         maniaObject.Column = firstColumn + (lastColumn - maniaObject.Column);
                         maniaPlayfield.Add(maniaObject);
@@ -71,7 +70,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                     double selectionStartTime = selectedObjects.Min(ho => ho.StartTime);
                     double selectionEndTime = selectedObjects.Max(ho => ho.GetEndTime());
 
-                    EditorBeatmap.PerformOnSelection(hitObject =>
+                    performOnSelection(hitObject =>
                     {
                         hitObject.StartTime = selectionStartTime + (selectionEndTime - hitObject.GetEndTime());
                     });
@@ -117,14 +116,21 @@ namespace osu.Game.Rulesets.Mania.Edit
 
             columnDelta = Math.Clamp(columnDelta, -minColumn, maniaPlayfield.TotalColumns - 1 - maxColumn);
 
-            EditorBeatmap.PerformOnSelection(h =>
+            performOnSelection(h =>
             {
                 maniaPlayfield.Remove(h);
-                ((ManiaHitObject)h).Column += columnDelta;
+                h.Column += columnDelta;
                 maniaPlayfield.Add(h);
             });
+        }
 
-            // `HitObjectUsageEventBuffer`'s usage transferal flows and the playfield's `SetKeepAlive()` functionality do not combine well with this operation's usage pattern,
+        private void performOnSelection(Action<ManiaHitObject> action)
+        {
+            var selectedObjects = EditorBeatmap.SelectedHitObjects.OfType<ManiaHitObject>().ToArray();
+
+            EditorBeatmap.PerformOnSelection(h => action.Invoke((ManiaHitObject)h));
+
+            // `HitObjectUsageEventBuffer`'s usage transferal flows and the playfield's `SetKeepAlive()` functionality do not combine well with mania's usage patterns,
             // leading to selections being sometimes partially dropped if some of the objects being moved are off screen
             // (check blame for detailed explanation).
             // thus, ensure that selection is preserved manually.

@@ -40,11 +40,13 @@ namespace osu.Game.Overlays.Mods
 
         public AddPresetPopover(AddPresetButton addPresetButton)
         {
+            const float content_width = 300;
+
             button = addPresetButton;
 
             Child = new FillFlowContainer
             {
-                Width = 300,
+                Width = content_width,
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(7),
                 Children = new Drawable[]
@@ -63,12 +65,24 @@ namespace osu.Game.Overlays.Mods
                         Label = CommonStrings.Description,
                         TabbableContentContainer = this
                     },
-                    createButton = new ShearedButton
+                    new FillFlowContainer
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Text = ModSelectOverlayStrings.AddPreset,
-                        Action = createPreset
+                        AutoSizeAxes = Axes.Both,
+                        Spacing = new Vector2(7),
+                        Direction = FillDirection.Vertical,
+                        Children = new Drawable[]
+                        {
+                            createButton = new ShearedButton(content_width)
+                            {
+                                // todo: for some very odd reason, this needs to be anchored to topright for the fill flow to be correctly sized to the AABB of the sheared button
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                Text = ModSelectOverlayStrings.AddPreset,
+                                Action = createPreset
+                            }
+                        }
                     }
                 }
             };

@@ -99,7 +99,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 ForegroundColourHover = colourProvider.Content1;
                 BackgroundColourHover = colourProvider.Background1;
 
-                AddInternal(hoverClickSounds = new HoverClickSounds());
+                AddInternal(hoverClickSounds = new HoverClickSounds(HoverSampleSet.MenuOpen));
             }
 
             protected override void LoadComplete()

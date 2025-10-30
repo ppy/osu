@@ -41,6 +41,9 @@ namespace osu.Game.Screens.Play.HUD
         {
             get
             {
+                if (!Interactive)
+                    return default;
+
                 double progress = Math.Clamp(lastMouseX, 0, DrawWidth) / DrawWidth;
 
                 TimeSpan currentSpan = TimeSpan.FromMilliseconds(Math.Round((EndTime - StartTime) * progress));

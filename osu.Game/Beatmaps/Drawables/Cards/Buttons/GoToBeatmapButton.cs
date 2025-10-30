@@ -16,19 +16,19 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         private readonly Bindable<DownloadState> state = new Bindable<DownloadState>();
 
         private readonly APIBeatmapSet beatmapSet;
+        private readonly bool allowNavigationToBeatmap;
 
-        public GoToBeatmapButton(APIBeatmapSet beatmapSet)
+        public GoToBeatmapButton(APIBeatmapSet beatmapSet, bool allowNavigationToBeatmap)
         {
             this.beatmapSet = beatmapSet;
-
-            Icon.Icon = FontAwesome.Solid.AngleDoubleRight;
-            TooltipText = "Go to beatmap";
+            this.allowNavigationToBeatmap = allowNavigationToBeatmap;
         }
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame? game)
         {
             Action = () => game?.PresentBeatmap(beatmapSet);
+            Icon.Icon = FontAwesome.Solid.AngleDoubleRight;
         }
 
         protected override void LoadComplete()
@@ -41,7 +41,31 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 
         private void updateState()
         {
-            this.FadeTo(state.Value == DownloadState.LocallyAvailable ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            bool available = state.Value == DownloadState.LocallyAvailable;
+            Enabled.Value = allowNavigationToBeatmap && available;
+
+            float alpha;
+
+            if (available && allowNavigationToBeatmap)
+            {
+                TooltipText = "Go to beatmap";
+                Enabled.Value = true;
+                alpha = 1f;
+            }
+            else if (available)
+            {
+                TooltipText = string.Empty;
+                Enabled.Value = false;
+                alpha = 0.3f;
+            }
+            else
+            {
+                TooltipText = string.Empty;
+                Enabled.Value = false;
+                alpha = 0;
+            }
+
+            this.FadeTo(alpha, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }
     }
 }

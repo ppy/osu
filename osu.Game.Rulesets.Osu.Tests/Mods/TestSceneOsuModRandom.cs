@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 AngleSharpness = { Value = angleSharpness }
             },
-            Beatmap = jumpBeatmap,
+            CreateBeatmap = jumpBeatmap,
             Autoplay = true,
             PassCondition = () => true
         });
@@ -50,15 +50,15 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 AngleSharpness = { Value = angleSharpness }
             },
-            Beatmap = streamBeatmap,
+            CreateBeatmap = streamBeatmap,
             Autoplay = true,
             PassCondition = () => true
         });
 
-        private OsuBeatmap jumpBeatmap =>
+        private OsuBeatmap jumpBeatmap() =>
             createHitCircleBeatmap(new[] { 100, 200, 300, 400 }, 8, 300, 2 * 300);
 
-        private OsuBeatmap streamBeatmap =>
+        private OsuBeatmap streamBeatmap() =>
             createHitCircleBeatmap(new[] { 10, 20, 30, 40, 50, 60, 70, 80 }, 16, 150, 4 * 150);
 
         private OsuBeatmap createHitCircleBeatmap(IEnumerable<int> spacings, int objectsPerSpacing, int interval, int beatLength)
@@ -74,12 +74,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 BeatmapInfo = new BeatmapInfo
                 {
-                    StackLeniency = 0,
                     Difficulty = new BeatmapDifficulty
                     {
                         ApproachRate = 8.5f
                     }
                 },
+                StackLeniency = 0,
                 ControlPointInfo = controlPointInfo
             };
 

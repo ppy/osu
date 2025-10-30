@@ -11,6 +11,6 @@ namespace osu.Game.Database
         /// <summary>
         /// And action which will be fired when a notification should be presented to the user.
         /// </summary>
-        public Action<Notification> PostNotification { set; }
+        Action<Notification> PostNotification { set; }
     }
 }

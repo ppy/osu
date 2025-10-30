@@ -79,14 +79,14 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine("[General]");
 
             if (!string.IsNullOrEmpty(beatmap.Metadata.AudioFile)) writer.WriteLine(FormattableString.Invariant($"AudioFilename: {Path.GetFileName(beatmap.Metadata.AudioFile)}"));
-            writer.WriteLine(FormattableString.Invariant($"AudioLeadIn: {beatmap.BeatmapInfo.AudioLeadIn}"));
+            writer.WriteLine(FormattableString.Invariant($"AudioLeadIn: {beatmap.AudioLeadIn}"));
             writer.WriteLine(FormattableString.Invariant($"PreviewTime: {beatmap.Metadata.PreviewTime}"));
-            writer.WriteLine(FormattableString.Invariant($"Countdown: {(int)beatmap.BeatmapInfo.Countdown}"));
+            writer.WriteLine(FormattableString.Invariant($"Countdown: {(int)beatmap.Countdown}"));
             writer.WriteLine(FormattableString.Invariant(
                 $"SampleSet: {toLegacySampleBank(((beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePoints.FirstOrDefault() ?? SampleControlPoint.DEFAULT).SampleBank)}"));
-            writer.WriteLine(FormattableString.Invariant($"StackLeniency: {beatmap.BeatmapInfo.StackLeniency}"));
+            writer.WriteLine(FormattableString.Invariant($"StackLeniency: {beatmap.StackLeniency}"));
             writer.WriteLine(FormattableString.Invariant($"Mode: {onlineRulesetID}"));
-            writer.WriteLine(FormattableString.Invariant($"LetterboxInBreaks: {(beatmap.BeatmapInfo.LetterboxInBreaks ? '1' : '0')}"));
+            writer.WriteLine(FormattableString.Invariant($"LetterboxInBreaks: {(beatmap.LetterboxInBreaks ? '1' : '0')}"));
             // if (beatmap.BeatmapInfo.UseSkinSprites)
             //     writer.WriteLine(@"UseSkinSprites: 1");
             // if (b.AlwaysShowPlayfield)
@@ -95,14 +95,14 @@ namespace osu.Game.Beatmaps.Formats
             //     writer.WriteLine(@"OverlayPosition: " + b.OverlayPosition);
             // if (!string.IsNullOrEmpty(b.SkinPreference))
             //     writer.WriteLine(@"SkinPreference:" + b.SkinPreference);
-            if (beatmap.BeatmapInfo.EpilepsyWarning)
+            if (beatmap.EpilepsyWarning)
                 writer.WriteLine(@"EpilepsyWarning: 1");
-            if (beatmap.BeatmapInfo.CountdownOffset > 0)
-                writer.WriteLine(FormattableString.Invariant($@"CountdownOffset: {beatmap.BeatmapInfo.CountdownOffset}"));
+            if (beatmap.CountdownOffset > 0)
+                writer.WriteLine(FormattableString.Invariant($@"CountdownOffset: {beatmap.CountdownOffset}"));
             if (onlineRulesetID == 3)
-                writer.WriteLine(FormattableString.Invariant($"SpecialStyle: {(beatmap.BeatmapInfo.SpecialStyle ? '1' : '0')}"));
-            writer.WriteLine(FormattableString.Invariant($"WidescreenStoryboard: {(beatmap.BeatmapInfo.WidescreenStoryboard ? '1' : '0')}"));
-            if (beatmap.BeatmapInfo.SamplesMatchPlaybackRate)
+                writer.WriteLine(FormattableString.Invariant($"SpecialStyle: {(beatmap.SpecialStyle ? '1' : '0')}"));
+            writer.WriteLine(FormattableString.Invariant($"WidescreenStoryboard: {(beatmap.WidescreenStoryboard ? '1' : '0')}"));
+            if (beatmap.SamplesMatchPlaybackRate)
                 writer.WriteLine(@"SamplesMatchPlaybackRate: 1");
         }
 
@@ -110,12 +110,12 @@ namespace osu.Game.Beatmaps.Formats
         {
             writer.WriteLine("[Editor]");
 
-            if (beatmap.BeatmapInfo.Bookmarks.Length > 0)
-                writer.WriteLine(FormattableString.Invariant($"Bookmarks: {string.Join(',', beatmap.BeatmapInfo.Bookmarks)}"));
-            writer.WriteLine(FormattableString.Invariant($"DistanceSpacing: {beatmap.BeatmapInfo.DistanceSpacing}"));
+            if (beatmap.Bookmarks.Length > 0)
+                writer.WriteLine(FormattableString.Invariant($"Bookmarks: {string.Join(',', beatmap.Bookmarks)}"));
+            writer.WriteLine(FormattableString.Invariant($"DistanceSpacing: {beatmap.DistanceSpacing}"));
             writer.WriteLine(FormattableString.Invariant($"BeatDivisor: {beatmap.BeatmapInfo.BeatDivisor}"));
-            writer.WriteLine(FormattableString.Invariant($"GridSize: {beatmap.BeatmapInfo.GridSize}"));
-            writer.WriteLine(FormattableString.Invariant($"TimelineZoom: {beatmap.BeatmapInfo.TimelineZoom}"));
+            writer.WriteLine(FormattableString.Invariant($"GridSize: {beatmap.GridSize}"));
+            writer.WriteLine(FormattableString.Invariant($"TimelineZoom: {beatmap.TimelineZoom}"));
         }
 
         private void handleMetadata(TextWriter writer)
@@ -183,7 +183,17 @@ namespace osu.Game.Beatmaps.Formats
             if (scrollSpeedEncodedAsSliderVelocity)
             {
                 foreach (var point in legacyControlPoints.EffectPoints)
-                    legacyControlPoints.Add(point.Time, new DifficultyControlPoint { SliderVelocity = point.ScrollSpeed });
+                {
+                    legacyControlPoints.Add(point.Time, new DifficultyControlPoint
+                    {
+                        SliderVelocityBindable =
+                        {
+                            MinValue = point.ScrollSpeedBindable.MinValue,
+                            MaxValue = point.ScrollSpeedBindable.MaxValue,
+                            Value = point.ScrollSpeedBindable.Value,
+                        }
+                    });
+                }
             }
 
             LegacyControlPointProperties lastControlPointProperties = new LegacyControlPointProperties();
@@ -309,11 +319,13 @@ namespace osu.Game.Beatmaps.Formats
                 SampleControlPoint createSampleControlPointFor(double time, IList<HitSampleInfo> samples)
                 {
                     int volume = samples.Max(o => o.Volume);
+                    string bank = samples.Where(s => s.Name == HitSampleInfo.HIT_NORMAL).Select(s => s.Bank).FirstOrDefault()
+                                  ?? samples.Select(s => s.Bank).First();
                     int customIndex = samples.Any(o => o is ConvertHitObjectParser.LegacyHitSampleInfo)
                         ? samples.OfType<ConvertHitObjectParser.LegacyHitSampleInfo>().Max(o => o.CustomSampleBank)
                         : -1;
 
-                    return new LegacyBeatmapDecoder.LegacySampleControlPoint { Time = time, SampleVolume = volume, CustomSampleBank = customIndex };
+                    return new LegacyBeatmapDecoder.LegacySampleControlPoint { Time = time, SampleVolume = volume, SampleBank = bank, CustomSampleBank = customIndex };
                 }
             }
 
@@ -339,7 +351,7 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine("[Colours]");
 
-            for (int i = 0; i < colours.Count; i++)
+            for (int i = 0; i < Math.Min(colours.Count, LegacyBeatmapDecoder.MAX_COMBO_COLOUR_COUNT); i++)
             {
                 var comboColour = colours[i];
 
@@ -437,60 +449,31 @@ namespace osu.Game.Beatmaps.Formats
 
         private void addPathData(TextWriter writer, IHasPath pathData, Vector2 position)
         {
-            PathType? lastType = null;
-
             for (int i = 0; i < pathData.Path.ControlPoints.Count; i++)
             {
                 PathControlPoint point = pathData.Path.ControlPoints[i];
 
+                // Note that lazer's encoding format supports specifying multiple curve types for a slider path, which is not supported by stable.
+                // Backwards compatibility with stable is handled by `LegacyBeatmapExporter` and `BezierConverter.ConvertToModernBezier()`.
                 if (point.Type != null)
                 {
-                    // We've reached a new (explicit) segment!
-
-                    // Explicit segments have a new format in which the type is injected into the middle of the control point string.
-                    // To preserve compatibility with osu-stable as much as possible, explicit segments with the same type are converted to use implicit segments by duplicating the control point.
-                    // One exception are consecutive perfect curves, which aren't supported in osu!stable and can lead to decoding issues if encoded as implicit segments
-                    bool needsExplicitSegment = point.Type != lastType || point.Type == PathType.PERFECT_CURVE || i == pathData.Path.ControlPoints.Count - 1;
-
-                    // Another exception to this is when the last two control points of the last segment were duplicated. This is not a scenario supported by osu!stable.
-                    // Lazer does not add implicit segments for the last two control points of _any_ explicit segment, so an explicit segment is forced in order to maintain consistency with the decoder.
-                    if (i > 1)
+                    switch (point.Type?.Type)
                     {
-                        // We need to use the absolute control point position to determine equality, otherwise floating point issues may arise.
-                        Vector2 p1 = position + pathData.Path.ControlPoints[i - 1].Position;
-                        Vector2 p2 = position + pathData.Path.ControlPoints[i - 2].Position;
+                        case SplineType.BSpline:
+                            writer.Write(point.Type.Value.Degree > 0 ? $"B{point.Type.Value.Degree}|" : "B|");
+                            break;
 
-                        if ((int)p1.X == (int)p2.X && (int)p1.Y == (int)p2.Y)
-                            needsExplicitSegment = true;
-                    }
+                        case SplineType.Catmull:
+                            writer.Write("C|");
+                            break;
 
-                    if (needsExplicitSegment)
-                    {
-                        switch (point.Type?.Type)
-                        {
-                            case SplineType.BSpline:
-                                writer.Write(point.Type.Value.Degree > 0 ? $"B{point.Type.Value.Degree}|" : "B|");
-                                break;
+                        case SplineType.PerfectCurve:
+                            writer.Write("P|");
+                            break;
 
-                            case SplineType.Catmull:
-                                writer.Write("C|");
-                                break;
-
-                            case SplineType.PerfectCurve:
-                                writer.Write("P|");
-                                break;
-
-                            case SplineType.Linear:
-                                writer.Write("L|");
-                                break;
-                        }
-
-                        lastType = point.Type;
-                    }
-                    else
-                    {
-                        // New segment with the same type - duplicate the control point
-                        writer.Write(FormattableString.Invariant($"{position.X + point.Position.X}:{position.Y + point.Position.Y}|"));
+                        case SplineType.Linear:
+                            writer.Write("L|");
+                            break;
                     }
                 }
 
@@ -539,7 +522,7 @@ namespace osu.Game.Beatmaps.Formats
         private string getSampleBank(IList<HitSampleInfo> samples, bool banksOnly = false)
         {
             LegacySampleBank normalBank = toLegacySampleBank(samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank);
-            LegacySampleBank addBank = toLegacySampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name != HitSampleInfo.HIT_NORMAL)?.Bank);
+            LegacySampleBank addBank = toLegacySampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name != HitSampleInfo.HIT_NORMAL && !s.EditorAutoBank)?.Bank);
 
             StringBuilder sb = new StringBuilder();
 

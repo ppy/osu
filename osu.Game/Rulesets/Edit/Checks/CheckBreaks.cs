@@ -25,10 +25,10 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var startTimes = context.Beatmap.HitObjects.Select(ho => ho.StartTime).Order().ToList();
-            var endTimes = context.Beatmap.HitObjects.Select(ho => ho.GetEndTime()).Order().ToList();
+            var startTimes = context.CurrentDifficulty.Playable.HitObjects.Select(ho => ho.StartTime).Order().ToList();
+            var endTimes = context.CurrentDifficulty.Playable.HitObjects.Select(ho => ho.GetEndTime()).Order().ToList();
 
-            foreach (var breakPeriod in context.Beatmap.Breaks)
+            foreach (var breakPeriod in context.CurrentDifficulty.Playable.Breaks)
             {
                 if (breakPeriod.Duration < BreakPeriod.MIN_BREAK_DURATION)
                     yield return new IssueTemplateTooShort(this).Create(breakPeriod.StartTime);

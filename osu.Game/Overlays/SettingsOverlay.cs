@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
@@ -27,28 +28,37 @@ namespace osu.Game.Overlays
         public LocalisableString Title => SettingsStrings.HeaderTitle;
         public LocalisableString Description => SettingsStrings.HeaderDescription;
 
-        protected override IEnumerable<SettingsSection> CreateSections() => new SettingsSection[]
+        protected override IEnumerable<SettingsSection> CreateSections()
         {
-            // This list should be kept in sync with ScreenBehaviour.
-            new GeneralSection(),
-            new SkinSection(),
-            new InputSection(createSubPanel(new KeyBindingPanel())),
-            new UserInterfaceSection(),
-            new GameplaySection(),
-            new RulesetSection(),
-            new AudioSection(),
-            new GraphicsSection(),
-            new OnlineSection(),
-            new MaintenanceSection(),
-            new DebugSection(),
-        };
+            return new List<SettingsSection>
+            {
+                // This list should be kept in sync with ScreenBehaviour.
+                new GeneralSection(),
+                new SkinSection(),
+                new InputSection(createSubPanel(new KeyBindingPanel())),
+                new UserInterfaceSection(),
+                new GameplaySection(),
+                new RulesetSection(),
+                new AudioSection(),
+                new GraphicsSection(),
+                new OnlineSection(),
+                new MaintenanceSection(),
+                new DebugSection()
+            };
+        }
 
         private readonly List<SettingsSubPanel> subPanels = new List<SettingsSubPanel>();
 
         private SettingsSubPanel lastOpenedSubPanel;
 
         protected override Drawable CreateHeader() => new SettingsHeader(Title, Description);
-        protected override Drawable CreateFooter() => new SettingsFooter();
+
+        protected override Drawable CreateFooter() => new OsuContextMenuContainer
+        {
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            Child = new SettingsFooter()
+        };
 
         public SettingsOverlay()
             : base(false)
@@ -60,6 +70,9 @@ namespace osu.Game.Overlays
         public void ShowAtControl<T>()
             where T : Drawable
         {
+            // if search isn't cleared then the target control won't be visible if it doesn't match the query
+            SearchTextBox.Current.SetDefault();
+
             Show();
 
             // wait for load of sections
