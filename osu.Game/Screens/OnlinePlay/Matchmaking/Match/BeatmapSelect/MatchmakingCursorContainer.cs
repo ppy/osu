@@ -111,7 +111,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         {
             private float targetAlpha = 0;
 
-            private APIUser user;
+            private readonly APIUser user;
 
             public Cursor(APIUser user)
             {
