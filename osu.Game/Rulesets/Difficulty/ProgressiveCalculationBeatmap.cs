@@ -90,6 +90,20 @@ namespace osu.Game.Rulesets.Difficulty
         public double TotalBreakTime => BaseBeatmap.TotalBreakTime;
         public IEnumerable<BeatmapStatistic> GetStatistics() => BaseBeatmap.GetStatistics();
         public double GetMostCommonBeatLength() => BaseBeatmap.GetMostCommonBeatLength();
+        public double AudioLeadIn { get => BaseBeatmap.AudioLeadIn; set => BaseBeatmap.AudioLeadIn = value; }
+        public float StackLeniency { get => BaseBeatmap.StackLeniency; set => BaseBeatmap.StackLeniency = value; }
+        public bool SpecialStyle { get => BaseBeatmap.SpecialStyle; set => BaseBeatmap.SpecialStyle = value; }
+        public bool LetterboxInBreaks { get => BaseBeatmap.LetterboxInBreaks; set => BaseBeatmap.LetterboxInBreaks = value; }
+        public bool WidescreenStoryboard { get => BaseBeatmap.WidescreenStoryboard; set => BaseBeatmap.WidescreenStoryboard = value; }
+        public bool EpilepsyWarning { get => BaseBeatmap.EpilepsyWarning; set => BaseBeatmap.EpilepsyWarning = value; }
+        public bool SamplesMatchPlaybackRate { get => BaseBeatmap.SamplesMatchPlaybackRate; set => BaseBeatmap.SamplesMatchPlaybackRate = value; }
+        public double DistanceSpacing { get => BaseBeatmap.DistanceSpacing; set => BaseBeatmap.DistanceSpacing = value; }
+        public int GridSize { get => BaseBeatmap.GridSize; set => BaseBeatmap.GridSize = value; }
+        public double TimelineZoom { get => BaseBeatmap.TimelineZoom; set => BaseBeatmap.TimelineZoom = value; }
+        public CountdownType Countdown { get => BaseBeatmap.Countdown; set => BaseBeatmap.Countdown = value; }
+        public int CountdownOffset { get => BaseBeatmap.CountdownOffset; set => BaseBeatmap.CountdownOffset = value; }
+        public int[] Bookmarks { get => BaseBeatmap.Bookmarks; set => BaseBeatmap.Bookmarks = value; }
+        public int BeatmapVersion => BaseBeatmap.BeatmapVersion;
         public IBeatmap Clone() => new DifficultyCalculatorBeatmap(BaseBeatmap.Clone());
 
         #endregion
