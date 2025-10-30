@@ -30,7 +30,7 @@ namespace osu.Game.Skinning
 
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
-        private IBindable<StarDifficulty?> starDifficulty = null!;
+        private IBindable<StarDifficulty> starDifficulty = null!;
         private CancellationTokenSource? cancellationSource;
 
         private Color4[] colors = null!;
@@ -75,12 +75,12 @@ namespace osu.Game.Skinning
             }, true);
         }
 
-        private void updateSkillsBreakdown(StarDifficulty? starDifficulty)
+        private void updateSkillsBreakdown(StarDifficulty starDifficulty)
         {
-            if (starDifficulty == null)
+            if (starDifficulty.DifficultyAttributes == null)
                 return;
 
-            var skillNameValues = starDifficulty.Value.Attributes.GetSkillValues();
+            var skillNameValues = starDifficulty.DifficultyAttributes.GetSkillValues();
 
             // Square the values to make visual representation more intuitive
             double[] skillValues = skillNameValues.Select(x => Math.Pow(x.Value, 1)).ToArray();
