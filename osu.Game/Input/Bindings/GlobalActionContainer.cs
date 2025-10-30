@@ -223,8 +223,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Alt, InputKey.Right }, GlobalAction.NextVolumeMeter),
 
             new KeyBinding(new[] { InputKey.Control, InputKey.F4 }, GlobalAction.ToggleMute),
-            new KeyBinding(new[] { InputKey.Alt, InputKey.F1 }, GlobalAction.ToggleEffectsMute),
-            new KeyBinding(new[] { InputKey.Alt, InputKey.F2 }, GlobalAction.ToggleMusicMute),
+            new KeyBinding(new[] { InputKey.Control, InputKey.F5 }, GlobalAction.ToggleEffectsMute),
+            new KeyBinding(new[] { InputKey.Control, InputKey.F6 }, GlobalAction.ToggleMusicMute),
 
             new KeyBinding(InputKey.TrackPrevious, GlobalAction.MusicPrev),
             new KeyBinding(InputKey.F1, GlobalAction.MusicPrev),

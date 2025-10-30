@@ -12,8 +12,8 @@ namespace osu.Game.Overlays.Volume
     public enum MuteMode
     {
         Master,
-        Effect,
-        Track,
+        Effects,
+        Music,
     }
 
     public partial class VolumeMeterWithMute : VolumeMeter
@@ -41,9 +41,9 @@ namespace osu.Game.Overlays.Volume
             {
                 case MuteMode.Master:
                     return audio;
-                case MuteMode.Effect:
+                case MuteMode.Effects:
                     return audio.Samples;
-                case MuteMode.Track:
+                case MuteMode.Music:
                     return audio.Tracks;
                 default:
                     throw new System.Diagnostics.UnreachableException();
