@@ -7,7 +7,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -17,9 +16,10 @@ using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Edit.Timing
     {
         private Container swing = null!;
 
-        private OsuSpriteText bpmText = null!;
+        private OsuTextFlowContainer bpmText = null!;
 
         private Drawable weight = null!;
         private Drawable stick = null!;
@@ -213,10 +213,15 @@ namespace osu.Game.Screens.Edit.Timing
                         },
                     }
                 },
-                bpmText = new OsuSpriteText
+                bpmText = new OsuTextFlowContainer(st =>
+                {
+                    st.Font = OsuFont.Default.With(fixedWidth: true);
+                    st.Spacing = new Vector2(-1.9f, 0);
+                })
                 {
                     Name = @"BPM display",
                     Colour = overlayColourProvider.Content1,
+                    AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Y = -3,
@@ -227,12 +232,13 @@ namespace osu.Game.Screens.Edit.Timing
         }
 
         private double effectiveBeatLength;
+        private double effectiveBpm;
 
         private TimingControlPoint timingPoint = null!;
 
         private bool isSwinging;
 
-        private readonly BindableInt interpolatedBpm = new BindableInt();
+        private readonly BindableDouble interpolatedBpm = new BindableDouble();
 
         private ScheduledDelegate? latchDelegate;
 
@@ -255,7 +261,32 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.LoadComplete();
 
-            interpolatedBpm.BindValueChanged(_ => bpmText.Text = interpolatedBpm.Value.ToLocalisableString());
+            interpolatedBpm.BindValueChanged(_ => updateBpmText());
+        }
+
+        private void updateBpmText()
+        {
+            bool reachedFinalNumber = interpolatedBpm.Value == effectiveBpm;
+            int decimalPlaces = Math.Min(2, FormatUtils.FindPrecision((decimal)effectiveBpm));
+
+            string text = interpolatedBpm.Value.ToString($"N{decimalPlaces}");
+            int? breakPoint = null;
+
+            for (int i = 0; i < text.Length; i++)
+            {
+                if (!char.IsDigit(text[i]))
+                    breakPoint = i;
+            }
+
+            if (breakPoint != null)
+            {
+                bpmText.Text = text.Substring(0, breakPoint.Value);
+                bpmText.AddText(text.Substring(breakPoint.Value), cp => cp.Alpha = reachedFinalNumber ? 0.5f : 0.2f);
+            }
+            else
+            {
+                bpmText.Text = text;
+            }
         }
 
         protected override void Update()
@@ -274,15 +305,15 @@ namespace osu.Game.Screens.Edit.Timing
             if (effectiveBeatLength != timingPoint.BeatLength / Divisor)
             {
                 effectiveBeatLength = timingPoint.BeatLength / Divisor;
+                effectiveBpm = TimingSection.BeatLengthToBpm(effectiveBeatLength);
 
                 EarlyActivationMilliseconds = timingPoint.BeatLength / 2;
-
-                double effectiveBpm = 60000 / effectiveBeatLength;
 
                 float bpmRatio = (float)Interpolation.ApplyEasing(Easing.OutQuad, Math.Clamp((effectiveBpm - 30) / 480, 0, 1));
 
                 weight.MoveToY((float)Interpolation.Lerp(0.1f, 0.83f, bpmRatio), 600, Easing.OutQuint);
-                this.TransformBindableTo(interpolatedBpm, (int)Math.Round(effectiveBpm), 600, Easing.OutQuint);
+
+                this.TransformBindableTo(interpolatedBpm, effectiveBpm, 300, Easing.OutExpo);
             }
 
             if (!BeatSyncSource.Clock.IsRunning && isSwinging)

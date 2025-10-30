@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
@@ -39,6 +40,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private TestMultiplayerMatchSongSelect songSelect = null!;
         private Live<BeatmapSetInfo> importedBeatmapSet = null!;
+        private Room room = null!;
 
         [Resolved]
         private OsuConfigManager configManager { get; set; } = null!;
@@ -58,16 +60,26 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Add(beatmapStore);
         }
 
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+
+            AddStep("create room", () => room = CreateDefaultRoom());
+            AddStep("join room", () => JoinRoom(room));
+            WaitForJoined();
+        }
+
         private void setUp()
         {
-            AddStep("reset", () =>
+            AddStep("create song select", () =>
             {
                 Ruleset.Value = new OsuRuleset().RulesetInfo;
                 Beatmap.SetDefault();
                 SelectedMods.SetDefault();
+
+                LoadScreen(songSelect = new TestMultiplayerMatchSongSelect(room));
             });
 
-            AddStep("create song select", () => LoadScreen(songSelect = new TestMultiplayerMatchSongSelect(SelectedRoom.Value!)));
             AddUntilStep("wait for present", () => songSelect.IsCurrentScreen() && songSelect.BeatmapSetsLoaded);
         }
 
@@ -137,8 +149,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create song select", () =>
             {
-                SelectedRoom.Value!.Playlist.Single().RulesetID = 2;
-                songSelect = new TestMultiplayerMatchSongSelect(SelectedRoom.Value, SelectedRoom.Value.Playlist.Single());
+                room.Playlist.Single().RulesetID = 2;
+                songSelect = new TestMultiplayerMatchSongSelect(room, room.Playlist.Single());
                 songSelect.OnLoadComplete += _ => Ruleset.Value = new TaikoRuleset().RulesetInfo;
                 LoadScreen(songSelect);
             });
@@ -157,6 +169,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                           .ChildrenOfType<ModPanel>()
                           .Where(panel => panel.Visible)
                           .All(b => b.Mod.GetType() != type));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
         }
 
         private partial class TestMultiplayerMatchSongSelect : MultiplayerMatchSongSelect

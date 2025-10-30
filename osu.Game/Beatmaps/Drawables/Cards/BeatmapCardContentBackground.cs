@@ -21,7 +21,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public BeatmapCardContentBackground(IBeatmapSetOnlineInfo onlineInfo)
+        public BeatmapCardContentBackground(IBeatmapSetOnlineInfo onlineInfo, bool keepLoaded = false)
         {
             InternalChildren = new Drawable[]
             {
@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                cover = new DelayedLoadUnloadWrapper(() => createCover(onlineInfo), 500, 500)
+                cover = new DelayedLoadUnloadWrapper(() => createCover(onlineInfo), keepLoaded ? 0 : 500, keepLoaded ? double.MaxValue : 1000)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Colour4.Transparent

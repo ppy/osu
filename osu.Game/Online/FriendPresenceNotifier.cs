@@ -6,6 +6,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
@@ -17,6 +18,7 @@ using osu.Game.Online.Metadata;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Users;
+using osuTK.Graphics;
 
 namespace osu.Game.Online
 {
@@ -30,15 +32,6 @@ namespace osu.Game.Online
 
         [Resolved]
         private MetadataClient metadataClient { get; set; } = null!;
-
-        [Resolved]
-        private ChannelManager channelManager { get; set; } = null!;
-
-        [Resolved]
-        private ChatOverlay chatOverlay { get; set; } = null!;
-
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -165,24 +158,7 @@ namespace osu.Game.Online
                 return;
             }
 
-            APIUser? singleUser = onlineAlertQueue.Count == 1 ? onlineAlertQueue.Single() : null;
-
-            notifications.Post(new SimpleNotification
-            {
-                Icon = FontAwesome.Solid.UserPlus,
-                Text = $"Online: {string.Join(@", ", onlineAlertQueue.Select(u => u.Username))}",
-                IconColour = colours.Green,
-                Activated = () =>
-                {
-                    if (singleUser != null)
-                    {
-                        channelManager.OpenPrivateChannel(singleUser);
-                        chatOverlay.Show();
-                    }
-
-                    return true;
-                }
-            });
+            notifications.Post(new FriendOnlineNotification(onlineAlertQueue.ToArray()));
 
             onlineAlertQueue.Clear();
             lastOnlineAlertTime = null;
@@ -202,15 +178,75 @@ namespace osu.Game.Online
                 return;
             }
 
-            notifications.Post(new SimpleNotification
-            {
-                Icon = FontAwesome.Solid.UserMinus,
-                Text = $"Offline: {string.Join(@", ", offlineAlertQueue.Select(u => u.Username))}",
-                IconColour = colours.Red
-            });
+            notifications.Post(new FriendOfflineNotification(offlineAlertQueue.ToArray()));
 
             offlineAlertQueue.Clear();
             lastOfflineAlertTime = null;
+        }
+
+        public partial class FriendOnlineNotification : UserAvatarNotification
+        {
+            private readonly ICollection<APIUser> users;
+
+            public FriendOnlineNotification(ICollection<APIUser> users)
+                : base(users.Count == 1 ? users.Single() : null)
+            {
+                this.users = users;
+
+                Transient = true;
+                IsImportant = false;
+                Text = $"Online: {string.Join(@", ", users.Select(u => u.Username))}";
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours, ChannelManager channelManager, ChatOverlay chatOverlay)
+            {
+                if (users.Count > 1)
+                {
+                    Icon = FontAwesome.Solid.User;
+                    IconColour = colours.GrayD;
+                }
+                else
+                {
+                    Activated = () =>
+                    {
+                        channelManager.OpenPrivateChannel(users.Single());
+                        chatOverlay.Show();
+
+                        return true;
+                    };
+                }
+            }
+
+            public override string PopInSampleName => "UI/notification-friend-online";
+        }
+
+        public partial class FriendOfflineNotification : UserAvatarNotification
+        {
+            private readonly ICollection<APIUser> users;
+
+            public FriendOfflineNotification(ICollection<APIUser> users)
+                : base(users.Count == 1 ? users.Single() : null)
+            {
+                this.users = users;
+
+                Transient = true;
+                IsImportant = false;
+                Text = $"Offline: {string.Join(@", ", users.Select(u => u.Username))}";
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Icon = FontAwesome.Solid.UserSlash;
+
+                if (users.Count == 1)
+                    Avatar.Colour = Color4.White.Opacity(0.25f);
+                else
+                    IconColour = colours.Gray3;
+            }
+
+            public override string PopInSampleName => "UI/notification-friend-offline";
         }
     }
 }

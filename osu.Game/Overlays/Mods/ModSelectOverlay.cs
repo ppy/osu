@@ -35,7 +35,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
-    public abstract partial class ModSelectOverlay : ShearedOverlayContainer, ISamplePlaybackDisabler, IKeyBindingHandler<PlatformAction>
+    public partial class ModSelectOverlay : ShearedOverlayContainer, ISamplePlaybackDisabler, IKeyBindingHandler<PlatformAction>
     {
         public const int BUTTON_WIDTH = 200;
 
@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.Mods
         /// <summary>
         /// Whether the column with available mod presets should be shown.
         /// </summary>
-        protected virtual bool ShowPresets => false;
+        public bool ShowPresets { get; init; }
 
         protected virtual ModColumn CreateModColumn(ModType modType) => new ModColumn(modType, false);
 
@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private ScreenFooter? footer { get; set; }
 
-        protected ModSelectOverlay(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
+        public ModSelectOverlay(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
             : base(colourScheme)
         {
         }
@@ -168,7 +168,7 @@ namespace osu.Game.Overlays.Mods
                                         Anchor = Anchor.BottomLeft,
                                         Origin = Anchor.BottomLeft,
                                         Direction = FillDirection.Horizontal,
-                                        Shear = new Vector2(OsuGame.SHEAR, 0),
+                                        Shear = OsuGame.SHEAR,
                                         RelativeSizeAxes = Axes.Y,
                                         AutoSizeAxes = Axes.X,
                                         Margin = new MarginPadding { Horizontal = 70 },
@@ -353,7 +353,10 @@ namespace osu.Game.Overlays.Mods
                                     .ToArray();
 
                 foreach (var modState in modStates)
+                {
+                    modState.Active.Value = SelectedMods.Value.Any(selected => selected.GetType() == modState.Mod.GetType());
                     modState.Active.BindValueChanged(_ => updateFromInternalSelection());
+                }
 
                 newLocalAvailableMods[modType] = modStates;
             }
@@ -723,7 +726,7 @@ namespace osu.Game.Overlays.Mods
                     // DrawWidth/DrawPosition do not include shear effects, and we want to know the full extents of the columns post-shear,
                     // so we have to manually compensate.
                     var topLeft = column.ToSpaceOfOtherDrawable(Vector2.Zero, ScrollContent);
-                    var bottomRight = column.ToSpaceOfOtherDrawable(new Vector2(column.DrawWidth - column.DrawHeight * OsuGame.SHEAR, 0), ScrollContent);
+                    var bottomRight = column.ToSpaceOfOtherDrawable(new Vector2(column.DrawWidth - column.DrawHeight * OsuGame.SHEAR.X, 0), ScrollContent);
 
                     bool isCurrentlyVisible = Precision.AlmostBigger(topLeft.X, leftVisibleBound)
                                               && Precision.DefinitelyBigger(rightVisibleBound, bottomRight.X);

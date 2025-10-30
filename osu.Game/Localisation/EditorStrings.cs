@@ -70,6 +70,16 @@ namespace osu.Game.Localisation
         public static LocalisableString DeleteDifficulty => new TranslatableString(getKey(@"delete_difficulty"), @"Delete difficulty");
 
         /// <summary>
+        /// "Edit externally"
+        /// </summary>
+        public static LocalisableString EditExternally => new TranslatableString(getKey(@"edit_externally"), @"Edit externally");
+
+        /// <summary>
+        /// "Submit beatmap"
+        /// </summary>
+        public static LocalisableString SubmitBeatmap => new TranslatableString(getKey(@"submit_beatmap"), @"Submit beatmap");
+
+        /// <summary>
         /// "setup"
         /// </summary>
         public static LocalisableString SetupScreen => new TranslatableString(getKey(@"setup_screen"), @"setup");
@@ -145,6 +155,11 @@ namespace osu.Game.Localisation
         public static LocalisableString TimelineShowTimingChanges => new TranslatableString(getKey(@"timeline_show_timing_changes"), @"Show timing changes");
 
         /// <summary>
+        /// "Finish editing and import changes"
+        /// </summary>
+        public static LocalisableString FinishEditingExternally => new TranslatableString(getKey(@"Finish editing and import changes"), @"Finish editing and import changes");
+
+        /// <summary>
         /// "Show breaks"
         /// </summary>
         public static LocalisableString TimelineShowBreaks => new TranslatableString(getKey(@"timeline_show_breaks"), @"Show breaks");
@@ -183,6 +198,26 @@ namespace osu.Game.Localisation
         /// "Reset bookmarks"
         /// </summary>
         public static LocalisableString ResetBookmarks => new TranslatableString(getKey(@"reset_bookmarks"), @"Reset bookmarks");
+
+        /// <summary>
+        /// "Open beatmap info page"
+        /// </summary>
+        public static LocalisableString OpenInfoPage => new TranslatableString(getKey(@"open_info_page"), @"Open beatmap info page");
+
+        /// <summary>
+        /// "Open beatmap discussion page"
+        /// </summary>
+        public static LocalisableString OpenDiscussionPage => new TranslatableString(getKey(@"open_discussion_page"), @"Open beatmap discussion page");
+
+        /// <summary>
+        /// "Current difficulty"
+        /// </summary>
+        public static LocalisableString CheckCurrentDifficulty => new TranslatableString(getKey(@"check_current_difficulty"), @"Current difficulty");
+
+        /// <summary>
+        /// "Entire beatmap set"
+        /// </summary>
+        public static LocalisableString CheckEntireBeatmapSet => new TranslatableString(getKey(@"check_entire_beatmap_set"), @"Entire beatmap set");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

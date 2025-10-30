@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -76,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
             if (hasReachedObject && showHitMarkers.Value)
             {
                 float alpha = Interpolation.ValueAt(editorTime, 0, 1f, hitObjectTime, hitObjectTime + FADE_OUT_EXTENSION, Easing.In);
-                float ringScale = MathHelper.Clamp(Interpolation.ValueAt(editorTime, 0, 1f, hitObjectTime, hitObjectTime + FADE_OUT_EXTENSION / 2, Easing.OutQuint), 0, 1);
+                float ringScale = Math.Clamp(Interpolation.ValueAt(editorTime, 0, 1f, hitObjectTime, hitObjectTime + FADE_OUT_EXTENSION / 2, Easing.OutQuint), 0, 1);
 
                 ring.Scale = new Vector2(1 + 0.1f * ringScale);
                 content.Alpha = 0.9f * (1 - alpha);

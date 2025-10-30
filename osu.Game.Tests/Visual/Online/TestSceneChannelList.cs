@@ -115,6 +115,8 @@ namespace osu.Game.Tests.Visual.Online
                     channelList.AddChannel(createRandomPrivateChannel());
             });
 
+            AddStep("Add Team Channel", () => channelList.AddChannel(createRandomTeamChannel()));
+
             AddStep("Add Announce Channels", () =>
             {
                 for (int i = 0; i < 2; i++)
@@ -186,6 +188,17 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Name = $"Announce {id}",
                 Type = ChannelType.Announce,
+                Id = id,
+            };
+        }
+
+        private Channel createRandomTeamChannel()
+        {
+            int id = TestResources.GetNextTestID();
+            return new Channel
+            {
+                Name = $"Team {id}",
+                Type = ChannelType.Team,
                 Id = id,
             };
         }

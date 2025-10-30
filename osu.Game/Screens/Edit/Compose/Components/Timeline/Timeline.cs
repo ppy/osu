@@ -22,7 +22,7 @@ using osuTK.Input;
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     [Cached]
-    public partial class Timeline : ZoomableScrollContainer, IPositionSnapProvider
+    public partial class Timeline : ZoomableScrollContainer
     {
         private const float timeline_height = 80;
 
@@ -107,7 +107,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             CentreMarker centreMarker;
 
             // We don't want the centre marker to scroll
-            AddInternal(centreMarker = new CentreMarker());
+            AddInternal(centreMarker = new CentreMarker
+            {
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                Width = 8,
+                TriangleHeightRatio = 0.8f,
+                Colour = colourProvider.Colour2
+            });
 
             AddRange(new Drawable[]
             {
@@ -332,7 +339,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return (float)(time / editorClock.TrackLength * Content.DrawWidth);
         }
 
-        public SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
+        public SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
         {
             double time = TimeAtPosition(Content.ToLocalSpace(screenSpacePosition).X);
             return new SnapResult(screenSpacePosition, beatSnapProvider.SnapTime(time));

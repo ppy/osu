@@ -5,10 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Mods
 {
@@ -51,6 +54,107 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
                             {
                                 Type = HitType.Centre,
                                 StartTime = hit_time * 2,
+                            },
+                        },
+                        BeatmapInfo =
+                        {
+                            Difficulty = new BeatmapDifficulty
+                            {
+                                SliderTickRate = 4,
+                                OverallDifficulty = 0,
+                            },
+                            Ruleset = new TaikoRuleset().RulesetInfo
+                        },
+                    };
+
+                    beatmap.ControlPointInfo.Add(0, new EffectControlPoint { ScrollSpeed = 0.1f });
+                    return beatmap;
+                },
+            });
+        }
+
+        [Test]
+        public void TestIncreasedVisibilityOnFirstObject()
+        {
+            bool firstHitNeverFadedOut = true;
+            AddStep("enable increased visibility", () => LocalConfig.SetValue(OsuSetting.IncreaseFirstObjectVisibility, true));
+            CreateModTest(new ModTestData
+            {
+                Mod = new TaikoModHidden(),
+                Autoplay = true,
+                PassCondition = () =>
+                {
+                    var firstHit = this.ChildrenOfType<DrawableHit>().FirstOrDefault(h => h.HitObject.StartTime == 100);
+
+                    if (firstHit?.Alpha < 1 && !firstHit.IsHit)
+                        firstHitNeverFadedOut = false;
+
+                    return firstHitNeverFadedOut && checkAllMaxResultJudgements(2).Invoke();
+                },
+                CreateBeatmap = () =>
+                {
+                    var beatmap = new Beatmap<TaikoHitObject>
+                    {
+                        HitObjects = new List<TaikoHitObject>
+                        {
+                            new Hit
+                            {
+                                Type = HitType.Rim,
+                                StartTime = 100,
+                            },
+                            new Hit
+                            {
+                                Type = HitType.Centre,
+                                StartTime = 200,
+                            },
+                        },
+                        BeatmapInfo =
+                        {
+                            Difficulty = new BeatmapDifficulty
+                            {
+                                SliderTickRate = 4,
+                                OverallDifficulty = 0,
+                            },
+                            Ruleset = new TaikoRuleset().RulesetInfo
+                        },
+                    };
+
+                    beatmap.ControlPointInfo.Add(0, new EffectControlPoint { ScrollSpeed = 0.1f });
+                    return beatmap;
+                },
+            });
+        }
+
+        [Test]
+        public void TestNoIncreasedVisibilityOnFirstObject()
+        {
+            bool firstHitFadedOut = true;
+            AddStep("enable increased visibility", () => LocalConfig.SetValue(OsuSetting.IncreaseFirstObjectVisibility, false));
+            CreateModTest(new ModTestData
+            {
+                Mod = new TaikoModHidden(),
+                Autoplay = true,
+                PassCondition = () =>
+                {
+                    var firstHit = this.ChildrenOfType<DrawableHit>().FirstOrDefault(h => h.HitObject.StartTime == 100);
+                    firstHitFadedOut |= firstHit?.IsHit == false && firstHit.Alpha < 1;
+                    return firstHitFadedOut && checkAllMaxResultJudgements(2).Invoke();
+                },
+                CreateBeatmap = () =>
+                {
+                    var beatmap = new Beatmap<TaikoHitObject>
+                    {
+                        HitObjects = new List<TaikoHitObject>
+                        {
+                            new Hit
+                            {
+                                Type = HitType.Rim,
+                                StartTime = 100,
+                            },
+                            new Hit
+                            {
+                                Type = HitType.Centre,
+                                StartTime = 200,
                             },
                         },
                         BeatmapInfo =

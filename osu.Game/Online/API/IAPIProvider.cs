@@ -24,6 +24,11 @@ namespace osu.Game.Online.API
         IBindableList<APIRelation> Friends { get; }
 
         /// <summary>
+        /// The users blocked by the local user.
+        /// </summary>
+        IBindableList<APIRelation> Blocks { get; }
+
+        /// <summary>
         /// The language supplied by this provider to API requests.
         /// </summary>
         Language Language { get; }
@@ -51,14 +56,9 @@ namespace osu.Game.Online.API
         string ProvidedUsername { get; }
 
         /// <summary>
-        /// The URL endpoint for this API. Does not include a trailing slash.
+        /// Holds configuration for online endpoints.
         /// </summary>
-        string APIEndpointUrl { get; }
-
-        /// <summary>
-        /// The root URL of the website, excluding the trailing slash.
-        /// </summary>
-        string WebsiteRootUrl { get; }
+        EndpointConfiguration Endpoints { get; }
 
         /// <summary>
         /// The version of the API.
@@ -108,9 +108,14 @@ namespace osu.Game.Online.API
         void Login(string username, string password);
 
         /// <summary>
+        /// The <see cref="SessionVerificationMethod"/> requested by the server to complete verification.
+        /// </summary>
+        SessionVerificationMethod? SessionVerificationMethod { get; }
+
+        /// <summary>
         /// Provide a second-factor authentication code for authentication.
         /// </summary>
-        /// <param name="code">The 2FA code.</param>
+        /// <paramref name="code">The 2FA code.</paramref>
         void AuthenticateSecondFactor(string code);
 
         /// <summary>
@@ -124,6 +129,11 @@ namespace osu.Game.Online.API
         void UpdateLocalFriends();
 
         /// <summary>
+        /// Update the list of users blocked by the current user.
+        /// </summary>
+        void UpdateLocalBlocks();
+
+        /// <summary>
         /// Schedule a callback to run on the update thread.
         /// </summary>
         internal void Schedule(Action action);
@@ -133,8 +143,7 @@ namespace osu.Game.Online.API
         /// </summary>
         /// <param name="clientName">The name of the client this connector connects for, used for logging.</param>
         /// <param name="endpoint">The endpoint to the hub.</param>
-        /// <param name="preferMessagePack">Whether to use MessagePack for serialisation if available on this platform.</param>
-        IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack = true);
+        IHubClientConnector? GetHubConnector(string clientName, string endpoint);
 
         /// <summary>
         /// Accesses the <see cref="INotificationsClient"/> used to receive asynchronous notifications from web.

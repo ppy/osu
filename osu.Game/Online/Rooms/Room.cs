@@ -242,7 +242,7 @@ namespace osu.Game.Online.Rooms
         public int ChannelId
         {
             get => channelId;
-            private set => SetField(ref channelId, value);
+            set => SetField(ref channelId, value);
         }
 
         /// <summary>
@@ -261,6 +261,12 @@ namespace osu.Game.Online.Rooms
         {
             get => availability;
             set => SetField(ref availability, value);
+        }
+
+        public bool Pinned
+        {
+            get => pinned;
+            set => SetField(ref pinned, value);
         }
 
         [JsonProperty("id")]
@@ -339,8 +345,29 @@ namespace osu.Game.Online.Rooms
         [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
         private RoomStatus status;
 
+        [JsonProperty("pinned")]
+        private bool pinned;
+
         // Not yet serialised (not implemented).
         private RoomAvailability availability;
+
+        public Room()
+        {
+        }
+
+        public Room(MultiplayerRoom room)
+        {
+            RoomID = room.RoomID;
+            ChannelId = room.ChannelID;
+            Name = room.Settings.Name;
+            Password = room.Settings.Password;
+            Type = room.Settings.MatchType;
+            QueueMode = room.Settings.QueueMode;
+            AutoStartDuration = room.Settings.AutoStartDuration;
+            AutoSkip = room.Settings.AutoSkip;
+            Host = room.Host != null ? new APIUser { Id = room.Host.UserID } : null;
+            Playlist = room.Playlist.Select(p => new PlaylistItem(p)).ToArray();
+        }
 
         /// <summary>
         /// Copies values from another <see cref="Room"/> into this one.

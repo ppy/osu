@@ -320,7 +320,7 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     new Box
                     {
-                        Colour = colourProvider.Background3,
+                        Colour = colourProvider.Background2,
                         Alpha = isMainRow ? 1 : 0,
                         RelativeSizeAxes = Axes.Both,
                     },
@@ -356,8 +356,15 @@ namespace osu.Game.Screens.Edit.Timing
                 waveformGraph.Waveform = beatmap.Value.Waveform;
             }
 
-            public int BeatIndex { set => beatIndexText.Text = value.ToString(); }
-            public Vector2 WaveformScale { set => waveformGraph.Scale = value; }
+            public int BeatIndex
+            {
+                set => beatIndexText.Text = value.ToString();
+            }
+
+            public Vector2 WaveformScale
+            {
+                set => waveformGraph.Scale = value;
+            }
 
             public void WaveformOffsetTo(float value, bool animated) =>
                 this.TransformTo(nameof(waveformOffset), value, animated ? 300 : 0, Easing.OutQuint);
