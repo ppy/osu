@@ -17,6 +17,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
@@ -173,7 +174,7 @@ namespace osu.Game.Collections
                 }
                 else
                 {
-                    PlaceholderText = "Create a new collection";
+                    PlaceholderText = CollectionsStrings.CreateNew;
                 }
             }
         }
