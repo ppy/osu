@@ -227,7 +227,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onVoteToSkipPassed()
         {
-            Schedule(PerformIntroSkip);
+            Schedule(() => PerformIntroSkip(true));
         }
 
         protected override ResultsScreen CreateResults(ScoreInfo score)
