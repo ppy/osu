@@ -25,6 +25,8 @@ namespace osu.Game.Overlays
     public partial class VolumeOverlay : VisibilityContainer
     {
         public Bindable<bool> IsMuted { get; } = new Bindable<bool>();
+        public Bindable<bool> IsEffectMuted { get; } = new Bindable<bool>();
+        public Bindable<bool> IsMusicMuted { get; } = new Bindable<bool>();
 
         private const float offset = 10;
 
@@ -128,6 +130,28 @@ namespace osu.Game.Overlays
                 case GlobalAction.ToggleMute:
                     Show();
                     volumeMeters.OfType<MasterVolumeMeter>().First().ToggleMute();
+                    return true;
+
+                case GlobalAction.ToggleEffectsMute:
+                    Show();
+
+                    IsEffectMuted.Value = !IsEffectMuted.Value;
+                    if (IsEffectMuted.Value)
+                        volumeMeterEffect.Bindable.Set(0);
+                    else
+                        volumeMeterEffect.Bindable.Set(0.7f);
+
+                    return true;
+
+                case GlobalAction.ToggleMusicMute:
+                    Show();
+
+                    IsMusicMuted.Value = !IsMusicMuted.Value;
+                    if (IsMusicMuted.Value)
+                        volumeMeterMusic.Bindable.Set(0);
+                    else
+                        volumeMeterMusic.Bindable.Set(0.7f);
+
                     return true;
             }
 
