@@ -30,11 +30,11 @@ namespace osu.Game.Overlays
 
         private const float offset = 10;
 
-        private VolumeMeter volumeMeterMaster = null!;
-        private VolumeMeter volumeMeterEffect = null!;
-        private VolumeMeter volumeMeterMusic = null!;
+        private VolumeMeterWithMute volumeMeterMaster = null!;
+        private VolumeMeterWithMute volumeMeterEffect = null!;
+        private VolumeMeterWithMute volumeMeterMusic = null!;
 
-        private SelectionCycleFillFlowContainer<VolumeMeter> volumeMeters = null!;
+        private SelectionCycleFillFlowContainer<VolumeMeterWithMute> volumeMeters = null!;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays
                     Margin = new MarginPadding { Left = offset },
                     Children = new Drawable[]
                     {
-                        volumeMeters = new SelectionCycleFillFlowContainer<VolumeMeter>
+                        volumeMeters = new SelectionCycleFillFlowContainer<VolumeMeterWithMute>
                         {
                             Direction = FillDirection.Vertical,
                             AutoSizeAxes = Axes.Both,
@@ -69,9 +69,9 @@ namespace osu.Game.Overlays
                             Spacing = new Vector2(0, offset),
                             Children = new[]
                             {
-                                volumeMeterEffect = new EffectVolumeMeter("EFFECTS", 125, colours.BlueDarker) { IsMuted = { BindTarget = IsEffectMuted }, },
-                                volumeMeterMaster = new MasterVolumeMeter("MASTER", 150, colours.PinkDarker) { IsMuted = { BindTarget = IsMuted }, },
-                                volumeMeterMusic = new TrackVolumeMeter("MUSIC", 125, colours.BlueDarker) { IsMuted = { BindTarget = IsMusicMuted }, },
+                                volumeMeterEffect = new VolumeMeterWithMute("EFFECTS", 125, colours.BlueDarker, MuteMode.Effect) { IsMuted = { BindTarget = IsEffectMuted }, },
+                                volumeMeterMaster = new VolumeMeterWithMute("MASTER", 150, colours.PinkDarker, MuteMode.Master) { IsMuted = { BindTarget = IsMuted }, },
+                                volumeMeterMusic = new VolumeMeterWithMute("MUSIC", 125, colours.BlueDarker, MuteMode.Track) { IsMuted = { BindTarget = IsMusicMuted }, },
                             }
                         },
                     },
@@ -129,17 +129,17 @@ namespace osu.Game.Overlays
 
                 case GlobalAction.ToggleMute:
                     Show();
-                    volumeMeters.OfType<MasterVolumeMeter>().First().ToggleMute();
+                    volumeMeterMaster.ToggleMute();
                     return true;
 
                 case GlobalAction.ToggleEffectsMute:
                     Show();
-                    volumeMeters.OfType<EffectVolumeMeter>().First().ToggleMute();
+                    volumeMeterEffect.ToggleMute();
                     return true;
 
                 case GlobalAction.ToggleMusicMute:
                     Show();
-                    volumeMeters.OfType<TrackVolumeMeter>().First().ToggleMute();
+                    volumeMeterMusic.ToggleMute();
                     return true;
             }
 
