@@ -5,6 +5,7 @@
 
 using System;
 using System.Linq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -16,6 +17,7 @@ using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Online.API;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets.Mods;
@@ -25,17 +27,19 @@ using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK;
 using osuTK.Input;
-using static osu.Game.Tests.Visual.Navigation.TestSceneScreenNavigation;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
     public partial class TestSceneSkinEditorNavigation : OsuGameTestScene
     {
-        private TestPlaySongSelect songSelect;
+        private SoloSongSelect songSelect;
+        private ModSelectOverlay modSelect => songSelect.ChildrenOfType<ModSelectOverlay>().First();
+
         private SkinEditor skinEditor => Game.ChildrenOfType<SkinEditor>().FirstOrDefault();
 
         [Test]
@@ -103,6 +107,67 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestMutateProtectedSkinFromMainMenu_UndoToInitialStateIsCorrect()
+        {
+            AddStep("set default skin", () => Game.Dependencies.Get<SkinManager>().CurrentSkinInfo.SetDefault());
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+
+            openSkinEditor();
+            AddUntilStep("current skin is mutable", () => !Game.Dependencies.Get<SkinManager>().CurrentSkin.Value.SkinInfo.Value.Protected);
+
+            AddUntilStep("wait for player", () =>
+            {
+                DismissAnyNotifications();
+                return Game.ScreenStack.CurrentScreen is Player;
+            });
+
+            string state = string.Empty;
+
+            AddUntilStep("wait for accuracy counter", () => Game.ChildrenOfType<ArgonAccuracyCounter>().Any(counter => counter.Position != new Vector2()));
+            AddStep("dump state of accuracy meter", () => state = JsonConvert.SerializeObject(Game.ChildrenOfType<ArgonAccuracyCounter>().First().CreateSerialisedInfo()));
+            AddStep("add any component", () => Game.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick());
+            AddStep("undo", () => InputManager.Keys(PlatformAction.Undo));
+            AddUntilStep("only one accuracy meter left",
+                () => Game.ChildrenOfType<Player>().Single().ChildrenOfType<ArgonAccuracyCounter>().Count(),
+                () => Is.EqualTo(1));
+            AddAssert("accuracy meter state unchanged",
+                () => JsonConvert.SerializeObject(Game.ChildrenOfType<ArgonAccuracyCounter>().First().CreateSerialisedInfo()),
+                () => Is.EqualTo(state));
+        }
+
+        [Test]
+        public void TestMutateProtectedSkinFromPlayer_UndoToInitialStateIsCorrect()
+        {
+            AddStep("set default skin", () => Game.Dependencies.Get<SkinManager>().CurrentSkinInfo.SetDefault());
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+            advanceToSongSelect();
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("enable NF", () => Game.SelectedMods.Value = new[] { new OsuModNoFail() });
+            AddStep("enter gameplay", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("wait for player", () =>
+            {
+                DismissAnyNotifications();
+                return Game.ScreenStack.CurrentScreen is Player;
+            });
+            openSkinEditor();
+
+            string state = string.Empty;
+
+            AddUntilStep("wait for accuracy counter", () => Game.ChildrenOfType<ArgonAccuracyCounter>().Any(counter => counter.Position != new Vector2()));
+            AddStep("dump state of accuracy meter", () => state = JsonConvert.SerializeObject(Game.ChildrenOfType<ArgonAccuracyCounter>().First().CreateSerialisedInfo()));
+            AddStep("add any component", () => Game.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick());
+            AddStep("undo", () => InputManager.Keys(PlatformAction.Undo));
+            AddUntilStep("only one accuracy meter left",
+                () => Game.ChildrenOfType<Player>().Single().ChildrenOfType<ArgonAccuracyCounter>().Count(),
+                () => Is.EqualTo(1));
+            AddAssert("accuracy meter state unchanged",
+                () => JsonConvert.SerializeObject(Game.ChildrenOfType<ArgonAccuracyCounter>().First().CreateSerialisedInfo()),
+                () => Is.EqualTo(state));
+        }
+
+        [Test]
         public void TestComponentsDeselectedOnSkinEditorHide()
         {
             advanceToSongSelect();
@@ -115,12 +180,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for components", () => skinEditor.ChildrenOfType<SkinBlueprint>().Any());
 
-            AddStep("select all components", () =>
-            {
-                InputManager.PressKey(Key.ControlLeft);
-                InputManager.Key(Key.A);
-                InputManager.ReleaseKey(Key.ControlLeft);
-            });
+            AddStep("select all components", () => InputManager.Keys(PlatformAction.SelectAll));
 
             AddUntilStep("components selected", () => skinEditor.SelectedComponents.Count > 0);
 
@@ -218,6 +278,8 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             advanceToSongSelect();
             openSkinEditor();
+            AddUntilStep("skin editor visible", () => skinEditor.State.Value == Visibility.Visible);
+
             AddStep("select autoplay", () => Game.SelectedMods.Value = new Mod[] { new OsuModAutoplay() });
             AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
             AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
@@ -230,8 +292,9 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("settings not visible", () => getPlayerSettingsOverlay().DrawWidth, () => Is.EqualTo(0));
 
             toggleSkinEditor();
+            AddUntilStep("skin editor hidden", () => skinEditor.State.Value == Visibility.Hidden);
 
-            AddStep("move cursor slightly", () => InputManager.MoveMouseTo(InputManager.ScreenSpaceDrawQuad.TopRight + new Vector2(1)));
+            AddStep("move cursor slightly", () => InputManager.MoveMouseTo(InputManager.ScreenSpaceDrawQuad.TopRight + new Vector2(2)));
             AddUntilStep("settings visible", () => getPlayerSettingsOverlay().DrawWidth, () => Is.GreaterThan(0));
 
             AddStep("move cursor to right of screen too far", () => InputManager.MoveMouseTo(InputManager.ScreenSpaceDrawQuad.TopRight + new Vector2(10240, 0)));
@@ -259,10 +322,10 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestModOverlayClosesOnOpeningSkinEditor()
         {
             advanceToSongSelect();
-            AddStep("open mod overlay", () => songSelect.ModSelectOverlay.Show());
+            AddStep("open mod overlay", () => modSelect.Show());
 
             openSkinEditor();
-            AddUntilStep("mod overlay closed", () => songSelect.ModSelectOverlay.State.Value == Visibility.Hidden);
+            AddUntilStep("mod overlay closed", () => modSelect.State.Value == Visibility.Hidden);
         }
 
         [Test]
@@ -376,8 +439,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
         private void advanceToSongSelect()
         {
-            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
-            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+            PushAndConfirm(() => songSelect = new SoloSongSelect());
+            AddUntilStep("wait for song select", () => songSelect.CarouselItemsPresented);
         }
 
         private void openSkinEditor()

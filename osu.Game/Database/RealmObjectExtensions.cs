@@ -10,10 +10,12 @@ using AutoMapper;
 using AutoMapper.Internal;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osu.Game.Skinning;
 using Realms;
 
 namespace osu.Game.Database
@@ -169,6 +171,7 @@ namespace osu.Game.Database
             });
 
             c.CreateMap<RealmKeyBinding, RealmKeyBinding>();
+            c.CreateMap<BeatmapCollection, BeatmapCollection>();
             c.CreateMap<BeatmapMetadata, BeatmapMetadata>();
             c.CreateMap<BeatmapUserSettings, BeatmapUserSettings>();
             c.CreateMap<BeatmapDifficulty, BeatmapDifficulty>();
@@ -177,6 +180,7 @@ namespace osu.Game.Database
             c.CreateMap<RealmUser, RealmUser>();
             c.CreateMap<RealmFile, RealmFile>();
             c.CreateMap<RealmNamedFileUsage, RealmNamedFileUsage>();
+            c.CreateMap<SkinInfo, SkinInfo>();
         }
 
         /// <summary>
@@ -266,7 +270,7 @@ namespace osu.Game.Database
         /// <para>
         /// If a write transaction did not modify any objects in this <see cref="IRealmCollection{T}" />, the callback is not invoked at all.
         /// If an error occurs the callback will be invoked with <c>null</c> for the <c>sender</c> parameter and a non-<c>null</c> <c>error</c>.
-        /// Currently the only errors that can occur are when opening the <see cref="Realm" /> on the background worker thread.
+        /// Currently, the only errors that can occur are when opening the <see cref="Realm" /> on the background worker thread.
         /// </para>
         /// <para>
         /// At the time when the block is called, the <see cref="IRealmCollection{T}" /> object will be fully evaluated
@@ -285,8 +289,8 @@ namespace osu.Game.Database
         /// A subscription token. It must be kept alive for as long as you want to receive change notifications.
         /// To stop receiving notifications, call <see cref="IDisposable.Dispose" />.
         /// </returns>
-        /// <seealso cref="Realms.CollectionExtensions.SubscribeForNotifications{T}(IList{T}, NotificationCallbackDelegate{T})" />
-        /// <seealso cref="Realms.CollectionExtensions.SubscribeForNotifications{T}(IQueryable{T}, NotificationCallbackDelegate{T})" />
+        /// <seealso cref="Realms.CollectionExtensions.SubscribeForNotifications{T}(IList{T}, NotificationCallbackDelegate{T},KeyPathsCollection?)" />
+        /// <seealso cref="Realms.CollectionExtensions.SubscribeForNotifications{T}(IQueryable{T}, NotificationCallbackDelegate{T},KeyPathsCollection?)" />
 #pragma warning restore RS0030
         public static IDisposable QueryAsyncWithNotifications<T>(this IRealmCollection<T> collection, NotificationCallbackDelegate<T> callback)
             where T : RealmObjectBase

@@ -11,16 +11,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
     public class TaikoDifficultyAttributes : DifficultyAttributes
     {
         /// <summary>
-        /// The difficulty corresponding to the stamina skill.
+        /// The difficulty corresponding to the mechanical skills in osu!taiko.
+        /// This includes colour and stamina combined.
         /// </summary>
-        [JsonProperty("stamina_difficulty")]
-        public double StaminaDifficulty { get; set; }
-
-        /// <summary>
-        /// The ratio of stamina difficulty from mono-color (single colour) streams to total stamina difficulty.
-        /// </summary>
-        [JsonProperty("mono_stamina_factor")]
-        public double MonoStaminaFactor { get; set; }
+        public double MechanicalDifficulty { get; set; }
 
         /// <summary>
         /// The difficulty corresponding to the rhythm skill.
@@ -31,41 +25,31 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// <summary>
         /// The difficulty corresponding to the reading skill.
         /// </summary>
-        [JsonProperty("reading_difficulty")]
         public double ReadingDifficulty { get; set; }
 
         /// <summary>
         /// The difficulty corresponding to the colour skill.
         /// </summary>
-        [JsonProperty("colour_difficulty")]
         public double ColourDifficulty { get; set; }
 
-        [JsonProperty("rhythm_difficult_strains")]
-        public double RhythmTopStrains { get; set; }
+        /// <summary>
+        /// The difficulty corresponding to the stamina skill.
+        /// </summary>
+        public double StaminaDifficulty { get; set; }
 
-        [JsonProperty("colour_difficult_strains")]
-        public double ColourTopStrains { get; set; }
+        /// <summary>
+        /// The ratio of stamina difficulty from mono-color (single colour) streams to total stamina difficulty.
+        /// </summary>
+        [JsonProperty("mono_stamina_factor")]
+        public double MonoStaminaFactor { get; set; }
 
-        [JsonProperty("stamina_difficult_strains")]
+        /// <summary>
+        /// The factor corresponding to the consistency of a map.
+        /// </summary>
+        [JsonProperty("consistency_factor")]
+        public double ConsistencyFactor { get; set; }
+
         public double StaminaTopStrains { get; set; }
-
-        /// <summary>
-        /// The perceived hit window for a GREAT hit inclusive of rate-adjusting mods (DT/HT/etc).
-        /// </summary>
-        /// <remarks>
-        /// Rate-adjusting mods don't directly affect the hit window, but have a perceived effect as a result of adjusting audio timing.
-        /// </remarks>
-        [JsonProperty("great_hit_window")]
-        public double GreatHitWindow { get; set; }
-
-        /// <summary>
-        /// The perceived hit window for an OK hit inclusive of rate-adjusting mods (DT/HT/etc).
-        /// </summary>
-        /// <remarks>
-        /// Rate-adjusting mods don't directly affect the hit window, but have a perceived effect as a result of adjusting audio timing.
-        /// </remarks>
-        [JsonProperty("ok_hit_window")]
-        public double OkHitWindow { get; set; }
 
         public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
@@ -73,9 +57,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 yield return v;
 
             yield return (ATTRIB_ID_DIFFICULTY, StarRating);
-            yield return (ATTRIB_ID_GREAT_HIT_WINDOW, GreatHitWindow);
-            yield return (ATTRIB_ID_OK_HIT_WINDOW, OkHitWindow);
+            yield return (ATTRIB_ID_RHYTHM_DIFFICULTY, RhythmDifficulty);
             yield return (ATTRIB_ID_MONO_STAMINA_FACTOR, MonoStaminaFactor);
+            yield return (ATTRIB_ID_CONSISTENCY_FACTOR, ConsistencyFactor);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
@@ -83,9 +67,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             base.FromDatabaseAttributes(values, onlineInfo);
 
             StarRating = values[ATTRIB_ID_DIFFICULTY];
-            GreatHitWindow = values[ATTRIB_ID_GREAT_HIT_WINDOW];
-            OkHitWindow = values[ATTRIB_ID_OK_HIT_WINDOW];
+            RhythmDifficulty = values[ATTRIB_ID_RHYTHM_DIFFICULTY];
             MonoStaminaFactor = values[ATTRIB_ID_MONO_STAMINA_FACTOR];
+            ConsistencyFactor = values[ATTRIB_ID_CONSISTENCY_FACTOR];
         }
     }
 }

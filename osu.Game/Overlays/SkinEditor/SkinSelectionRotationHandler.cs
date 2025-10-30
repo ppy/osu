@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.SkinEditor
             objectsInRotation = selectedItems.Cast<Drawable>().ToArray();
             originalRotations = objectsInRotation.ToDictionary(d => d, d => d.Rotation);
             originalPositions = objectsInRotation.ToDictionary(d => d, d => d.ToScreenSpace(d.OriginPosition));
-            DefaultOrigin = GeometryUtils.GetSurroundingQuad(objectsInRotation.SelectMany(d => d.ScreenSpaceDrawQuad.GetVertices().ToArray())).Centre;
+            DefaultOrigin = GeometryUtils.GetSurroundingQuad(objectsInRotation.SelectMany(d => ToLocalSpace(d.ScreenSpaceDrawQuad).GetVertices().ToArray())).Centre;
 
             base.Begin();
         }
@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             foreach (var drawableItem in objectsInRotation)
             {
-                var rotatedPosition = GeometryUtils.RotatePointAroundOrigin(originalPositions[drawableItem], actualOrigin, rotation);
+                var rotatedPosition = GeometryUtils.RotatePointAroundOrigin(originalPositions[drawableItem], ToScreenSpace(actualOrigin), rotation);
                 UpdatePosition(drawableItem, rotatedPosition);
 
                 drawableItem.Rotation = originalRotations[drawableItem] + rotation;

@@ -140,8 +140,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (hoveredControlPoint == null)
                 return false;
 
-            hoveredControlPoint.IsSelected.Value = true;
-            ControlPointVisualiser?.DeleteSelected();
+            if (hoveredControlPoint.IsSelected.Value)
+                ControlPointVisualiser?.DeleteSelected();
+            else
+                ControlPointVisualiser?.Delete([hoveredControlPoint.ControlPoint]);
+
             return true;
         }
 
@@ -267,14 +270,21 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             if (adjustVelocity)
             {
                 proposedVelocity = proposedDistance / oldDuration;
-                proposedDistance = MathHelper.Clamp(proposedDistance, 0.1 * oldDuration, 10 * oldDuration);
+                proposedDistance = Math.Clamp(proposedDistance, 0.1 * oldDuration, 10 * oldDuration);
             }
             else
             {
-                double minDistance = distanceSnapProvider?.GetBeatSnapDistanceAt(HitObject, false) * oldVelocityMultiplier ?? 1;
+                double minDistance = distanceSnapProvider?.GetBeatSnapDistance() * oldVelocityMultiplier ?? 1;
+                // do not allow the slider to extend beyond the path's calculated distance.
+                // this can happen in two specific circumstances:
+                // - floating point issues (`minDistance` is just ever so slightly larger than the calculated distance)
+                // - the slider was placed with a higher beat snap active than the current one,
+                //   therefore snapping it to the current beat snap distance would mean extrapolating it beyond its actual shape as defined by its control points
+                minDistance = Math.Min(minDistance, HitObject.Path.CalculatedDistance);
+
                 // Add a small amount to the proposed distance to make it easier to snap to the full length of the slider.
-                proposedDistance = distanceSnapProvider?.FindSnappedDistance(HitObject, (float)proposedDistance + 1, DistanceSnapTarget.Start) ?? proposedDistance;
-                proposedDistance = MathHelper.Clamp(proposedDistance, minDistance, HitObject.Path.CalculatedDistance);
+                proposedDistance = distanceSnapProvider?.FindSnappedDistance((float)proposedDistance + 1, HitObject.StartTime, HitObject) ?? proposedDistance;
+                proposedDistance = Math.Clamp(proposedDistance, minDistance, HitObject.Path.CalculatedDistance);
             }
 
             if (Precision.AlmostEquals(proposedDistance, HitObject.Path.Distance) && Precision.AlmostEquals(proposedVelocity, HitObject.SliderVelocityMultiplier))
@@ -473,7 +483,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             HitObject.SnapTo(distanceSnapProvider);
 
             // If there are 0 or 1 remaining control points, or the slider has an invalid length, it is in a degenerate form and should be deleted
-            if (controlPoints.Count <= 1 || !HitObject.Path.HasValidLength)
+            if (controlPoints.Count <= 1 || !HitObject.Path.HasValidLengthForPlacement)
             {
                 placementHandler?.Delete(HitObject);
                 return;
@@ -616,14 +626,42 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         public override Vector2 ScreenSpaceSelectionPoint => DrawableObject.SliderBody?.ToScreenSpace(DrawableObject.SliderBody.PathOffset)
                                                              ?? BodyPiece.ToScreenSpace(BodyPiece.PathStartLocation);
 
-        protected override Vector2[] ScreenSpaceAdditionalNodes => new[]
-        {
+        protected override Vector2[] ScreenSpaceAdditionalNodes => getScreenSpaceControlPointNodes().Prepend(
             DrawableObject.SliderBody?.ToScreenSpace(DrawableObject.SliderBody.PathEndOffset) ?? BodyPiece.ToScreenSpace(BodyPiece.PathEndLocation)
-        };
+        ).ToArray();
+
+        private IEnumerable<Vector2> getScreenSpaceControlPointNodes()
+        {
+            // Returns the positions of control points that produce visible kinks on the slider's path
+            // This excludes inherited control points from Bezier, B-Spline, Perfect, and Catmull curves
+            if (DrawableObject.SliderBody == null)
+                yield break;
+
+            PathType? currentPathType = null;
+
+            // Skip the last control point because its always either not on the slider path or exactly on the slider end
+            for (int i = 0; i < DrawableObject.HitObject.Path.ControlPoints.Count - 1; i++)
+            {
+                var controlPoint = DrawableObject.HitObject.Path.ControlPoints[i];
+
+                if (controlPoint.Type is not null)
+                    currentPathType = controlPoint.Type;
+
+                // Skip the first control point because it is already covered by the slider head
+                if (i == 0)
+                    continue;
+
+                if (controlPoint.Type is null && currentPathType != PathType.LINEAR)
+                    continue;
+
+                var screenSpacePosition = DrawableObject.SliderBody.ToScreenSpace(DrawableObject.SliderBody.PathOffset + controlPoint.Position);
+                yield return screenSpacePosition;
+            }
+        }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
-            if (BodyPiece.ReceivePositionalInputAt(screenSpacePos))
+            if (BodyPiece.ReceivePositionalInputAt(screenSpacePos) && (IsSelected || DrawableObject.Body.Alpha > 0 || DrawableObject.HeadCircle.Alpha > 0))
                 return true;
 
             if (ControlPointVisualiser == null)

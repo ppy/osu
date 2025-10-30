@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -15,6 +16,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -30,7 +32,8 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
-using osu.Game.Screens.Select;
+using osu.Game.Screens.SelectV2;
+using osu.Game.Storyboards.Drawables;
 using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Graphics;
@@ -45,6 +48,7 @@ namespace osu.Game.Tests.Visual.Background
         private LoadBlockingTestPlayer player;
         private BeatmapManager manager;
         private RulesetStore rulesets;
+        private UpdateCounter storyboardUpdateCounter;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -195,6 +199,28 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         [Test]
+        public void TestStoryboardUpdatesWhenDimmed()
+        {
+            performFullSetup();
+            createFakeStoryboard();
+
+            AddStep("Enable fully dimmed storyboard", () =>
+            {
+                player.StoryboardReplacesBackground.Value = true;
+                player.StoryboardEnabled.Value = true;
+                player.DimmableStoryboard.IgnoreUserSettings.Value = false;
+                songSelect.DimLevel.Value = 1f;
+            });
+
+            AddUntilStep("Storyboard is invisible", () => !player.IsStoryboardVisible);
+
+            AddWaitStep("wait some", 20);
+
+            AddUntilStep("Storyboard is always present", () => player.ChildrenOfType<DrawableStoryboard>().Single().AlwaysPresent, () => Is.True);
+            AddUntilStep("Dimmable storyboard content is being updated", () => storyboardUpdateCounter.StoryboardContentLastUpdated, () => Is.EqualTo(Time.Current).Within(100));
+        }
+
+        [Test]
         public void TestStoryboardIgnoreUserSettings()
         {
             performFullSetup();
@@ -269,15 +295,19 @@ namespace osu.Game.Tests.Visual.Background
         {
             player.StoryboardEnabled.Value = false;
             player.StoryboardReplacesBackground.Value = false;
-            player.DimmableStoryboard.Add(new OsuSpriteText
+            player.DimmableStoryboard.AddRange(new Drawable[]
             {
-                Size = new Vector2(500, 50),
-                Alpha = 1,
-                Colour = Color4.White,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Text = "THIS IS A STORYBOARD",
-                Font = new FontUsage(size: 50)
+                storyboardUpdateCounter = new UpdateCounter(),
+                new OsuSpriteText
+                {
+                    Size = new Vector2(500, 50),
+                    Alpha = 1,
+                    Colour = Color4.White,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Text = "THIS IS A STORYBOARD",
+                    Font = new FontUsage(size: 50)
+                }
             });
         });
 
@@ -295,7 +325,7 @@ namespace osu.Game.Tests.Visual.Background
         private void setupUserSettings()
         {
             AddUntilStep("Song select is current", () => songSelect.IsCurrentScreen());
-            AddUntilStep("Song select has selection", () => songSelect.Carousel?.SelectedBeatmapInfo != null);
+            AddUntilStep("Song select has selection", () => songSelect.Carousel?.CurrentGroupedBeatmap != null);
             AddStep("Set default user settings", () =>
             {
                 SelectedMods.Value = new[] { new OsuModNoFail() };
@@ -310,7 +340,7 @@ namespace osu.Game.Tests.Visual.Background
             rulesets?.Dispose();
         }
 
-        private partial class DummySongSelect : PlaySongSelect
+        private partial class DummySongSelect : SoloSongSelect
         {
             private FadeAccessibleBackground background;
 
@@ -325,7 +355,7 @@ namespace osu.Game.Tests.Visual.Background
             public readonly Bindable<double> DimLevel = new BindableDouble();
             public readonly Bindable<double> BlurLevel = new BindableDouble();
 
-            public new BeatmapCarousel Carousel => base.Carousel;
+            public BeatmapCarousel Carousel => this.ChildrenOfType<BeatmapCarousel>().SingleOrDefault();
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
@@ -338,7 +368,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBackgroundDimmed() => background.CurrentColour == OsuColour.Gray(1f - background.CurrentDim);
 
-            public bool IsBackgroundUndimmed() => background.CurrentColour == Color4.White;
+            public bool IsBackgroundUndimmed() => background.CurrentColour == new Color4(0.9f, 0.9f, 0.9f, 1f);
 
             public bool IsUserBlurApplied() => Precision.AlmostEquals(background.CurrentBlur, new Vector2((float)BlurLevel.Value * BackgroundScreenBeatmap.USER_BLUR_FACTOR), 0.1f);
 
@@ -346,14 +376,14 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBackgroundVisible() => background.CurrentAlpha == 1;
 
-            public bool IsBackgroundBlur() => Precision.AlmostEquals(background.CurrentBlur, new Vector2(BACKGROUND_BLUR), 0.1f);
+            public bool IsBackgroundBlur() => Precision.AlmostBigger(background.CurrentBlur.X, 0, 0.1f);
 
             public bool CheckBackgroundBlur(Vector2 expected) => Precision.AlmostEquals(background.CurrentBlur, expected, 0.1f);
 
             /// <summary>
             /// Make sure every time a screen gets pushed, the background doesn't get replaced
             /// </summary>
-            /// <returns>Whether or not the original background (The one created in DummySongSelect) is still the current background</returns>
+            /// <returns>Whether the original background (The one created in DummySongSelect) is still the current background</returns>
             public bool IsBackgroundCurrent() => background?.IsCurrentScreen() == true;
         }
 
@@ -384,7 +414,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public new DimmableStoryboard DimmableStoryboard => base.DimmableStoryboard;
 
-            // Whether or not the player should be allowed to load.
+            // Whether the player should be allowed to load.
             public bool BlockLoad;
 
             public Bindable<bool> StoryboardEnabled;
@@ -448,6 +478,17 @@ namespace osu.Game.Tests.Visual.Background
             public FadeAccessibleBackground(WorkingBeatmap beatmap)
                 : base(beatmap)
             {
+            }
+        }
+
+        private partial class UpdateCounter : Drawable
+        {
+            public double StoryboardContentLastUpdated;
+
+            protected override void Update()
+            {
+                base.Update();
+                StoryboardContentLastUpdated = Time.Current;
             }
         }
 

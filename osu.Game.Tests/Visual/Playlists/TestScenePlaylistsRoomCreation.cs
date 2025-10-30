@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -32,14 +33,16 @@ namespace osu.Game.Tests.Visual.Playlists
 {
     public partial class TestScenePlaylistsRoomCreation : OnlinePlayTestScene
     {
+        private RulesetStore rulesets = null!;
         private BeatmapManager manager = null!;
         private TestPlaylistsRoomSubScreen match = null!;
         private BeatmapSetInfo importedBeatmap = null!;
+        private Room room = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
         }
@@ -47,11 +50,9 @@ namespace osu.Game.Tests.Visual.Playlists
         [SetUpSteps]
         public void SetupSteps()
         {
-            AddStep("set room", () => SelectedRoom.Value = new Room());
-
             importBeatmap();
 
-            AddStep("load match", () => LoadScreen(match = new TestPlaylistsRoomSubScreen(SelectedRoom.Value!)));
+            AddStep("load match", () => LoadScreen(match = new TestPlaylistsRoomSubScreen(room = new Room())));
             AddUntilStep("wait for load", () => match.IsCurrentScreen());
         }
 
@@ -119,7 +120,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 ];
             });
 
-            AddAssert("first playlist item selected", () => match.SelectedItem.Value == SelectedRoom.Value!.Playlist[0]);
+            AddAssert("first playlist item selected", () => match.SelectedItem.Value == room.Playlist[0]);
         }
 
         [Test]
@@ -177,6 +178,7 @@ namespace osu.Game.Tests.Visual.Playlists
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
                 ];
+                room.EndDate = DateTimeOffset.Now.AddHours(1);
             });
 
             AddAssert("match has default beatmap", () => match.Beatmap.IsDefault);
@@ -197,10 +199,9 @@ namespace osu.Game.Tests.Visual.Playlists
             AddUntilStep("match has correct beatmap", () => realHash == match.Beatmap.Value.BeatmapInfo.MD5Hash);
         }
 
-        private void setupAndCreateRoom(Action<Room> room)
+        private void setupAndCreateRoom(Action<Room> setupFunc)
         {
-            AddStep("setup room", () => room(SelectedRoom.Value!));
-
+            AddStep("setup room", () => setupFunc(room));
             AddStep("click create button", () =>
             {
                 InputManager.MoveMouseTo(this.ChildrenOfType<PlaylistsRoomSettingsOverlay.CreateRoomButton>().Single());
@@ -214,7 +215,20 @@ namespace osu.Game.Tests.Visual.Playlists
 
             Debug.Assert(beatmap.BeatmapInfo.BeatmapSet != null);
             importedBeatmap = manager.Import(beatmap.BeatmapInfo.BeatmapSet)!.Value.Detach();
+            Realm.Write(r =>
+            {
+                foreach (var beatmapInfo in r.All<BeatmapInfo>())
+                    beatmapInfo.OnlineMD5Hash = beatmapInfo.MD5Hash;
+            });
         });
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
+        }
 
         private partial class TestPlaylistsRoomSubScreen : PlaylistsRoomSubScreen
         {

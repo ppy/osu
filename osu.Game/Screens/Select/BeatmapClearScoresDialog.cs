@@ -15,13 +15,13 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private ScoreManager scoreManager { get; set; } = null!;
 
-        public BeatmapClearScoresDialog(BeatmapInfo beatmapInfo, Action onCompletion)
+        public BeatmapClearScoresDialog(BeatmapInfo beatmapInfo, Action? onCompletion = null)
         {
             BodyText = $"All local scores on {beatmapInfo.GetDisplayTitle()}";
             DangerousAction = () =>
             {
                 Task.Run(() => scoreManager.Delete(beatmapInfo))
-                    .ContinueWith(_ => onCompletion);
+                    .ContinueWith(_ => onCompletion?.Invoke());
             };
         }
     }

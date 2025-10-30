@@ -4,8 +4,8 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
@@ -305,7 +305,8 @@ namespace osu.Game.Screens.Edit.Timing
             [Resolved]
             private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
-            private readonly IBindable<Track> track = new Bindable<Track>();
+            [Resolved]
+            private EditorClock editorClock { get; set; } = null!;
 
             public WaveformRow(bool isMainRow)
             {
@@ -313,13 +314,13 @@ namespace osu.Game.Screens.Edit.Timing
             }
 
             [BackgroundDependencyLoader]
-            private void load(EditorClock clock)
+            private void load()
             {
                 InternalChildren = new Drawable[]
                 {
                     new Box
                     {
-                        Colour = colourProvider.Background3,
+                        Colour = colourProvider.Background2,
                         Alpha = isMainRow ? 1 : 0,
                         RelativeSizeAxes = Axes.Both,
                     },
@@ -343,17 +344,27 @@ namespace osu.Game.Screens.Edit.Timing
                         Colour = colourProvider.Content2
                     }
                 };
-
-                track.BindTo(clock.Track);
             }
 
             protected override void LoadComplete()
             {
-                track.ValueChanged += _ => waveformGraph.Waveform = beatmap.Value.Waveform;
+                editorClock.TrackChanged += updateWaveform;
             }
 
-            public int BeatIndex { set => beatIndexText.Text = value.ToString(); }
-            public Vector2 WaveformScale { set => waveformGraph.Scale = value; }
+            private void updateWaveform()
+            {
+                waveformGraph.Waveform = beatmap.Value.Waveform;
+            }
+
+            public int BeatIndex
+            {
+                set => beatIndexText.Text = value.ToString();
+            }
+
+            public Vector2 WaveformScale
+            {
+                set => waveformGraph.Scale = value;
+            }
 
             public void WaveformOffsetTo(float value, bool animated) =>
                 this.TransformTo(nameof(waveformOffset), value, animated ? 300 : 0, Easing.OutQuint);
@@ -362,6 +373,14 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 get => waveformGraph.X;
                 set => waveformGraph.X = value;
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                if (editorClock.IsNotNull())
+                    editorClock.TrackChanged -= updateWaveform;
             }
         }
     }

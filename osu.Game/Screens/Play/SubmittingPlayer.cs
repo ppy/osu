@@ -21,6 +21,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
@@ -152,7 +153,7 @@ namespace osu.Game.Screens.Play
                                 Logger.Log($"Please ensure that you are using the latest version of the official game releases.\n\n{whatWillHappen}", level: LogLevel.Important);
                                 break;
 
-                            case @"invalid beatmap_hash":
+                            case @"invalid or missing beatmap_hash":
                                 Logger.Log($"This beatmap does not match the online version. Please update or redownload it.\n\n{whatWillHappen}", level: LogLevel.Important);
                                 break;
 
@@ -185,6 +186,24 @@ namespace osu.Game.Screens.Play
         /// <returns>Whether gameplay should be immediately exited as a result. Returning false allows the gameplay session to continue. Defaults to true.</returns>
         protected virtual bool ShouldExitOnTokenRetrievalFailure(Exception exception) => true;
 
+        public override bool AllowCriticalSettingsAdjustment
+        {
+            get
+            {
+                // General limitations to ensure players don't do anything too weird.
+                // These match stable for now.
+
+                // TODO: the blocking conditions should probably display a message.
+                if (!IsBreakTime.Value && GameplayClockContainer.CurrentTime - GameplayClockContainer.GameplayStartTime > 10000)
+                    return false;
+
+                if (GameplayClockContainer.IsPaused.Value)
+                    return false;
+
+                return base.AllowCriticalSettingsAdjustment;
+            }
+        }
+
         protected override async Task PrepareScoreForResultsAsync(Score score)
         {
             await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
@@ -215,27 +234,38 @@ namespace osu.Game.Screens.Play
             spectatorClient.BeginPlaying(token, GameplayState, Score);
         }
 
-        protected override void OnFail()
+        public override bool Pause()
         {
-            base.OnFail();
+            bool wasPaused = GameplayClockContainer.IsPaused.Value;
 
-            submitFromFailOrQuit();
+            bool paused = base.Pause();
+
+            if (!wasPaused && paused)
+                Score.ScoreInfo.Pauses.Add((int)Math.Round(GameplayClockContainer.CurrentTime));
+
+            return paused;
+        }
+
+        protected override void ConcludeFailedScore(Score score)
+        {
+            base.ConcludeFailedScore(score);
+            submitFromFailOrQuit(score);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
         {
             bool exiting = base.OnExiting(e);
-            submitFromFailOrQuit();
+            submitFromFailOrQuit(Score);
             statics.SetValue(Static.LastLocalUserScore, Score?.ScoreInfo.DeepClone());
             return exiting;
         }
 
-        private void submitFromFailOrQuit()
+        private void submitFromFailOrQuit(Score score)
         {
             if (LoadedBeatmapSuccessfully)
             {
                 // compare: https://github.com/ppy/osu/blob/ccf1acce56798497edfaf92d3ece933469edcf0a/osu.Game/Screens/Play/Player.cs#L848-L851
-                var scoreCopy = Score.DeepClone();
+                var scoreCopy = score.DeepClone();
 
                 Task.Run(async () =>
                 {
@@ -284,6 +314,13 @@ namespace osu.Game.Screens.Play
                 return Task.CompletedTask;
             }
 
+            // zero scores should also never be submitted.
+            if (score.ScoreInfo.TotalScore == 0)
+            {
+                Logger.Log("Zero score, skipping score submission");
+                return Task.CompletedTask;
+            }
+
             // mind the timing of this.
             // once `scoreSubmissionSource` is created, it is presumed that submission is taking place in the background,
             // so all exceptional circumstances that would disallow submission must be handled above.
@@ -316,5 +353,11 @@ namespace osu.Game.Screens.Play
             api.Queue(request);
             return scoreSubmissionSource.Task;
         }
+
+        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score)
+        {
+            AllowRetry = true,
+            IsLocalPlay = true,
+        };
     }
 }
