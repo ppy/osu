@@ -91,6 +91,7 @@ namespace osu.Game.Overlays.SkinEditor
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.BeatmapSkins, beatmapSkins);
+            config.BindWith(OsuSetting.HUDVisibilityMode, configVisibilityMode);
         }
 
         protected override void LoadComplete()
@@ -117,7 +118,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected override void PopIn()
         {
-            globallyDisableBeatmapSkinSetting();
+            overrideSkinEditorRelevantSettings();
 
             if (skinEditor != null)
             {
@@ -159,7 +160,7 @@ namespace osu.Game.Overlays.SkinEditor
             nestedInputManagerDisable?.Dispose();
             nestedInputManagerDisable = null;
 
-            globallyReenableBeatmapSkinSetting();
+            restoreSkinEditorRelevantSettings();
         }
 
         public void PresentGameplay() => presentGameplay(false);
@@ -330,24 +331,33 @@ namespace osu.Game.Overlays.SkinEditor
         private readonly Bindable<bool> beatmapSkins = new Bindable<bool>();
         private LeasedBindable<bool>? leasedBeatmapSkins;
 
-        private void globallyDisableBeatmapSkinSetting()
-        {
-            if (beatmapSkins.Disabled)
-                return;
+        private readonly Bindable<HUDVisibilityMode> configVisibilityMode = new Bindable<HUDVisibilityMode>();
+        private LeasedBindable<HUDVisibilityMode>? leasedVisibilityMode;
 
-            // The skin editor doesn't work well if beatmap skins are being applied to the player screen.
-            // To keep things simple, disable the setting game-wide while using the skin editor.
-            //
-            // This causes a full reload of the skin, which is pretty ugly.
-            // TODO: Investigate if we can avoid this when a beatmap skin is not being applied by the current beatmap.
-            leasedBeatmapSkins = beatmapSkins.BeginLease(true);
-            leasedBeatmapSkins.Value = false;
+        private void overrideSkinEditorRelevantSettings()
+        {
+            if (!beatmapSkins.Disabled)
+            {
+                // The skin editor doesn't work well if beatmap skins are being applied to the player screen.
+                // To keep things simple, disable the setting game-wide while using the skin editor.
+                //
+                // This causes a full reload of the skin, which is pretty ugly.
+                // TODO: Investigate if we can avoid this when a beatmap skin is not being applied by the current beatmap.
+                leasedBeatmapSkins = beatmapSkins.BeginLease(true);
+                leasedBeatmapSkins.Value = false;
+            }
+
+            leasedVisibilityMode = configVisibilityMode.BeginLease(true);
+            leasedVisibilityMode.Value = HUDVisibilityMode.Always;
         }
 
-        private void globallyReenableBeatmapSkinSetting()
+        private void restoreSkinEditorRelevantSettings()
         {
             leasedBeatmapSkins?.Return();
             leasedBeatmapSkins = null;
+
+            leasedVisibilityMode?.Return();
+            leasedVisibilityMode = null;
         }
 
         public new void ToggleVisibility()
