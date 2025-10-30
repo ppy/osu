@@ -701,10 +701,10 @@ namespace osu.Game.Screens.Play
         {
             if (!muteWarningShownOnce.Value)
             {
-                double aggregateVolumeTrack = audioManager.Volume.Value * audioManager.VolumeTrack.Value;
+                double aggregateVolumeTrack = audioManager.AggregateVolume.Value * audioManager.Tracks.AggregateVolume.Value;
 
                 // Checks if the notification has not been shown yet and also if master volume is muted, track/music volume is muted or if the whole game is muted.
-                if (volumeOverlay?.IsMuted.Value == true || Precision.AlmostBigger(volume_requirement, aggregateVolumeTrack))
+                if (Precision.AlmostBigger(volume_requirement, aggregateVolumeTrack))
                 {
                     notificationOverlay?.Post(new MutedNotification());
                     muteWarningShownOnce.Value = true;
@@ -730,6 +730,7 @@ namespace osu.Game.Screens.Play
                     notificationOverlay.Hide();
 
                     volumeOverlay.IsMuted.Value = false;
+                    volumeOverlay.IsMusicMuted.Value = false;
 
                     // Check values before resetting, as the user may have only had mute enabled, in which case we might not need to adjust volumes.
                     // Note that we only restore halfway to ensure the user isn't suddenly overloaded by unexpectedly high volume.
