@@ -55,12 +55,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
-                    Child = panelGridContainer = new PanelGridContainer
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Padding = new MarginPadding(20),
-                        Spacing = new Vector2(panel_spacing)
+                        panelGridContainer = new PanelGridContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Padding = new MarginPadding(20),
+                            Spacing = new Vector2(panel_spacing)
+                        },
+                        new MatchmakingCursorContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
                     },
                 },
                 rollContainer = new Container<BeatmapSelectPanel>
