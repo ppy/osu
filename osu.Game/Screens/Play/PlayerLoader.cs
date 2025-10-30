@@ -168,9 +168,6 @@ namespace osu.Game.Screens.Play
         private INotificationOverlay? notificationOverlay { get; set; }
 
         [Resolved]
-        private VolumeOverlay? volumeOverlay { get; set; }
-
-        [Resolved]
         private AudioManager audioManager { get; set; } = null!;
 
         [Resolved]

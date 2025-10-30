@@ -41,10 +41,13 @@ namespace osu.Game.Overlays.Volume
             {
                 case MuteMode.Master:
                     return audio;
+
                 case MuteMode.Effects:
                     return audio.Samples;
+
                 case MuteMode.Music:
                     return audio.Tracks;
+
                 default:
                     throw new System.Diagnostics.UnreachableException();
             }
