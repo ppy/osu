@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
-using osu.Framework.Logging;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Matchmaking.Events;
@@ -148,8 +147,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
             public void OnCursorPositionReceived(Vector2 position)
             {
-                Logger.Log($"position changed: {position}");
-
                 ClearTransforms(targetMember: nameof(targetAlpha));
 
                 this.MoveTo(position, 100, Easing.Out);
