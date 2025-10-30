@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -30,14 +31,20 @@ namespace osu.Game.Tests.Visual.Online
                 if (supportLevel > 3)
                     supportLevel = 0;
 
-                ((DummyAPIAccess)API).Friends.Add(new APIUser
+                ((DummyAPIAccess)API).Friends.Add(new APIRelation
                 {
-                    Username = @"peppy",
-                    Id = 2,
-                    Colour = "99EB47",
-                    CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
-                    IsSupporter = supportLevel > 0,
-                    SupportLevel = supportLevel
+                    TargetID = 2,
+                    RelationType = RelationType.Friend,
+                    Mutual = true,
+                    TargetUser = new APIUser
+                    {
+                        Username = @"peppy",
+                        Id = 2,
+                        Colour = "99EB47",
+                        CoverUrl = TestResources.COVER_IMAGE_3,
+                        IsSupporter = supportLevel > 0,
+                        SupportLevel = supportLevel
+                    }
                 });
             }
         }

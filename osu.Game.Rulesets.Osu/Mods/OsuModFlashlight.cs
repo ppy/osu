@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     public partial class OsuModFlashlight : ModFlashlight<OsuHitObject>, IApplicableToDrawableHitObject
     {
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModBlinds)).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModBloom), typeof(OsuModBlinds) }).ToArray();
 
         private const double default_follow_delay = 120;
 
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override BindableBool ComboBasedSize { get; } = new BindableBool(true);
 
-        public override float DefaultFlashlightSize => 200;
+        public override float DefaultFlashlightSize => 125;
 
         private OsuFlashlight flashlight = null!;
 

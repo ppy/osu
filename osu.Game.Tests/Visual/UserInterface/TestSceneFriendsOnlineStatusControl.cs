@@ -1,16 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Metadata;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dashboard.Friends;
+using osu.Game.Tests.Visual.Metadata;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -19,37 +20,90 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-        private FriendOnlineStreamControl control;
+        private TestMetadataClient metadataClient = null!;
 
         [SetUp]
-        public void SetUp() => Schedule(() => Child = control = new FriendOnlineStreamControl
+        public void SetUp() => Schedule(() =>
         {
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
+            Child = new DependencyProvidingContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                CachedDependencies =
+                [
+                    (typeof(MetadataClient), metadataClient = new TestMetadataClient())
+                ],
+                Children = new Drawable[]
+                {
+                    metadataClient,
+                    new FriendOnlineStreamControl
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                }
+            };
         });
 
         [Test]
-        public void Populate()
+        public void TestChangeFriends()
         {
-            AddStep("Populate", () => control.Populate(new List<APIUser>
+            AddStep("set 10 friends", () =>
             {
-                new APIUser
+                DummyAPIAccess api = (DummyAPIAccess)API;
+                api.Friends.Clear();
+                api.Friends.AddRange(Enumerable.Range(1, 10).Select(i => new APIRelation
                 {
-                    IsOnline = true
-                },
-                new APIUser
-                {
-                    IsOnline = false
-                },
-                new APIUser
-                {
-                    IsOnline = false
-                }
-            }));
+                    RelationType = RelationType.Friend,
+                    TargetID = i,
+                    TargetUser = new APIUser { Id = i },
+                }));
+            });
 
-            AddAssert("3 users", () => control.Items.FirstOrDefault(item => item.Status == OnlineStatus.All)?.Count == 3);
-            AddAssert("1 online user", () => control.Items.FirstOrDefault(item => item.Status == OnlineStatus.Online)?.Count == 1);
-            AddAssert("2 offline users", () => control.Items.FirstOrDefault(item => item.Status == OnlineStatus.Offline)?.Count == 2);
+            AddStep("set 20 friends", () =>
+            {
+                DummyAPIAccess api = (DummyAPIAccess)API;
+                api.Friends.Clear();
+                api.Friends.AddRange(Enumerable.Range(1, 20).Select(i => new APIRelation
+                {
+                    RelationType = RelationType.Friend,
+                    TargetID = i,
+                    TargetUser = new APIUser { Id = i },
+                }));
+            });
+        }
+
+        [Test]
+        public void TestChangeOnlineStates()
+        {
+            AddStep("set 10 friends", () =>
+            {
+                DummyAPIAccess api = (DummyAPIAccess)API;
+                api.Friends.Clear();
+                api.Friends.AddRange(Enumerable.Range(1, 10).Select(i => new APIRelation
+                {
+                    RelationType = RelationType.Friend,
+                    TargetID = i,
+                    TargetUser = new APIUser { Id = i },
+                }));
+            });
+
+            AddStep("make users 1-5 online", () =>
+            {
+                for (int i = 1; i <= 5; i++)
+                    metadataClient.FriendPresenceUpdated(i, new UserPresence { Status = UserStatus.Online });
+            });
+
+            AddStep("make users 1-5 DnD", () =>
+            {
+                for (int i = 1; i <= 5; i++)
+                    metadataClient.FriendPresenceUpdated(i, new UserPresence { Status = UserStatus.DoNotDisturb });
+            });
+
+            AddStep("make users 1-5 offline", () =>
+            {
+                for (int i = 1; i <= 5; i++)
+                    metadataClient.FriendPresenceUpdated(i, null);
+            });
         }
     }
 }

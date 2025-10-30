@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -12,6 +13,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose;
+using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -63,29 +65,36 @@ namespace osu.Game.Rulesets.Edit
             startTimeBindable.BindValueChanged(_ => ApplyDefaultsToHitObject(), true);
         }
 
+        private bool placementBegun;
+
         protected override void BeginPlacement(bool commitStart = false)
         {
             base.BeginPlacement(commitStart);
 
-            placementHandler.BeginPlacement(HitObject);
+            if (State.Value == Visibility.Visible)
+                placementHandler.ShowPlacement(HitObject);
+
+            placementBegun = true;
         }
 
         public override void EndPlacement(bool commit)
         {
             base.EndPlacement(commit);
 
-            placementHandler.EndPlacement(HitObject, IsValidForPlacement && commit);
+            if (IsValidForPlacement && commit)
+                placementHandler.CommitPlacement(HitObject);
+            else
+                placementHandler.HidePlacement();
         }
 
         /// <summary>
-        /// Updates the time and position of this <see cref="PlacementBlueprint"/> based on the provided snap information.
+        /// Updates the time and position of this <see cref="PlacementBlueprint"/>.
         /// </summary>
-        /// <param name="result">The snap result information.</param>
-        public override void UpdateTimeAndPosition(SnapResult result)
+        public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double time)
         {
             if (PlacementActive == PlacementState.Waiting)
             {
-                HitObject.StartTime = result.Time ?? EditorClock.CurrentTime;
+                HitObject.StartTime = time;
 
                 if (HitObject is IHasComboInformation comboInformation)
                     comboInformation.UpdateComboInformation(getPreviousHitObject() as IHasComboInformation);
@@ -120,6 +129,8 @@ namespace osu.Game.Rulesets.Edit
                 for (int i = 0; i < hasRepeats.NodeSamples.Count; i++)
                     hasRepeats.NodeSamples[i] = HitObject.Samples.Select(o => o.With()).ToList();
             }
+
+            return new SnapResult(screenSpacePosition, time);
         }
 
         /// <summary>
@@ -127,5 +138,19 @@ namespace osu.Game.Rulesets.Edit
         /// refreshing <see cref="Objects.HitObject.NestedHitObjects"/> and parameters for the <see cref="HitObject"/>.
         /// </summary>
         protected void ApplyDefaultsToHitObject() => HitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+
+            if (placementBegun)
+                placementHandler.ShowPlacement(HitObject);
+        }
+
+        protected override void PopOut()
+        {
+            base.PopOut();
+            placementHandler.HidePlacement();
+        }
     }
 }

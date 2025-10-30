@@ -1,17 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Input;
 using osu.Game.Input.Bindings;
-using osu.Game.Localisation;
 using osu.Game.Online.Rooms;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
 
@@ -20,8 +18,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     public partial class GameplayChatDisplay : MatchChatDisplay, IKeyBindingHandler<GlobalAction>
     {
         [Resolved(CanBeNull = true)]
-        [CanBeNull]
-        private ILocalUserPlayInfo localUserInfo { get; set; }
+        private ILocalUserPlayInfo? localUserInfo { get; set; }
+
+        protected new ChatTextBox TextBox => base.TextBox!;
 
         private readonly IBindable<LocalUserPlayingState> localUserPlaying = new Bindable<LocalUserPlayingState>();
 
@@ -32,6 +31,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private readonly Bindable<bool> expandedFromTextBoxFocus = new Bindable<bool>();
 
         private const float height = 100;
+        private const float width = 260;
 
         public override bool PropagateNonPositionalInputSubTree => true;
 
@@ -39,16 +39,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             : base(room, leaveChannelOnDispose: false)
         {
             RelativeSizeAxes = Axes.X;
-
             Background.Alpha = 0.2f;
+        }
 
-            TextBox.PlaceholderText = ChatStrings.InGameInputPlaceholder;
-            TextBox.Focus = () => TextBox.PlaceholderText = Resources.Localisation.Web.ChatStrings.InputPlaceholder;
+        [BackgroundDependencyLoader]
+        private void load(RealmKeyBindingStore keyBindingStore)
+        {
+            resetPlaceholderText();
+            TextBox.Focus = () => TextBox.PlaceholderText = ChatStrings.InputPlaceholder;
             TextBox.FocusLost = () =>
             {
-                TextBox.PlaceholderText = ChatStrings.InGameInputPlaceholder;
+                resetPlaceholderText();
                 expandedFromTextBoxFocus.Value = false;
             };
+
+            void resetPlaceholderText() => TextBox.PlaceholderText = Localisation.ChatStrings.InGameInputPlaceholder(keyBindingStore.GetBindingsStringFor(GlobalAction.ToggleChatFocus));
         }
 
         protected override bool OnHover(HoverEvent e) => true; // use UI mouse cursor.
@@ -62,7 +67,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             localUserPlaying.BindValueChanged(playing =>
             {
-                // for now let's never hold focus. this avoid misdirected gameplay keys entering chat.
+                // for now let's never hold focus. this avoids misdirected gameplay keys entering chat.
                 // note that this is done within this callback as it triggers an un-focus as well.
                 TextBox.HoldFocus = false;
 

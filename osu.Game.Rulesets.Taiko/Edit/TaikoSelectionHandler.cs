@@ -54,18 +54,15 @@ namespace osu.Game.Rulesets.Taiko.Edit
 
         public void SetStrongState(bool state)
         {
-            if (SelectedItems.OfType<Hit>().All(h => h.IsStrong == state))
+            if (SelectedItems.OfType<TaikoStrongableHitObject>().All(h => h.IsStrong == state))
                 return;
 
             EditorBeatmap.PerformOnSelection(h =>
             {
-                if (!(h is Hit taikoHit)) return;
+                if (h is not TaikoStrongableHitObject strongable) return;
 
-                if (taikoHit.IsStrong != state)
-                {
-                    taikoHit.IsStrong = state;
-                    EditorBeatmap.Update(taikoHit);
-                }
+                if (strongable.IsStrong != state)
+                    strongable.IsStrong = state;
             });
         }
 
@@ -77,10 +74,7 @@ namespace osu.Game.Rulesets.Taiko.Edit
             EditorBeatmap.PerformOnSelection(h =>
             {
                 if (h is Hit taikoHit)
-                {
                     taikoHit.Type = state ? HitType.Rim : HitType.Centre;
-                    EditorBeatmap.Update(h);
-                }
             });
         }
 

@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Play
 
         private readonly Func<Task<ScoreInfo>>? importFailedScore;
 
-        private ScoreInfo? importedScore;
+        private Live<ScoreInfo>? importedScore;
 
         private DownloadButton button = null!;
 
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Play
                     switch (state.Value)
                     {
                         case DownloadState.LocallyAvailable:
-                            game?.PresentScore(importedScore, ScorePresentType.Gameplay);
+                            game?.PresentScore(importedScore?.Value, ScorePresentType.Gameplay);
                             break;
 
                         case DownloadState.NotDownloaded:
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Play
                             {
                                 Task.Run(importFailedScore).ContinueWith(t =>
                                 {
-                                    importedScore = realm.Run(r => r.Find<ScoreInfo>(t.GetResultSafely().ID)?.Detach());
+                                    importedScore = realm.Run<Live<ScoreInfo>?>(r => r.Find<ScoreInfo>(t.GetResultSafely().ID)?.ToLive(realm));
                                     Schedule(() => state.Value = importedScore != null ? DownloadState.LocallyAvailable : DownloadState.NotDownloaded);
                                 }).FireAndForget();
                             }
@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Play
 
             if (player != null)
             {
-                importedScore = realm.Run(r => r.Find<ScoreInfo>(player.Score.ScoreInfo.ID)?.Detach());
+                importedScore = realm.Run(r => r.Find<ScoreInfo>(player.Score.ScoreInfo.ID)?.ToLive(realm));
                 state.Value = importedScore != null ? DownloadState.LocallyAvailable : DownloadState.NotDownloaded;
             }
 
@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Play
         {
             if (state.NewValue != DownloadState.LocallyAvailable) return;
 
-            if (importedScore != null) scoreManager.Export(importedScore);
+            if (importedScore != null) scoreManager.Export(importedScore.Value);
 
             this.state.ValueChanged -= exportWhenReady;
         }

@@ -36,9 +36,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private Box topBackground = null!;
         private Box background = null!;
 
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -117,19 +114,19 @@ namespace osu.Game.Overlays.Profile.Header.Components
             topBackground.Colour = colourProvider.Background5;
 
             totalParticipation.Value = DailyChallengeStatsDisplayStrings.UnitDay(statistics.PlayCount.ToLocalisableString(@"N0"));
-            totalParticipation.ValueColour = colours.ForRankingTier(TierForPlayCount(statistics.PlayCount));
+            totalParticipation.ValueColour = OsuColour.ForRankingTier(TierForPlayCount(statistics.PlayCount));
 
             currentDaily.Value = DailyChallengeStatsDisplayStrings.UnitDay(content.Statistics.DailyStreakCurrent.ToLocalisableString(@"N0"));
-            currentDaily.ValueColour = colours.ForRankingTier(TierForDaily(statistics.DailyStreakCurrent));
+            currentDaily.ValueColour = OsuColour.ForRankingTier(TierForDaily(statistics.DailyStreakCurrent));
 
             currentWeekly.Value = DailyChallengeStatsDisplayStrings.UnitWeek(statistics.WeeklyStreakCurrent.ToLocalisableString(@"N0"));
-            currentWeekly.ValueColour = colours.ForRankingTier(TierForWeekly(statistics.WeeklyStreakCurrent));
+            currentWeekly.ValueColour = OsuColour.ForRankingTier(TierForWeekly(statistics.WeeklyStreakCurrent));
 
             bestDaily.Value = DailyChallengeStatsDisplayStrings.UnitDay(statistics.DailyStreakBest.ToLocalisableString(@"N0"));
-            bestDaily.ValueColour = colours.ForRankingTier(TierForDaily(statistics.DailyStreakBest));
+            bestDaily.ValueColour = OsuColour.ForRankingTier(TierForDaily(statistics.DailyStreakBest));
 
             bestWeekly.Value = DailyChallengeStatsDisplayStrings.UnitWeek(statistics.WeeklyStreakBest.ToLocalisableString(@"N0"));
-            bestWeekly.ValueColour = colours.ForRankingTier(TierForWeekly(statistics.WeeklyStreakBest));
+            bestWeekly.ValueColour = OsuColour.ForRankingTier(TierForWeekly(statistics.WeeklyStreakBest));
 
             topTen.Value = statistics.Top10PercentPlacements.ToLocalisableString(@"N0");
             topTen.ValueColour = colourProvider.Content2;
@@ -138,34 +135,31 @@ namespace osu.Game.Overlays.Profile.Header.Components
             topFifty.ValueColour = colourProvider.Content2;
         }
 
-        // reference: https://github.com/ppy/osu-web/blob/adf1e94754ba9625b85eba795f4a310caf169eec/resources/js/profile-page/daily-challenge.tsx#L13-L47
+        // reference: https://github.com/ppy/osu-web/blob/a97f156014e00ea1aa315140da60542e798a9f06/resources/js/profile-page/daily-challenge.tsx#L13-L47
 
-        // Rounding up is needed here to ensure the overlay shows the same colour as osu-web for the play count.
-        // This is because, for example, 31 / 3 > 10 in JavaScript because floats are used, while here it would
-        // get truncated to 10 with an integer division and show a lower tier.
-        public static RankingTier TierForPlayCount(int playCount) => TierForDaily((int)Math.Ceiling(playCount / 3.0d));
+        public static RankingTier TierForPlayCount(int playCount) => TierForDaily((int)Math.Floor(playCount / 3.0d));
 
         public static RankingTier TierForDaily(int daily)
         {
-            if (daily > 360)
+            if (daily >= 360)
                 return RankingTier.Lustrous;
 
-            if (daily > 240)
+            if (daily >= 240)
                 return RankingTier.Radiant;
 
-            if (daily > 120)
+            if (daily >= 120)
                 return RankingTier.Rhodium;
 
-            if (daily > 60)
+            if (daily >= 60)
                 return RankingTier.Platinum;
 
-            if (daily > 30)
+            if (daily >= 30)
                 return RankingTier.Gold;
 
-            if (daily > 10)
+            if (daily >= 10)
                 return RankingTier.Silver;
 
-            if (daily > 5)
+            if (daily >= 5)
                 return RankingTier.Bronze;
 
             return RankingTier.Iron;

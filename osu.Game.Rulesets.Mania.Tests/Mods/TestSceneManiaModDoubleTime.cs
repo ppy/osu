@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
                                   && Precision.AlmostEquals(Player.ScoreProcessor.Accuracy.Value, 0.9836, 0.01)
                                   && Player.ScoreProcessor.TotalScore.Value == 946_049,
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo },
                 Difficulty = { OverallDifficulty = 10 },
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
                                       && Player.ScoreProcessor.Accuracy.Value == 1
                                       && Player.ScoreProcessor.TotalScore.Value == (long)(1_000_000 * doubleTime.ScoreMultiplier),
                 Autoplay = false,
-                Beatmap = new Beatmap
+                CreateBeatmap = () => new Beatmap
                 {
                     BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo },
                     Difficulty = { OverallDifficulty = 10 },

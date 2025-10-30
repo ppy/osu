@@ -40,6 +40,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private Editor? editor { get; set; }
 
+        [Resolved]
+        private TimelineBlueprintContainer? timelineBlueprintContainer { get; set; }
+
         public SamplePointPiece(HitObject hitObject)
         {
             HitObject = hitObject;
@@ -55,11 +58,47 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [BackgroundDependencyLoader]
         private void load()
         {
-            HitObject.DefaultsApplied += _ => updateText();
+            Label.AllowMultiline = false;
+            LabelContainer.AutoSizeAxes = Axes.None;
             updateText();
 
             if (editor != null)
                 editor.ShowSampleEditPopoverRequested += onShowSampleEditPopoverRequested;
+        }
+
+        private readonly Bindable<bool> contracted = new Bindable<bool>();
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            HitObject.DefaultsApplied += onDefaultsApplied;
+
+            if (timelineBlueprintContainer != null)
+                contracted.BindTo(timelineBlueprintContainer.SamplePointContracted);
+
+            contracted.BindValueChanged(v =>
+            {
+                if (v.NewValue)
+                {
+                    Label.FadeOut(200, Easing.OutQuint);
+                    LabelContainer.ResizeTo(new Vector2(12), 200, Easing.OutQuint);
+                    LabelContainer.CornerRadius = 6;
+                }
+                else
+                {
+                    Label.FadeIn(200, Easing.OutQuint);
+                    LabelContainer.ResizeTo(new Vector2(Label.Width, 16), 200, Easing.OutQuint);
+                    LabelContainer.CornerRadius = 8;
+                }
+            }, true);
+
+            FinishTransforms();
+        }
+
+        private void onDefaultsApplied(HitObject hitObject)
+        {
+            updateText();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -68,6 +107,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             if (editor != null)
                 editor.ShowSampleEditPopoverRequested -= onShowSampleEditPopoverRequested;
+
+            HitObject.DefaultsApplied -= onDefaultsApplied;
         }
 
         private void onShowSampleEditPopoverRequested(double time)
@@ -87,6 +128,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private void updateText()
         {
             Label.Text = $"{abbreviateBank(GetBankValue(GetSamples()))} {GetVolumeValue(GetSamples())}";
+
+            if (!contracted.Value)
+                LabelContainer.ResizeWidthTo(Label.Width, 200, Easing.OutQuint);
         }
 
         private static string? abbreviateBank(string? bank)
@@ -107,7 +151,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public static string? GetAdditionBankValue(IEnumerable<HitSampleInfo> samples)
         {
-            return samples.FirstOrDefault(o => o.Name != HitSampleInfo.HIT_NORMAL)?.Bank;
+            var firstAddition = samples.FirstOrDefault(o => o.Name != HitSampleInfo.HIT_NORMAL);
+            if (firstAddition == null)
+                return null;
+
+            return firstAddition.EditorAutoBank ? EditorSelectionHandler.HIT_BANK_AUTO : firstAddition.Bank;
         }
 
         public static int GetVolumeValue(ICollection<HitSampleInfo> samples)
@@ -259,7 +307,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 createStateBindables();
                 updateTernaryStates();
-                togglesCollection.AddRange(createTernaryButtons().Select(b => new DrawableTernaryButton(b) { RelativeSizeAxes = Axes.None, Size = new Vector2(40, 40) }));
+                togglesCollection.AddRange(createTernaryButtons());
             }
 
             private string? getCommonBank() => allRelevantSamples.Select(h => GetBankValue(h.samples)).Distinct().Count() == 1
@@ -320,7 +368,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     for (int i = 0; i < relevantSamples.Count; i++)
                     {
-                        if (relevantSamples[i].Name != HitSampleInfo.HIT_NORMAL) continue;
+                        if (relevantSamples[i].Name != HitSampleInfo.HIT_NORMAL && !relevantSamples[i].EditorAutoBank) continue;
 
                         relevantSamples[i] = relevantSamples[i].With(newBank: newBank);
                     }
@@ -331,11 +379,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 updateAllRelevantSamples((_, relevantSamples) =>
                 {
+                    string normalBank = relevantSamples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank ?? HitSampleInfo.BANK_SOFT;
+
                     for (int i = 0; i < relevantSamples.Count; i++)
                     {
-                        if (relevantSamples[i].Name == HitSampleInfo.HIT_NORMAL) continue;
+                        if (relevantSamples[i].Name == HitSampleInfo.HIT_NORMAL)
+                            continue;
 
-                        relevantSamples[i] = relevantSamples[i].With(newBank: newBank);
+                        // Addition samples with bank set to auto should inherit the bank of the normal sample
+                        if (newBank == EditorSelectionHandler.HIT_BANK_AUTO)
+                        {
+                            relevantSamples[i] = relevantSamples[i].With(newBank: normalBank, newEditorAutoBank: true);
+                        }
+                        else
+                            relevantSamples[i] = relevantSamples[i].With(newBank: newBank, newEditorAutoBank: false);
                     }
                 });
             }
@@ -359,7 +416,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             private void createStateBindables()
             {
-                foreach (string sampleName in HitSampleInfo.AllAdditions)
+                foreach (string sampleName in HitSampleInfo.ALL_ADDITIONS)
                 {
                     var bindable = new Bindable<TernaryState>
                     {
@@ -383,7 +440,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     selectionSampleStates[sampleName] = bindable;
                 }
 
-                banks.AddRange(HitSampleInfo.AllBanks);
+                banks.AddRange(HitSampleInfo.ALL_BANKS.Prepend(EditorSelectionHandler.HIT_BANK_AUTO));
             }
 
             private void updateTernaryStates()
@@ -394,10 +451,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
             }
 
-            private IEnumerable<TernaryButton> createTernaryButtons()
+            private IEnumerable<DrawableTernaryButton> createTernaryButtons()
             {
                 foreach ((string sampleName, var bindable) in selectionSampleStates)
-                    yield return new TernaryButton(bindable, string.Empty, () => ComposeBlueprintContainer.GetIconForSample(sampleName));
+                {
+                    yield return new DrawableTernaryButton
+                    {
+                        Current = bindable,
+                        Description = string.Empty,
+                        CreateIcon = () => ComposeBlueprintContainer.GetIconForSample(sampleName),
+                        RelativeSizeAxes = Axes.None,
+                        Size = new Vector2(40, 40),
+                    };
+                }
             }
 
             private void addHitSample(string sampleName)
@@ -448,7 +514,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     if (string.IsNullOrEmpty(newBank))
                         return true;
 
-                    if (e.ShiftPressed)
+                    if (e.ShiftPressed && newBank != EditorSelectionHandler.HIT_BANK_AUTO)
                     {
                         setBank(newBank);
                         updatePrimaryBankState();
@@ -462,11 +528,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
                 else
                 {
-                    var item = togglesCollection.ElementAtOrDefault(rightIndex);
+                    var item = togglesCollection.ElementAtOrDefault(rightIndex - 1);
 
                     if (item is not DrawableTernaryButton button) return base.OnKeyDown(e);
 
-                    button.Button.Toggle();
+                    button.Toggle();
                 }
 
                 return true;
@@ -476,16 +542,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 switch (key)
                 {
-                    case Key.W:
+                    case Key.Q:
                         index = 0;
                         break;
 
-                    case Key.E:
+                    case Key.W:
                         index = 1;
                         break;
 
-                    case Key.R:
+                    case Key.E:
                         index = 2;
+                        break;
+
+                    case Key.R:
+                        index = 3;
                         break;
 
                     default:

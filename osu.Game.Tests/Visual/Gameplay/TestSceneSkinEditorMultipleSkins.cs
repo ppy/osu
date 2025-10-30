@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Tests.Gameplay;
 using osuTK.Input;
 
@@ -36,6 +37,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Cached]
         public readonly EditorClipboard Clipboard = new EditorClipboard();
+
+        [Cached(typeof(IGameplayLeaderboardProvider))]
+        private EmptyGameplayLeaderboardProvider leaderboardProvider = new EmptyGameplayLeaderboardProvider();
 
         public TestSceneSkinEditorMultipleSkins()
         {

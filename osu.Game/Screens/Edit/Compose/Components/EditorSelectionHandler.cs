@@ -3,23 +3,30 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Audio;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     public partial class EditorSelectionHandler : SelectionHandler<HitObject>
     {
+        /// <summary>
+        /// Whether right click should delete even when shift is not held.
+        /// </summary>
+        public bool RightClickAlwaysQuickDeletes { get; set; }
+
         /// <summary>
         /// A special bank name that is only used in the editor UI.
         /// When selected and in placement mode, the bank of the last hit object will always be used.
@@ -37,7 +44,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // bring in updates from selection changes
             EditorBeatmap.HitObjectUpdated += _ => Scheduler.AddOnce(UpdateTernaryStates);
 
-            SelectedItems.CollectionChanged += (_, _) => Scheduler.AddOnce(UpdateTernaryStates);
+            SelectedItems.CollectionChanged += onSelectedItemsChanged;
+        }
+
+        protected override bool ShouldQuickDelete(MouseButtonEvent e)
+        {
+            if (RightClickAlwaysQuickDeletes && e.Button == MouseButton.Right)
+                return true;
+
+            return base.ShouldQuickDelete(e);
         }
 
         protected override void DeleteItems(IEnumerable<HitObject> items) => EditorBeatmap.RemoveRange(items);
@@ -65,11 +80,21 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public readonly Dictionary<string, Bindable<TernaryState>> SelectionAdditionBankStates = new Dictionary<string, Bindable<TernaryState>>();
 
         /// <summary>
+        /// Whether there is no selection and the auto <see cref="SelectionBankStates"/> can be used.
+        /// </summary>
+        public readonly Bindable<bool> AutoSelectionBankEnabled = new Bindable<bool>();
+
+        /// <summary>
+        /// Whether the selection contains any addition samples and the <see cref="SelectionAdditionBankStates"/> can be used.
+        /// </summary>
+        public readonly Bindable<bool> SelectionAdditionBanksEnabled = new Bindable<bool>();
+
+        /// <summary>
         /// Set up ternary state bindables and bind them to selection/hitobject changes (in both directions)
         /// </summary>
         private void createStateBindables()
         {
-            foreach (string bankName in HitSampleInfo.AllBanks.Prepend(HIT_BANK_AUTO))
+            foreach (string bankName in HitSampleInfo.ALL_BANKS.Prepend(HIT_BANK_AUTO))
             {
                 var bindable = new Bindable<TernaryState>
                 {
@@ -133,7 +158,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 SelectionBankStates[bankName] = bindable;
             }
 
-            foreach (string bankName in HitSampleInfo.AllBanks.Prepend(HIT_BANK_AUTO))
+            foreach (string bankName in HitSampleInfo.ALL_BANKS.Prepend(HIT_BANK_AUTO))
             {
                 var bindable = new Bindable<TernaryState>
                 {
@@ -153,10 +178,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                             }
                             else
                             {
-                                // Auto should never apply when there is a selection made.
-                                if (bankName == HIT_BANK_AUTO)
-                                    break;
-
                                 // Completely empty selections should be allowed in the case that none of the selected objects have any addition samples.
                                 // This is also required to stop a bindable feedback loop when a HitObject has zero addition samples (and LINQ `All` below becomes true).
                                 if (SelectedItems.SelectMany(enumerateAllSamples).All(h => h.All(o => o.Name == HitSampleInfo.HIT_NORMAL)))
@@ -164,8 +185,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                                 // Never remove a sample bank.
                                 // These are basically radio buttons, not toggles.
-                                if (SelectedItems.SelectMany(enumerateAllSamples).All(h => h.Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(s => s.Bank == bankName)))
-                                    bindable.Value = TernaryState.True;
+                                if (bankName == HIT_BANK_AUTO)
+                                {
+                                    if (SelectedItems.SelectMany(enumerateAllSamples).All(h => h.Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(s => s.EditorAutoBank)))
+                                        bindable.Value = TernaryState.True;
+                                }
+                                else
+                                {
+                                    if (SelectedItems.SelectMany(enumerateAllSamples).All(h => h.Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(s => s.Bank == bankName && !s.EditorAutoBank)))
+                                        bindable.Value = TernaryState.True;
+                                }
                             }
 
                             break;
@@ -183,14 +212,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                             }
                             else
                             {
-                                // Auto should just not apply if there's a selection already made.
-                                // Maybe we could make it a disabled button in the future, but right now the editor buttons don't support disabled state.
-                                if (bankName == HIT_BANK_AUTO)
-                                {
-                                    bindable.Value = TernaryState.False;
-                                    break;
-                                }
-
                                 // If none of the selected objects have any addition samples, we should not apply the addition bank.
                                 if (SelectedItems.SelectMany(enumerateAllSamples).All(h => h.All(o => o.Name == HitSampleInfo.HIT_NORMAL)))
                                 {
@@ -208,11 +229,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 SelectionAdditionBankStates[bankName] = bindable;
             }
 
-            // start with normal selected.
-            SelectionBankStates[SampleControlPoint.DEFAULT_BANK].Value = TernaryState.True;
-            SelectionAdditionBankStates[SampleControlPoint.DEFAULT_BANK].Value = TernaryState.True;
+            resetTernaryStates();
 
-            foreach (string sampleName in HitSampleInfo.AllAdditions)
+            foreach (string sampleName in HitSampleInfo.ALL_ADDITIONS)
             {
                 var bindable = new Bindable<TernaryState>
                 {
@@ -252,12 +271,28 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
         }
 
+        private void resetTernaryStates()
+        {
+            if (SelectedItems.Count > 0)
+                return;
+
+            SelectionNewComboState.Value = TernaryState.False;
+            AutoSelectionBankEnabled.Value = true;
+            SelectionAdditionBanksEnabled.Value = true;
+            SelectionBankStates[HIT_BANK_AUTO].Value = TernaryState.True;
+            SelectionAdditionBankStates[HIT_BANK_AUTO].Value = TernaryState.True;
+            foreach (var (_, sampleState) in SelectionSampleStates)
+                sampleState.Value = TernaryState.False;
+        }
+
         /// <summary>
         /// Called when context menu ternary states may need to be recalculated (selection changed or hitobject updated).
         /// </summary>
         protected virtual void UpdateTernaryStates()
         {
-            SelectionNewComboState.Value = GetStateFromSelection(SelectedItems.OfType<IHasComboInformation>(), h => h.NewCombo);
+            if (SelectedItems.Any())
+                SelectionNewComboState.Value = GetStateFromSelection(SelectedItems.OfType<IHasComboInformation>(), h => h.NewCombo);
+            AutoSelectionBankEnabled.Value = SelectedItems.Count == 0;
 
             var samplesInSelection = SelectedItems.SelectMany(enumerateAllSamples).ToArray();
 
@@ -271,10 +306,22 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s).Where(o => o.Name == HitSampleInfo.HIT_NORMAL), h => h.Bank == bankName);
             }
 
+            SelectionAdditionBanksEnabled.Value = samplesInSelection.SelectMany(s => s).Any(o => o.Name != HitSampleInfo.HIT_NORMAL);
+
             foreach ((string bankName, var bindable) in SelectionAdditionBankStates)
             {
-                bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s).Where(o => o.Name != HitSampleInfo.HIT_NORMAL), h => h.Bank == bankName);
+                bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s).Where(o => o.Name != HitSampleInfo.HIT_NORMAL),
+                    h => (bankName != HIT_BANK_AUTO && h.Bank == bankName && !h.EditorAutoBank) || (bankName == HIT_BANK_AUTO && h.EditorAutoBank));
             }
+        }
+
+        private void onSelectedItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            // Reset the ternary states when the selection is cleared.
+            if (SelectedItems.Count == 0)
+                Scheduler.AddOnce(resetTernaryStates);
+            else
+                Scheduler.AddOnce(UpdateTernaryStates);
         }
 
         private IEnumerable<IList<HitSampleInfo>> enumerateAllSamples(HitObject hitObject)
@@ -326,8 +373,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     for (int i = 0; i < hasRepeats.NodeSamples.Count; ++i)
                         hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: bankName) : s).ToList();
                 }
-
-                EditorBeatmap.Update(h);
             });
         }
 
@@ -337,36 +382,37 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="bankName">The name of the sample bank.</param>
         public void SetSampleAdditionBank(string bankName)
         {
-            bool hasRelevantBank(HitObject hitObject)
-            {
-                bool result = hitObject.Samples.Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(s => s.Bank == bankName);
-
-                if (hitObject is IHasRepeats hasRepeats)
-                {
-                    foreach (var node in hasRepeats.NodeSamples)
-                        result &= node.Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(s => s.Bank == bankName);
-                }
-
-                return result;
-            }
+            bool hasRelevantBank(HitObject hitObject) =>
+                bankName == HIT_BANK_AUTO
+                    ? enumerateAllSamples(hitObject).SelectMany(o => o).Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(s => s.EditorAutoBank)
+                    : enumerateAllSamples(hitObject).SelectMany(o => o).Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(s => s.Bank == bankName && !s.EditorAutoBank);
 
             if (SelectedItems.All(hasRelevantBank))
                 return;
 
             EditorBeatmap.PerformOnSelection(h =>
             {
-                if (enumerateAllSamples(h).SelectMany(o => o).Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(s => s.Bank == bankName))
+                if (hasRelevantBank(h))
                     return;
 
-                h.Samples = h.Samples.Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? s.With(newBank: bankName) : s).ToList();
+                string normalBank = h.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank ?? HitSampleInfo.BANK_SOFT;
+                h.Samples = h.Samples.Select(s =>
+                                 s.Name != HitSampleInfo.HIT_NORMAL
+                                     ? bankName == HIT_BANK_AUTO ? s.With(newBank: normalBank, newEditorAutoBank: true) : s.With(newBank: bankName, newEditorAutoBank: false)
+                                     : s)
+                             .ToList();
 
                 if (h is IHasRepeats hasRepeats)
                 {
                     for (int i = 0; i < hasRepeats.NodeSamples.Count; ++i)
-                        hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? s.With(newBank: bankName) : s).ToList();
+                    {
+                        normalBank = hasRepeats.NodeSamples[i].FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank ?? HitSampleInfo.BANK_SOFT;
+                        hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Select(s =>
+                            s.Name != HitSampleInfo.HIT_NORMAL
+                                ? bankName == HIT_BANK_AUTO ? s.With(newBank: normalBank, newEditorAutoBank: true) : s.With(newBank: bankName, newEditorAutoBank: false)
+                                : s).ToList();
+                    }
                 }
-
-                EditorBeatmap.Update(h);
             });
         }
 
@@ -407,15 +453,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                         var hitSample = h.CreateHitSampleInfo(sampleName);
 
-                        string? existingAdditionBank = node.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL)?.Bank;
-                        if (existingAdditionBank != null)
-                            hitSample = hitSample.With(newBank: existingAdditionBank);
+                        HitSampleInfo? existingAddition = node.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL);
+                        if (existingAddition != null)
+                            hitSample = hitSample.With(newBank: existingAddition.Bank, newEditorAutoBank: existingAddition.EditorAutoBank);
 
                         node.Add(hitSample);
                     }
                 }
-
-                EditorBeatmap.Update(h);
             });
         }
 
@@ -437,8 +481,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     for (int i = 0; i < hasRepeats.NodeSamples.Count; ++i)
                         hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Where(s => s.Name != sampleName).ToList();
                 }
-
-                EditorBeatmap.Update(h);
             });
         }
 
@@ -459,7 +501,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (comboInfo == null || comboInfo.NewCombo == state) return;
 
                 comboInfo.NewCombo = state;
-                EditorBeatmap.Update(h);
             });
         }
 
