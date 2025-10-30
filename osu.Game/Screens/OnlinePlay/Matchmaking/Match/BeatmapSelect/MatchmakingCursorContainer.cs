@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -93,6 +94,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         {
             if (cursorLookup.Remove(user.UserID, out var cursor))
                 cursor.Expire();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            if (client.IsNotNull())
+            {
+                client.UserJoined -= onUserJoined;
+                client.UserLeft -= onUserLeft;
+                client.MatchEvent -= onMatchEvent;
+            }
+
+            base.Dispose(isDisposing);
         }
 
         private partial class Cursor : CompositeDrawable
