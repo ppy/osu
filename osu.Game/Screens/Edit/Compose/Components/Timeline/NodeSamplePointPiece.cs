@@ -22,6 +22,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             NodeIndex = nodeIndex;
         }
 
+        protected override double GetTime()
+        {
+            var hasRepeats = (IHasRepeats)HitObject;
+            return HitObject.StartTime + hasRepeats.Duration * NodeIndex / hasRepeats.SpanCount();
+        }
+
         protected override IList<HitSampleInfo> GetSamples()
         {
             var hasRepeats = (IHasRepeats)HitObject;

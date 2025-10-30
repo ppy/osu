@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Skinning;
 using osu.Game.Tests.Gameplay;
 
@@ -42,10 +43,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached(typeof(IGameplayClock))]
         private readonly IGameplayClock gameplayClock = new GameplayClockContainer(new TrackVirtual(60000), false, false);
 
+        [Cached(typeof(IGameplayLeaderboardProvider))]
+        private EmptyGameplayLeaderboardProvider leaderboardProvider = new EmptyGameplayLeaderboardProvider();
+
         private IEnumerable<HUDOverlay> hudOverlays => CreatedDrawables.OfType<HUDOverlay>();
 
         // best way to check without exposing.
-        private Drawable hideTarget => hudOverlay.ChildrenOfType<SkinComponentsContainer>().First();
+        private Drawable hideTarget => hudOverlay.ChildrenOfType<SkinnableContainer>().First();
         private Drawable keyCounterFlow => hudOverlay.ChildrenOfType<KeyCounterDisplay>().First().ChildrenOfType<FillFlowContainer<KeyCounter>>().Single();
 
         public TestSceneSkinnableHUDOverlay()
@@ -101,7 +105,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
             AddUntilStep("HUD overlay loaded", () => hudOverlay.IsAlive);
             AddUntilStep("components container loaded",
-                () => hudOverlay.ChildrenOfType<SkinComponentsContainer>().Any(scc => scc.ComponentsLoaded));
+                () => hudOverlay.ChildrenOfType<SkinnableContainer>().Any(scc => scc.ComponentsLoaded));
         }
 
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();

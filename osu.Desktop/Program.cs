@@ -14,7 +14,7 @@ using osu.Game;
 using osu.Game.IPC;
 using osu.Game.Tournament;
 using SDL;
-using Squirrel;
+using Velopack;
 
 namespace osu.Desktop
 {
@@ -28,22 +28,16 @@ namespace osu.Desktop
 
         private static LegacyTcpIpcProvider? legacyIpc;
 
+        private static bool isFirstRun;
+
         [STAThread]
         public static void Main(string[] args)
         {
-            /*
-             * WARNING: DO NOT PLACE **ANY** CODE ABOVE THE FOLLOWING BLOCK!
-             *
-             * Logic handling Squirrel MUST run before EVERYTHING if you do not want to break it.
-             * To be more precise: Squirrel is internally using a rather... crude method to determine whether it is running under NUnit,
-             * namely by checking loaded assemblies:
-             * https://github.com/clowd/Clowd.Squirrel/blob/24427217482deeeb9f2cacac555525edfc7bd9ac/src/Squirrel/SimpleSplat/PlatformModeDetector.cs#L17-L32
-             *
-             * If it finds ANY assembly from the ones listed above - REGARDLESS of the reason why it is loaded -
-             * the app will then do completely broken things like:
-             * - not creating system shortcuts (as the logic is if'd out if "running tests")
-             * - not exiting after the install / first-update / uninstall hooks are ran (as the `Environment.Exit()` calls are if'd out if "running tests")
-             */
+            // IMPORTANT DON'T IGNORE: For general sanity, velopack's setup needs to run before anything else.
+            // This has bitten us in the rear before (bricked updater), and although the underlying issue from
+            // last time has been fixed, let's not tempt fate.
+            setupVelopack(args);
+
             if (OperatingSystem.IsWindows())
             {
                 var windowsVersion = Environment.OSVersion.Version;
@@ -66,8 +60,6 @@ namespace osu.Desktop
                         return;
                     }
                 }
-
-                setupSquirrel();
             }
 
             // NVIDIA profiles are based on the executable name of a process.
@@ -109,7 +101,7 @@ namespace osu.Desktop
 
             var hostOptions = new HostOptions
             {
-                IPCPort = !tournamentClient ? OsuGame.IPC_PORT : null,
+                IPCPipeName = !tournamentClient ? OsuGame.IPC_PIPE_NAME : null,
                 FriendlyGameName = OsuGameBase.GAME_NAME,
             };
 
@@ -145,7 +137,12 @@ namespace osu.Desktop
                 if (tournamentClient)
                     host.Run(new TournamentGame());
                 else
-                    host.Run(new OsuGameDesktop(args));
+                {
+                    host.Run(new OsuGameDesktop(args)
+                    {
+                        IsFirstRun = isFirstRun
+                    });
+                }
             }
         }
 
@@ -177,32 +174,43 @@ namespace osu.Desktop
             return false;
         }
 
-        [SupportedOSPlatform("windows")]
-        private static void setupSquirrel()
+        private static void setupVelopack(string[] args)
         {
-            SquirrelAwareApp.HandleEvents(onInitialInstall: (_, tools) =>
+            // Arguments being present indicate the user is either starting the game in a special (aka tournament) mode,
+            // or is running with pending imports via file association or otherwise.
+            //
+            // In both these scenarios, we'd hope the game does not attempt to update.
+            //
+            // Special consideration for velopack startup arguments, which must be handled during update.
+            // See https://docs.velopack.io/integrating/hooks#command-line-hooks.
+            if (args.Length > 0 && !args[0].StartsWith("--velo", StringComparison.Ordinal))
             {
-                tools.CreateShortcutForThisExe();
-                tools.CreateUninstallerRegistryEntry();
-                WindowsAssociationManager.InstallAssociations();
-            }, onAppUpdate: (_, tools) =>
+                Logger.Log("Handling arguments, skipping velopack setup.");
+                return;
+            }
+
+            if (OsuGameDesktop.IsPackageManaged)
             {
-                tools.CreateUninstallerRegistryEntry();
-                WindowsAssociationManager.UpdateAssociations();
-            }, onAppUninstall: (_, tools) =>
-            {
-                tools.RemoveShortcutForThisExe();
-                tools.RemoveUninstallerRegistryEntry();
-                WindowsAssociationManager.UninstallAssociations();
-            }, onEveryRun: (_, _, _) =>
-            {
-                // While setting the `ProcessAppUserModelId` fixes duplicate icons/shortcuts on the taskbar, it currently
-                // causes the right-click context menu to function incorrectly.
-                //
-                // This may turn out to be non-required after an alternative solution is implemented.
-                // see https://github.com/clowd/Clowd.Squirrel/issues/24
-                // tools.SetProcessAppUserModelId();
-            });
+                Logger.Log("Updates are being managed by an external provider. Skipping Velopack setup.");
+                return;
+            }
+
+            var app = VelopackApp.Build();
+
+            app.OnFirstRun(_ => isFirstRun = true);
+
+            if (OperatingSystem.IsWindows())
+                configureWindows(app);
+
+            app.Run();
+        }
+
+        [SupportedOSPlatform("windows")]
+        private static void configureWindows(VelopackApp app)
+        {
+            app.OnFirstRun(_ => WindowsAssociationManager.InstallAssociations());
+            app.OnAfterUpdateFastCallback(_ => WindowsAssociationManager.UpdateAssociations());
+            app.OnBeforeUninstallFastCallback(_ => WindowsAssociationManager.UninstallAssociations());
         }
     }
 }

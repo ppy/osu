@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.Navigation
             });
             AddStep("create IPC sender channels", () =>
             {
-                ipcSenderHost = new HeadlessGameHost(gameHost.Name, new HostOptions { IPCPort = OsuGame.IPC_PORT });
+                ipcSenderHost = new HeadlessGameHost(gameHost.Name, new HostOptions { IPCPipeName = OsuGame.IPC_PIPE_NAME });
                 osuSchemeLinkIPCSender = new OsuSchemeLinkIPCChannel(ipcSenderHost);
                 archiveImportIPCSender = new ArchiveImportIPCChannel(ipcSenderHost);
             });

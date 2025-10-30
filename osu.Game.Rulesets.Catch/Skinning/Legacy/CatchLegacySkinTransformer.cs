@@ -4,7 +4,7 @@
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -31,40 +31,59 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         {
             switch (lookup)
             {
-                case SkinComponentsContainerLookup containerLookup:
-                    if (containerLookup.Target != SkinComponentsContainerLookup.TargetArea.MainHUDComponents)
+                case GlobalSkinnableContainerLookup containerLookup:
+                    // Only handle per ruleset defaults here.
+                    if (containerLookup.Ruleset == null)
                         return base.GetDrawableComponent(lookup);
 
-                    // Modifications for global components.
-                    if (containerLookup.Ruleset == null)
-                        return base.GetDrawableComponent(lookup) as Container;
-
-                    // Skin has configuration.
-                    if (base.GetDrawableComponent(lookup) is UserConfiguredLayoutContainer d)
-                        return d;
+                    // we don't have enough assets to display these components (this is especially the case on a "beatmap" skin).
+                    if (!IsProvidingLegacyResources)
+                        return null;
 
                     // Our own ruleset components default.
-                    // todo: remove CatchSkinComponents.CatchComboCounter and refactor LegacyCatchComboCounter to be added here instead.
-                    return new DefaultSkinComponentsContainer(container =>
+                    switch (containerLookup.Lookup)
                     {
-                        var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();
+                        case GlobalSkinnableContainers.MainHUDComponents:
+                            // todo: remove CatchSkinComponents.CatchComboCounter and refactor LegacyCatchComboCounter to be added here instead.
+                            return new DefaultSkinComponentsContainer(container =>
+                            {
+                                var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();
+                                var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
+                                var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
 
-                        if (keyCounter != null)
-                        {
-                            // set the anchor to top right so that it won't squash to the return button to the top
-                            keyCounter.Anchor = Anchor.CentreRight;
-                            keyCounter.Origin = Anchor.CentreRight;
-                            keyCounter.X = 0;
-                            // 340px is the default height inherit from stable
-                            keyCounter.Y = container.ToLocalSpace(new Vector2(0, container.ScreenSpaceDrawQuad.Centre.Y - 340f)).Y;
-                        }
-                    })
-                    {
-                        Children = new Drawable[]
-                        {
-                            new LegacyKeyCounterDisplay(),
-                        }
-                    };
+                                if (keyCounter != null)
+                                {
+                                    // set the anchor to top right so that it won't squash to the return button to the top
+                                    keyCounter.Anchor = Anchor.CentreRight;
+                                    keyCounter.Origin = Anchor.TopRight;
+                                    keyCounter.Position = new Vector2(0, -40) * 1.6f;
+                                }
+
+                                if (spectatorList != null)
+                                {
+                                    spectatorList.Anchor = Anchor.BottomLeft;
+                                    spectatorList.Origin = Anchor.BottomLeft;
+                                    spectatorList.Position = new Vector2(10, -10);
+                                }
+
+                                if (leaderboard != null)
+                                {
+                                    leaderboard.Anchor = Anchor.CentreLeft;
+                                    leaderboard.Origin = Anchor.CentreLeft;
+                                    leaderboard.X = 10;
+                                }
+                            })
+                            {
+                                Children = new Drawable[]
+                                {
+                                    new LegacyKeyCounterDisplay(),
+                                    new SpectatorList(),
+                                    new DrawableGameplayLeaderboard(),
+                                }
+                            };
+                    }
+
+                    return null;
 
                 case CatchSkinComponentLookup catchSkinComponent:
                     switch (catchSkinComponent.Component)

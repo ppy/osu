@@ -11,7 +11,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
 namespace osu.Game.Collections
@@ -25,6 +27,9 @@ namespace osu.Game.Collections
         protected override string PopOutSampleName => @"UI/overlay-big-pop-out";
 
         private IDisposable? duckOperation;
+
+        private BasicSearchTextBox searchTextBox = null!;
+        private DrawableCollectionList list = null!;
 
         [Resolved]
         private MusicController? musicController { get; set; }
@@ -75,7 +80,7 @@ namespace osu.Game.Collections
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Text = "Manage collections",
+                                            Text = CollectionsStrings.ManageCollectionsTitle,
                                             Font = OsuFont.GetFont(size: 30),
                                             Padding = new MarginPadding { Vertical = 10 },
                                         },
@@ -104,10 +109,31 @@ namespace osu.Game.Collections
                                             RelativeSizeAxes = Axes.Both,
                                             Colour = colours.GreySeaFoamDarker
                                         },
-                                        new DrawableCollectionList
+                                        new Container
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                        }
+                                            Padding = new MarginPadding(10),
+                                            Children = new Drawable[]
+                                            {
+                                                searchTextBox = new BasicSearchTextBox
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    Y = 10,
+                                                    Height = 40,
+                                                    ReleaseFocusOnCommit = false,
+                                                    HoldFocus = true,
+                                                    PlaceholderText = HomeStrings.SearchPlaceholder,
+                                                },
+                                                list = new DrawableCollectionList
+                                                {
+                                                    Padding = new MarginPadding
+                                                    {
+                                                        Top = 60,
+                                                    },
+                                                    RelativeSizeAxes = Axes.Both,
+                                                }
+                                            }
+                                        },
                                     }
                                 }
                             },
@@ -115,6 +141,16 @@ namespace osu.Game.Collections
                     }
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            searchTextBox.Current.BindValueChanged(_ =>
+            {
+                list.SearchTerm = searchTextBox.Current.Value;
+            });
         }
 
         protected override void Dispose(bool isDisposing)

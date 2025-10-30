@@ -5,6 +5,8 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public class SliderRepeat : SliderEndCircle
     {
+        public double PathProgress { get; set; }
+
         public SliderRepeat(Slider slider)
             : base(slider)
         {

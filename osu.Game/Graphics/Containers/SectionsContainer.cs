@@ -208,7 +208,7 @@ namespace osu.Game.Graphics.Containers
         private float getScrollTargetForDrawable(Drawable target)
         {
             // implementation similar to ScrollIntoView but a bit more nuanced.
-            return scrollContainer.GetChildPosInContent(target) - scrollContainer.DisplayableContent * scroll_y_centre;
+            return (float)(scrollContainer.GetChildPosInContent(target) - scrollContainer.DisplayableContent * scroll_y_centre);
         }
 
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
@@ -259,7 +259,7 @@ namespace osu.Game.Graphics.Containers
                 updateSectionsMargin();
             }
 
-            float currentScroll = scrollContainer.Current;
+            float currentScroll = (float)scrollContainer.Current;
 
             if (currentScroll != lastKnownScroll)
             {

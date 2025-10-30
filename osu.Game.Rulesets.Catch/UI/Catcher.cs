@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Width of the area that can be used to attempt catches during gameplay.
         /// </summary>
-        public readonly float CatchWidth;
+        public float CatchWidth { get; private set; }
 
         private readonly SkinnableCatcher body;
 
@@ -142,10 +142,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             Size = new Vector2(BASE_SIZE);
 
-            if (difficulty != null)
-                Scale = calculateScale(difficulty);
-
-            CatchWidth = CalculateCatchWidth(Scale);
+            ApplyDifficulty(difficulty);
 
             InternalChildren = new Drawable[]
             {
@@ -227,7 +224,20 @@ namespace osu.Game.Rulesets.Catch.UI
                     addLighting(result, drawableObject.AccentColour.Value, positionInStack.X);
             }
 
-            // droplet doesn't affect the catcher state
+            if (result.IsHit)
+                CurrentState = hitObject.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle;
+            else if (hitObject is not Banana)
+                CurrentState = CatcherAnimationState.Fail;
+
+            if (palpableObject.HitObject.LastInCombo)
+            {
+                if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
+                    Explode();
+                else
+                    Drop();
+            }
+
+            // droplet doesn't affect hyperdash state
             if (hitObject is TinyDroplet) return;
 
             // if a hyper fruit was already handled this frame, just go where it says to go.
@@ -246,19 +256,6 @@ namespace osu.Game.Rulesets.Catch.UI
                 }
                 else
                     SetHyperDashState();
-            }
-
-            if (result.IsHit)
-                CurrentState = hitObject.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle;
-            else if (!(hitObject is Banana))
-                CurrentState = CatcherAnimationState.Fail;
-
-            if (palpableObject.HitObject.LastInCombo)
-            {
-                if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
-                    Explode();
-                else
-                    Drop();
             }
         }
 
@@ -310,6 +307,17 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 lastHyperDashStartTime = Time.Current;
             }
+        }
+
+        /// <summary>
+        /// Set the scale and catch width.
+        /// </summary>
+        public void ApplyDifficulty(IBeatmapDifficultyInfo? difficulty)
+        {
+            if (difficulty != null)
+                Scale = calculateScale(difficulty);
+
+            CatchWidth = CalculateCatchWidth(Scale);
         }
 
         /// <summary>

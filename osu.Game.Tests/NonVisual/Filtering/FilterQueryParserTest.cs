@@ -85,16 +85,6 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.That(filterCriteria.SearchTerms[0].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
         }
 
-        /*
-         * The following tests have been written a bit strangely (they don't check exact
-         * bound equality with what the filter says).
-         * This is to account for floating-point arithmetic issues.
-         * For example, specifying a bpm<140 filter would previously match beatmaps with BPM
-         * of 139.99999, which would be displayed in the UI as 140.
-         * Due to this the tests check the last tick inside the range and the first tick
-         * outside of the range.
-         */
-
         [TestCase("star")]
         [TestCase("stars")]
         public void TestApplyStarQueries(string variant)
@@ -105,10 +95,30 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual("easy", filterCriteria.SearchText.Trim());
             Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
             Assert.IsNotNull(filterCriteria.StarDifficulty.Max);
-            Assert.Greater(filterCriteria.StarDifficulty.Max, 3.99d);
-            Assert.Less(filterCriteria.StarDifficulty.Max, 4.00d);
+            Assert.AreEqual(filterCriteria.StarDifficulty.Max, 4.00d);
             Assert.IsNull(filterCriteria.StarDifficulty.Min);
         }
+
+        [Test]
+        public void TestStarQueriesInclusive()
+        {
+            const string query = "stars>=6";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(filterCriteria.StarDifficulty.Min, 6.00d);
+            Assert.True(filterCriteria.StarDifficulty.IsLowerInclusive);
+            Assert.IsNull(filterCriteria.StarDifficulty.Max);
+        }
+
+        /*
+         * The following tests have been written a bit strangely (they don't check exact
+         * bound equality with what the filter says).
+         * This is to account for floating-point arithmetic issues.
+         * For example, specifying a bpm<140 filter would previously match beatmaps with BPM
+         * of 139.99999, which would be displayed in the UI as 140.
+         * Due to this the tests check the last tick inside the range and the first tick
+         * outside of the range.
+         */
 
         [Test]
         public void TestApplyApproachRateQueries()
@@ -169,14 +179,23 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [Test]
         public void TestApplyBPMQueries()
         {
+            const string query = "bpm=200";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(filterCriteria.BPM.Min, 199.5d);
+            Assert.AreEqual(filterCriteria.BPM.Max, 200.5d);
+        }
+
+        [Test]
+        public void TestApplyBPMRangeQueries()
+        {
             const string query = "bpm>:200 gotta go fast";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("gotta go fast", filterCriteria.SearchText.Trim());
             Assert.AreEqual(3, filterCriteria.SearchTerms.Length);
             Assert.IsNotNull(filterCriteria.BPM.Min);
-            Assert.Greater(filterCriteria.BPM.Min, 199.99d);
-            Assert.Less(filterCriteria.BPM.Min, 200.00d);
+            Assert.AreEqual(filterCriteria.BPM.Min, 199.5d);
             Assert.IsNull(filterCriteria.BPM.Max);
         }
 
@@ -282,6 +301,16 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.That(filterCriteria.OnlineStatus.Values, Is.Empty);
+        }
+
+        [Test]
+        public void TestPartialStatusNotMatch()
+        {
+            const string query = "status!=r";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.IsNotEmpty(filterCriteria.OnlineStatus.Values);
+            Assert.That(filterCriteria.OnlineStatus.Values, Does.Not.Contain(BeatmapOnlineStatus.Ranked));
         }
 
         [Test]
@@ -501,6 +530,18 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.That(visibleBeatmaps, Is.EqualTo(expectedBeatmapIndexes));
         }
 
+        [Test]
+        public void TestApplySourceQueries()
+        {
+            const string query = "find me songs with source=\"unit tests\" please";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("find me songs with  please", filterCriteria.SearchText.Trim());
+            Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
+            Assert.AreEqual("unit tests", filterCriteria.Source.SearchTerm);
+            Assert.That(filterCriteria.Source.MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
+        }
+
         private class CustomFilterCriteria : IRulesetFilterCriteria
         {
             public string? CustomValue { get; set; }
@@ -537,7 +578,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCaseSource(nameof(correct_date_query_examples))]
         public void TestValidDateQueries(string dateQuery)
         {
-            string query = $"played<{dateQuery} time";
+            string query = $"lastplayed<{dateQuery} time";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual(true, filterCriteria.LastPlayed.HasFilter);
@@ -571,7 +612,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [Test]
         public void TestGreaterDateQuery()
         {
-            const string query = "played>50";
+            const string query = "lastplayed>50";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.That(filterCriteria.LastPlayed.Max, Is.Not.Null);
@@ -584,7 +625,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [Test]
         public void TestLowerDateQuery()
         {
-            const string query = "played<50";
+            const string query = "lastplayed<50";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.That(filterCriteria.LastPlayed.Max, Is.Null);
@@ -597,7 +638,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [Test]
         public void TestBothSidesDateQuery()
         {
-            const string query = "played>3M played<1y6M";
+            const string query = "lastplayed>3M lastplayed<1y6M";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.That(filterCriteria.LastPlayed.Min, Is.Not.Null);
@@ -611,7 +652,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [Test]
         public void TestEqualDateQuery()
         {
-            const string query = "played=50";
+            const string query = "lastplayed=50";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual(false, filterCriteria.LastPlayed.HasFilter);
@@ -620,11 +661,131 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [Test]
         public void TestOutOfRangeDateQuery()
         {
-            const string query = "played<10000y";
+            const string query = "lastplayed<10000y";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual(true, filterCriteria.LastPlayed.HasFilter);
             Assert.AreEqual(DateTimeOffset.MinValue.AddMilliseconds(1), filterCriteria.LastPlayed.Min);
+        }
+
+        private static DateTimeOffset dateTimeOffsetFromDateOnly(int year, int month, int day) =>
+            new DateTimeOffset(year, month, day, 0, 0, 0, TimeSpan.Zero);
+
+        private static readonly object[] ranked_date_valid_test_cases =
+        {
+            new object[] { "ranked<2012", dateTimeOffsetFromDateOnly(2012, 1, 1), (FilterCriteria x) => x.DateRanked.Max },
+            new object[] { "ranked<2012.03", dateTimeOffsetFromDateOnly(2012, 3, 1), (FilterCriteria x) => x.DateRanked.Max },
+            new object[] { "ranked<2012/03/05", dateTimeOffsetFromDateOnly(2012, 3, 5), (FilterCriteria x) => x.DateRanked.Max },
+            new object[] { "ranked<2012-3-5", dateTimeOffsetFromDateOnly(2012, 3, 5), (FilterCriteria x) => x.DateRanked.Max },
+
+            new object[] { "ranked<=2012", dateTimeOffsetFromDateOnly(2013, 1, 1), (FilterCriteria x) => x.DateRanked.Max },
+            new object[] { "ranked<=2012.03", dateTimeOffsetFromDateOnly(2012, 4, 1), (FilterCriteria x) => x.DateRanked.Max },
+            new object[] { "ranked<=2012/03/05", dateTimeOffsetFromDateOnly(2012, 3, 6), (FilterCriteria x) => x.DateRanked.Max },
+            new object[] { "ranked<=2012-3-5", dateTimeOffsetFromDateOnly(2012, 3, 6), (FilterCriteria x) => x.DateRanked.Max },
+
+            new object[] { "ranked>2012", dateTimeOffsetFromDateOnly(2013, 1, 1), (FilterCriteria x) => x.DateRanked.Min },
+            new object[] { "ranked>2012.03", dateTimeOffsetFromDateOnly(2012, 4, 1), (FilterCriteria x) => x.DateRanked.Min },
+            new object[] { "ranked>2012/03/05", dateTimeOffsetFromDateOnly(2012, 3, 6), (FilterCriteria x) => x.DateRanked.Min },
+            new object[] { "ranked>2012-3-5", dateTimeOffsetFromDateOnly(2012, 3, 6), (FilterCriteria x) => x.DateRanked.Min },
+
+            new object[] { "ranked>=2012", dateTimeOffsetFromDateOnly(2012, 1, 1), (FilterCriteria x) => x.DateRanked.Min },
+            new object[] { "ranked>=2012.03", dateTimeOffsetFromDateOnly(2012, 3, 1), (FilterCriteria x) => x.DateRanked.Min },
+            new object[] { "ranked>=2012/03/05", dateTimeOffsetFromDateOnly(2012, 3, 5), (FilterCriteria x) => x.DateRanked.Min },
+            new object[] { "ranked>=2012-3-5", dateTimeOffsetFromDateOnly(2012, 3, 5), (FilterCriteria x) => x.DateRanked.Min },
+
+            new object[] { "ranked=2012", dateTimeOffsetFromDateOnly(2012, 1, 1), (FilterCriteria x) => x.DateRanked.Min },
+            new object[] { "ranked=2012", dateTimeOffsetFromDateOnly(2012, 1, 1), (FilterCriteria x) => x.DateRanked.Min },
+            new object[] { "ranked=2012-03", dateTimeOffsetFromDateOnly(2012, 3, 1), (FilterCriteria x) => x.DateRanked.Min },
+            new object[] { "ranked=2012-03", dateTimeOffsetFromDateOnly(2012, 4, 1), (FilterCriteria x) => x.DateRanked.Max },
+            new object[] { "ranked=2012-03-05", dateTimeOffsetFromDateOnly(2012, 3, 5), (FilterCriteria x) => x.DateRanked.Min },
+            new object[] { "ranked=2012-03-05", dateTimeOffsetFromDateOnly(2012, 3, 6), (FilterCriteria x) => x.DateRanked.Max },
+        };
+
+        [Test]
+        [TestCaseSource(nameof(ranked_date_valid_test_cases))]
+        public void TestValidRankedDateQueries(string query, DateTimeOffset expected, Func<FilterCriteria, DateTimeOffset?> f)
+        {
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(true, filterCriteria.DateRanked.HasFilter);
+            Assert.AreEqual(expected, f(filterCriteria));
+        }
+
+        private static readonly object[] ranked_date_invalid_test_cases =
+        {
+            new object[] { "ranked<0" },
+            new object[] { "ranked=99999" },
+            new object[] { "ranked>=2012-03-05-04" },
+        };
+
+        [Test]
+        [TestCaseSource(nameof(ranked_date_invalid_test_cases))]
+        public void TestInvalidRankedDateQueries(string query)
+        {
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(false, filterCriteria.DateRanked.HasFilter);
+        }
+
+        private static readonly object[] submitted_date_test_cases =
+        {
+            new object[] { "submitted<2012", true },
+            new object[] { "submitted<2012.03", true },
+            new object[] { "submitted<2012/03/05", true },
+            new object[] { "submitted<2012-3-5", true },
+
+            new object[] { "submitted<0", false },
+            new object[] { "submitted=99999", false },
+            new object[] { "submitted>=2012-03-05-04", false },
+            new object[] { "submitted>=2012/03.05-04", false },
+        };
+
+        [Test]
+        [TestCaseSource(nameof(submitted_date_test_cases))]
+        public void TestInvalidRankedDateQueries(string query, bool expected)
+        {
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(expected, filterCriteria.DateSubmitted.HasFilter);
+        }
+
+        private static readonly object[] played_query_tests =
+        {
+            new object[] { "0", DateTimeOffset.MinValue, true },
+            new object[] { "0", DateTimeOffset.Now, false },
+            new object[] { "false", DateTimeOffset.MinValue, true },
+            new object[] { "false", DateTimeOffset.Now, false },
+            new object[] { "no", DateTimeOffset.MinValue, true },
+            new object[] { "no", DateTimeOffset.Now, false },
+
+            new object[] { "1", DateTimeOffset.MinValue, false },
+            new object[] { "1", DateTimeOffset.Now, true },
+            new object[] { "true", DateTimeOffset.MinValue, false },
+            new object[] { "true", DateTimeOffset.Now, true },
+            new object[] { "yes", DateTimeOffset.MinValue, false },
+            new object[] { "yes", DateTimeOffset.Now, true },
+        };
+
+        [Test]
+        [TestCaseSource(nameof(played_query_tests))]
+        public void TestPlayedQuery(string query, DateTimeOffset reference, bool matched)
+        {
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, $"played={query}");
+            Assert.AreEqual(true, filterCriteria.LastPlayed.HasFilter);
+            Assert.AreEqual(matched, filterCriteria.LastPlayed.IsInRange(reference));
+        }
+
+        [Test]
+        public void TestMultipleTextFilters()
+        {
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, "tag=\"simple\" tag=\"clean\"!");
+            Assert.That(filterCriteria.UserTags, Has.Count.EqualTo(2));
+            Assert.That(filterCriteria.UserTags[0].SearchTerm, Is.EqualTo("simple"));
+            Assert.That(filterCriteria.UserTags[0].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
+            Assert.That(filterCriteria.UserTags[1].SearchTerm, Is.EqualTo("clean"));
+            Assert.That(filterCriteria.UserTags[1].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.FullPhrase));
         }
     }
 }

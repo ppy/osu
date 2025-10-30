@@ -4,8 +4,6 @@
 #nullable disable
 
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,44 +18,71 @@ namespace osu.Game.Graphics.UserInterface
 {
     public partial class OsuMenu : Menu
     {
-        private Sample sampleOpen;
-        private Sample sampleClose;
+        protected const double DELAY_BEFORE_FADE_OUT = 50;
+        protected const double FADE_DURATION = 280;
 
         // todo: this shouldn't be required after https://github.com/ppy/osu-framework/issues/4519 is fixed.
-        private bool wasOpened;
+        protected bool WasOpened { get; private set; }
+
+        public bool PlaySamples { get; }
+
+        [Resolved]
+        private OsuMenuSamples menuSamples { get; set; } = null!;
 
         public OsuMenu(Direction direction, bool topLevelMenu = false)
+            : this(direction, topLevelMenu, playSamples: !topLevelMenu)
+        {
+        }
+
+        protected OsuMenu(Direction direction, bool topLevelMenu, bool playSamples)
             : base(direction, topLevelMenu)
         {
+            PlaySamples = playSamples;
             BackgroundColour = Color4.Black.Opacity(0.5f);
 
             MaskingContainer.CornerRadius = 4;
             ItemsContainer.Padding = new MarginPadding(5);
+
+            OnSubmenuOpen += _ => menuSamples?.PlaySubOpenSample();
         }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        protected override void Update()
         {
-            sampleOpen = audio.Samples.Get(@"UI/dropdown-open");
-            sampleClose = audio.Samples.Get(@"UI/dropdown-close");
+            base.Update();
+
+            bool showCheckboxes = false;
+
+            foreach (var drawableItem in ItemsContainer)
+            {
+                if (drawableItem.Item is StatefulMenuItem)
+                    showCheckboxes = true;
+            }
+
+            foreach (var drawableItem in ItemsContainer)
+            {
+                if (drawableItem is DrawableOsuMenuItem osuItem)
+                    osuItem.ShowCheckbox.Value = showCheckboxes;
+            }
         }
 
         protected override void AnimateOpen()
         {
-            if (!TopLevelMenu && !wasOpened)
-                sampleOpen?.Play();
+            if (PlaySamples && !WasOpened)
+                menuSamples?.PlayOpenSample();
 
-            this.FadeIn(300, Easing.OutQuint);
-            wasOpened = true;
+            WasOpened = true;
+            this.FadeIn(FADE_DURATION, Easing.OutQuint);
         }
 
         protected override void AnimateClose()
         {
-            if (!TopLevelMenu && wasOpened)
-                sampleClose?.Play();
+            if (PlaySamples && WasOpened)
+                menuSamples?.PlayCloseSample();
 
-            this.FadeOut(300, Easing.OutQuint);
-            wasOpened = false;
+            this.Delay(DELAY_BEFORE_FADE_OUT)
+                .FadeOut(FADE_DURATION, Easing.OutQuint);
+
+            WasOpened = false;
         }
 
         protected override void UpdateSize(Vector2 newSize)
@@ -65,12 +90,21 @@ namespace osu.Game.Graphics.UserInterface
             if (Direction == Direction.Vertical)
             {
                 Width = newSize.X;
-                this.ResizeHeightTo(newSize.Y, 300, Easing.OutQuint);
+
+                if (newSize.Y > 0)
+                    this.ResizeHeightTo(newSize.Y, 300, Easing.OutQuint);
+                else
+                    // Delay until the fade out finishes from AnimateClose.
+                    this.Delay(DELAY_BEFORE_FADE_OUT + FADE_DURATION).ResizeHeightTo(0);
             }
             else
             {
                 Height = newSize.Y;
-                this.ResizeWidthTo(newSize.X, 300, Easing.OutQuint);
+                if (newSize.X > 0)
+                    this.ResizeWidthTo(newSize.X, 300, Easing.OutQuint);
+                else
+                    // Delay until the fade out finishes from AnimateClose.
+                    this.Delay(DELAY_BEFORE_FADE_OUT + FADE_DURATION).ResizeWidthTo(0);
             }
         }
 
@@ -109,7 +143,7 @@ namespace osu.Game.Graphics.UserInterface
                     Colour = BackgroundColourHover,
                     RelativeSizeAxes = Axes.X,
                     Height = 2f,
-                    Width = 0.8f,
+                    Width = 0.9f,
                 });
             }
 

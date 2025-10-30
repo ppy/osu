@@ -12,10 +12,11 @@ using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
-using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Components;
+using osu.Game.Skinning.Triangles;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Skins
@@ -67,7 +68,19 @@ namespace osu.Game.Tests.Skins
             // Covers legacy rank display
             "Archives/modified-classic-20230809.osk",
             // Covers legacy key counter
-            "Archives/modified-classic-20240724.osk"
+            "Archives/modified-classic-20240724.osk",
+            // Covers skinnable mod display
+            "Archives/modified-default-20241207.osk",
+            // Covers skinnable spectator list
+            "Archives/modified-argon-20250116.osk",
+            // Covers player team flag
+            "Archives/modified-argon-20250214.osk",
+            // Covers skinnable leaderboard
+            "Archives/modified-argon-20250424.osk",
+            // Covers "Argon" unstable rate counter
+            "Archives/modified-argon-20250809.osk",
+            // Covers "Argon" judgement counter
+            "Archives/modified-argon-20250308.osk",
         };
 
         /// <summary>
@@ -107,7 +120,7 @@ namespace osu.Game.Tests.Skins
                 var skin = new TestSkin(new SkinInfo(), null, storage);
 
                 Assert.That(skin.LayoutInfos, Has.Count.EqualTo(2));
-                Assert.That(skin.LayoutInfos[SkinComponentsContainerLookup.TargetArea.MainHUDComponents].AllDrawables.ToArray(), Has.Length.EqualTo(9));
+                Assert.That(skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].AllDrawables.ToArray(), Has.Length.EqualTo(9));
             }
         }
 
@@ -120,8 +133,20 @@ namespace osu.Game.Tests.Skins
                 var skin = new TestSkin(new SkinInfo(), null, storage);
 
                 Assert.That(skin.LayoutInfos, Has.Count.EqualTo(2));
-                Assert.That(skin.LayoutInfos[SkinComponentsContainerLookup.TargetArea.MainHUDComponents].AllDrawables.ToArray(), Has.Length.EqualTo(10));
-                Assert.That(skin.LayoutInfos[SkinComponentsContainerLookup.TargetArea.MainHUDComponents].AllDrawables.Select(i => i.Type), Contains.Item(typeof(PlayerName)));
+                Assert.That(skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].AllDrawables.ToArray(), Has.Length.EqualTo(10));
+                Assert.That(skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].AllDrawables.Select(i => i.Type), Contains.Item(typeof(PlayerName)));
+            }
+        }
+
+        [Test]
+        public void TestDeserialiseInvalidDrawables()
+        {
+            using (var stream = TestResources.OpenResource("Archives/argon-invalid-drawable.osk"))
+            using (var storage = new ZipArchiveReader(stream))
+            {
+                var skin = new TestSkin(new SkinInfo(), null, storage);
+
+                Assert.That(skin.LayoutInfos.Any(kvp => kvp.Value.AllDrawables.Any(d => d.Type == typeof(StarFountain))), Is.False);
             }
         }
 
@@ -134,10 +159,10 @@ namespace osu.Game.Tests.Skins
                 var skin = new TestSkin(new SkinInfo(), null, storage);
 
                 Assert.That(skin.LayoutInfos, Has.Count.EqualTo(2));
-                Assert.That(skin.LayoutInfos[SkinComponentsContainerLookup.TargetArea.MainHUDComponents].AllDrawables.ToArray(), Has.Length.EqualTo(6));
-                Assert.That(skin.LayoutInfos[SkinComponentsContainerLookup.TargetArea.SongSelect].AllDrawables.ToArray(), Has.Length.EqualTo(1));
+                Assert.That(skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].AllDrawables.ToArray(), Has.Length.EqualTo(6));
+                Assert.That(skin.LayoutInfos[GlobalSkinnableContainers.SongSelect].AllDrawables.ToArray(), Has.Length.EqualTo(1));
 
-                var skinnableInfo = skin.LayoutInfos[SkinComponentsContainerLookup.TargetArea.SongSelect].AllDrawables.First();
+                var skinnableInfo = skin.LayoutInfos[GlobalSkinnableContainers.SongSelect].AllDrawables.First();
 
                 Assert.That(skinnableInfo.Type, Is.EqualTo(typeof(SkinnableSprite)));
                 Assert.That(skinnableInfo.Settings.First().Key, Is.EqualTo("sprite_name"));
@@ -148,10 +173,10 @@ namespace osu.Game.Tests.Skins
             using (var storage = new ZipArchiveReader(stream))
             {
                 var skin = new TestSkin(new SkinInfo(), null, storage);
-                Assert.That(skin.LayoutInfos[SkinComponentsContainerLookup.TargetArea.MainHUDComponents].AllDrawables.ToArray(), Has.Length.EqualTo(8));
-                Assert.That(skin.LayoutInfos[SkinComponentsContainerLookup.TargetArea.MainHUDComponents].AllDrawables.Select(i => i.Type), Contains.Item(typeof(UnstableRateCounter)));
-                Assert.That(skin.LayoutInfos[SkinComponentsContainerLookup.TargetArea.MainHUDComponents].AllDrawables.Select(i => i.Type), Contains.Item(typeof(ColourHitErrorMeter)));
-                Assert.That(skin.LayoutInfos[SkinComponentsContainerLookup.TargetArea.MainHUDComponents].AllDrawables.Select(i => i.Type), Contains.Item(typeof(LegacySongProgress)));
+                Assert.That(skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].AllDrawables.ToArray(), Has.Length.EqualTo(8));
+                Assert.That(skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].AllDrawables.Select(i => i.Type), Contains.Item(typeof(TrianglesUnstableRateCounter)));
+                Assert.That(skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].AllDrawables.Select(i => i.Type), Contains.Item(typeof(ColourHitErrorMeter)));
+                Assert.That(skin.LayoutInfos[GlobalSkinnableContainers.MainHUDComponents].AllDrawables.Select(i => i.Type), Contains.Item(typeof(LegacySongProgress)));
             }
         }
 

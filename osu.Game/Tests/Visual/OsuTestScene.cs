@@ -306,7 +306,9 @@ namespace osu.Game.Tests.Visual
                         StarRating = original.StarRating,
                         DifficultyName = original.DifficultyName,
                     }
-                }
+                },
+                HasFavourited = false,
+                FavouriteCount = 0,
             };
 
             foreach (var beatmap in result.Beatmaps)
@@ -330,6 +332,9 @@ namespace osu.Game.Tests.Visual
             if (MusicController?.TrackLoaded == true)
                 MusicController.Stop();
 
+            if (realm?.IsValueCreated == true)
+                Realm.Dispose();
+
             RecycleLocalStorage(true);
         }
 
@@ -338,8 +343,6 @@ namespace osu.Game.Tests.Visual
         public class ClockBackedTestWorkingBeatmap : TestWorkingBeatmap
         {
             private readonly Track track;
-
-            private readonly TrackVirtualStore store;
 
             /// <summary>
             /// Create an instance which creates a <see cref="TestBeatmap"/> for the provided ruleset when requested.
@@ -370,7 +373,7 @@ namespace osu.Game.Tests.Visual
 
                 if (referenceClock != null)
                 {
-                    store = new TrackVirtualStore(referenceClock);
+                    var store = new TrackVirtualStore(referenceClock);
                     audio.AddItem(store);
                     track = store.GetVirtual(trackLength);
                 }
@@ -381,12 +384,6 @@ namespace osu.Game.Tests.Visual
                 // To ease testability, ensure the track is available from point of construction.
                 // (Usually this would be done by MusicController for us).
                 LoadTrack();
-            }
-
-            ~ClockBackedTestWorkingBeatmap()
-            {
-                // Remove the track store from the audio manager
-                store?.Dispose();
             }
 
             protected override Track GetBeatmapTrack() => track;

@@ -1,0 +1,112 @@
+# .NET Code Style
+# IDE styles reference: https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/
+is_global = true
+
+# IDE0001: Simplify names
+dotnet_diagnostic.IDE0001.severity = warning
+
+# IDE0002: Simplify member access
+dotnet_diagnostic.IDE0002.severity = warning
+
+# IDE0003: Remove qualification
+dotnet_diagnostic.IDE0003.severity = warning
+
+# IDE0004: Remove unnecessary cast
+dotnet_diagnostic.IDE0004.severity = warning
+
+# IDE0005: Remove unnecessary imports
+dotnet_diagnostic.IDE0005.severity = warning
+
+# IDE0034: Simplify default literal
+dotnet_diagnostic.IDE0034.severity = warning
+
+# IDE0036: Sort modifiers
+dotnet_diagnostic.IDE0036.severity = warning
+
+# IDE0040: Add accessibility modifier
+dotnet_diagnostic.IDE0040.severity = warning
+
+# IDE0049: Use keyword for type name
+dotnet_diagnostic.IDE0040.severity = warning
+
+# IDE0055: Fix formatting
+dotnet_diagnostic.IDE0055.severity = warning
+
+# IDE0051: Private method is unused
+dotnet_diagnostic.IDE0051.severity = silent
+
+# IDE0052: Private member is unused
+dotnet_diagnostic.IDE0052.severity = silent
+
+# IDE0073: File header
+dotnet_diagnostic.IDE0073.severity = warning
+
+# IDE0130: Namespace mismatch with folder
+dotnet_diagnostic.IDE0130.severity = warning
+
+# IDE1006: Naming style
+dotnet_diagnostic.IDE1006.severity = warning
+
+# CA1305: Specify IFormatProvider
+# Too many noisy warnings for parsing/formatting numbers
+dotnet_diagnostic.CA1305.severity = none
+
+# messagepack complains about "osu" not being title cased due to reserved words
+dotnet_diagnostic.CS8981.severity = none
+
+# CA1507: Use nameof to express symbol names
+# Flags serialization name attributes
+dotnet_diagnostic.CA1507.severity = suggestion
+
+# CA1806: Do not ignore method results
+# The usages for numeric parsing are explicitly optional
+dotnet_diagnostic.CA1806.severity = suggestion
+
+# CA1822: Mark members as static
+# Potential false positive around reflection/too much noise
+dotnet_diagnostic.CA1822.severity = none
+
+# CA1826: Do not use Enumerable method on indexable collections
+dotnet_diagnostic.CA1826.severity = suggestion
+
+# CA1859: Use concrete types when possible for improved performance
+# Involves design considerations
+dotnet_diagnostic.CA1859.severity = suggestion
+
+# CA1860: Avoid using 'Enumerable.Any()' extension method
+dotnet_diagnostic.CA1860.severity = suggestion
+
+# CA1861: Avoid constant arrays as arguments
+# Outdated with collection expressions
+dotnet_diagnostic.CA1861.severity = suggestion
+
+# CA2007: Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.CA2007.severity = warning
+
+# CA2016: Forward the 'CancellationToken' parameter to methods
+# Some overloads are having special handling for debugger
+dotnet_diagnostic.CA2016.severity = suggestion
+
+# CA2021: Do not call Enumerable.Cast<T> or Enumerable.OfType<T> with incompatible types
+# Causing a lot of false positives with generics
+dotnet_diagnostic.CA2021.severity = none
+
+# CA2101: Specify marshaling for P/Invoke string arguments
+# Reports warning for all non-UTF16 usages on DllImport; consider migrating to LibraryImport
+dotnet_diagnostic.CA2101.severity = none
+
+# CA2201: Do not raise reserved exception types
+dotnet_diagnostic.CA2201.severity = warning
+
+# CA2208: Instantiate argument exceptions correctly
+dotnet_diagnostic.CA2208.severity = suggestion
+
+# CA2242: Test for NaN correctly
+dotnet_diagnostic.CA2242.severity = warning
+
+# Banned APIs
+dotnet_diagnostic.RS0030.severity = error
+
+# Temporarily disable analysing CanBeNull = true in NRT contexts due to mobile issues.
+# See: https://github.com/ppy/osu/pull/19677
+dotnet_diagnostic.OSUF001.severity = none

@@ -20,10 +20,12 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Skinning;
@@ -169,11 +171,20 @@ namespace osu.Game.Screens.Menu
                     if (s.Beatmaps.Count == 0)
                         return;
 
-                    initialBeatmap = beatmaps.GetWorkingBeatmap(s.Beatmaps.First());
+                    var working = beatmaps.GetWorkingBeatmap(s.Beatmaps.First());
+
+                    // Ensure files area actually present on disk.
+                    // This is to handle edge cases like users deleting files outside the game and breaking the world.
+                    if (!hasAllFiles(working))
+                        return;
+
+                    initialBeatmap = working;
                 });
 
                 return UsingThemedIntro = initialBeatmap != null;
             }
+
+            AddInternal(new GlobalScrollAdjustsVolume());
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -184,6 +195,20 @@ namespace osu.Game.Screens.Menu
 
         [Resolved]
         private INotificationOverlay notifications { get; set; }
+
+        private bool hasAllFiles(WorkingBeatmap working)
+        {
+            foreach (var f in working.BeatmapSetInfo.Files)
+            {
+                using (var str = working.GetStream(f.File.GetStoragePath()))
+                {
+                    if (str == null)
+                        return false;
+                }
+            }
+
+            return true;
+        }
 
         private void ensureEventuallyArrivingAtMenu()
         {
@@ -207,7 +232,7 @@ namespace osu.Game.Screens.Menu
                         Text = NotificationsStrings.AudioPlaybackIssue
                     });
                 }
-            }, 5000);
+            }, 8000);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)

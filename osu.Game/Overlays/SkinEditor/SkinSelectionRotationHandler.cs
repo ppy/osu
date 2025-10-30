@@ -46,7 +46,6 @@ namespace osu.Game.Overlays.SkinEditor
 
         private Drawable[]? objectsInRotation;
 
-        private Vector2? defaultOrigin;
         private Dictionary<Drawable, float>? originalRotations;
         private Dictionary<Drawable, Vector2>? originalPositions;
 
@@ -60,7 +59,7 @@ namespace osu.Game.Overlays.SkinEditor
             objectsInRotation = selectedItems.Cast<Drawable>().ToArray();
             originalRotations = objectsInRotation.ToDictionary(d => d, d => d.Rotation);
             originalPositions = objectsInRotation.ToDictionary(d => d, d => d.ToScreenSpace(d.OriginPosition));
-            defaultOrigin = GeometryUtils.GetSurroundingQuad(objectsInRotation.SelectMany(d => d.ScreenSpaceDrawQuad.GetVertices().ToArray())).Centre;
+            DefaultOrigin = GeometryUtils.GetSurroundingQuad(objectsInRotation.SelectMany(d => ToLocalSpace(d.ScreenSpaceDrawQuad).GetVertices().ToArray())).Centre;
 
             base.Begin();
         }
@@ -70,7 +69,7 @@ namespace osu.Game.Overlays.SkinEditor
             if (objectsInRotation == null)
                 throw new InvalidOperationException($"Cannot {nameof(Update)} a rotate operation without calling {nameof(Begin)} first!");
 
-            Debug.Assert(originalRotations != null && originalPositions != null && defaultOrigin != null);
+            Debug.Assert(originalRotations != null && originalPositions != null && DefaultOrigin != null);
 
             if (objectsInRotation.Length == 1 && origin == null)
             {
@@ -79,11 +78,11 @@ namespace osu.Game.Overlays.SkinEditor
                 return;
             }
 
-            var actualOrigin = origin ?? defaultOrigin.Value;
+            var actualOrigin = origin ?? DefaultOrigin.Value;
 
             foreach (var drawableItem in objectsInRotation)
             {
-                var rotatedPosition = GeometryUtils.RotatePointAroundOrigin(originalPositions[drawableItem], actualOrigin, rotation);
+                var rotatedPosition = GeometryUtils.RotatePointAroundOrigin(originalPositions[drawableItem], ToScreenSpace(actualOrigin), rotation);
                 UpdatePosition(drawableItem, rotatedPosition);
 
                 drawableItem.Rotation = originalRotations[drawableItem] + rotation;
@@ -100,7 +99,7 @@ namespace osu.Game.Overlays.SkinEditor
             objectsInRotation = null;
             originalPositions = null;
             originalRotations = null;
-            defaultOrigin = null;
+            DefaultOrigin = null;
 
             base.Commit();
         }

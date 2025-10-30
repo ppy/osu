@@ -2,10 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
+using System.Threading.Tasks;
 using Microsoft.Win32;
 using osu.Desktop.Performance;
 using osu.Desktop.Security;
@@ -17,6 +17,7 @@ using osu.Framework.Logging;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
 using osu.Framework.Allocation;
+using osu.Game.Configuration;
 using osu.Game.IO;
 using osu.Game.IPC;
 using osu.Game.Online.Multiplayer;
@@ -32,6 +33,8 @@ namespace osu.Desktop
 
         [Cached(typeof(IHighPerformanceSessionManager))]
         private readonly HighPerformanceSessionManager highPerformanceSessionManager = new HighPerformanceSessionManager();
+
+        public bool IsFirstRun { get; init; }
 
         public OsuGameDesktop(string[]? args = null)
             : base(args)
@@ -67,7 +70,12 @@ namespace osu.Desktop
             {
                 try
                 {
-                    stableInstallPath = getStableInstallPathFromRegistry();
+                    stableInstallPath = getStableInstallPathFromRegistry("osustable.File.osz");
+
+                    if (!string.IsNullOrEmpty(stableInstallPath) && checkExists(stableInstallPath))
+                        return stableInstallPath;
+
+                    stableInstallPath = getStableInstallPathFromRegistry("osu!");
 
                     if (!string.IsNullOrEmpty(stableInstallPath) && checkExists(stableInstallPath))
                         return stableInstallPath;
@@ -89,48 +97,34 @@ namespace osu.Desktop
         }
 
         [SupportedOSPlatform("windows")]
-        private string? getStableInstallPathFromRegistry()
+        private string? getStableInstallPathFromRegistry(string progId)
         {
-            using (RegistryKey? key = Registry.ClassesRoot.OpenSubKey("osu!"))
+            using (RegistryKey? key = Registry.ClassesRoot.OpenSubKey(progId))
                 return key?.OpenSubKey(WindowsAssociationManager.SHELL_OPEN_COMMAND)?.GetValue(string.Empty)?.ToString()?.Split('"')[1].Replace("osu!.exe", "");
         }
 
+        public static bool IsPackageManaged => !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("OSU_EXTERNAL_UPDATE_PROVIDER"));
+
         protected override UpdateManager CreateUpdateManager()
         {
-            string? packageManaged = Environment.GetEnvironmentVariable("OSU_EXTERNAL_UPDATE_PROVIDER");
+            // If this is the first time we've run the game, ie it is being installed,
+            // reset the user's release stream to "lazer".
+            //
+            // This ensures that if a user is trying to recover from a failed startup on an unstable release stream,
+            // the game doesn't immediately try and update them back to the release stream after starting up.
+            if (IsFirstRun)
+                LocalConfig.SetValue(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
 
-            if (!string.IsNullOrEmpty(packageManaged))
+            if (IsPackageManaged)
                 return new NoActionUpdateManager();
 
-            switch (RuntimeInfo.OS)
-            {
-                case RuntimeInfo.Platform.Windows:
-                    Debug.Assert(OperatingSystem.IsWindows());
-
-                    return new SquirrelUpdateManager();
-
-                default:
-                    return new SimpleUpdateManager();
-            }
+            return new VelopackUpdateManager();
         }
 
         public override bool RestartAppWhenExited()
         {
-            switch (RuntimeInfo.OS)
-            {
-                case RuntimeInfo.Platform.Windows:
-                    Debug.Assert(OperatingSystem.IsWindows());
-
-                    // Of note, this is an async method in squirrel that adds an arbitrary delay before returning
-                    // likely to ensure the external process is in a good state.
-                    //
-                    // We're not waiting on that here, but the outro playing before the actual exit should be enough
-                    // to cover this.
-                    Squirrel.UpdateManager.RestartAppWhenExited().FireAndForget();
-                    return true;
-            }
-
-            return base.RestartAppWhenExited();
+            Task.Run(() => Velopack.UpdateExe.Start(waitPid: (uint)Environment.ProcessId)).FireAndForget();
+            return true;
         }
 
         protected override void LoadComplete()
@@ -156,7 +150,6 @@ namespace osu.Desktop
             if (iconStream != null)
                 host.Window.SetIconFromStream(iconStream);
 
-            host.Window.CursorState |= CursorState.Hidden;
             host.Window.Title = Name;
         }
 
