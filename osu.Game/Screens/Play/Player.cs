@@ -706,13 +706,13 @@ namespace osu.Game.Screens.Play
             PerformIntroSkip();
         }
 
-        protected void PerformIntroSkip()
+        protected void PerformIntroSkip(bool fullLength = false)
         {
             // user requested skip
             // disable sample playback to stop currently playing samples and perform skip
             samplePlaybackDisabled.Value = true;
 
-            (GameplayClockContainer as MasterGameplayClockContainer)?.Skip();
+            (GameplayClockContainer as MasterGameplayClockContainer)?.Skip(fullLength);
 
             // return samplePlaybackDisabled.Value to what is defined by the beatmap's current state
             updateSampleDisabledState();
