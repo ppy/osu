@@ -365,8 +365,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             {
                 double strictPath = calculateStrictSliderPath(slider);
 
-                double normalVelocity = slider.LazyTravelTime > 0 ? slider.LazyTravelDistance / slider.LazyTravelTime : 0;
-                double strictVelocity = slider.LazyTravelTime > 0 ? strictPath / slider.LazyTravelTime : 0;
+                double normalVelocity = LazyTravelTime > 0 ? LazyTravelDistance / LazyTravelTime : 0;
+                double strictVelocity = LazyTravelTime > 0 ? strictPath / LazyTravelTime : 0;
 
                 if (strictVelocity > normalVelocity)
                 {
@@ -377,7 +377,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                     double multiplier = (normalVelocity + deltaVelocity) / strictVelocity;
 
-                    slider.LazyTravelDistance = (float)(strictPath * multiplier);
+                    LazyTravelDistance = (float)(strictPath * multiplier);
                 }
             }
         }
