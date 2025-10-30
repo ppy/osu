@@ -69,9 +69,9 @@ namespace osu.Game.Overlays
                             Spacing = new Vector2(0, offset),
                             Children = new[]
                             {
-                                volumeMeterEffect = new VolumeMeter("EFFECTS", 125, colours.BlueDarker),
+                                volumeMeterEffect = new EffectVolumeMeter("EFFECTS", 125, colours.BlueDarker) { IsMuted = { BindTarget = IsEffectMuted }, },
                                 volumeMeterMaster = new MasterVolumeMeter("MASTER", 150, colours.PinkDarker) { IsMuted = { BindTarget = IsMuted }, },
-                                volumeMeterMusic = new VolumeMeter("MUSIC", 125, colours.BlueDarker),
+                                volumeMeterMusic = new TrackVolumeMeter("MUSIC", 125, colours.BlueDarker) { IsMuted = { BindTarget = IsMusicMuted }, },
                             }
                         },
                     },
@@ -134,24 +134,12 @@ namespace osu.Game.Overlays
 
                 case GlobalAction.ToggleEffectsMute:
                     Show();
-
-                    IsEffectMuted.Value = !IsEffectMuted.Value;
-                    if (IsEffectMuted.Value)
-                        volumeMeterEffect.Bindable.Set(0);
-                    else
-                        volumeMeterEffect.Bindable.Set(0.7f);
-
+                    volumeMeters.OfType<EffectVolumeMeter>().First().ToggleMute();
                     return true;
 
                 case GlobalAction.ToggleMusicMute:
                     Show();
-
-                    IsMusicMuted.Value = !IsMusicMuted.Value;
-                    if (IsMusicMuted.Value)
-                        volumeMeterMusic.Bindable.Set(0);
-                    else
-                        volumeMeterMusic.Bindable.Set(0.7f);
-
+                    volumeMeters.OfType<TrackVolumeMeter>().First().ToggleMute();
                     return true;
             }
 
