@@ -5,10 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -21,6 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override string Acronym => "SR";
         public override double ScoreMultiplier => 0.6;
         public override LocalisableString Description => "Simplify tricky rhythms!";
+        public override IconUsage? Icon => OsuIcon.ModSimplifiedRhythm;
         public override ModType Type => ModType.DifficultyReduction;
 
         [SettingSource("1/3 to 1/2 conversion", "Converts 1/3 patterns to 1/2 rhythm.")]
@@ -37,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             var taikoBeatmap = (TaikoBeatmap)beatmap;
             var controlPointInfo = taikoBeatmap.ControlPointInfo;
 
-            Hit[] hits = taikoBeatmap.HitObjects.Where(obj => obj is Hit).Cast<Hit>().ToArray();
+            Hit[] hits = taikoBeatmap.HitObjects.OfType<Hit>().ToArray();
 
             if (hits.Length == 0)
                 return;
@@ -61,10 +64,10 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     if (inPattern)
                     {
                         // pattern continues
-                        if (snapValue == baseRhythm) continue;
+                        if (snapValue == baseRhythm)
+                            continue;
 
                         inPattern = false;
-
                         processPattern(i);
                     }
                     else
@@ -108,7 +111,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                                 if (indexInPattern % 3 == 1)
                                     taikoBeatmap.HitObjects.Remove(hits[j]);
                                 else if (indexInPattern % 3 == 2)
-                                    hits[j].StartTime = hits[j + 1].StartTime - controlPointInfo.TimingPointAt(hits[j].StartTime).BeatLength / adjustedRhythm;
+                                    hits[j].StartTime = hits[j - 2].StartTime + controlPointInfo.TimingPointAt(hits[j].StartTime).BeatLength / adjustedRhythm;
 
                                 break;
                             }

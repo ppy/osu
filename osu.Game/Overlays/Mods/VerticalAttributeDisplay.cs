@@ -7,33 +7,30 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
-    public partial class VerticalAttributeDisplay : Container, IHasCurrentValue<double>
+    public partial class VerticalAttributeDisplay : Container, IHasCustomTooltip<RulesetBeatmapAttribute?>
     {
-        public Bindable<double> Current
-        {
-            get => current.Current;
-            set => current.Current = value;
-        }
-
         private readonly BindableWithCurrent<double> current = new BindableWithCurrent<double>();
-
-        public Bindable<ModEffect> AdjustType = new Bindable<ModEffect>();
 
         /// <summary>
         /// Text to display in the top area of the display.
         /// </summary>
-        public LocalisableString Label { get; protected set; }
+        public LocalisableString Label
+        {
+            get => text.Text;
+            set => text.Text = value;
+        }
 
         private readonly EffectCounter counter;
         private readonly OsuSpriteText text;
@@ -41,11 +38,70 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
-        private void updateTextColor()
+        public VerticalAttributeDisplay()
+        {
+            AutoSizeAxes = Axes.X;
+            RelativeSizeAxes = Axes.Y;
+
+            Origin = Anchor.CentreLeft;
+            Anchor = Anchor.CentreLeft;
+
+            InternalChild = new FillFlowContainer
+            {
+                Origin = Anchor.CentreLeft,
+                Anchor = Anchor.CentreLeft,
+                RelativeSizeAxes = Axes.Y,
+                Width = 42,
+                Direction = FillDirection.Vertical,
+                Children = new Drawable[]
+                {
+                    text = new OsuSpriteText
+                    {
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        Font = OsuFont.Default.With(size: 20, weight: FontWeight.Bold)
+                    },
+                    counter = new EffectCounter
+                    {
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        Current = { BindTarget = current },
+                    }
+                }
+            };
+        }
+
+        public void SetAttribute(RulesetBeatmapAttribute? attribute)
+        {
+            if (attribute != null)
+            {
+                text.Text = attribute.Acronym;
+                current.Value = attribute.AdjustedValue;
+                var effect = calculateEffect(attribute.OriginalValue, attribute.AdjustedValue);
+                updateTextColor(effect);
+                Alpha = 1;
+            }
+            else
+                Alpha = 0;
+
+            TooltipContent = attribute;
+        }
+
+        private static ModEffect calculateEffect(double oldValue, double newValue)
+        {
+            if (Precision.AlmostEquals(newValue, oldValue, 0.01))
+                return ModEffect.NotChanged;
+            if (newValue < oldValue)
+                return ModEffect.DifficultyReduction;
+
+            return ModEffect.DifficultyIncrease;
+        }
+
+        private void updateTextColor(ModEffect effect)
         {
             Color4 newColor;
 
-            switch (AdjustType.Value)
+            switch (effect)
             {
                 case ModEffect.NotChanged:
                     newColor = Color4.White;
@@ -60,59 +116,11 @@ namespace osu.Game.Overlays.Mods
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(AdjustType.Value));
+                    throw new ArgumentOutOfRangeException(nameof(effect), effect, null);
             }
 
             text.Colour = newColor;
             counter.Colour = newColor;
-        }
-
-        public VerticalAttributeDisplay(LocalisableString label)
-        {
-            Label = label;
-
-            AutoSizeAxes = Axes.X;
-
-            Origin = Anchor.CentreLeft;
-            Anchor = Anchor.CentreLeft;
-
-            AdjustType.BindValueChanged(_ => updateTextColor());
-
-            InternalChild = new FillFlowContainer
-            {
-                Origin = Anchor.CentreLeft,
-                Anchor = Anchor.CentreLeft,
-                AutoSizeAxes = Axes.Y,
-                Width = 50,
-                Direction = FillDirection.Vertical,
-                Children = new Drawable[]
-                {
-                    text = new OsuSpriteText
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        Text = Label,
-                        Margin = new MarginPadding { Horizontal = 15 }, // to reserve space for 0.XX value
-                        Font = OsuFont.Default.With(size: 20, weight: FontWeight.Bold)
-                    },
-                    counter = new EffectCounter
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        Current = { BindTarget = Current },
-                    }
-                }
-            };
-        }
-
-        public static ModEffect CalculateEffect(double oldValue, double newValue)
-        {
-            if (Precision.AlmostEquals(newValue, oldValue, 0.01))
-                return ModEffect.NotChanged;
-            if (newValue < oldValue)
-                return ModEffect.DifficultyReduction;
-
-            return ModEffect.DifficultyIncrease;
         }
 
         public enum ModEffect
@@ -133,5 +141,8 @@ namespace osu.Game.Overlays.Mods
                 Font = OsuFont.Default.With(size: 18, weight: FontWeight.SemiBold)
             };
         }
+
+        public ITooltip<RulesetBeatmapAttribute?> GetCustomTooltip() => new BeatmapAttributeTooltip();
+        public RulesetBeatmapAttribute? TooltipContent { get; set; }
     }
 }
