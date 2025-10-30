@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Select.Carousel
             }
 
             if (manager != null)
-                hideRequested = manager.Hide;
+                hideRequested = b => manager.Hide(b);
 
             Header.Children = new Drawable[]
             {
