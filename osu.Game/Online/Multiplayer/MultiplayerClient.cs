@@ -131,6 +131,9 @@ namespace osu.Game.Online.Multiplayer
         public event Action<int, long>? MatchmakingItemDeselected;
         public event Action<MatchRoomState>? MatchRoomStateChanged;
 
+        public event Action<int>? UserVotedToSkip;
+        public event Action? VoteToSkipPassed;
+
         /// <summary>
         /// Whether the <see cref="MultiplayerClient"/> is currently connected.
         /// This is NOT thread safe and usage should be scheduled.
@@ -519,6 +522,12 @@ namespace osu.Game.Online.Multiplayer
                         APIRoom.EndDate = DateTimeOffset.Now;
                         APIRoom.Status = RoomStatus.Idle;
                         break;
+                }
+
+                if (state == MultiplayerRoomState.Playing)
+                {
+                    foreach (var user in Room.Users)
+                        user.VotedToSkip = false;
                 }
 
                 RoomUpdated?.Invoke();
@@ -920,12 +929,33 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.UserVotedToSkip(int userId)
         {
-            throw new NotImplementedException();
+            handleRoomRequest(() =>
+            {
+                Debug.Assert(Room != null);
+
+                var user = Room.Users.SingleOrDefault(u => u.UserID == userId);
+
+                // TODO: user should NEVER be null here, see https://github.com/ppy/osu/issues/17713.
+                if (user == null)
+                    return;
+
+                user.VotedToSkip = true;
+
+                UserVotedToSkip?.Invoke(userId);
+            });
+
+            return Task.CompletedTask;
         }
 
         Task IMultiplayerClient.VoteToSkipPassed()
         {
-            throw new NotImplementedException();
+            handleRoomRequest(() =>
+            {
+                Debug.Assert(Room != null);
+                VoteToSkipPassed?.Invoke();
+            });
+
+            return Task.CompletedTask;
         }
 
         /// <summary>

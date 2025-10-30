@@ -563,7 +563,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public override Task VoteToSkip()
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         protected override Task<MultiplayerRoom> CreateRoomInternal(MultiplayerRoom room)
