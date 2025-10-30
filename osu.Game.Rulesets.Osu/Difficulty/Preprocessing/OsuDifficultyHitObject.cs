@@ -207,11 +207,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double sliderJumpBonus = 1.0;
 
             // Punish the cases where 1/2 slider going into 1/2 note
-            sliderJumpBonus *= DifficultyCalculationUtils.ReverseLerp(lastDifficultyObject.StrainTime, StrainTime * 0.55, StrainTime * 0.75);
+            sliderJumpBonus *= DifficultyCalculationUtils.ReverseLerp(lastDifficultyObject.AdjustedDeltaTime, AdjustedDeltaTime * 0.55, AdjustedDeltaTime * 0.75);
 
             // Punish the cases where 1/2 slider going into two 1/2 notes
             if (sliderCurr == null)
-                sliderJumpBonus *= DifficultyCalculationUtils.ReverseLerp(StrainTime, lastDifficultyObject.StrainTime * 0.55, lastDifficultyObject.StrainTime * 0.75);
+                sliderJumpBonus *= DifficultyCalculationUtils.ReverseLerp(AdjustedDeltaTime, lastDifficultyObject.AdjustedDeltaTime * 0.55, lastDifficultyObject.AdjustedDeltaTime * 0.75);
 
             // Punish too short sliders to prevent cheesing
             static double length(Slider? slider) => slider.IsNotNull() ? slider.Velocity * slider.SpanDuration : 0;
