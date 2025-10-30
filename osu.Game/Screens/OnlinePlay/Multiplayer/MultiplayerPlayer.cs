@@ -56,7 +56,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 AllowPause = false,
                 AllowRestart = false,
-                AllowSkipping = room.AutoSkip,
                 AutomaticallySkipIntro = room.AutoSkip,
                 ShowLeaderboard = true,
             })
@@ -121,6 +120,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             client.GameplayStarted += onGameplayStarted;
             client.ResultsReady += onResultsReady;
+            client.VoteToSkipPassed += onVoteToSkipPassed;
 
             ScoreProcessor.HasCompleted.BindValueChanged(_ =>
             {
@@ -219,6 +219,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             await Task.WhenAny(resultsReady.Task, Task.Delay(TimeSpan.FromSeconds(60))).ConfigureAwait(false);
         }
 
+        protected override void RequestIntroSkip()
+        {
+            // No base call because we aren't skipping yet.
+            client.VoteToSkip();
+        }
+
+        private void onVoteToSkipPassed()
+        {
+            Schedule(PerformIntroSkip);
+        }
+
         protected override ResultsScreen CreateResults(ScoreInfo score)
         {
             Debug.Assert(Room.RoomID != null);
@@ -242,6 +253,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 client.GameplayStarted -= onGameplayStarted;
                 client.ResultsReady -= onResultsReady;
+                client.VoteToSkipPassed -= onVoteToSkipPassed;
             }
         }
     }
