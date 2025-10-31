@@ -34,7 +34,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             get => localUser;
             set => localUser = value;
         }
-        
         public APIUser[] Users
         {
             get => users;
