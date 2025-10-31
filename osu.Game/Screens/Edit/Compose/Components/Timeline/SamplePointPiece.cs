@@ -440,11 +440,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
             }
 
-            private void playDemoSample()
+            private void playDemoSample() => Scheduler.AddOnce(() =>
             {
                 demoSample.Samples = allRelevantSamples.First().samples.Cast<ISampleInfo>().ToArray();
                 demoSample.Play();
-            }
+            });
 
             /// <summary>
             /// Applies the given update action on all samples of <see cref="allRelevantSamples"/>
