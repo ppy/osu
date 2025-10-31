@@ -105,7 +105,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
 
             int countTotal = client.Room.Users.Count(u => u.State == MultiplayerUserState.Playing);
-            int countSkipped = client.Room.Users.Count(u => u.State == MultiplayerUserState.Playing && u.VotedToSkip);
+            int countSkipped = client.Room.Users.Count(u => u.State == MultiplayerUserState.Playing && u.VotedToSkipIntro);
             int countRequired = countTotal / 2 + 1;
 
             countText.Text = $"{Math.Min(countRequired, countSkipped)} / {countRequired}";
