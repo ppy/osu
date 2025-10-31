@@ -80,10 +80,10 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
 
             current.BindValueChanged(_ => updateSelectionState(), true);
 
-            Action = OnAction;
+            Action = onAction;
         }
 
-        protected void OnAction()
+        private void onAction()
         {
             if (!Enabled.Value)
                 return;
