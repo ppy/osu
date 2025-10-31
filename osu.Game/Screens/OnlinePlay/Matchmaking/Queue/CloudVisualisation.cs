@@ -24,10 +24,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
     public partial class CloudVisualisation : CompositeDrawable
     {
         private APIUser[] users = [];
+        private APIUser? localUser;
         private Container usersContainer = null!;
 
         private readonly Bindable<double?> lastSamplePlayback = new Bindable<double?>();
 
+        public APIUser? LocalUser
+        {
+        get => localUser;
+        set => localUser = value;
+        }
+        
         public APIUser[] Users
         {
             get => users;
@@ -38,7 +45,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 foreach (var u in usersContainer)
                     u.Delay(RNG.Next(0, 1000)).FadeOut(500).Expire();
 
-                LoadComponentsAsync(users.Select(u => new MovingAvatar(u, lastSamplePlayback)), avatars =>
+                var cloudUsers = users.Where(u => localUser == null || u.Id != localUser.Id);
+
+                LoadComponentsAsync(cloudUsers.Select(u => new MovingAvatar(u, lastSamplePlayback)), avatars =>
                 {
                     if (usersContainer.Count == 0)
                     {
