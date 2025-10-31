@@ -31,8 +31,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         public APIUser? LocalUser
         {
-        get => localUser;
-        set => localUser = value;
+            get => localUser;
+            set => localUser = value;
         }
         
         public APIUser[] Users
