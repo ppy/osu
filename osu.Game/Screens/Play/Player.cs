@@ -708,6 +708,10 @@ namespace osu.Game.Screens.Play
             PerformIntroSkip();
         }
 
+        /// <summary>
+        /// Skip forward to the next valid skip point.
+        /// </summary>
+        /// <param name="fullLength"><c>true</c> to skip as close to gameplay as possible, or <c>false</c> to skip only to the next valid skip point.</param>
         protected void PerformIntroSkip(bool fullLength = false)
         {
             // user requested skip
