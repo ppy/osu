@@ -132,7 +132,7 @@ namespace osu.Game.Online.Multiplayer
         public event Action<MatchRoomState>? MatchRoomStateChanged;
 
         public event Action<int>? UserVotedToSkip;
-        public event Action? VoteToSkipPassed;
+        public event Action? VoteToSkipIntroPassed;
 
         /// <summary>
         /// Whether the <see cref="MultiplayerClient"/> is currently connected.
@@ -496,7 +496,7 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task RemovePlaylistItem(long playlistItemId);
 
-        public abstract Task VoteToSkip();
+        public abstract Task VoteToSkipIntro();
 
         Task IMultiplayerClient.RoomStateChanged(MultiplayerRoomState state)
         {
@@ -853,7 +853,7 @@ namespace osu.Game.Online.Multiplayer
                 Debug.Assert(Room != null);
 
                 foreach (var user in Room.Users)
-                    user.VotedToSkip = false;
+                    user.VotedToSkipIntro = false;
 
                 GameplayStarted?.Invoke();
             });
@@ -925,7 +925,7 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
-        Task IMultiplayerClient.UserVotedToSkip(int userId)
+        Task IMultiplayerClient.UserVotedToSkipIntro(int userId)
         {
             handleRoomRequest(() =>
             {
@@ -937,7 +937,7 @@ namespace osu.Game.Online.Multiplayer
                 if (user == null)
                     return;
 
-                user.VotedToSkip = true;
+                user.VotedToSkipIntro = true;
 
                 UserVotedToSkip?.Invoke(userId);
             });
@@ -945,12 +945,12 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
-        Task IMultiplayerClient.VoteToSkipPassed()
+        Task IMultiplayerClient.VoteToSkipIntroPassed()
         {
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
-                VoteToSkipPassed?.Invoke();
+                VoteToSkipIntroPassed?.Invoke();
             });
 
             return Task.CompletedTask;

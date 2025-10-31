@@ -53,7 +53,7 @@ namespace osu.Game.Online.Multiplayer
         /// Whether this user voted to skip the beatmap intro.
         /// </summary>
         [Key(7)]
-        public bool VotedToSkip;
+        public bool VotedToSkipIntro;
 
         [IgnoreMember]
         public APIUser? User { get; set; }
