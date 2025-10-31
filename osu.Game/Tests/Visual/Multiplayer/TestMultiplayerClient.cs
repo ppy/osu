@@ -568,7 +568,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public async Task UserVoteToSkip(int userId)
         {
-            await ((IMultiplayerClient)this).UserVotedToSkip(userId);
+            await ((IMultiplayerClient)this).UserVotedToSkip(userId).ConfigureAwait(false);
         }
 
         protected override Task<MultiplayerRoom> CreateRoomInternal(MultiplayerRoom room)
