@@ -61,12 +61,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 });
             }
 
-            AddStep("local user votes", () => MultiplayerClient.VoteToSkip().WaitSafely());
+            AddStep("local user votes", () => MultiplayerClient.VoteToSkipIntro().WaitSafely());
 
             for (int i = 0; i < 4; i++)
             {
                 int i2 = i;
-                AddStep($"user {i2} votes", () => MultiplayerClient.UserVoteToSkip(i2).WaitSafely());
+                AddStep($"user {i2} votes", () => MultiplayerClient.UserVoteToSkipIntro(i2).WaitSafely());
             }
         }
     }

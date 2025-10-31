@@ -561,14 +561,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public override Task RemovePlaylistItem(long playlistItemId) => RemoveUserPlaylistItem(api.LocalUser.Value.OnlineID, clone(playlistItemId));
 
-        public override Task VoteToSkip()
+        public override Task VoteToSkipIntro()
         {
-            return UserVoteToSkip(api.LocalUser.Value.OnlineID);
+            return UserVoteToSkipIntro(api.LocalUser.Value.OnlineID);
         }
 
-        public async Task UserVoteToSkip(int userId)
+        public async Task UserVoteToSkipIntro(int userId)
         {
-            await ((IMultiplayerClient)this).UserVotedToSkip(userId).ConfigureAwait(false);
+            await ((IMultiplayerClient)this).UserVotedToSkipIntro(userId).ConfigureAwait(false);
         }
 
         protected override Task<MultiplayerRoom> CreateRoomInternal(MultiplayerRoom room)

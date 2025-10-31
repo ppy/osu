@@ -120,7 +120,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             client.GameplayStarted += onGameplayStarted;
             client.ResultsReady += onResultsReady;
-            client.VoteToSkipPassed += onVoteToSkipPassed;
+            client.VoteToSkipIntroPassed += onVoteToSkipIntroPassed;
 
             ScoreProcessor.HasCompleted.BindValueChanged(_ =>
             {
@@ -224,10 +224,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override void RequestIntroSkip()
         {
             // No base call because we aren't skipping yet.
-            client.VoteToSkip().FireAndForget();
+            client.VoteToSkipIntro().FireAndForget();
         }
 
-        private void onVoteToSkipPassed()
+        private void onVoteToSkipIntroPassed()
         {
             Schedule(() => PerformIntroSkip(true));
         }
@@ -255,7 +255,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 client.GameplayStarted -= onGameplayStarted;
                 client.ResultsReady -= onResultsReady;
-                client.VoteToSkipPassed -= onVoteToSkipPassed;
+                client.VoteToSkipIntroPassed -= onVoteToSkipIntroPassed;
             }
         }
     }
