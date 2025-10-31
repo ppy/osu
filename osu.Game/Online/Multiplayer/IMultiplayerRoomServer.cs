@@ -115,7 +115,7 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// Votes to skip the beatmap intro.
         /// </summary>
-        Task VoteToSkip();
+        Task VoteToSkipIntro();
 
         /// <summary>
         /// Invites a player to the current room.
