@@ -524,12 +524,6 @@ namespace osu.Game.Online.Multiplayer
                         break;
                 }
 
-                if (state == MultiplayerRoomState.Playing)
-                {
-                    foreach (var user in Room.Users)
-                        user.VotedToSkip = false;
-                }
-
                 RoomUpdated?.Invoke();
             });
 
@@ -857,6 +851,10 @@ namespace osu.Game.Online.Multiplayer
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
+
+                foreach (var user in Room.Users)
+                    user.VotedToSkip = false;
+
                 GameplayStarted?.Invoke();
             });
 
