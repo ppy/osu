@@ -148,6 +148,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Debug.Assert(client.Room != null);
         }
 
+        protected override SkipOverlay CreateSkipOverlay(double startTime) => new MultiplayerSkipOverlay(startTime);
+
         protected override void StartGameplay()
         {
             // We can enter this screen one of two ways:

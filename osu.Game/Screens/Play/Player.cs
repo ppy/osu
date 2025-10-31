@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Play
 
         private BreakTracker breakTracker;
 
-        private SkipOverlay skipIntroOverlay;
+        protected SkipOverlay SkipIntroOverlay { get; private set; }
         private SkipOverlay skipOutroOverlay;
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
@@ -500,10 +500,10 @@ namespace osu.Game.Screens.Play
                     },
                     // display the cursor above some HUD elements.
                     DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
-                    skipIntroOverlay = new SkipOverlay(DrawableRuleset.GameplayStartTime)
+                    SkipIntroOverlay = CreateSkipOverlay(DrawableRuleset.GameplayStartTime).With(o =>
                     {
-                        RequestSkip = RequestIntroSkip
-                    },
+                        o.RequestSkip = RequestIntroSkip;
+                    }),
                     skipOutroOverlay = new SkipOverlay(GameplayState.Storyboard.LatestEventTime ?? 0)
                     {
                         RequestSkip = () => progressToResults(false),
@@ -522,12 +522,14 @@ namespace osu.Game.Screens.Play
 
             if (!Configuration.AllowSkipping || !DrawableRuleset.AllowGameplayOverlays)
             {
-                skipIntroOverlay.Expire();
+                SkipIntroOverlay.Expire();
                 skipOutroOverlay.Expire();
             }
 
             return container;
         }
+
+        protected virtual SkipOverlay CreateSkipOverlay(double startTime) => new SkipOverlay(startTime);
 
         private void onBreakTimeChanged(ValueChangedEvent<bool> isBreakTime)
         {
@@ -1158,7 +1160,7 @@ namespace osu.Game.Screens.Play
             GameplayClockContainer.Reset(startClock: true);
 
             if (Configuration.AutomaticallySkipIntro)
-                skipIntroOverlay.SkipWhenReady();
+                SkipIntroOverlay.SkipWhenReady();
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
