@@ -239,15 +239,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (lastLastDifficultyObject != null && lastLastDifficultyObject.BaseObject is not Spinner)
             {
-                Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastDifficultyObject);
-
-                Vector2 v1 = lastLastCursorPosition - LastObject.StackedPosition;
-                Vector2 v2 = BaseObject.StackedPosition - lastCursorPosition;
-
-                float dot = Vector2.Dot(v1, v2);
-                float det = v1.X * v2.Y - v1.Y * v2.X;
-
-                Angle = Math.Abs(Math.Atan2(det, dot));
+                Angle = Math.Abs(calculateAngle(lastDifficultyObject!, lastLastDifficultyObject!));
             }
         }
 
@@ -357,6 +349,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 if (i == nestedObjects.Count - 1)
                     LazyEndPosition = currCursorPosition;
             }
+        }
+
+        private double calculateAngle(OsuDifficultyHitObject lastDifficultyObject, OsuDifficultyHitObject lastLastDifficultyObject)
+        {
+            Vector2 lastCursorPosition = getEndCursorPosition(lastDifficultyObject);
+            Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastDifficultyObject);
+
+            if (lastDifficultyObject.BaseObject is Slider slider && lastDifficultyObject.TravelDistance > 0)
+            {
+                IList<HitObject> nestedObjects = slider.NestedHitObjects;
+
+                OsuHitObject lastNestedObject = (OsuHitObject)nestedObjects[^1];
+                OsuHitObject secondLastNestedObject = (OsuHitObject)nestedObjects[^2];
+
+                lastCursorPosition = lastNestedObject.StackedPosition;
+                lastLastCursorPosition = secondLastNestedObject.StackedPosition;
+            }
+
+            Vector2 v1 = lastLastCursorPosition - lastCursorPosition;
+            Vector2 v2 = BaseObject.StackedPosition - lastCursorPosition;
+
+            float dot = Vector2.Dot(v1, v2);
+            float det = v1.X * v2.Y - v1.Y * v2.X;
+
+            return Math.Atan2(det, dot);
         }
 
         private Vector2 getEndCursorPosition(OsuDifficultyHitObject difficultyHitObject)
