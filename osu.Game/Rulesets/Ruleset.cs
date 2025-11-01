@@ -28,6 +28,7 @@ using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
@@ -260,8 +261,9 @@ namespace osu.Game.Rulesets
         /// Optionally creates a <see cref="IBeatmapProcessor"/> to alter a <see cref="IBeatmap"/> after it has been converted.
         /// </summary>
         /// <param name="beatmap">The <see cref="IBeatmap"/> to be processed.</param>
+        /// <param name="changeHandler">The <see cref="IBeatmapEditorChangeHandler"/> to record changes to.</param>
         /// <returns>The <see cref="IBeatmapProcessor"/>.</returns>
-        public virtual IBeatmapProcessor? CreateBeatmapProcessor(IBeatmap beatmap) => null;
+        public virtual IBeatmapProcessor? CreateBeatmapProcessor(IBeatmap beatmap, IBeatmapEditorChangeHandler? changeHandler = null) => null;
 
         public abstract DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap);
 
