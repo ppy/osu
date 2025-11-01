@@ -24,7 +24,9 @@ namespace osu.Game.Overlays
 
         private readonly Bindable<string> path = new Bindable<string>(INDEX_PATH);
         private readonly Bindable<APIWikiPage?> wikiData = new Bindable<APIWikiPage?>();
-        private readonly IBindable<Language> language = new Bindable<Language>();
+        private readonly IBindable<Language> gameLanguage = new Bindable<Language>();
+
+        private readonly Bindable<Language> currentLanguage = new Bindable<Language>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -50,8 +52,19 @@ namespace osu.Game.Overlays
             path.BindValueChanged(onPathChanged);
             wikiData.BindTo(Header.WikiPageData);
 
-            language.BindTo(game.CurrentLanguage);
-            language.BindValueChanged(onLangChanged);
+            bindCurrentLanguageToDropDown();
+            Header.LanguageDropdown.DropDownUpdated += bindCurrentLanguageToDropDown;
+
+            gameLanguage.BindTo(game.CurrentLanguage);
+            // always change wiki's language when user switch game language.
+            gameLanguage.BindValueChanged(l => currentLanguage.Value = l.NewValue, true);
+            currentLanguage.BindValueChanged(onLangChanged);
+        }
+
+        private void bindCurrentLanguageToDropDown()
+        {
+            Header.LanguageDropdown.Current.Value = currentLanguage.Value;
+            currentLanguage.BindTo(Header.LanguageDropdown.Current);
         }
 
         public void ShowPage(string pagePath = INDEX_PATH)
@@ -139,7 +152,7 @@ namespace osu.Game.Overlays
             if (e.NewValue == "error")
                 return;
 
-            loadPage(e.NewValue, language.Value);
+            loadPage(e.NewValue, currentLanguage.Value);
         }
 
         private void onLangChanged(ValueChangedEvent<Language> e)
@@ -151,6 +164,9 @@ namespace osu.Game.Overlays
         private void onSuccess(APIWikiPage response)
         {
             wikiData.Value = response;
+            // unbind here to prevent current language change.
+            Header.LanguageDropdown.Current.UnbindFrom(currentLanguage);
+            Header.LanguageDropdown.UpdateDropdown(response.AvailableLocales);
             path.Value = response.Path;
 
             if (response.Layout.Equals(INDEX_PATH, StringComparison.OrdinalIgnoreCase))
