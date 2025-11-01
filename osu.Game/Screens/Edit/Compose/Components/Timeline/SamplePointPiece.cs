@@ -261,10 +261,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     }
                 };
 
-                bank.TabbableContentContainer = flow;
-                additionBank.TabbableContentContainer = flow;
-                volume.TabbableContentContainer = flow;
-
                 // if the piece belongs to a currently selected object, assume that the user wants to change all selected objects.
                 // if the piece belongs to an unselected object, operate on that object alone, independently of the selection.
                 relevantObjects = (beatmap.SelectedHitObjects.Contains(hitObject) ? beatmap.SelectedHitObjects : hitObject.Yield()).ToArray();
@@ -462,6 +458,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         CreateIcon = () => ComposeBlueprintContainer.GetIconForSample(sampleName),
                         RelativeSizeAxes = Axes.None,
                         Size = new Vector2(40, 40),
+                        CanBeTabbedTo = true,
                     };
                 }
             }
@@ -504,6 +501,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             protected override bool OnKeyDown(KeyDownEvent e)
             {
+                if (e.Key == Key.Tab)
+                {
+                    this.MoveFocusToNextTabStop(e.ShiftPressed, requireFocusedChild: false);
+                    return true;
+                }
+
                 if (e.ControlPressed || e.SuperPressed || !checkRightToggleFromKey(e.Key, out int rightIndex))
                     return base.OnKeyDown(e);
 
