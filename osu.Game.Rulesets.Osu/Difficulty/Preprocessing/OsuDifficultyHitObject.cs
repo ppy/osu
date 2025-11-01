@@ -364,9 +364,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (lastDifficultyObject.BaseObject is Slider slider && lastDifficultyObject.TravelDistance > 0)
             {
-
                 OsuHitObject secondLastNestedObject = (OsuHitObject)slider.NestedHitObjects[^2];
-
                 lastLastCursorPosition = secondLastNestedObject.StackedPosition;
             }
 
