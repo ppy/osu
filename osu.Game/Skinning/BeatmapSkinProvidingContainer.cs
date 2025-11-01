@@ -5,7 +5,10 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
+using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Storyboards;
 
 namespace osu.Game.Skinning
@@ -57,12 +60,35 @@ namespace osu.Game.Skinning
             return beatmapSkins.Value;
         }
 
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
+
+        private HitsoundsSetting beatmapHitsoundsState;
+
         protected override bool AllowSampleLookup(ISampleInfo sampleInfo)
         {
             if (beatmapSkins == null)
                 throw new InvalidOperationException($"{nameof(BeatmapSkinProvidingContainer)} needs to be loaded before being consumed.");
 
-            return sampleInfo is StoryboardSampleInfo || beatmapHitsounds.Value;
+            bool useBeatmapHitsounds;
+
+            switch (beatmapHitsoundsState)
+            {
+                case HitsoundsSetting.HitsoundsOn:
+                    useBeatmapHitsounds = true;
+                    break;
+
+                case HitsoundsSetting.HitsoundsOff:
+                    useBeatmapHitsounds = false;
+                    break;
+
+                case HitsoundsSetting.UseGlobalSetting:
+                default:
+                    useBeatmapHitsounds = beatmapHitsounds.Value;
+                    break;
+            }
+
+            return sampleInfo is StoryboardSampleInfo || useBeatmapHitsounds;
         }
 
         private readonly ISkin skin;
@@ -88,12 +114,26 @@ namespace osu.Game.Skinning
             return base.CreateChildDependencies(parent);
         }
 
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
+        private IDisposable? beatmapHitsoundsSubscription;
+
         [BackgroundDependencyLoader]
         private void load(SkinManager skins)
         {
             beatmapSkins.BindValueChanged(_ => TriggerSourceChanged());
             beatmapColours.BindValueChanged(_ => TriggerSourceChanged());
             beatmapHitsounds.BindValueChanged(_ => TriggerSourceChanged());
+
+            beatmapHitsoundsSubscription = realm.SubscribeToPropertyChanged(
+                r => r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)?.UserSettings,
+                settings => settings.HitsoundsInt,
+                val =>
+                {
+                    beatmapHitsoundsState = (HitsoundsSetting)val;
+                    TriggerSourceChanged();
+                });
 
             currentSkin = skins.CurrentSkin.GetBoundCopy();
             currentSkin.BindValueChanged(_ =>
@@ -116,6 +156,12 @@ namespace osu.Game.Skinning
                 else
                     SetSources(new[] { skin });
             }, true);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            beatmapHitsoundsSubscription?.Dispose();
         }
     }
 }
