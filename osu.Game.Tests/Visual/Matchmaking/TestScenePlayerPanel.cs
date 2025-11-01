@@ -108,5 +108,10 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             AddToggleStep("toggle quit", quit => panel.HasQuit = quit);
         }
+
+        [Test]
+        public void TestDownloadProgress()
+        {
+        }
     }
 }
