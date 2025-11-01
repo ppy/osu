@@ -251,7 +251,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         result = variantText;
                     else
                         result = LocalisableString.Interpolate($"{result}\n{variantText}");
-
                 }
             }
 
