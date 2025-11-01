@@ -428,6 +428,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         Action = avatarAction.Action
                     }).ConfigureAwait(false);
                     break;
+
+                case MatchmakingCursorPositionRequest cursorAction:
+                    await ((IMultiplayerClient)this).MatchEvent(new MatchmakingCursorPositionEvent
+                    {
+                        UserId = userId,
+                        X = cursorAction.X,
+                        Y = cursorAction.Y,
+                    }).ConfigureAwait(false);
+                    break;
             }
         }
 
