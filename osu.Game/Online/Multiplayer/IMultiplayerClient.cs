@@ -149,5 +149,15 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         /// <param name="item">The changed item.</param>
         Task PlaylistItemChanged(MultiplayerPlaylistItem item);
+
+        /// <summary>
+        /// Signals that a user has requested to skip the beatmap intro.
+        /// </summary>
+        Task UserVotedToSkipIntro(int userId);
+
+        /// <summary>
+        /// Signals that the vote to skip the beatmap intro has passed.
+        /// </summary>
+        Task VoteToSkipIntroPassed();
     }
 }
