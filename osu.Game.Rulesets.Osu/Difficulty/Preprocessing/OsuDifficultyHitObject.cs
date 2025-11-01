@@ -239,7 +239,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (lastLastDifficultyObject != null && lastLastDifficultyObject.BaseObject is not Spinner)
             {
-                Angle = Math.Abs(calculateAngle(lastDifficultyObject!, lastLastDifficultyObject!));
+                if (lastDifficultyObject!.BaseObject is Slider slider && lastDifficultyObject.TravelDistance > 0)
+                    lastCursorPosition = slider.HeadCircle.StackedPosition;
+                Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastDifficultyObject);
+
+                double angle = Math.Abs(calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition));
+                double sliderAngle = Math.Abs(calculateSliderAngle(lastDifficultyObject!, lastLastCursorPosition));
+
+                Angle = Math.Min(angle, sliderAngle);
             }
         }
 
@@ -351,24 +358,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
         }
 
-        private double calculateAngle(OsuDifficultyHitObject lastDifficultyObject, OsuDifficultyHitObject lastLastDifficultyObject)
+        private double calculateSliderAngle(OsuDifficultyHitObject lastDifficultyObject, Vector2 lastLastCursorPosition)
         {
             Vector2 lastCursorPosition = getEndCursorPosition(lastDifficultyObject);
-            Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastDifficultyObject);
 
             if (lastDifficultyObject.BaseObject is Slider slider && lastDifficultyObject.TravelDistance > 0)
             {
-                IList<HitObject> nestedObjects = slider.NestedHitObjects;
 
-                OsuHitObject lastNestedObject = (OsuHitObject)nestedObjects[^1];
-                OsuHitObject secondLastNestedObject = (OsuHitObject)nestedObjects[^2];
+                OsuHitObject secondLastNestedObject = (OsuHitObject)slider.NestedHitObjects[^2];
 
-                lastCursorPosition = lastNestedObject.StackedPosition;
                 lastLastCursorPosition = secondLastNestedObject.StackedPosition;
             }
 
-            Vector2 v1 = lastLastCursorPosition - lastCursorPosition;
-            Vector2 v2 = BaseObject.StackedPosition - lastCursorPosition;
+            return calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition);
+        }
+
+        private double calculateAngle(Vector2 currentPosition, Vector2 lastPosition, Vector2 lastLastPosition)
+        {
+            Vector2 v1 = lastLastPosition - lastPosition;
+            Vector2 v2 = currentPosition - lastPosition;
 
             float dot = Vector2.Dot(v1, v2);
             float det = v1.X * v2.Y - v1.Y * v2.X;
