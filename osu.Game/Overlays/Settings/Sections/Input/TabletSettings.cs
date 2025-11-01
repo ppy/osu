@@ -13,6 +13,7 @@ using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -34,6 +35,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private readonly Bindable<Vector2> areaOffset = new Bindable<Vector2>();
         private readonly Bindable<Vector2> areaSize = new Bindable<Vector2>();
+        private readonly Bindable<Vector2> outputAreaSize = new Bindable<Vector2>();
+        private readonly Bindable<Vector2> outputAreaOffset = new Bindable<Vector2>();
         private readonly IBindable<TabletInfo> tablet = new Bindable<TabletInfo>();
 
         private readonly BindableNumber<float> offsetX = new BindableNumber<float> { MinValue = 0, Precision = 1 };
@@ -45,6 +48,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private readonly BindableNumber<float> rotation = new BindableNumber<float> { MinValue = 0, MaxValue = 360, Precision = 1 };
 
         private readonly BindableNumber<float> pressureThreshold = new BindableNumber<float> { MinValue = 0.0f, MaxValue = 1.0f, Precision = 0.005f };
+
+        private Bindable<ScalingMode> scalingMode = null!;
+        private Bindable<float> scalingSizeX = null!;
+        private Bindable<float> scalingSizeY = null!;
+        private Bindable<float> scalingPositionX = new Bindable<float>();
+        private Bindable<float> scalingPositionY = new Bindable<float>();
 
         [Resolved]
         private GameHost host { get; set; }
@@ -77,8 +86,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationManager localisation)
+        private void load(OsuColour colours, LocalisationManager localisation, OsuConfigManager osuConfig)
         {
+            scalingMode = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
+            scalingSizeX = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX);
+            scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
+            scalingPositionX = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionX);
+            scalingPositionY = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionY);
+
             Children = new Drawable[]
             {
                 new SettingsCheckbox
@@ -152,7 +167,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             Text = TabletSettingsStrings.ConformToCurrentGameAspectRatio,
                             Action = () =>
                             {
-                                forceAspectRatio((float)host.Window.ClientSize.Width / host.Window.ClientSize.Height);
+                                float gameplayWidth = host.Window.ClientSize.Width;
+                                float gameplayHeight = host.Window.ClientSize.Height;
+
+                                if (osuConfig.Get<ScalingMode>(OsuSetting.Scaling) == ScalingMode.Everything)
+                                {
+                                    gameplayWidth *= osuConfig.Get<float>(OsuSetting.ScalingSizeX);
+                                    gameplayHeight *= osuConfig.Get<float>(OsuSetting.ScalingSizeY);
+                                }
+
+                                forceAspectRatio(gameplayWidth / gameplayHeight);
                             },
                             CanBeShown = { BindTarget = enabled }
                         },
@@ -249,6 +273,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 sizeY.Value = val.NewValue.Y;
             }), true);
 
+            outputAreaSize.BindTo(tabletHandler.OutputAreaSize);
+            outputAreaOffset.BindTo(tabletHandler.OutputAreaOffset);
+
             sizeX.BindValueChanged(val =>
             {
                 areaSize.Value = new Vector2(val.NewValue, areaSize.Value.Y);
@@ -271,6 +298,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 aspectRatioApplication?.Cancel();
                 aspectRatioApplication = Schedule(() => forceAspectRatio(aspect.NewValue));
             });
+
+            updateScaling();
+            scalingMode.BindValueChanged(_ => updateScaling());
+            scalingSizeX.BindValueChanged(_ => updateScaling());
+            scalingSizeY.BindValueChanged(_ => updateScaling());
+            scalingPositionX.BindValueChanged(_ => updateScaling());
+            scalingPositionY.BindValueChanged(_ => updateScaling());
 
             pressureThreshold.BindTo(tabletHandler.PressureThreshold);
 
@@ -357,6 +391,20 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             aspectRatioApplication?.Cancel();
             aspectLock.Value = true;
+        }
+
+        private void updateScaling()
+        {
+            if (scalingMode.Value == ScalingMode.Everything)
+            {
+                outputAreaSize.Value = new Vector2(scalingSizeX.Value, scalingSizeY.Value);
+                outputAreaOffset.Value = new Vector2(scalingPositionX.Value, scalingPositionY.Value);
+            }
+            else
+            {
+                outputAreaSize.Value = new Vector2(1, 1);
+                outputAreaOffset.Value = new Vector2(0.5f, 0.5f);
+            }
         }
 
         private void updateAspectRatio() => aspectRatio.Value = currentAspectRatio;
