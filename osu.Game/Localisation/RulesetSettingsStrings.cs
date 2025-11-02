@@ -62,7 +62,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "0.5× (every second beat)"
         /// </summary>
-        public static LocalisableString KiaiFlashFrequency05x => new TranslatableString(getKey(@"kiai_flash_frequency_0_5x"), @"0.5× (every second beat)");
+        public static LocalisableString KiaiFlashFrequency05X => new TranslatableString(getKey(@"kiai_flash_frequency_0_5x"), @"0.5× (every second beat)");
 
         /// <summary>
         /// "0.25× (every fourth beat)"

@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Osu.Configuration
         [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.KiaiFlashFrequency1X))]
         EveryBeat,
 
-        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.KiaiFlashFrequency05x))]
+        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.KiaiFlashFrequency05X))]
         EverySecondBeat,
 
         [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.KiaiFlashFrequency025X))]
