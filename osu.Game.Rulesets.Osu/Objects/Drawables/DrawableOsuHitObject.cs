@@ -126,9 +126,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private void applyDim(Drawable piece)
         {
-            float dimmingAmount = Math.Clamp(hitObjectDimmingStrength.Value, 0f, 2f);
-            byte dimChannel = (byte)Math.Clamp(Math.Round(255 - (255 - 195) * dimmingAmount), 0, 255);
-            Color4 dimColour = new Color4(dimChannel, dimChannel, dimChannel, 255);
+            float dimmingMultiplier = Math.Clamp(hitObjectDimmingStrength.Value, 0f, 2f);
+            byte dimColorValue = (byte)Math.Clamp(Math.Round(255 - (255 - 195) * dimmingMultiplier), 0, 255);
+            Color4 dimColour = new Color4(dimColorValue, dimColorValue, dimColorValue, 255);
 
             piece.FadeColour(dimColour);
             using (piece.BeginDelayedSequence(InitialLifetimeOffset - OsuHitWindows.MISS_WINDOW))
