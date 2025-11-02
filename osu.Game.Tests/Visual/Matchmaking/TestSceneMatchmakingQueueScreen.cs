@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             base.SetUpSteps();
 
-            AddStep("load screen", () => LoadScreen(new IntroScreen()));
+            AddStep("load screen", () => LoadScreen(new ScreenIntro()));
         }
 
         [Test]

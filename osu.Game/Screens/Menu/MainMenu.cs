@@ -482,7 +482,7 @@ namespace osu.Game.Screens.Menu
 
         private void loadSongSelect() => this.Push(new SoloSongSelect());
 
-        private void joinOrLeaveMatchmakingQueue() => this.Push(new OnlinePlay.Matchmaking.Intro.IntroScreen());
+        private void joinOrLeaveMatchmakingQueue() => this.Push(new OnlinePlay.Matchmaking.Intro.ScreenIntro());
 
         private partial class MobileDisclaimerDialog : PopupDialog
         {
