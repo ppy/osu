@@ -57,17 +57,17 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "1× (every beat)"
         /// </summary>
-        public static LocalisableString KiaiFlashFrequency1x => new TranslatableString(getKey(@"kiai_flash_frequency_1x"), @"1× (every beat)");
+        public static LocalisableString KiaiFlashFrequency1X => new TranslatableString(getKey(@"kiai_flash_frequency_1x"), @"1× (every beat)");
 
         /// <summary>
         /// "0.5× (every second beat)"
         /// </summary>
-        public static LocalisableString KiaiFlashFrequency0_5x => new TranslatableString(getKey(@"kiai_flash_frequency_0_5x"), @"0.5× (every second beat)");
+        public static LocalisableString KiaiFlashFrequency05x => new TranslatableString(getKey(@"kiai_flash_frequency_0_5x"), @"0.5× (every second beat)");
 
         /// <summary>
         /// "0.25× (every fourth beat)"
         /// </summary>
-        public static LocalisableString KiaiFlashFrequency0_25x => new TranslatableString(getKey(@"kiai_flash_frequency_0_25x"), @"0.25× (every fourth beat)");
+        public static LocalisableString KiaiFlashFrequency025X => new TranslatableString(getKey(@"kiai_flash_frequency_0_25x"), @"0.25× (every fourth beat)");
 
         /// <summary>
         /// "None"

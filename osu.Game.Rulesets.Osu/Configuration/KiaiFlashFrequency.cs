@@ -8,13 +8,13 @@ namespace osu.Game.Rulesets.Osu.Configuration
 {
     public enum KiaiFlashFrequency
     {
-        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.KiaiFlashFrequency1x))]
+        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.KiaiFlashFrequency1X))]
         EveryBeat,
 
-        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.KiaiFlashFrequency0_5x))]
+        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.KiaiFlashFrequency05x))]
         EverySecondBeat,
 
-        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.KiaiFlashFrequency0_25x))]
+        [LocalisableDescription(typeof(RulesetSettingsStrings), nameof(RulesetSettingsStrings.KiaiFlashFrequency025X))]
         EveryFourthBeat,
     }
 }
