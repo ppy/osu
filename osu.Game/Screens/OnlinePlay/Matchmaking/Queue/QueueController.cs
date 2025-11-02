@@ -165,7 +165,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 CompletionClickAction = () =>
                 {
                     client.MatchmakingAcceptInvitation().FireAndForget();
-                    performer?.PerformFromScreen(s => s.Push(new IntroScreen()));
+                    performer?.PerformFromScreen(s => s.Push(new ScreenIntro()));
 
                     Close(false);
                     return true;
