@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             if (beatIndex % interval != 0)
                 return;
 
-            float opacityMultiplier = Math.Clamp(kiaiFlashStrength.Value, 0.5f, 2f);
+            float opacityMultiplier = Math.Clamp(kiaiFlashStrength.Value, 0.0f, 10.0f);
 
             Child
                 .FadeTo(flash_opacity * opacityMultiplier, EarlyActivationMilliseconds, Easing.OutQuint)

@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private void applyDim(Drawable piece)
         {
-            float dimmingMultiplier = Math.Clamp(hitObjectDimmingStrength.Value, 0f, 2f);
+            float dimmingMultiplier = hitObjectDimmingStrength.Value;
             byte dimColorValue = (byte)Math.Clamp(Math.Round(255 - (255 - 195) * dimmingMultiplier), 0, 255);
             Color4 dimColour = new Color4(dimColorValue, dimColorValue, dimColorValue, 255);
 
