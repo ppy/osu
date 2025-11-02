@@ -22,6 +22,9 @@ namespace osu.Game.Rulesets.Osu.Configuration
             SetDefault(OsuRulesetSetting.ShowCursorTrail, true);
             SetDefault(OsuRulesetSetting.ShowCursorRipples, false);
             SetDefault(OsuRulesetSetting.PlayfieldBorderStyle, PlayfieldBorderStyle.None);
+            SetDefault(OsuRulesetSetting.HitObjectDimmingStrength, 1f);
+            SetDefault(OsuRulesetSetting.KiaiFlashStrength, 1f);
+            SetDefault(OsuRulesetSetting.KiaiFlashFrequency, KiaiFlashFrequency.EveryBeat);
 
             SetDefault(OsuRulesetSetting.ReplayClickMarkersEnabled, false);
             SetDefault(OsuRulesetSetting.ReplayFrameMarkersEnabled, false);
@@ -38,6 +41,9 @@ namespace osu.Game.Rulesets.Osu.Configuration
         ShowCursorTrail,
         ShowCursorRipples,
         PlayfieldBorderStyle,
+        HitObjectDimmingStrength,
+        KiaiFlashStrength,
+        KiaiFlashFrequency,
 
         // Replay
         ReplayClickMarkersEnabled,

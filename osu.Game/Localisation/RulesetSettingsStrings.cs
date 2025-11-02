@@ -40,6 +40,36 @@ namespace osu.Game.Localisation
         public static LocalisableString PlayfieldBorderStyle => new TranslatableString(getKey(@"playfield_border_style"), @"Playfield border style");
 
         /// <summary>
+        /// "Hit object dimming"
+        /// </summary>
+        public static LocalisableString HitObjectDimmingStrength => new TranslatableString(getKey(@"hit_object_dimming_strength"), @"Hit object dimming");
+
+        /// <summary>
+        /// "Kiai flash strength"
+        /// </summary>
+        public static LocalisableString KiaiFlashStrength => new TranslatableString(getKey(@"kiai_flash_strength"), @"Kiai flash strength");
+
+        /// <summary>
+        /// "Kiai flash frequency"
+        /// </summary>
+        public static LocalisableString KiaiFlashFrequency => new TranslatableString(getKey(@"kiai_flash_frequency"), @"Kiai flash frequency");
+
+        /// <summary>
+        /// "1× (every beat)"
+        /// </summary>
+        public static LocalisableString KiaiFlashFrequency1x => new TranslatableString(getKey(@"kiai_flash_frequency_1x"), @"1× (every beat)");
+
+        /// <summary>
+        /// "0.5× (every second beat)"
+        /// </summary>
+        public static LocalisableString KiaiFlashFrequency0_5x => new TranslatableString(getKey(@"kiai_flash_frequency_0_5x"), @"0.5× (every second beat)");
+
+        /// <summary>
+        /// "0.25× (every fourth beat)"
+        /// </summary>
+        public static LocalisableString KiaiFlashFrequency0_25x => new TranslatableString(getKey(@"kiai_flash_frequency_0_25x"), @"0.25× (every fourth beat)");
+
+        /// <summary>
         /// "None"
         /// </summary>
         public static LocalisableString BorderNone => new TranslatableString(getKey(@"no_borders"), @"None");

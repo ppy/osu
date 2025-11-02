@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Localisation;
@@ -20,10 +21,29 @@ namespace osu.Game.Rulesets.Osu.UI
         {
         }
 
+        private readonly BindableFloat hitObjectDimmingStrength = new BindableFloat
+        {
+            MinValue = 0f,
+            MaxValue = 2f,
+            Precision = 0.05f,
+            Default = 1f,
+        };
+
+        private readonly BindableFloat kiaiFlashStrength = new BindableFloat
+        {
+            MinValue = 0.5f,
+            MaxValue = 2f,
+            Precision = 0.05f,
+            Default = 1f,
+        };
+
         [BackgroundDependencyLoader]
         private void load()
         {
             var config = (OsuRulesetConfigManager)Config;
+
+            config.BindWith(OsuRulesetSetting.HitObjectDimmingStrength, hitObjectDimmingStrength);
+            config.BindWith(OsuRulesetSetting.KiaiFlashStrength, kiaiFlashStrength);
 
             Children = new Drawable[]
             {
@@ -52,6 +72,26 @@ namespace osu.Game.Rulesets.Osu.UI
                 {
                     LabelText = RulesetSettingsStrings.PlayfieldBorderStyle,
                     Current = config.GetBindable<PlayfieldBorderStyle>(OsuRulesetSetting.PlayfieldBorderStyle),
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = RulesetSettingsStrings.HitObjectDimmingStrength,
+                    Keywords = new[] { "dimming", "lightup", "pre-hit" },
+                    KeyboardStep = 0.05f,
+                    Current = hitObjectDimmingStrength,
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = RulesetSettingsStrings.KiaiFlashStrength,
+                    Keywords = new[] { "kiai", "flash", "intensity" },
+                    KeyboardStep = 0.05f,
+                    Current = kiaiFlashStrength,
+                },
+                new SettingsEnumDropdown<KiaiFlashFrequency>
+                {
+                    LabelText = RulesetSettingsStrings.KiaiFlashFrequency,
+                    Keywords = new[] { "kiai", "frequency", "cadence", "beat" },
+                    Current = config.GetBindable<KiaiFlashFrequency>(OsuRulesetSetting.KiaiFlashFrequency),
                 },
             };
         }

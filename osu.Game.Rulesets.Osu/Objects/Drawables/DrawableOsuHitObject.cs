@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
@@ -28,6 +29,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public readonly IBindable<int> StackHeightBindable = new Bindable<int>();
         public readonly IBindable<float> ScaleBindable = new BindableFloat();
         public readonly IBindable<int> IndexInCurrentComboBindable = new Bindable<int>();
+
+        [Resolved(canBeNull: true)]
+        private OsuRulesetConfigManager config { get; set; }
+
+        private readonly BindableFloat hitObjectDimmingStrength = new BindableFloat(1f);
 
         // Must be set to update IsHovered as it's used in relax mod to detect osu hit objects.
         public override bool HandlePositionalInput => true;
@@ -52,6 +58,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private void load()
         {
             Alpha = 0;
+
+            hitObjectDimmingStrength.MinValue = 0f;
+            hitObjectDimmingStrength.MaxValue = 2f;
+            hitObjectDimmingStrength.Precision = 0.05f;
+
+            config?.BindWith(OsuRulesetSetting.HitObjectDimmingStrength, hitObjectDimmingStrength);
         }
 
         protected override void OnApply()
@@ -114,7 +126,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private void applyDim(Drawable piece)
         {
-            piece.FadeColour(new Color4(195, 195, 195, 255));
+            float dimmingAmount = Math.Clamp(hitObjectDimmingStrength.Value, 0f, 2f);
+            byte dimChannel = (byte)Math.Clamp(Math.Round(255 - (255 - 195) * dimmingAmount), 0, 255);
+            Color4 dimColour = new Color4(dimChannel, dimChannel, dimChannel, 255);
+
+            piece.FadeColour(dimColour);
             using (piece.BeginDelayedSequence(InitialLifetimeOffset - OsuHitWindows.MISS_WINDOW))
                 piece.FadeColour(Color4.White, 100);
         }
