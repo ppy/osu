@@ -239,8 +239,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (lastLastDifficultyObject != null && lastLastDifficultyObject.BaseObject is not Spinner)
             {
-                if (lastDifficultyObject!.BaseObject is Slider slider && lastDifficultyObject.TravelDistance > 0)
-                    lastCursorPosition = slider.HeadCircle.StackedPosition;
+                if (lastDifficultyObject!.BaseObject is Slider prevSlider && lastDifficultyObject.TravelDistance > 0)
+                    lastCursorPosition = prevSlider.HeadCircle.StackedPosition;
                 Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastDifficultyObject);
 
                 double angle = Math.Abs(calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition));
@@ -362,9 +362,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         {
             Vector2 lastCursorPosition = getEndCursorPosition(lastDifficultyObject);
 
-            if (lastDifficultyObject.BaseObject is Slider slider && lastDifficultyObject.TravelDistance > 0)
+            if (lastDifficultyObject.BaseObject is Slider prevSlider && lastDifficultyObject.TravelDistance > 0)
             {
-                OsuHitObject secondLastNestedObject = (OsuHitObject)slider.NestedHitObjects[^2];
+                OsuHitObject secondLastNestedObject = (OsuHitObject)prevSlider.NestedHitObjects[^2];
                 lastLastCursorPosition = secondLastNestedObject.StackedPosition;
             }
 
