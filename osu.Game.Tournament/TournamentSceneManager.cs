@@ -14,6 +14,7 @@ using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens;
 using osu.Game.Tournament.Screens.Drawings;
@@ -55,6 +56,7 @@ namespace osu.Game.Tournament
 
         private Container chatContainer = null!;
         private FillFlowContainer buttons = null!;
+        private DialogOverlay dialogOverlay = null!;
 
         public TournamentSceneManager()
         {
@@ -159,6 +161,7 @@ namespace osu.Game.Tournament
                         },
                     },
                 },
+                dialogOverlay = new DialogOverlay(),
             };
 
             foreach (var drawable in screens)
@@ -245,7 +248,7 @@ namespace osu.Game.Tournament
             if (previousSize == newSize) return;
 
             windowSize.Value = newSize;
-            AddInternal(new ResolutionConfirmationPopup(revertAction: () => windowSize.Value = previousSize));
+            dialogOverlay.Push(new ResolutionConfirmationDialog(() => windowSize.Value = previousSize));
         }
 
         private partial class Separator : CompositeDrawable
