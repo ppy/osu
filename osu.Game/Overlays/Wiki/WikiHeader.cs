@@ -13,7 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
@@ -120,23 +120,24 @@ namespace osu.Game.Overlays.Wiki
             }
         }
 
-        private partial class ShowOnGitHubButton : GrayButton
+        private partial class ShowOnGitHubButton : RoundedButton
         {
             public override LocalisableString TooltipText => WikiOverlayStrings.ShowOnGitHub;
 
             public readonly Bindable<string> TargetPath = new Bindable<string>();
 
-            public ShowOnGitHubButton()
-                : base(FontAwesome.Brands.Github)
-            {
-            }
-
             [BackgroundDependencyLoader(true)]
-            private void load([CanBeNull] ILinkHandler linkHandler, OverlayColourProvider colourProvider)
+            private void load([CanBeNull] ILinkHandler linkHandler)
             {
-                Icon.Size = new Vector2(20);
-                Background.Colour = colourProvider.Background5;
-                HoverColour = colourProvider.Light4;
+                Width = 42;
+
+                Add(new SpriteIcon
+                {
+                    Size = new Vector2(12),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Icon = FontAwesome.Brands.Github,
+                });
 
                 Action = () => linkHandler?.HandleLink(TargetPath.Value);
             }
