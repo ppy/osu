@@ -158,6 +158,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
             ppInfo.Content = user?.Statistics?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";
+            ppInfo.ContentTooltipText = getPPInfoTooltipText(user);
 
             foreach (var scoreRankInfo in scoreRankInfos)
                 scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
@@ -228,6 +229,28 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         else
                             result = LocalisableString.Interpolate($"{result}\n{variantText}");
                     }
+                }
+            }
+
+            return result ?? default;
+        }
+
+        private static LocalisableString getPPInfoTooltipText(APIUser? user)
+        {
+            var variants = user?.Statistics?.Variants;
+
+            LocalisableString? result = null;
+
+            if (variants?.Count > 0)
+            {
+                foreach (var variant in variants)
+                {
+                    var variantText = LocalisableString.Interpolate($"{variant.VariantType.GetLocalisableDescription()}: {variant.PP.ToLocalisableString("#,##0")}");
+
+                    if (result == null)
+                        result = variantText;
+                    else
+                        result = LocalisableString.Interpolate($"{result}\n{variantText}");
                 }
             }
 
