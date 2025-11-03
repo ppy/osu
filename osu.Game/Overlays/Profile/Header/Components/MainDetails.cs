@@ -156,18 +156,18 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             var user = data?.User;
 
-            medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
-            ppInfo.Content = user?.Statistics?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";
-            ppInfo.ContentTooltipText = getPPInfoTooltipText(user);
+            medalInfo.Content.Text = user?.Achievements?.Length.ToString() ?? "0";
+            ppInfo.Content.Text = user?.Statistics?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";
+            ppInfo.Content.TooltipText = getPPInfoTooltipText(user);
 
             foreach (var scoreRankInfo in scoreRankInfos)
                 scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
 
-            detailGlobalRank.Content = user?.Statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
-            detailGlobalRank.ContentTooltipText = getGlobalRankTooltipText(user);
+            detailGlobalRank.Content.Text = user?.Statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
+            detailGlobalRank.Content.TooltipText = getGlobalRankTooltipText(user);
 
-            detailCountryRank.Content = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
-            detailCountryRank.ContentTooltipText = getCountryRankTooltipText(user);
+            detailCountryRank.Content.Text = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
+            detailCountryRank.Content.TooltipText = getCountryRankTooltipText(user);
 
             rankGraph.Statistics.Value = user?.Statistics;
         }

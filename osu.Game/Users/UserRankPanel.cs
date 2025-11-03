@@ -71,8 +71,8 @@ namespace osu.Game.Users
             var statistics = statisticsProvider?.GetStatisticsFor(ruleset.Value);
 
             loadingLayer.State.Value = statistics == null ? Visibility.Visible : Visibility.Hidden;
-            globalRankDisplay.Content = statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? "-";
-            countryRankDisplay.Content = statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? "-";
+            globalRankDisplay.Content.Text = statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? "-";
+            countryRankDisplay.Content.Text = statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? "-";
         }
 
         protected override Drawable CreateLayout()
