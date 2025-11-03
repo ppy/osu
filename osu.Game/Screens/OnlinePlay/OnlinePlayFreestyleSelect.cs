@@ -7,6 +7,7 @@ using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.Rooms;
@@ -43,6 +44,40 @@ namespace osu.Game.Screens.OnlinePlay
             LeftArea.Padding = new MarginPadding { Top = Header.HEIGHT };
         }
 
+        protected override bool OnStart()
+        {
+            FilterCriteria criteria = FilterControl.CreateCriteria();
+
+            // Beatmaps with too different of a duration are filtered away; this is just a final safety.
+            if (!criteria.Length.IsInRange(Beatmap.Value.BeatmapInfo.Length))
+            {
+                Logger.Log("The selected beatmap's duration differs too much from the host's selection.", level: LogLevel.Error);
+                return false;
+            }
+
+            // Beatmaps without a valid online ID are filtered away; this is just a final safety.
+            if (Beatmap.Value.BeatmapInfo.OnlineID < 0)
+            {
+                Logger.Log("The selected beatmap is not available online.", level: LogLevel.Error);
+                return false;
+            }
+
+            // Beatmaps from different sets are filtered away; this is just a final safety.
+            if (Beatmap.Value.BeatmapSetInfo.OnlineID != criteria.BeatmapSetId)
+            {
+                Logger.Log("The selected beatmap is from a different beatmap set.", level: LogLevel.Error);
+                return false;
+            }
+
+            if (Ruleset.Value.OnlineID < 0)
+            {
+                Logger.Log("The selected ruleset is not available online.", level: LogLevel.Error);
+                return false;
+            }
+
+            return true;
+        }
+
         protected override FilterControl CreateFilterControl() => new DifficultySelectFilterControl(item);
 
         protected override IEnumerable<(FooterButton button, OverlayContainer? overlay)> CreateSongSelectFooterButtons()
@@ -62,17 +97,22 @@ namespace osu.Game.Screens.OnlinePlay
         private partial class DifficultySelectFilterControl : FilterControl
         {
             private readonly PlaylistItem item;
-            private double itemLength;
-            private int beatmapSetId;
+
+            [Resolved]
+            private RealmAccess realm { get; set; } = null!;
 
             public DifficultySelectFilterControl(PlaylistItem item)
             {
                 this.item = item;
             }
 
-            [BackgroundDependencyLoader]
-            private void load(RealmAccess realm)
+            public override FilterCriteria CreateCriteria()
             {
+                var criteria = base.CreateCriteria();
+
+                double itemLength = 0;
+                int beatmapSetId = 0;
+
                 realm.Run(r =>
                 {
                     int beatmapId = item.Beatmap.OnlineID;
@@ -81,11 +121,6 @@ namespace osu.Game.Screens.OnlinePlay
                     itemLength = beatmap?.Length ?? 0;
                     beatmapSetId = beatmap?.BeatmapSet?.OnlineID ?? 0;
                 });
-            }
-
-            public override FilterCriteria CreateCriteria()
-            {
-                var criteria = base.CreateCriteria();
 
                 // Must be from the same set as the playlist item.
                 criteria.BeatmapSetId = beatmapSetId;
@@ -96,7 +131,6 @@ namespace osu.Game.Screens.OnlinePlay
                 criteria.Length.Max = itemLength + 30000;
                 criteria.Length.IsLowerInclusive = true;
                 criteria.Length.IsUpperInclusive = true;
-
                 return criteria;
             }
         }

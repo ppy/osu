@@ -80,6 +80,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("ruleset_id")]
         public int RulesetId { get; set; }
 
+        [JsonProperty("beatmap_id")]
+        public int BeatmapId { get; set; }
+
         public ScoreInfo CreateScoreInfo(ScoreManager scoreManager, RulesetStore rulesets, [NotNull] BeatmapInfo beatmap)
         {
             var ruleset = rulesets.GetRuleset(RulesetId);

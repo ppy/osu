@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
@@ -426,7 +427,10 @@ namespace osu.Game.Screens.Select
             (beatmapOptionsButton = new FooterButtonOptions(), BeatmapOptions)
         };
 
-        protected virtual ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay();
+        protected virtual ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay
+        {
+            ShowPresets = true,
+        };
 
         private DependencyContainer dependencies = null!;
 
@@ -521,12 +525,12 @@ namespace osu.Game.Screens.Select
 
         private ScheduledDelegate? selectionChangedDebounce;
 
-        private void updateCarouselSelection(ValueChangedEvent<WorkingBeatmap>? e = null)
+        private void updateCarouselSelection(ValueChangedEvent<WorkingBeatmap?> e = default)
         {
-            var beatmap = e?.NewValue ?? Beatmap.Value;
+            var beatmap = e.NewValue ?? Beatmap.Value;
             if (beatmap is DummyWorkingBeatmap || !this.IsCurrentScreen()) return;
 
-            if (beatmap.BeatmapSetInfo.Protected && e != null)
+            if (beatmap.BeatmapSetInfo.Protected)
             {
                 Logger.Log($"Denying working beatmap switch to protected beatmap {beatmap}");
                 Beatmap.Value = e.OldValue;
@@ -1134,6 +1138,10 @@ namespace osu.Game.Screens.Select
         {
             private readonly Action? resetCarouselPosition;
 
+            private bool mouseContained;
+
+            private InputManager inputManager = null!;
+
             public LeftSideInteractionContainer(Action resetCarouselPosition)
             {
                 this.resetCarouselPosition = resetCarouselPosition;
@@ -1146,16 +1154,31 @@ namespace osu.Game.Screens.Select
 
             protected override bool OnMouseDown(MouseDownEvent e) => true;
 
-            protected override bool OnHover(HoverEvent e)
+            protected override void LoadComplete()
             {
-                resetCarouselPosition?.Invoke();
-                return base.OnHover(e);
+                inputManager = GetContainingInputManager()!;
+                base.LoadComplete();
             }
-        }
 
-        internal partial class SoloModSelectOverlay : UserModSelectOverlay
-        {
-            protected override bool ShowPresets => true;
+            protected override void Update()
+            {
+                base.Update();
+
+                // We want to trigger an action whenever the cursor is in the left area of song select.
+                // Other elements in song select handle input, so rather than using `OnHover` let's check the true mouse position.
+                if (Contains(inputManager.CurrentState.Mouse.Position))
+                {
+                    if (!mouseContained)
+                    {
+                        mouseContained = true;
+                        resetCarouselPosition?.Invoke();
+                    }
+                }
+                else
+                {
+                    mouseContained = false;
+                }
+            }
         }
     }
 }

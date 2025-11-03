@@ -12,6 +12,7 @@ using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Users;
 
 namespace osu.Game.Online.Metadata
@@ -55,7 +56,7 @@ namespace osu.Game.Online.Metadata
         {
             // Importantly, we are intentionally not using MessagePack here to correctly support derived class serialization.
             // More information on the limitations / reasoning can be found in osu-server-spectator's initialisation code.
-            connector = api.GetHubConnector(nameof(OnlineMetadataClient), endpoint, false);
+            connector = api.GetHubConnector(nameof(OnlineMetadataClient), endpoint);
 
             if (connector != null)
             {
@@ -88,13 +89,13 @@ namespace osu.Game.Online.Metadata
             userStatus.BindValueChanged(status =>
             {
                 if (localUser.Value is not GuestUser)
-                    UpdateStatus(status.NewValue);
+                    UpdateStatus(status.NewValue).FireAndForget();
             }, true);
 
             userActivity.BindValueChanged(activity =>
             {
                 if (localUser.Value is not GuestUser)
-                    UpdateActivity(activity.NewValue);
+                    UpdateActivity(activity.NewValue).FireAndForget();
             }, true);
         }
 
@@ -116,12 +117,12 @@ namespace osu.Game.Online.Metadata
             }
 
             if (IsWatchingUserPresence)
-                BeginWatchingUserPresenceInternal();
+                BeginWatchingUserPresenceInternal().FireAndForget();
 
             if (localUser.Value is not GuestUser)
             {
-                UpdateActivity(userActivity.Value);
-                UpdateStatus(userStatus.Value);
+                UpdateActivity(userActivity.Value).FireAndForget();
+                UpdateStatus(userStatus.Value).FireAndForget();
             }
 
             if (lastQueueId.Value >= 0)

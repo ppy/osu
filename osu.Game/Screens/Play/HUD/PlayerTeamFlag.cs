@@ -3,8 +3,10 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Skinning;
@@ -40,10 +42,19 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(UserLookupCache userLookupCache)
         {
             if (gameplayState != null)
-                flag.Team = gameplayState.Score.ScoreInfo.User.Team;
+            {
+                if (gameplayState.Score.ScoreInfo.User.Team != null)
+                    flag.Team = gameplayState.Score.ScoreInfo.User.Team;
+                else
+                {
+                    // We only store very basic information about a user to realm, so there's a high chance we don't have the team information.
+                    userLookupCache.GetUserAsync(gameplayState.Score.ScoreInfo.User.Id)
+                                   .ContinueWith(task => Schedule(() => flag.Team = task.GetResultSafely()?.Team));
+                }
+            }
             else
             {
                 apiUser = api.LocalUser.GetBoundCopy();

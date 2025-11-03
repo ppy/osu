@@ -469,9 +469,20 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
             else
             {
-                SnapResult result = positionSnapProvider?.TrySnapToPositionGrid(Parent!.ToScreenSpace(e.MousePosition));
+                Vector2 newControlPointPosition = Parent!.ToScreenSpace(e.MousePosition);
 
-                Vector2 movementDelta = Parent!.ToLocalSpace(result?.ScreenSpacePosition ?? Parent!.ToScreenSpace(e.MousePosition)) - dragStartPositions[draggedControlPointIndex] - hitObject.Position;
+                // Snapping inherited B-spline control points to nearby objects would be unintuitive, because snapping them does not equate to snapping the interpolated slider path.
+                bool shouldSnapToNearbyObjects = dragPathTypes[draggedControlPointIndex] is not null ||
+                                                 dragPathTypes[..draggedControlPointIndex].LastOrDefault(t => t is not null)?.Type != SplineType.BSpline;
+
+                SnapResult result = null;
+                if (shouldSnapToNearbyObjects)
+                    result = positionSnapProvider?.TrySnapToNearbyObjects(newControlPointPosition, oldStartTime);
+                if (positionSnapProvider?.TrySnapToPositionGrid(result?.ScreenSpacePosition ?? newControlPointPosition, result?.Time ?? oldStartTime) is SnapResult gridSnapResult)
+                    result = gridSnapResult;
+                result ??= new SnapResult(newControlPointPosition, oldStartTime);
+
+                Vector2 movementDelta = Parent!.ToLocalSpace(result.ScreenSpacePosition) - dragStartPositions[draggedControlPointIndex] - hitObject.Position;
 
                 for (int i = 0; i < controlPoints.Count; ++i)
                 {
@@ -484,7 +495,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             // Snap the path to the current beat divisor before checking length validity.
             hitObject.SnapTo(distanceSnapProvider);
 
-            if (!hitObject.Path.HasValidLength)
+            if (!hitObject.Path.HasValidLengthForPlacement)
             {
                 for (int i = 0; i < hitObject.Path.ControlPoints.Count; i++)
                     hitObject.Path.ControlPoints[i].Position = oldControlPoints[i];

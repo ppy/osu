@@ -81,12 +81,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             changeHandler?.BeginChange();
 
             objectsInScale = selectedMovableObjects.ToDictionary(ho => ho, ho => new OriginalHitObjectState(ho));
-            OriginalSurroundingQuad = objectsInScale.Count == 1 && objectsInScale.First().Key is Slider slider
-                ? GeometryUtils.GetSurroundingQuad(slider.Path.ControlPoints.Select(p => slider.Position + p.Position))
-                : GeometryUtils.GetSurroundingQuad(objectsInScale.Keys);
-            originalConvexHull = objectsInScale.Count == 1 && objectsInScale.First().Key is Slider slider2
-                ? GeometryUtils.GetConvexHull(slider2.Path.ControlPoints.Select(p => slider2.Position + p.Position))
-                : GeometryUtils.GetConvexHull(objectsInScale.Keys);
+            OriginalSurroundingQuad = GeometryUtils.GetSurroundingQuad(objectsInScale.Keys);
+            originalConvexHull = GeometryUtils.GetConvexHull(objectsInScale.Keys);
             defaultOrigin = GeometryUtils.MinimumEnclosingCircle(originalConvexHull).Item1;
         }
 
@@ -180,7 +176,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             Quad scaledQuad = GeometryUtils.GetSurroundingQuad(new OsuHitObject[] { slider });
             (bool xInBounds, bool yInBounds) = isQuadInBounds(scaledQuad);
 
-            if (xInBounds && yInBounds && slider.Path.HasValidLength)
+            if (xInBounds && yInBounds && slider.Path.HasValidLengthForPlacement)
                 return;
 
             for (int i = 0; i < slider.Path.ControlPoints.Count; i++)
@@ -263,12 +259,12 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     case Axes.X:
                         (sLowerBound, sUpperBound) = computeBounds(lowerBounds - b, upperBounds - b, a);
-                        s.X = MathHelper.Clamp(s.X, sLowerBound, sUpperBound);
+                        s.X = Math.Clamp(s.X, sLowerBound, sUpperBound);
                         break;
 
                     case Axes.Y:
                         (sLowerBound, sUpperBound) = computeBounds(lowerBounds - a, upperBounds - a, b);
-                        s.Y = MathHelper.Clamp(s.Y, sLowerBound, sUpperBound);
+                        s.Y = Math.Clamp(s.Y, sLowerBound, sUpperBound);
                         break;
 
                     case Axes.Both:
@@ -276,11 +272,11 @@ namespace osu.Game.Rulesets.Osu.Edit
                         // Therefore the ratio s.X / s.Y will be maintained
                         (sLowerBound, sUpperBound) = computeBounds(lowerBounds, upperBounds, a * s.X + b * s.Y);
                         s.X = s.X < 0
-                            ? MathHelper.Clamp(s.X, s.X * sUpperBound, s.X * sLowerBound)
-                            : MathHelper.Clamp(s.X, s.X * sLowerBound, s.X * sUpperBound);
+                            ? Math.Clamp(s.X, s.X * sUpperBound, s.X * sLowerBound)
+                            : Math.Clamp(s.X, s.X * sLowerBound, s.X * sUpperBound);
                         s.Y = s.Y < 0
-                            ? MathHelper.Clamp(s.Y, s.Y * sUpperBound, s.Y * sLowerBound)
-                            : MathHelper.Clamp(s.Y, s.Y * sLowerBound, s.Y * sUpperBound);
+                            ? Math.Clamp(s.Y, s.Y * sUpperBound, s.Y * sLowerBound)
+                            : Math.Clamp(s.Y, s.Y * sLowerBound, s.Y * sUpperBound);
                         break;
                 }
 
@@ -312,7 +308,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private void moveSelectionInBounds()
         {
-            Quad quad = GeometryUtils.GetSurroundingQuad(objectsInScale!.Keys);
+            Quad quad = GeometryUtils.GetSurroundingQuad(objectsInScale!.Keys, true);
 
             Vector2 delta = Vector2.Zero;
 

@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
@@ -18,7 +17,7 @@ using Realms;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public partial class AddPlaylistToCollectionButton : RoundedButton, IHasTooltip
+    public partial class AddPlaylistToCollectionButton : RoundedButton
     {
         private readonly Room room;
 
@@ -161,7 +160,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             collectionSubscription?.Dispose();
         }
 
-        public LocalisableString TooltipText
+        public override LocalisableString TooltipText
         {
             get
             {

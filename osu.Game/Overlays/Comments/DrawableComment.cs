@@ -420,7 +420,7 @@ namespace osu.Game.Overlays.Comments
         private void copyUrl()
         {
             clipboard.SetText($@"{api.Endpoints.APIUrl}/comments/{Comment.Id}");
-            onScreenDisplay?.Display(new CopyUrlToast());
+            onScreenDisplay?.Display(new CopiedToClipboardToast());
         }
 
         private void toggleReply()

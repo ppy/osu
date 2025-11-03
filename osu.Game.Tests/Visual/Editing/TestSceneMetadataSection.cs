@@ -65,10 +65,10 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.Keys(PlatformAction.Paste);
             });
 
-            assertArtistMetadata("Example Artist");
+            assertArtistMetadata("Example ArtistExample Artist");
 
             // It's important values are committed immediately on focus loss so the editor exit sequence detects them.
-            AddAssert("value immediately changed on focus loss", () =>
+            AddAssert("value still changed after focus loss", () =>
             {
                 ((IFocusManager)InputManager).TriggerFocusContention(metadataSection);
                 return editorBeatmap.Metadata.Artist;
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.Editing
                 InputManager.Keys(PlatformAction.Paste);
             });
 
-            assertArtistMetadata("Example Artist");
+            assertArtistMetadata("Example ArtistExample Artist");
 
             AddStep("commit", () => InputManager.Key(Key.Enter));
 

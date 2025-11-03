@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 {
     public class CheckZeroByteFiles : ICheck
     {
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Files, "Zero-byte files");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Files, "Zero-byte files", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
@@ -19,13 +19,13 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var beatmapSet = context.Beatmap.BeatmapInfo.BeatmapSet;
+            var beatmapSet = context.CurrentDifficulty.Playable.BeatmapInfo.BeatmapSet;
 
             if (beatmapSet != null)
             {
                 foreach (var file in beatmapSet.Files)
                 {
-                    using (Stream data = context.WorkingBeatmap.GetStream(file.File.GetStoragePath()))
+                    using (Stream data = context.CurrentDifficulty.Working.GetStream(file.File.GetStoragePath()))
                     {
                         if (data?.Length == 0)
                             yield return new IssueTemplateZeroBytes(this).Create(file.Filename);

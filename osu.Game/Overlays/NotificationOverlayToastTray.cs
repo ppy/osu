@@ -91,7 +91,12 @@ namespace osu.Game.Overlays
         public void FlushAllToasts()
         {
             foreach (var notification in toastFlow.ToArray())
+            {
+                if (notification.IsCritical)
+                    continue;
+
                 forwardNotification(notification);
+            }
         }
 
         public void Post(Notification notification)
@@ -174,7 +179,7 @@ namespace osu.Game.Overlays
                 }
 
                 height = toastFlow.DrawHeight + 120;
-                alpha = MathHelper.Clamp(toastFlow.DrawHeight / 41, 0, 1) * maxNotificationAlpha;
+                alpha = Math.Clamp(toastFlow.DrawHeight / 41, 0, 1) * maxNotificationAlpha;
             }
 
             toastContentBackground.Height = (float)Interpolation.DampContinuously(toastContentBackground.Height, height, 10, Clock.ElapsedFrameTime);

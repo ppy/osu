@@ -42,9 +42,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var decoder = Decoder.GetDecoder<Beatmap>(stream);
                 var working = new TestWorkingBeatmap(decoder.Decode(stream));
 
-                Assert.AreEqual(6, working.BeatmapInfo.BeatmapVersion);
-                Assert.AreEqual(6, working.Beatmap.BeatmapInfo.BeatmapVersion);
-                Assert.AreEqual(6, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapInfo.BeatmapVersion);
+                Assert.AreEqual(6, working.Beatmap.BeatmapVersion);
+                Assert.That(working.Beatmap.BeatmapInfo.Ruleset.Name, Is.Not.EqualTo("null placeholder ruleset"));
+                Assert.AreEqual(6, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapVersion);
             }
         }
 
@@ -59,9 +59,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 ((LegacyBeatmapDecoder)decoder).ApplyOffsets = applyOffsets;
                 var working = new TestWorkingBeatmap(decoder.Decode(stream));
 
-                Assert.AreEqual(4, working.BeatmapInfo.BeatmapVersion);
-                Assert.AreEqual(4, working.Beatmap.BeatmapInfo.BeatmapVersion);
-                Assert.AreEqual(4, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapInfo.BeatmapVersion);
+                Assert.AreEqual(4, working.Beatmap.BeatmapVersion);
+                Assert.AreEqual(4, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapVersion);
 
                 Assert.AreEqual(-1, working.BeatmapInfo.Metadata.PreviewTime);
             }
@@ -397,6 +396,35 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     new Color4(255, 187, 255, 255),
                     new Color4(255, 177, 140, 255),
                     new Color4(100, 100, 100, 255), // alpha is specified as 100, but should be ignored.
+                };
+                Assert.AreEqual(expectedColors.Length, comboColors.Count);
+                for (int i = 0; i < expectedColors.Length; i++)
+                    Assert.AreEqual(expectedColors[i], comboColors[i]);
+            }
+        }
+
+        [Test]
+        public void TestComboColourCountIsLimitedToEight()
+        {
+            var decoder = new LegacySkinDecoder();
+
+            using (var resStream = TestResources.OpenResource("too-many-combo-colours.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var comboColors = decoder.Decode(stream).ComboColours;
+
+                Debug.Assert(comboColors != null);
+
+                Color4[] expectedColors =
+                {
+                    new Color4(142, 199, 255, 255),
+                    new Color4(255, 128, 128, 255),
+                    new Color4(128, 255, 255, 255),
+                    new Color4(128, 255, 128, 255),
+                    new Color4(255, 187, 255, 255),
+                    new Color4(255, 177, 140, 255),
+                    new Color4(100, 100, 100, 255),
+                    new Color4(142, 199, 255, 255),
                 };
                 Assert.AreEqual(expectedColors.Length, comboColors.Count);
                 for (int i = 0; i < expectedColors.Length; i++)

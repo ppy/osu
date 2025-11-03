@@ -19,9 +19,11 @@ namespace osu.Game.Online.API
         IBindable<APIUser> LocalUser { get; }
 
         /// <summary>
-        /// The user's friends.
+        /// The local user's current state.
+        /// Contains auxiliary information such as the user's friends, blocks, and favourites,
+        /// as well as methods to manage those in a way that keeps this state consistent throughout the game.
         /// </summary>
-        IBindableList<APIRelation> Friends { get; }
+        ILocalUserState LocalUserState { get; }
 
         /// <summary>
         /// The language supplied by this provider to API requests.
@@ -103,20 +105,20 @@ namespace osu.Game.Online.API
         void Login(string username, string password);
 
         /// <summary>
+        /// The <see cref="SessionVerificationMethod"/> requested by the server to complete verification.
+        /// </summary>
+        SessionVerificationMethod? SessionVerificationMethod { get; }
+
+        /// <summary>
         /// Provide a second-factor authentication code for authentication.
         /// </summary>
-        /// <param name="code">The 2FA code.</param>
+        /// <paramref name="code">The 2FA code.</paramref>
         void AuthenticateSecondFactor(string code);
 
         /// <summary>
         /// Log out the current user.
         /// </summary>
         void Logout();
-
-        /// <summary>
-        /// Update the friends status of the current user.
-        /// </summary>
-        void UpdateLocalFriends();
 
         /// <summary>
         /// Schedule a callback to run on the update thread.
@@ -128,8 +130,7 @@ namespace osu.Game.Online.API
         /// </summary>
         /// <param name="clientName">The name of the client this connector connects for, used for logging.</param>
         /// <param name="endpoint">The endpoint to the hub.</param>
-        /// <param name="preferMessagePack">Whether to use MessagePack for serialisation if available on this platform.</param>
-        IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack = true);
+        IHubClientConnector? GetHubConnector(string clientName, string endpoint);
 
         /// <summary>
         /// Accesses the <see cref="INotificationsClient"/> used to receive asynchronous notifications from web.

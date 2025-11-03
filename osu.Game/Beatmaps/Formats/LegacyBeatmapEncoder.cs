@@ -319,11 +319,25 @@ namespace osu.Game.Beatmaps.Formats
                 SampleControlPoint createSampleControlPointFor(double time, IList<HitSampleInfo> samples)
                 {
                     int volume = samples.Max(o => o.Volume);
-                    int customIndex = samples.Any(o => o is ConvertHitObjectParser.LegacyHitSampleInfo)
-                        ? samples.OfType<ConvertHitObjectParser.LegacyHitSampleInfo>().Max(o => o.CustomSampleBank)
-                        : -1;
+                    string bank = samples.Where(s => s.Name == HitSampleInfo.HIT_NORMAL).Select(s => s.Bank).FirstOrDefault()
+                                  ?? samples.Select(s => s.Bank).First();
 
-                    return new LegacyBeatmapDecoder.LegacySampleControlPoint { Time = time, SampleVolume = volume, CustomSampleBank = customIndex };
+                    int customIndex = samples.Max(s =>
+                    {
+                        switch (s)
+                        {
+                            case ConvertHitObjectParser.LegacyHitSampleInfo legacy:
+                                return legacy.CustomSampleBank;
+
+                            default:
+                                if (int.TryParse(s.Suffix, out int index))
+                                    return index;
+
+                                return s.UseBeatmapSamples ? 1 : -1;
+                        }
+                    });
+
+                    return new LegacyBeatmapDecoder.LegacySampleControlPoint { Time = time, SampleVolume = volume, SampleBank = bank, CustomSampleBank = customIndex };
                 }
             }
 
@@ -349,7 +363,7 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine("[Colours]");
 
-            for (int i = 0; i < colours.Count; i++)
+            for (int i = 0; i < Math.Min(colours.Count, LegacyBeatmapDecoder.MAX_COMBO_COLOUR_COUNT); i++)
             {
                 var comboColour = colours[i];
 
