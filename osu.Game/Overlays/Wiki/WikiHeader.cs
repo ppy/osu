@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Wiki
                 Spacing = new Vector2(5),
                 Children = new Drawable[]
                 {
-                    new ShowOnGithubButton
+                    new ShowOnGitHubButton
                     {
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
@@ -119,13 +119,13 @@ namespace osu.Game.Overlays.Wiki
             }
         }
 
-        private partial class ShowOnGithubButton : GrayButton
+        private partial class ShowOnGitHubButton : GrayButton
         {
-            public override LocalisableString TooltipText => "Show on GitHub";
+            public override LocalisableString TooltipText => WikiOverlayStrings.ShowOnGitHub;
 
             public readonly Bindable<string> TargetPath = new Bindable<string>();
 
-            public ShowOnGithubButton()
+            public ShowOnGitHubButton()
                 : base(FontAwesome.Brands.Github)
             {
             }
