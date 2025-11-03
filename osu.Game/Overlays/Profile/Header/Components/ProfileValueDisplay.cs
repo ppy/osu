@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     },
                     Content = new ContentText
                     {
-                        Font = OsuFont.GetFont(size: big ? 30 : 20, weight: FontWeight.Light),
+                        Font = OsuFont.GetFont(size: big ? 30 : 20, weight: big ? FontWeight.Regular : FontWeight.Light),
                     },
                     new Container // Add a minimum size to the FillFlowContainer
                     {

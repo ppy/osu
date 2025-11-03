@@ -1,9 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Tests.Visual.UserInterface;
 using osu.Game.Users;
@@ -34,8 +36,31 @@ namespace osu.Game.Tests.Visual.Online
                 Value = new UserStatistics
                 {
                     GlobalRank = rank,
-                    GlobalRankPercent = rank / 1_000_000,
-                }
+                    GlobalRankPercent = rank / 1_000_000f,
+                    Variants =
+                    [
+                        new UserStatistics.Variant
+                        {
+                            VariantType = UserStatistics.RulesetVariant.FourKey,
+                            GlobalRank = rank / 3,
+                        },
+                        new UserStatistics.Variant
+                        {
+                            VariantType = UserStatistics.RulesetVariant.SevenKey,
+                            GlobalRank = 2 * rank / 3,
+                        }
+                    ]
+                },
+            },
+            HighestRank =
+            {
+                Value = rank == null
+                    ? null
+                    : new APIUser.UserRankHighest
+                    {
+                        Rank = rank.Value / 2,
+                        UpdatedAt = DateTimeOffset.Now.AddMonths(-3),
+                    }
             }
         };
     }
