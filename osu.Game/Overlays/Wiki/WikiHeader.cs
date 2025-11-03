@@ -122,7 +122,7 @@ namespace osu.Game.Overlays.Wiki
 
         private partial class ShowOnGitHubButton : RoundedButton
         {
-            public override LocalisableString TooltipText => WikiOverlayStrings.ShowOnGitHub;
+            public override LocalisableString TooltipText => WikiStrings.ShowEditLink;
 
             public readonly Bindable<string> TargetPath = new Bindable<string>();
 
