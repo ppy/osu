@@ -150,7 +150,7 @@ namespace osu.Game.Overlays.Wiki
                 {
                     this.FadeTo(e.NewValue != null ? 1 : 0);
                     Enabled.Value = e.NewValue != null;
-                });
+                }, true);
             }
         }
     }
