@@ -2,10 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Drawing;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -51,12 +49,11 @@ namespace osu.Game.Tournament
         [Cached]
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay();
 
-        [Resolved]
-        private FrameworkConfigManager frameworkConfig { get; set; } = null!;
+        [Cached]
+        private DialogOverlay dialogOverlay = new DialogOverlay();
 
         private Container chatContainer = null!;
         private FillFlowContainer buttons = null!;
-        private DialogOverlay dialogOverlay = null!;
 
         public TournamentSceneManager()
         {
@@ -161,7 +158,7 @@ namespace osu.Game.Tournament
                         },
                     },
                 },
-                dialogOverlay = new DialogOverlay(),
+                dialogOverlay,
             };
 
             foreach (var drawable in screens)
@@ -238,17 +235,6 @@ namespace osu.Game.Tournament
 
             foreach (var s in buttons.OfType<ScreenButton>())
                 s.IsSelected = screenType == s.Type;
-        }
-
-        public void SetHeight(int height)
-        {
-            var windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
-            Size previousSize = windowSize.Value;
-            Size newSize = new Size((int)(height * ASPECT_RATIO / STREAM_AREA_WIDTH * REQUIRED_WIDTH), height);
-            if (previousSize == newSize) return;
-
-            windowSize.Value = newSize;
-            dialogOverlay.Push(new ResolutionConfirmationDialog(() => windowSize.Value = previousSize));
         }
 
         private partial class Separator : CompositeDrawable

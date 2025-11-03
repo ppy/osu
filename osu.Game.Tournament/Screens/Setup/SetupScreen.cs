@@ -1,8 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Drawing;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -13,6 +15,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osuTK;
@@ -41,11 +44,17 @@ namespace osu.Game.Tournament.Screens.Setup
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
 
+        [Resolved]
+        private DialogOverlay? dialogOverlay { get; set; }
+
         private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
+        private Bindable<Size> windowSize = null!;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(FrameworkConfigManager frameworkConfig)
         {
+            windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
+
             InternalChildren = new Drawable[]
             {
                 new Box
@@ -127,7 +136,15 @@ namespace osu.Game.Tournament.Screens.Setup
                 {
                     Label = "Stream area resolution",
                     ButtonText = "Set height",
-                    Action = height => sceneManager?.SetHeight(height),
+                    Action = height =>
+                    {
+                        Size previousSize = windowSize.Value;
+                        Size newSize = new Size((int)(height * TournamentSceneManager.ASPECT_RATIO / TournamentSceneManager.STREAM_AREA_WIDTH * TournamentSceneManager.REQUIRED_WIDTH), height);
+                        if (previousSize == newSize) return;
+
+                        windowSize.Value = newSize;
+                        dialogOverlay?.Push(new ResolutionConfirmationDialog(() => windowSize.Value = previousSize));
+                    },
                 },
                 new LabelledSwitchButton
                 {
