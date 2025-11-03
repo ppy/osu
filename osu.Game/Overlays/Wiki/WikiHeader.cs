@@ -5,6 +5,7 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -130,14 +131,14 @@ namespace osu.Game.Overlays.Wiki
             {
             }
 
-            [BackgroundDependencyLoader]
-            private void load(ILinkHandler linkHandler, OverlayColourProvider colourProvider)
+            [BackgroundDependencyLoader(true)]
+            private void load([CanBeNull] ILinkHandler linkHandler, OverlayColourProvider colourProvider)
             {
                 Icon.Size = new Vector2(20);
                 Background.Colour = colourProvider.Background5;
                 HoverColour = colourProvider.Light4;
 
-                Action = () => linkHandler.HandleLink(TargetPath.Value);
+                Action = () => linkHandler?.HandleLink(TargetPath.Value);
             }
 
             protected override void LoadComplete()
