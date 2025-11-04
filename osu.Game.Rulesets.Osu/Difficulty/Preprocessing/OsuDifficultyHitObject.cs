@@ -239,14 +239,39 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (lastLastDifficultyObject != null && lastLastDifficultyObject.BaseObject is not Spinner)
             {
+                Vector2 lastLastCursorPosition = lastLastDifficultyObject.BaseObject.StackedPosition;
+                if (lastLastDifficultyObject.BaseObject is Slider prevPrevSlider)
+                {
+                    OsuHitObject lastNestedObject = (OsuHitObject)prevPrevSlider.NestedHitObjects[^1];
+                    lastLastCursorPosition = lastNestedObject.StackedPosition;
+                }
+
                 if (lastDifficultyObject!.BaseObject is Slider prevSlider && lastDifficultyObject.TravelDistance > 0)
-                    lastCursorPosition = prevSlider.HeadCircle.StackedPosition;
-                Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastDifficultyObject);
+                {
+                    OsuHitObject lastNestedObject = (OsuHitObject)prevSlider.NestedHitObjects[^1];
+                    OsuHitObject secondLastNestedObject = (OsuHitObject)prevSlider.NestedHitObjects[^2];
 
-                double angle = Math.Abs(calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition));
-                double sliderAngle = Math.Abs(calculateSliderAngle(lastDifficultyObject!, lastLastCursorPosition));
+                    Vector2 lastNestedPosition = lastNestedObject.StackedPosition;
+                    Vector2 secondLastNestedPosition = secondLastNestedObject.StackedPosition;
 
-                Angle = Math.Min(angle, sliderAngle);
+                    double sliderAngle = Math.Abs(calculateAngle(BaseObject.StackedPosition, lastNestedPosition, secondLastNestedPosition));
+
+                    // We always assume that the player tries to ignore the slider tail.
+                    Vector2 assumedNaturalCursorPosition = (BaseObject.StackedPosition + secondLastNestedPosition) / 2;
+                    // This is the distance from the assumed natural cursor position to the slider tail.
+                    double h = (assumedNaturalCursorPosition * scalingFactor - lastNestedPosition * scalingFactor).Length;
+
+                    if (h > NORMALISED_RADIUS * maximum_slider_radius || sliderAngle < double.DegreesToRadians(90))
+                    {
+                        lastCursorPosition = lastNestedPosition;
+                        lastLastCursorPosition = secondLastNestedPosition;
+                    }
+                    else
+                    {
+                        lastCursorPosition = prevSlider.HeadCircle.StackedPosition;
+                    }
+                }
+                Angle = Math.Abs(calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition));
             }
         }
 
@@ -356,19 +381,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 if (i == nestedObjects.Count - 1)
                     LazyEndPosition = currCursorPosition;
             }
-        }
-
-        private double calculateSliderAngle(OsuDifficultyHitObject lastDifficultyObject, Vector2 lastLastCursorPosition)
-        {
-            Vector2 lastCursorPosition = getEndCursorPosition(lastDifficultyObject);
-
-            if (lastDifficultyObject.BaseObject is Slider prevSlider && lastDifficultyObject.TravelDistance > 0)
-            {
-                OsuHitObject secondLastNestedObject = (OsuHitObject)prevSlider.NestedHitObjects[^2];
-                lastLastCursorPosition = secondLastNestedObject.StackedPosition;
-            }
-
-            return calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition);
         }
 
         private double calculateAngle(Vector2 currentPosition, Vector2 lastPosition, Vector2 lastLastPosition)
