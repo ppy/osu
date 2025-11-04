@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -115,6 +116,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             int countRequired = countTotal / 2 + 1;
 
             countText.Text = $"{Math.Min(countRequired, countSkipped)} / {countRequired}";
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (client.IsNotNull())
+            {
+                client.UserLeft -= onUserLeft;
+                client.UserStateChanged -= onUserStateChanged;
+                client.UserVotedToSkip -= onUserVotedToSkip;
+            }
         }
     }
 }
