@@ -75,10 +75,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.LoadComplete();
 
+            client.UserLeft += onUserLeft;
             client.UserStateChanged += onUserStateChanged;
             client.UserVotedToSkip += onUserVotedToSkip;
 
             updateText();
+        }
+
+        private void onUserLeft(MultiplayerRoomUser user)
+        {
+            Schedule(updateText);
         }
 
         private void onUserStateChanged(MultiplayerRoomUser user, MultiplayerUserState state)
