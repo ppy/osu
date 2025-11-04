@@ -245,7 +245,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,
                                 RelativeSizeAxes = Axes.X,
-                                Size = new Vector2(0.5f, 4f),
                                 Colour = colourProvider?.Content2 ?? colours.Gray3
                             }
                         }
@@ -491,12 +490,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         private void onBeatmapAvailabilityChanged(MultiplayerRoomUser user, BeatmapAvailability availability) => Scheduler.Add(() =>
         {
             if (availability.State == DownloadState.Downloading)
-            {
                 downloadProgressBar.FadeIn(200, Easing.OutPow10);
-                downloadProgressBar.ResizeWidthTo(availability.DownloadProgress ?? 0, 200, Easing.OutPow10);
-            }
             else
                 downloadProgressBar.FadeOut(200, Easing.OutPow10);
+
+            downloadProgressBar.ResizeWidthTo(availability.DownloadProgress ?? 0, 200, Easing.OutPow10);
         });
 
         protected override void Dispose(bool isDisposing)
