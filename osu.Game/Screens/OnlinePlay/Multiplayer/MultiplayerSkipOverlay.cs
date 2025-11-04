@@ -101,7 +101,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void updateText()
         {
-            if (client.Room == null)
+            if (client.Room == null || client.Room.Settings.AutoSkip)
                 return;
 
             int countTotal = client.Room.Users.Count(u => u.State == MultiplayerUserState.Playing);
