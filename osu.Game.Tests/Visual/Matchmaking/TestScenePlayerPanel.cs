@@ -27,7 +27,13 @@ namespace osu.Game.Tests.Visual.Matchmaking
             AddStep("join room", () => JoinRoom(CreateDefaultRoom(MatchType.Matchmaking)));
             WaitForJoined();
 
-            AddStep("add panel", () => Child = panel = new PlayerPanel(new MultiplayerRoomUser(1)
+            AddStep("join other player to room", () => MultiplayerClient.AddUser(new APIUser
+            {
+                Id = 2,
+                Username = "peppy",
+            }));
+
+            AddStep("add panel", () => Child = panel = new PlayerPanel(new MultiplayerRoomUser(2)
             {
                 User = new APIUser
                 {
@@ -85,9 +91,9 @@ namespace osu.Game.Tests.Visual.Matchmaking
                     UserDictionary =
                     {
                         {
-                            1, new MatchmakingUser
+                            2, new MatchmakingUser
                             {
-                                UserId = 1,
+                                UserId = 2,
                                 Placement = 1,
                                 Points = ++points
                             }
@@ -100,13 +106,22 @@ namespace osu.Game.Tests.Visual.Matchmaking
         [Test]
         public void TestJump()
         {
-            AddStep("jump", () => MultiplayerClient.SendUserMatchRequest(1, new MatchmakingAvatarActionRequest { Action = MatchmakingAvatarAction.Jump }).WaitSafely());
+            AddStep("jump", () => MultiplayerClient.SendUserMatchRequest(2, new MatchmakingAvatarActionRequest { Action = MatchmakingAvatarAction.Jump }).WaitSafely());
         }
 
         [Test]
         public void TestQuit()
         {
             AddToggleStep("toggle quit", quit => panel.HasQuit = quit);
+        }
+
+        [Test]
+        public void TestDownloadProgress()
+        {
+            AddStep("set download progress 20%", () => MultiplayerClient.ChangeUserBeatmapAvailability(2, BeatmapAvailability.Downloading(0.2f)));
+            AddStep("set download progress 50%", () => MultiplayerClient.ChangeUserBeatmapAvailability(2, BeatmapAvailability.Downloading(0.5f)));
+            AddStep("set download progress 90%", () => MultiplayerClient.ChangeUserBeatmapAvailability(2, BeatmapAvailability.Downloading(0.9f)));
+            AddStep("set locally available", () => MultiplayerClient.ChangeUserBeatmapAvailability(2, BeatmapAvailability.LocallyAvailable()));
         }
     }
 }
