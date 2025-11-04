@@ -40,6 +40,9 @@ namespace osu.Game.Users
         [JsonProperty(@"global_rank")]
         public int? GlobalRank;
 
+        [JsonProperty(@"global_rank_percent")]
+        public float? GlobalRankPercent;
+
         [JsonProperty(@"country_rank")]
         public int? CountryRank;
 
