@@ -78,7 +78,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             client.UserLeft += onUserLeft;
             client.UserStateChanged += onUserStateChanged;
-            client.UserVotedToSkip += onUserVotedToSkip;
+            client.UserVotedToSkipIntro += onUserVotedToSkipIntro;
 
             updateText();
         }
@@ -93,7 +93,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Schedule(updateText);
         }
 
-        private void onUserVotedToSkip(int userId) => Schedule(() =>
+        private void onUserVotedToSkipIntro(int userId) => Schedule(() =>
         {
             updateText();
 
@@ -126,7 +126,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 client.UserLeft -= onUserLeft;
                 client.UserStateChanged -= onUserStateChanged;
-                client.UserVotedToSkip -= onUserVotedToSkip;
+                client.UserVotedToSkipIntro -= onUserVotedToSkipIntro;
             }
         }
     }
