@@ -245,6 +245,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,
                                 RelativeSizeAxes = Axes.X,
+                                Size = new Vector2(0, 4),
                                 Colour = colourProvider?.Content2 ?? colours.Gray3
                             }
                         }
