@@ -131,7 +131,7 @@ namespace osu.Game.Online.Multiplayer
         public event Action<int, long>? MatchmakingItemDeselected;
         public event Action<MatchRoomState>? MatchRoomStateChanged;
 
-        public event Action<int>? UserVotedToSkip;
+        public event Action<int>? UserVotedToSkipIntro;
         public event Action? VoteToSkipIntroPassed;
 
         /// <summary>
@@ -939,7 +939,7 @@ namespace osu.Game.Online.Multiplayer
 
                 user.VotedToSkipIntro = true;
 
-                UserVotedToSkip?.Invoke(userId);
+                UserVotedToSkipIntro?.Invoke(userId);
             });
 
             return Task.CompletedTask;
