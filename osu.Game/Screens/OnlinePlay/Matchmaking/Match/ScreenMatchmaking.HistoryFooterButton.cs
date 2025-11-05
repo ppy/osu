@@ -34,7 +34,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             }
 
             private void openRoomHistory()
-                => game?.OpenUrlExternally($@"/multiplayer/rooms/{room.RoomID}");
+                => game?.OpenUrlExternally($@"/multiplayer/rooms/{room.RoomID}/events");
         }
     }
 }
