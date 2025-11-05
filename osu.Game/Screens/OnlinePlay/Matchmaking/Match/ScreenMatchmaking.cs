@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -29,6 +30,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.Gameplay;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Users;
@@ -46,6 +48,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         /// Padding between rows of the content.
         /// </summary>
         private const float row_padding = 10;
+
+        private static readonly Vector2 chat_size = new Vector2(550, 130);
 
         public override bool? ApplyModTrackAdjustments => true;
 
@@ -104,8 +108,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             {
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.BottomRight,
-                Size = new Vector2(700, 130),
-                Margin = new MarginPadding { Bottom = 10, Right = WaveOverlayContainer.WIDTH_PADDING - HORIZONTAL_OVERFLOW_PADDING },
+                Size = chat_size,
+                Margin = new MarginPadding
+                {
+                    Right = WaveOverlayContainer.WIDTH_PADDING - HORIZONTAL_OVERFLOW_PADDING,
+                    Bottom = row_padding
+                },
                 Alpha = 0
             };
         }
@@ -162,9 +170,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                                 [
                                     new Container
                                     {
+                                        Name = "Chat Area Space",
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
-                                        Size = new Vector2(700, 130),
+                                        Size = new Vector2(550, 130),
                                         Margin = new MarginPadding { Bottom = row_padding }
                                     }
                                 ]
@@ -326,6 +335,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             return false;
         }
 
+        public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() =>
+        [
+            new HistoryFooterButton(room)
+        ];
+
         public override void OnEntering(ScreenTransitionEvent e)
         {
             base.OnEntering(e);
@@ -463,7 +477,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
                 // This component is added to the screen footer which is only about 50px high.
                 // Therefore, it's given a large absolute size to give the context menu enough space to display correctly.
-                Size = new Vector2(700);
+                Size = new Vector2(chat_size.X);
 
                 InternalChild = new OsuContextMenuContainer
                 {
