@@ -20,6 +20,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
@@ -27,6 +28,7 @@ using osu.Game.Online.Matchmaking.Events;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results;
@@ -107,6 +109,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         private BufferedContainer backgroundQuitTarget = null!;
         private BufferedContainer avatarQuitTarget = null!;
 
+        private Box downloadProgressBar = null!;
+
         private PlayerPanelDisplayMode displayMode = PlayerPanelDisplayMode.Horizontal;
         private bool hasQuit;
 
@@ -158,80 +162,91 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
-                        Child = mainContent = new Container
+                        Children = new Drawable[]
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
-                            Children = new[]
+                            mainContent = new Container
                             {
-                                quitText = new OsuSpriteText
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Both,
+                                Children = new[]
                                 {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Text = "QUIT",
-                                    Font = OsuFont.Default.With(weight: "Bold", size: 70),
-                                    Rotation = -22.5f,
-                                    Colour = OsuColour.Gray(0.3f),
-                                    Blending = BlendingParameters.Additive
-                                },
-                                avatarPositionTarget = new Container
-                                {
-                                    Origin = Anchor.Centre,
-                                    Size = avatar_size,
-                                    Child = avatarJumpTarget = new Container
+                                    quitText = new OsuSpriteText
                                     {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Text = "QUIT",
+                                        Font = OsuFont.Default.With(weight: "Bold", size: 70),
+                                        Rotation = -22.5f,
+                                        Colour = OsuColour.Gray(0.3f),
+                                        Blending = BlendingParameters.Additive
+                                    },
+                                    avatarPositionTarget = new Container
+                                    {
+                                        Origin = Anchor.Centre,
+                                        Size = avatar_size,
+                                        Child = avatarJumpTarget = new Container
+                                        {
+                                            Anchor = Anchor.BottomCentre,
+                                            Origin = Anchor.BottomCentre,
+                                            RelativeSizeAxes = Axes.Both,
+                                            Child = avatar = new Container
+                                            {
+                                                Anchor = Anchor.Centre,
+                                                Origin = Anchor.Centre,
+                                                RelativeSizeAxes = Axes.Both,
+                                                // Needs to be re-buffered as the avatar is proxied outside of the parent buffered container.
+                                                Child = avatarQuitTarget = new BufferedContainer
+                                                {
+                                                    FrameBufferScale = new Vector2(1.5f),
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Child = new MatchmakingAvatar(User, isOwnUser: User.Id == api.LocalUser.Value.Id)
+                                                    {
+                                                        Anchor = Anchor.Centre,
+                                                        Origin = Anchor.Centre,
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Size = Vector2.One
+                                                    }
+                                                }
+                                            },
+                                        }
+                                    },
+                                    rankText = new OsuSpriteText
+                                    {
+                                        Alpha = 0,
+                                        Anchor = Anchor.BottomRight,
+                                        Origin = Anchor.BottomCentre,
+                                        Blending = BlendingParameters.Additive,
+                                        Margin = new MarginPadding(4),
+                                        Text = "-",
+                                        Font = OsuFont.Style.Title.With(size: 55),
+                                    },
+                                    username = new OsuSpriteText
+                                    {
+                                        Alpha = 0,
                                         Anchor = Anchor.BottomCentre,
                                         Origin = Anchor.BottomCentre,
-                                        RelativeSizeAxes = Axes.Both,
-                                        Child = avatar = new Container
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            RelativeSizeAxes = Axes.Both,
-                                            // Needs to be re-buffered as the avatar is proxied outside of the parent buffered container.
-                                            Child = avatarQuitTarget = new BufferedContainer
-                                            {
-                                                FrameBufferScale = new Vector2(1.5f),
-                                                RelativeSizeAxes = Axes.Both,
-                                                Child = new MatchmakingAvatar(User, isOwnUser: User.Id == api.LocalUser.Value.Id)
-                                                {
-                                                    Anchor = Anchor.Centre,
-                                                    Origin = Anchor.Centre,
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Size = Vector2.One
-                                                }
-                                            }
-                                        },
+                                        Text = User.Username,
+                                        Font = OsuFont.Style.Heading1,
+                                    },
+                                    scoreText = new OsuSpriteText
+                                    {
+                                        Alpha = 0,
+                                        Margin = new MarginPadding(10),
+                                        Anchor = Anchor.BottomCentre,
+                                        Origin = Anchor.BottomCentre,
+                                        Font = OsuFont.Style.Heading2,
+                                        Text = "0 pts"
                                     }
-                                },
-                                rankText = new OsuSpriteText
-                                {
-                                    Alpha = 0,
-                                    Anchor = Anchor.BottomRight,
-                                    Origin = Anchor.BottomCentre,
-                                    Blending = BlendingParameters.Additive,
-                                    Margin = new MarginPadding(4),
-                                    Text = "-",
-                                    Font = OsuFont.Style.Title.With(size: 55),
-                                },
-                                username = new OsuSpriteText
-                                {
-                                    Alpha = 0,
-                                    Anchor = Anchor.BottomCentre,
-                                    Origin = Anchor.BottomCentre,
-                                    Text = User.Username,
-                                    Font = OsuFont.Style.Heading1,
-                                },
-                                scoreText = new OsuSpriteText
-                                {
-                                    Alpha = 0,
-                                    Margin = new MarginPadding(10),
-                                    Anchor = Anchor.BottomCentre,
-                                    Origin = Anchor.BottomCentre,
-                                    Font = OsuFont.Style.Heading2,
-                                    Text = "0 pts"
                                 }
+                            },
+                            downloadProgressBar = new Box
+                            {
+                                Anchor = Anchor.BottomLeft,
+                                Origin = Anchor.BottomLeft,
+                                RelativeSizeAxes = Axes.X,
+                                Size = new Vector2(0, 4),
+                                Colour = colourProvider?.Content2 ?? colours.Gray3
                             }
                         }
                     }
@@ -250,6 +265,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
             client.MatchRoomStateChanged += onRoomStateChanged;
             client.MatchEvent += onMatchEvent;
+            client.BeatmapAvailabilityChanged += onBeatmapAvailabilityChanged;
 
             onRoomStateChanged(client.Room!.MatchState);
 
@@ -472,6 +488,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             }
         }
 
+        private void onBeatmapAvailabilityChanged(MultiplayerRoomUser user, BeatmapAvailability availability) => Scheduler.Add(() =>
+        {
+            if (availability.State == DownloadState.Downloading)
+                downloadProgressBar.FadeIn(200, Easing.OutPow10);
+            else
+                downloadProgressBar.FadeOut(200, Easing.OutPow10);
+
+            downloadProgressBar.ResizeWidthTo(availability.DownloadProgress ?? 0, 200, Easing.OutPow10);
+        });
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -480,6 +506,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             {
                 client.MatchRoomStateChanged -= onRoomStateChanged;
                 client.MatchEvent -= onMatchEvent;
+                client.BeatmapAvailabilityChanged -= onBeatmapAvailabilityChanged;
             }
         }
 

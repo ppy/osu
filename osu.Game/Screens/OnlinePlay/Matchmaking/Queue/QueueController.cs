@@ -119,7 +119,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             if (backgroundNotification != null)
                 return;
 
-            notifications?.Post(backgroundNotification = new BackgroundQueueNotification());
+            notifications?.Post(backgroundNotification = new BackgroundQueueNotification(this));
         }
 
         private void closeNotifications()
@@ -154,8 +154,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             [Resolved]
             private MultiplayerClient client { get; set; } = null!;
 
+            private readonly QueueController controller;
+
             private Notification? foundNotification;
             private Sample? matchFoundSample;
+
+            public BackgroundQueueNotification(QueueController controller)
+            {
+                this.controller = controller;
+            }
 
             [BackgroundDependencyLoader]
             private void load(AudioManager audio)
@@ -165,7 +172,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 CompletionClickAction = () =>
                 {
                     client.MatchmakingAcceptInvitation().FireAndForget();
-                    performer?.PerformFromScreen(s => s.Push(new IntroScreen()));
+                    controller.CurrentState.Value = ScreenQueue.MatchmakingScreenState.AcceptedWaitingForRoom;
+
+                    performer?.PerformFromScreen(s => s.Push(new ScreenIntro()));
 
                     Close(false);
                     return true;
