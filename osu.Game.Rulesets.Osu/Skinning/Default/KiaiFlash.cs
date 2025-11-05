@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             if (!effectPoint.KiaiMode)
                 return;
 
-            double beatLength = timingPoint.BeatLength;
+            double beatLength = timingPoint.BeatLength; // bpm = 60000 / beatLength
             double flashingPeriod;
             if (beatLength < 120) // >=500 bpm, flash every 4 beats
             {
