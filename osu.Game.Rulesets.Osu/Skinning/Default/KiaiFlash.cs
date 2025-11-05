@@ -37,16 +37,23 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             double beatLength = timingPoint.BeatLength; // bpm = 60000 / beatLength
             double flashingPeriod;
+
             if (beatLength < 120) // >=500 bpm, flash every 4 beats
             {
                 if (beatIndex % 4 != 0)
+                {
                     return;
+                }
+
                 flashingPeriod = beatLength * 4;
             }
             else if (beatLength < 240) // >=250 bpm, flash every 2 beats
             {
                 if (beatIndex % 2 != 0)
+                {
                     return;
+                }
+
                 flashingPeriod = beatLength * 2;
             }
             else // <250 bpm, flash every beat
