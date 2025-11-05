@@ -12,6 +12,8 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mania.Difficulty.Skills;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
+using osu.Game.Rulesets.Mania.Difficulty.Utils;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
@@ -22,10 +24,28 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaDifficultyCalculator : DifficultyCalculator
     {
-        // Maybe .97 is good?
-        private const double difficulty_multiplier = .97;//1.029
+        private const double difficulty_multiplier = 0.9818199983381549;
+        private const double final_scaling_factor = 0.975;
+        private const double strain_threshold = 0.01;
+
+        // Pre-computed constants
+        private const double scaled_cross_column_factor = 0.2352941176;
+        private const double scaled_jack_factor = 0.01666666667;
+        private const double scaled_pressing_factor = 0.025;
+        private const double scaled_unevenness_factor = 0.5;
+        private const double scaled_release_factor = 0.1666666667;
+
+        // Difficulty calculation weights
+        private const double high_percentile_weight = 0.22; // 0.25 * 0.88
+        private const double mid_percentile_weight = 0.188; // 0.20 * 0.94
+        private const double power_mean_weight = 0.55;
+
+        public readonly double[] DifficultyPercentilesHigh = { 0.945, 0.935, 0.925, 0.915 };
+        public readonly double[] DifficultyPercentilesMid = { 0.845, 0.835, 0.825, 0.815 };
 
         private readonly bool isForCurrentRuleset;
+        private SunnyStrainData? cachedStrainData;
+        private Dictionary<StrainKey, double>? strainCache;
 
         public override int Version => 20241008;
 
@@ -40,15 +60,140 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new ManiaDifficultyAttributes { Mods = mods };
 
-            SunnyStrain strain = (SunnyStrain)skills[0];
-            ManiaDifficultyAttributes attributes = new ManiaDifficultyAttributes
+            var sameColumnSkill = (Jack)skills[0];
+            var crossColumnSkill = (CrossColumn)skills[1];
+            var pressingIntensitySkill = (PressingIntensity)skills[2];
+            var unevennessSkill = (Unevenness)skills[3];
+            var releaseSkill = (Release)skills[4];
+            var localNoteCountSkill = (LocalNoteCount)skills[5];
+            //var activeKeySkill = (ActiveKey)skills[6];
+
+            var combinedStrains = combineStrains(
+                sameColumnSkill.GetObjectStrains().ToList(),
+                crossColumnSkill.GetObjectStrains().ToList(),
+                pressingIntensitySkill.GetObjectStrains().ToList(),
+                unevennessSkill.GetObjectStrains().ToList(),
+                releaseSkill.GetObjectStrains().ToList(),
+                localNoteCountSkill.GetObjectStrains().ToList(),
+                localNoteCountSkill.GetActiveKeyStrains().ToList()
+            );
+
+            double sr = calculateDifficultyValue(combinedStrains, localNoteCountSkill);
+            int totalColumns = ((ManiaBeatmap)Beatmap).TotalColumns;
+
+            return new ManiaDifficultyAttributes
             {
-                StarRating = strain.DifficultyValue() /*skills.OfType<SunnyStrain>().Single().DifficultyValue()*/ * difficulty_multiplier,
+                StarRating = sr * difficulty_multiplier,
+                CrossColumnDifficulty = crossColumnSkill.DifficultyValue() * scaled_cross_column_factor / totalColumns,
+                JackDifficulty = sameColumnSkill.DifficultyValue() * scaled_jack_factor,
+                PressingIntensityDifficulty = pressingIntensitySkill.DifficultyValue() * scaled_pressing_factor,
+                UnevennessDifficulty = unevennessSkill.DifficultyValue() * scaled_unevenness_factor,
+                ReleaseDifficulty = releaseSkill.DifficultyValue() * scaled_release_factor,
                 Mods = mods,
                 MaxCombo = beatmap.HitObjects.Sum(maxComboForObject),
             };
+        }
 
-            return attributes;
+        private List<double> combineStrains(
+            IReadOnlyList<double> jackStrains,
+            IReadOnlyList<double> crossStrains,
+            IReadOnlyList<double> pressingStrains,
+            IReadOnlyList<double> unevennessStrains,
+            IReadOnlyList<double> releaseStrains,
+            IReadOnlyList<double> localNoteStrains,
+            IReadOnlyList<double> activeKeyStrains)
+        {
+            strainCache ??= new Dictionary<StrainKey, double>();
+
+            int count = jackStrains.Count;
+            var combinedStrains = new List<double>(count);
+
+            for (int i = 0; i < count; i++)
+            {
+                double sameColumn = jackStrains[i];
+                double crossColumn = crossStrains[i];
+                double pressingIntensity = pressingStrains[i];
+                double unevenness = unevennessStrains[i];
+                double release = releaseStrains[i];
+
+                // Early exit for negligible strains
+                if (sameColumn < strain_threshold && crossColumn < strain_threshold &&
+                    pressingIntensity < strain_threshold && unevenness < strain_threshold &&
+                    release < strain_threshold)
+                {
+                    combinedStrains.Add(0.0);
+                    continue;
+                }
+
+                double localNoteCount = localNoteStrains[i];
+                double activeKeyCount = activeKeyStrains[i];
+
+                var key = new StrainKey(sameColumn, crossColumn, pressingIntensity,
+                    unevenness, release, localNoteCount, activeKeyCount);
+
+                if (strainCache.TryGetValue(key, out double cachedResult))
+                {
+                    combinedStrains.Add(cachedResult);
+                    continue;
+                }
+
+                double clampedSameColumn = Math.Min(sameColumn, 8.0 + 0.85 * sameColumn);
+
+                double unevennessKeyAdjustment = 1.0;
+                if (unevenness > 0.0 && activeKeyCount > 0.0)
+                    unevennessKeyAdjustment = Math.Pow(unevenness, 3.0 / activeKeyCount);
+
+                double unevennessSameColumnComponent = unevennessKeyAdjustment * clampedSameColumn;
+                double firstComponent = 0.4 * Math.Pow(unevennessSameColumnComponent, 1.5);
+
+                double releaseComponent = release * 35.0 / (localNoteCount + 8.0);
+                double unevennessPressingReleaseComponent = Math.Pow(unevenness, 2.0 / 3.0) * (0.8 * pressingIntensity + releaseComponent);
+                double secondComponent = 0.6 * Math.Pow(unevennessPressingReleaseComponent, 1.5);
+
+                double totalStrainDifficulty = Math.Pow(firstComponent + secondComponent, 2.0 / 3.0);
+                double twistComponent = (unevennessKeyAdjustment * crossColumn) / (crossColumn + totalStrainDifficulty + 1.0);
+
+                double poweredTwist = twistComponent > 0.0 ? twistComponent * Math.Sqrt(twistComponent) : 0.0;
+                double finalStrain = 2.7 * Math.Sqrt(totalStrainDifficulty) * poweredTwist + totalStrainDifficulty * 0.27;
+
+                strainCache[key] = finalStrain;
+                combinedStrains.Add(finalStrain);
+            }
+
+            return combinedStrains;
+        }
+
+        private double calculateDifficultyValue(List<double> combinedStrains, LocalNoteCount localNoteCountSkill)
+        {
+            double[] sorted = combinedStrains.Where(s => s > 0).ToArray();
+            if (sorted.Length == 0) return 0.0;
+
+            Array.Sort(sorted);
+
+            double highPercentileMean = DifficultyValueUtils.CalculatePercentileMean(sorted, DifficultyPercentilesHigh);
+            double midPercentileMean = DifficultyValueUtils.CalculatePercentileMean(sorted, DifficultyPercentilesMid);
+            double powerMean = DifficultyValueUtils.CalculatePowerMean(sorted, 5.0);
+
+            double rawDifficulty = high_percentile_weight * highPercentileMean +
+                                   mid_percentile_weight * midPercentileMean +
+                                   power_mean_weight * powerMean;
+
+            return applyFinalScaling(rawDifficulty, localNoteCountSkill);
+        }
+
+        private double applyFinalScaling(double rawDifficulty, LocalNoteCount localNoteCountSkill)
+        {
+            double totalCurrentNotes = localNoteCountSkill.GetTotalNotesWithWeight();
+            double scaled = rawDifficulty * totalCurrentNotes / (totalCurrentNotes + 60.0);
+
+            // Apply rescaling if config exists
+            if (cachedStrainData?.Config != null && scaled > cachedStrainData.Config.rescaleHighThreshold)
+            {
+                scaled = cachedStrainData.Config.rescaleHighThreshold + (scaled - cachedStrainData.Config.rescaleHighThreshold) /
+                    cachedStrainData.Config.rescaleHighFactor;
+            }
+
+            return scaled * final_scaling_factor;
         }
 
         private static int maxComboForObject(HitObject hitObject)
@@ -63,22 +208,45 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
             var sortedObjects = beatmap.HitObjects.ToArray();
 
-            LegacySortHelper<HitObject>.Sort(sortedObjects, Comparer<HitObject>.Create((a, b) => (int)Math.Round(a.StartTime) - (int)Math.Round(b.StartTime)));
+            LegacySortHelper<HitObject>.Sort(sortedObjects,
+                Comparer<HitObject>.Create((a, b) => (int)Math.Round(a.StartTime) - (int)Math.Round(b.StartTime)));
 
-            List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
+            var objects = new List<DifficultyHitObject>(Math.Max(0, sortedObjects.Length - 1));
 
             for (int i = 1; i < sortedObjects.Length; i++)
-                objects.Add(new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1], clockRate, objects, objects.Count));
+            {
+                objects.Add(new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1],
+                    clockRate, objects, objects.Count));
+            }
+
+            var preprocessor = new SunnyPreprocessor(objects, (ManiaBeatmap)Beatmap, new FormulaConfig());
+            cachedStrainData = preprocessor.Process();
 
             return objects;
         }
 
         protected override IEnumerable<DifficultyHitObject> SortObjects(IEnumerable<DifficultyHitObject> input) => input;
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate) => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
-            new SunnyStrain(mods, CreateDifficultyHitObjects(beatmap, clockRate), (ManiaBeatmap)Beatmap, new FormulaConfig())
-        };
+            if (cachedStrainData == null)
+            {
+                var difficultyHitObjects = CreateDifficultyHitObjects(beatmap, clockRate);
+                var preprocessor = new SunnyPreprocessor(difficultyHitObjects, (ManiaBeatmap)Beatmap, new FormulaConfig());
+                cachedStrainData = preprocessor.Process();
+            }
+
+            return new Skill[]
+            {
+                new Jack(mods, cachedStrainData),
+                new CrossColumn(mods, cachedStrainData),
+                new PressingIntensity(mods, cachedStrainData),
+                new Unevenness(mods, cachedStrainData),
+                new Release(mods, cachedStrainData),
+                new LocalNoteCount(mods, cachedStrainData),
+                //new ActiveKey(mods, cachedStrainData),
+            };
+        }
 
         protected override Mod[] DifficultyAdjustmentMods
         {
@@ -112,6 +280,52 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                     new ManiaModKey9(),
                     new MultiMod(new ManiaModKey9(), new ManiaModDualStages()),
                 }).ToArray();
+            }
+        }
+
+        private readonly struct StrainKey : IEquatable<StrainKey>
+        {
+            private readonly int sameColumnRounded;
+            private readonly int crossColumnRounded;
+            private readonly int pressingIntensityRounded;
+            private readonly int unevennessRounded;
+            private readonly int releaseRounded;
+            private readonly int localNoteCountRounded;
+            private readonly int activeKeyCountRounded;
+
+            public StrainKey(double sameColumn, double crossColumn, double pressingIntensity, double unevenness, double release, double localNoteCount, double activeKeyCount)
+            {
+                sameColumnRounded = (int)Math.Round(sameColumn * 1000);
+                crossColumnRounded = (int)Math.Round(crossColumn * 1000);
+                pressingIntensityRounded = (int)Math.Round(pressingIntensity * 1000);
+                unevennessRounded = (int)Math.Round(unevenness * 1000);
+                releaseRounded = (int)Math.Round(release * 1000);
+                localNoteCountRounded = (int)Math.Round(localNoteCount * 1000);
+                activeKeyCountRounded = (int)Math.Round(activeKeyCount * 1000);
+            }
+
+            public bool Equals(StrainKey other) =>
+                sameColumnRounded == other.sameColumnRounded &&
+                crossColumnRounded == other.crossColumnRounded &&
+                pressingIntensityRounded == other.pressingIntensityRounded &&
+                unevennessRounded == other.unevennessRounded &&
+                releaseRounded == other.releaseRounded &&
+                localNoteCountRounded == other.localNoteCountRounded &&
+                activeKeyCountRounded == other.activeKeyCountRounded;
+
+            public override bool Equals(object? obj) => obj is StrainKey other && Equals(other);
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(
+                    sameColumnRounded,
+                    crossColumnRounded,
+                    pressingIntensityRounded,
+                    unevennessRounded,
+                    releaseRounded,
+                    localNoteCountRounded,
+                    activeKeyCountRounded
+                );
             }
         }
     }

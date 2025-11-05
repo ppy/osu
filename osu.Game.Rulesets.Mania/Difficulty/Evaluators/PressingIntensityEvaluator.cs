@@ -171,7 +171,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
             {
                 var note = data.AllNotes[noteIndex];
                 int noteStartTime = (int)Math.Round(note.StartTime);
-                int noteEndTime = (int)Math.Round(note.EndTime); // note.IsLong ? (int)Math.Round(note.EndTime) : noteStartTime;
+                int noteEndTime = (int)Math.Round(note.EndTime);
 
                 int leftWindow400Index = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners,
                     noteStartTime - data.Config.keyUsageWindowMs);

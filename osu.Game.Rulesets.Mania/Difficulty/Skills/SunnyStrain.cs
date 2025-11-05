@@ -70,14 +70,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
             double currentTime = maniaCurrent.StartTime;
 
-            double sameColumnDifficulty = SameColumnEvaluator.EvaluateDifficultyAt(currentTime, strainData); // SAFE
-            double crossColumnDifficulty = CrossColumnEvaluator.EvaluateDifficultyAt(currentTime, strainData); //SAFE
-            double pressingIntensityDifficulty = PressingIntensityEvaluator.EvaluateDifficultyAt(currentTime, strainData); // IDK?
-            double unevennessDifficulty = UnevennessEvaluator.EvaluateDifficultyAt(currentTime, strainData); // IDK?
-            double releaseDifficulty = ReleaseFactorEvaluator.EvaluateDifficultyAt(currentTime, strainData); // SAFE
+            double sameColumnDifficulty = SameColumnEvaluator.EvaluateDifficultyAt(currentTime, strainData);
+            double crossColumnDifficulty = CrossColumnEvaluator.EvaluateDifficultyAt(currentTime, strainData);
+            double pressingIntensityDifficulty = PressingIntensityEvaluator.EvaluateDifficultyAt(currentTime, strainData);
+            double unevennessDifficulty = UnevennessEvaluator.EvaluateDifficultyAt(currentTime, strainData);
+            double releaseDifficulty = ReleaseFactorEvaluator.EvaluateDifficultyAt(currentTime, strainData);
 
-            double localNoteCount = strainData.SampleFeatureAtTime(currentTime, strainData.LocalNoteCount); // SAFE
-            double activeKeyCount = strainData.SampleFeatureAtTime(currentTime, strainData.ActiveKeyCount); // SAFE
+            double localNoteCount = strainData.SampleFeatureAtTime(currentTime, strainData.LocalNoteCount);
+            double activeKeyCount = strainData.SampleFeatureAtTime(currentTime, strainData.ActiveKeyCount);
 
             /*Console.WriteLine($"time={currentTime}, sameColumn={sameColumnDifficulty}, crossColumn={crossColumnDifficulty}, "
                               + $"pressingIntensity={pressingIntensityDifficulty}, unevenessDifficulty={unevennessDifficulty}, releaseDifficulty={releaseDifficulty}, localNoteCount={localNoteCount}, "
@@ -175,20 +175,20 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
     // TEMPORARY ONLY FOR TESTING
     public class FormulaConfig
     {
-        public double rescaleHighThreshold = 10.01191947310021;
-        public double rescaleHighFactor = 1.4413495576620445;
-        public double hitLeniencyBase = 0.3274102106755597;
-        public double hitLeniencyOdMultiplier = 3.4089356422856554;
-        public double hitLeniencyOdBase = 55.07787194224247;
-        public double smoothingWindowMs = 493.6941401846966;
-        public double accuracySmoothingWindowMs = 500.0;
-        public double columnActivityWindowMs = 246.75167259941304;
-        public double keyUsageWindowMs =  323.9887868867879;
-        public double jackNerfCoefficient = 0.46404885543338015;
-        public double jackNerfBase = 18.414285011810225;
-        public double jackNerfPower = -34.692933993910664;
-        public double streamBoostMinRatio = 169.97179025061487;
-        public double streamBoostMaxRatio = 382.02728653035257;
-        public double streamBoostCoefficient = 8.090697350532603E-8;
+        public double rescaleHighThreshold = 9.648018295800334;
+        public double rescaleHighFactor = 1.4441598782471803;
+        public double hitLeniencyBase = 0.3310181856698675;
+        public double hitLeniencyOdMultiplier = 3.360810802810689;
+        public double hitLeniencyOdBase = 56.59723759581402;
+        public double smoothingWindowMs = 490.74808264043077;
+        public double accuracySmoothingWindowMs = 383.2749819546263;
+        public double columnActivityWindowMs = 231.11564703753132;
+        public double keyUsageWindowMs = 310.92348654941304;
+        public double jackNerfCoefficient = 0.47020623513898313;
+        public double jackNerfBase = 18.441418584326687;
+        public double jackNerfPower = -33.72322163074505;
+        public double streamBoostMinRatio = 172.41458658810265;
+        public double streamBoostMaxRatio = 384.7187521409616;
+        public double streamBoostCoefficient = 6.58242983168459E-8;
     }
 }

@@ -74,9 +74,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
 
             // Handle boundary cases
             if (targetPoint <= xArray[0]) return yArray[0];
-
-            int lastIndex = xArray.Length - 1;
-            if (targetPoint >= xArray[lastIndex]) return yArray[lastIndex];
+            if (targetPoint >= xArray[^1]) return yArray[^1];
 
             // Find the appropriate interval using binary search
             int searchResult = Array.BinarySearch(xArray, targetPoint);
@@ -87,8 +85,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
             int leftIndex = rightIndex - 1;
 
             // Perform linear interpolation
-            double denominator = (xArray[rightIndex] - xArray[leftIndex]);
-            if (denominator == 0.0) return yArray[leftIndex]; // Avoid division by zero
+            double denominator = xArray[rightIndex] - xArray[leftIndex];
+            if (denominator == 0.0) return yArray[leftIndex];
 
             double interpolationFactor = (targetPoint - xArray[leftIndex]) / denominator;
             return yArray[leftIndex] * (1.0 - interpolationFactor) + yArray[rightIndex] * interpolationFactor;

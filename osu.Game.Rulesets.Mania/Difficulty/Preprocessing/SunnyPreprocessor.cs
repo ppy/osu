@@ -45,8 +45,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 
             processDifficultyHitObjects(data);
             organizeNotesByColumn(data);
-
-            data.MaxTime = (int)difficultyHitObjects.Last().EndTime;
+            calculateMaxTime(data);
 
             data.CornerData = new CornerData();
             data.CornerData.ComputeTimeCorners(data.AllNotes, data.MaxTime);
@@ -54,6 +53,23 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             computeAllFeatures(data);
 
             return data;
+        }
+
+        private void calculateMaxTime(SunnyStrainData data)
+        {
+            var notes = data.AllNotes;
+
+            if (notes.Length == 0)
+            {
+                data.MaxTime = 0;
+                return;
+            }
+
+            var last = notes[^1];
+
+            double maxTime = Math.Max(last.StartTime, last.IsLong ? last.EndTime : last.StartTime);
+            data.MaxTime = (int)Math.Ceiling(maxTime) + 1;
+            //Console.WriteLine(data.MaxTime);
         }
 
         /// <summary>
