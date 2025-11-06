@@ -483,6 +483,15 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
+        protected override void FindCarouselItemsForSelection(ref Selection keyboardSelection, ref Selection selection, IList<CarouselItem> items)
+        {
+            if (keyboardSelection.Model != null && grouping.ItemMap.TryGetValue(keyboardSelection.Model, out var keyboardSelectionItem))
+                keyboardSelection = keyboardSelection with { CarouselItem = keyboardSelectionItem.item, Index = keyboardSelectionItem.index };
+
+            if (selection.Model != null && grouping.ItemMap.TryGetValue(selection.Model, out var selectionItem))
+                selection = selection with { CarouselItem = selectionItem.item, Index = selectionItem.index };
+        }
+
         protected override void HandleFilterCompleted()
         {
             base.HandleFilterCompleted();
@@ -497,14 +506,7 @@ namespace osu.Game.Screens.SelectV2
             // The filter might have changed the set of available groups, which means that the current selection may point to a stale group.
             // Check whether that is the case.
             bool groupingRemainsOff = currentGroupedBeatmap?.Group == null && grouping.GroupItems.Count == 0;
-
-            bool groupStillValid = false;
-
-            if (currentGroupedBeatmap?.Group != null)
-            {
-                groupStillValid = grouping.GroupItems.TryGetValue(currentGroupedBeatmap.Group, out var items)
-                                  && items.Any(i => CheckModelEquality(i.Model, currentGroupedBeatmap));
-            }
+            bool groupStillValid = currentGroupedBeatmap?.Group != null && grouping.ItemMap.ContainsKey(currentGroupedBeatmap);
 
             if (groupingRemainsOff || groupStillValid)
             {
@@ -697,9 +699,8 @@ namespace osu.Game.Screens.SelectV2
             if (CheckModelEquality(ExpandedGroup, CurrentGroupedBeatmap.Group))
                 return;
 
-            var groupItem = GetCarouselItems()?.FirstOrDefault(i => CheckModelEquality(i.Model, CurrentGroupedBeatmap.Group));
-            if (groupItem != null)
-                Activate(groupItem);
+            if (grouping.ItemMap.TryGetValue(CurrentGroupedBeatmap.Group, out var groupItem))
+                Activate(groupItem.item);
         }
 
         protected override double? GetScrollTarget()
@@ -710,9 +711,13 @@ namespace osu.Game.Screens.SelectV2
             // attempt a fallback to other possibly expanded panels (set first, then group)
             if (target == null)
             {
-                var items = GetCarouselItems();
-                var targetItem = items?.FirstOrDefault(i => CheckModelEquality(i.Model, ExpandedBeatmapSet))
-                                 ?? items?.FirstOrDefault(i => CheckModelEquality(i.Model, ExpandedGroup));
+                CarouselItem? targetItem = null;
+
+                if (ExpandedBeatmapSet != null && grouping.ItemMap.TryGetValue(ExpandedBeatmapSet, out var setItem))
+                    targetItem = setItem.item;
+
+                if (targetItem == null && ExpandedGroup != null && grouping.ItemMap.TryGetValue(ExpandedGroup, out var groupItem))
+                    targetItem = groupItem.item;
 
                 target = targetItem?.CarouselYPosition;
             }
