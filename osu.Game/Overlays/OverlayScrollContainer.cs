@@ -58,8 +58,9 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
 
-            // Calculate progress based on the bottom position of the overlay
-            progress.Value = Math.Clamp((Current + DrawHeight) / AvailableContent, 0, 1);
+            // Map current position to standardized progress
+            float height = AvailableContent - DrawHeight;
+            progress.Value = height == 0 ? 1 : Math.Round(Math.Clamp(Current / height, 0, 1), 3);
 
             if (ScrollContent.DrawHeight + button_scroll_position < DrawHeight)
             {
