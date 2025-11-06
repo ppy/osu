@@ -7,7 +7,10 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
+using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -116,7 +119,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             if (backgroundNotification != null)
                 return;
 
-            notifications?.Post(backgroundNotification = new BackgroundQueueNotification());
+            notifications?.Post(backgroundNotification = new BackgroundQueueNotification(this));
         }
 
         private void closeNotifications()
@@ -151,8 +154,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             [Resolved]
             private MultiplayerClient client { get; set; } = null!;
 
+            private readonly QueueController controller;
+
             private Notification? foundNotification;
             private Sample? matchFoundSample;
+
+            public BackgroundQueueNotification(QueueController controller)
+            {
+                this.controller = controller;
+            }
 
             [BackgroundDependencyLoader]
             private void load(AudioManager audio)
@@ -162,7 +172,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 CompletionClickAction = () =>
                 {
                     client.MatchmakingAcceptInvitation().FireAndForget();
-                    performer?.PerformFromScreen(s => s.Push(new IntroScreen()));
+                    controller.CurrentState.Value = ScreenQueue.MatchmakingScreenState.AcceptedWaitingForRoom;
+
+                    performer?.PerformFromScreen(s => s.Push(new ScreenIntro()));
 
                     Close(false);
                     return true;
@@ -200,7 +212,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             public partial class MatchFoundNotification : ProgressCompletionNotification
             {
-                // for future use.
+                protected override IconUsage CloseButtonIcon => FontAwesome.Solid.Times;
+
+                public MatchFoundNotification()
+                {
+                    IsCritical = true;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
+                {
+                    Icon = FontAwesome.Solid.Bolt;
+                    IconContent.Colour = ColourInfo.GradientVertical(colours.YellowDark, colours.YellowLight);
+                }
             }
         }
     }

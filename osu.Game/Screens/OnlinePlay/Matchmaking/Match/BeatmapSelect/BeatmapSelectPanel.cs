@@ -111,7 +111,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             {
                 Debug.Assert(card == null);
 
-                var beatmap = b.GetResultSafely()!;
+                APIBeatmap beatmap = b.GetResultSafely() ?? new APIBeatmap
+                {
+                    BeatmapSet = new APIBeatmapSet
+                    {
+                        Title = "unknown beatmap",
+                        TitleUnicode = "unknown beatmap",
+                        Artist = "unknown artist",
+                        ArtistUnicode = "unknown artist",
+                    }
+                };
+
                 beatmap.StarRating = Item.StarRating;
 
                 mainContent.Add(card = new BeatmapCardMatchmaking(beatmap)

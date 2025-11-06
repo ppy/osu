@@ -53,6 +53,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        [Resolved]
+        private BeatmapSetOverlay? beatmapSetOverlay { get; set; }
+
         public BeatmapCardMatchmaking(APIBeatmap beatmap)
             : base(beatmap.BeatmapSet!, false)
         {
@@ -319,7 +322,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             {
                 List<MenuItem> items = new List<MenuItem>
                 {
-                    new OsuMenuItem(ContextMenuStrings.ViewBeatmap, MenuItemType.Highlighted, DefaultAction)
+                    new OsuMenuItem(ContextMenuStrings.ViewBeatmap, MenuItemType.Highlighted, () => beatmapSetOverlay?.FetchAndShowBeatmap(beatmap.OnlineID))
                 };
 
                 foreach (var button in buttonContainer.Buttons)

@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Utils;
@@ -80,7 +81,7 @@ namespace osu.Game.Graphics
 
         public DateTimeOffset TooltipContent => Date;
 
-        private class HumanisedDate : IEquatable<HumanisedDate>, ILocalisableStringData
+        private class HumanisedDate : ILocalisableStringData
         {
             public readonly DateTimeOffset Date;
 
@@ -89,11 +90,18 @@ namespace osu.Game.Graphics
                 Date = date;
             }
 
-            public bool Equals(HumanisedDate? other)
-                => other?.Date != null && Date.Equals(other.Date);
-
-            public bool Equals(ILocalisableStringData? other)
-                => other is HumanisedDate otherDate && Equals(otherDate);
+            /// <remarks>
+            /// Humanizer formats the <see cref="Date"/> relative to the local computer time.
+            /// Therefore, replacing a <see cref="HumanisedDate"/> instance with another instance of the class with the same <see cref="Date"/>
+            /// should have the effect of replacing and re-formatting the text.
+            /// Including <see cref="Date"/> in equality members would stop this from happening, as <see cref="SpriteText.Text"/>
+            /// has equality-based early guards to prevent redundant text replaces.
+            /// Thus, instances of these class just compare <see langword="false"/> to any <see cref="ILocalisableStringData"/> to ensure re-formatting happens correctly.
+            /// There are "technically" more "correct" ways to do this (like also including the current time into equality checks),
+            /// but they are simultaneously functionally equivalent to this and overly convoluted.
+            /// This is a private hack-job of a wrapper around humanizer anyway.
+            /// </remarks>
+            public bool Equals(ILocalisableStringData? other) => false;
 
             public string GetLocalised(LocalisationParameters parameters) => HumanizerUtils.Humanize(Date);
 
