@@ -58,7 +58,11 @@ namespace osu.Game.Screens.Play.HUD
                 performanceCalculator = gameplayState.Ruleset.CreatePerformanceCalculator();
                 clonedMods = gameplayState.Mods.Select(m => m.DeepClone()).ToArray();
 
-                scoreInfo = new ScoreInfo(gameplayState.Score.ScoreInfo.BeatmapInfo, gameplayState.Score.ScoreInfo.Ruleset) { Mods = clonedMods };
+                scoreInfo = new ScoreInfo(gameplayState.Score.ScoreInfo.BeatmapInfo, gameplayState.Score.ScoreInfo.Ruleset)
+                {
+                    Mods = clonedMods,
+                    IsLegacyScore = gameplayState.Score.ScoreInfo.IsLegacyScore
+                };
 
                 var gameplayWorkingBeatmap = new GameplayWorkingBeatmap(gameplayState.Beatmap);
                 difficultyCache.GetTimedDifficultyAttributesAsync(gameplayWorkingBeatmap, gameplayState.Ruleset, clonedMods, loadCancellationSource.Token)
@@ -82,7 +86,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 // Legacy score may be necessary for correct pp calculation of legacy scores depending on the ruleset.
                 // If it's not necessary - method CreateLegacyScoreProcessor will return null and legacy score calculation will be skipped.
-                if (clonedMods.OfType<ModClassic>().Any())
+                if (scoreInfo.IsLegacyScore)
                 {
                     legacyScoreProcessor = gameplayState.Ruleset.CreateLegacyScoreProcessor();
                     legacyScoreProcessor?.ApplyBeatmap(gameplayState.Beatmap);
@@ -130,7 +134,9 @@ namespace osu.Game.Screens.Play.HUD
             }
 
             scoreProcessor.PopulateScore(scoreInfo);
-            scoreInfo.LegacyTotalScore = legacyTotalScore;
+
+            if (legacyScoreProcessor != null)
+                scoreInfo.LegacyTotalScore = legacyTotalScore;
 
             Current.Value = (int)Math.Round(performanceCalculator?.Calculate(scoreInfo, attrib).Total ?? 0, MidpointRounding.AwayFromZero);
             IsValid = true;
