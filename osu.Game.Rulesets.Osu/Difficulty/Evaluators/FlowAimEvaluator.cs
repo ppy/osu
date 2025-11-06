@@ -80,6 +80,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double acuteAngleBonus = CalculateFlowAcuteAngleBonus(current);
                 double angleChangeBonus = CalculateFlowAngleChangeBonus(current);
 
+                // If all three notes are overlapping - don't reward angle bonuses as you don't have to do additional movement
                 double overlappedNotesWeight = 1;
 
                 if (current.Index > 2)
@@ -146,9 +147,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLast0Obj = (OsuDifficultyHitObject)current.Previous(0);
+            var osuLast1Obj = (OsuDifficultyHitObject)current.Previous(0);
 
             if (osuCurrObj.AngleSigned == null || osuLast0Obj.AngleSigned == null)
                 return 0;
+
+            const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
             double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.AdjustedDeltaTime;
             double prevVelocity = osuLast0Obj.LazyJumpDistance / osuLast0Obj.AdjustedDeltaTime;
@@ -158,6 +162,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double baseVelocity = Math.Min(currVelocity, prevVelocity);
             double angleChangeBonus = Math.Pow(Math.Sin((currAngle - lastAngle) / 2), 2) * baseVelocity;
+
+            // Take the largest of last 3 distances and if it's too small - decrease flow angle change bonus, because it's cheesable
+            double largestPrevDistance = Math.Max(Math.Max(osuCurrObj.LazyJumpDistance, osuLast0Obj.LazyJumpDistance), osuLast1Obj.LazyJumpDistance);
+            angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(largestPrevDistance, 0, diameter);
 
             return angleChangeBonus;
         }
