@@ -131,6 +131,11 @@ namespace osu.Game.Online.Multiplayer
         public event Action<int, long>? MatchmakingItemDeselected;
         public event Action<MatchRoomState>? MatchRoomStateChanged;
 
+        public event Action<int>? UserVotedToSkipIntro;
+        public event Action? VoteToSkipIntroPassed;
+
+        public event Action<MultiplayerRoomUser, BeatmapAvailability>? BeatmapAvailabilityChanged;
+
         /// <summary>
         /// Whether the <see cref="MultiplayerClient"/> is currently connected.
         /// This is NOT thread safe and usage should be scheduled.
@@ -493,6 +498,8 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task RemovePlaylistItem(long playlistItemId);
 
+        public abstract Task VoteToSkipIntro();
+
         Task IMultiplayerClient.RoomStateChanged(MultiplayerRoomState state)
         {
             handleRoomRequest(() =>
@@ -770,6 +777,7 @@ namespace osu.Game.Online.Multiplayer
 
                 user.BeatmapAvailability = beatmapAvailability;
 
+                BeatmapAvailabilityChanged?.Invoke(user, beatmapAvailability);
                 RoomUpdated?.Invoke();
             });
 
@@ -846,6 +854,10 @@ namespace osu.Game.Online.Multiplayer
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
+
+                foreach (var user in Room.Users)
+                    user.VotedToSkipIntro = false;
+
                 GameplayStarted?.Invoke();
             });
 
@@ -911,6 +923,37 @@ namespace osu.Game.Online.Multiplayer
 
                 ItemChanged?.Invoke(item);
                 RoomUpdated?.Invoke();
+            });
+
+            return Task.CompletedTask;
+        }
+
+        Task IMultiplayerClient.UserVotedToSkipIntro(int userId)
+        {
+            handleRoomRequest(() =>
+            {
+                Debug.Assert(Room != null);
+
+                var user = Room.Users.SingleOrDefault(u => u.UserID == userId);
+
+                // TODO: user should NEVER be null here, see https://github.com/ppy/osu/issues/17713.
+                if (user == null)
+                    return;
+
+                user.VotedToSkipIntro = true;
+
+                UserVotedToSkipIntro?.Invoke(userId);
+            });
+
+            return Task.CompletedTask;
+        }
+
+        Task IMultiplayerClient.VoteToSkipIntroPassed()
+        {
+            handleRoomRequest(() =>
+            {
+                Debug.Assert(Room != null);
+                VoteToSkipIntroPassed?.Invoke();
             });
 
             return Task.CompletedTask;

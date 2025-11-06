@@ -1,11 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -60,6 +62,42 @@ namespace osu.Game.Tests.Visual.Matchmaking
             {
                 if (panel != null)
                     panel.AllowSelection = value;
+            });
+        }
+
+        [Test]
+        public void TestFailedBeatmapLookup()
+        {
+            AddStep("setup request handle", () =>
+            {
+                var api = (DummyAPIAccess)API;
+                var handler = api.HandleRequest;
+                api.HandleRequest = req =>
+                {
+                    switch (req)
+                    {
+                        case GetBeatmapRequest:
+                        case GetBeatmapsRequest:
+                            req.TriggerFailure(new InvalidOperationException());
+                            return false;
+
+                        default:
+                            return handler?.Invoke(req) ?? false;
+                    }
+                };
+            });
+
+            AddStep("add panel", () =>
+            {
+                Child = new OsuContextMenuContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = new BeatmapSelectPanel(new MultiplayerPlaylistItem())
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                };
             });
         }
     }

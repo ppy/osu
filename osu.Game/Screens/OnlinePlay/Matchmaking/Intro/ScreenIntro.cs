@@ -21,7 +21,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
     /// <summary>
     /// A brief intro animation that introduces matchmaking to the user.
     /// </summary>
-    public partial class IntroScreen : OsuScreen
+    public partial class ScreenIntro : OsuScreen
     {
         public override bool DisallowExternalBeatmapRulesetChanges => false;
 
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
 
         protected override BackgroundScreen CreateBackground() => new MatchmakingIntroBackgroundScreen(colourProvider);
 
-        public IntroScreen()
+        public ScreenIntro()
         {
             ValidForResume = false;
         }
