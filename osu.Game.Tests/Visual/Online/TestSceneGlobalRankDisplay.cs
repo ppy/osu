@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Online
             Direction = FillDirection.Full,
             Padding = new MarginPadding(20),
             Spacing = new Vector2(40),
-            ChildrenEnumerable = new int?[] { 64, 423, 1453, 3468, 18_367, 48_342, 178_432, 375_231, 897_783, null }.Select(createDisplay)
+            ChildrenEnumerable = new int?[] { 64, 423, 1_453, 3_468, 8_367, 48_342, 78_432, 375_231, 897_783, null }.Select(createDisplay)
         };
 
         private GlobalRankDisplay createDisplay(int? rank) => new GlobalRankDisplay

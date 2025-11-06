@@ -75,19 +75,19 @@ namespace osu.Game.Overlays.Profile.Header.Components
             if (percent < 0.0005)
                 return RankingTier.Radiant;
 
-            if (percent < 0.0025)
+            if (percent < 0.0015)
                 return RankingTier.Rhodium;
 
             if (percent < 0.005)
                 return RankingTier.Platinum;
 
-            if (percent < 0.025)
+            if (percent < 0.015)
                 return RankingTier.Gold;
 
             if (percent < 0.05)
                 return RankingTier.Silver;
 
-            if (percent < 0.25)
+            if (percent < 0.15)
                 return RankingTier.Bronze;
 
             if (percent < 0.5)
