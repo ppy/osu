@@ -109,7 +109,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 AllowSelection = allowSelection,
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
-                Action = ItemSelected,
+                Action = i => ItemSelected?.Invoke(i),
             };
 
             panelGridContainer.Add(panel);
