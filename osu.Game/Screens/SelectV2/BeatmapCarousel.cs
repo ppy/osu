@@ -927,9 +927,6 @@ namespace osu.Game.Screens.SelectV2
             if (x is BeatmapInfo beatmapInfoX && y is BeatmapInfo beatmapInfoY)
                 return beatmapInfoX.Equals(beatmapInfoY);
 
-            if (x is GroupDefinition groupX && y is GroupDefinition groupY)
-                return groupX.Equals(groupY);
-
             if (x is StarDifficultyGroupDefinition starX && y is StarDifficultyGroupDefinition starY)
                 return starX.Equals(starY);
 
@@ -938,6 +935,14 @@ namespace osu.Game.Screens.SelectV2
 
             if (x is RankedStatusGroupDefinition statusX && y is RankedStatusGroupDefinition statusY)
                 return statusX.Equals(statusY);
+
+            // NOTE: this branch must be AFTER all branches that compare `GroupDefinition` subtypes!
+            // this is an optimisation measure. any subclass of `GroupDefinition` will pass the `is GroupDefinition` check,
+            // and testing a subclass of `GroupDefinition` against any other `GroupDefinition` (or subclass thereof)
+            // will result in a casting cascade of `Equals(GroupDefinition) -> Equals(object) -> Equals(GroupDefinitionSubClass)`
+            // (that last one only if the type check passes)
+            if (x is GroupDefinition groupX && y is GroupDefinition groupY)
+                return groupX.Equals(groupY);
 
             return base.CheckModelEquality(x, y);
         }
