@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class FlowAimEvaluator
     {
         // The reason why this exist in evaluator instead of FlowAim skill - it's because it's very important to keep flowaim in the same scaling as snapaim on evaluator level
-        private const double flow_multiplier = 1.095;
+        private const double flow_multiplier = 1.1;
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
