@@ -100,6 +100,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double? Angle { get; private set; }
 
+        public bool? IsClockwise { get; private set; }
+
         /// <summary>
         /// Retrieves the full hit window for a Great <see cref="HitResult"/>.
         /// </summary>
@@ -247,7 +249,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 float dot = Vector2.Dot(v1, v2);
                 float det = v1.X * v2.Y - v1.Y * v2.X;
 
-                Angle = Math.Abs(Math.Atan2(det, dot));
+                double angle = Math.Atan2(det, dot);
+                IsClockwise = angle < 0;
+                Angle = Math.Abs(angle);
             }
         }
 
