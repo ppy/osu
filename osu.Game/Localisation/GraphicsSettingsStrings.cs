@@ -100,21 +100,6 @@ namespace osu.Game.Localisation
         public static LocalisableString DetailSettingsHeader => new TranslatableString(getKey(@"detail_settings_header"), @"Detail Settings");
 
         /// <summary>
-        /// "Storyboard / video"
-        /// </summary>
-        public static LocalisableString StoryboardVideo => new TranslatableString(getKey(@"storyboard_video"), @"Storyboard / video");
-
-        /// <summary>
-        /// "Combo colour normalisation"
-        /// </summary>
-        public static LocalisableString ComboColourNormalisation => new TranslatableString(getKey(@"combo_colour_normalisation"), @"Combo colour normalisation");
-
-        /// <summary>
-        /// "Hit lighting"
-        /// </summary>
-        public static LocalisableString HitLighting => new TranslatableString(getKey(@"hit_lighting"), @"Hit lighting");
-
-        /// <summary>
         /// "Screenshots"
         /// </summary>
         public static LocalisableString Screenshots => new TranslatableString(getKey(@"screenshots"), @"Screenshots");

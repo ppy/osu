@@ -32,12 +32,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     LabelText = GameplaySettingsStrings.BackgroundBlur,
                     DisplayAsPercentage = true
                 },
-                showStoryboardToggle = new PlayerCheckbox { LabelText = GraphicsSettingsStrings.StoryboardVideo },
+                showStoryboardToggle = new PlayerCheckbox { LabelText = GameplaySettingsStrings.StoryboardVideo },
                 beatmapSkinsToggle = new PlayerCheckbox { LabelText = SkinSettingsStrings.BeatmapSkins },
                 beatmapColorsToggle = new PlayerCheckbox { LabelText = SkinSettingsStrings.BeatmapColours },
                 comboColourNormalisationSliderBar = new PlayerSliderBar<float>
                 {
-                    LabelText = GraphicsSettingsStrings.ComboColourNormalisation,
+                    LabelText = GameplaySettingsStrings.ComboColourNormalisation,
                     DisplayAsPercentage = true,
                 },
             };

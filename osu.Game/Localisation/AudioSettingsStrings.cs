@@ -30,11 +30,6 @@ namespace osu.Game.Localisation
         public static LocalisableString OutputDevice => new TranslatableString(getKey(@"output_device"), @"Output device");
 
         /// <summary>
-        /// "Hitsound stereo separation"
-        /// </summary>
-        public static LocalisableString PositionalLevel => new TranslatableString(getKey(@"positional_hitsound_audio_level"), @"Hitsound stereo separation");
-
-        /// <summary>
         /// "Master"
         /// </summary>
         public static LocalisableString MasterVolume => new TranslatableString(getKey(@"master_volume"), @"Master");
@@ -83,11 +78,6 @@ namespace osu.Game.Localisation
         /// "Apply suggested offset"
         /// </summary>
         public static LocalisableString ApplySuggestedOffset => new TranslatableString(getKey(@"apply_suggested_offset"), @"Apply suggested offset");
-
-        /// <summary>
-        /// "Offset wizard"
-        /// </summary>
-        public static LocalisableString OffsetWizard => new TranslatableString(getKey(@"offset_wizard"), @"Offset wizard");
 
         /// <summary>
         /// "Adjust beatmap offset automatically"

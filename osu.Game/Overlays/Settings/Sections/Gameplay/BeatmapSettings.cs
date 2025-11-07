@@ -42,13 +42,13 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = GraphicsSettingsStrings.StoryboardVideo,
+                    LabelText = GameplaySettingsStrings.StoryboardVideo,
                     Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
                 },
                 new SettingsSlider<float>
                 {
                     Keywords = new[] { "color" },
-                    LabelText = GraphicsSettingsStrings.ComboColourNormalisation,
+                    LabelText = GameplaySettingsStrings.ComboColourNormalisation,
                     Current = comboColourNormalisation,
                     DisplayAsPercentage = true,
                 }

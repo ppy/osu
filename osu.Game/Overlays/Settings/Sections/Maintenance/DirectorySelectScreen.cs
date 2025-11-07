@@ -109,7 +109,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                     Origin = Anchor.Centre,
                                     Width = 300,
                                     Margin = new MarginPadding(10),
-                                    Text = MaintenanceSettingsStrings.SelectDirectory,
+                                    Text = GeneralSettingsStrings.SelectDirectory,
                                     Action = () => OnSelection(directorySelector.CurrentPath.Value)
                                 },
                             }

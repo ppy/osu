@@ -65,6 +65,41 @@ namespace osu.Game.Localisation
         public static LocalisableString ChangeFolderLocation => new TranslatableString(getKey(@"change_folder_location"), @"Change folder location...");
 
         /// <summary>
+        /// "Migration in progress"
+        /// </summary>
+        public static LocalisableString MigrationInProgress => new TranslatableString(getKey(@"migration_in_progress"), @"Migration in progress");
+
+        /// <summary>
+        /// "This could take a few minutes depending on the speed of your disk(s)."
+        /// </summary>
+        public static LocalisableString MigrationDescription => new TranslatableString(getKey(@"migration_description"), @"This could take a few minutes depending on the speed of your disk(s).");
+
+        /// <summary>
+        /// "Please avoid interacting with the game!"
+        /// </summary>
+        public static LocalisableString ProhibitedInteractDuringMigration => new TranslatableString(getKey(@"prohibited_interact_during_migration"), @"Please avoid interacting with the game!");
+
+        /// <summary>
+        /// "Please select a new location"
+        /// </summary>
+        public static LocalisableString SelectNewLocation => new TranslatableString(getKey(@"select_new_location"), @"Please select a new location");
+
+        /// <summary>
+        /// "The target directory already seems to have an osu! install. Use that data instead?"
+        /// </summary>
+        public static LocalisableString TargetDirectoryAlreadyInstalledOsu => new TranslatableString(getKey(@"target_directory_already_installed_osu"), @"The target directory already seems to have an osu! install. Use that data instead?");
+
+        /// <summary>
+        /// "To complete this operation, osu! will close. Please open it again to use the new data location."
+        /// </summary>
+        public static LocalisableString RestartAndReOpenRequiredForCompletion => new TranslatableString(getKey(@"restart_and_re_open_required_for_completion"), @"To complete this operation, osu! will close. Please open it again to use the new data location.");
+
+        /// <summary>
+        /// "Select directory"
+        /// </summary>
+        public static LocalisableString SelectDirectory => new TranslatableString(getKey(@"select_directory"), @"Select directory");
+
+        /// <summary>
         /// "Run setup wizard"
         /// </summary>
         public static LocalisableString RunSetupWizard => new TranslatableString(getKey(@"run_setup_wizard"), @"Run setup wizard");

@@ -21,18 +21,18 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
             {
                 new SettingsSlider<float, SizeSlider<float>>
                 {
-                    LabelText = SkinSettingsStrings.GameplayCursorSize,
+                    LabelText = GameplaySettingsStrings.GameplayCursorSize,
                     Current = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
                     KeyboardStep = 0.01f
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = SkinSettingsStrings.AutoCursorSize,
+                    LabelText = GameplaySettingsStrings.AutoCursorSize,
                     Current = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = SkinSettingsStrings.GameplayCursorDuringTouch,
+                    LabelText = GameplaySettingsStrings.GameplayCursorDuringTouch,
                     Keywords = new[] { @"touchscreen" },
                     Current = config.GetBindable<bool>(OsuSetting.GameplayCursorDuringTouch)
                 },

@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
             {
                 new SettingsSlider<float>
                 {
-                    LabelText = AudioSettingsStrings.PositionalLevel,
+                    LabelText = GameplaySettingsStrings.PositionalLevel,
                     Keywords = new[] { @"positional", @"balance" },
                     Current = osuConfig.GetBindable<float>(OsuSetting.PositionalHitsoundsLevel),
                     KeyboardStep = 0.01f,

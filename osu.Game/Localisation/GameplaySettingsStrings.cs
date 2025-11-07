@@ -40,6 +40,16 @@ namespace osu.Game.Localisation
         public static LocalisableString BackgroundHeader => new TranslatableString(getKey(@"background"), @"Background");
 
         /// <summary>
+        /// "Storyboard / video"
+        /// </summary>
+        public static LocalisableString StoryboardVideo => new TranslatableString(getKey(@"storyboard_video"), @"Storyboard / video");
+
+        /// <summary>
+        /// "Combo colour normalisation"
+        /// </summary>
+        public static LocalisableString ComboColourNormalisation => new TranslatableString(getKey(@"combo_colour_normalisation"), @"Combo colour normalisation");
+
+        /// <summary>
         /// "Background dim"
         /// </summary>
         public static LocalisableString BackgroundDim => new TranslatableString(getKey(@"dim"), @"Background dim");
@@ -75,6 +85,11 @@ namespace osu.Game.Localisation
         public static LocalisableString FadePlayfieldWhenHealthLow => new TranslatableString(getKey(@"fade_playfield_when_health_low"), @"Fade playfield to red when health is low");
 
         /// <summary>
+        /// "Hit lighting"
+        /// </summary>
+        public static LocalisableString HitLighting => new TranslatableString(getKey(@"hit_lighting"), @"Hit lighting");
+
+        /// <summary>
         /// "Star fountains"
         /// </summary>
         public static LocalisableString StarFountains => new TranslatableString(getKey(@"star_fountains"), @"Star fountains");
@@ -100,6 +115,11 @@ namespace osu.Game.Localisation
         public static LocalisableString AlwaysRequireHoldForMenu => new TranslatableString(getKey(@"require_holding_key_to_pause_gameplay"), @"Require holding key to pause gameplay");
 
         /// <summary>
+        /// "Hitsound stereo separation"
+        /// </summary>
+        public static LocalisableString PositionalLevel => new TranslatableString(getKey(@"positional_hitsound_audio_level"), @"Hitsound stereo separation");
+
+        /// <summary>
         /// "Always play first combo break sound"
         /// </summary>
         public static LocalisableString AlwaysPlayFirstComboBreak => new TranslatableString(getKey(@"always_play_first_combo_break"), @"Always play first combo break sound");
@@ -113,6 +133,21 @@ namespace osu.Game.Localisation
         /// "Disable Windows key during gameplay"
         /// </summary>
         public static LocalisableString DisableWinKey => new TranslatableString(getKey(@"disable_win_key"), @"Disable Windows key during gameplay");
+
+        /// <summary>
+        /// "Gameplay cursor size"
+        /// </summary>
+        public static LocalisableString GameplayCursorSize => new TranslatableString(getKey(@"gameplay_cursor_size"), @"Gameplay cursor size");
+
+        /// <summary>
+        /// "Adjust gameplay cursor size based on current beatmap"
+        /// </summary>
+        public static LocalisableString AutoCursorSize => new TranslatableString(getKey(@"auto_cursor_size"), @"Adjust gameplay cursor size based on current beatmap");
+
+        /// <summary>
+        /// "Show gameplay cursor during touch input"
+        /// </summary>
+        public static LocalisableString GameplayCursorDuringTouch => new TranslatableString(getKey(@"gameplay_cursor_during_touch"), @"Show gameplay cursor during touch input");
 
         /// <summary>
         /// "Mods"

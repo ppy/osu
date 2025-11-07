@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         public override bool HideOverlaysOnEnter => true;
 
-        public override LocalisableString HeaderText => MaintenanceSettingsStrings.SelectNewLocation;
+        public override LocalisableString HeaderText => GeneralSettingsStrings.SelectNewLocation;
 
         protected override void OnSelection(DirectoryInfo directory)
         {
@@ -52,9 +52,9 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     // Quick test for whether there's already an osu! install at the target path.
                     if (fileInfos.Any(f => f.Name == OsuGameBase.CLIENT_DATABASE_FILENAME))
                     {
-                        dialogOverlay.Push(new ConfirmDialog(MaintenanceSettingsStrings.TargetDirectoryAlreadyInstalledOsu, () =>
+                        dialogOverlay.Push(new ConfirmDialog(GeneralSettingsStrings.TargetDirectoryAlreadyInstalledOsu, () =>
                             {
-                                dialogOverlay.Push(new ConfirmDialog(MaintenanceSettingsStrings.RestartAndReOpenRequiredForCompletion, () =>
+                                dialogOverlay.Push(new ConfirmDialog(GeneralSettingsStrings.RestartAndReOpenRequiredForCompletion, () =>
                                 {
                                     (storage as OsuStorage)?.ChangeDataPath(target.FullName);
                                     game.Exit();

@@ -77,7 +77,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Timing-based note colouring"
         /// </summary>
-        public static LocalisableString TimingBasedColouring => new TranslatableString(getKey(@"Timing_based_colouring"), @"Timing-based note colouring");
+        public static LocalisableString TimingBasedColouring => new TranslatableString(getKey(@"timing_based_colouring"), @"Timing-based note colouring");
 
         /// <summary>
         /// "{0}ms (speed {1:N1})"

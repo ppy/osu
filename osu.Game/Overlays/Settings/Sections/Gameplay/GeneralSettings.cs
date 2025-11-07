@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = GraphicsSettingsStrings.HitLighting,
+                    LabelText = GameplaySettingsStrings.HitLighting,
                     Current = config.GetBindable<bool>(OsuSetting.HitLighting)
                 },
                 new SettingsCheckbox
