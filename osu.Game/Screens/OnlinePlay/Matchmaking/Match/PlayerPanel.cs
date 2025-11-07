@@ -7,6 +7,8 @@ using System.Globalization;
 using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,6 +17,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -114,6 +117,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         private PlayerPanelDisplayMode displayMode = PlayerPanelDisplayMode.Horizontal;
         private bool hasQuit;
 
+        private enum InteractionSampleType
+        {
+            PlayerJump,
+            PlayerReJump,
+            OtherPlayerJump,
+        }
+
+        private Dictionary<InteractionSampleType, Sample?> interactionSamples = new Dictionary<InteractionSampleType, Sample?>();
+        private readonly Dictionary<InteractionSampleType, SampleChannel?> interactionSampleChannels = new Dictionary<InteractionSampleType, SampleChannel?>();
+        private double samplePitch;
+        private double? lastSamplePlayback;
+
         public PlayerPanel(MultiplayerRoomUser user)
             : base(HoverSampleSet.Button)
         {
@@ -130,7 +145,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             Content.Masking = true;
             Content.CornerRadius = 10;
@@ -255,6 +270,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
             // Allow avatar to exist outside of masking for when it jumps around and stuff.
             AddInternal(avatar.CreateProxy());
+
+            interactionSamples = new Dictionary<InteractionSampleType, Sample?>
+            {
+                { InteractionSampleType.PlayerJump, audio.Samples.Get(@"Multiplayer/Matchmaking/player-jump") },
+                { InteractionSampleType.PlayerReJump, audio.Samples.Get(@"Multiplayer/Matchmaking/player-rejump") },
+                { InteractionSampleType.OtherPlayerJump, audio.Samples.Get(@"Multiplayer/Matchmaking/player-jump-other") }
+            };
         }
 
         protected override void LoadComplete()
@@ -272,6 +294,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             avatar.ScaleTo(0)
                   .ScaleTo(1, 500, Easing.OutElasticHalf)
                   .FadeIn(200);
+
+            // pick a random pitch to be used by the player for duration of this session
+            samplePitch = 0.75f + RNG.NextDouble(0f, 0.75f);
         }
 
         public PlayerPanelDisplayMode DisplayMode
@@ -481,6 +506,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                             scale.Then().ScaleTo(new Vector2(1, 1.05f), 200, Easing.Out)
                                  .Then().ScaleTo(new Vector2(1, 0.95f), 200, Easing.In)
                                  .Then().ScaleTo(Vector2.One, 800, Easing.OutElastic);
+
+                            // only play jump sample if panel is visible
+                            if (Alpha > 0)
+                                playJumpSample(isConsecutive);
+
                             break;
                     }
 
@@ -497,6 +527,44 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
             downloadProgressBar.ResizeWidthTo(availability.DownloadProgress ?? 0, 200, Easing.OutPow10);
         });
+
+        private void playJumpSample(bool rejumping)
+        {
+            bool isLocalUser = User.OnlineID == client.LocalUser?.UserID;
+
+            if (isLocalUser)
+                playInteractionSample(rejumping ? InteractionSampleType.PlayerReJump : InteractionSampleType.PlayerJump);
+            else
+                playInteractionSample(InteractionSampleType.OtherPlayerJump);
+        }
+
+        private void playInteractionSample(InteractionSampleType sampleType)
+        {
+            bool enoughTimePassedSinceLastPlayback = lastSamplePlayback == null || Time.Current - lastSamplePlayback.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
+            if (!enoughTimePassedSinceLastPlayback)
+                return;
+
+            Sample? targetSample = interactionSamples[sampleType];
+            SampleChannel? targetChannel = interactionSampleChannels.GetValueOrDefault(sampleType);
+
+            targetChannel?.Stop();
+            targetChannel = targetSample?.GetChannel();
+
+            if (targetChannel == null)
+                return;
+
+            float horizontalPos = BoundingBox.Centre.X / Parent!.ToLocalSpace(Parent!.ScreenSpaceDrawQuad).Width;
+            // rescale balance from 0..1 to -1..1
+            float balance = -1f + horizontalPos * 2f;
+
+            targetChannel.Frequency.Value = samplePitch;
+            targetChannel.Balance.Value = balance * OsuGameBase.SFX_STEREO_STRENGTH;
+            targetChannel.Play();
+
+            interactionSampleChannels[sampleType] = targetChannel;
+
+            lastSamplePlayback = Time.Current;
+        }
 
         protected override void Dispose(bool isDisposing)
         {
