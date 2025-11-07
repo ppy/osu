@@ -236,7 +236,7 @@ namespace osu.Game.Screens.Play
             if (gameplayState != null)
             {
                 playInfoText.NewLine();
-                playInfoText.AddText(SongSelectStrings.Accuracy);
+                playInfoText.AddText(RulesetBeatmapAttributesStrings.Accuracy);
                 playInfoText.AddText(": ");
                 playInfoText.AddText(gameplayState!.ScoreProcessor.Accuracy.Value.FormatAccuracy(), cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
             }

@@ -454,30 +454,30 @@ namespace osu.Game.Rulesets.Mania
             var adjustedDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
             var colours = new OsuColour();
 
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.KeyCount, @"KC", originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 18)
+            yield return new RulesetBeatmapAttribute(RulesetBeatmapAttributesStrings.KeyCount, @"KC", originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 18)
             {
-                Description = "Affects the number of key columns on the playfield."
+                Description = RulesetBeatmapAttributesStrings.KeyCountDescription
             };
 
             var hitWindows = new ManiaHitWindows();
             hitWindows.SetDifficulty(adjustedDifficulty.OverallDifficulty);
             hitWindows.IsConvert = !beatmapInfo.Ruleset.Equals(RulesetInfo);
             hitWindows.ClassicModActive = mods.Any(m => m is ManiaModClassic);
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10)
+            yield return new RulesetBeatmapAttribute(RulesetBeatmapAttributesStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10)
             {
-                Description = "Affects timing requirements for notes.",
+                Description = RulesetBeatmapAttributesStrings.ManiaAccuracyDescription,
                 AdditionalMetrics = hitWindows.GetAllAvailableWindows()
                                               .Reverse()
                                               .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
-                                                  $"{window.result.GetDescription().ToUpperInvariant()} hit window",
+                                                  RulesetBeatmapAttributesStrings.HitWindowMetric(window.result.GetDescription().ToUpperInvariant()),
                                                   LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result):0.##} ms"),
                                                   colours.ForHitResult(window.result)
                                               )).ToArray()
             };
 
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10)
+            yield return new RulesetBeatmapAttribute(RulesetBeatmapAttributesStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10)
             {
-                Description = "Affects the harshness of health drain and the health penalties for missing."
+                Description = RulesetBeatmapAttributesStrings.HPDrainDescription
             };
         }
 

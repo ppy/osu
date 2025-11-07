@@ -301,28 +301,28 @@ namespace osu.Game.Rulesets.Taiko
             var hitWindows = new TaikoHitWindows();
             hitWindows.SetDifficulty(modAdjustedDifficulty.OverallDifficulty);
             double rate = ModUtils.CalculateRateWithMods(mods);
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, effectiveDifficulty.OverallDifficulty, 10)
+            yield return new RulesetBeatmapAttribute(RulesetBeatmapAttributesStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, effectiveDifficulty.OverallDifficulty, 10)
             {
-                Description = "Affects timing requirements for hits and mash rate requirements for swells.",
+                Description = RulesetBeatmapAttributesStrings.TaikoAccuracyDescription,
                 AdditionalMetrics = hitWindows.GetAllAvailableWindows()
                                               .Reverse()
                                               .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
-                                                  $"{window.result.GetDescription().ToUpperInvariant()} hit window",
+                                                  RulesetBeatmapAttributesStrings.HitWindowMetric(window.result.GetDescription().ToUpperInvariant()),
                                                   LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result) / rate:0.##} ms"),
                                                   colours.ForHitResult(window.result)
                                               ))
-                                              .Append(new RulesetBeatmapAttribute.AdditionalMetric("Hits per second required to clear swells", LocalisableString.Interpolate($@"{TaikoBeatmapConverter.RequiredSwellHitsPerSecond(modAdjustedDifficulty.OverallDifficulty):0.#}")))
+                                              .Append(new RulesetBeatmapAttribute.AdditionalMetric(RulesetBeatmapAttributesStrings.ClearSwellsMetric, LocalisableString.Interpolate($@"{TaikoBeatmapConverter.RequiredSwellHitsPerSecond(modAdjustedDifficulty.OverallDifficulty):0.#}")))
                                               .ToArray()
             };
 
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, effectiveDifficulty.DrainRate, 10)
+            yield return new RulesetBeatmapAttribute(RulesetBeatmapAttributesStrings.HPDrain, @"HP", originalDifficulty.DrainRate, effectiveDifficulty.DrainRate, 10)
             {
-                Description = "Affects the harshness of health drain and the health penalties for missing."
+                Description = RulesetBeatmapAttributesStrings.HPDrainDescription
             };
 
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.ScrollSpeed, @"SS", 1f, (float)(effectiveDifficulty.SliderMultiplier / originalDifficulty.SliderMultiplier), 4)
+            yield return new RulesetBeatmapAttribute(RulesetBeatmapAttributesStrings.ScrollSpeed, @"SS", 1f, (float)(effectiveDifficulty.SliderMultiplier / originalDifficulty.SliderMultiplier), 4)
             {
-                Description = "Multiplier applied to the baseline scroll speed of the playfield when no mods are active."
+                Description = RulesetBeatmapAttributesStrings.ScrollSpeedDescription
             };
         }
     }
