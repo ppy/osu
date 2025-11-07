@@ -87,7 +87,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             if (client.Room!.MatchState is not MatchmakingRoomState matchmakingState)
                 return;
 
-            if (matchmakingState.CandidateItem != -1 || client.Room!.CurrentPlaylistItem.Expired)
+            if (matchmakingState.Stage != MatchmakingStage.ServerBeatmapFinalised)
+                return;
+
+            if (matchmakingState.CandidateItem != -1)
                 return;
 
             beatmapSelectGrid.RevealRandomItem(client.Room!.CurrentPlaylistItem);
