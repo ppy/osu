@@ -12,6 +12,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect;
 using osu.Game.Tests.Visual.Multiplayer;
 
@@ -137,6 +138,34 @@ namespace osu.Game.Tests.Visual.Matchmaking
             AddToggleStep("allow selection", value => panel!.AllowSelection = value);
 
             AddStep("reveal beatmap", () => panel!.DisplayItem(new MultiplayerPlaylistItem()));
+        }
+
+        [Test]
+        public void TestBeatmapWithMods()
+        {
+            AddStep("add panel", () =>
+            {
+                BeatmapSelectPanel? panel;
+
+                Child = new OsuContextMenuContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = panel = new BeatmapSelectPanel(new MultiplayerPlaylistItem
+                    {
+                        RequiredMods = [new APIMod(new OsuModHardRock()), new APIMod(new OsuModDoubleTime())]
+                    })
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                };
+
+                panel.AddUser(new APIUser
+                {
+                    Id = 2,
+                    Username = "peppy",
+                });
+            });
         }
     }
 }
