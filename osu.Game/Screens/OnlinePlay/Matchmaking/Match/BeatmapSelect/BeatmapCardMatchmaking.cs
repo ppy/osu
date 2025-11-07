@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -11,6 +12,8 @@ using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 {
@@ -21,6 +24,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
         [Resolved]
         private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
+
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; } = null!;
 
         private readonly List<APIUser> users = new List<APIUser>();
 
@@ -65,6 +71,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
         public void DisplayItem(MultiplayerPlaylistItem item)
         {
+            Ruleset? ruleset = rulesetStore.GetRuleset(item.RulesetID)?.CreateInstance();
+
+            if (ruleset == null)
+                return;
+
+            Mod[] mods = item.RequiredMods.Select(m => m.ToMod(ruleset)).ToArray();
+
             Task.Run(loadBeatmap);
 
             async Task loadBeatmap()
@@ -84,7 +97,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
                 beatmap.StarRating = item.StarRating;
 
-                loadContent(new BeatmapCardMatchmakingBeatmapContent(beatmap));
+                loadContent(new BeatmapCardMatchmakingBeatmapContent(beatmap, mods));
             }
         }
 
