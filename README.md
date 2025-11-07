@@ -117,7 +117,7 @@ UseLocalResources.sh
 Note that these commands assume you have the relevant project(s) checked out in adjacent directories:
 
 ```
-|- osu            // this repository
+|- osu            // This repository
 |- osu-framework
 |- osu-resources
 ```
