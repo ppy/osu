@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -11,6 +12,7 @@ using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Difficulty;
 using osuTK;
 
@@ -126,7 +128,7 @@ namespace osu.Game.Overlays.Mods
 
                 if (!Precision.AlmostEquals(attribute.OriginalValue, attribute.AdjustedValue))
                 {
-                    adjustedByModsText.Text = $"This value is being adjusted by mods ({attribute.OriginalValue:0.0#} → {attribute.AdjustedValue:0.0#}).";
+                    adjustedByModsText.Text = RulesetBeatmapAttributesStrings.AdjustedByMods(attribute.OriginalValue.ToLocalisableString("0.0#"), attribute.AdjustedValue.ToLocalisableString("0.0#"));
                     adjustedByModsText.Alpha = 1;
                     shouldShow = true;
                 }

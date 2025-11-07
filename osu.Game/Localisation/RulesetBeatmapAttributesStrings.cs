@@ -130,6 +130,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString FadeInTimeMetric => new TranslatableString(getKey(@"fade_in_time_metric"), @"Fade-in time");
 
+        /// <summary>
+        /// "This value is being adjusted by mods ({0} → {1})."
+        /// </summary>
+        public static LocalisableString AdjustedByMods(LocalisableString originalValue, LocalisableString adjustedValue) => new TranslatableString(getKey(@"adjusted_by_mods"), @"This value is being adjusted by mods ({0} → {1}).", originalValue, adjustedValue);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
