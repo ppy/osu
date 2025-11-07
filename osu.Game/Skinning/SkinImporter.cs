@@ -177,9 +177,10 @@ namespace osu.Game.Skinning
 
             if (existingFile == null)
             {
-                // skins without a skin.ini are supposed to import using the "latest version" spec.
+                // skins without a skin.ini are supposed to import using the "latest version" spec, unless we're making a copy of the retro skin which specifies 1.0.
                 // see https://github.com/peppy/osu-stable-reference/blob/1531237b63392e82c003c712faa028406073aa8f/osu!/Graphics/Skinning/SkinManager.cs#L297-L298
-                newLines.Add(FormattableString.Invariant($"Version: {SkinConfiguration.LATEST_VERSION}"));
+                decimal version = item.InstantiationInfo == typeof(RetroSkin).GetInvariantInstantiationInfo() ? 1.0M : SkinConfiguration.LATEST_VERSION;
+                newLines.Add(FormattableString.Invariant($"Version: {version}"));
 
                 // In the case a skin doesn't have a skin.ini yet, let's create one.
                 writeNewSkinIni();

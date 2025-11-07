@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Extensions;
 using osu.Game.IO;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -40,6 +41,23 @@ namespace osu.Game.Skinning
                 new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Retro")
             )
         {
+            Configuration.ConfigDictionary[@"SliderBallFlip"] = "0";
+            Configuration.ConfigDictionary[@"SliderBallFrames"] = "10";
+            Configuration.ConfigDictionary[@"AllowSliderBallTint"] = "0";
+            Configuration.ConfigDictionary[@"CursorTrailRotate"] = "0";
+            Configuration.ConfigDictionary[@"Version"] = "1";
+
+            Configuration.CustomComboColours =
+            [
+                new Color4(255, 150, 0, 255),
+                new Color4(5, 240, 5, 255),
+                new Color4(5, 5, 240, 255),
+                new Color4(240, 5, 5, 255)
+            ];
+
+            Configuration.ConfigDictionary[@"HitCircleOverlap"] = "3";
+            Configuration.ConfigDictionary[@"ScoreOverlap"] = "3";
+            Configuration.ConfigDictionary[@"ComboOverlap"] = "3";
         }
 
         public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
