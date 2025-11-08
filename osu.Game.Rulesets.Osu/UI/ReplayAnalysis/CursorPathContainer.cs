@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
             lifetimeManager.EntryBecameAlive += entryBecameAlive;
             lifetimeManager.EntryBecameDead += entryBecameDead;
 
-            PathRadius = 0.5f;
+            PathRadius = 1f;
         }
 
         [BackgroundDependencyLoader]
