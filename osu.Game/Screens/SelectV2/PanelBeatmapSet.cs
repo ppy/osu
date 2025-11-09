@@ -268,7 +268,7 @@ namespace osu.Game.Screens.SelectV2
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
                     items.Add(new OsuMenuItem(SongSelectStrings.RestoreAllHidden, MenuItemType.Standard, () => songSelect?.RestoreAllHidden(beatmapSet)));
 
-                items.Add(new OsuMenuItem(CommonStrings.Delete, MenuItemType.Destructive, () => songSelect?.Delete(beatmapSet)));
+                items.Add(new OsuMenuItem(CommonStrings.DeleteEllipsis, MenuItemType.Destructive, () => songSelect?.Delete(beatmapSet)));
                 return items.ToArray();
             }
         }
