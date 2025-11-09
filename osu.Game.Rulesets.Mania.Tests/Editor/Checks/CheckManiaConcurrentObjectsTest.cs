@@ -55,6 +55,16 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor.Checks
             });
         }
 
+        [Test]
+        public void TestHoldNotesAlmostConcurrentOnSameColumn()
+        {
+            assertAlmostConcurrentSame(new List<HitObject>
+            {
+                createHoldNote(startTime: 100, endTime: 400.75d, column: 1),
+                createHoldNote(startTime: 408, endTime: 700.75d, column: 1)
+            });
+        }
+
         private void assertOk(List<HitObject> hitobjects)
         {
             Assert.That(check.Run(getContext(hitobjects)), Is.Empty);
@@ -65,7 +75,17 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor.Checks
             var issues = check.Run(getContext(hitobjects)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(count));
-            Assert.That(issues.All(issue => issue.Template is CheckConcurrentObjects.IssueTemplateConcurrentSame));
+            Assert.That(issues.All(issue => issue.Template is CheckConcurrentObjects.IssueTemplateConcurrent));
+            Assert.That(issues.All(issue => issue.ToString().Contains("s are concurrent here")));
+        }
+
+        private void assertAlmostConcurrentSame(List<HitObject> hitobjects)
+        {
+            var issues = check.Run(getContext(hitobjects)).ToList();
+
+            Assert.That(issues, Has.Count.EqualTo(1));
+            Assert.That(issues.All(issue => issue.Template is CheckConcurrentObjects.IssueTemplateAlmostConcurrent));
+            Assert.That(issues.All(issue => issue.ToString().Contains("s are less than 10ms apart")));
         }
 
         private BeatmapVerifierContext getContext(List<HitObject> hitobjects)

@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Game.Models;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Users;
 using osu.Game.Utils;
 using Realms;
@@ -15,10 +17,10 @@ namespace osu.Game.Beatmaps
     /// A realm model containing metadata for a beatmap.
     /// </summary>
     /// <remarks>
-    /// This is currently stored against each beatmap difficulty, even when it is duplicated.
+    /// An instance of this object is stored against each beatmap difficulty.
     /// It is also provided via <see cref="BeatmapSetInfo"/> for convenience and historical purposes.
-    /// A future effort could see this converted to an <see cref="EmbeddedObject"/> or potentially de-duped
-    /// and shared across multiple difficulties in the same set, if required.
+    /// Note that accessing the metadata via <see cref="BeatmapSetInfo"/> may result in indeterminate results
+    /// as metadata can meaningfully differ per beatmap in a set.
     ///
     /// Note that difficulty name is not stored in this metadata but in <see cref="BeatmapInfo"/>.
     /// </remarks>
@@ -42,6 +44,13 @@ namespace osu.Game.Beatmaps
 
         [JsonProperty(@"tags")]
         public string Tags { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The list of user-voted tags applicable to this beatmap.
+        /// This information is populated from online sources (<see cref="RealmPopulatingOnlineLookupSource"/>)
+        /// and can meaningfully differ between beatmaps of a single set.
+        /// </summary>
+        public IList<string> UserTags { get; } = null!;
 
         /// <summary>
         /// The time in milliseconds to begin playing the track for preview purposes.

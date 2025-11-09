@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            currentBurstStrain *= strainDecayBurst(((OsuDifficultyHitObject)current).StrainTime);
+            currentBurstStrain *= strainDecayBurst(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
             currentBurstStrain += SpeedEvaluator.EvaluateDifficultyOf(current, Mods) * burstMultiplier;
 
@@ -77,10 +77,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double staminaValue = StaminaEvaluator.EvaluateDifficultyOf(current);
 
-            currentStreamStrain *= strainDecayStream(((OsuDifficultyHitObject)current).StrainTime);
+            currentStreamStrain *= strainDecayStream(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
             currentStreamStrain += staminaValue * streamMultiplier;
 
-            currentStaminaStrain *= strainDecayStamina(((OsuDifficultyHitObject)current).StrainTime, staminaValue * staminaMultiplier);
+            currentStaminaStrain *= strainDecayStamina(((OsuDifficultyHitObject)current).AdjustedDeltaTime, staminaValue * staminaMultiplier);
             currentStaminaStrain += staminaValue * staminaMultiplier;
 
             double totalValue = DifficultyCalculationUtils.PowerMean(meanExponent,

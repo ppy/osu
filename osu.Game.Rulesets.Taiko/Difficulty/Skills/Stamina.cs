@@ -42,20 +42,28 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += StaminaEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
+            double staminaDifficulty = StaminaEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
 
             // Safely prevents previous strains from shifting as new notes are added.
             var currentObject = current as TaikoDifficultyHitObject;
             int index = currentObject?.ColourData.MonoStreak?.HitObjects.IndexOf(currentObject) ?? 0;
 
-            double monolengthBonus = isConvert ? 1 : 1 + Math.Min(Math.Max((index - 5) / 50.0, 0), 0.30);
+            double monoLengthBonus = isConvert ? 1.0 : 1.0 + 0.5 * DifficultyCalculationUtils.ReverseLerp(index, 5, 20);
 
-            if (SingleColourStamina)
-                return DifficultyCalculationUtils.Logistic(-(index - 10) / 2.0, currentStrain);
+            // Mono-streak bonus is only applied to colour-based stamina to reward longer sequences of same-colour hits within patterns.
+            if (!SingleColourStamina)
+                staminaDifficulty *= monoLengthBonus;
 
-            return currentStrain * monolengthBonus;
+            currentStrain += staminaDifficulty;
+
+            // For converted maps, difficulty often comes entirely from long mono streams with no colour variation.
+            // To avoid over-rewarding these maps based purely on stamina strain, we dampen the strain value once the index exceeds 10.
+            return SingleColourStamina ? DifficultyCalculationUtils.Logistic(-(index - 10) / 2.0, currentStrain) : currentStrain;
         }
 
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => SingleColourStamina ? 0 : currentStrain * strainDecay(time - current.Previous(0).StartTime);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) =>
+            SingleColourStamina
+                ? 0
+                : currentStrain * strainDecay(time - current.Previous(0).StartTime);
     }
 }

@@ -316,6 +316,26 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("ensure no submission", () => Player.SubmittedScore == null);
         }
 
+        [Test]
+        public void TestNoSubmissionOnLocallyModifiedBeatmapWithOnlineId()
+        {
+            prepareTestAPI(true);
+
+            createPlayerTest(false, r =>
+            {
+                var beatmap = createTestBeatmap(r);
+                beatmap.BeatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
+                return beatmap;
+            });
+
+            AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+
+            addFakeHit();
+
+            AddStep("exit", () => Player.Exit());
+            AddAssert("ensure no submission", () => Player.SubmittedScore == null);
+        }
+
         [TestCase(null)]
         [TestCase(10)]
         public void TestNoSubmissionOnCustomRuleset(int? rulesetId)

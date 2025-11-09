@@ -274,6 +274,29 @@ namespace osu.Game.Tests.Visual.Playlists
             AddUntilStep("all panels have non-negative position", () => this.ChildrenOfType<ScorePanel>().All(p => p.ScorePosition.Value > 0));
         }
 
+        [Test]
+        public void TestPresentInvalidOnlineScore()
+        {
+            AddStep("set up invalid user score", () =>
+            {
+                userScore.OnlineID = -1;
+                userScore.TotalScore = 0;
+            });
+
+            AddStep("bind user score info handler", () => bindHandler(userScore: userScore));
+
+            createResultsWithScore(() => userScore);
+
+            AddUntilStep("wait for user score to be displayed", () => resultsScreen.ChildrenOfType<ScorePanelList>().Single().GetScorePanels().Any());
+            AddWaitStep("wait for any more potential scores", 5);
+            AddAssert("only 1 score visible", () => resultsScreen.ChildrenOfType<ScorePanelList>().Single().GetScorePanels().Count(), () => Is.EqualTo(1));
+
+            AddUntilStep("left loading spinner hidden", () =>
+                resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreLeft).State.Value == Visibility.Hidden);
+            AddUntilStep("right loading spinner hidden", () =>
+                resultsScreen.ChildrenOfType<LoadingSpinner>().Single(l => l.Anchor == Anchor.CentreRight).State.Value == Visibility.Hidden);
+        }
+
         private void createResultsWithScore(Func<ScoreInfo> getScore)
         {
             AddStep("load results", () =>
@@ -359,7 +382,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 switch (request)
                 {
                     case ShowPlaylistScoreRequest s:
-                        if (userScore == null)
+                        if (userScore == null || userScore.OnlineID == -1)
                             triggerFail(s);
                         else
                             triggerSuccess(s, () => createUserResponse(userScore));
@@ -367,7 +390,7 @@ namespace osu.Game.Tests.Visual.Playlists
                         break;
 
                     case ShowPlaylistUserScoreRequest u:
-                        if (userScore == null)
+                        if (userScore == null || userScore.OnlineID == -1)
                             triggerFail(u);
                         else
                             triggerSuccess(u, () => createUserResponse(userScore));

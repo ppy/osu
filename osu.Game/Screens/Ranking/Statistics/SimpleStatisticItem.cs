@@ -19,10 +19,23 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// </summary>
         protected string Value
         {
-            set => this.value.Text = value;
+            set => valueText.Text = value;
         }
 
-        private readonly OsuSpriteText value;
+        /// <summary>
+        /// The font size preferred for the displayed texts.
+        /// </summary>
+        public float FontSize
+        {
+            set
+            {
+                nameText.Font = nameText.Font.With(size: value);
+                valueText.Font = valueText.Font.With(size: value);
+            }
+        }
+
+        private readonly OsuSpriteText nameText;
+        private readonly OsuSpriteText valueText;
 
         /// <summary>
         /// Creates a new simple statistic item.
@@ -37,14 +50,14 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             AddRange(new[]
             {
-                new OsuSpriteText
+                nameText = new OsuSpriteText
                 {
                     Text = Name,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE)
                 },
-                value = new OsuSpriteText
+                valueText = new OsuSpriteText
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
