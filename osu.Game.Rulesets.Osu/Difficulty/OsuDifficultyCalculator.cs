@@ -86,6 +86,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimDifficultyValue = aim.DifficultyValue();
             double aimNoSlidersDifficultyValue = aimWithoutSliders.DifficultyValue();
             double speedDifficultyValue = speed.DifficultyValue();
+            double speedNoStaminaDifficultyValue = speedWithoutStamina.DifficultyValue();
 
             double mechanicalDifficultyRating = calculateMechanicalDifficultyRating(aimDifficultyValue, speedDifficultyValue);
             double sliderFactor = aimDifficultyValue > 0 ? OsuRatingCalculator.CalculateDifficultyRating(aimNoSlidersDifficultyValue) / OsuRatingCalculator.CalculateDifficultyRating(aimDifficultyValue) : 1;
@@ -95,8 +96,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimRating = osuRatingCalculator.ComputeAimRating(aimDifficultyValue);
             double speedRating = osuRatingCalculator.ComputeSpeedRating(speedDifficultyValue);
 
-            double speedRatingNoStamina = computeSpeedRating(speedWithoutStamina.DifficultyValue(), mods, totalHits, approachRate, overallDifficulty);
-            double staminaFactor = speedRating > 0 ? speedRatingNoStamina / speedRating : 1;
+            double staminaFactor = speedRating > 0 ? osuRatingCalculator.ComputeSpeedRating(speedNoStaminaDifficultyValue) / speedRating : 1;
 
             double flashlightRating = 0.0;
 

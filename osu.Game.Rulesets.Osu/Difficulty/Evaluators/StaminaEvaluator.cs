@@ -20,10 +20,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double bpmBonus = 0.0;
 
-            if (DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.StrainTime) > 240)
-                bpmBonus = Math.Pow((DifficultyCalculationUtils.BPMToMilliseconds(240) - osuCurrObj.StrainTime) / 16.5, 1.1);
+            if (DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime) > 240)
+                bpmBonus = Math.Pow((DifficultyCalculationUtils.BPMToMilliseconds(240) - osuCurrObj.AdjustedDeltaTime) / 16.5, 1.1);
 
-            double finalValue = (1 + bpmBonus) * 1000 / osuCurrObj.StrainTime;
+            double finalValue = (1 + bpmBonus) * 1000 / osuCurrObj.AdjustedDeltaTime;
 
             double doubletapness = 1.0 - osuCurrObj.GetDoubletapness((OsuDifficultyHitObject?)osuCurrObj.Next(0));
 
