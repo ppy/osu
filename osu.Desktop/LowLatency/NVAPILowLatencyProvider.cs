@@ -34,7 +34,7 @@ namespace osu.Desktop.LowLatency
 
             bool enable = mode != LatencyMode.Off;
             bool boost = mode == LatencyMode.Boost;
-            var status = NVAPI.SetSleepModeHelper(_deviceHandle, enable, boost, boost, 1000);
+            var status = NVAPI.SetSleepModeHelper(_deviceHandle, enable, boost, boost, 0);
 
             Console.WriteLine("NVAPI SetSleepMode status: " + status);
         }
