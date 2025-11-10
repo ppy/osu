@@ -101,10 +101,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (usingClassicSliderAccuracy && score.LegacyTotalScore != null)
             {
-                var legacyScoreMissCalculator = new OsuLegacyScoreMissCalculator(score, osuAttributes);
-                scoreBasedEstimatedMissCount = legacyScoreMissCalculator.Calculate();
-
-                effectiveMissCount = scoreBasedEstimatedMissCount.Value;
+                double comboPortion = Math.Clamp((score.TotalScoreWithoutMods / 500000.0 - Math.Pow(score.Accuracy, 5)) / score.Accuracy, 0, 1);
+                effectiveMissCount = Math.Pow(comboPortion, -2) - 1;
             }
             else
             {
