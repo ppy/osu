@@ -80,6 +80,16 @@ namespace osu.Game.Localisation
         public static LocalisableString LearnMoreAboutLazerTooltip => new TranslatableString(getKey(@"check_out_the_feature_comparison"), @"Check out the feature comparison and FAQ");
 
         /// <summary>
+        /// "Report an issue"
+        /// </summary>
+        public static LocalisableString ReportIssue => new TranslatableString(getKey(@"report_issue"), @"Report an issue");
+
+        /// <summary>
+        /// "Report a problem with the game to the developers."
+        /// </summary>
+        public static LocalisableString ReportIssueTooltip => new TranslatableString(getKey(@"report_issue_tooltip"), @"Report a problem with the game to the developers.");
+
+        /// <summary>
         /// "Check with your package manager / provider for other release streams."
         /// </summary>
         public static LocalisableString ChangeReleaseStreamPackageManagerWarning => new TranslatableString(getKey(@"change_release_stream_package_warning"), @"Check with your package manager / provider for other release streams.");
