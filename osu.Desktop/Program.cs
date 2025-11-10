@@ -5,9 +5,11 @@ using System;
 using System.IO;
 using System.Runtime.Versioning;
 using osu.Desktop.LegacyIpc;
+using osu.Desktop.LowLatency;
 using osu.Desktop.Windows;
 using osu.Framework;
 using osu.Framework.Development;
+using osu.Framework.Graphics.Rendering.LowLatency;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game;
@@ -138,6 +140,8 @@ namespace osu.Desktop
                     host.Run(new TournamentGame());
                 else
                 {
+                    host.SetLowLatencyProvider(new NVAPILowLatencyProvider());
+                    host.SetLowLatencyMode(LatencyMode.On);
                     host.Run(new OsuGameDesktop(args)
                     {
                         IsFirstRun = isFirstRun

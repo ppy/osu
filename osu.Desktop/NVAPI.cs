@@ -104,6 +104,21 @@ namespace osu.Desktop
 
         private static readonly SaveSettingsDelegate SaveSettings;
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate NvStatus SetSleepModeDelegate(IntPtr pDevice, ref NvSetSleepModeParams pParams);
+
+        private static readonly SetSleepModeDelegate SetSleepMode;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate NvStatus SetLatencyMarkerDelegate(IntPtr pDevice, uint marker, ulong frameId);
+
+        private static readonly SetLatencyMarkerDelegate SetLatencyMarker;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate NvStatus SleepDelegate(IntPtr pDevice);
+
+        private static readonly SleepDelegate Sleep;
+
         public static NvStatus Status { get; private set; } = NvStatus.OK;
         public static bool Available { get; private set; }
 
@@ -338,6 +353,27 @@ namespace osu.Desktop
             return !checkError(SaveSettings(sessionHandle), nameof(SaveSettings));
         }
 
+        internal static NvStatus SetSleepModeHelper(IntPtr devicePtr, bool enable, bool boost, bool useMarkersOptimize, uint minimumIntervalUs)
+        {
+            if (!Available)
+                return NvStatus.NO_IMPLEMENTATION;
+
+            NvSetSleepModeParams sleepParams = new NvSetSleepModeParams
+            {
+                version = NvSetSleepModeParams.Stride,
+                bLowLatencyMode = enable ? 1u : 0u,
+                bLowLatencyBoost = boost ? 1u : 0u,
+                bUseMarkersToOptimize = useMarkersOptimize ? 1u : 0u,
+                minimumIntervalUs = minimumIntervalUs,
+            };
+
+            return SetSleepMode(devicePtr, ref sleepParams);
+        }
+
+        internal static NvStatus SetLatencyMarkerHelper(IntPtr devicePtr, uint marker, ulong frameId) => SetLatencyMarker(devicePtr, marker, frameId);
+
+        internal static NvStatus FrameSleepHelper(IntPtr devicePtr) => Sleep(devicePtr);
+
         /// <summary>
         /// Creates a session to access the driver configuration.
         /// </summary>
@@ -400,6 +436,9 @@ namespace osu.Desktop
                     getDelegate(0x7FA2173A, out EnumApplications);
                     getDelegate(0x4347A9DE, out CreateApplication);
                     getDelegate(0xFCBC7E14, out SaveSettings);
+                    getDelegate(0xAC1CA9E0, out SetSleepMode);
+                    getDelegate(0xD9984C05, out SetLatencyMarker);
+                    getDelegate(0x852CD1D2, out Sleep);
                 }
 
                 if (createSession())
@@ -424,6 +463,20 @@ namespace osu.Desktop
         private static extern IntPtr queryInterface64(uint id);
 
         private delegate NvStatus InitializeDelegate();
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct NvSetSleepModeParams
+    {
+        public uint version;
+        public uint bLowLatencyMode;
+        public uint bLowLatencyBoost;
+        public uint bUseMarkersToOptimize;
+        public uint minimumIntervalUs;
+        public uint reserved0;
+        public uint reserved1;
+        public uint reserved2;
+        public static uint Stride => (uint)Marshal.SizeOf(typeof(NvSetSleepModeParams)) | (1 << 16);
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
