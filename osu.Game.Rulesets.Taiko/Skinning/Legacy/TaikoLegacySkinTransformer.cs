@@ -103,6 +103,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 {
                     switch (taikoComponent.Component)
                     {
+                        case TaikoSkinComponents.DrumRollHead:
+                            if (GetTexture("taiko-roll-middle") != null)
+                                return new LegacyCirclePiece();
+
+                            return null;
+
                         case TaikoSkinComponents.DrumRollBody:
                             if (GetTexture("taiko-roll-middle") != null)
                                 return new LegacyDrumRoll();
