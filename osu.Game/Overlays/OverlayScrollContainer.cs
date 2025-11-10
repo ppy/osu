@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -14,6 +15,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -36,6 +38,7 @@ namespace osu.Game.Overlays
         public ScrollBackButton Button { get; private set; }
 
         private readonly Bindable<double?> lastScrollTarget = new Bindable<double?>();
+        private readonly Bindable<double> progress = new Bindable<double>();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -46,13 +49,18 @@ namespace osu.Game.Overlays
                 Origin = Anchor.BottomRight,
                 Margin = new MarginPadding(20),
                 Action = scrollBack,
-                LastScrollTarget = { BindTarget = lastScrollTarget }
+                LastScrollTarget = { BindTarget = lastScrollTarget },
+                Progress = { BindTarget = progress },
             });
         }
 
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
+
+            // Map current position to standardized progress
+            float height = AvailableContent - DrawHeight;
+            progress.Value = height == 0 ? 1 : Math.Round(Math.Clamp(Current / height, 0, 1), 3);
 
             if (ScrollContent.DrawHeight + button_scroll_position < DrawHeight)
             {
@@ -110,9 +118,11 @@ namespace osu.Game.Overlays
 
             private readonly Container content;
             private readonly Box background;
+            private readonly CircularProgress currentCircularProgress;
             private readonly SpriteIcon spriteIcon;
 
             public Bindable<double?> LastScrollTarget = new Bindable<double?>();
+            public Bindable<double> Progress = new Bindable<double>();
 
             protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds();
 
@@ -145,6 +155,11 @@ namespace osu.Game.Overlays
                         {
                             RelativeSizeAxes = Axes.Both
                         },
+                        currentCircularProgress = new CircularProgress
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            InnerRadius = 0.1f,
+                        },
                         spriteIcon = new SpriteIcon
                         {
                             Anchor = Anchor.Centre,
@@ -164,6 +179,7 @@ namespace osu.Game.Overlays
                 IdleColour = colourProvider.Background6;
                 HoverColour = colourProvider.Background5;
                 flashColour = colourProvider.Light1;
+                currentCircularProgress.Colour = colourProvider.Highlight1;
 
                 scrollToTopSample = audio.Samples.Get(@"UI/scroll-to-top");
                 scrollToPreviousSample = audio.Samples.Get(@"UI/scroll-to-previous");
@@ -172,6 +188,8 @@ namespace osu.Game.Overlays
             protected override void LoadComplete()
             {
                 base.LoadComplete();
+
+                Progress.BindValueChanged(p => currentCircularProgress.Progress = p.NewValue, true);
 
                 LastScrollTarget.BindValueChanged(target =>
                 {
