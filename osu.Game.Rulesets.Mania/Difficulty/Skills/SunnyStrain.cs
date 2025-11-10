@@ -146,30 +146,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
             return scaled * final_scaling_factor;
         }
-
-        /*
-         private double applyFinalScaling(double rawDifficulty)
-         {
-            double scaled = rawDifficulty;
-            double totalNotes = strainData.AllNotes.Length;
-
-            for (int i = 0; i < strainData.LongNotes.Length; i++)
-            {
-                var ln = strainData.LongNotes[i];
-                double dur = Math.Min(ln.EndTime - ln.StartTime, 1000);
-                totalNotes += 0.5 * dur / 200.0;
-            }
-
-            scaled *= totalNotes / (totalNotes + 60.0);
-
-            if (scaled > strainData.Config.rescaleHighThreshold)
-            {
-                scaled = strainData.Config.rescaleHighThreshold + (scaled - strainData.Config.rescaleHighThreshold) / strainData.Config.rescaleHighFactor;
-            }
-
-            return scaled * final_scaling_factor;
-         }
-         */
     }
 
     // TEMPORARY ONLY FOR TESTING

@@ -18,7 +18,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         private readonly SunnyStrainData strainData;
         private double currentStrain;
 
-        public PressingIntensity(Mod[] mods, SunnyStrainData data) : base(mods: mods)
+        public PressingIntensity(Mod[] mods, SunnyStrainData data)
+            : base(mods: mods)
         {
             strainData = data;
         }
@@ -45,22 +46,5 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             currentStrain = PressingIntensityEvaluator.EvaluateDifficultyAt(currentTime, strainData);
             return currentStrain;
         }
-
-        /*public override double DifficultyValue()
-        {
-            var peaks = GetCurrentStrainPeaks().Where(p => p > 0);
-            double[] sorted = peaks.OrderDescending().ToArray();
-            Array.Sort(sorted);
-
-            double highPercentileMean = DifficultyValueUtils.CalculatePercentileMean(sorted, difficultyPercentilesHigh);
-            double midPercentileMean = DifficultyValueUtils.CalculatePercentileMean(sorted, difficultyPercentilesMid);
-            double powerMean = DifficultyValueUtils.CalculatePowerMean(sorted, 5.0);
-
-            double rawDifficulty = 0.25 * (0.88 * highPercentileMean) +
-                                   0.20 * (0.94 * midPercentileMean) +
-                                   0.55 * powerMean;
-
-            return rawDifficulty;
-        }*/
     }
 }
