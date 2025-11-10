@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Rendering.LowLatency;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
@@ -26,6 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         {
             var renderer = config.GetBindable<RendererType>(FrameworkSetting.Renderer);
             automaticRendererInUse = renderer.Value == RendererType.Automatic;
+            var reflexMode = config.GetBindable<LatencyMode>(FrameworkSetting.LatencyMode);
 
             Children = new Drawable[]
             {
@@ -51,12 +53,22 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = GraphicsSettingsStrings.ThreadingMode,
                     Current = config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode)
                 },
+                new SettingsEnumDropdown<LatencyMode>
+                {
+                    LabelText = "Reflex",
+                    Current = reflexMode
+                },
                 new SettingsCheckbox
                 {
                     LabelText = GraphicsSettingsStrings.ShowFPS,
                     Current = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay)
                 },
             };
+
+            reflexMode.BindValueChanged(r =>
+            {
+                host.SetLowLatencyMode(r.NewValue);
+            });
 
             renderer.BindValueChanged(r =>
             {

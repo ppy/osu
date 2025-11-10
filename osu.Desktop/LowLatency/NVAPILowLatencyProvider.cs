@@ -35,6 +35,7 @@ namespace osu.Desktop.LowLatency
             bool enable = mode != LatencyMode.Off;
             bool boost = mode == LatencyMode.Boost;
             var status = NVAPI.SetSleepModeHelper(_deviceHandle, enable, boost, boost, 1000);
+
             Console.WriteLine("NVAPI SetSleepMode status: " + status);
         }
 
@@ -44,7 +45,6 @@ namespace osu.Desktop.LowLatency
                 return;
 
             var status = NVAPI.SetLatencyMarkerHelper(_deviceHandle, (uint)marker, frameId);
-            Console.WriteLine("NVAPI SetMarker status: " + status);
         }
 
         public void FrameSleep()
@@ -53,7 +53,6 @@ namespace osu.Desktop.LowLatency
                 return;
 
             var status = NVAPI.FrameSleepHelper(_deviceHandle);
-            Console.WriteLine("NVAPI FrameSleep status: " + status);
         }
     }
 }

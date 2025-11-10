@@ -110,7 +110,7 @@ namespace osu.Desktop
         private static readonly SetSleepModeDelegate SetSleepMode;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate NvStatus SetLatencyMarkerDelegate(IntPtr pDevice, uint marker, ulong frameId);
+        private delegate NvStatus SetLatencyMarkerDelegate(IntPtr pDevice, ref NvFrameMarkerParams pParams);
 
         private static readonly SetLatencyMarkerDelegate SetLatencyMarker;
 
@@ -361,16 +361,25 @@ namespace osu.Desktop
             NvSetSleepModeParams sleepParams = new NvSetSleepModeParams
             {
                 version = NvSetSleepModeParams.Stride,
-                bLowLatencyMode = enable ? 1u : 0u,
-                bLowLatencyBoost = boost ? 1u : 0u,
-                bUseMarkersToOptimize = useMarkersOptimize ? 1u : 0u,
-                minimumIntervalUs = minimumIntervalUs,
+                bLowLatencyMode = enable ? (byte)1 : (byte)0,
+                bLowLatencyBoost = boost ? (byte)1 : (byte)0,
+                minimumIntervalUs = 0,
+                bUseMarkersToOptimize = useMarkersOptimize ? (byte)1 : (byte)0,
             };
 
             return SetSleepMode(devicePtr, ref sleepParams);
         }
 
-        internal static NvStatus SetLatencyMarkerHelper(IntPtr devicePtr, uint marker, ulong frameId) => SetLatencyMarker(devicePtr, marker, frameId);
+        internal static NvStatus SetLatencyMarkerHelper(IntPtr devicePtr, uint marker, ulong frameId)
+        {
+            var frameMarkerParams = new NvFrameMarkerParams
+            {
+                version = NvFrameMarkerParams.Stride,
+                frameID = frameId,
+                markerType = marker
+            };
+            return SetLatencyMarker(devicePtr, ref frameMarkerParams);
+        }
 
         internal static NvStatus FrameSleepHelper(IntPtr devicePtr) => Sleep(devicePtr);
 
@@ -465,18 +474,38 @@ namespace osu.Desktop
         private delegate NvStatus InitializeDelegate();
     }
 
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     internal struct NvSetSleepModeParams
     {
         public uint version;
-        public uint bLowLatencyMode;
-        public uint bLowLatencyBoost;
-        public uint bUseMarkersToOptimize;
-        public uint minimumIntervalUs;
-        public uint reserved0;
-        public uint reserved1;
-        public uint reserved2;
-        public static uint Stride => (uint)Marshal.SizeOf(typeof(NvSetSleepModeParams)) | (1 << 16);
+        public byte bLowLatencyMode;
+        public byte bLowLatencyBoost;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+        private byte[] _pad0; // explicit padding to align next uint
+
+        public uint minimumIntervalUs; // NvU32
+
+        public byte bUseMarkersToOptimize; // NvBool (1 byte)
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 31)]
+        private byte[] rsvd; // reserved (must be zeroed)
+
+        public static uint Stride => (uint)Marshal.SizeOf(typeof(NvSetSleepModeParams)) | (1u << 16);
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct NvFrameMarkerParams
+    {
+        public uint version;
+        public ulong frameID;
+        public uint markerType;
+        public ulong rsvd0;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 56)]
+        public byte[] rsvd;
+
+        public static uint Stride => (uint)Marshal.SizeOf(typeof(NvFrameMarkerParams)) | (1u << 16);
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
