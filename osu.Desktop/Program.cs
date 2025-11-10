@@ -139,7 +139,10 @@ namespace osu.Desktop
                     host.Run(new TournamentGame());
                 else
                 {
-                    host.SetLowLatencyProvider(new NVAPILowLatencyProvider());
+                    // If we're on windows, attempt to use the NVAPI Low Latency Provider
+                    if (OperatingSystem.IsWindows())
+                        host.SetLowLatencyProvider(new NVAPILowLatencyProvider());
+
                     host.Run(new OsuGameDesktop(args)
                     {
                         IsFirstRun = isFirstRun

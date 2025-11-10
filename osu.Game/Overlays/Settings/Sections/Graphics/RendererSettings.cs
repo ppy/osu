@@ -22,6 +22,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private bool automaticRendererInUse;
 
+        private SettingsEnumDropdown<LatencyMode>? reflexSetting;
+
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager config, OsuConfigManager osuConfig, IDialogOverlay? dialogOverlay, OsuGame? game, GameHost host)
         {
@@ -53,10 +55,12 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = GraphicsSettingsStrings.ThreadingMode,
                     Current = config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode)
                 },
-                new SettingsEnumDropdown<LatencyMode>
+                reflexSetting = new SettingsEnumDropdown<LatencyMode>
                 {
-                    LabelText = "Reflex",
-                    Current = reflexMode
+                    LabelText = "NVIDIA Reflex",
+                    Current = reflexMode,
+                    Keywords = new[] { @"nvidia", @"latency", @"reflex" },
+                    TooltipText = "Reduces latency by leveraging the NVIDIA Reflex API on NVIDIA GPUs.\nRecommended to have On, turn off only if experiencing issues."
                 },
                 new SettingsCheckbox
                 {
@@ -65,10 +69,20 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 },
             };
 
+            // Ensure NVIDIA reflex is turned off and hidden if the resolved renderer isn't Direct3D 11
+            if (host.ResolvedRenderer != RendererType.Deferred_Direct3D11 && host.ResolvedRenderer != RendererType.Direct3D11)
+            {
+                reflexMode.Value = LatencyMode.Off;
+                reflexSetting.Hide();
+            }
+
             reflexMode.BindValueChanged(r =>
             {
                 host.SetLowLatencyMode(r.NewValue);
-            });
+
+                reflexSetting.ClearNoticeText();
+                if (r.NewValue == LatencyMode.Boost) setReflexBoostNotice();
+            }, true);
 
             renderer.BindValueChanged(r =>
             {
@@ -92,6 +106,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 }
             });
         }
+
+        private void setReflexBoostNotice() => reflexSetting?.SetNoticeText("Boost increases GPU power consumption and may increase latency in some cases. Disable Boost if experiencing issues.", true);
 
         private partial class RendererSettingsDropdown : SettingsEnumDropdown<RendererType>
         {
