@@ -47,6 +47,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                             Origin = Anchor.Centre,
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Vertical,
+                            Alpha = 0,
                             Children =
                             [
                                 new SpriteIcon

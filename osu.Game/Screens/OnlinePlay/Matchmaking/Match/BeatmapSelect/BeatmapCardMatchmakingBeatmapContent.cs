@@ -322,6 +322,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             }
         }
 
+        public float AvatarOffset => buttonContainer.DrawWidth - buttonContainer.MainAreaSize.X;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();

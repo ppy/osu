@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 {
     public partial class TestSceneBeatmapSelectGrid : OnlinePlayTestScene
     {
-        private MultiplayerPlaylistItem[] items = null!;
+        private IMatchmakingPlaylistItem[] items = null!;
 
         private BeatmapSelectGrid grid = null!;
 
@@ -36,24 +36,44 @@ namespace osu.Game.Tests.Visual.Matchmaking
                                          .Take(50)
                                          .ToArray();
 
+            IEnumerable<MatchmakingPlaylistItemBeatmap> playlistItems;
+
             if (beatmaps.Length > 0)
             {
-                items = Enumerable.Range(1, 50).Select(i => new MultiplayerPlaylistItem
+                playlistItems = Enumerable.Range(1, 50).Select(i =>
                 {
-                    ID = i,
-                    BeatmapID = beatmaps[i % beatmaps.Length].OnlineID,
-                    StarRating = i / 10.0,
-                }).ToArray();
+                    var beatmap = beatmaps[i % beatmaps.Length];
+
+                    return new MatchmakingPlaylistItemBeatmap(
+                        new MultiplayerPlaylistItem
+                        {
+                            ID = i,
+                            BeatmapID = beatmap.OnlineID,
+                            StarRating = i / 10.0,
+                        },
+                        CreateAPIBeatmap(beatmap),
+                        Array.Empty<Mod>()
+                    );
+                });
             }
             else
             {
-                items = Enumerable.Range(1, 50).Select(i => new MultiplayerPlaylistItem
-                {
-                    ID = i,
-                    BeatmapID = i,
-                    StarRating = i / 10.0,
-                }).ToArray();
+                playlistItems = Enumerable.Range(1, 50).Select(i => new MatchmakingPlaylistItemBeatmap(
+                    new MultiplayerPlaylistItem
+                    {
+                        ID = i,
+                        BeatmapID = i,
+                        StarRating = i / 10.0,
+                    },
+                    CreateAPIBeatmap(),
+                    Array.Empty<Mod>()
+                ));
             }
+
+            foreach (var item in playlistItems)
+                item.Beatmap.StarRating = item.PlaylistItem.StarRating;
+
+            items = playlistItems.Cast<IMatchmakingPlaylistItem>().Append(new MatchmakingPlaylistItemRandom()).ToArray();
         }
 
         public override void SetUpSteps()
@@ -68,11 +88,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 Scale = new Vector2(0.8f),
             });
 
-            AddStep("add items", () =>
-            {
-                foreach (var item in items)
-                    grid.AddItem(item);
-            });
+            AddStep("add items", () => grid.AddItems(items));
 
             AddWaitStep("wait for panels", 3);
         }
@@ -85,17 +101,17 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 // test scene is weird.
             });
 
-            AddStep("add selection 1", () => grid.ChildrenOfType<BeatmapSelectPanel>().First().AddUser(new APIUser
+            AddStep("add selection 1", () => grid.ChildrenOfType<MatchmakingSelectPanel>().First().AddUser(new APIUser
             {
                 Id = DummyAPIAccess.DUMMY_USER_ID,
                 Username = "Maarvin",
             }));
-            AddStep("add selection 2", () => grid.ChildrenOfType<BeatmapSelectPanel>().Skip(5).First().AddUser(new APIUser
+            AddStep("add selection 2", () => grid.ChildrenOfType<MatchmakingSelectPanel>().Skip(5).First().AddUser(new APIUser
             {
                 Id = 2,
                 Username = "peppy",
             }));
-            AddStep("add selection 3", () => grid.ChildrenOfType<BeatmapSelectPanel>().Skip(10).First().AddUser(new APIUser
+            AddStep("add selection 3", () => grid.ChildrenOfType<MatchmakingSelectPanel>().Skip(10).First().AddUser(new APIUser
             {
                 Id = 1040328,
                 Username = "smoogipoo",
@@ -109,7 +125,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
             {
                 var (candidateItems, finalItem) = pickRandomItems(5);
 
-                grid.RollAndDisplayFinalBeatmap(candidateItems, finalItem);
+                grid.RollAndDisplayFinalBeatmap(candidateItems, finalItem, finalItem);
             });
         }
 
@@ -138,7 +154,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
                 grid.PlayRollAnimation(finalItem, duration: 0);
 
-                Scheduler.AddDelayed(() => grid.PresentRolledBeatmap(finalItem), 500);
+                Scheduler.AddDelayed(() => grid.PresentRolledBeatmap(finalItem, finalItem), 500);
             });
         }
 
@@ -147,14 +163,31 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             AddStep("present beatmap", () =>
             {
-                var (candidateItems, finalItem) = pickRandomItems(5);
+                var (candidateItems, finalItem) = pickRandomItems(1);
 
                 grid.TransferCandidatePanelsToRollContainer(candidateItems, duration: 0);
                 grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
                 grid.PlayRollAnimation(finalItem, duration: 0);
 
-                Scheduler.AddDelayed(() => grid.PresentUnanimouslyChosenBeatmap(finalItem), 500);
+                Scheduler.AddDelayed(() => grid.PresentUnanimouslyChosenBeatmap(finalItem, finalItem), 500);
             });
+        }
+
+        [Test]
+        public void TestPresentRandomItem()
+        {
+            AddStep("present random item panel", () =>
+            {
+                grid.TransferCandidatePanelsToRollContainer(pickRandomItems(4).candidateItems.Append(-1).ToArray(), duration: 0);
+                grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
+                grid.PlayRollAnimation(-1, duration: 0);
+
+                Scheduler.AddDelayed(() => grid.PresentUnanimouslyChosenBeatmap(-1, /*TODO*/-1), 500);
+            });
+
+            AddWaitStep("wait for animation", 5);
+
+            AddStep("reveal beatmap", () => grid.RevealRandomItem(new MultiplayerPlaylistItem()));
         }
 
         [TestCase(1)]
@@ -180,7 +213,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             AddStep("display roll order", () =>
             {
-                var panels = grid.ChildrenOfType<BeatmapSelectPanel>().ToArray();
+                var panels = grid.ChildrenOfType<MatchmakingSelectPanel>().ToArray();
 
                 for (int i = 0; i < panels.Length; i++)
                 {
@@ -195,23 +228,6 @@ namespace osu.Game.Tests.Visual.Matchmaking
                     });
                 }
             });
-        }
-
-        [Test]
-        public void TestPresentRandomItem()
-        {
-            AddStep("present random item panel", () =>
-            {
-                grid.TransferCandidatePanelsToRollContainer(pickRandomItems(4).candidateItems.Append(-1).ToArray(), duration: 0);
-                grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
-                grid.PlayRollAnimation(-1, duration: 0);
-
-                Scheduler.AddDelayed(() => grid.PresentUnanimouslyChosenBeatmap(-1), 500);
-            });
-
-            AddWaitStep("wait for animation", 5);
-
-            AddStep("reveal beatmap", () => grid.RevealRandomItem(new MultiplayerPlaylistItem()));
         }
 
         private (long[] candidateItems, long finalItem) pickRandomItems(int count)

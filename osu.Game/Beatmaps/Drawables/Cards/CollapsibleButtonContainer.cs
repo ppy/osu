@@ -12,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
@@ -184,5 +185,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 button.HoverColour = downloadTracker.State.Value != DownloadState.LocallyAvailable ? colourProvider.Content1 : colourProvider.Foreground1;
             }
         }
+
+        public Vector2 MainAreaSize => mainArea.DrawSize;
     }
 }
