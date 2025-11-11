@@ -33,15 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             this.sliderFactor = sliderFactor;
         }
 
-        public static double ComputeAimRatingWithVersatility(double aimRating, double snapAimRating, double flowAimRating)
-        {
-            // Increasing this multiplier buffs versatile aim+flow maps
-            const double aim_versatility_bonus = 0.1;
-
-            // We consider that average map has ratio of summed ratings to total to be equal to 1.7x
-            double baseVersatilityBonus = double.Lerp(1, 1.7, aim_versatility_bonus);
-            return double.Lerp(aimRating, snapAimRating + flowAimRating, aim_versatility_bonus) / baseVersatilityBonus;
-        }
+        public static double SumTotalAimRating(double aimRating, double snapAimRating, double flowAimRating) => aimRating * 0.9 + snapAimRating * 0.1 + flowAimRating * 0.1;
 
         public double ComputeCombinedAimRating(double aimDifficultyValue, double snapAimDifficultyValue, double flowAimDifficultyValue)
         {
@@ -69,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimRating = double.Lerp(snapAimRating, aimRating, 0.5);
             }
 
-            aimRating = ComputeAimRatingWithVersatility(aimRating, snapAimRating, flowAimRating);
+            aimRating = SumTotalAimRating(aimRating, snapAimRating, flowAimRating);
 
             return computeRawAimRating(aimRating);
         }

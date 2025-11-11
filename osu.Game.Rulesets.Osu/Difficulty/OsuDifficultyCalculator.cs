@@ -183,7 +183,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateMechanicalDifficultyRating(double aimDifficultyValue, double snapAimDifficultyValue, double flowAimDifficultyValue, double speedDifficultyValue)
         {
-            double totalAimRating = OsuRatingCalculator.ComputeAimRatingWithVersatility(
+            double totalAimRating = OsuRatingCalculator.SumTotalAimRating(
                 OsuRatingCalculator.CalculateDifficultyRating(aimDifficultyValue),
                 OsuRatingCalculator.CalculateDifficultyRating(snapAimDifficultyValue),
                 OsuRatingCalculator.CalculateDifficultyRating(flowAimDifficultyValue)
