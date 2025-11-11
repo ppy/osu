@@ -209,7 +209,7 @@ namespace osu.Game.Screens.SelectV2
                 case GroupMode.Collections:
                 {
                     var collections = GetCollections();
-                    return getGroupsBy(b => defineGroupByCollection(b, collections), items);
+                    return getCollectionGroups(collections, items);
                 }
 
                 case GroupMode.MyMaps:
@@ -396,29 +396,72 @@ namespace osu.Game.Screens.SelectV2
             return new GroupDefinition(0, source).Yield();
         }
 
-        private IEnumerable<GroupDefinition> defineGroupByCollection(BeatmapInfo beatmap, List<BeatmapCollection> collections)
+        // This record is used in the getCollectionGroups function
+        // The `index` field corresponds to the index of the given item in the list given prior to grouping
+        // We have to save that index in order to preserve the ordering of `CarouselItem`s because sorting happens before grouping
+        // The `inGroup` field is used to create a final group for `CarouselItem`s that are in no collections
+        private record CarouselItemInGroup(CarouselItem item, int index, bool inGroup);
+
+        private List<GroupMapping> getCollectionGroups(List<BeatmapCollection> collections, List<CarouselItem> items)
         {
-            bool anyCollections = false;
+            var MD5HashToCarouselItemMap = new Dictionary<string, CarouselItemInGroup>();
+            for (int i = 0; i < items.Count; i++)
+            {
+                CarouselItem item = items[i];
+                BeatmapInfo b = (BeatmapInfo)item.Model;
+                MD5HashToCarouselItemMap[b.MD5Hash] = new CarouselItemInGroup(item, i, false);
+            }
+
+            var groups = new List<GroupMapping>();
 
             for (int i = 0; i < collections.Count; i++)
             {
+                // NOTE: the ordering of the incoming collection list is significant and needs to be preserved.
+                // the fallback to ordering by name cannot be relied on.
+                // see xmldoc of `BeatmapCarousel.GetAllCollections()`.
                 var collection = collections[i];
+                var collectionGroupDefinition = new GroupDefinition(i, collection.Name);
 
-                if (collection.BeatmapMD5Hashes.Contains(beatmap.MD5Hash))
+                // Preserve carousel sorting
+                var sortedItems = new SortedList<int, CarouselItem>();
+
+                foreach (var MD5Hash in collection.BeatmapMD5Hashes)
                 {
-                    // NOTE: the ordering of the incoming collection list is significant and needs to be preserved.
-                    // the fallback to ordering by name cannot be relied on.
-                    // see xmldoc of `BeatmapCarousel.GetAllCollections()`.
-                    yield return new GroupDefinition(i, collection.Name);
+                    // This check is necessary because some collections might contain maps that are not installed
+                    if (MD5HashToCarouselItemMap.TryGetValue(MD5Hash, out var carouselItemInGroup))
+                    {
+                        sortedItems.Add(carouselItemInGroup.index, carouselItemInGroup.item);
+                        MD5HashToCarouselItemMap[MD5Hash] = carouselItemInGroup with { inGroup = true };
+                    }
+                }
 
-                    anyCollections = true;
+                var collectionGroupMapping = new GroupMapping(collectionGroupDefinition, sortedItems.Values.ToList());
+
+                if (collectionGroupMapping.ItemsInGroup.Count > 0)
+                {
+                    groups.Add(collectionGroupMapping);
                 }
             }
 
-            if (anyCollections)
-                yield break;
+            var itemsNotInCollection = new SortedList<int, CarouselItem>();
+            foreach (var (item, index, inGroup) in MD5HashToCarouselItemMap.Values)
+            {
+                if (!inGroup)
+                {
+                    itemsNotInCollection.Add(index, item);
+                }
+            }
 
-            yield return new GroupDefinition(int.MaxValue, "Not in collection");
+            if (itemsNotInCollection.Count > 0)
+            {
+                var notInCollectionGroupDefinition = new GroupDefinition(int.MaxValue, "Not in collection");
+                var notInCollectionGroupMapping = new GroupMapping(notInCollectionGroupDefinition, itemsNotInCollection.Values.ToList());
+                groups.Add(notInCollectionGroupMapping);
+            }
+
+            return groups.OrderBy(g => g.Group!.Order)
+                         .ThenBy(g => g.Group!.Title.ToString())
+                         .ToList();
         }
 
         private IEnumerable<GroupDefinition> defineGroupByOwnMaps(BeatmapInfo beatmap, int? localUserId, string? localUserUsername)
