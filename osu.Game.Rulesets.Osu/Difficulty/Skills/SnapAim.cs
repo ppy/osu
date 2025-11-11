@@ -20,10 +20,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double snap = AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders);
             double flow = FlowAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders);
 
-            if (flow < snap)
-                return flow * Math.Pow(flow / snap, 2.5);
+            return snap * probabilityOfSnap(snap, flow);
+        }
 
-            return snap;
+        private double probabilityOfSnap(double snap, double flow)
+        {
+            // If snap is easier - we always use snap
+            if (snap <= flow)
+                return 1.0;
+
+            // If flow is easier - we decrease the weight of the snap difficulty accordingly
+            return Math.Pow(flow / snap, 3.5);
         }
     }
 }
