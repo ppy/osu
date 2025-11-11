@@ -64,9 +64,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Start from base of the bonus
             double speeflowBonus = multiplier * diameter / osuCurrObj.AdjustedDeltaTime;
 
-            // Spacing factor, reward up to 1 radius. The reason why we're doing this is because we want to be close live speedflow
-            // If we won't do this - it will be similar to multiplicative speed and distance bonuses, not additive
-            speeflowBonus *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.LazyJumpDistance, -radius, radius);
+            // Spacing factor, reward up to 1 radius. The reason why we want to buff primarily low spacing speedflow.
+            // Explanation about formula: it goes fast from 0 and then slow downs, capping out on 1 radius.
+            // To achieve this we use negative radius as an argument and then cut down the range to reward starting from zero distance.
+            speeflowBonus *= 2 * (DifficultyCalculationUtils.Smoothstep(osuCurrObj.LazyJumpDistance, -radius, radius) - 0.5);
 
             // Bpm factor
             speeflowBonus *= (osuCurrObj.AdjustedDeltaTime / (osuCurrObj.AdjustedDeltaTime - bpm_factor) - 1);
