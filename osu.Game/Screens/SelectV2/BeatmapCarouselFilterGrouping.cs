@@ -397,10 +397,10 @@ namespace osu.Game.Screens.SelectV2
         }
 
         // This record is used in the getCollectionGroups function
-        // The `index` field corresponds to the index of the given item in the list given prior to grouping
+        // The `Index` field corresponds to the index of the given item in the list given prior to grouping
         // We have to save that index in order to preserve the ordering of `CarouselItem`s because sorting happens before grouping
-        // The `inGroup` field is used to create a final group for `CarouselItem`s that are in no collections
-        private record CarouselItemInGroup(CarouselItem item, int index, bool inGroup);
+        // The `InGroup` field is used to create a final group for `CarouselItem`s that are in no collections
+        private record CarouselItemInGroup(CarouselItem Item, int Index, bool InGroup);
 
         private List<GroupMapping> getCollectionGroups(List<BeatmapCollection> collections, List<CarouselItem> items)
         {
@@ -429,8 +429,8 @@ namespace osu.Game.Screens.SelectV2
                     // This check is necessary because some collections might contain maps that are not installed
                     if (MD5HashToCarouselItemMap.TryGetValue(MD5Hash, out var carouselItemInGroup))
                     {
-                        sortedItems.Add(carouselItemInGroup.index, carouselItemInGroup.item);
-                        MD5HashToCarouselItemMap[MD5Hash] = carouselItemInGroup with { inGroup = true };
+                        sortedItems.Add(carouselItemInGroup.Index, carouselItemInGroup.Item);
+                        MD5HashToCarouselItemMap[MD5Hash] = carouselItemInGroup with { InGroup = true };
                     }
                 }
 
