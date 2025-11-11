@@ -228,8 +228,9 @@ namespace osu.Game.Skinning
                 // First attempt to deserialise using the new SkinLayoutInfo format
                 layout = JsonConvert.DeserializeObject<SkinLayoutInfo>(jsonContent);
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Log($"Deserialising skin layout to {nameof(SkinLayoutInfo)} failed. Falling back to {nameof(SerialisedDrawableInfo)}[].\nDetails: {ex}");
             }
 
             // If deserialisation using SkinLayoutInfo fails, attempt to deserialise using the old naked list.
