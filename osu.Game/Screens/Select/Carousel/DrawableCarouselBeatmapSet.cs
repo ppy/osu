@@ -328,7 +328,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             return new TernaryStateToggleMenuItem(collection.Name, MenuItemType.Standard, s =>
             {
-                liveCollection.PerformWrite(c =>
+                Task.Run(() => liveCollection.PerformWrite(c =>
                 {
                     foreach (var b in beatmapSet.Beatmaps)
                     {
@@ -346,7 +346,7 @@ namespace osu.Game.Screens.Select.Carousel
                                 break;
                         }
                     }
-                });
+                }));
             })
             {
                 State = { Value = state }
