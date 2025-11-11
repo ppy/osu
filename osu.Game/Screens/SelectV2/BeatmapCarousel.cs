@@ -459,6 +459,8 @@ namespace osu.Game.Screens.SelectV2
                         // - Background user tag population runs and causes a realm update.
                         //   We don't display user tags so want to ignore this.
                         bool equalForDisplayPurposes =
+                            // covers import-as-update flows, such as updating the beatmap with the latest online versions, or external editing inside editor
+                            oldBeatmap.ID == newBeatmap.ID &&
                             // covers metadata changes
                             oldBeatmap.Hash == newBeatmap.Hash &&
                             // sanity check
