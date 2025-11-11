@@ -404,12 +404,13 @@ namespace osu.Game.Screens.SelectV2
 
         private List<GroupMapping> getCollectionGroups(List<BeatmapCollection> collections, List<CarouselItem> items)
         {
-            var MD5HashToCarouselItemMap = new Dictionary<string, CarouselItemInGroup>();
+            var md5HashToCarouselItemMap = new Dictionary<string, CarouselItemInGroup>();
+
             for (int i = 0; i < items.Count; i++)
             {
                 CarouselItem item = items[i];
                 BeatmapInfo b = (BeatmapInfo)item.Model;
-                MD5HashToCarouselItemMap[b.MD5Hash] = new CarouselItemInGroup(item, i, false);
+                md5HashToCarouselItemMap[b.MD5Hash] = new CarouselItemInGroup(item, i, false);
             }
 
             var groups = new List<GroupMapping>();
@@ -424,13 +425,13 @@ namespace osu.Game.Screens.SelectV2
 
                 var sortedItems = new SortedList<int, CarouselItem>();
 
-                foreach (var MD5Hash in collection.BeatmapMD5Hashes)
+                foreach (string md5Hash in collection.BeatmapMD5Hashes)
                 {
                     // This check is necessary because some collections might contain maps that are not installed
-                    if (MD5HashToCarouselItemMap.TryGetValue(MD5Hash, out var carouselItemInGroup))
+                    if (md5HashToCarouselItemMap.TryGetValue(md5Hash, out var carouselItemInGroup))
                     {
                         sortedItems.Add(carouselItemInGroup.Index, carouselItemInGroup.Item);
-                        MD5HashToCarouselItemMap[MD5Hash] = carouselItemInGroup with { InGroup = true };
+                        md5HashToCarouselItemMap[md5Hash] = carouselItemInGroup with { InGroup = true };
                     }
                 }
 
@@ -443,7 +444,8 @@ namespace osu.Game.Screens.SelectV2
             }
 
             var itemsNotInCollection = new SortedList<int, CarouselItem>();
-            foreach (var (item, index, inGroup) in MD5HashToCarouselItemMap.Values)
+
+            foreach (var (item, index, inGroup) in md5HashToCarouselItemMap.Values)
             {
                 if (!inGroup)
                 {
