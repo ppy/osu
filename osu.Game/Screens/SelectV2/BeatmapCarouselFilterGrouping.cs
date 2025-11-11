@@ -422,7 +422,6 @@ namespace osu.Game.Screens.SelectV2
                 var collection = collections[i];
                 var collectionGroupDefinition = new GroupDefinition(i, collection.Name);
 
-                // Preserve carousel sorting
                 var sortedItems = new SortedList<int, CarouselItem>();
 
                 foreach (var MD5Hash in collection.BeatmapMD5Hashes)
