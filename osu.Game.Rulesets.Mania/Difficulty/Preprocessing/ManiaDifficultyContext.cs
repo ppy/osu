@@ -2,34 +2,21 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Rulesets.Mania.Difficulty.Skills;
+using System.Collections.Generic;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner.Data;
 
-namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
+namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 {
-    public class SunnyStrainData
+    public class ManiaDifficultyContext
     {
-        /// <summary>All notes in the beatmap, sorted by start time</summary>
-        public ManiaDifficultyHitObject[] AllNotes { get; set; }
-
-        /// <summary>Notes organized by column</summary>
-        public ManiaDifficultyHitObject[][] NotesByColumn { get; set; }
-
-        /// <summary>All long notes in the beatmap</summary>
-        public ManiaDifficultyHitObject[] LongNotes { get; set; }
-
-        /// <summary>Long notes sorted by end time (for release timing calculations)</summary>
-        public ManiaDifficultyHitObject[] LongNoteTails { get; set; }
+        public List<ManiaDifficultyHitObject> AllNotes, LongNotes, LongNoteTails;
 
         /// <summary>Time corner data defining sampling points for difficulty calculation</summary>
         public CornerData CornerData { get; set; }
 
-        /// <summary>TEMPORARY ONLY FOR TESTING</summary>
-        public FormulaConfig Config { get; set; }
-
         /// <summary>Hit timing leniency based on Overall Difficulty</summary>
         public double HitLeniency { get; set; }
 
-        /// <summary>Number of columns (keys) in this beatmap</summary>
         public int KeyCount { get; set; }
 
         /// <summary>Maximum time value in the beatmap</summary>
@@ -60,8 +47,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
         /// Samples a difficulty feature value at a specific time using interpolation.
         /// This is the main interface for getting difficulty values at arbitrary time points.
         /// </summary>
-        public double SampleFeatureAtTime(double time, double[] featureArray)
-            => interpolateValue(time, CornerData.TimeCorners, featureArray);
+        public double SampleFeatureAtTime(double time, double[] featureArray) => interpolateValue(time, CornerData.TimeCorners, featureArray);
 
         /// <summary>
         /// Performs linear interpolation to find a value at a specific point.
@@ -72,19 +58,15 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
             if (xArray.Length == 0 || yArray.Length == 0)
                 return 0.0;
 
-            // Handle boundary cases
             if (targetPoint <= xArray[0]) return yArray[0];
             if (targetPoint >= xArray[^1]) return yArray[^1];
 
-            // Find the appropriate interval using binary search
             int searchResult = Array.BinarySearch(xArray, targetPoint);
             if (searchResult >= 0) return yArray[searchResult];
 
-            // Convert negative result to insertion point
             int rightIndex = ~searchResult;
             int leftIndex = rightIndex - 1;
 
-            // Perform linear interpolation
             double denominator = xArray[rightIndex] - xArray[leftIndex];
             if (denominator == 0.0) return yArray[leftIndex];
 

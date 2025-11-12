@@ -13,9 +13,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
         /// <summary>Density values at each time point</summary>
         public required double[] DensityValues;
 
-        /// <summary>Cumulative sum for efficient range queries</summary>
-        public required double[] CumulativeSum;
-
         /// <summary>
         /// Calculates the total density contribution between two time points.
         /// This is used to determine how much long note influence exists in a time range.

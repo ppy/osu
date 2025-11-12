@@ -1,21 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Difficulty.Skills;
-using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Mania.Difficulty.Evaluators;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
-using osu.Game.Rulesets.Mania.Difficulty.Utils;
-using osu.Game.Rulesets.Mods;
-
 namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
-    public class SunnyStrain : StrainSkill
+    /*public class SunnyStrain : StrainSkill
     {
         private const double final_scaling_factor = 0.975;
         private const double strain_decay_base = .20143474157245744;
@@ -23,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         private readonly double[] difficultyPercentilesHigh = { 0.945, 0.935, 0.925, 0.915 };
         private readonly double[] difficultyPercentilesMid = { 0.845, 0.835, 0.825, 0.815 };
 
-        private readonly SunnyStrainData strainData;
+        private readonly ManiaDifficultyContext strainData;
         private double currentStrain;
         private double currentNoteCount;
         private double currentLongNoteWeight;
@@ -78,10 +66,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
             double localNoteCount = strainData.SampleFeatureAtTime(currentTime, strainData.LocalNoteCount);
             double activeKeyCount = strainData.SampleFeatureAtTime(currentTime, strainData.ActiveKeyCount);
-
-            /*Console.WriteLine($"time={currentTime}, sameColumn={sameColumnDifficulty}, crossColumn={crossColumnDifficulty}, "
-                              + $"pressingIntensity={pressingIntensityDifficulty}, unevenessDifficulty={unevennessDifficulty}, releaseDifficulty={releaseDifficulty}, localNoteCount={localNoteCount}, "
-                              + $"activeKeyCount={activeKeyCount} \n");*/
 
             double clampedSameColumnDifficulty = Math.Min(sameColumnDifficulty, 8.0 + 0.85 * sameColumnDifficulty);
 
@@ -146,7 +130,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
             return scaled * final_scaling_factor;
         }
-    }
+    }*/
 
     // TEMPORARY ONLY FOR TESTING
     public class FormulaConfig

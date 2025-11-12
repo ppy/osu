@@ -3,49 +3,76 @@
 
 using System;
 using System.Buffers;
+using System.Collections.Generic;
+using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner.Data;
 
-namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
+namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner
 {
-    public class CornerData
+    /// <summary>
+    /// Preprocessor that computes time corners for difficulty sampling.
+    /// Separates computation logic from data storage.
+    /// </summary>
+    public class CornerDataPreprocessor
     {
-        /// <summary>Time corners used for final difficulty sampling (union of Base and Accuracy corners)</summary>
-        public double[] TimeCorners { get; set; } = Array.Empty<double>();
-
-        /// <summary>Base time corners derived from note positions with small offsets</summary>
-        public double[] BaseTimeCorners { get; set; } = Array.Empty<double>();
-
-        /// <summary>Accuracy-focused time corners with wider windows around notes</summary>
-        public double[] AccuracyTimeCorners { get; set; } = Array.Empty<double>();
-
-        /// <summary>
-        /// Computes all time corner arrays based on note positions.
-        /// This creates strategic time points for efficient difficulty calculation.
-        /// </summary>
-        public void ComputeTimeCorners(ManiaDifficultyHitObject[] allNotes, int maxTime)
+        public static CornerData Process(List<DifficultyHitObject> hitObjects, int maxTime)
         {
-            // Handle null input explicitly
-            if (allNotes.Length == 0)
+            var cornerData = new CornerData();
+
+            if (hitObjects.Count == 0)
             {
-                BaseTimeCorners = new[] { 0.0, maxTime };
-                AccuracyTimeCorners = BaseTimeCorners;
-                TimeCorners = BaseTimeCorners;
-                return;
+                cornerData.BaseTimeCorners = new[] { 0.0, maxTime };
+                cornerData.AccuracyTimeCorners = cornerData.BaseTimeCorners;
+                cornerData.TimeCorners = cornerData.BaseTimeCorners;
+                return cornerData;
             }
 
-            int noteCount = allNotes.Length;
+            int noteCount = hitObjects.Count;
+            var arrayPool = ArrayPool<double>.Shared;
+
+            double[] baseTimePoints = collectBaseTimePoints(hitObjects, noteCount, arrayPool);
+
+            cornerData.BaseTimeCorners = buildBaseTimeCorners(baseTimePoints, arrayPool, maxTime);
+            cornerData.AccuracyTimeCorners = buildAccuracyTimeCorners(baseTimePoints, arrayPool, maxTime);
+            cornerData.TimeCorners = createTimeCornerUnion(cornerData.BaseTimeCorners, cornerData.AccuracyTimeCorners);
+
+            return cornerData;
+            /*CornerData cornerData = computeTimeCorners(hitObjects, maxTime);
+            hitObjects.ForEach(dho =>
+            {
+                var mdho = (ManiaDifficultyHitObject)dho;
+                mdho.Data = cornerData;
+            });*/
+        }
+
+        /*/// <summary>
+        /// Computes all time corner arrays based on note positions.
+        /// </summary>
+        private static CornerData computeTimeCorners(List<DifficultyHitObject> allNotes, int maxTime)
+        {
+            var cornerData = new CornerData();
+
+            if (allNotes.Count == 0)
+            {
+                cornerData.BaseTimeCorners = new[] { 0.0, maxTime };
+                cornerData.AccuracyTimeCorners = cornerData.BaseTimeCorners;
+                cornerData.TimeCorners = cornerData.BaseTimeCorners;
+                return cornerData;
+            }
+
+            int noteCount = allNotes.Count;
             var arrayPool = ArrayPool<double>.Shared;
 
             double[] baseTimePoints = collectBaseTimePoints(allNotes, noteCount, arrayPool);
 
-            BaseTimeCorners = buildBaseTimeCorners(baseTimePoints, arrayPool, maxTime);
-            AccuracyTimeCorners = buildAccuracyTimeCorners(baseTimePoints, arrayPool, maxTime);
-            TimeCorners = createTimeCornerUnion();
-        }
+            cornerData.BaseTimeCorners = buildBaseTimeCorners(baseTimePoints, arrayPool, maxTime);
+            cornerData.AccuracyTimeCorners = buildAccuracyTimeCorners(baseTimePoints, arrayPool, maxTime);
+            cornerData.TimeCorners = createTimeCornerUnion(cornerData.BaseTimeCorners, cornerData.AccuracyTimeCorners);
 
-        /// <summary>
-        /// Collects all fundamental time points from notes (start/end times).
-        /// </summary>
-        private double[] collectBaseTimePoints(ManiaDifficultyHitObject[] allNotes, int noteCount, ArrayPool<double> pool)
+            return cornerData;
+        }*/
+
+        private static double[] collectBaseTimePoints(List<DifficultyHitObject> allNotes, int noteCount, ArrayPool<double> pool)
         {
             int estimatedCapacity = Math.Max(32, noteCount * 3);
             double[] timePoints = pool.Rent(estimatedCapacity);
@@ -53,23 +80,21 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
 
             for (int i = 0; i < noteCount; i++)
             {
-                var note = allNotes[i];
+                var note = (ManiaDifficultyHitObject)allNotes[i];
 
-                // Ensure we don't exceed array capacity
                 if (timePointCount >= timePoints.Length)
-                    timePoints = expandIntArray(timePoints, ref timePointCount, pool);
+                    timePoints = expandArray(timePoints, ref timePointCount, pool);
 
                 timePoints[timePointCount++] = note.StartTime;
 
                 if (note.IsLong)
                 {
                     if (timePointCount >= timePoints.Length)
-                        timePoints = expandIntArray(timePoints, ref timePointCount, pool);
+                        timePoints = expandArray(timePoints, ref timePointCount, pool);
                     timePoints[timePointCount++] = note.EndTime;
                 }
             }
 
-            // Return only the used portion
             double[] result = new double[timePointCount];
             Array.Copy(timePoints, 0, result, 0, timePointCount);
             pool.Return(timePoints, clearArray: true);
@@ -77,37 +102,29 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
             return result;
         }
 
-        /// <summary>
-        /// Builds base time corners with small offsets around each note time.
-        /// These corners are used for most difficulty calculations.
-        /// </summary>
-        private double[] buildBaseTimeCorners(double[] baseTimePoints, ArrayPool<double> pool, int maxTime)
+        private static double[] buildBaseTimeCorners(double[] baseTimePoints, ArrayPool<double> pool, int maxTime)
         {
             int basePointCount = baseTimePoints.Length;
             int expandedCapacity = Math.Max(8, basePointCount * 4 + 4);
             double[] expandedPoints = pool.Rent(expandedCapacity);
             int expandedCount = 0;
 
-            // Create small offsets around each base time point
             for (int i = 0; i < basePointCount; i++)
             {
                 double baseTime = baseTimePoints[i];
                 if (baseTime < 0 || baseTime > maxTime) continue;
 
-                // Ensure capacity for 4 new points
                 if (expandedCount + 4 >= expandedPoints.Length)
-                    expandedPoints = expandIntArray(expandedPoints, ref expandedCount, pool);
+                    expandedPoints = expandArray(expandedPoints, ref expandedCount, pool);
 
-                // Add the base time and small offsets
                 expandedPoints[expandedCount++] = baseTime;
-                expandedPoints[expandedCount++] = baseTime + 501; // Just after hit window
-                expandedPoints[expandedCount++] = baseTime - 499; // Just before hit window
-                expandedPoints[expandedCount++] = baseTime + 1; // Tiny offset for precision
+                expandedPoints[expandedCount++] = baseTime + 501;
+                expandedPoints[expandedCount++] = baseTime - 499;
+                expandedPoints[expandedCount++] = baseTime + 1;
             }
 
-            // Add boundary points
             if (expandedCount + 2 >= expandedPoints.Length)
-                expandedPoints = expandIntArray(expandedPoints, ref expandedCount, pool);
+                expandedPoints = expandArray(expandedPoints, ref expandedCount, pool);
             expandedPoints[expandedCount++] = 0;
             expandedPoints[expandedCount++] = maxTime;
 
@@ -117,56 +134,45 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
             return result;
         }
 
-        /// <summary>
-        /// Builds accuracy time corners with wider windows around notes.
-        /// These are used specifically for accuracy-related calculations.
-        /// </summary>
-        private double[] buildAccuracyTimeCorners(double[] baseTimePoints, ArrayPool<double> pool, int maxTime)
+        private static double[] buildAccuracyTimeCorners(double[] baseTimePoints, ArrayPool<double> pool, int maxTime)
         {
             int basePointCount = baseTimePoints.Length;
             int accuracyCapacity = Math.Max(8, basePointCount * 3 + 2);
             double[] accuracyPoints = pool.Rent(accuracyCapacity);
             int accuracyCount = 0;
 
-            // Add boundary points
             if (accuracyCount >= accuracyPoints.Length)
-                accuracyPoints = expandIntArray(accuracyPoints, ref accuracyCount, pool);
+                accuracyPoints = expandArray(accuracyPoints, ref accuracyCount, pool);
             accuracyPoints[accuracyCount++] = 0;
 
             if (accuracyCount >= accuracyPoints.Length)
-                accuracyPoints = expandIntArray(accuracyPoints, ref accuracyCount, pool);
+                accuracyPoints = expandArray(accuracyPoints, ref accuracyCount, pool);
             accuracyPoints[accuracyCount++] = maxTime;
 
-            // Add wider windows around each note
             for (int i = 0; i < basePointCount; i++)
             {
                 double baseTime = baseTimePoints[i];
-
-                // Create 1-second windows around each note
                 double windowBefore = baseTime - 1000;
                 double windowAfter = baseTime + 1000;
 
-                // Add window start if it's within valid range
                 if (windowBefore >= 0 && windowBefore <= maxTime)
                 {
                     if (accuracyCount >= accuracyPoints.Length)
-                        accuracyPoints = expandIntArray(accuracyPoints, ref accuracyCount, pool);
+                        accuracyPoints = expandArray(accuracyPoints, ref accuracyCount, pool);
                     accuracyPoints[accuracyCount++] = windowBefore;
                 }
 
-                // Add the base time
                 if (baseTime >= 0 && baseTime <= maxTime)
                 {
                     if (accuracyCount >= accuracyPoints.Length)
-                        accuracyPoints = expandIntArray(accuracyPoints, ref accuracyCount, pool);
+                        accuracyPoints = expandArray(accuracyPoints, ref accuracyCount, pool);
                     accuracyPoints[accuracyCount++] = baseTime;
                 }
 
-                // Add window end if it's within valid range
                 if (windowAfter >= 0 && windowAfter <= maxTime)
                 {
                     if (accuracyCount >= accuracyPoints.Length)
-                        accuracyPoints = expandIntArray(accuracyPoints, ref accuracyCount, pool);
+                        accuracyPoints = expandArray(accuracyPoints, ref accuracyCount, pool);
                     accuracyPoints[accuracyCount++] = windowAfter;
                 }
             }
@@ -177,10 +183,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
             return result;
         }
 
-        /// <summary>
-        /// Processes and sorts time points, removing duplicates.
-        /// </summary>
-        private double[] processAndSortTimePoints(double[] timePoints, int count, int maxTime)
+        private static double[] processAndSortTimePoints(double[] timePoints, int count, int maxTime)
         {
             Array.Sort(timePoints, 0, count);
 
@@ -204,23 +207,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
             return result;
         }
 
-        /// <summary>
-        /// Creates a union of BaseTimeCorners and AccuracyTimeCorners.
-        /// This provides comprehensive time coverage for all difficulty calculations.
-        /// </summary>
-        private double[] createTimeCornerUnion()
+        private static double[] createTimeCornerUnion(double[] baseTimeCorners, double[] accuracyTimeCorners)
         {
-            int baseLength = BaseTimeCorners.Length;
-            int accuracyLength = AccuracyTimeCorners.Length;
+            int baseLength = baseTimeCorners.Length;
+            int accuracyLength = accuracyTimeCorners.Length;
             double[] unionArray = new double[baseLength + accuracyLength];
 
             int baseIndex = 0, accuracyIndex = 0, unionIndex = 0;
 
-            // Merge the two sorted arrays while removing duplicates
             while (baseIndex < baseLength || accuracyIndex < accuracyLength)
             {
-                double baseValue = baseIndex < baseLength ? BaseTimeCorners[baseIndex] : double.MaxValue;
-                double accuracyValue = accuracyIndex < accuracyLength ? AccuracyTimeCorners[accuracyIndex] : double.MaxValue;
+                double baseValue = baseIndex < baseLength ? baseTimeCorners[baseIndex] : double.MaxValue;
+                double accuracyValue = accuracyIndex < accuracyLength ? accuracyTimeCorners[accuracyIndex] : double.MaxValue;
 
                 if (baseValue < accuracyValue)
                 {
@@ -236,7 +234,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
                 }
                 else
                 {
-                    // Both values are equal - add once and advance both indices
                     if (unionIndex == 0 || unionArray[unionIndex - 1] != baseValue)
                         unionArray[unionIndex++] = baseValue;
                     baseIndex++;
@@ -249,10 +246,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
             return result;
         }
 
-        /// <summary>
-        /// Expands an integer array when more capacity is needed.
-        /// </summary>
-        private static double[] expandIntArray(double[] array, ref int currentSize, ArrayPool<double> pool)
+        private static double[] expandArray(double[] array, ref int currentSize, ArrayPool<double> pool)
         {
             int newSize = Math.Max(array.Length * 2, currentSize + 4);
             double[] newArray = pool.Rent(newSize);
@@ -262,4 +256,3 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
         }
     }
 }
-

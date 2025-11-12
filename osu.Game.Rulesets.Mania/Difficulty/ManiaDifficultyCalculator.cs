@@ -12,7 +12,6 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mania.Difficulty.Skills;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Mods;
@@ -44,7 +43,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         public readonly double[] DifficultyPercentilesMid = { 0.845, 0.835, 0.825, 0.815 };
 
         private readonly bool isForCurrentRuleset;
-        private SunnyStrainData? cachedStrainData;
         private Dictionary<StrainKey, double>? strainCache;
 
         public override int Version => 20241008;
@@ -66,15 +64,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             var unevennessSkill = (Unevenness)skills[3];
             var releaseSkill = (Release)skills[4];
             var localNoteCountSkill = (LocalNoteCount)skills[5];
-            //var activeKeySkill = (ActiveKey)skills[6];
 
             var combinedStrains = combineStrains(
-                sameColumnSkill.GetObjectStrains().ToList(),
-                crossColumnSkill.GetObjectStrains().ToList(),
-                pressingIntensitySkill.GetObjectStrains().ToList(),
-                unevennessSkill.GetObjectStrains().ToList(),
-                releaseSkill.GetObjectStrains().ToList(),
-                localNoteCountSkill.GetObjectStrains().ToList(),
+                sameColumnSkill.GetCurrentStrainPeaks().ToList(),
+                crossColumnSkill.GetCurrentStrainPeaks().ToList(),
+                pressingIntensitySkill.GetCurrentStrainPeaks().ToList(),
+                unevennessSkill.GetCurrentStrainPeaks().ToList(),
+                releaseSkill.GetCurrentStrainPeaks().ToList(),
+                localNoteCountSkill.GetCurrentStrainPeaks().ToList(),
                 localNoteCountSkill.GetActiveKeyStrains().ToList()
             );
 
@@ -104,19 +101,28 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             IReadOnlyList<double> activeKeyStrains)
         {
             strainCache ??= new Dictionary<StrainKey, double>();
+            int count = new[]
+            {
+                jackStrains.Count,
+                crossStrains.Count,
+                pressingStrains.Count,
+                unevennessStrains.Count,
+                releaseStrains.Count,
+                localNoteStrains.Count,
+                activeKeyStrains.Count
+            }.Max();
 
-            int count = jackStrains.Count;
             var combinedStrains = new List<double>(count);
+            static double valueOrZero(IReadOnlyList<double> list, int i) => i < list.Count ? list[i] : 0.0;
 
             for (int i = 0; i < count; i++)
             {
-                double sameColumn = jackStrains[i];
-                double crossColumn = crossStrains[i];
-                double pressingIntensity = pressingStrains[i];
-                double unevenness = unevennessStrains[i];
-                double release = releaseStrains[i];
+                double sameColumn = valueOrZero(jackStrains, i);
+                double crossColumn = valueOrZero(crossStrains, i);
+                double pressingIntensity = valueOrZero(pressingStrains, i);
+                double unevenness = valueOrZero(unevennessStrains, i);
+                double release = valueOrZero(releaseStrains, i);
 
-                // Early exit for negligible strains
                 if (sameColumn < strain_threshold && crossColumn < strain_threshold &&
                     pressingIntensity < strain_threshold && unevenness < strain_threshold &&
                     release < strain_threshold)
@@ -125,8 +131,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                     continue;
                 }
 
-                double localNoteCount = localNoteStrains[i];
-                double activeKeyCount = activeKeyStrains[i];
+                double localNoteCount = valueOrZero(localNoteStrains, i);
+                double activeKeyCount = valueOrZero(activeKeyStrains, i);
 
                 var key = new StrainKey(sameColumn, crossColumn, pressingIntensity,
                     unevenness, release, localNoteCount, activeKeyCount);
@@ -138,24 +144,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 }
 
                 double clampedSameColumn = Math.Min(sameColumn, 8.0 + 0.85 * sameColumn);
-
                 double unevennessKeyAdjustment = 1.0;
                 if (unevenness > 0.0 && activeKeyCount > 0.0)
                     unevennessKeyAdjustment = Math.Pow(unevenness, 3.0 / activeKeyCount);
-
                 double unevennessSameColumnComponent = unevennessKeyAdjustment * clampedSameColumn;
                 double firstComponent = 0.4 * Math.Pow(unevennessSameColumnComponent, 1.5);
-
                 double releaseComponent = release * 35.0 / (localNoteCount + 8.0);
                 double unevennessPressingReleaseComponent = Math.Pow(unevenness, 2.0 / 3.0) * (0.8 * pressingIntensity + releaseComponent);
                 double secondComponent = 0.6 * Math.Pow(unevennessPressingReleaseComponent, 1.5);
-
                 double totalStrainDifficulty = Math.Pow(firstComponent + secondComponent, 2.0 / 3.0);
                 double twistComponent = (unevennessKeyAdjustment * crossColumn) / (crossColumn + totalStrainDifficulty + 1.0);
-
                 double poweredTwist = twistComponent > 0.0 ? twistComponent * Math.Sqrt(twistComponent) : 0.0;
                 double finalStrain = 2.7 * Math.Sqrt(totalStrainDifficulty) * poweredTwist + totalStrainDifficulty * 0.27;
-
                 strainCache[key] = finalStrain;
                 combinedStrains.Add(finalStrain);
             }
@@ -183,14 +183,15 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         private double applyFinalScaling(double rawDifficulty, LocalNoteCount localNoteCountSkill)
         {
+            FormulaConfig config = new FormulaConfig();
             double totalCurrentNotes = localNoteCountSkill.GetTotalNotesWithWeight();
             double scaled = rawDifficulty * totalCurrentNotes / (totalCurrentNotes + 60.0);
 
             // Apply rescaling if config exists
-            if (cachedStrainData?.Config != null && scaled > cachedStrainData.Config.rescaleHighThreshold)
+            if (scaled > config.rescaleHighThreshold)
             {
-                scaled = cachedStrainData.Config.rescaleHighThreshold + (scaled - cachedStrainData.Config.rescaleHighThreshold) /
-                    cachedStrainData.Config.rescaleHighFactor;
+                scaled = config.rescaleHighThreshold + (scaled - config.rescaleHighThreshold) /
+                    config.rescaleHighFactor;
             }
 
             return scaled * final_scaling_factor;
@@ -207,20 +208,54 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             var sortedObjects = beatmap.HitObjects.ToArray();
+            int totalColumns = Math.Max(1, ((ManiaBeatmap)beatmap).TotalColumns);
 
             LegacySortHelper<HitObject>.Sort(sortedObjects,
                 Comparer<HitObject>.Create((a, b) => (int)Math.Round(a.StartTime) - (int)Math.Round(b.StartTime)));
 
+            if (sortedObjects.Length <= 1)
+                return Array.Empty<DifficultyHitObject>();
+
             var objects = new List<DifficultyHitObject>(Math.Max(0, sortedObjects.Length - 1));
+            List<DifficultyHitObject>[] perColumnObjects = new List<DifficultyHitObject>[totalColumns];
+
+            for (int column = 0; column < totalColumns; column++)
+                perColumnObjects[column] = new List<DifficultyHitObject>();
+            /*var longNotes = new List<DifficultyHitObject>();
+            var longNotesTails = new List<DifficultyHitObject>();*/
 
             for (int i = 1; i < sortedObjects.Length; i++)
             {
-                objects.Add(new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1],
-                    clockRate, objects, objects.Count));
+                var mdho = new ManiaDifficultyHitObject(
+                    sortedObjects[i],
+                    sortedObjects[i - 1],
+                    clockRate,
+                    objects,
+                    perColumnObjects,
+                    /*longNotes,
+                    longNotesTails,*/
+                    objects.Count
+                );
+
+                objects.Add(mdho);
+                perColumnObjects[mdho.Column].Add(mdho);
+
+                /*if (mdho.Column >= 0 && mdho.Column < totalColumns)
+                    perColumnObjects[mdho.Column].Add(mdho);
+
+                if (mdho.IsLong)
+                    longNotes.Add(mdho);*/
             }
 
-            var preprocessor = new SunnyPreprocessor(objects, (ManiaBeatmap)Beatmap, new FormulaConfig());
-            cachedStrainData = preprocessor.Process();
+            /*if (longNotes.Count > 0)
+            {
+                longNotesTails.AddRange(longNotes);
+                longNotesTails.Sort((a, b) => a.EndTime.CompareTo(b.EndTime));
+            }*/
+
+            //var preprocessor = new SunnyPreprocessor(objects, (ManiaBeatmap)Beatmap, new FormulaConfig());
+            //cachedStrainData = preprocessor.Process();
+            ManiaDifficultyPreprocessor.ProcessAndAssign(objects, beatmap);
 
             return objects;
         }
@@ -229,22 +264,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
-            if (cachedStrainData == null)
-            {
-                var difficultyHitObjects = CreateDifficultyHitObjects(beatmap, clockRate);
-                var preprocessor = new SunnyPreprocessor(difficultyHitObjects, (ManiaBeatmap)Beatmap, new FormulaConfig());
-                cachedStrainData = preprocessor.Process();
-            }
-
             return new Skill[]
             {
-                new Jack(mods, cachedStrainData),
-                new CrossColumn(mods, cachedStrainData),
-                new PressingIntensity(mods, cachedStrainData),
-                new Unevenness(mods, cachedStrainData),
-                new Release(mods, cachedStrainData),
-                new LocalNoteCount(mods, cachedStrainData),
-                //new ActiveKey(mods, cachedStrainData),
+                new Jack(mods),
+                new CrossColumn(mods),
+                new PressingIntensity(mods),
+                new Unevenness(mods),
+                new Release(mods),
+                new LocalNoteCount(mods),
             };
         }
 

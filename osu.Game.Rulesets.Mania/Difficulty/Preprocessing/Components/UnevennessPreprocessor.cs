@@ -2,28 +2,22 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
+using System.Collections.Generic;
+using System.Linq;
+using osu.Game.Rulesets.Mania.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 
-namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
+namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
 {
-    public static class UnevennessEvaluator
+    public class UnevennessPreprocessor
     {
-        /// <summary>
-        /// Evaluates the unevenness difficulty at a specific time point.
-        /// </summary>
-        public static double EvaluateDifficultyAt(double time, SunnyStrainData data)
-        {
-            return data.SampleFeatureAtTime(time, data.Unevenness);
-        }
-
         /// <summary>
         /// Computes the unevenness values across all time points.
         /// This measures how irregular the timing patterns are between adjacent columns.
         /// </summary>
-        public static double[] ComputeUnevenness(SunnyStrainData data)
+        public static double[] ComputeValues(ManiaDifficultyContext data)
         {
-            bool[][] keyUsagePatterns = CrossColumnEvaluator.ComputeKeyUsage(data);
+            bool[][] keyUsagePatterns = CrossColumnPreprocessor.ComputeKeyUsage(data);
             double[][] timingDeltasByColumn = computeTimingDeltasByColumn(data);
 
             double[] baseUnevenness = calculateBaseUnevenness(data, keyUsagePatterns, timingDeltasByColumn);
@@ -40,23 +34,23 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// Computes timing deltas (time between consecutive notes) for each column.
         /// This is used to analyze timing irregularities.
         /// </summary>
-        private static double[][] computeTimingDeltasByColumn(SunnyStrainData data)
+        private static double[][] computeTimingDeltasByColumn(ManiaDifficultyContext data)
         {
             int timePointCount = data.CornerData.BaseTimeCorners.Length;
             double[][] timingDeltas = new double[data.KeyCount][];
 
-            // Process each column independently for better cache performance
             for (int column = 0; column < data.KeyCount; column++)
             {
                 double[] columnDeltas = new double[timePointCount];
-                var columnNotes = data.NotesByColumn[column];
+                List<ManiaDifficultyHitObject> columnNotes = data.AllNotes.First().PerColumnObjects.Select(list => list.Cast<ManiaDifficultyHitObject>().ToList()).ToArray()[column];
+                //var columnNotes = data.PerColumnObjects[column];
 
                 // Initialize with default value (no pattern detected)
                 const double no_pattern_value = 1e9;
                 for (int i = 0; i < timePointCount; i++)
                     columnDeltas[i] = no_pattern_value;
 
-                if (columnNotes.Length < 2)
+                if (columnNotes.Count < 2)
                 {
                     timingDeltas[column] = columnDeltas;
                     continue;
@@ -65,10 +59,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
                 int searchIndex = 0;
 
                 // Process consecutive note pairs
-                for (int noteIndex = 0; noteIndex + 1 < columnNotes.Length; noteIndex++)
+                for (int noteIndex = 0; noteIndex < columnNotes.Count; noteIndex++)
                 {
                     var currentNote = columnNotes[noteIndex];
-                    var nextNote = columnNotes[noteIndex + 1];
+                    var nextNote = currentNote.NextInColumn();
+
+                    if (nextNote == null) break;
 
                     int startIndex = StrainArrayUtils.FindLeftBoundProgressive(
                         data.CornerData.BaseTimeCorners, ref searchIndex, currentNote.StartTime);
@@ -94,8 +90,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// Calculates the base unevenness without smoothing.
         /// This analyzes timing differences between adjacent active columns.
         /// </summary>
-        private static double[] calculateBaseUnevenness(SunnyStrainData data, bool[][] keyUsagePatterns, double[][] timingDeltas)
+        private static double[] calculateBaseUnevenness(ManiaDifficultyContext data, bool[][] keyUsagePatterns, double[][] timingDeltas)
         {
+            FormulaConfig config = new FormulaConfig();
+
             int keyCount = data.KeyCount;
             int accuracyTimePoints = data.CornerData.AccuracyTimeCorners.Length;
             if (accuracyTimePoints == 0) return Array.Empty<double>();
@@ -166,7 +164,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
             return StrainArrayUtils.ApplySmoothingToArray(
                 data.CornerData.AccuracyTimeCorners,
                 unevennessBase,
-                data.Config.accuracySmoothingWindowMs,
+                config.accuracySmoothingWindowMs,
                 1.0,
                 "avg"
             );

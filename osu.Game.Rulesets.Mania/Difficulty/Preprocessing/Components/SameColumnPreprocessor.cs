@@ -3,27 +3,20 @@
 
 using System;
 using System.Buffers;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Mania.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 
-namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
+namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
 {
-    public static class SameColumnEvaluator
+    public class SameColumnPreprocessor
     {
-        /// <summary>
-        /// Evaluates the same-column difficulty at a specific time point.
-        /// </summary>
-        public static double EvaluateDifficultyAt(double time, SunnyStrainData data)
-        {
-            return data.SampleFeatureAtTime(time, data.SameColumnPressure);
-        }
-
         /// <summary>
         /// Computes the same-column pressure values across all time points.
         /// This measures the difficulty of rapid repeated presses in individual columns.
         /// </summary>
-        public static double[] ComputeSameColumnPressure(SunnyStrainData data)
+        public static double[] ComputeValues(ManiaDifficultyContext data)
         {
             int timePointCount = data.CornerData.BaseTimeCorners.Length;
             if (timePointCount == 0) return Array.Empty<double>();
@@ -47,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
 
                 calculatePerColumnIntensities(data, sameColumnIntensityBuffer, deltaTimeBuffer,
                     baseTimeCorners, hitLeniencyFactorSqrt, keyCount, timePointCount);
-                applyColumnSmoothing(data, sameColumnIntensityBuffer, baseTimeCorners, keyCount, timePointCount, arraySliceSize);
+                applyColumnSmoothing(sameColumnIntensityBuffer, baseTimeCorners, keyCount, timePointCount, arraySliceSize);
                 combineColumnValues(combinedSameColumn, sameColumnIntensityBuffer, deltaTimeBuffer,
                     keyCount, timePointCount);
             }
@@ -69,23 +62,31 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// Calculates the intensity values for each column independently.
         /// This finds rapid sequences within individual columns.
         /// </summary>
-        private static void calculatePerColumnIntensities(SunnyStrainData data, double[] intensityBuffer, double[] deltaBuffer, double[] baseTimeCorners, double hitLeniencyFactor, int keyCount, int timePointCount)
+        private static void calculatePerColumnIntensities(ManiaDifficultyContext data, double[] intensityBuffer, double[] deltaBuffer, double[] baseTimeCorners, double hitLeniencyFactor, int keyCount, int timePointCount)
         {
-            var notesByColumn = data.NotesByColumn;
+            List<ManiaDifficultyHitObject>[] notesByColumn = data.AllNotes
+                                                                 .First()
+                                                                 .PerColumnObjects
+                                                                 .Select(list => list.Cast<ManiaDifficultyHitObject>().ToList())
+                                                                 .ToArray();
+
+            //var notesByColumn = data.PerColumnObjects;
 
             for (int column = 0; column < keyCount; column++)
             {
                 var columnNotes = notesByColumn[column];
-                if (columnNotes.Length < 2) continue; // Need at least 2 notes for a pattern
+                if (columnNotes.Count < 2) continue; // Need at least 2 notes for a pattern
 
                 int bufferOffset = column * timePointCount;
                 int searchIndex = 0;
 
                 // Process consecutive note pairs in this column
-                for (int noteIndex = 0; noteIndex + 1 < columnNotes.Length; noteIndex++)
+                for (int noteIndex = 0; noteIndex + 1 < columnNotes.Count; noteIndex++)
                 {
                     var currentNote = columnNotes[noteIndex];
-                    var nextNote = columnNotes[noteIndex + 1];
+                    var nextNote = currentNote.NextInColumn();
+
+                    if (nextNote == null) break;
 
                     // Find time range for this note pair
                     int startTimeIndex = StrainArrayUtils.FindLeftBoundProgressive(baseTimeCorners, ref searchIndex, currentNote.StartTime);
@@ -99,7 +100,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
                     double baseIntensity = (1.0 / deltaTimeSeconds) * (1.0 / (deltaTimeSeconds + 0.11 * hitLeniencyFactor));
 
                     // Apply jack nerf (same-column patterns get harder the closer they are to optimal jack timing)
-                    double jackNerf = calculateJackNerf(deltaTimeSeconds, data.Config);
+                    double jackNerf = calculateJackNerf(deltaTimeSeconds);
                     double finalIntensity = baseIntensity * jackNerf;
 
                     // Apply values to the time range
@@ -119,8 +120,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// Calculates the jack nerf factor based on timing relative to optimal jack speed.
         /// Jacks (rapid same-column presses) have an optimal timing that's hardest to execute.
         /// </summary>
-        private static double calculateJackNerf(double deltaTimeSeconds, FormulaConfig config)
+        private static double calculateJackNerf(double deltaTimeSeconds)
         {
+            FormulaConfig config = new FormulaConfig();
             double timingDeviation = Math.Abs(deltaTimeSeconds - 0.08);
             double nerfBase = config.jackNerfBase + timingDeviation;
             double nerfValue = config.jackNerfCoefficient * Math.Pow(nerfBase, config.jackNerfPower);
@@ -132,8 +134,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// Applies smoothing to each column's intensity values independently using the consolidated utility.
         /// This creates more stable difficulty curves.
         /// </summary>
-        private static void applyColumnSmoothing(SunnyStrainData data, double[] intensityBuffer, double[] baseTimeCorners, int keyCount, int timePointCount, int arraySliceSize)
+        private static void applyColumnSmoothing(double[] intensityBuffer, double[] baseTimeCorners, int keyCount, int timePointCount, int arraySliceSize)
         {
+            FormulaConfig config = new FormulaConfig();
+
             var arrayPool = ArrayPool<double>.Shared;
             double[] smoothedBuffer = arrayPool.Rent(keyCount * arraySliceSize);
             Array.Clear(smoothedBuffer, 0, keyCount * arraySliceSize);
@@ -145,7 +149,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
                     int columnOffset = column * timePointCount;
 
                     StrainArrayUtils.ApplySmoothingToColumn(intensityBuffer, smoothedBuffer, baseTimeCorners,
-                        columnOffset, timePointCount, data.Config.smoothingWindowMs);
+                        columnOffset, timePointCount, config.smoothingWindowMs);
                 }
 
                 Array.Copy(smoothedBuffer, 0, intensityBuffer, 0, keyCount * timePointCount);

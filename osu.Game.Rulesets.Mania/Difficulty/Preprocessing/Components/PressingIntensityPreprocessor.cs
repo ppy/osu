@@ -3,28 +3,21 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
+using osu.Game.Rulesets.Mania.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 
-namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
+namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
 {
-    public static class PressingIntensityEvaluator
+    public class PressingIntensityPreprocessor
     {
-        /// <summary>
-        /// Evaluates the pressing intensity difficulty at a specific time point.
-        /// </summary>
-        public static double EvaluateDifficultyAt(double time, SunnyStrainData data)
-        {
-            return data.SampleFeatureAtTime(time, data.PressingIntensity);
-        }
-
         /// <summary>
         /// Computes the pressing intensity values across all time points.
         /// This considers long note density, anchor patterns, and note timing.
         /// </summary>
-        public static double[] ComputePressingIntensity(SunnyStrainData data)
+        public static double[] ComputeValues(ManiaDifficultyContext data)
         {
+            FormulaConfig config = new FormulaConfig();
             var longNoteDensity = buildLongNoteDensity(data);
             double[] anchorValues = CalculateAnchorValues(data);
             double[] basePattern = calculateBasePressingIntensity(data, longNoteDensity, anchorValues);
@@ -33,7 +26,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
             double[] smoothed = StrainArrayUtils.ApplySmoothingToArray(
                 data.CornerData.BaseTimeCorners,
                 basePattern,
-                data.Config.smoothingWindowMs,
+                config.smoothingWindowMs,
                 0.001,
                 "sum"
             );
@@ -50,19 +43,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// Builds density data for long notes, which affects how difficult pressing patterns are.
         /// Long notes create sustained finger usage that impacts coordination.
         /// </summary>
-        private static LongNoteDensityData buildLongNoteDensity(SunnyStrainData data)
+        private static LongNoteDensityData buildLongNoteDensity(ManiaDifficultyContext data)
         {
-            if (data.LongNotes.Length == 0)
+            if (data.LongNotes.Count == 0)
             {
                 return new LongNoteDensityData
                 {
                     TimePoints = new[] { 0.0, data.MaxTime },
                     DensityValues = new[] { 0.0 },
-                    CumulativeSum = new[] { 0.0 }
                 };
             }
 
-            int longNoteCount = data.LongNotes.Length;
+            int longNoteCount = data.LongNotes.Count;
             int estimatedEventCount = longNoteCount * 3 + 4; // Each long note creates ~3 events
 
             double[] eventTimes = new double[estimatedEventCount];
@@ -128,27 +120,27 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
                 densityValuesList.Add(clampedDensity);
             }
 
-            // Calculate cumulative sum for efficient range queries
-            var cumulative = new List<double>(timePointsList.Count + 1) { 0.0 };
+            /*
+             var cumulative = new List<double>(timePointsList.Count + 1) { 0.0 };
 
             for (int j = 0; j < timePointsList.Count - 1; j++)
             {
                 double timeSpan = timePointsList[j + 1] - timePointsList[j];
                 cumulative.Add(cumulative[^1] + timeSpan * densityValuesList[j]);
             }
+             */
 
             return new LongNoteDensityData
             {
                 TimePoints = timePointsList.ToArray(),
                 DensityValues = densityValuesList.ToArray(),
-                CumulativeSum = cumulative.ToArray()
             };
         }
 
         /// <summary>
         /// Calculates anchor values that represent how balanced finger usage is.
         /// </summary>
-        public static double[] CalculateAnchorValues(SunnyStrainData data)
+        public static double[] CalculateAnchorValues(ManiaDifficultyContext data)
         {
             double[][] keyUsage400 = calculateKeyUsage400(data);
             return computeAnchorFromKeyUsage(keyUsage400);
@@ -158,8 +150,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// Calculates key usage with a 400ms window around each note.
         /// This determines how much each finger is being used at different times.
         /// </summary>
-        private static double[][] calculateKeyUsage400(SunnyStrainData data)
+        private static double[][] calculateKeyUsage400(ManiaDifficultyContext data)
         {
+            FormulaConfig config = new FormulaConfig();
+
             int timePoints = data.CornerData.BaseTimeCorners.Length;
             if (timePoints == 0) return Array.Empty<double[]>();
 
@@ -167,18 +161,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
             for (int column = 0; column < data.KeyCount; column++)
                 keyUsage[column] = new double[timePoints];
 
-            for (int noteIndex = 0; noteIndex < data.AllNotes.Length; noteIndex++)
+            for (int noteIndex = 0; noteIndex < data.AllNotes.Count; noteIndex++)
             {
                 var note = data.AllNotes[noteIndex];
                 int noteStartTime = (int)Math.Round(note.StartTime);
                 int noteEndTime = (int)Math.Round(note.EndTime);
 
                 int leftWindow400Index = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners,
-                    noteStartTime - data.Config.keyUsageWindowMs);
+                    noteStartTime - config.keyUsageWindowMs);
                 int leftIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, noteStartTime);
                 int rightIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, noteEndTime);
                 int rightWindow400Index = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners,
-                    noteEndTime + data.Config.keyUsageWindowMs);
+                    noteEndTime + config.keyUsageWindowMs);
 
                 // Base usage value depends on note duration
                 double baseUsage = 3.75 + Math.Min(noteEndTime - noteStartTime, 1500) / 150.0;
@@ -191,7 +185,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
                 applyFullUsage(columnUsage, leftIndex, rightIndex, timePoints, baseUsage);
 
                 // Gradual falloff in the windows before and after the note
-                double windowDenominator = data.Config.keyUsageWindowMs * data.Config.keyUsageWindowMs;
+                double windowDenominator = config.keyUsageWindowMs * config.keyUsageWindowMs;
                 applyWindowUsage(columnUsage, data.CornerData.BaseTimeCorners, leftWindow400Index, leftIndex,
                     noteStartTime, baseUsage, windowDenominator, timePoints);
                 applyWindowUsage(columnUsage, data.CornerData.BaseTimeCorners, rightIndex, rightWindow400Index,
@@ -292,12 +286,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// Calculates the base pressing intensity before smoothing.
         /// This is the core calculation that determines how difficult pressing patterns are.
         /// </summary>
-        private static double[] calculateBasePressingIntensity(SunnyStrainData data, LongNoteDensityData longNoteDensity, double[] anchorValues)
+        private static double[] calculateBasePressingIntensity(ManiaDifficultyContext data, LongNoteDensityData longNoteDensity, double[] anchorValues)
         {
             int timePoints = data.CornerData.BaseTimeCorners.Length;
             double[] pressingIntensityBase = new double[timePoints];
 
-            for (int noteIndex = 0; noteIndex + 1 < data.AllNotes.Length; noteIndex++)
+            for (int noteIndex = 0; noteIndex + 1 < data.AllNotes.Count; noteIndex++)
             {
                 var currentNote = data.AllNotes[noteIndex];
                 var nextNote = data.AllNotes[noteIndex + 1];
@@ -321,7 +315,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// <summary>
         /// Processes simultaneous notes (chords), which create difficulty spikes.
         /// </summary>
-        private static void processSimultaneousNotes(ManiaDifficultyHitObject currentNote, SunnyStrainData data, double[] pressingIntensityBase, int timePoints)
+        private static void processSimultaneousNotes(ManiaDifficultyHitObject currentNote, ManiaDifficultyContext data, double[] pressingIntensityBase, int timePoints)
         {
             // Calculate chord difficulty based on timing window
             double chordDifficulty = 1000.0 * Math.Pow(0.02 * (4.0 / data.HitLeniency - 24.0), 0.25);
@@ -334,7 +328,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// <summary>
         /// Processes a sequence of two consecutive notes to calculate pressing difficulty.
         /// </summary>
-        private static void processNoteSequence(ManiaDifficultyHitObject currentNote, ManiaDifficultyHitObject nextNote, double deltaTime, SunnyStrainData data, LongNoteDensityData longNoteDensity, double[] anchorValues, double[] pressingIntensityBase, int timePoints)
+        private static void processNoteSequence(ManiaDifficultyHitObject currentNote, ManiaDifficultyHitObject nextNote, double deltaTime, ManiaDifficultyContext data, LongNoteDensityData longNoteDensity, double[] anchorValues, double[] pressingIntensityBase, int timePoints)
         {
             int startIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, currentNote.StartTime);
             int endIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, nextNote.StartTime);
@@ -344,7 +338,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
 
             // Calculate various difficulty components
             double longNoteBoost = calculateLongNoteBoost(currentNote, nextNote, longNoteDensity);
-            double streamBoost = calculateStreamBoost(deltaTimeSeconds, data);
+            double streamBoost = calculateStreamBoost(deltaTimeSeconds);
             double pressingValue = calculatePressingValue(deltaTimeSeconds, longNoteBoost, streamBoost, data);
 
             // Apply the calculated difficulty to the time range
@@ -382,7 +376,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// <summary>
         /// Calculates the base pressing difficulty value considering timing, context, and hit leniency.
         /// </summary>
-        private static double calculatePressingValue(double deltaTime, double longNoteBoost, double streamBoost, SunnyStrainData data)
+        private static double calculatePressingValue(double deltaTime, double longNoteBoost, double streamBoost, ManiaDifficultyContext data)
         {
             double baseIntensity = 1.0 / deltaTime;
             double inverseLeniency = 1.0 / data.HitLeniency;
@@ -422,16 +416,17 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
         /// Calculates boost factor for stream patterns (rapid note sequences).
         /// Stream patterns get bonus difficulty due to stamina and coordination requirements.
         /// </summary>
-        private static double calculateStreamBoost(double deltaTime, SunnyStrainData data)
+        private static double calculateStreamBoost(double deltaTime)
         {
+            FormulaConfig config = new FormulaConfig();
             double streamRatio = 7.5 / deltaTime; // How "streamy" this pattern is
 
-            if (streamRatio > data.Config.streamBoostMinRatio && streamRatio < data.Config.streamBoostMaxRatio)
+            if (streamRatio > config.streamBoostMinRatio && streamRatio < config.streamBoostMaxRatio)
             {
-                double ratioDistance = streamRatio - data.Config.streamBoostMaxRatio;
+                double ratioDistance = streamRatio - config.streamBoostMaxRatio;
                 double quadraticFactor = ratioDistance * ratioDistance;
 
-                return 1.0 + data.Config.streamBoostCoefficient * (streamRatio - data.Config.streamBoostMinRatio) * quadraticFactor;
+                return 1.0 + config.streamBoostCoefficient * (streamRatio - config.streamBoostMinRatio) * quadraticFactor;
             }
 
             return 1.0;

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Skills
@@ -14,17 +13,15 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
     public class LocalNoteCount : StrainSkill
     {
         private const double strain_decay_base = .20143474157245744;
-        private readonly SunnyStrainData strainData;
         private double currentStrain;
         private double currentNoteCount;
         private double currentLongNoteWeight;
 
         private readonly List<double> activeKeyStrains;
 
-        public LocalNoteCount(Mod[] mods, SunnyStrainData data)
+        public LocalNoteCount(Mod[] mods)
             : base(mods: mods)
         {
-            strainData = data;
             currentNoteCount = 0;
             currentLongNoteWeight = 0;
             activeKeyStrains = new List<double>();
@@ -54,13 +51,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             }
 
             double currentTime = maniaCurrent.StartTime;
-            double activeKeyValue = strainData.SampleFeatureAtTime(currentTime, strainData.ActiveKeyCount);
+            double activeKeyValue = maniaCurrent.PreprocessedDifficultyData.SampleFeatureAtTime(currentTime, maniaCurrent.PreprocessedDifficultyData.ActiveKeyCount);
             activeKeyStrains.Add(activeKeyValue);
 
             if (prev != null && prev.StartTime == maniaCurrent.StartTime)
                 return currentStrain;
 
-            currentStrain = strainData.SampleFeatureAtTime(currentTime, strainData.LocalNoteCount);
+            currentStrain = maniaCurrent.PreprocessedDifficultyData.SampleFeatureAtTime(currentTime, maniaCurrent.PreprocessedDifficultyData.LocalNoteCount);
 
             return currentStrain;
         }

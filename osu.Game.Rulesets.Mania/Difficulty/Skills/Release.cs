@@ -4,9 +4,7 @@
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
-using osu.Game.Rulesets.Mania.Difficulty.Evaluators;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Skills
@@ -15,13 +13,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
     {
         private const double strain_decay_base = .20143474157245744;
 
-        private readonly SunnyStrainData strainData;
         private double currentStrain;
 
-        public Release(Mod[] mods, SunnyStrainData data)
+        public Release(Mod[] mods)
             : base(mods: mods)
         {
-            strainData = data;
         }
 
         private double strainDecay(double ms) => Math.Pow(strain_decay_base, ms / 1000);
@@ -42,8 +38,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             if (prev != null && prev.StartTime == maniaCurrent.StartTime)
                 return currentStrain;
 
-            double currentTime = maniaCurrent.StartTime;
-            currentStrain = ReleaseFactorEvaluator.EvaluateDifficultyAt(currentTime, strainData);
+            var data = maniaCurrent.PreprocessedDifficultyData;
+            currentStrain = data.SampleFeatureAtTime(maniaCurrent.StartTime, data.ReleaseFactor);
             return currentStrain;
         }
     }
