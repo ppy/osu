@@ -25,9 +25,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
         public bool AllowSelection { get; set; }
 
-        public readonly MultiplayerPlaylistItem Item;
+        public readonly IMatchmakingPlaylistItem Item;
 
-        public Action<MultiplayerPlaylistItem>? Action { private get; init; }
+        public Action<MultiplayerPlaylistItem>? Action { private get; set; }
 
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
@@ -40,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         private Drawable lighting = null!;
         private BeatmapCardMatchmakingContent.AvatarOverlay selectionOverlay = null!;
 
-        protected MatchmakingSelectPanel(MultiplayerPlaylistItem item)
+        protected MatchmakingSelectPanel(IMatchmakingPlaylistItem item)
         {
             Item = item;
             Size = SIZE;
@@ -170,7 +170,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                     .Then()
                     .FadeTo(0.1f, 400);
 
-            Action?.Invoke(Item);
+            Action?.Invoke(Item.PlaylistItem);
         }
 
         public void ShowChosenBorder()
@@ -185,7 +185,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                   .FadeTo(0.7f, 800, Easing.OutQuint);
         }
 
-        public abstract void PresentAsChosenBeatmap(MultiplayerPlaylistItem item);
+        public abstract void PresentAsChosenBeatmap(MatchmakingPlaylistItemBeatmap item);
 
         public void HideBorder()
         {

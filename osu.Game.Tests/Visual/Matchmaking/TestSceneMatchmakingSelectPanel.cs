@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 Child = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = panel = new MatchmakingSelectPanelBeatmap(new MultiplayerPlaylistItem())
+                    Child = panel = new MatchmakingSelectPanelBeatmap(new MatchmakingPlaylistItemBeatmap(new MultiplayerPlaylistItem(), CreateAPIBeatmap(), []))
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -108,7 +108,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 Child = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = new MatchmakingSelectPanelBeatmap(new MultiplayerPlaylistItem())
+                    Child = new MatchmakingSelectPanelBeatmap(new MatchmakingPlaylistItemBeatmap(new MultiplayerPlaylistItem(), new APIBeatmap(), []))
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -127,7 +127,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 Child = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = panel = new MatchmakingSelectPanelRandom(new MultiplayerPlaylistItem { ID = -1 })
+                    Child = panel = new MatchmakingSelectPanelRandom(new MatchmakingPlaylistItemRandom())
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             AddToggleStep("allow selection", value => panel!.AllowSelection = value);
 
-            AddStep("reveal beatmap", () => panel!.PresentAsChosenBeatmap(new MultiplayerPlaylistItem()));
+            AddStep("reveal beatmap", () => panel!.PresentAsChosenBeatmap(new MatchmakingPlaylistItemBeatmap(new MultiplayerPlaylistItem(), CreateAPIBeatmap(), [])));
         }
 
         [Test]
@@ -150,10 +150,8 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 Child = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = panel = new MatchmakingSelectPanelBeatmap(new MultiplayerPlaylistItem
-                    {
-                        RequiredMods = [new APIMod(new OsuModHardRock()), new APIMod(new OsuModDoubleTime())]
-                    })
+                    Child = panel = new MatchmakingSelectPanelBeatmap(new MatchmakingPlaylistItemBeatmap(new MultiplayerPlaylistItem(), CreateAPIBeatmap(),
+                        [new OsuModHardRock(), new OsuModDoubleTime()]))
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

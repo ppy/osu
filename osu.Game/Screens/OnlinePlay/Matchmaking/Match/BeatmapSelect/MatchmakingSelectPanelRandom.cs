@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -15,7 +14,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 {
     public partial class MatchmakingSelectPanelRandom : MatchmakingSelectPanel
     {
-        public MatchmakingSelectPanelRandom(MultiplayerPlaylistItem item)
+        public new MatchmakingPlaylistItemRandom Item => (MatchmakingPlaylistItemRandom)base.Item;
+
+        public MatchmakingSelectPanelRandom(MatchmakingPlaylistItemRandom item)
             : base(item) { }
 
         private Container? randomPanelContent;
@@ -61,7 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             });
         }
 
-        public override void PresentAsChosenBeatmap(MultiplayerPlaylistItem item)
+        public override void PresentAsChosenBeatmap(MatchmakingPlaylistItemBeatmap item)
         {
             ShowChosenBorder();
 

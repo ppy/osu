@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Toolkit.HighPerformance;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -35,6 +36,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
         public event Action<MultiplayerPlaylistItem>? ItemSelected;
 
+        private readonly Dictionary<long, IMatchmakingPlaylistItem> playlistItems = new Dictionary<long, IMatchmakingPlaylistItem>();
         private readonly Dictionary<long, MatchmakingSelectPanel> panelLookup = new Dictionary<long, MatchmakingSelectPanel>();
 
         private readonly PanelGridContainer panelGridContainer;
@@ -72,9 +74,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                     Masking = true,
                 },
             };
-
-            // Special item denoting a random selection.
-            AddRandomItem();
         }
 
         [BackgroundDependencyLoader]
@@ -87,54 +86,57 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             swooshSample = audio.Samples.Get(@"SongSelect/options-pop-out");
         }
 
-        protected override void LoadComplete()
+        public void AddItems(IEnumerable<IMatchmakingPlaylistItem> items) => Task.Run(() =>
         {
-            base.LoadComplete();
+            var panels = new List<MatchmakingSelectPanel>();
 
-            const double enter_duration = 500;
-
-            // the scroll container has a 1 frame delay until it receives the correct height for the scrollable area which leads to the scrollbar resizing awkwardly
-            // if we wait until the panels have entered we get to avoid having to see that and the scrollbar it will appear synchronized with the rest of the content as a bonus
-            Scheduler.AddDelayed(() => scroll.ScrollbarVisible = true, enter_duration);
-
-            SchedulerAfterChildren.Add(() =>
+            foreach (var item in items)
             {
-                foreach (var panel in panelGridContainer)
+                playlistItems[item.ID] = item;
+
+                var panel = panelLookup[item.ID] = createPanel(item);
+                panel.AllowSelection = allowSelection;
+                panel.Anchor = Anchor.TopCentre;
+                panel.Origin = Anchor.TopCentre;
+                panel.Action = ItemSelected;
+
+                panels.Add(panel);
+            }
+
+            Schedule(() => LoadComponentsAsync(panels, _ => addPanels()));
+
+            MatchmakingSelectPanel createPanel(IMatchmakingPlaylistItem item) => item switch
+            {
+                MatchmakingPlaylistItemBeatmap beatmapItem => new MatchmakingSelectPanelBeatmap(beatmapItem),
+                MatchmakingPlaylistItemRandom randomItem => new MatchmakingSelectPanelRandom(randomItem),
+                _ => throw new ArgumentOutOfRangeException(nameof(item), $"Unknown playlist item type {item.GetType().Name}")
+            };
+
+            void addPanels()
+            {
+                foreach (var panel in panels)
                 {
-                    double delay = panel.Y / 3;
-
-                    panel.FadeInAndEnterFromBelow(duration: enter_duration, delay: delay);
+                    panelGridContainer.Add(panel);
+                    panelGridContainer.SetLayoutPosition(panel, panel.Item.LayoutPosition);
                 }
-            });
-        }
 
-        public void AddItem(MultiplayerPlaylistItem item)
-        {
-            var panel = panelLookup[item.ID] = new MatchmakingSelectPanelBeatmap(item)
-            {
-                AllowSelection = allowSelection,
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-                Action = i => ItemSelected?.Invoke(i),
-            };
+                const double enter_duration = 500;
 
-            panelGridContainer.Add(panel);
-            panelGridContainer.SetLayoutPosition(panel, (float)item.StarRating);
-        }
+                // the scroll container has a 1 frame delay until it receives the correct height for the scrollable area which leads to the scrollbar resizing awkwardly
+                // if we wait until the panels have entered we get to avoid having to see that and the scrollbar it will appear synchronized with the rest of the content as a bonus
+                Scheduler.AddDelayed(() => scroll.ScrollbarVisible = true, enter_duration);
 
-        public void AddRandomItem()
-        {
-            var panel = panelLookup[PLAYLIST_ITEM_RANDOM] = new MatchmakingSelectPanelRandom(new MultiplayerPlaylistItem { ID = PLAYLIST_ITEM_RANDOM })
-            {
-                AllowSelection = allowSelection,
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-                Action = i => ItemSelected?.Invoke(i),
-            };
+                SchedulerAfterChildren.Add(() =>
+                {
+                    foreach (var panel in panelGridContainer)
+                    {
+                        double delay = panel.Y / 3;
 
-            panelGridContainer.Add(panel);
-            panelGridContainer.SetLayoutPosition(panel, 0f);
-        }
+                        panel.FadeInAndEnterFromBelow(duration: enter_duration, delay: delay);
+                    }
+                });
+            }
+        });
 
         public void SetUserSelection(APIUser user, long itemId, bool selected)
         {
@@ -343,9 +345,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 {
                     rollContainer.ChangeChildDepth(panel, float.MinValue);
 
-                    var item = panelLookup[finalItem].Item;
+                    var item = playlistItems[finalItem];
 
-                    panel.PresentAsChosenBeatmap(item);
+                    Debug.Assert(item is MatchmakingPlaylistItemBeatmap);
+
+                    panel.PresentAsChosenBeatmap((MatchmakingPlaylistItemBeatmap)item);
 
                     resultSample?.Play();
                 });

@@ -1,14 +1,22 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Database;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 {
@@ -18,9 +26,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         public override Drawable PlayersDisplayArea { get; }
 
         private readonly BeatmapSelectGrid beatmapSelectGrid;
+        private readonly List<MultiplayerPlaylistItem> items = new List<MultiplayerPlaylistItem>();
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
+
+        [Resolved]
+        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
+
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; } = null!;
 
         public SubScreenBeatmapSelect()
         {
@@ -67,8 +82,51 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             if (item.Expired)
                 return;
 
-            beatmapSelectGrid.AddItem(item);
+            items.Add(item);
+            Scheduler.AddOnce(addItems);
         });
+
+        private void addItems() => Task.Run(addItemsAsync);
+
+        private async Task addItemsAsync()
+        {
+            var itemsImmutable = items.ToImmutableArray();
+            items.Clear();
+
+            var beatmaps = await beatmapLookupCache.GetBeatmapsAsync(itemsImmutable.Select(item => item.BeatmapID).ToArray()).ConfigureAwait(false);
+
+            var matchmakingItems = new List<IMatchmakingPlaylistItem>();
+
+            foreach (var record in itemsImmutable.Zip(beatmaps))
+            {
+                var (item, beatmap) = record;
+
+                beatmap ??= new APIBeatmap
+                {
+                    BeatmapSet = new APIBeatmapSet
+                    {
+                        Title = "unknown beatmap",
+                        TitleUnicode = "unknown beatmap",
+                        Artist = "unknown artist",
+                        ArtistUnicode = "unknown artist",
+                    }
+                };
+
+                beatmap.StarRating = item.StarRating;
+
+                Ruleset? ruleset = rulesetStore.GetRuleset(item.RulesetID)?.CreateInstance();
+
+                Debug.Assert(ruleset != null);
+
+                Mod[] mods = item.RequiredMods.Select(m => m.ToMod(ruleset)).ToArray();
+
+                matchmakingItems.Add(new MatchmakingPlaylistItemBeatmap(item, beatmap, mods));
+            }
+
+            matchmakingItems.Add(new MatchmakingPlaylistItemRandom());
+
+            Schedule(() => beatmapSelectGrid.AddItems(matchmakingItems));
+        }
 
         private void onItemSelected(int userId, long itemId)
         {
