@@ -32,10 +32,8 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 {
-    public partial class BeatmapCardMatchmakingBeatmapContent : BeatmapCardMatchmakingContent, IHasContextMenu
+    public partial class BeatmapCardMatchmakingBeatmapContent : CompositeDrawable, IHasContextMenu
     {
-        public override AvatarOverlay SelectionOverlay => selectionOverlay;
-
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
@@ -53,10 +51,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         private CollapsibleButtonContainer buttonContainer = null!;
         private FillFlowContainer idleBottomContent = null!;
         private BeatmapCardDownloadProgressBar downloadProgressBar = null!;
-        private AvatarOverlay selectionOverlay = null!;
 
         public BeatmapCardMatchmakingBeatmapContent(APIBeatmap beatmap, Mod[] mods)
         {
+            Size = MatchmakingSelectPanel.SIZE;
+
             this.beatmap = beatmap;
             this.mods = mods;
 
@@ -81,7 +80,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 thumbnail = new BeatmapCardThumbnail(beatmapSet, beatmapSet, keepLoaded: true)
                 {
                     Name = @"Left (icon) area",
-                    Size = new Vector2(BeatmapCardMatchmaking.HEIGHT),
+                    Size = new Vector2(MatchmakingSelectPanel.SIZE.Y),
                     Padding = new MarginPadding { Right = BeatmapCard.CORNER_RADIUS },
                     Child = leftIconArea = new FillFlowContainer
                     {
@@ -93,8 +92,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 },
                 buttonContainer = new CollapsibleButtonContainer(beatmapSet, allowNavigationToBeatmap: false, keepBackgroundLoaded: true)
                 {
-                    X = BeatmapCardMatchmaking.HEIGHT - BeatmapCard.CORNER_RADIUS,
-                    Width = BeatmapCard.WIDTH - BeatmapCardMatchmaking.HEIGHT + BeatmapCard.CORNER_RADIUS,
+                    X = MatchmakingSelectPanel.SIZE.Y - BeatmapCard.CORNER_RADIUS,
+                    Width = BeatmapCard.WIDTH - MatchmakingSelectPanel.SIZE.Y + BeatmapCard.CORNER_RADIUS,
                     FavouriteState = { BindTarget = favouriteState },
                     ButtonsCollapsedWidth = 0,
                     ButtonsExpandedWidth = 24,
@@ -276,11 +275,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                                 }
                             }
                         },
-                        selectionOverlay = new AvatarOverlay
-                        {
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                        }
                     }
                 }
             };
@@ -322,7 +316,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             }
         }
 
-        public float AvatarOffset => buttonContainer.DrawWidth - buttonContainer.MainAreaSize.X;
+        public float AvatarOffset => buttonContainer.DrawWidth - buttonContainer.MainContent.DrawWidth;
 
         protected override void LoadComplete()
         {

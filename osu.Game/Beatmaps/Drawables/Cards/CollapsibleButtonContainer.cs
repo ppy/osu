@@ -12,7 +12,6 @@ using osu.Game.Graphics;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
-using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
@@ -51,7 +50,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         public IEnumerable<BeatmapCardIconButton> Buttons => buttons;
 
-        protected override Container<Drawable> Content => mainContent;
+        protected override Container<Drawable> Content => MainContent;
+
+        public Container MainContent { get; }
 
         private readonly Container background;
 
@@ -59,7 +60,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         private readonly Container<BeatmapCardIconButton> buttons;
 
         private readonly Container mainArea;
-        private readonly Container mainContent;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -132,7 +132,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                             RelativeSizeAxes = Axes.Both,
                             Dimmed = { BindTarget = ShowDetails }
                         },
-                        mainContent = new Container
+                        MainContent = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding
@@ -185,7 +185,5 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 button.HoverColour = downloadTracker.State.Value != DownloadState.LocallyAvailable ? colourProvider.Content1 : colourProvider.Foreground1;
             }
         }
-
-        public Vector2 MainAreaSize => mainArea.DrawSize;
     }
 }

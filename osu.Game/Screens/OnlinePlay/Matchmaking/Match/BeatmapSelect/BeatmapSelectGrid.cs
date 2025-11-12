@@ -24,8 +24,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 {
     public partial class BeatmapSelectGrid : CompositeDrawable
     {
-        public const int PLAYLIST_ITEM_RANDOM = -1;
-
         public const double ARRANGE_DELAY = 200;
 
         private const double hide_duration = 800;
@@ -147,12 +145,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 panel.AddUser(user);
             else
                 panel.RemoveUser(user);
-        }
-
-        public void RevealRandomItem(MultiplayerPlaylistItem item)
-        {
-            if (!panelLookup.TryGetValue(-1, out var panel))
-                return;
         }
 
         public void RollAndDisplayFinalBeatmap(long[] candidateItemIds, long rolledItemId, long finalItemId)
