@@ -93,66 +93,45 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         private static double[] calculateBaseUnevenness(ManiaDifficultyContext data, bool[][] keyUsagePatterns, double[][] timingDeltas)
         {
             FormulaConfig config = new FormulaConfig();
-
             int keyCount = data.KeyCount;
             int accuracyTimePoints = data.CornerData.AccuracyTimeCorners.Length;
+
             if (accuracyTimePoints == 0) return Array.Empty<double>();
 
             double[] unevennessBase = new double[accuracyTimePoints];
-
-            // Initialize to neutral
             for (int i = 0; i < accuracyTimePoints; i++)
                 unevennessBase[i] = 1.0;
 
-            if (keyCount < 2) return unevennessBase; // Need at least 2 columns for unevenness
+            if (keyCount < 2) return unevennessBase;
 
             int baseTimePoints = data.CornerData.BaseTimeCorners.Length;
 
-            // Pre-calculate adjacent column differences once
-            double[][] adjacentDifferences = new double[keyCount - 1][];
-
-            for (int adjacentPair = 0; adjacentPair < keyCount - 1; adjacentPair++)
-            {
-                double[] pairDifferences = new double[baseTimePoints];
-                double[] leftDeltas = timingDeltas[adjacentPair];
-                double[] rightDeltas = timingDeltas[adjacentPair + 1];
-
-                for (int timeIndex = 0; timeIndex < baseTimePoints; timeIndex++)
-                {
-                    double leftDelta = leftDeltas[timeIndex];
-                    double rightDelta = rightDeltas[timeIndex];
-                    double absoluteDifference = Math.Abs(leftDelta - rightDelta);
-                    double slowPatternPenalty = 0.4 * Math.Max(0.0, Math.Max(leftDelta, rightDelta) - 0.11);
-                    pairDifferences[timeIndex] = absoluteDifference + slowPatternPenalty;
-                }
-
-                adjacentDifferences[adjacentPair] = pairDifferences;
-            }
-
-            // Process each accuracy time point
+            // Process each accuracy time point directly without pre-computing all differences
             for (int accuracyIndex = 0; accuracyIndex < accuracyTimePoints; accuracyIndex++)
             {
                 double accuracyTime = data.CornerData.AccuracyTimeCorners[accuracyIndex];
                 int baseTimeIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, accuracyTime);
 
-                // Clamp to a valid range
                 if (baseTimeIndex >= baseTimePoints) baseTimeIndex = baseTimePoints - 1;
                 if (baseTimeIndex < 0) continue;
 
                 int previousActiveColumn = -1;
 
-                // Find active adjacent column pairs and apply penalties
                 for (int column = 0; column < keyCount; column++)
                 {
                     if (!keyUsagePatterns[column][baseTimeIndex]) continue;
 
-                    if (previousActiveColumn >= 0 && previousActiveColumn < keyCount - 1)
+                    if (previousActiveColumn >= 0)
                     {
-                        double timingDifference = adjacentDifferences[previousActiveColumn][baseTimeIndex];
-                        double penalty = calculateUnevennessPenalty(timingDifference,
-                            timingDeltas[previousActiveColumn][baseTimeIndex],
-                            timingDeltas[column][baseTimeIndex]);
+                        // Compute difference on-demand instead of from pre-computed array
+                        double leftDelta = timingDeltas[previousActiveColumn][baseTimeIndex];
+                        double rightDelta = timingDeltas[column][baseTimeIndex];
 
+                        double absoluteDifference = Math.Abs(leftDelta - rightDelta);
+                        double slowPatternPenalty = 0.4 * Math.Max(0.0, Math.Max(leftDelta, rightDelta) - 0.11);
+                        double timingDifference = absoluteDifference + slowPatternPenalty;
+
+                        double penalty = calculateUnevennessPenalty(timingDifference, leftDelta, rightDelta);
                         unevennessBase[accuracyIndex] *= penalty;
                     }
 
@@ -160,7 +139,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
                 }
             }
 
-            // Apply smoothing in a single pass
             return StrainArrayUtils.ApplySmoothingToArray(
                 data.CornerData.AccuracyTimeCorners,
                 unevennessBase,

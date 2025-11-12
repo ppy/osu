@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Utils
                 // Convert percentile to array index with proper rounding
                 int targetIndex = (int)Math.Round(maxValidIndex * percentilePosition);
 
-                // Ensure index is within valid bounds
+                // Ensure the index is within valid bounds
                 targetIndex = Math.Max(0, Math.Min(targetIndex, maxValidIndex));
 
                 percentileSum += sortedPeaks[targetIndex];

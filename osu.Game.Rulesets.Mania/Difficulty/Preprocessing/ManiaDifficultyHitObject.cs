@@ -21,6 +21,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         public ManiaDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, List<DifficultyHitObject>[] perColumnObjects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
+            PreprocessedDifficultyData = new ManiaDifficultyContext();
             PerColumnObjects = perColumnObjects;
             columnIndex = perColumnObjects[Column].Count;
         }
@@ -46,13 +47,5 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             int index = columnIndex + (forwardsIndex + 1);
             return index >= 0 && index < PerColumnObjects[Column].Count ? (ManiaDifficultyHitObject)PerColumnObjects[Column][index] : null;
         }
-
-        //public void SetColumnIndex(int idx) => columnIndex = idx;
-
-        /*public int CompareTo(ManiaDifficultyHitObject other)
-        {
-            int timeComparison = StartTime.CompareTo(other.StartTime);
-            return timeComparison != 0 ? timeComparison : Column.CompareTo(other.Column);
-        }*/
     }
 }

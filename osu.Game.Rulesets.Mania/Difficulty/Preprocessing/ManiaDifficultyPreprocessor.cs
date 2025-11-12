@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner.Data;
 using osu.Game.Rulesets.Mania.Difficulty.Skills;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
@@ -35,23 +34,19 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             processDifficultyHitObjects(data, hitObjects, beatmap);
             calculateMaxTime(data);
 
-            CornerData cornerData = CornerDataPreprocessor.Process(hitObjects, data.MaxTime);
+            var cornerData = CornerDataPreprocessor.Process(hitObjects, data.MaxTime);
             data.CornerData = cornerData;
 
             computeAllComponents(data);
-            //CornerDataPreprocessor.ProcessAndAssign(hitObjects, calculateMaxTime(beatmap));
 
             hitObjects.ForEach(hitObject =>
-            {
-                ((ManiaDifficultyHitObject)hitObject).PreprocessedDifficultyData = data;
-            });
+                ((ManiaDifficultyHitObject)hitObject).PreprocessedDifficultyData = data);
         }
 
         private static void processDifficultyHitObjects(ManiaDifficultyContext data, List<DifficultyHitObject> hitObjects, IBeatmap beatmap)
         {
             int totalColumns = Math.Max(1, ((ManiaBeatmap)beatmap).TotalColumns);
 
-            // prepare empty output structures
             var perColumnObjects = new List<ManiaDifficultyHitObject>[totalColumns];
             for (int c = 0; c < totalColumns; c++)
                 perColumnObjects[c] = new List<ManiaDifficultyHitObject>();
@@ -62,7 +57,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             if (hitObjects.Count == 0)
             {
                 data.AllNotes = new List<ManiaDifficultyHitObject>();
-                //data.PerColumnObjects = perColumnObjects;
                 data.LongNotes = new List<ManiaDifficultyHitObject>();
                 data.LongNoteTails = new List<ManiaDifficultyHitObject>();
                 return;
@@ -75,22 +69,17 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
                 maniaList.Add((ManiaDifficultyHitObject)hitObjects[i]);
             }
 
-            //maniaList.Sort((a, b) => a.CompareTo(b));
-
-            foreach (var mdho in maniaList)
+            foreach (var maniaDifficultyHitObject in maniaList)
             {
-                int col = mdho.Column;
+                int col = maniaDifficultyHitObject.Column;
 
                 if (col >= 0 && col < totalColumns)
                 {
-                    //int pos = perColumnObjects[col].Count;
-                    perColumnObjects[col].Add(mdho);
-
-                    //mdho.SetColumnIndex(pos);
+                    perColumnObjects[col].Add(maniaDifficultyHitObject);
                 }
 
-                if (mdho.IsLong)
-                    longNotes.Add(mdho);
+                if (maniaDifficultyHitObject.IsLong)
+                    longNotes.Add(maniaDifficultyHitObject);
             }
 
             if (longNotes.Count > 0)
@@ -100,7 +89,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             }
 
             data.AllNotes = maniaList;
-            //data.PerColumnObjects = perColumnObjects;
             data.LongNotes = longNotes;
             data.LongNoteTails = longNotesTails;
         }

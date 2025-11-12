@@ -37,40 +37,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner
             cornerData.TimeCorners = createTimeCornerUnion(cornerData.BaseTimeCorners, cornerData.AccuracyTimeCorners);
 
             return cornerData;
-            /*CornerData cornerData = computeTimeCorners(hitObjects, maxTime);
-            hitObjects.ForEach(dho =>
-            {
-                var mdho = (ManiaDifficultyHitObject)dho;
-                mdho.Data = cornerData;
-            });*/
         }
-
-        /*/// <summary>
-        /// Computes all time corner arrays based on note positions.
-        /// </summary>
-        private static CornerData computeTimeCorners(List<DifficultyHitObject> allNotes, int maxTime)
-        {
-            var cornerData = new CornerData();
-
-            if (allNotes.Count == 0)
-            {
-                cornerData.BaseTimeCorners = new[] { 0.0, maxTime };
-                cornerData.AccuracyTimeCorners = cornerData.BaseTimeCorners;
-                cornerData.TimeCorners = cornerData.BaseTimeCorners;
-                return cornerData;
-            }
-
-            int noteCount = allNotes.Count;
-            var arrayPool = ArrayPool<double>.Shared;
-
-            double[] baseTimePoints = collectBaseTimePoints(allNotes, noteCount, arrayPool);
-
-            cornerData.BaseTimeCorners = buildBaseTimeCorners(baseTimePoints, arrayPool, maxTime);
-            cornerData.AccuracyTimeCorners = buildAccuracyTimeCorners(baseTimePoints, arrayPool, maxTime);
-            cornerData.TimeCorners = createTimeCornerUnion(cornerData.BaseTimeCorners, cornerData.AccuracyTimeCorners);
-
-            return cornerData;
-        }*/
 
         private static double[] collectBaseTimePoints(List<DifficultyHitObject> allNotes, int noteCount, ArrayPool<double> pool)
         {

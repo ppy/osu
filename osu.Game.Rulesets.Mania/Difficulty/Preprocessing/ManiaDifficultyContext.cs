@@ -9,10 +9,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 {
     public class ManiaDifficultyContext
     {
-        public List<ManiaDifficultyHitObject> AllNotes, LongNotes, LongNoteTails;
+        public List<ManiaDifficultyHitObject> AllNotes { get; set; } = new List<ManiaDifficultyHitObject>();
+        public List<ManiaDifficultyHitObject> LongNotes { get; set; } = new List<ManiaDifficultyHitObject>();
+        public List<ManiaDifficultyHitObject> LongNoteTails { get; set; } = new List<ManiaDifficultyHitObject>();
 
         /// <summary>Time corner data defining sampling points for difficulty calculation</summary>
-        public CornerData CornerData { get; set; }
+        public CornerData CornerData { get; set; } = new CornerData();
 
         /// <summary>Hit timing leniency based on Overall Difficulty</summary>
         public double HitLeniency { get; set; }
@@ -23,25 +25,25 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         public int MaxTime { get; set; }
 
         /// <summary>Difficulty from same-column patterns (jacks)</summary>
-        public double[] SameColumnPressure { get; set; }
+        public double[] SameColumnPressure { get; set; } = Array.Empty<double>();
 
         /// <summary>Difficulty from cross-column coordination patterns</summary>
-        public double[] CrossColumnPressure { get; set; }
+        public double[] CrossColumnPressure { get; set; } = Array.Empty<double>();
 
         /// <summary>Difficulty from pressing intensity and timing</summary>
-        public double[] PressingIntensity { get; set; }
+        public double[] PressingIntensity { get; set; } = Array.Empty<double>();
 
         /// <summary>Difficulty penalty from uneven timing patterns</summary>
-        public double[] Unevenness { get; set; }
+        public double[] Unevenness { get; set; } = Array.Empty<double>();
 
         /// <summary>Difficulty from long note release timing</summary>
-        public double[] ReleaseFactor { get; set; }
+        public double[] ReleaseFactor { get; set; } = Array.Empty<double>();
 
         /// <summary>Local note count for density calculations</summary>
-        public double[] LocalNoteCount { get; set; }
+        public double[] LocalNoteCount { get; set; } = Array.Empty<double>();
 
         /// <summary>Number of active keys at each time point</summary>
-        public double[] ActiveKeyCount { get; set; }
+        public double[] ActiveKeyCount { get; set; } = Array.Empty<double>();
 
         /// <summary>
         /// Samples a difficulty feature value at a specific time using interpolation.

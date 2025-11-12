@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 
@@ -10,19 +9,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaDifficultyAttributes : DifficultyAttributes
     {
-        [JsonProperty("cross_column_difficulty")]
         public double CrossColumnDifficulty { get; set; }
-
-        [JsonProperty("jack_difficulty")]
         public double JackDifficulty { get; set; }
-
-        [JsonProperty("pressing_intensity_difficulty")]
         public double PressingIntensityDifficulty { get; set; }
-
-        [JsonProperty("release_difficulty")]
         public double ReleaseDifficulty { get; set; }
-
-        [JsonProperty("unevenness_difficulty")]
         public double UnevennessDifficulty { get; set; }
 
         public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()

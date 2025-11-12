@@ -66,12 +66,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             var localNoteCountSkill = (LocalNoteCount)skills[5];
 
             var combinedStrains = combineStrains(
-                sameColumnSkill.GetCurrentStrainPeaks().ToList(),
-                crossColumnSkill.GetCurrentStrainPeaks().ToList(),
-                pressingIntensitySkill.GetCurrentStrainPeaks().ToList(),
-                unevennessSkill.GetCurrentStrainPeaks().ToList(),
-                releaseSkill.GetCurrentStrainPeaks().ToList(),
-                localNoteCountSkill.GetCurrentStrainPeaks().ToList(),
+                sameColumnSkill.GetObjectStrains().ToList(),
+                crossColumnSkill.GetObjectStrains().ToList(),
+                pressingIntensitySkill.GetObjectStrains().ToList(),
+                unevennessSkill.GetObjectStrains().ToList(),
+                releaseSkill.GetObjectStrains().ToList(),
+                localNoteCountSkill.GetObjectStrains().ToList(),
                 localNoteCountSkill.GetActiveKeyStrains().ToList()
             );
 
@@ -221,40 +221,22 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             for (int column = 0; column < totalColumns; column++)
                 perColumnObjects[column] = new List<DifficultyHitObject>();
-            /*var longNotes = new List<DifficultyHitObject>();
-            var longNotesTails = new List<DifficultyHitObject>();*/
 
             for (int i = 1; i < sortedObjects.Length; i++)
             {
-                var mdho = new ManiaDifficultyHitObject(
+                var maniaDifficultyHitObject = new ManiaDifficultyHitObject(
                     sortedObjects[i],
                     sortedObjects[i - 1],
                     clockRate,
                     objects,
                     perColumnObjects,
-                    /*longNotes,
-                    longNotesTails,*/
                     objects.Count
                 );
 
-                objects.Add(mdho);
-                perColumnObjects[mdho.Column].Add(mdho);
-
-                /*if (mdho.Column >= 0 && mdho.Column < totalColumns)
-                    perColumnObjects[mdho.Column].Add(mdho);
-
-                if (mdho.IsLong)
-                    longNotes.Add(mdho);*/
+                objects.Add(maniaDifficultyHitObject);
+                perColumnObjects[maniaDifficultyHitObject.Column].Add(maniaDifficultyHitObject);
             }
 
-            /*if (longNotes.Count > 0)
-            {
-                longNotesTails.AddRange(longNotes);
-                longNotesTails.Sort((a, b) => a.EndTime.CompareTo(b.EndTime));
-            }*/
-
-            //var preprocessor = new SunnyPreprocessor(objects, (ManiaBeatmap)Beatmap, new FormulaConfig());
-            //cachedStrainData = preprocessor.Process();
             ManiaDifficultyPreprocessor.ProcessAndAssign(objects, beatmap);
 
             return objects;
