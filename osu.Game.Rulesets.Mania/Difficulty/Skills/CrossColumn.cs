@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
     public class CrossColumn : StrainSkill
     {
-        private const double strain_decay_base = 0.2112006520665233;
+        private const double strain_decay_base = 0.20232160642123984;
 
         private double currentStrain;
 

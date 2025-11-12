@@ -10,16 +10,16 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
-    public class LocalNoteCount : StrainSkill
+    public class LocalNoteDensity : StrainSkill
     {
-        private const double strain_decay_base = .20143474157245744;
+        private const double strain_decay_base = 1;
         private double currentStrain;
         private double currentNoteCount;
         private double currentLongNoteWeight;
 
         private readonly List<double> activeKeyStrains;
 
-        public LocalNoteCount(Mod[] mods)
+        public LocalNoteDensity(Mod[] mods)
             : base(mods: mods)
         {
             currentNoteCount = 0;

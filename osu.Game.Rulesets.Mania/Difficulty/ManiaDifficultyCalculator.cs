@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaDifficultyCalculator : DifficultyCalculator
     {
-        private const double difficulty_multiplier = 0.9818199983381549;
+        private const double difficulty_multiplier = 0.9850679876375877;
         private const double final_scaling_factor = 0.975;
         private const double strain_threshold = 0.01;
 
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             var pressingIntensitySkill = (PressingIntensity)skills[2];
             var unevennessSkill = (Unevenness)skills[3];
             var releaseSkill = (Release)skills[4];
-            var localNoteCountSkill = (LocalNoteCount)skills[5];
+            var localNoteCountSkill = (LocalNoteDensity)skills[5];
 
             var combinedStrains = combineStrains(
                 sameColumnSkill.GetObjectStrains().ToList(),
@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return combinedStrains;
         }
 
-        private double calculateDifficultyValue(List<double> combinedStrains, LocalNoteCount localNoteCountSkill)
+        private double calculateDifficultyValue(List<double> combinedStrains, LocalNoteDensity localNoteDensitySkill)
         {
             double[] sorted = combinedStrains.Where(s => s > 0).ToArray();
             if (sorted.Length == 0) return 0.0;
@@ -178,13 +178,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                                    mid_percentile_weight * midPercentileMean +
                                    power_mean_weight * powerMean;
 
-            return applyFinalScaling(rawDifficulty, localNoteCountSkill);
+            return applyFinalScaling(rawDifficulty, localNoteDensitySkill);
         }
 
-        private double applyFinalScaling(double rawDifficulty, LocalNoteCount localNoteCountSkill)
+        private double applyFinalScaling(double rawDifficulty, LocalNoteDensity localNoteDensitySkill)
         {
             FormulaConfig config = new FormulaConfig();
-            double totalCurrentNotes = localNoteCountSkill.GetTotalNotesWithWeight();
+            double totalCurrentNotes = localNoteDensitySkill.GetTotalNotesWithWeight();
             double scaled = rawDifficulty * totalCurrentNotes / (totalCurrentNotes + 60.0);
 
             // Apply rescaling if config exists
@@ -253,7 +253,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 new PressingIntensity(mods),
                 new Unevenness(mods),
                 new Release(mods),
-                new LocalNoteCount(mods),
+                new LocalNoteDensity(mods),
             };
         }
 
