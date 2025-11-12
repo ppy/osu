@@ -188,10 +188,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             double scaled = rawDifficulty * totalCurrentNotes / (totalCurrentNotes + 60.0);
 
             // Apply rescaling if config exists
-            if (scaled > config.rescaleHighThreshold)
+            if (scaled > config.RescaleHighThreshold)
             {
-                scaled = config.rescaleHighThreshold + (scaled - config.rescaleHighThreshold) /
-                    config.rescaleHighFactor;
+                scaled = config.RescaleHighThreshold + (scaled - config.RescaleHighThreshold) /
+                    config.RescaleHighFactor;
             }
 
             return scaled * final_scaling_factor;

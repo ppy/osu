@@ -3,7 +3,6 @@
 
 using System;
 using osu.Game.Rulesets.Difficulty.Utils;
-using osu.Game.Rulesets.Mania.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
@@ -23,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
             double[] smoothed = StrainArrayUtils.ApplySmoothingToArray(
                 data.CornerData.BaseTimeCorners,
                 baseRelease,
-                config.smoothingWindowMs,
+                config.SmoothingWindowMs,
                 0.001,
                 "sum"
             );

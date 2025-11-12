@@ -5,7 +5,6 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Rulesets.Mania.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
@@ -25,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
             double[] smoothedPressure = StrainArrayUtils.ApplySmoothingToArray(
                 data.CornerData.BaseTimeCorners,
                 baseCrossColumnPressure,
-                config.smoothingWindowMs,
+                config.SmoothingWindowMs,
                 0.001,
                 "sum"
             );
@@ -387,13 +386,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
                 var note = data.AllNotes[noteIndex];
 
                 // Calculate the active window around this note
-                double windowStartTime = Math.Max(0, note.StartTime - config.columnActivityWindowMs);
+                double windowStartTime = Math.Max(0, note.StartTime - config.ColumnActivityWindowMs);
                 double windowEndTime;
 
                 if (note.IsLong)
-                    windowEndTime = Math.Min(data.MaxTime - 1, note.EndTime + config.columnActivityWindowMs);
+                    windowEndTime = Math.Min(data.MaxTime - 1, note.EndTime + config.ColumnActivityWindowMs);
                 else
-                    windowEndTime = Math.Min(data.MaxTime - 1, note.StartTime + config.columnActivityWindowMs);
+                    windowEndTime = Math.Min(data.MaxTime - 1, note.StartTime + config.ColumnActivityWindowMs);
 
                 int startIndex = Math.Max(0, StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, windowStartTime));
                 int endIndex = Math.Max(0, StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, windowEndTime));

@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
-using osu.Game.Rulesets.Mania.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
@@ -12,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
     public class PressingIntensityPreprocessor
     {
         /// <summary>
-        /// Computes the pressing intensity values across all time points.
+        /// Computes the pressing intensity values across all-time points.
         /// This considers long note density, anchor patterns, and note timing.
         /// </summary>
         public static double[] ComputeValues(ManiaDifficultyContext data)
@@ -26,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
             double[] smoothed = StrainArrayUtils.ApplySmoothingToArray(
                 data.CornerData.BaseTimeCorners,
                 basePattern,
-                config.smoothingWindowMs,
+                config.SmoothingWindowMs,
                 0.001,
                 "sum"
             );
@@ -77,7 +76,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
                 densityDeltas[eventPosition++] = -0.3; // Slight reduction
 
                 eventTimes[eventPosition] = longNote.EndTime;
-                densityDeltas[eventPosition++] = -1.0; // Full removal at end
+                densityDeltas[eventPosition++] = -1.0; // Full removal at the end
             }
 
             eventTimes[eventPosition] = 0;
@@ -168,11 +167,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
                 int noteEndTime = (int)Math.Round(note.EndTime);
 
                 int leftWindow400Index = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners,
-                    noteStartTime - config.keyUsageWindowMs);
+                    noteStartTime - config.KeyUsageWindowMs);
                 int leftIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, noteStartTime);
                 int rightIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, noteEndTime);
                 int rightWindow400Index = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners,
-                    noteEndTime + config.keyUsageWindowMs);
+                    noteEndTime + config.KeyUsageWindowMs);
 
                 // Base usage value depends on note duration
                 double baseUsage = 3.75 + Math.Min(noteEndTime - noteStartTime, 1500) / 150.0;
@@ -185,7 +184,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
                 applyFullUsage(columnUsage, leftIndex, rightIndex, timePoints, baseUsage);
 
                 // Gradual falloff in the windows before and after the note
-                double windowDenominator = config.keyUsageWindowMs * config.keyUsageWindowMs;
+                double windowDenominator = config.KeyUsageWindowMs * config.KeyUsageWindowMs;
                 applyWindowUsage(columnUsage, data.CornerData.BaseTimeCorners, leftWindow400Index, leftIndex,
                     noteStartTime, baseUsage, windowDenominator, timePoints);
                 applyWindowUsage(columnUsage, data.CornerData.BaseTimeCorners, rightIndex, rightWindow400Index,
@@ -421,12 +420,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
             FormulaConfig config = new FormulaConfig();
             double streamRatio = 7.5 / deltaTime; // How "streamy" this pattern is
 
-            if (streamRatio > config.streamBoostMinRatio && streamRatio < config.streamBoostMaxRatio)
+            if (streamRatio > config.StreamBoostMinRatio && streamRatio < config.StreamBoostMaxRatio)
             {
-                double ratioDistance = streamRatio - config.streamBoostMaxRatio;
+                double ratioDistance = streamRatio - config.StreamBoostMaxRatio;
                 double quadraticFactor = ratioDistance * ratioDistance;
 
-                return 1.0 + config.streamBoostCoefficient * (streamRatio - config.streamBoostMinRatio) * quadraticFactor;
+                return 1.0 + config.StreamBoostCoefficient * (streamRatio - config.StreamBoostMinRatio) * quadraticFactor;
             }
 
             return 1.0;

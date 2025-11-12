@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner;
-using osu.Game.Rulesets.Mania.Difficulty.Skills;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 {
@@ -119,8 +118,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             double overallDifficulty = beatmap.BeatmapInfo.Difficulty.OverallDifficulty;
 
             // Calculate raw leniency using OD-based formula
-            double odAdjustedValue = config.hitLeniencyOdBase - Math.Ceiling(config.hitLeniencyOdMultiplier * overallDifficulty);
-            double rawLeniency = config.hitLeniencyBase * Math.Sqrt(odAdjustedValue / 500.0);
+            double odAdjustedValue = config.HitLeniencyOdBase - Math.Ceiling(config.HitLeniencyOdMultiplier * overallDifficulty);
+            double rawLeniency = config.HitLeniencyBase * Math.Sqrt(odAdjustedValue / 500.0);
 
             // Apply cap to prevent extreme values
             rawLeniency = Math.Min(rawLeniency, 0.6 * (rawLeniency - 0.09) + 0.09);

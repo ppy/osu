@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Rulesets.Mania.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
@@ -142,7 +141,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
             return StrainArrayUtils.ApplySmoothingToArray(
                 data.CornerData.AccuracyTimeCorners,
                 unevennessBase,
-                config.accuracySmoothingWindowMs,
+                config.AccuracySmoothingWindowMs,
                 1.0,
                 "avg"
             );

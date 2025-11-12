@@ -5,7 +5,6 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Rulesets.Mania.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
@@ -64,11 +63,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         /// </summary>
         private static void calculatePerColumnIntensities(ManiaDifficultyContext data, double[] intensityBuffer, double[] deltaBuffer, double[] baseTimeCorners, double hitLeniencyFactor, int keyCount, int timePointCount)
         {
-            List<ManiaDifficultyHitObject>[] notesByColumn = data.AllNotes
-                                                                 .First()
-                                                                 .PerColumnObjects
-                                                                 .Select(list => list.Cast<ManiaDifficultyHitObject>().ToList())
-                                                                 .ToArray();
+            List<ManiaDifficultyHitObject>[] notesByColumn = data.AllNotes.First().PerColumnObjects.Select(list => list.Cast<ManiaDifficultyHitObject>().ToList()).ToArray();
 
             //var notesByColumn = data.PerColumnObjects;
 
@@ -124,8 +119,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         {
             FormulaConfig config = new FormulaConfig();
             double timingDeviation = Math.Abs(deltaTimeSeconds - 0.08);
-            double nerfBase = config.jackNerfBase + timingDeviation;
-            double nerfValue = config.jackNerfCoefficient * Math.Pow(nerfBase, config.jackNerfPower);
+            double nerfBase = config.JackNerfBase + timingDeviation;
+            double nerfValue = config.JackNerfCoefficient * Math.Pow(nerfBase, config.JackNerfPower);
 
             return 1.0 - nerfValue; // Return nerf factor (lower = more nerf)
         }
@@ -149,7 +144,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
                     int columnOffset = column * timePointCount;
 
                     StrainArrayUtils.ApplySmoothingToColumn(intensityBuffer, smoothedBuffer, baseTimeCorners,
-                        columnOffset, timePointCount, config.smoothingWindowMs);
+                        columnOffset, timePointCount, config.SmoothingWindowMs);
                 }
 
                 Array.Copy(smoothedBuffer, 0, intensityBuffer, 0, keyCount * timePointCount);
