@@ -46,6 +46,12 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
         public MatchmakingUserList Users { get; set; } = new MatchmakingUserList();
 
         /// <summary>
+        /// The type of panel that was rolled to display the <see cref="CandidateItem"/>.
+        /// </summary>
+        [Key(5)]
+        public RollResultType RollType { get; set; }
+
+        /// <summary>
         /// Advances to the next round.
         /// </summary>
         public void AdvanceRound()
@@ -96,6 +102,12 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
             int i = 1;
             foreach (var user in Users.Order(new MatchmakingUserComparer(CurrentRound)))
                 user.Placement = i++;
+        }
+
+        public enum RollResultType
+        {
+            Beatmap,
+            Random,
         }
     }
 }

@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Transforms;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Rooms;
 using osuTK;
 
@@ -147,8 +148,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 panel.RemoveUser(user);
         }
 
-        public void RollAndDisplayFinalBeatmap(long[] candidateItemIds, long rolledItemId, long finalItemId)
+        public void RollAndDisplayFinalBeatmap(long[] candidateItemIds, long finalItemId, MatchmakingRoomState.RollResultType rollType)
         {
+            long rolledItemId = rollType switch
+            {
+                MatchmakingRoomState.RollResultType.Beatmap => finalItemId,
+                MatchmakingRoomState.RollResultType.Random => IMatchmakingPlaylistItem.ID_RANDOM,
+                _ => throw new ArgumentOutOfRangeException(nameof(rollType), rollType, null)
+            };
+
             Debug.Assert(candidateItemIds.Length >= 1);
             Debug.Assert(candidateItemIds.Contains(finalItemId));
             Debug.Assert(panelLookup.ContainsKey(finalItemId));
