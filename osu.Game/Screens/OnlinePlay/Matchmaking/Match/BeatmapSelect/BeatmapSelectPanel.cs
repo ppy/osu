@@ -13,6 +13,7 @@ using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -106,11 +107,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                     },
                 }
             };
-
-            if (Item.ID == -1)
-                card.DisplayRandom();
-            else
-                card.DisplayItem(Item);
         }
 
         public void AddUser(APIUser user)
@@ -123,10 +119,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             card.RemoveUser(user);
         }
 
-        public void DisplayItem(MultiplayerPlaylistItem item)
-        {
-            card.DisplayItem(item);
-        }
+        public void DisplayBeatmap(APIBeatmap beatmap, Mod[] mods) => card.DisplayBeatmap(beatmap, mods);
+
+        public void DisplayRandom() => card.DisplayRandom();
 
         protected override bool OnHover(HoverEvent e)
         {

@@ -34,6 +34,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         public event Action<MultiplayerPlaylistItem>? ItemSelected;
 
         private readonly Dictionary<long, BeatmapSelectPanel> panelLookup = new Dictionary<long, BeatmapSelectPanel>();
+        private readonly Dictionary<long, MatchmakingPlaylistItem> playlistItems = new Dictionary<long, MatchmakingPlaylistItem>();
 
         private readonly PanelGridContainer panelGridContainer;
         private readonly Container<BeatmapSelectPanel> rollContainer;
@@ -69,9 +70,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                     Masking = true,
                 },
             };
-
-            // Special item denoting a random selection.
-            AddItem(new MultiplayerPlaylistItem { ID = -1 });
         }
 
         [BackgroundDependencyLoader]
@@ -84,39 +82,55 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             swooshSample = audio.Samples.Get(@"SongSelect/options-pop-out");
         }
 
-        protected override void LoadComplete()
+        public void AddItems(IEnumerable<MatchmakingPlaylistItem> items)
         {
-            base.LoadComplete();
-
-            const double enter_duration = 500;
-
-            // the scroll container has a 1 frame delay until it receives the correct height for the scrollable area which leads to the scrollbar resizing awkwardly
-            // if we wait until the panels have entered we get to avoid having to see that and the scrollbar it will appear synchronized with the rest of the content as a bonus
-            Scheduler.AddDelayed(() => scroll.ScrollbarVisible = true, enter_duration);
-
-            SchedulerAfterChildren.Add(() =>
+            foreach (var item in items)
             {
-                foreach (var panel in panelGridContainer)
+                playlistItems[item.ID] = item;
+
+                var panel = panelLookup[item.ID] = new BeatmapSelectPanel(item.PlaylistItem)
                 {
-                    double delay = panel.Y / 3;
+                    AllowSelection = allowSelection,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Action = i => ItemSelected?.Invoke(i),
+                };
 
-                    panel.FadeInAndEnterFromBelow(duration: enter_duration, delay: delay);
-                }
-            });
-        }
+                panelGridContainer.Add(panel);
+                panelGridContainer.SetLayoutPosition(panel, (float)item.PlaylistItem.StarRating);
 
-        public void AddItem(MultiplayerPlaylistItem item)
-        {
-            var panel = panelLookup[item.ID] = new BeatmapSelectPanel(item)
+                panel.DisplayBeatmap(item.Beatmap, item.Mods);
+            }
+
+            var randomPanel = panelLookup[-1] = new BeatmapSelectPanel(new MultiplayerPlaylistItem { ID = -1 })
             {
                 AllowSelection = allowSelection,
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
                 Action = i => ItemSelected?.Invoke(i),
             };
+            panelGridContainer.Add(randomPanel);
+            panelGridContainer.SetLayoutPosition(randomPanel, float.MinValue);
+            randomPanel.DisplayRandom();
 
-            panelGridContainer.Add(panel);
-            panelGridContainer.SetLayoutPosition(panel, (float)item.StarRating);
+            Schedule(() =>
+            {
+                const double enter_duration = 500;
+
+                // the scroll container has a 1 frame delay until it receives the correct height for the scrollable area which leads to the scrollbar resizing awkwardly
+                // if we wait until the panels have entered we get to avoid having to see that and the scrollbar it will appear synchronized with the rest of the content as a bonus
+                Scheduler.AddDelayed(() => scroll.ScrollbarVisible = true, enter_duration);
+
+                SchedulerAfterChildren.Add(() =>
+                {
+                    foreach (var panel in panelGridContainer)
+                    {
+                        double delay = panel.Y / 3;
+
+                        panel.FadeInAndEnterFromBelow(duration: enter_duration, delay: delay);
+                    }
+                });
+            });
         }
 
         public void SetUserSelection(APIUser user, long itemId, bool selected)
@@ -135,7 +149,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             if (!panelLookup.TryGetValue(-1, out var panel))
                 return;
 
-            panel.DisplayItem(item);
+            playlistItems.TryGetValue(item.ID, out var playlistItem);
+
+            Debug.Assert(playlistItem != null);
+
+            panel.DisplayBeatmap(playlistItem.Beatmap, playlistItem.Mods);
         }
 
         public void RollAndDisplayFinalBeatmap(long[] candidateItemIds, long finalItemId)

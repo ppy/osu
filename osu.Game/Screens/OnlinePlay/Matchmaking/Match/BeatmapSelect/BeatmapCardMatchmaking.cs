@@ -2,17 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Rooms;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
@@ -21,12 +16,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
     {
         public const float WIDTH = 345;
         public const float HEIGHT = 80;
-
-        [Resolved]
-        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
-
-        [Resolved]
-        private RulesetStore rulesetStore { get; set; } = null!;
 
         private readonly List<APIUser> users = new List<APIUser>();
 
@@ -69,37 +58,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             content?.SelectionOverlay.RemoveUser(user.Id);
         }
 
-        public void DisplayItem(MultiplayerPlaylistItem item)
-        {
-            Ruleset? ruleset = rulesetStore.GetRuleset(item.RulesetID)?.CreateInstance();
-
-            if (ruleset == null)
-                return;
-
-            Mod[] mods = item.RequiredMods.Select(m => m.ToMod(ruleset)).ToArray();
-
-            Task.Run(loadBeatmap);
-
-            async Task loadBeatmap()
-            {
-                APIBeatmap? beatmap = await beatmapLookupCache.GetBeatmapAsync(item.BeatmapID).ConfigureAwait(false);
-
-                beatmap ??= new APIBeatmap
-                {
-                    BeatmapSet = new APIBeatmapSet
-                    {
-                        Title = "unknown beatmap",
-                        TitleUnicode = "unknown beatmap",
-                        Artist = "unknown artist",
-                        ArtistUnicode = "unknown artist",
-                    }
-                };
-
-                beatmap.StarRating = item.StarRating;
-
-                loadContent(new BeatmapCardMatchmakingBeatmapContent(beatmap, mods));
-            }
-        }
+        public void DisplayBeatmap(APIBeatmap beatmap, Mod[] mods) => loadContent(new BeatmapCardMatchmakingBeatmapContent(beatmap, mods));
 
         public void DisplayRandom() => loadContent(new BeatmapCardMatchmakingRandomContent());
 
