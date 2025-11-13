@@ -36,6 +36,8 @@ namespace osu.Game.Screens.Edit.GameplayTest
         [Cached(typeof(IGameplayLeaderboardProvider))]
         private EmptyGameplayLeaderboardProvider leaderboardProvider = new EmptyGameplayLeaderboardProvider();
 
+        private bool quickPauseActive;
+
         public EditorPlayer(Editor editor)
             : base(new PlayerConfiguration { ShowResults = false })
         {
@@ -180,10 +182,16 @@ namespace osu.Game.Screens.Edit.GameplayTest
             switch (e.Action)
             {
                 case GlobalAction.EditorTestPlayToggleAutoplay:
+                    if (GameplayClockContainer.IsPaused.Value && !quickPauseActive)
+                        return false;
+
                     toggleAutoplay();
                     return true;
 
                 case GlobalAction.EditorTestPlayToggleQuickPause:
+                    if (GameplayClockContainer.IsPaused.Value && !quickPauseActive)
+                        return false;
+
                     toggleQuickPause();
                     return true;
 
@@ -206,9 +214,6 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
         private void toggleAutoplay()
         {
-            if (GameplayClockContainer.IsPaused.Value)
-                return;
-
             if (DrawableRuleset.ReplayScore == null)
             {
                 var autoplay = Ruleset.Value.CreateInstance().GetAutoplayMod();
@@ -230,10 +235,12 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
         private void toggleQuickPause()
         {
-            if (GameplayClockContainer.IsPaused.Value)
-                GameplayClockContainer.Start();
-            else
+            quickPauseActive = !quickPauseActive;
+
+            if (quickPauseActive)
                 GameplayClockContainer.Stop();
+            else
+                GameplayClockContainer.Start();
         }
 
         private void quickExit(bool useCurrentTime)
