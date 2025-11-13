@@ -206,6 +206,9 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
         private void toggleAutoplay()
         {
+            if (GameplayClockContainer.IsPaused.Value)
+                return;
+
             if (DrawableRuleset.ReplayScore == null)
             {
                 var autoplay = Ruleset.Value.CreateInstance().GetAutoplayMod();
