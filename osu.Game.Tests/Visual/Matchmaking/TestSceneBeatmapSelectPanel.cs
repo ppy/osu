@@ -57,6 +57,8 @@ namespace osu.Game.Tests.Visual.Matchmaking
                         Origin = Anchor.Centre,
                     }
                 };
+
+                Schedule(() => panel!.DisplayBeatmap(CreateAPIBeatmap(), []));
             });
 
             AddStep("add maarvin", () => panel!.AddUser(new APIUser
@@ -133,11 +135,13 @@ namespace osu.Game.Tests.Visual.Matchmaking
                         Origin = Anchor.Centre,
                     }
                 };
+
+                Schedule(() => panel!.DisplayRandom());
             });
 
             AddToggleStep("allow selection", value => panel!.AllowSelection = value);
 
-            AddStep("reveal beatmap", () => panel!.DisplayItem(new MultiplayerPlaylistItem()));
+            AddStep("reveal beatmap", () => panel!.DisplayBeatmap(CreateAPIBeatmap(), []));
         }
 
         [Test]
@@ -150,15 +154,14 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 Child = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = panel = new BeatmapSelectPanel(new MultiplayerPlaylistItem
-                    {
-                        RequiredMods = [new APIMod(new OsuModHardRock()), new APIMod(new OsuModDoubleTime())]
-                    })
+                    Child = panel = new BeatmapSelectPanel(new MultiplayerPlaylistItem())
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     }
                 };
+
+                Schedule(() => panel!.DisplayBeatmap(CreateAPIBeatmap(), [new OsuModHardRock(), new OsuModDoubleTime()]));
 
                 panel.AddUser(new APIUser
                 {
