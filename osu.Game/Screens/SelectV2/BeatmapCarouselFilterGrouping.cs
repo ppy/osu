@@ -26,6 +26,8 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         public int BeatmapItemsCount { get; private set; }
 
+        public IDictionary<object, (CarouselItem item, int index)> ItemMap => itemMap;
+
         /// <summary>
         /// Beatmap sets contain difficulties as related panels. This dictionary holds the relationships between set-difficulties to allow expanding them on selection.
         /// </summary>
@@ -36,6 +38,7 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         public IDictionary<GroupDefinition, HashSet<CarouselItem>> GroupItems => groupMap;
 
+        private Dictionary<object, (CarouselItem, int)> itemMap = new Dictionary<object, (CarouselItem, int)>();
         private Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>> setMap = new Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>>();
         private Dictionary<GroupDefinition, HashSet<CarouselItem>> groupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>();
 
@@ -49,6 +52,7 @@ namespace osu.Game.Screens.SelectV2
             return await Task.Run(() =>
             {
                 // preallocate space for the new mappings using last known estimates
+                var newItemMap = new Dictionary<object, (CarouselItem, int)>(itemMap.Count);
                 var newSetMap = new Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>>(setMap.Count);
                 var newGroupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>(groupMap.Count);
 
@@ -127,6 +131,7 @@ namespace osu.Game.Screens.SelectV2
                     {
                         newItems.Add(i);
 
+                        newItemMap[i.Model] = (i, newItems.Count - 1);
                         currentGroupItems?.Add(i);
                         currentSetItems?.Add(i);
 
@@ -136,6 +141,7 @@ namespace osu.Game.Screens.SelectV2
 
                 cancellationToken.ThrowIfCancellationRequested();
 
+                Interlocked.Exchange(ref itemMap, newItemMap);
                 Interlocked.Exchange(ref setMap, newSetMap);
                 Interlocked.Exchange(ref groupMap, newGroupMap);
                 BeatmapItemsCount = displayedBeatmapsCount;

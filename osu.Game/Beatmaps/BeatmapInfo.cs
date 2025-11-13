@@ -157,6 +157,12 @@ namespace osu.Game.Beatmaps
 
         public bool Equals(IBeatmapInfo? other) => other is BeatmapInfo b && Equals(b);
 
+        public override int GetHashCode()
+        {
+            // ReSharper disable once NonReadonlyMemberInGetHashCode
+            return ID.GetHashCode();
+        }
+
         public bool AudioEquals(BeatmapInfo? other) => other != null
                                                        && BeatmapSet != null
                                                        && other.BeatmapSet != null
