@@ -44,12 +44,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 
         private static void processDifficultyHitObjects(ManiaDifficultyContext data, List<DifficultyHitObject> hitObjects, IBeatmap beatmap)
         {
-            int totalColumns = Math.Max(1, ((ManiaBeatmap)beatmap).TotalColumns);
-
-            var perColumnObjects = new List<ManiaDifficultyHitObject>[totalColumns];
-            for (int c = 0; c < totalColumns; c++)
-                perColumnObjects[c] = new List<ManiaDifficultyHitObject>();
-
             var longNotes = new List<ManiaDifficultyHitObject>();
             var longNotesTails = new List<ManiaDifficultyHitObject>();
 
@@ -65,26 +59,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 
             for (int i = 0; i < hitObjects.Count; i++)
             {
-                maniaList.Add((ManiaDifficultyHitObject)hitObjects[i]);
-            }
+                var mdho = (ManiaDifficultyHitObject)hitObjects[i];
+                maniaList.Add(mdho);
 
-            foreach (var maniaDifficultyHitObject in maniaList)
-            {
-                int col = maniaDifficultyHitObject.Column;
-
-                if (col >= 0 && col < totalColumns)
-                {
-                    perColumnObjects[col].Add(maniaDifficultyHitObject);
-                }
-
-                if (maniaDifficultyHitObject.IsLong)
-                    longNotes.Add(maniaDifficultyHitObject);
+                if (mdho.IsLong)
+                    longNotes.Add(mdho);
             }
 
             if (longNotes.Count > 0)
             {
-                longNotesTails.AddRange(longNotes);
-                longNotesTails.Sort((a, b) => a.EndTime.CompareTo(b.EndTime));
+                var longNoteTails = new List<ManiaDifficultyHitObject>(longNotes);
+                longNoteTails.Sort((a, b) => a.EndTime.CompareTo(b.EndTime));
+                data.LongNoteTails = longNoteTails;
             }
 
             data.AllNotes = maniaList;

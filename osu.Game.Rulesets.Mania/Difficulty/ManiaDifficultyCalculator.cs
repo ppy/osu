@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             var pressingIntensitySkill = (PressingIntensity)skills[2];
             var unevennessSkill = (Unevenness)skills[3];
             var releaseSkill = (Release)skills[4];
-            var localNoteCountSkill = (LocalNoteDensity)skills[5];
+            var localNoteDensitySkill = (LocalNoteDensity)skills[5];
 
             var combinedStrains = combineStrains(
                 sameColumnSkill.GetObjectStrains().ToList(),
@@ -71,11 +71,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 pressingIntensitySkill.GetObjectStrains().ToList(),
                 unevennessSkill.GetObjectStrains().ToList(),
                 releaseSkill.GetObjectStrains().ToList(),
-                localNoteCountSkill.GetObjectStrains().ToList(),
-                localNoteCountSkill.GetActiveKeyStrains().ToList()
+                localNoteDensitySkill.GetObjectStrains().ToList(),
+                localNoteDensitySkill.GetActiveKeyStrains().ToList()
             );
 
-            double sr = calculateDifficultyValue(combinedStrains, localNoteCountSkill);
+            double sr = calculateDifficultyValue(combinedStrains, localNoteDensitySkill);
             int totalColumns = ((ManiaBeatmap)Beatmap).TotalColumns;
 
             return new ManiaDifficultyAttributes
