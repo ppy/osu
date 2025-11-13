@@ -17,7 +17,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         public new MatchmakingPlaylistItemRandom Item => (MatchmakingPlaylistItemRandom)base.Item;
 
         public MatchmakingSelectPanelRandom(MatchmakingPlaylistItemRandom item)
-            : base(item) { }
+            : base(item)
+        {
+        }
 
         private Container? randomPanelContent;
         private BeatmapCardMatchmakingBeatmapContent? beatmapPanelContent;

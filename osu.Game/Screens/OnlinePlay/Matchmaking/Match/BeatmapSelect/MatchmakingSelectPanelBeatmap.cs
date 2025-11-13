@@ -13,7 +13,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         public new MatchmakingPlaylistItemBeatmap Item => (MatchmakingPlaylistItemBeatmap)base.Item;
 
         public MatchmakingSelectPanelBeatmap(MatchmakingPlaylistItemBeatmap item)
-            : base(item) { }
+            : base(item)
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
