@@ -1,11 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Backgrounds;
@@ -27,10 +31,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         private Container? randomPanelContent;
         private BeatmapCardMatchmakingBeatmapContent? beatmapPanelContent;
         private SpriteIcon dice = null!;
+        private OsuSpriteText label = null!;
+
+        private Sample? resultSample;
+        private Sample? swooshSample;
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(AudioManager audio, OverlayColourProvider colourProvider)
         {
+            resultSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Selection/roulette-result");
+            swooshSample = audio.Samples.Get(@"SongSelect/options-pop-out");
+
             Add(randomPanelContent = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -46,7 +57,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0.1f,
                     },
-                    new OsuSpriteText
+                    label = new OsuSpriteText
                     {
                         Y = 20,
                         Anchor = Anchor.Centre,
@@ -70,23 +81,47 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
         public override void PresentAsChosenBeatmap(MatchmakingPlaylistItemBeatmap item)
         {
-            ShowChosenBorder();
+            const double duration = 800;
 
             this.MoveTo(Vector2.Zero, 1000, Easing.OutExpo)
-                .ScaleTo(1.5f, 1000, Easing.OutExpo);
+                .ScaleTo(1.5f, duration, Easing.OutExpo);
 
-            randomPanelContent?.Expire();
-            dice.FadeOut().Expire();
+            dice.MoveToY(-200, duration * 0.55, new PowEasingFunction(2.75, easeOut: true))
+                .Then()
+                .Schedule(() => ScaleContainer.ChangeChildDepth(dice, float.MaxValue))
+                .MoveToY(-DrawHeight / 2, duration * 0.45, new PowEasingFunction(2.2))
+                .Then()
+                .FadeOut()
+                .Expire();
 
-            var flashLayer = new Box { RelativeSizeAxes = Axes.Both };
+            dice.RotateTo(dice.Rotation - 360 * 5, duration * 1.3f, Easing.Out);
 
-            AddRange(new Drawable[]
+            label.FadeOut(200).Expire();
+
+            swooshSample?.Play();
+
+            Scheduler.AddDelayed(() =>
             {
-                beatmapPanelContent = new BeatmapCardMatchmakingBeatmapContent(item.Beatmap, item.Mods),
-                flashLayer,
-            });
+                randomPanelContent?.Expire();
 
-            flashLayer.FadeOutFromOne(1000, Easing.In).Expire();
+                ShowChosenBorder();
+
+                ScaleContainer.ScaleTo(0.92f, 120, Easing.Out)
+                              .Then()
+                              .ScaleTo(1f, 600, Easing.OutElasticHalf);
+
+                var flashLayer = new Box { RelativeSizeAxes = Axes.Both };
+
+                AddRange(new Drawable[]
+                {
+                    beatmapPanelContent = new BeatmapCardMatchmakingBeatmapContent(item.Beatmap, item.Mods),
+                    flashLayer,
+                });
+
+                flashLayer.FadeOut(1000).Expire();
+
+                resultSample?.Play();
+            }, duration);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -118,5 +153,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         };
 
         private static IconUsage randomDiceIcon() => diceIcons[RNG.Next(diceIcons.Length)];
+
+        private readonly struct PowEasingFunction(double exponent, bool easeOut = false) : IEasingFunction
+        {
+            public double ApplyEasing(double time)
+            {
+                if (easeOut)
+                    time = 1 - time;
+
+                double value = Math.Pow(time, exponent);
+
+                return easeOut ? 1 - value : value;
+            }
+        }
     }
 }

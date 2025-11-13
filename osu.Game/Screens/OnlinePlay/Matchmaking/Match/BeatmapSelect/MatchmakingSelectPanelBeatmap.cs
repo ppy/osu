@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osuTK;
 
@@ -17,9 +18,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         {
         }
 
+        private Sample? resultSample;
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
+            resultSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Selection/roulette-result");
+
             Add(content = new BeatmapCardMatchmakingBeatmapContent(Item.Beatmap, Item.Mods));
         }
 
@@ -29,6 +34,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
             this.MoveTo(Vector2.Zero, 1000, Easing.OutExpo)
                 .ScaleTo(1.5f, 1000, Easing.OutExpo);
+
+            resultSample?.Play();
         }
 
         private BeatmapCardMatchmakingBeatmapContent? content;
