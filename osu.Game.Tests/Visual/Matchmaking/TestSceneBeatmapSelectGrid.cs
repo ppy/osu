@@ -233,7 +233,8 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
         private (long[] candidateItems, long finalItem) pickRandomItems(int count)
         {
-            long[] candidateItems = items.Select(it => it.ID).ToArray();
+            long[] candidateItems = items.Where(it => it is MatchmakingPlaylistItemBeatmap)
+                                         .Select(it => it.ID).ToArray();
             Random.Shared.Shuffle(candidateItems);
             candidateItems = candidateItems.Take(count).ToArray();
 
