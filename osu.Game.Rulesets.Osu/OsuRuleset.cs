@@ -450,6 +450,6 @@ namespace osu.Game.Rulesets.Osu
 
         public override bool EditorShowScrollSpeed => false;
 
-        public override RulesetEditorMenuBarItems? CreateEditorMenuBarItems() => new OsuRulesetEditorMenuBarItems();
+        public override RulesetEditorMenuBarItems CreateEditorMenuBarItems() => new OsuRulesetEditorMenuBarItems();
     }
 }
