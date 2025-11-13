@@ -44,9 +44,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 
         private static void processDifficultyHitObjects(ManiaDifficultyContext data, List<DifficultyHitObject> hitObjects, IBeatmap beatmap)
         {
-            var longNotes = new List<ManiaDifficultyHitObject>();
-            var longNotesTails = new List<ManiaDifficultyHitObject>();
-
             if (hitObjects.Count == 0)
             {
                 data.AllNotes = new List<ManiaDifficultyHitObject>();
@@ -56,6 +53,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             }
 
             var maniaList = new List<ManiaDifficultyHitObject>(hitObjects.Count);
+            var longNotes = new List<ManiaDifficultyHitObject>();
 
             for (int i = 0; i < hitObjects.Count; i++)
             {
@@ -66,16 +64,19 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
                     longNotes.Add(mdho);
             }
 
+            data.AllNotes = maniaList;
+            data.LongNotes = longNotes;
+
             if (longNotes.Count > 0)
             {
                 var longNoteTails = new List<ManiaDifficultyHitObject>(longNotes);
                 longNoteTails.Sort((a, b) => a.EndTime.CompareTo(b.EndTime));
                 data.LongNoteTails = longNoteTails;
             }
-
-            data.AllNotes = maniaList;
-            data.LongNotes = longNotes;
-            data.LongNoteTails = longNotesTails;
+            else
+            {
+                data.LongNoteTails = new List<ManiaDifficultyHitObject>();
+            }
         }
 
         private static void calculateMaxTime(ManiaDifficultyContext data)
