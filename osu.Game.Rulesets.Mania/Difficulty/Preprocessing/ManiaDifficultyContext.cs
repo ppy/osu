@@ -51,29 +51,21 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         /// </summary>
         public double SampleFeatureAtTime(double time, double[] featureArray) => interpolateValue(time, CornerData.TimeCorners, featureArray);
 
-        /// <summary>
-        /// Performs linear interpolation to find a value at a specific point.
-        /// This enables smooth difficulty curves between discrete calculation points.
-        /// </summary>
-        private double interpolateValue(double targetPoint, double[] xArray, double[] yArray)
+        private double interpolateValue(double targetTime, double[] timePoints, double[] values)
         {
-            if (xArray.Length == 0 || yArray.Length == 0)
+            if (timePoints.Length == 0 || values.Length == 0)
                 return 0.0;
 
-            if (targetPoint <= xArray[0]) return yArray[0];
-            if (targetPoint >= xArray[^1]) return yArray[^1];
+            if (targetTime <= timePoints[0]) return values[0];
+            if (targetTime >= timePoints[^1]) return values[^1];
 
-            int searchResult = Array.BinarySearch(xArray, targetPoint);
-            if (searchResult >= 0) return yArray[searchResult];
+            int index = Array.BinarySearch(timePoints, targetTime);
 
-            int rightIndex = ~searchResult;
-            int leftIndex = rightIndex - 1;
+            if (index >= 0)
+                return values[index];
 
-            double denominator = xArray[rightIndex] - xArray[leftIndex];
-            if (denominator == 0.0) return yArray[leftIndex];
-
-            double interpolationFactor = (targetPoint - xArray[leftIndex]) / denominator;
-            return yArray[leftIndex] * (1.0 - interpolationFactor) + yArray[rightIndex] * interpolationFactor;
+            int floorIndex = (~index) - 1;
+            return values[Math.Clamp(floorIndex, 0, values.Length - 1)];
         }
     }
 }
