@@ -679,13 +679,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), CustomSampleBank, IsLayered);
         }
 
-        private class FileHitSampleInfo : LegacyHitSampleInfo, IEquatable<FileHitSampleInfo>
+        public class FileHitSampleInfo : LegacyHitSampleInfo, IEquatable<FileHitSampleInfo>
         {
             public readonly string Filename;
 
             public FileHitSampleInfo(string filename, int volume)
                 // Force CSS=1 to make sure that the LegacyBeatmapSkin does not fall back to the user skin.
-                : base(HIT_NORMAL, customSampleBank: 1, volume: volume)
+                : base(HIT_NORMAL, SampleControlPoint.DEFAULT_BANK, customSampleBank: 1, volume: volume)
             {
                 Filename = filename;
             }
