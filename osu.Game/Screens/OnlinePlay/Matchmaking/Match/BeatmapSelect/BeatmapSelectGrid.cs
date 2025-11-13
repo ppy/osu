@@ -157,10 +157,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 _ => throw new ArgumentOutOfRangeException(nameof(rollType), rollType, null)
             };
 
+            Debug.Assert(finalItemId != IMatchmakingPlaylistItem.ID_RANDOM);
             Debug.Assert(candidateItemIds.Length >= 1);
-            Debug.Assert(candidateItemIds.Contains(finalItemId));
-            Debug.Assert(panelLookup.ContainsKey(finalItemId));
-            Debug.Assert(candidateItemIds.All(id => panelLookup.ContainsKey(id)));
+            Debug.Assert(candidateItemIds.Contains(rolledItemId));
+            Debug.Assert(panelLookup.ContainsKey(rolledItemId));
+            Debug.Assert(playlistItems.ContainsKey(finalItemId));
+
+            foreach (long id in candidateItemIds)
+                Debug.Assert(panelLookup.ContainsKey(id));
 
             allowSelection = false;
 
