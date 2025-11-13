@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
@@ -86,6 +87,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             });
 
             flashLayer.FadeOutFromOne(1000, Easing.In).Expire();
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            var icon = randomDiceIcon();
+
+            while (icon.Equals(dice.Icon))
+                icon = randomDiceIcon();
+
+            dice.Icon = icon;
+            dice.ScaleTo(0.65f, 60, Easing.Out)
+                .Then()
+                .Schedule(() => dice.Icon = icon)
+                .ScaleTo(1f, 400, Easing.OutElasticHalf);
+
+            return base.OnClick(e);
         }
 
         protected override float AvatarOverlayOffset => base.AvatarOverlayOffset + (beatmapPanelContent?.AvatarOffset ?? 0);
