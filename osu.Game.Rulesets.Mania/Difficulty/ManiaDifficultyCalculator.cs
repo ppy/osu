@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         public readonly double[] DifficultyPercentilesMid = { 0.845, 0.835, 0.825, 0.815 };
 
         private readonly bool isForCurrentRuleset;
-        private Dictionary<StrainKey, double>? strainCache;
+        private Dictionary<(int, int, int, int, int, int, int), double>? strainCache;
 
         public override int Version => 20241008;
 
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             IReadOnlyList<double> localNoteStrains,
             IReadOnlyList<double> activeKeyStrains)
         {
-            strainCache ??= new Dictionary<StrainKey, double>();
+            strainCache ??= new Dictionary<(int, int, int, int, int, int, int), double>();
             int count = new[]
             {
                 jackStrains.Count,
@@ -134,10 +134,17 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double localNoteCount = valueOrZero(localNoteStrains, i);
                 double activeKeyCount = valueOrZero(activeKeyStrains, i);
 
-                var key = new StrainKey(sameColumn, crossColumn, pressingIntensity,
-                    unevenness, release, localNoteCount, activeKeyCount);
+                var cacheKey = (
+                    (int)Math.Round(sameColumn * 1000),
+                    (int)Math.Round(crossColumn * 1000),
+                    (int)Math.Round(pressingIntensity * 1000),
+                    (int)Math.Round(unevenness * 1000),
+                    (int)Math.Round(release * 1000),
+                    (int)Math.Round(localNoteCount * 1000),
+                    (int)Math.Round(activeKeyCount * 1000)
+                );
 
-                if (strainCache.TryGetValue(key, out double cachedResult))
+                if (strainCache.TryGetValue(cacheKey, out double cachedResult))
                 {
                     combinedStrains.Add(cachedResult);
                     continue;
@@ -156,7 +163,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double twistComponent = (unevennessKeyAdjustment * crossColumn) / (crossColumn + totalStrainDifficulty + 1.0);
                 double poweredTwist = twistComponent > 0.0 ? twistComponent * Math.Sqrt(twistComponent) : 0.0;
                 double finalStrain = 2.7 * Math.Sqrt(totalStrainDifficulty) * poweredTwist + totalStrainDifficulty * 0.27;
-                strainCache[key] = finalStrain;
+                strainCache[cacheKey] = finalStrain;
                 combinedStrains.Add(finalStrain);
             }
 
@@ -289,52 +296,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                     new ManiaModKey9(),
                     new MultiMod(new ManiaModKey9(), new ManiaModDualStages()),
                 }).ToArray();
-            }
-        }
-
-        private readonly struct StrainKey : IEquatable<StrainKey>
-        {
-            private readonly int sameColumnRounded;
-            private readonly int crossColumnRounded;
-            private readonly int pressingIntensityRounded;
-            private readonly int unevennessRounded;
-            private readonly int releaseRounded;
-            private readonly int localNoteCountRounded;
-            private readonly int activeKeyCountRounded;
-
-            public StrainKey(double sameColumn, double crossColumn, double pressingIntensity, double unevenness, double release, double localNoteCount, double activeKeyCount)
-            {
-                sameColumnRounded = (int)Math.Round(sameColumn * 1000);
-                crossColumnRounded = (int)Math.Round(crossColumn * 1000);
-                pressingIntensityRounded = (int)Math.Round(pressingIntensity * 1000);
-                unevennessRounded = (int)Math.Round(unevenness * 1000);
-                releaseRounded = (int)Math.Round(release * 1000);
-                localNoteCountRounded = (int)Math.Round(localNoteCount * 1000);
-                activeKeyCountRounded = (int)Math.Round(activeKeyCount * 1000);
-            }
-
-            public bool Equals(StrainKey other) =>
-                sameColumnRounded == other.sameColumnRounded &&
-                crossColumnRounded == other.crossColumnRounded &&
-                pressingIntensityRounded == other.pressingIntensityRounded &&
-                unevennessRounded == other.unevennessRounded &&
-                releaseRounded == other.releaseRounded &&
-                localNoteCountRounded == other.localNoteCountRounded &&
-                activeKeyCountRounded == other.activeKeyCountRounded;
-
-            public override bool Equals(object? obj) => obj is StrainKey other && Equals(other);
-
-            public override int GetHashCode()
-            {
-                return HashCode.Combine(
-                    sameColumnRounded,
-                    crossColumnRounded,
-                    pressingIntensityRounded,
-                    unevennessRounded,
-                    releaseRounded,
-                    localNoteCountRounded,
-                    activeKeyCountRounded
-                );
             }
         }
     }
