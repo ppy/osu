@@ -37,9 +37,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private Bindable<ScalingMode> scalingMode = null!;
         private Bindable<Size> sizeFullscreen = null!;
         private Bindable<Size> sizeWindowed = null!;
-        private readonly BindableWithCurrent<Size> currentResolution = new BindableWithCurrent<Size>();
 
-        private readonly BindableList<Size> resolutions = new BindableList<Size>(new[] { new Size(9999, 9999) });
+        private readonly BindableList<Size> resolutionsFullscreen = new BindableList<Size>(new[] { new Size(9999, 9999) });
+        private readonly BindableList<Size> resolutionsWindowed = new BindableList<Size>();
         private readonly IBindable<FullscreenCapability> fullscreenCapability = new Bindable<FullscreenCapability>(FullscreenCapability.Capable);
 
         [Resolved]
@@ -50,12 +50,15 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private IWindow? window;
 
-        private SettingsDropdown<Size> resolutionDropdown = null!;
+        private SettingsDropdown<Size> resolutionFullscreenDropdown = null!;
+        private SettingsDropdown<Size> resolutionWindowedDropdown = null!;
         private SettingsDropdown<Display> displayDropdown = null!;
         private SettingsDropdown<WindowMode> windowModeDropdown = null!;
         private SettingsCheckbox minimiseOnFocusLossCheckbox = null!;
         private SettingsCheckbox safeAreaConsiderationsCheckbox = null!;
 
+        private Bindable<double> windowedPositionX = null!;
+        private Bindable<double> windowedPositionY = null!;
         private Bindable<float> scalingPositionX = null!;
         private Bindable<float> scalingPositionY = null!;
         private Bindable<float> scalingSizeX = null!;
@@ -73,6 +76,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             scalingMode = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
             sizeFullscreen = config.GetBindable<Size>(FrameworkSetting.SizeFullscreen);
             sizeWindowed = config.GetBindable<Size>(FrameworkSetting.WindowedSize);
+            windowedPositionX = config.GetBindable<double>(FrameworkSetting.WindowedPositionX);
+            windowedPositionY = config.GetBindable<double>(FrameworkSetting.WindowedPositionY);
             scalingSizeX = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX);
             scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
             scalingPositionX = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionX);
@@ -103,12 +108,19 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Items = window?.Displays,
                     Current = currentDisplay,
                 },
-                resolutionDropdown = new ResolutionSettingsDropdown
+                resolutionFullscreenDropdown = new ResolutionSettingsDropdown
                 {
                     LabelText = GraphicsSettingsStrings.Resolution,
                     ShowsDefaultIndicator = false,
-                    ItemSource = resolutions,
-                    Current = currentResolution
+                    ItemSource = resolutionsFullscreen,
+                    Current = sizeFullscreen
+                },
+                resolutionWindowedDropdown = new ResolutionSettingsDropdown
+                {
+                    LabelText = GraphicsSettingsStrings.Resolution,
+                    ShowsDefaultIndicator = false,
+                    ItemSource = resolutionsWindowed,
+                    Current = sizeWindowed
                 },
                 minimiseOnFocusLossCheckbox = new SettingsCheckbox
                 {
@@ -199,27 +211,31 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             {
                 updateDisplaySettingsVisibility();
                 updateScreenModeWarning();
-                updateCurrentResolutionBinding();
             }, true);
 
             currentDisplay.BindValueChanged(display => Schedule(() =>
             {
                 if (display.NewValue == null)
                 {
-                    resolutions.Clear();
+                    resolutionsFullscreen.Clear();
+                    resolutionsWindowed.Clear();
                     return;
                 }
 
-                var buffer = new Bindable<Size>(currentResolution.Value);
-                currentResolution.Current = buffer;
+                var buffer = new Bindable<Size>(sizeWindowed.Value);
+                resolutionWindowedDropdown.Current = buffer;
 
-                resolutions.ReplaceRange(1, resolutions.Count - 1, display.NewValue.DisplayModes
-                                                                          .Where(m => m.Size.Width >= 800 && m.Size.Height >= 600)
-                                                                          .OrderByDescending(m => Math.Max(m.Size.Height, m.Size.Width))
-                                                                          .Select(m => m.Size)
-                                                                          .Distinct());
+                var newResolutions = display.NewValue.DisplayModes
+                                            .Where(m => m.Size.Width >= 800 && m.Size.Height >= 600)
+                                            .OrderByDescending(m => Math.Max(m.Size.Height, m.Size.Width))
+                                            .Select(m => m.Size)
+                                            .Distinct()
+                                            .ToList();
 
-                updateCurrentResolutionBinding();
+                resolutionsFullscreen.ReplaceRange(1, resolutionsFullscreen.Count - 1, newResolutions);
+                resolutionsWindowed.ReplaceRange(0, resolutionsWindowed.Count, newResolutions);
+
+                resolutionWindowedDropdown.Current = sizeWindowed;
 
                 updateDisplaySettingsVisibility();
             }), true);
@@ -229,20 +245,13 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 if (windowModeDropdown.Current.Value != WindowMode.Windowed)
                     return;
 
-                if (window?.WindowState == Framework.Platform.WindowState.Normal &&
-                    size.NewValue == new Size(9999, 9999)
-                   )
-                {
-                    window.WindowState = Framework.Platform.WindowState.Maximised;
-                    return;
-                }
-
-                if (window?.WindowState == Framework.Platform.WindowState.Maximised &&
-                    size.NewValue != new Size(9999, 9999)
-                   )
+                if (window?.WindowState == Framework.Platform.WindowState.Maximised)
                 {
                     window.WindowState = Framework.Platform.WindowState.Normal;
                 }
+
+                windowedPositionX.Value = 0.5;
+                windowedPositionY.Value = 0.5;
             });
 
             scalingMode.BindValueChanged(_ =>
@@ -276,20 +285,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             }
         }
 
-        private void updateCurrentResolutionBinding()
-        {
-            switch (windowModeDropdown.Current.Value)
-            {
-                case WindowMode.Fullscreen:
-                    currentResolution.Current = sizeFullscreen;
-                    break;
-
-                case WindowMode.Windowed:
-                    currentResolution.Current = sizeWindowed;
-                    break;
-            }
-        }
-
         private void onDisplaysChanged(IEnumerable<Display> displays)
         {
             Scheduler.AddOnce(d =>
@@ -302,9 +297,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private void updateDisplaySettingsVisibility()
         {
-            resolutionDropdown.CanBeShown.Value = resolutions.Count > 1
-                                                  && (windowModeDropdown.Current.Value == WindowMode.Fullscreen ||
-                                                      windowModeDropdown.Current.Value == WindowMode.Windowed);
+            resolutionFullscreenDropdown.CanBeShown.Value = windowModeDropdown.Current.Value == WindowMode.Fullscreen && resolutionsFullscreen.Count > 1;
+            resolutionWindowedDropdown.CanBeShown.Value = windowModeDropdown.Current.Value == WindowMode.Windowed && resolutionsWindowed.Count > 1;
+
             displayDropdown.CanBeShown.Value = displayDropdown.Items.Count() > 1;
             minimiseOnFocusLossCheckbox.CanBeShown.Value = RuntimeInfo.IsDesktop && windowModeDropdown.Current.Value == WindowMode.Fullscreen;
             safeAreaConsiderationsCheckbox.CanBeShown.Value = host.Window?.SafeAreaPadding.Value.Total != Vector2.Zero;
