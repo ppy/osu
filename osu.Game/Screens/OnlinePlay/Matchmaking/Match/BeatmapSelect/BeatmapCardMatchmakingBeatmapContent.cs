@@ -81,7 +81,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 thumbnail = new BeatmapCardThumbnail(beatmapSet, beatmapSet, keepLoaded: true)
                 {
                     Name = @"Left (icon) area",
-                    Size = new Vector2(BeatmapCardMatchmaking.HEIGHT),
+                    Size = new Vector2(MatchmakingSelectPanel.HEIGHT),
                     Padding = new MarginPadding { Right = BeatmapCard.CORNER_RADIUS },
                     Child = leftIconArea = new FillFlowContainer
                     {
@@ -93,8 +93,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 },
                 buttonContainer = new CollapsibleButtonContainer(beatmapSet, allowNavigationToBeatmap: false, keepBackgroundLoaded: true)
                 {
-                    X = BeatmapCardMatchmaking.HEIGHT - BeatmapCard.CORNER_RADIUS,
-                    Width = BeatmapCard.WIDTH - BeatmapCardMatchmaking.HEIGHT + BeatmapCard.CORNER_RADIUS,
+                    X = MatchmakingSelectPanel.HEIGHT - BeatmapCard.CORNER_RADIUS,
+                    Width = BeatmapCard.WIDTH - MatchmakingSelectPanel.HEIGHT + BeatmapCard.CORNER_RADIUS,
                     FavouriteState = { BindTarget = favouriteState },
                     ButtonsCollapsedWidth = 0,
                     ButtonsExpandedWidth = 24,
