@@ -108,7 +108,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
             var playlistItems = new List<MatchmakingPlaylistItem>();
 
-            foreach (var entry in items.Zip(beatmaps))
+            foreach (var entry in itemsImmutable.Zip(beatmaps))
             {
                 var (item, beatmap) = entry;
 
