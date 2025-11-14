@@ -10,8 +10,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
 {
     public class UnevennessPreprocessor
     {
+        private const int accuracy_smoothing_window_ms = 400;
+
         /// <summary>
-        /// Computes the unevenness values across all time points.
+        /// Computes the unevenness values across all-time points.
         /// This measures how irregular the timing patterns are between adjacent columns.
         /// </summary>
         public static double[] ComputeValues(ManiaDifficultyContext data)
@@ -42,7 +44,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
             {
                 double[] columnDeltas = new double[timePointCount];
                 List<ManiaDifficultyHitObject> columnNotes = data.AllNotes.First().PerColumnObjects.Select(list => list.Cast<ManiaDifficultyHitObject>().ToList()).ToArray()[column];
-                //var columnNotes = data.PerColumnObjects[column];
 
                 // Initialize with default value (no pattern detected)
                 const double no_pattern_value = 1e9;
@@ -91,7 +92,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         /// </summary>
         private static double[] calculateBaseUnevenness(ManiaDifficultyContext data, bool[][] keyUsagePatterns, double[][] timingDeltas)
         {
-            FormulaConfig config = new FormulaConfig();
             int keyCount = data.KeyCount;
             int accuracyTimePoints = data.CornerData.AccuracyTimeCorners.Length;
 
@@ -122,7 +122,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
 
                     if (previousActiveColumn >= 0)
                     {
-                        // Compute difference on-demand instead of from pre-computed array
                         double leftDelta = timingDeltas[previousActiveColumn][baseTimeIndex];
                         double rightDelta = timingDeltas[column][baseTimeIndex];
 
@@ -141,7 +140,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
             return StrainArrayUtils.ApplySmoothingToArray(
                 data.CornerData.AccuracyTimeCorners,
                 unevennessBase,
-                config.AccuracySmoothingWindowMs,
+                accuracy_smoothing_window_ms,
                 1.0,
                 "avg"
             );

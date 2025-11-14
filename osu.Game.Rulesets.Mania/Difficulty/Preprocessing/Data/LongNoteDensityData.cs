@@ -5,18 +5,27 @@ using System;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
 {
+    /// <summary>
+    /// Represents density contribution from long notes over time.
+    /// Stores time points where density changes and corresponding density values.
+    /// </summary>
     public class LongNoteDensityData
     {
-        /// <summary>Time points where density values change</summary>
+        /// <summary>
+        /// Time points where density values change (must be sorted).
+        /// </summary>
         public required double[] TimePoints;
 
-        /// <summary>Density values at each time point</summary>
+        /// <summary>
+        /// Density values corresponding to each time point in <see cref="TimePoints"/>.
+        /// </summary>
         public required double[] DensityValues;
 
         /// <summary>
-        /// Calculates the total density contribution between two time points.
-        /// This is used to determine how much long note influence exists in a time range.
+        /// Calculates total density contribution between two time points.
+        /// Integrates density values over the specified time range.
         /// </summary>
+        /// <returns>Total density contribution in the time range</returns>
         public double SumBetween(int startTime, int endTime)
         {
             if (TimePoints.Length == 0) return 0.0;
@@ -24,31 +33,31 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
             int startIndex = findTimeIndex(startTime);
             int endIndex = findTimeIndex(endTime);
 
+            // Single segment case
             if (startIndex == endIndex)
             {
-                // Range falls within a single density segment
                 return (endTime - startTime) * DensityValues[startIndex];
             }
 
             double totalContribution = 0.0;
 
-            // Add contribution from the first partial segment
+            // First partial segment
             totalContribution += (TimePoints[startIndex + 1] - startTime) * DensityValues[startIndex];
 
-            // Add contributions from complete segments in between
+            // Full segments in between
             for (int i = startIndex + 1; i < endIndex; i++)
                 totalContribution += (TimePoints[i + 1] - TimePoints[i]) * DensityValues[i];
 
-            // Add contribution from the last partial segment
+            // Last partial segment
             totalContribution += (endTime - TimePoints[endIndex]) * DensityValues[endIndex];
 
             return totalContribution;
         }
 
         /// <summary>
-        /// Finds the index of the density segment that contains the given time.
-        /// Uses binary search for efficient lookup.
+        /// Finds the density segment index containing the specified time.
         /// </summary>
+        /// <returns>Index of the density segment containing the time</returns>
         private int findTimeIndex(int time)
         {
             int index = Array.BinarySearch(TimePoints, time);

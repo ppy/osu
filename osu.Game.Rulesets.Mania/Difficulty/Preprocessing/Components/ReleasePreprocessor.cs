@@ -9,20 +9,21 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
 {
     public class ReleasePreprocessor
     {
+        private const int smoothing_window_ms = 500;
+
         /// <summary>
         /// Computes the release factor values across all time points.
         /// This focuses on the difficulty of timing long note releases correctly.
         /// </summary>
         public static double[] ComputeValues(ManiaDifficultyContext data)
         {
-            FormulaConfig config = new FormulaConfig();
             double[] baseRelease = calculateBaseReleaseFactor(data);
 
             // Apply smoothing to create stable difficulty curves
             double[] smoothed = StrainArrayUtils.ApplySmoothingToArray(
                 data.CornerData.BaseTimeCorners,
                 baseRelease,
-                config.SmoothingWindowMs,
+                smoothing_window_ms,
                 0.001,
                 "sum"
             );
@@ -67,7 +68,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
             for (int i = 0; i < data.LongNoteTails.Count; i++)
             {
                 var tailNote = data.LongNoteTails[i];
-                var nextNoteInColumn = tailNote.NextInColumn(); //findNextNoteInColumn(tailNote, data, startTimesByColumn);
+                var nextNoteInColumn = tailNote.NextInColumn();
 
                 // Calculate difficulty components
                 double holdDuration = Math.Abs(tailNote.EndTime - tailNote.StartTime - 80.0);
@@ -89,8 +90,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
                 double holdDifficultyComponent = 0.001 * holdDuration / data.HitLeniency;
                 double timingDifficultyComponent = 0.001 * releaseToNextNote / data.HitLeniency;
 
-                double lh = DifficultyCalculationUtils.Logistic(holdDifficultyComponent, 0.75, 5.0); // logistic for hold
-                double lt = DifficultyCalculationUtils.Logistic(timingDifficultyComponent, 0.75, 5.0); // logistic for timing
+                double lh = DifficultyCalculationUtils.Logistic(holdDifficultyComponent, 0.75, 5.0);
+                double lt = DifficultyCalculationUtils.Logistic(timingDifficultyComponent, 0.75, 5.0);
 
                 // harmonic mean of the two logistic outputs (safe against repeated evaluation)
                 releaseDifficulties[i] = 2.0 * (lh * lt) / (lh + lt);

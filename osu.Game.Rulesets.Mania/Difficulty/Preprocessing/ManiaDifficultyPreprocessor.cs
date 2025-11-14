@@ -13,15 +13,19 @@ using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner;
 namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 {
     /// <summary>
-    /// Main preprocessor that converts raw difficulty hit objects into structured data for difficulty calculation.
-    /// This class orchestrates the entire preprocessing pipeline.
+    /// Orchestrates the entire preprocessing pipeline for Mania difficulty calculation.
+    /// Converts raw hit objects into structured difficulty context data through multiple processing stages.
     /// </summary>
     public class ManiaDifficultyPreprocessor
     {
+        private const double hit_leniency_base = 0.33;
+        private const double hit_leniency_multiplier = 3.10;
+        private const double hit_leniency_od_base = 56.59;
+
         /// <summary>
-        /// Main processing method that converts input data into a complete <see cref="ManiaDifficultyContext"/> structure.
+        /// Entry point for the preprocessing pipeline.
+        /// Processes hit objects, computes all difficulty metrics, and assigns the final context to each hit object.
         /// </summary>
-        /// <returns>Fully processed strain data ready for difficulty calculation</returns>
         public static void ProcessAndAssign(List<DifficultyHitObject> hitObjects, IBeatmap beatmap)
         {
             var data = new ManiaDifficultyContext
@@ -30,19 +34,28 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
                 HitLeniency = calculateHitLeniency(beatmap)
             };
 
-            processDifficultyHitObjects(data, hitObjects, beatmap);
+            processDifficultyHitObjects(data, hitObjects);
             calculateMaxTime(data);
 
             var cornerData = CornerDataPreprocessor.Process(hitObjects, data.MaxTime);
             data.CornerData = cornerData;
 
-            computeAllComponents(data);
+            data.SameColumnPressure = SameColumnPreprocessor.ComputeValues(data);
+            data.CrossColumnPressure = CrossColumnPreprocessor.ComputeValues(data);
+            data.PressingIntensity = PressingIntensityPreprocessor.ComputeValues(data);
+            data.Unevenness = UnevennessPreprocessor.ComputeValues(data);
+            data.ReleaseFactor = ReleasePreprocessor.ComputeValues(data);
+
+            computeSupplementaryMetrics(data);
 
             hitObjects.ForEach(hitObject =>
                 ((ManiaDifficultyHitObject)hitObject).PreprocessedDifficultyData = data);
         }
 
-        private static void processDifficultyHitObjects(ManiaDifficultyContext data, List<DifficultyHitObject> hitObjects, IBeatmap beatmap)
+        /// <summary>
+        /// Categorizes hit objects into specialized <see cref="ManiaDifficultyHitObject"/> lists and performs initial setup.
+        /// </summary>
+        private static void processDifficultyHitObjects(ManiaDifficultyContext data, List<DifficultyHitObject> hitObjects)
         {
             if (hitObjects.Count == 0)
             {
@@ -67,6 +80,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             data.AllNotes = maniaList;
             data.LongNotes = longNotes;
 
+            // Special handling for long note tails (sorted by end time)
             if (longNotes.Count > 0)
             {
                 var longNoteTails = new List<ManiaDifficultyHitObject>(longNotes);
@@ -79,6 +93,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             }
         }
 
+        /// <summary>
+        /// Calculates the maximum time boundary for the beatmap based on the last hit object.
+        /// Used for clamping time values and defining end boundaries in calculations.
+        /// </summary>
         private static void calculateMaxTime(ManiaDifficultyContext data)
         {
             var notes = data.AllNotes;
@@ -91,51 +109,39 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 
             var last = notes[^1];
 
+            // Determine max time considering both start and end times of the last object
             double maxTime = Math.Max(last.StartTime, last.IsLong ? last.EndTime : last.StartTime);
             data.MaxTime = (int)Math.Ceiling(maxTime) + 1;
         }
 
         /// <summary>
-        /// Calculates hit leniency based on the beatmap's OD.
-        /// Tighter timing windows make patterns more difficult to execute accurately.
+        /// Calculates hit window leniency based on the beatmap's Overall Difficulty.
         /// </summary>
+        /// <returns>Hit leniency value in milliseconds (clamped to reasonable bounds)</returns>
         private static double calculateHitLeniency(IBeatmap beatmap)
         {
-            FormulaConfig config = new FormulaConfig();
             double overallDifficulty = beatmap.BeatmapInfo.Difficulty.OverallDifficulty;
+            double odAdjustedValue = hit_leniency_od_base - Math.Ceiling(hit_leniency_multiplier * overallDifficulty);
+            double rawLeniency = hit_leniency_base * Math.Sqrt(odAdjustedValue / 500.0);
 
-            // Calculate raw leniency using OD-based formula
-            double odAdjustedValue = config.HitLeniencyOdBase - Math.Ceiling(config.HitLeniencyOdMultiplier * overallDifficulty);
-            double rawLeniency = config.HitLeniencyBase * Math.Sqrt(odAdjustedValue / 500.0);
-
-            // Apply cap to prevent extreme values
             rawLeniency = Math.Min(rawLeniency, 0.6 * (rawLeniency - 0.09) + 0.09);
 
             return Math.Max(1e-9, rawLeniency);
         }
 
-        private static void computeAllComponents(ManiaDifficultyContext data)
-        {
-            data.SameColumnPressure = SameColumnPreprocessor.ComputeValues(data);
-            data.CrossColumnPressure = CrossColumnPreprocessor.ComputeValues(data);
-            data.PressingIntensity = PressingIntensityPreprocessor.ComputeValues(data);
-            data.Unevenness = UnevennessPreprocessor.ComputeValues(data);
-            data.ReleaseFactor = ReleasePreprocessor.ComputeValues(data);
-
-            computeSupplementaryMetrics(data);
-        }
-
         /// <summary>
-        /// Computes supplementary metrics like note density and active key counts.
-        /// These support the main difficulty calculations.
+        /// Computes supplementary metrics that support the main difficulty calculations:
+        /// - Local note density (notes per second)
+        /// - Active key count (simultaneous key presses)
+        /// These are computed at base time corners and then interpolated to final time corners.
         /// </summary>
         private static void computeSupplementaryMetrics(ManiaDifficultyContext data)
         {
-            // Get all note hit times for density calculations
+            // Prepare sorted note times for density calculations
             double[] noteHitTimes = data.AllNotes.Select(note => note.StartTime).ToArray();
             Array.Sort(noteHitTimes);
 
-            // Calculate key usage patterns
+            // Get key usage patterns from cross-column preprocessor
             bool[][] keyUsagePatterns = CrossColumnPreprocessor.ComputeKeyUsage(data);
             int timePointCount = data.CornerData.BaseTimeCorners.Length;
 
@@ -146,12 +152,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             {
                 double currentTime = data.CornerData.BaseTimeCorners[timeIndex];
 
-                // Count notes in 1-second window around this time
+                // Count notes in 1-second window (500ms before/after)
                 localNoteCountBase[timeIndex] = countNotesInWindow(noteHitTimes, currentTime, 500.0);
+                // Count simultaneously active keys
                 activeKeyCountBase[timeIndex] = countActiveKeys(keyUsagePatterns, timeIndex, data.KeyCount);
             }
 
-            // Interpolate to final resolution using step interpolation (maintains discrete values)
+            // Interpolate to final time corners using step function (preserves discrete values)
             data.LocalNoteCount = interpolateWithStepFunction(data.CornerData.TimeCorners,
                 data.CornerData.BaseTimeCorners, localNoteCountBase);
             data.ActiveKeyCount = interpolateWithStepFunction(data.CornerData.TimeCorners,
@@ -159,7 +166,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         }
 
         /// <summary>
-        /// Counts notes within a time window around a center point.
+        /// Counts notes within a symmetric time window around a center point.
         /// </summary>
         private static double countNotesInWindow(double[] sortedNoteTimes, double centerTime, double windowRadius)
         {
@@ -176,12 +183,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         }
 
         /// <summary>
-        /// Counts the number of active keys at a specific time index.
+        /// Counts the number of keys currently pressed at a specific time index.
+        /// Uses precomputed key usage patterns from <see cref="CrossColumnPreprocessor"/>.
         /// </summary>
+        /// <param name="keyUsage">2D array of key usage [column][time index]</param>
+        /// <param name="timeIndex">Index in the time corner array</param>
+        /// <param name="keyCount">Total number of keys/columns</param>
+        /// <returns>Number of simultaneously active keys</returns>
         private static double countActiveKeys(bool[][] keyUsage, int timeIndex, int keyCount)
         {
             int activeCount = 0;
 
+            // Count active keys across all columns
             for (int column = 0; column < keyCount; column++)
             {
                 if (keyUsage[column][timeIndex]) activeCount++;
@@ -191,8 +204,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         }
 
         /// <summary>
-        /// Performs step interpolation (maintains discrete values rather than smooth interpolation).
-        /// This is appropriate for count-based metrics that should have discrete values.
+        /// Performs step interpolation (zero-order hold) between time points.
+        /// Preserves discrete values rather than creating smooth transitions.
+        /// Appropriate for count-based metrics like note density and active keys.
         /// </summary>
         private static double[] interpolateWithStepFunction(double[] newTimePoints, double[] originalTimePoints, double[] originalValues)
         {
@@ -210,14 +224,16 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 
             int sourceIndex = 0;
 
+            // Step interpolation: maintain value until next breakpoint
             for (int targetIndex = 0; targetIndex < newPointCount; targetIndex++)
             {
                 double targetTime = newTimePoints[targetIndex];
 
-                // Find the appropriate source value (step function - use value until next breakpoint)
+                // Advance source index while next breakpoint is before target time
                 while (sourceIndex + 1 < originalPointCount && originalTimePoints[sourceIndex + 1] <= targetTime)
                     sourceIndex++;
 
+                // Use current source value (clamped to array bounds)
                 result[targetIndex] = originalValues[Math.Min(sourceIndex, originalValues.Length - 1)];
             }
 

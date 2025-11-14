@@ -5,16 +5,28 @@ using System;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner.Data
 {
+    /// <summary>
+    /// Container for time-based sampling points used in difficulty calculation.
+    /// Stores three distinct sets of time corners that define when difficulty metrics should be sampled.
+    /// </summary>
     public class CornerData
     {
-        /// <summary>Time corners used for final difficulty sampling (union of Base and Accuracy corners)</summary>
+        /// <summary>
+        /// Final set of time corners used for sampling all difficulty metrics.
+        /// This is the union of <see cref="BaseTimeCorners"/> and <see cref="AccuracyTimeCorners"/>.
+        /// </summary>
         public double[] TimeCorners { get; set; } = Array.Empty<double>();
 
-        /// <summary>Base time corners derived from note positions with small offsets</summary>
+        /// <summary>
+        /// Base time corners derived directly from note positions with minor offsets.
+        /// These capture fundamental rhythm and pattern changes in the beatmap.
+        /// </summary>
         public double[] BaseTimeCorners { get; set; } = Array.Empty<double>();
 
-        /// <summary>Accuracy-focused time corners with wider windows around notes</summary>
+        /// <summary>
+        /// Accuracy-focused time corners with expanded windows around notes.
+        /// These emphasize timing precision requirements by sampling wider intervals around hit objects.
+        /// </summary>
         public double[] AccuracyTimeCorners { get; set; } = Array.Empty<double>();
     }
 }
-

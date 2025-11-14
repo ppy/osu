@@ -10,22 +10,29 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
 {
     public class PressingIntensityPreprocessor
     {
+        private const int key_usage_window_ms = 400;
+        private const int smoothing_window_ms = 500;
+
+        private const double stream_boost_min_ratio = 172.41;
+        private const double stream_boost_max_ratio = 370.55;
+        private const double stream_boost_coefficient = 4.89E-8;
+
         /// <summary>
         /// Computes the pressing intensity values across all-time points.
         /// This considers long note density, anchor patterns, and note timing.
         /// </summary>
         public static double[] ComputeValues(ManiaDifficultyContext data)
         {
-            FormulaConfig config = new FormulaConfig();
             var longNoteDensity = buildLongNoteDensity(data);
-            double[] anchorValues = CalculateAnchorValues(data);
+            double[][] keyUsage400 = calculateKeyUsage400(data);
+            double[] anchorValues = computeAnchorFromKeyUsage(keyUsage400);
             double[] basePattern = calculateBasePressingIntensity(data, longNoteDensity, anchorValues);
 
             // Apply smoothing to create more stable difficulty curves
             double[] smoothed = StrainArrayUtils.ApplySmoothingToArray(
                 data.CornerData.BaseTimeCorners,
                 basePattern,
-                config.SmoothingWindowMs,
+                smoothing_window_ms,
                 0.001,
                 "sum"
             );
@@ -137,22 +144,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         }
 
         /// <summary>
-        /// Calculates anchor values that represent how balanced finger usage is.
-        /// </summary>
-        public static double[] CalculateAnchorValues(ManiaDifficultyContext data)
-        {
-            double[][] keyUsage400 = calculateKeyUsage400(data);
-            return computeAnchorFromKeyUsage(keyUsage400);
-        }
-
-        /// <summary>
         /// Calculates key usage with a 400ms window around each note.
         /// This determines how much each finger is being used at different times.
         /// </summary>
+        /// <returns>2D array of key usage values [column][time index]</returns>
         private static double[][] calculateKeyUsage400(ManiaDifficultyContext data)
         {
-            FormulaConfig config = new FormulaConfig();
-
             int timePoints = data.CornerData.BaseTimeCorners.Length;
             if (timePoints == 0) return Array.Empty<double[]>();
 
@@ -167,11 +164,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
                 int noteEndTime = (int)Math.Round(note.EndTime);
 
                 int leftWindow400Index = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners,
-                    noteStartTime - config.KeyUsageWindowMs);
+                    noteStartTime - key_usage_window_ms);
                 int leftIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, noteStartTime);
                 int rightIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, noteEndTime);
                 int rightWindow400Index = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners,
-                    noteEndTime + config.KeyUsageWindowMs);
+                    noteEndTime + key_usage_window_ms);
 
                 // Base usage value depends on note duration
                 double baseUsage = 3.75 + Math.Min(noteEndTime - noteStartTime, 1500) / 150.0;
@@ -184,11 +181,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
                 applyFullUsage(columnUsage, leftIndex, rightIndex, timePoints, baseUsage);
 
                 // Gradual falloff in the windows before and after the note
-                double windowDenominator = config.KeyUsageWindowMs * config.KeyUsageWindowMs;
+                const double window_denominator = key_usage_window_ms * key_usage_window_ms;
+
                 applyWindowUsage(columnUsage, data.CornerData.BaseTimeCorners, leftWindow400Index, leftIndex,
-                    noteStartTime, baseUsage, windowDenominator, timePoints);
+                    noteStartTime, baseUsage, window_denominator, timePoints);
                 applyWindowUsage(columnUsage, data.CornerData.BaseTimeCorners, rightIndex, rightWindow400Index,
-                    noteEndTime, baseUsage, windowDenominator, timePoints);
+                    noteEndTime, baseUsage, window_denominator, timePoints);
             }
 
             return keyUsage;
@@ -417,15 +415,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         /// </summary>
         private static double calculateStreamBoost(double deltaTime)
         {
-            FormulaConfig config = new FormulaConfig();
             double streamRatio = 7.5 / deltaTime; // How "streamy" this pattern is
 
-            if (streamRatio > config.StreamBoostMinRatio && streamRatio < config.StreamBoostMaxRatio)
+            if (streamRatio > stream_boost_min_ratio && streamRatio < stream_boost_max_ratio)
             {
-                double ratioDistance = streamRatio - config.StreamBoostMaxRatio;
+                double ratioDistance = streamRatio - stream_boost_max_ratio;
                 double quadraticFactor = ratioDistance * ratioDistance;
 
-                return 1.0 + config.StreamBoostCoefficient * (streamRatio - config.StreamBoostMinRatio) * quadraticFactor;
+                return 1.0 + stream_boost_coefficient * (streamRatio - stream_boost_min_ratio) * quadraticFactor;
             }
 
             return 1.0;

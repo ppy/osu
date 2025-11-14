@@ -11,6 +11,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
 {
     public class SameColumnPreprocessor
     {
+        private const int smoothing_window_ms = 500;
+        private const double jack_nerf_coefficient = 0.47;
+        private const double jack_nerf_base = 18.45;
+        private const double jack_nerf_power = -33.91;
+
         /// <summary>
         /// Computes the same-column pressure values across all time points.
         /// This measures the difficulty of rapid repeated presses in individual columns.
@@ -117,10 +122,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         /// </summary>
         private static double calculateJackNerf(double deltaTimeSeconds)
         {
-            FormulaConfig config = new FormulaConfig();
             double timingDeviation = Math.Abs(deltaTimeSeconds - 0.08);
-            double nerfBase = config.JackNerfBase + timingDeviation;
-            double nerfValue = config.JackNerfCoefficient * Math.Pow(nerfBase, config.JackNerfPower);
+            double nerfBase = jack_nerf_base + timingDeviation;
+            double nerfValue = jack_nerf_coefficient * Math.Pow(nerfBase, jack_nerf_power);
 
             return 1.0 - nerfValue; // Return nerf factor (lower = more nerf)
         }
@@ -131,8 +135,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         /// </summary>
         private static void applyColumnSmoothing(double[] intensityBuffer, double[] baseTimeCorners, int keyCount, int timePointCount, int arraySliceSize)
         {
-            FormulaConfig config = new FormulaConfig();
-
             var arrayPool = ArrayPool<double>.Shared;
             double[] smoothedBuffer = arrayPool.Rent(keyCount * arraySliceSize);
             Array.Clear(smoothedBuffer, 0, keyCount * arraySliceSize);
@@ -144,7 +146,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
                     int columnOffset = column * timePointCount;
 
                     StrainArrayUtils.ApplySmoothingToColumn(intensityBuffer, smoothedBuffer, baseTimeCorners,
-                        columnOffset, timePointCount, config.SmoothingWindowMs);
+                        columnOffset, timePointCount, smoothing_window_ms);
                 }
 
                 Array.Copy(smoothedBuffer, 0, intensityBuffer, 0, keyCount * timePointCount);
@@ -181,13 +183,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
 
                     if (weight <= 0.0) continue;
 
-                    // Use 5th power to emphasize difficult patterns
                     double poweredIntensity = Math.Pow(columnIntensity, 5.0);
                     weightedNumerator += poweredIntensity * weight;
                     totalWeight += weight;
                 }
 
-                // Calculate weighted power mean (reverse the 5th power)
                 combinedResult[timeIndex] = totalWeight > 1e-9 ? Math.Pow(weightedNumerator / totalWeight, 1.0 / 5.0) : 0.0;
             }
         }
