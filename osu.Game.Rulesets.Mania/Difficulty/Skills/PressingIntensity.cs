@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
     public class PressingIntensity : StrainSkill
     {
-        private const double strain_decay_base = 0.21151922938773776;
+        private const double strain_decay_base = 0.20636299563385252;
 
         private double currentStrain;
 

@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaDifficultyCalculator : DifficultyCalculator
     {
-        private const double difficulty_multiplier = 0.9850679876375877;
+        private const double difficulty_multiplier = 0.9827163333895287;
         private const double final_scaling_factor = 0.975;
         private const double strain_threshold = 0.01;
 
@@ -163,6 +163,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double twistComponent = (unevennessKeyAdjustment * crossColumn) / (crossColumn + totalStrainDifficulty + 1.0);
                 double poweredTwist = twistComponent > 0.0 ? twistComponent * Math.Sqrt(twistComponent) : 0.0;
                 double finalStrain = 2.7 * Math.Sqrt(totalStrainDifficulty) * poweredTwist + totalStrainDifficulty * 0.27;
+
                 strainCache[cacheKey] = finalStrain;
                 combinedStrains.Add(finalStrain);
             }
@@ -194,7 +195,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             double totalCurrentNotes = localNoteDensitySkill.GetTotalNotesWithWeight();
             double scaled = rawDifficulty * totalCurrentNotes / (totalCurrentNotes + 60.0);
 
-            // Apply rescaling if config exists
             if (scaled > config.RescaleHighThreshold)
             {
                 scaled = config.RescaleHighThreshold + (scaled - config.RescaleHighThreshold) /
@@ -215,7 +215,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             var sortedObjects = beatmap.HitObjects.ToArray();
-            int totalColumns = Math.Max(1, ((ManiaBeatmap)beatmap).TotalColumns);
+            int totalColumns = ((ManiaBeatmap)beatmap).TotalColumns;
 
             LegacySortHelper<HitObject>.Sort(sortedObjects,
                 Comparer<HitObject>.Create((a, b) => (int)Math.Round(a.StartTime) - (int)Math.Round(b.StartTime)));

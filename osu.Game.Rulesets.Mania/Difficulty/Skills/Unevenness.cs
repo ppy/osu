@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
     public class Unevenness : StrainSkill
     {
-        private const double strain_decay_base = 0.2;
+        private const double strain_decay_base = 0.20372521888692857;
 
         private double currentStrain;
 

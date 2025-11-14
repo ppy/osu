@@ -5,15 +5,15 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class FormulaConfig
     {
-        public double RescaleHighThreshold = 10.351016531598967;
-        public double RescaleHighFactor = 1.4441598782471803;
+        public double RescaleHighThreshold = 10.421040776725855; // 9.0
+        public double RescaleHighFactor = 1.713757153751726; // 1.0 / 1.2
         public double HitLeniencyBase = 0.3310181856698675;
         public double HitLeniencyOdMultiplier = 3.109121989522241;
         public double HitLeniencyOdBase = 56.59723759581402;
-        public double SmoothingWindowMs = 490.8525597893018;
-        public double AccuracySmoothingWindowMs = 338.2749819546263;
-        public double ColumnActivityWindowMs = 231.11564703753132;
-        public double KeyUsageWindowMs = 340.92348654941304;
+        public double SmoothingWindowMs = 500;
+        public double AccuracySmoothingWindowMs = 400;
+        public double ColumnActivityWindowMs = 150;
+        public double KeyUsageWindowMs = 400;
         public double JackNerfCoefficient = 0.47020623513898313;
         public double JackNerfBase = 18.45757328394883;
         public double JackNerfPower = -33.918373694021355;

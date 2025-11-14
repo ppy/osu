@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
     public class Release : StrainSkill
     {
-        private const double strain_decay_base = 0.20281598223515768;
+        private const double strain_decay_base = 0.21520555150701948;
 
         private double currentStrain;
 
