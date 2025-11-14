@@ -91,7 +91,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             var itemsImmutable = items.ToImmutableArray();
             items.Clear();
 
-            var beatmaps = await beatmapLookupCache.GetBeatmapsAsync(itemsImmutable.Select(it => it.BeatmapID).ToArray());
+            var beatmaps = await beatmapLookupCache.GetBeatmapsAsync(itemsImmutable.Select(it => it.BeatmapID).ToArray()).ConfigureAwait(false);
 
             var playlistItems = new List<MatchmakingPlaylistItem>();
 
@@ -121,7 +121,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 playlistItems.Add(new MatchmakingPlaylistItem(item, beatmap, mods));
             }
 
-            beatmapSelectGrid.AddItems(playlistItems);
+            Scheduler.Add(() =>
+            {
+                beatmapSelectGrid.AddItems(playlistItems);
+            });
         }
 
         private void onItemSelected(int userId, long itemId)
