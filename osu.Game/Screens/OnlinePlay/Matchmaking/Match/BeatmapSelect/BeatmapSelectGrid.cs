@@ -43,6 +43,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
         private readonly Sample?[] spinSamples = new Sample?[5];
         private static readonly int[] spin_sample_sequence = [0, 1, 2, 3, 4, 2, 3, 4];
+        private Sample? randomRevealSample;
         private Sample? resultSample;
         private Sample? swooshSample;
         private double? lastSamplePlayback;
@@ -80,6 +81,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             for (int i = 0; i < spinSamples.Length; i++)
                 spinSamples[i] = audio.Samples.Get($@"Multiplayer/Matchmaking/Selection/roulette-{i}");
 
+            randomRevealSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Selection/random-reveal");
             resultSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Selection/roulette-result");
             swooshSample = audio.Samples.Get(@"SongSelect/options-pop-out");
         }
@@ -136,6 +138,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 return;
 
             panel.DisplayItem(item);
+            randomRevealSample?.Play();
         }
 
         public void RollAndDisplayFinalBeatmap(long[] candidateItemIds, long finalItemId)
