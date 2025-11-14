@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Transforms;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Rooms;
 using osuTK;
 
@@ -150,7 +151,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             // randomPanel.RevealBeatmap(playlistItem.Beatmap, playlistItem.Mods);
         });
 
-        public void RollAndDisplayFinalBeatmap(long[] candidateItemIds, long finalItemId) => whenPanelsLoaded(() =>
+        public void RollAndDisplayFinalBeatmap(long[] candidateItemIds, long finalItemId, MatchmakingRoomState.CandidateType candidateType) => whenPanelsLoaded(() =>
         {
             Debug.Assert(candidateItemIds.Length >= 1);
             Debug.Assert(candidateItemIds.Contains(finalItemId));
@@ -166,7 +167,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 this.Delay(ARRANGE_DELAY)
                     .Schedule(() => ArrangeItemsForRollAnimation())
                     .Delay(arrange_duration + present_beatmap_delay)
-                    .Schedule(() => PresentUnanimouslyChosenBeatmap(finalItemId));
+                    .Schedule(() => PresentUnanimouslyChosenBeatmap(finalItemId, candidateType));
             }
             else
             {
@@ -175,7 +176,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                     .Delay(arrange_duration)
                     .Schedule(() => PlayRollAnimation(finalItemId, roll_duration))
                     .Delay(roll_duration + present_beatmap_delay)
-                    .Schedule(() => PresentRolledBeatmap(finalItemId));
+                    .Schedule(() => PresentRolledBeatmap(finalItemId, candidateType));
             }
         });
 
@@ -322,13 +323,20 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             }
         }
 
-        internal void PresentRolledBeatmap(long finalItem)
+        internal void PresentRolledBeatmap(long finalItem, MatchmakingRoomState.CandidateType candidateType)
         {
+            long itemToReveal = candidateType switch
+            {
+                MatchmakingRoomState.CandidateType.UserSelection => finalItem,
+                MatchmakingRoomState.CandidateType.Random => -1,
+                _ => throw new ArgumentOutOfRangeException(nameof(candidateType), candidateType, null)
+            };
+
             Debug.Assert(rollContainer.Children.Any(it => it.Item.ID == finalItem));
 
             foreach (var panel in rollContainer.Children)
             {
-                if (panel.Item.ID != finalItem)
+                if (panel.Item.ID != itemToReveal)
                 {
                     panel.FadeOut(200);
                     panel.PopOutAndExpire(easing: Easing.InQuad);
@@ -347,11 +355,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             }
         }
 
-        internal void PresentUnanimouslyChosenBeatmap(long finalItem)
+        internal void PresentUnanimouslyChosenBeatmap(long finalItem, MatchmakingRoomState.CandidateType candidateType)
         {
             // TODO: display special animation in this case
 
-            PresentRolledBeatmap(finalItem);
+            PresentRolledBeatmap(finalItem, candidateType);
         }
 
         private readonly TaskCompletionSource panelsLoaded = new TaskCompletionSource();

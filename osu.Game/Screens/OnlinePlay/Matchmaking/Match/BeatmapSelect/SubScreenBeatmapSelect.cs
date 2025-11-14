@@ -150,7 +150,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             beatmapSelectGrid.RevealRandomItem(client.Room!.CurrentPlaylistItem);
         }
 
-        public void RollFinalBeatmap(long[] candidateItems, long finalItem) => beatmapSelectGrid.RollAndDisplayFinalBeatmap(candidateItems, finalItem);
+        public void RollFinalBeatmap(long[] candidateItems, long finalItem, MatchmakingRoomState.CandidateType panelType) =>
+            beatmapSelectGrid.RollAndDisplayFinalBeatmap(candidateItems, finalItem, panelType);
 
         protected override void Dispose(bool isDisposing)
         {
