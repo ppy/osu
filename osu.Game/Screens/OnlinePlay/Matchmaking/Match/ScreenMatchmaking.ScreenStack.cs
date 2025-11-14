@@ -108,7 +108,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
                     case MatchmakingStage.ServerBeatmapFinalised:
                         Debug.Assert(screenStack.CurrentScreen is SubScreenBeatmapSelect);
-                        ((SubScreenBeatmapSelect)screenStack.CurrentScreen).RollFinalBeatmap(matchmakingState.CandidateItems, matchmakingState.CandidateItem);
+                        ((SubScreenBeatmapSelect)screenStack.CurrentScreen).RollFinalBeatmap(matchmakingState.CandidateItems, matchmakingState.CandidateItem, matchmakingState.CandidateItemType);
                         break;
 
                     case MatchmakingStage.ResultsDisplaying:
