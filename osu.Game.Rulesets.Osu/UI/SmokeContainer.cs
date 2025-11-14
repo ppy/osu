@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -24,6 +25,13 @@ namespace osu.Game.Rulesets.Osu.UI
         private Vector2 lastMousePosition;
 
         public override bool ReceivePositionalInputAt(Vector2 _) => true;
+
+        [BackgroundDependencyLoader]
+        private void load(ISkinSource source)
+        {
+            // Preloads the smoke texture to prevent lag spike from loading the texture mid map.
+            source.GetDrawableComponent(new OsuSkinComponentLookup(OsuSkinComponents.CursorSmoke));
+        }
 
         public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
         {
