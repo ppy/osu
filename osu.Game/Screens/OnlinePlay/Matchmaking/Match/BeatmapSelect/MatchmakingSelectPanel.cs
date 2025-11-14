@@ -182,6 +182,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             border.FadeOut(500, Easing.OutQuint);
         }
 
+        public abstract void PresentAsChosenBeatmap(MatchmakingPlaylistItem playlistItem);
+
         public void FadeInAndEnterFromBelow(double duration = 500, double delay = 0, float distance = 200)
         {
             scaleContainer
