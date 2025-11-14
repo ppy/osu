@@ -11,12 +11,14 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Database;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 {
@@ -27,6 +29,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
         private readonly BeatmapSelectGrid beatmapSelectGrid;
         private readonly List<MultiplayerPlaylistItem> items = new List<MultiplayerPlaylistItem>();
+        private readonly LoadingSpinner loadingSpinner;
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
@@ -45,9 +48,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Horizontal = 200 },
-                    Child = beatmapSelectGrid = new BeatmapSelectGrid
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        beatmapSelectGrid = new BeatmapSelectGrid
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        loadingSpinner = new LoadingSpinner
+                        {
+                            Size = new Vector2(64),
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            State = { Value = Visibility.Visible }
+                        }
                     },
                 },
                 new Container
@@ -123,6 +136,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
             Scheduler.Add(() =>
             {
+                loadingSpinner.Hide();
                 beatmapSelectGrid.AddItems(playlistItems);
             });
         }
