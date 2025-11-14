@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.Events;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
+using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 {
@@ -43,6 +44,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         public override void PresentAsChosenBeatmap(MatchmakingPlaylistItem playlistItem)
         {
             const double duration = 800;
+
+            this.MoveTo(Vector2.Zero, 1000, Easing.OutExpo)
+                .ScaleTo(1.5f, 1000, Easing.OutExpo);
 
             content.Dice.MoveToY(-200, duration * 0.55, new PowEasingFunction(2.75, easeOut: true))
                    .Then()

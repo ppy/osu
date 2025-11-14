@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect;
@@ -131,7 +132,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
             {
                 var (candidateItems, finalItem) = pickRandomItems(5);
 
-                grid.RollAndDisplayFinalBeatmap(candidateItems, finalItem);
+                grid.RollAndDisplayFinalBeatmap(candidateItems, finalItem, MatchmakingRoomState.CandidateType.UserSelection);
             });
         }
 
@@ -160,7 +161,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
                 grid.PlayRollAnimation(finalItem, duration: 0);
 
-                Scheduler.AddDelayed(() => grid.PresentRolledBeatmap(finalItem), 500);
+                Scheduler.AddDelayed(() => grid.PresentRolledBeatmap(finalItem, MatchmakingRoomState.CandidateType.UserSelection), 500);
             });
         }
 
@@ -175,7 +176,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
                 grid.PlayRollAnimation(finalItem, duration: 0);
 
-                Scheduler.AddDelayed(() => grid.PresentUnanimouslyChosenBeatmap(finalItem), 500);
+                Scheduler.AddDelayed(() => grid.PresentUnanimouslyChosenBeatmap(finalItem, MatchmakingRoomState.CandidateType.UserSelection), 500);
             });
         }
 
@@ -184,13 +185,15 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             AddStep("present random item panel", () =>
             {
-                grid.TransferCandidatePanelsToRollContainer(pickRandomItems(4).candidateItems.Append(-1).ToArray(), duration: 0);
+                var (candidateItems, finalItem) = pickRandomItems(4);
+
+                grid.TransferCandidatePanelsToRollContainer(candidateItems.Append(-1).ToArray(), duration: 0);
                 grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
                 grid.PlayRollAnimation(-1, duration: 0);
 
                 Scheduler.AddDelayed(() =>
                 {
-                    grid.PresentUnanimouslyChosenBeatmap(-1);
+                    grid.PresentRolledBeatmap(finalItem, MatchmakingRoomState.CandidateType.Random);
                     grid.RevealRandomItem(items[RNG.Next(items.Length)].PlaylistItem);
                 }, 500);
             });
