@@ -78,6 +78,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
                 flashLayer.FadeOutFromOne(1000, Easing.In);
 
+                ScaleContainer.ScaleTo(0.92f, 120, Easing.Out)
+                              .Then()
+                              .ScaleTo(1f, 600, Easing.OutElasticHalf);
+
                 resultSample?.Play();
             }, duration);
         }
