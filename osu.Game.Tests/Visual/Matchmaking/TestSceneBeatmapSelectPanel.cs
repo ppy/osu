@@ -42,21 +42,19 @@ namespace osu.Game.Tests.Visual.Matchmaking
         [Test]
         public void TestBeatmapPanel()
         {
-            BeatmapSelectPanel? panel = null;
+            MatchmakingSelectPanel? panel = null;
 
             AddStep("add panel", () =>
             {
                 Child = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = panel = new BeatmapSelectPanel(new MultiplayerPlaylistItem())
+                    Child = panel = new MatchmakingSelectPanelBeatmap(new MatchmakingPlaylistItem(new MultiplayerPlaylistItem(), CreateAPIBeatmap(), []))
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     }
                 };
-
-                Schedule(() => panel!.DisplayBeatmap(CreateAPIBeatmap(), []));
             });
 
             AddStep("add maarvin", () => panel!.AddUser(new APIUser
@@ -84,26 +82,24 @@ namespace osu.Game.Tests.Visual.Matchmaking
         [Test]
         public void TestRandomPanel()
         {
-            BeatmapSelectPanel? panel = null;
+            MatchmakingSelectPanelRandom? panel = null;
 
             AddStep("add panel", () =>
             {
                 Child = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = panel = new BeatmapSelectPanel(new MultiplayerPlaylistItem { ID = -1 })
+                    Child = panel = new MatchmakingSelectPanelRandom(new MultiplayerPlaylistItem { ID = -1 })
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     }
                 };
-
-                Schedule(() => panel!.DisplayRandom());
             });
 
             AddToggleStep("allow selection", value => panel!.AllowSelection = value);
 
-            AddStep("reveal beatmap", () => panel!.DisplayBeatmap(CreateAPIBeatmap(), []));
+            AddStep("reveal beatmap", () => panel!.RevealBeatmap(CreateAPIBeatmap(), []));
         }
 
         [Test]
@@ -111,19 +107,17 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             AddStep("add panel", () =>
             {
-                BeatmapSelectPanel? panel;
+                MatchmakingSelectPanel? panel;
 
                 Child = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = panel = new BeatmapSelectPanel(new MultiplayerPlaylistItem())
+                    Child = panel = new MatchmakingSelectPanelBeatmap(new MatchmakingPlaylistItem(new MultiplayerPlaylistItem(), CreateAPIBeatmap(), [new OsuModHardRock(), new OsuModDoubleTime()]))
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     }
                 };
-
-                Schedule(() => panel!.DisplayBeatmap(CreateAPIBeatmap(), [new OsuModHardRock(), new OsuModDoubleTime()]));
 
                 panel.AddUser(new APIUser
                 {

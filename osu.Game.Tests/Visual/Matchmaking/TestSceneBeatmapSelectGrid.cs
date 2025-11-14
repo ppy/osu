@@ -107,17 +107,17 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 // test scene is weird.
             });
 
-            AddStep("add selection 1", () => grid.ChildrenOfType<BeatmapSelectPanel>().First().AddUser(new APIUser
+            AddStep("add selection 1", () => grid.ChildrenOfType<MatchmakingSelectPanel>().First().AddUser(new APIUser
             {
                 Id = DummyAPIAccess.DUMMY_USER_ID,
                 Username = "Maarvin",
             }));
-            AddStep("add selection 2", () => grid.ChildrenOfType<BeatmapSelectPanel>().Skip(5).First().AddUser(new APIUser
+            AddStep("add selection 2", () => grid.ChildrenOfType<MatchmakingSelectPanel>().Skip(5).First().AddUser(new APIUser
             {
                 Id = 2,
                 Username = "peppy",
             }));
-            AddStep("add selection 3", () => grid.ChildrenOfType<BeatmapSelectPanel>().Skip(10).First().AddUser(new APIUser
+            AddStep("add selection 3", () => grid.ChildrenOfType<MatchmakingSelectPanel>().Skip(10).First().AddUser(new APIUser
             {
                 Id = 1040328,
                 Username = "smoogipoo",
@@ -202,7 +202,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             AddStep("display roll order", () =>
             {
-                var panels = grid.ChildrenOfType<BeatmapSelectPanel>().ToArray();
+                var panels = grid.ChildrenOfType<MatchmakingSelectPanel>().ToArray();
 
                 for (int i = 0; i < panels.Length; i++)
                 {
