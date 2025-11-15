@@ -10,9 +10,17 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner
     /// <summary>
     /// Generates time-based sampling points (<see cref="CornerData"/>) for difficulty calculation.
     /// Computes three distinct corner sets from hit objects:
-    /// 1. Base corners (fundamental pattern changes)
-    /// 2. Accuracy corners (timing precision windows)
-    /// 3. Union corners (final sampling points)
+    /// <list type="number">
+    /// <item>
+    /// <description>Base corners (fundamental pattern changes)</description>
+    /// </item>
+    /// <item>
+    /// <description>Accuracy corners (timing precision windows)</description>
+    /// </item>
+    /// <item>
+    /// <description>Union corners (final sampling points)</description>
+    /// </item>
+    /// </list>
     /// </summary>
     public class CornerPreprocessor
     {
