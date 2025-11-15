@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Density;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 {
@@ -37,8 +38,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             processDifficultyHitObjects(data, hitObjects);
             calculateMaxTime(data);
 
-            var cornerData = CornerDataPreprocessor.Process(hitObjects, data.MaxTime);
-            data.CornerData = cornerData;
+            CornerPreprocessor.ProcessAndAssign(data);
+            LongNoteDensityPreprocessor.ProcessAndAssign(data);
 
             data.SameColumnPressure = SameColumnPreprocessor.ComputeValues(data);
             data.CrossColumnPressure = CrossColumnPreprocessor.ComputeValues(data);
@@ -49,7 +50,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             computeSupplementaryMetrics(data);
 
             hitObjects.ForEach(hitObject =>
-                ((ManiaDifficultyHitObject)hitObject).PreprocessedDifficultyData = data);
+                ((ManiaDifficultyHitObject)hitObject).DifficultyContext = data);
         }
 
         /// <summary>

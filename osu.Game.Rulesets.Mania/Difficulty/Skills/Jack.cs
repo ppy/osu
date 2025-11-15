@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
     public class Jack : StrainSkill
     {
-        private const double strain_decay_base = 0.22131014684419884;
+        private const double strain_decay_base = 0.22;
 
         private double currentStrain;
 
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             if (prev != null && prev.StartTime == maniaCurrent.StartTime)
                 return currentStrain;
 
-            var data = maniaCurrent.PreprocessedDifficultyData;
+            var data = maniaCurrent.DifficultyContext;
             currentStrain = data.SampleFeatureAtTime(maniaCurrent.StartTime, data.SameColumnPressure);
             return currentStrain;
         }

@@ -4,8 +4,6 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner.Data;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner
 {
@@ -16,24 +14,38 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner
     /// 2. Accuracy corners (timing precision windows)
     /// 3. Union corners (final sampling points)
     /// </summary>
-    public class CornerDataPreprocessor
+    public class CornerPreprocessor
     {
         /// <summary>
-        /// Processes hit objects to generate time corners for difficulty sampling.
+        /// Processes hit objects to generate time-based sampling points (<see cref="CornerData"/>) for difficulty calculation.
+        /// This method constructs three distinct sets of time corners:
+        /// <list type="number">
+        /// <item>
+        /// <description><see cref="CornerData.BaseTimeCorners"/>: Fundamental pattern change points with micro-offsets to capture nuances</description>
+        /// </item>
+        /// <item>
+        /// <description><see cref="CornerData.AccuracyTimeCorners"/>: Timing precision windows centered around hit objects</description>
+        /// </item>
+        /// <item>
+        /// <description><see cref="CornerData.TimeCorners"/>: Union of base and accuracy corners forming final sampling points</description>
+        /// </item>
+        /// </list>
+        ///
+        /// The generated corners serve as temporal anchors where difficulty metrics are evaluated during calculation.
         /// </summary>
-        /// <param name="hitObjects">All hit objects in the beatmap section being processed</param>
-        /// <param name="maxTime">Maximum time boundary (typically beatmap duration)</param>
-        /// <returns>Computed corner data containing all-time sampling points</returns>
-        public static CornerData Process(List<DifficultyHitObject> hitObjects, int maxTime)
+        /// <param name="data">The mania difficulty context containing hit objects and timing boundaries</param>
+        public static void ProcessAndAssign(ManiaDifficultyContext data)
         {
             var cornerData = new CornerData();
+            var hitObjects = data.AllNotes;
 
             if (hitObjects.Count == 0)
             {
-                cornerData.BaseTimeCorners = new[] { 0.0, maxTime };
+                cornerData.BaseTimeCorners = new[] { 0.0, data.MaxTime };
                 cornerData.AccuracyTimeCorners = cornerData.BaseTimeCorners;
                 cornerData.TimeCorners = cornerData.BaseTimeCorners;
-                return cornerData;
+                data.CornerData = cornerData;
+                return;
             }
 
             int noteCount = hitObjects.Count;
@@ -43,18 +55,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner
             double[] baseTimePoints = collectBaseTimePoints(hitObjects, noteCount, arrayPool);
 
             // Build specialized corner sets
-            cornerData.BaseTimeCorners = buildBaseTimeCorners(baseTimePoints, arrayPool, maxTime);
-            cornerData.AccuracyTimeCorners = buildAccuracyTimeCorners(baseTimePoints, arrayPool, maxTime);
+            cornerData.BaseTimeCorners = buildBaseTimeCorners(baseTimePoints, arrayPool, data.MaxTime);
+            cornerData.AccuracyTimeCorners = buildAccuracyTimeCorners(baseTimePoints, arrayPool, data.MaxTime);
             cornerData.TimeCorners = createTimeCornerUnion(cornerData.BaseTimeCorners, cornerData.AccuracyTimeCorners);
 
-            return cornerData;
+            data.CornerData = cornerData;
         }
 
         /// <summary>
         /// Collects fundamental time points from hit objects (start/end times of notes).
         /// </summary>
         /// <returns>Array of unique time points from hit objects</returns>
-        private static double[] collectBaseTimePoints(List<DifficultyHitObject> allNotes, int noteCount, ArrayPool<double> pool)
+        private static double[] collectBaseTimePoints(List<ManiaDifficultyHitObject> allNotes, int noteCount, ArrayPool<double> pool)
         {
             int estimatedCapacity = Math.Max(32, noteCount * 3);
             double[] timePoints = pool.Rent(estimatedCapacity);
@@ -62,7 +74,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner
 
             for (int i = 0; i < noteCount; i++)
             {
-                var note = (ManiaDifficultyHitObject)allNotes[i];
+                var note = allNotes[i];
 
                 // Expand array if needed
                 if (timePointCount >= timePoints.Length)

@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
     public class Release : StrainSkill
     {
-        private const double strain_decay_base = 0.21520555150701948;
+        private const double strain_decay_base = 0.21;
 
         private double currentStrain;
 
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             if (prev != null && prev.StartTime == maniaCurrent.StartTime)
                 return currentStrain;
 
-            var data = maniaCurrent.PreprocessedDifficultyData;
+            var data = maniaCurrent.DifficultyContext;
             currentStrain = data.SampleFeatureAtTime(maniaCurrent.StartTime, data.ReleaseFactor);
             return currentStrain;
         }

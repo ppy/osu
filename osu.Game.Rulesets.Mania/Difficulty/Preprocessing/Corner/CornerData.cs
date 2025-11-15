@@ -3,7 +3,7 @@
 
 using System;
 
-namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner.Data
+namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner
 {
     /// <summary>
     /// Container for time-based sampling points used in difficulty calculation.

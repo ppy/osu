@@ -15,13 +15,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         public bool IsLong => EndTime > StartTime;
 
         private readonly int columnIndex;
-        public ManiaDifficultyContext PreprocessedDifficultyData;
+        public ManiaDifficultyContext DifficultyContext;
         public readonly List<DifficultyHitObject>[] PerColumnObjects;
 
         public ManiaDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, List<DifficultyHitObject>[] perColumnObjects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
-            PreprocessedDifficultyData = new ManiaDifficultyContext();
+            DifficultyContext = new ManiaDifficultyContext();
             PerColumnObjects = perColumnObjects;
             columnIndex = perColumnObjects[Column].Count;
         }

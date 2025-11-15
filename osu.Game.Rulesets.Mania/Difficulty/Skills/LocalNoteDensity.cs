@@ -42,13 +42,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             }
 
             double currentTime = maniaCurrent.StartTime;
-            double activeKeyValue = maniaCurrent.PreprocessedDifficultyData.SampleFeatureAtTime(currentTime, maniaCurrent.PreprocessedDifficultyData.ActiveKeyCount);
+            double activeKeyValue = maniaCurrent.DifficultyContext.SampleFeatureAtTime(currentTime, maniaCurrent.DifficultyContext.ActiveKeyCount);
             activeKeyStrains.Add(activeKeyValue);
 
             if (prev != null && prev.StartTime == maniaCurrent.StartTime)
                 return currentStrain;
 
-            currentStrain = maniaCurrent.PreprocessedDifficultyData.SampleFeatureAtTime(currentTime, maniaCurrent.PreprocessedDifficultyData.LocalNoteCount);
+            currentStrain = maniaCurrent.DifficultyContext.SampleFeatureAtTime(currentTime, maniaCurrent.DifficultyContext.LocalNoteCount);
 
             return currentStrain;
         }

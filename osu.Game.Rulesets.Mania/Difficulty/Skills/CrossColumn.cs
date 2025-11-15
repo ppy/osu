@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
     public class CrossColumn : StrainSkill
     {
-        private const double strain_decay_base = 0.20093259944367545;
+        private const double strain_decay_base = 0.2;
 
         private double currentStrain;
 
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             if (prev != null && prev.StartTime == maniaCurrent.StartTime)
                 return currentStrain;
 
-            var data = maniaCurrent.PreprocessedDifficultyData;
+            var data = maniaCurrent.DifficultyContext;
             currentStrain = data.SampleFeatureAtTime(maniaCurrent.StartTime, data.CrossColumnPressure);
             return currentStrain;
         }
