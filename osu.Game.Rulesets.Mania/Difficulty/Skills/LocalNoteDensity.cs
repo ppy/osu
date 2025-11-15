@@ -12,7 +12,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
     public class LocalNoteDensity : StrainSkill
     {
-        private const double strain_decay_base = 1;
         private double currentStrain;
         private double currentNoteCount;
         private double currentLongNoteWeight;
@@ -27,15 +26,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             activeKeyStrains = new List<double>();
         }
 
-        private double strainDecay(double ms) => Math.Pow(strain_decay_base, ms / 1000);
-
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current)
-        {
-            ManiaDifficultyHitObject prev = (ManiaDifficultyHitObject)current.Previous(0);
-            double prevTime = prev.StartTime;
-            double deltaMs = Math.Max(0.0, time - prevTime);
-            return currentStrain * strainDecay(deltaMs);
-        }
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => 0;
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
@@ -44,7 +35,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
             currentNoteCount++;
 
-            if (maniaCurrent.EndTime > maniaCurrent.StartTime)
+            if (maniaCurrent.IsLong)
             {
                 double longNoteDuration = Math.Min(maniaCurrent.EndTime - maniaCurrent.StartTime, 1000.0);
                 currentLongNoteWeight += 0.5 * longNoteDuration / 200.0;

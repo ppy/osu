@@ -53,9 +53,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner
         /// <summary>
         /// Collects fundamental time points from hit objects (start/end times of notes).
         /// </summary>
-        /// <param name="allNotes">List of all hit objects to process</param>
-        /// <param name="noteCount">Number of hit objects to process</param>
-        /// <param name="pool">Array pool for efficient memory usage</param>
         /// <returns>Array of unique time points from hit objects</returns>
         private static double[] collectBaseTimePoints(List<DifficultyHitObject> allNotes, int noteCount, ArrayPool<double> pool)
         {
