@@ -544,7 +544,7 @@ namespace osu.Game.Beatmaps.Formats
             if (!banksOnly)
             {
                 int customSampleBank = toLegacyCustomSampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name)));
-                string sampleFilename = samples.FirstOrDefault(s => string.IsNullOrEmpty(s.Name))?.LookupNames.First() ?? string.Empty;
+                string sampleFilename = samples.FirstOrDefault(s => s is ConvertHitObjectParser.FileHitSampleInfo)?.LookupNames.First() ?? string.Empty;
                 int volume = samples.FirstOrDefault()?.Volume ?? 100;
 
                 // We want to ignore custom sample banks and volume when not encoding to the mania game mode,
