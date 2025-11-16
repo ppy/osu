@@ -130,12 +130,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuCurrObj.Angle == null)
                 return 0;
 
+            const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
+            const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
+
             double currAngle = (double)osuCurrObj.Angle;
 
             double currAngleBonus = AimEvaluator.CalcAcuteAngleBonus(currAngle);
 
             double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.AdjustedDeltaTime;
             double acuteAngleBonus = currVelocity * currAngleBonus;
+
+            // If spacing is too low - decrease reward
+            acuteAngleBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, radius, diameter);
 
             return acuteAngleBonus;
         }
@@ -148,7 +154,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLast0Obj = (OsuDifficultyHitObject)current.Previous(0);
-            var osuLast1Obj = (OsuDifficultyHitObject)current.Previous(0);
+            var osuLast1Obj = (OsuDifficultyHitObject)current.Previous(1);
 
             if (osuCurrObj.AngleSigned == null || osuLast0Obj.AngleSigned == null)
                 return 0;
@@ -165,8 +171,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double angleChangeBonus = Math.Pow(Math.Sin((currAngle - lastAngle) / 2), 2) * baseVelocity;
 
             // Take the largest of last 3 distances and if it's too small - decrease flow angle change bonus, because it's cheesable
-            double largestPrevDistance = Math.Max(Math.Max(osuCurrObj.LazyJumpDistance, osuLast0Obj.LazyJumpDistance), osuLast1Obj.LazyJumpDistance);
-            angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(largestPrevDistance, 0, diameter);
+            angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(Math.Max(osuCurrObj.LazyJumpDistance, osuLast1Obj.LazyJumpDistance), 0, diameter);
 
             return angleChangeBonus;
         }
