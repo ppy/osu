@@ -141,19 +141,20 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestPost()
         {
+            const string written_text = "comm";
+
             setUpCommentsResponse(new CommentBundle { Comments = new List<Comment>() });
             AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
             AddAssert("no comments placeholder shown", () => commentsContainer.ChildrenOfType<CommentsContainer.NoCommentsPlaceholder>().Any());
 
             setUpPostResponse();
-            AddStep("enter text", () => editorTextBox.Current.Value = "comm");
+            AddStep("enter text", () => editorTextBox.Current.Value = written_text);
             AddStep("submit", () => commentsContainer.ChildrenOfType<RoundedButton>().First().TriggerClick());
 
             AddUntilStep("comment sent", () =>
             {
-                string writtenText = editorTextBox.Current.Value;
                 var comment = commentsContainer.ChildrenOfType<DrawableComment>().LastOrDefault();
-                return comment != null && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == writtenText);
+                return comment != null && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == written_text);
             });
             AddAssert("no comments placeholder removed", () => !commentsContainer.ChildrenOfType<CommentsContainer.NoCommentsPlaceholder>().Any());
         }
@@ -161,39 +162,144 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestPostWithExistingComments()
         {
+            const string written_text = "comm";
+
             setUpCommentsResponse(getExampleComments());
             AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
             AddUntilStep("comments shown", () => commentsContainer.ChildrenOfType<DrawableComment>().Any());
 
             setUpPostResponse();
-            AddStep("enter text", () => editorTextBox.Current.Value = "comm");
+            AddStep("enter text", () => editorTextBox.Current.Value = written_text);
             AddStep("submit", () => commentsContainer.ChildrenOfType<CommentEditor>().Single().ChildrenOfType<RoundedButton>().First().TriggerClick());
 
             AddUntilStep("comment sent", () =>
             {
-                string writtenText = editorTextBox.Current.Value;
                 var comment = commentsContainer.ChildrenOfType<DrawableComment>().LastOrDefault();
-                return comment != null && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == writtenText);
+                return comment != null && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == written_text);
             });
         }
 
         [Test]
         public void TestPostAsOwner()
         {
+            const string written_text = "comm";
+
             setUpCommentsResponse(getExampleComments());
             AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
             AddUntilStep("comments shown", () => commentsContainer.ChildrenOfType<DrawableComment>().Any());
 
             setUpPostResponse(true);
-            AddStep("enter text", () => editorTextBox.Current.Value = "comm");
+            AddStep("enter text", () => editorTextBox.Current.Value = written_text);
             AddStep("submit", () => commentsContainer.ChildrenOfType<CommentEditor>().Single().ChildrenOfType<RoundedButton>().First().TriggerClick());
 
             AddUntilStep("comment sent", () =>
             {
-                string writtenText = editorTextBox.Current.Value;
                 var comment = commentsContainer.ChildrenOfType<DrawableComment>().LastOrDefault();
-                return comment != null && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == writtenText) && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == "MAPPER");
+                return comment != null && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == written_text) && comment.ChildrenOfType<SpriteText>().Any(y => y.Text == "MAPPER");
             });
+        }
+
+        [Test]
+        public void TestDeletedCommentNotVisible()
+        {
+            var bundle = getExampleComments();
+            bundle.Comments.Add(new Comment
+            {
+                Id = 1337,
+                LegacyName = "BadUser",
+                CreatedAt = DateTimeOffset.Now,
+                DeletedAt = DateTimeOffset.Now,
+            });
+            setUpCommentsResponse(bundle);
+            AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddUntilStep("comments shown", () => commentsContainer.ChildrenOfType<DrawableComment>().Any());
+
+            AddAssert("deleted comment not visible", () =>
+            {
+                var deleted = this.ChildrenOfType<DrawableComment>().Single(c => c.Comment.LegacyName == "BadUser");
+                return !deleted.IsPresent;
+            });
+        }
+
+        [Test]
+        public void TestRepliesOfDeletedCommentVisible()
+        {
+            var bundle = getExampleComments();
+
+            Comment deleted;
+
+            bundle.Comments.Add(deleted = new Comment
+            {
+                Id = 1337,
+                LegacyName = "BadUser",
+                CreatedAt = DateTimeOffset.Now,
+                DeletedAt = DateTimeOffset.Now,
+                RepliesCount = 1,
+            });
+
+            bundle.Comments.Add(new Comment
+            {
+                Id = 1338,
+                Message = "This is a reply to a deleted comment",
+                LegacyName = "GoodUser",
+                CreatedAt = DateTimeOffset.Now,
+                ParentId = deleted.Id,
+            });
+
+            setUpCommentsResponse(bundle);
+            AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddUntilStep("comments shown", () => commentsContainer.ChildrenOfType<DrawableComment>().Any());
+
+            AddAssert("deleted comment visible", () =>
+            {
+                var deletedDrawable = this.ChildrenOfType<DrawableComment>().Single(c => c.Comment.LegacyName == "BadUser");
+                return deletedDrawable.IsPresent;
+            });
+
+            AddAssert("reply comment visible", () =>
+            {
+                var replyDrawable = this.ChildrenOfType<DrawableComment>().Single(c => c.Comment.LegacyName == "GoodUser");
+                return replyDrawable.IsPresent;
+            });
+        }
+
+        [Test]
+        public void TestDeletedCommentWithDeletedRepliesStillNotVisible()
+        {
+            var bundle = getExampleComments();
+
+            Comment deleted;
+
+            bundle.Comments.Add(deleted = new Comment
+            {
+                Id = 1337,
+                LegacyName = "BadUser",
+                CreatedAt = DateTimeOffset.Now,
+                DeletedAt = DateTimeOffset.Now,
+                RepliesCount = 1,
+            });
+
+            bundle.Comments.Add(new Comment
+            {
+                Id = 1338,
+                Message = "This is a reply to a deleted comment",
+                LegacyName = "GoodUser",
+                CreatedAt = DateTimeOffset.Now,
+                DeletedAt = DateTimeOffset.Now,
+                ParentId = deleted.Id,
+            });
+
+            setUpCommentsResponse(bundle);
+            AddStep("show comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 123));
+            AddUntilStep("comments shown", () => commentsContainer.ChildrenOfType<DrawableComment>().Any());
+
+            AddAssert("deleted comment not visible", () =>
+            {
+                var deletedDrawable = this.ChildrenOfType<DrawableComment>().Single(c => c.Comment.LegacyName == "BadUser");
+                return !deletedDrawable.IsPresent;
+            });
+
+            // we don't have to check IsPresent state of reply comment, since it's a child of the parent comment, which is already not present.
         }
 
         private void setUpCommentsResponse(CommentBundle commentBundle)
