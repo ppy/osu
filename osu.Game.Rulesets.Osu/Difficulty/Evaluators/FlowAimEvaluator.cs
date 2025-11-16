@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         // This bonus accounts for the fact that flow is circular movement, therefore flowing on sharp angles is harder.
         public static double CalculateFlowAcuteAngleBonus(DifficultyHitObject current)
         {
-            const double acuteAngleBonusMultiplier = 1.05;
+            const double acute_angle_bonus_multiplier = 1.05;
 
             if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
                 return 0;
@@ -145,13 +145,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // If spacing is too low - decrease reward
             acuteAngleBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, radius, diameter);
 
-            return acuteAngleBonus * acuteAngleBonusMultiplier;
+            return acuteAngleBonus * acute_angle_bonus_multiplier;
         }
 
         // This bonus accounts for flow aim being harder when angle is changing.
         public static double CalculateFlowAngleChangeBonus(DifficultyHitObject current)
         {
-            const double angleChangeBonusMultiplier = 1.0;
+            const double angle_change_bonus_multiplier = 1.0;
 
             if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
                 return 0;
@@ -177,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Take the largest of last 3 distances and if it's too small - decrease flow angle change bonus, because it's cheesable
             angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(Math.Max(osuCurrObj.LazyJumpDistance, osuLast1Obj.LazyJumpDistance), 0, diameter);
 
-            return angleChangeBonus * angleChangeBonusMultiplier;
+            return angleChangeBonus * angle_change_bonus_multiplier;
         }
     }
 }
