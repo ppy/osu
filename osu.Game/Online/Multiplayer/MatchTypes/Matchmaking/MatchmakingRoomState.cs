@@ -46,7 +46,7 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
         public MatchmakingUserList Users { get; set; } = new MatchmakingUserList();
 
         [Key(5)]
-        public CandidateType CandidateItemType { get; set; }
+        public MatchmakingCandidateType CandidateType { get; set; }
 
         /// <summary>
         /// Advances to the next round.
@@ -99,12 +99,6 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
             int i = 1;
             foreach (var user in Users.Order(new MatchmakingUserComparer(CurrentRound)))
                 user.Placement = i++;
-        }
-
-        public enum CandidateType
-        {
-            UserSelection,
-            Random,
         }
     }
 }
