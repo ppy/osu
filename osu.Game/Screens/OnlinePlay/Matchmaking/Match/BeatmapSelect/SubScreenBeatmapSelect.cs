@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,7 +27,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         public override Drawable PlayersDisplayArea { get; }
 
         private readonly BeatmapSelectGrid beatmapSelectGrid;
-        private readonly List<MultiplayerPlaylistItem> items = new List<MultiplayerPlaylistItem>();
         private readonly LoadingSpinner loadingSpinner;
 
         [Resolved]
@@ -78,37 +76,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         {
             base.LoadComplete();
 
-            client.ItemAdded += onItemAdded;
-
-            foreach (var item in client.Room!.Playlist)
-                onItemAdded(item);
-
             beatmapSelectGrid.ItemSelected += item => client.MatchmakingToggleSelection(item.ID);
-
             client.MatchmakingItemSelected += onItemSelected;
             client.MatchmakingItemDeselected += onItemDeselected;
             client.SettingsChanged += onSettingsChanged;
+
+            Debug.Assert(client.Room != null);
+
+            loadItems(client.Room.Playlist.ToArray()).FireAndForget();
         }
 
-        private void onItemAdded(MultiplayerPlaylistItem item)
+        private async Task loadItems(MultiplayerPlaylistItem[] items)
         {
-            if (item.Expired)
-                return;
+            var beatmaps = await beatmapLookupCache.GetBeatmapsAsync(items.Select(it => it.BeatmapID).ToArray()).ConfigureAwait(false);
+            var matchmakingItems = new List<MatchmakingPlaylistItem>();
 
-            items.Add(item);
-            Scheduler.AddOnce(() => Task.Run(loadItems));
-        }
-
-        private async Task loadItems()
-        {
-            var itemsImmutable = items.ToImmutableArray();
-            items.Clear();
-
-            var beatmaps = await beatmapLookupCache.GetBeatmapsAsync(itemsImmutable.Select(it => it.BeatmapID).ToArray()).ConfigureAwait(false);
-
-            var playlistItems = new List<MatchmakingPlaylistItem>();
-
-            foreach (var entry in itemsImmutable.Zip(beatmaps))
+            foreach (var entry in items.Zip(beatmaps))
             {
                 var (item, beatmap) = entry;
 
@@ -131,13 +114,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
                 Mod[] mods = item.RequiredMods.Select(m => m.ToMod(ruleset)).ToArray();
 
-                playlistItems.Add(new MatchmakingPlaylistItem(item, beatmap, mods));
+                matchmakingItems.Add(new MatchmakingPlaylistItem(item, beatmap, mods));
             }
 
             Scheduler.Add(() =>
             {
                 loadingSpinner.Hide();
-                beatmapSelectGrid.AddItems(playlistItems);
+                beatmapSelectGrid.AddItems(matchmakingItems);
             });
         }
 
@@ -175,7 +158,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
             if (client.IsNotNull())
             {
-                client.ItemAdded -= onItemAdded;
                 client.MatchmakingItemSelected -= onItemSelected;
                 client.MatchmakingItemDeselected -= onItemDeselected;
                 client.SettingsChanged -= onSettingsChanged;
