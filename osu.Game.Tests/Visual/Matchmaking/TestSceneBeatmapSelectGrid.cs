@@ -179,6 +179,23 @@ namespace osu.Game.Tests.Visual.Matchmaking
             });
         }
 
+        [Test]
+        public void TestPresentRandomItem()
+        {
+            AddStep("present random item panel", () =>
+            {
+                grid.TransferCandidatePanelsToRollContainer(pickRandomItems(4).candidateItems.Append(-1).ToArray(), duration: 0);
+                grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
+                grid.PlayRollAnimation(-1, duration: 0);
+
+                Scheduler.AddDelayed(() =>
+                {
+                    grid.PresentUnanimouslyChosenBeatmap(-1);
+                    grid.RevealRandomItem(items[RNG.Next(items.Length)].PlaylistItem);
+                }, 500);
+            });
+        }
+
         [TestCase(1)]
         [TestCase(2)]
         [TestCase(3)]
@@ -216,23 +233,6 @@ namespace osu.Game.Tests.Visual.Matchmaking
                         Font = OsuFont.Default.With(size: 50, weight: FontWeight.SemiBold),
                     });
                 }
-            });
-        }
-
-        [Test]
-        public void TestPresentRandomItem()
-        {
-            AddStep("present random item panel", () =>
-            {
-                grid.TransferCandidatePanelsToRollContainer(pickRandomItems(4).candidateItems.Append(-1).ToArray(), duration: 0);
-                grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
-                grid.PlayRollAnimation(-1, duration: 0);
-
-                Scheduler.AddDelayed(() =>
-                {
-                    grid.PresentUnanimouslyChosenBeatmap(-1);
-                    grid.RevealRandomItem(items[RNG.Next(items.Length)].PlaylistItem);
-                }, 500);
             });
         }
 
