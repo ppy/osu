@@ -18,13 +18,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         {
         }
 
-        private BeatmapCardMatchmakingContent content = null!;
+        private CardContent content = null!;
         private readonly List<APIUser> users = new List<APIUser>();
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(content = new BeatmapCardMatchmakingRandomContent());
+            Add(content = new CardContentRandom());
         }
 
         public void RevealBeatmap(APIBeatmap beatmap, Mod[] mods)
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
             AddRange(new Drawable[]
             {
-                content = new BeatmapCardMatchmakingBeatmapContent(beatmap, mods),
+                content = new CardContentBeatmap(beatmap, mods),
                 flashLayer,
             });
 

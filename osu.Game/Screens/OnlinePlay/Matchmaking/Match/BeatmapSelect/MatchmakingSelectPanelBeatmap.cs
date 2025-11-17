@@ -19,12 +19,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             mods = item.Mods;
         }
 
-        private BeatmapCardMatchmakingContent content = null!;
+        private CardContent content = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(content = new BeatmapCardMatchmakingBeatmapContent(beatmap, mods));
+            Add(content = new CardContentBeatmap(beatmap, mods));
         }
 
         public override void AddUser(APIUser user)
