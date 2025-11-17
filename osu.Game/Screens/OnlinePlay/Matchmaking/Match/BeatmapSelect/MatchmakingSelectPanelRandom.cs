@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
@@ -55,6 +56,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         {
             users.Remove(user);
             content.SelectionOverlay.RemoveUser(user.Id);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (AllowSelection && content is CardContentRandom randomContent)
+                randomContent.RollDice();
+
+            return base.OnClick(e);
         }
     }
 }

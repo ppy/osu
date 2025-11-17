@@ -65,6 +65,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 Dice.Spin(10_000, RotationDirection.Clockwise);
             }
 
+            public void RollDice()
+            {
+                var icon = randomDiceIcon();
+
+                while (icon.Equals(Dice.Icon))
+                    icon = randomDiceIcon();
+
+                Dice.ScaleTo(0.65f, 60, Easing.Out)
+                    .Then()
+                    .Schedule(() => Dice.Icon = icon)
+                    .ScaleTo(1f, 400, Easing.OutElasticHalf);
+            }
+
             private static IconUsage[] diceIcons => new[]
             {
                 FontAwesome.Solid.DiceOne,
