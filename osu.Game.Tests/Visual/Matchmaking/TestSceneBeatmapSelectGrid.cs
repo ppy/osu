@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
             {
                 var (candidateItems, finalItem) = pickRandomItems(5);
 
-                grid.RollAndDisplayFinalBeatmap(candidateItems, finalItem, MatchmakingRoomState.CandidateType.UserSelection);
+                grid.RollAndDisplayFinalBeatmap(candidateItems, finalItem, MatchmakingCandidateType.UserSelection);
             });
         }
 
@@ -161,7 +161,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
                 grid.PlayRollAnimation(finalItem, duration: 0);
 
-                Scheduler.AddDelayed(() => grid.PresentRolledBeatmap(finalItem, MatchmakingRoomState.CandidateType.UserSelection), 500);
+                Scheduler.AddDelayed(() => grid.PresentRolledBeatmap(finalItem, MatchmakingCandidateType.UserSelection), 500);
             });
         }
 
@@ -176,7 +176,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
                 grid.PlayRollAnimation(finalItem, duration: 0);
 
-                Scheduler.AddDelayed(() => grid.PresentUnanimouslyChosenBeatmap(finalItem, MatchmakingRoomState.CandidateType.UserSelection), 500);
+                Scheduler.AddDelayed(() => grid.PresentUnanimouslyChosenBeatmap(finalItem, MatchmakingCandidateType.UserSelection), 500);
             });
         }
 
@@ -193,7 +193,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
                 Scheduler.AddDelayed(() =>
                 {
-                    grid.PresentRolledBeatmap(finalItem, MatchmakingRoomState.CandidateType.Random);
+                    grid.PresentRolledBeatmap(finalItem, MatchmakingCandidateType.Random);
                     grid.RevealRandomItem(items[RNG.Next(items.Length)].PlaylistItem);
                 }, 500);
             });
