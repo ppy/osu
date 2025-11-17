@@ -182,8 +182,7 @@ namespace osu.Game.Overlays.Chat
                                 Shadow = false,
                                 Anchor = Anchor.TopLeft,
                                 Origin = Anchor.TopLeft,
-                                Spacing = new Vector2(-1, 0),
-                                Font = OsuFont.GetFont(size: font_size, weight: FontWeight.SemiBold, fixedWidth: true),
+                                Font = OsuFont.GetFont(size: font_size, weight: FontWeight.SemiBold),
                                 AlwaysPresent = true,
                             },
                             drawableUsername = new DrawableChatUsername(message.Sender)
@@ -301,6 +300,10 @@ namespace osu.Game.Overlays.Chat
         private void updateTimestamp()
         {
             drawableTimestamp.Text = message.Timestamp.LocalDateTime.ToLocalisableString(prefer24HourTime.Value ? @"HH:mm" : @"hh:mm tt");
+            drawableTimestamp.Font = prefer24HourTime.Value
+                ? OsuFont.GetFont(size: font_size, weight: FontWeight.SemiBold, fixedWidth: true)
+                : OsuFont.GetFont(size: font_size, weight: FontWeight.SemiBold);
+            drawableTimestamp.Spacing = prefer24HourTime.Value ? new Vector2(-1, 0) : Vector2.Zero;
         }
 
         private static readonly Color4[] default_username_colours =

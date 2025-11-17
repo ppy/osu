@@ -63,7 +63,6 @@ namespace osu.Game.Overlays.Toolbar
                 realTime = new OsuSpriteText
                 {
                     Font = OsuFont.Default.With(fixedWidth: true),
-                    Spacing = new Vector2(-1.5f, 0),
                 },
                 runningText = new FillFlowContainer
                 {
@@ -94,6 +93,8 @@ namespace osu.Game.Overlays.Toolbar
         protected override void UpdateDisplay(DateTimeOffset now)
         {
             realTime.Text = now.ToLocalisableString(use24HourDisplay ? @"HH:mm:ss" : @"h:mm:ss tt");
+            realTime.Font = use24HourDisplay ? OsuFont.Default.With(fixedWidth: true) : OsuFont.Default;
+            realTime.Spacing = use24HourDisplay ? new Vector2(-1.5f, 0) : Vector2.Zero;
             gameTime.Text = $"{new TimeSpan(TimeSpan.TicksPerSecond * (int)(Clock.CurrentTime / 1000)):c}";
         }
 
