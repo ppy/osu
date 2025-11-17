@@ -364,7 +364,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
         private void whenPanelsLoaded(Action action) => Task.Run(async () =>
         {
-            await panelsLoaded.Task;
+            await panelsLoaded.Task.ConfigureAwait(false);
             Schedule(action);
         });
 
