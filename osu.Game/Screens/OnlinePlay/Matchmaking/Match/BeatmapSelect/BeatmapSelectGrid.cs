@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Toolkit.HighPerformance;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -125,10 +126,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
                     panel.FadeInAndEnterFromBelow(duration: enter_duration, delay: delay);
                 }
+
+                panelsLoaded.SetResult();
             });
         }
 
-        public void SetUserSelection(APIUser user, long itemId, bool selected)
+        public void SetUserSelection(APIUser user, long itemId, bool selected) => whenPanelsLoaded(() =>
         {
             if (!panelLookup.TryGetValue(itemId, out var panel))
                 return;
@@ -137,18 +140,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 panel.AddUser(user);
             else
                 panel.RemoveUser(user);
-        }
+        });
 
-        public void RevealRandomItem(MultiplayerPlaylistItem item)
+        public void RevealRandomItem(MultiplayerPlaylistItem item) => whenPanelsLoaded(() =>
         {
             playlistItems.TryGetValue(item.ID, out var playlistItem);
 
             Debug.Assert(playlistItem != null);
 
             randomPanel.RevealBeatmap(playlistItem.Beatmap, playlistItem.Mods);
-        }
+        });
 
-        public void RollAndDisplayFinalBeatmap(long[] candidateItemIds, long finalItemId)
+        public void RollAndDisplayFinalBeatmap(long[] candidateItemIds, long finalItemId) => whenPanelsLoaded(() =>
         {
             Debug.Assert(candidateItemIds.Length >= 1);
             Debug.Assert(candidateItemIds.Contains(finalItemId));
@@ -175,7 +178,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                     .Delay(roll_duration + present_beatmap_delay)
                     .Schedule(() => PresentRolledBeatmap(finalItemId));
             }
-        }
+        });
 
         internal void TransferCandidatePanelsToRollContainer(long[] candidateItemIds, double duration = hide_duration)
         {
@@ -353,6 +356,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
             PresentRolledBeatmap(finalItem);
         }
+
+        private readonly TaskCompletionSource panelsLoaded = new TaskCompletionSource();
+
+        private void whenPanelsLoaded(Action action) => Task.Run(async () =>
+        {
+            await panelsLoaded.Task;
+            Schedule(action);
+        });
 
         private partial class PanelGridContainer : FillFlowContainer<MatchmakingSelectPanel>
         {
