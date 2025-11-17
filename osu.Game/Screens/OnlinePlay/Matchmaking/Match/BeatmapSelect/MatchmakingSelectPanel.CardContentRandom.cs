@@ -3,9 +3,10 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Utils;
+using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osuTK;
@@ -22,6 +23,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             private OverlayColourProvider colourProvider { get; set; } = null!;
 
             private AvatarOverlay selectionOverlay = null!;
+            public SpriteIcon Dice { get; private set; } = null!;
 
             [BackgroundDependencyLoader]
             private void load()
@@ -31,50 +33,49 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background2,
+                        Colour = colourProvider.Dark5,
                     },
-                    new Container
+                    new TrianglesV2
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding
-                        {
-                            Horizontal = 10,
-                            Vertical = 4
-                        },
-                        Children = new Drawable[]
-                        {
-                            new FillFlowContainer
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Vertical,
-                                Children =
-                                [
-                                    new SpriteIcon
-                                    {
-                                        Anchor = Anchor.TopCentre,
-                                        Origin = Anchor.TopCentre,
-                                        Size = new Vector2(32),
-                                        Icon = FontAwesome.Solid.Random,
-                                    },
-                                    new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.TopCentre,
-                                        Origin = Anchor.TopCentre,
-                                        Text = "Random",
-                                    }
-                                ]
-                            },
-                            selectionOverlay = new AvatarOverlay
-                            {
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                            }
-                        }
+                        Alpha = 0.1f,
+                    },
+                    new OsuSpriteText
+                    {
+                        Y = 20,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Text = "Random"
+                    },
+                    Dice = new SpriteIcon
+                    {
+                        Y = -10,
+                        Size = new Vector2(28),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Icon = randomDiceIcon(),
+                    },
+                    selectionOverlay = new AvatarOverlay
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
                     }
                 };
+
+                Dice.Spin(10_000, RotationDirection.Clockwise);
             }
+
+            private static IconUsage[] diceIcons => new[]
+            {
+                FontAwesome.Solid.DiceOne,
+                FontAwesome.Solid.DiceTwo,
+                FontAwesome.Solid.DiceThree,
+                FontAwesome.Solid.DiceFour,
+                FontAwesome.Solid.DiceFive,
+                FontAwesome.Solid.DiceSix,
+            };
+
+            private static IconUsage randomDiceIcon() => diceIcons[RNG.Next(diceIcons.Length)];
         }
     }
 }
