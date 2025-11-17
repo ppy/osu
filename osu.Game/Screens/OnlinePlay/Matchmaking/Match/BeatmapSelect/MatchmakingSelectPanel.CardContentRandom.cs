@@ -24,6 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
             private AvatarOverlay selectionOverlay = null!;
             public SpriteIcon Dice { get; private set; } = null!;
+            public OsuSpriteText Label { get; private set; } = null!;
 
             [BackgroundDependencyLoader]
             private void load()
@@ -40,7 +41,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0.1f,
                     },
-                    new OsuSpriteText
+                    Label = new OsuSpriteText
                     {
                         Y = 20,
                         Anchor = Anchor.Centre,
