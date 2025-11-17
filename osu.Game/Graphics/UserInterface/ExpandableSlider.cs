@@ -23,6 +23,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         private readonly OsuSpriteText label;
         private readonly TSlider slider;
+        private readonly Container sliderContainer;
 
         private LocalisableString contractedLabelText;
 
@@ -96,10 +97,15 @@ namespace osu.Game.Graphics.UserInterface
                 Children = new Drawable[]
                 {
                     label = new OsuSpriteText(),
-                    slider = new TSlider
+                    sliderContainer = new Container
                     {
+                        AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
-                    },
+                        Child = slider = new TSlider
+                        {
+                            RelativeSizeAxes = Axes.X,
+                        },
+                    }
                 }
             };
         }
@@ -116,17 +122,19 @@ namespace osu.Game.Graphics.UserInterface
                 Expanded.Value = containerExpanded.NewValue;
             }, true);
 
-            Expanded.BindValueChanged(v =>
-            {
-                label.Text = v.NewValue ? expandedLabelText : contractedLabelText;
-                slider.FadeTo(v.NewValue ? Current.Disabled ? 0.3f : 1f : 0f, 500, Easing.OutQuint);
-                slider.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
-            }, true);
+            Expanded.BindValueChanged(_ => updateVisibility());
+            Current.BindDisabledChanged(_ => updateVisibility(animated: false));
+            updateVisibility(animated: false);
+        }
 
-            Current.BindDisabledChanged(disabled =>
-            {
-                slider.Alpha = Expanded.Value ? disabled ? 0.3f : 1 : 0f;
-            });
+        private void updateVisibility(bool animated = true)
+        {
+            label.Text = Expanded.Value ? expandedLabelText : contractedLabelText;
+            slider.FadeTo(Current.Disabled ? 0.3f : 1f, animated ? 500 : 0, Easing.OutQuint);
+
+            // some sliders update their own alpha internally based on disabled state, so the fade needs to be done on a parent drawable
+            sliderContainer.FadeTo(Expanded.Value ? 1 : 0, animated ? 500 : 0, Easing.OutQuint);
+            sliderContainer.BypassAutoSizeAxes = !Expanded.Value ? Axes.Y : Axes.None;
         }
     }
 

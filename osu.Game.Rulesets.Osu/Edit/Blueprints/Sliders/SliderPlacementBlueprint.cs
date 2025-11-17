@@ -48,8 +48,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         [Resolved]
         private IDistanceSnapProvider? distanceSnapProvider { get; set; }
 
-        [Resolved]
-        private FreehandSliderToolboxGroup? freehandToolboxGroup { get; set; }
+        private FreehandSliderToolboxGroup? freehandToolboxGroup;
 
         [Resolved]
         private EditorClock? editorClock { get; set; }
@@ -59,6 +58,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private readonly IncrementalBSplineBuilder bSplineBuilder = new IncrementalBSplineBuilder { Degree = 4 };
 
         protected override bool IsValidForPlacement => HitObject.Path.HasValidLengthForPlacement;
+
+        public override EditorToolboxGroup CreateToolboxGroup() => freehandToolboxGroup = new FreehandSliderToolboxGroup();
 
         public SliderPlacementBlueprint()
             : base(new Slider())
