@@ -228,12 +228,12 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
                 grid.PlayRollAnimation(-1, duration: 0);
 
-                Scheduler.AddDelayed(() => grid.PresentUnanimouslyChosenBeatmap(-1), 500);
+                Scheduler.AddDelayed(() =>
+                {
+                    grid.PresentUnanimouslyChosenBeatmap(-1);
+                    grid.RevealRandomItem(items[RNG.Next(items.Length)].PlaylistItem);
+                }, 500);
             });
-
-            AddWaitStep("wait for animation", 5);
-
-            AddStep("reveal beatmap", () => grid.RevealRandomItem(items[RNG.Next(items.Length)].PlaylistItem));
         }
 
         private (long[] candidateItems, long finalItem) pickRandomItems(int count)
