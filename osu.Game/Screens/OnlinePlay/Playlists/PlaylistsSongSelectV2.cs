@@ -16,6 +16,7 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Footer;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Utils;
 
@@ -30,6 +31,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         protected readonly Bindable<bool> Freestyle = new Bindable<bool>(true);
         private readonly Bindable<IReadOnlyList<Mod>> freeMods = new Bindable<IReadOnlyList<Mod>>([]);
 
+        private readonly AddToPlaylistFooterButton addToPlaylistFooterButton;
+
         private readonly Room room;
         private ModSelectOverlay modSelect = null!;
         private FreeModSelectOverlay freeModSelect = null!;
@@ -40,6 +43,19 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
             LeftPadding = new MarginPadding { Top = CORNER_RADIUS_HIDE_OFFSET + Header.HEIGHT };
+
+            addToPlaylistFooterButton = new AddToPlaylistFooterButton
+            {
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
+                Margin = new MarginPadding
+                {
+                    Bottom = OsuGame.SCREEN_EDGE_MARGIN,
+                    Right = OsuGame.SCREEN_EDGE_MARGIN * 2
+                },
+                Alpha = 0,
+                Action = AddNewItem
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -61,6 +77,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             Freestyle.BindValueChanged(onFreestyleChanged);
 
             updateValidMods();
+
+            Footer?.Add(addToPlaylistFooterButton);
         }
 
         public void AddNewItem()
@@ -124,6 +142,51 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 room.Playlist = [createItem()];
 
             this.Exit();
+        }
+
+        public override void OnEntering(ScreenTransitionEvent e)
+        {
+            base.OnEntering(e);
+
+            addToPlaylistFooterButton.Appear();
+        }
+
+        public override void OnResuming(ScreenTransitionEvent e)
+        {
+            base.OnResuming(e);
+
+            addToPlaylistFooterButton.Appear();
+        }
+
+        public override void OnSuspending(ScreenTransitionEvent e)
+        {
+            base.OnSuspending(e);
+
+            addToPlaylistFooterButton.Disappear();
+        }
+
+        public override bool OnExiting(ScreenExitEvent e)
+        {
+            if (base.OnExiting(e))
+                return true;
+
+            addToPlaylistFooterButton.Disappear().Expire();
+            return false;
+        }
+
+        protected override void LogoArriving(OsuLogo logo, bool resuming)
+        {
+            // Intentionally not calling base so the logo isn't shown.
+        }
+
+        protected override void LogoExiting(OsuLogo logo)
+        {
+            // Intentionally not calling base so the logo isn't shown.
+        }
+
+        protected override void LogoSuspending(OsuLogo logo)
+        {
+            // Intentionally not calling base so the logo isn't shown.
         }
 
         public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons()

@@ -70,6 +70,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestShowScreen()
+        {
+            AddStep("show screen", () => { });
+        }
+
+        [Test]
         public void TestItemAddedIfEmptyOnStart()
         {
             AddStep("finalise selection", () => InputManager.Key(Key.Enter));
