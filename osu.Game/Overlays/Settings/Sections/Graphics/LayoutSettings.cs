@@ -248,8 +248,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 if (size.NewValue == sizeWindowed.Value || windowModeDropdown.Current.Value != WindowMode.Windowed)
                     return;
 
-                sizeWindowed.Value = size.NewValue;
-
                 if (window?.WindowState == Framework.Platform.WindowState.Maximised)
                 {
                     window.WindowState = Framework.Platform.WindowState.Normal;
@@ -257,12 +255,17 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
                 var dBounds = currentDisplay.Value.Bounds;
                 var dUsable = currentDisplay.Value.UsableBounds;
-                int w = size.NewValue.Width;
-                int h = size.NewValue.Height;
+                float topBar = host.Window?.BorderSize.Value.Top ?? 0;
+
+                int w = Math.Min(size.NewValue.Width, dUsable.Width);
+                int h = (int)Math.Min(size.NewValue.Height, dUsable.Height - topBar);
+
+                windowedResolution.Value = new Size(w, h);
+                sizeWindowed.Value = windowedResolution.Value;
 
                 float adjustedY = Math.Max(
                     dUsable.Y + (dUsable.Height - h) / 2f,
-                    dUsable.Y + (host.Window?.BorderSize.Value.Top ?? 0) // titlebar adjustment
+                    dUsable.Y + topBar // titlebar adjustment
                 );
                 windowedPositionY.Value = dBounds.Height - h != 0 ? (adjustedY - dBounds.Y) / (dBounds.Height - h) : 0;
                 windowedPositionX.Value = dBounds.Width - w != 0 ? (dUsable.X - dBounds.X + (dUsable.Width - w) / 2f) / (dBounds.Width - w) : 0;
