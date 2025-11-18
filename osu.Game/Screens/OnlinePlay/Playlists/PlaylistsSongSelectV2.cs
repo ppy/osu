@@ -61,10 +61,23 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(freeModSelect = new FreeModSelectOverlay
+            AddRangeInternal(new Drawable[]
             {
-                SelectedMods = { BindTarget = freeMods },
-                IsValidMod = isValidAllowedMod,
+                freeModSelect = new FreeModSelectOverlay
+                {
+                    SelectedMods = { BindTarget = freeMods },
+                    IsValidMod = isValidAllowedMod,
+                },
+                new PlaylistTray(room)
+                {
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    Margin = new MarginPadding
+                    {
+                        Bottom = ScreenFooterButton.HEIGHT,
+                        Right = OsuGame.SCREEN_EDGE_MARGIN
+                    }
+                }
             });
         }
 
@@ -194,8 +207,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             var buttons = base.CreateFooterButtons().ToList();
 
             buttons.Single(i => i is FooterButtonMods).TooltipText = MultiplayerMatchStrings.RequiredModsButtonTooltip;
-
-            buttons.Insert(0, new FooterButtonPlaylistV2(room));
 
             buttons.InsertRange(buttons.FindIndex(b => b is FooterButtonMods) + 1,
             [
