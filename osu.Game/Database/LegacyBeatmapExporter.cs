@@ -132,7 +132,20 @@ namespace osu.Game.Database
                     hasPath.Path.ControlPoints[^1].Type = null;
 
                 if (BezierConverter.CountSegments(hasPath.Path.ControlPoints) <= 1
-                    && hasPath.Path.ControlPoints[0].Type!.Value.Degree == null) continue;
+                    && hasPath.Path.ControlPoints[0].Type!.Value.Degree == null)
+                {
+                    // Round every control point to integer positions before skipping to the next hit object
+                    for (int i = 0; i < hasPath.Path.ControlPoints.Count; i++)
+                    {
+                        var position = new Vector2(
+                            MathF.Round(hasPath.Path.ControlPoints[i].Position.X),
+                            MathF.Round(hasPath.Path.ControlPoints[i].Position.Y));
+
+                        hasPath.Path.ControlPoints[i].Position = position;
+                    }
+
+                    continue;
+                }
 
                 var convertedToBezier = BezierConverter.ConvertToModernBezier(hasPath.Path.ControlPoints);
 
@@ -142,10 +155,10 @@ namespace osu.Game.Database
                 {
                     var convertedPoint = convertedToBezier[i];
 
-                    // Truncate control points to integer positions
+                    // Round control points to integer positions
                     var position = new Vector2(
-                        (float)Math.Floor(convertedPoint.Position.X),
-                        (float)Math.Floor(convertedPoint.Position.Y));
+                        MathF.Round(convertedPoint.Position.X),
+                        MathF.Round(convertedPoint.Position.Y));
 
                     // stable only supports a single curve type specification per slider.
                     // we exploit the fact that the converted-to-Bézier path only has Bézier segments,

@@ -44,7 +44,7 @@ namespace osu.Game.Online.API.Requests
         private class VerificationFailureResponse
         {
             [JsonProperty("method")]
-            public SessionVerificationMethod RequiredSessionVerificationMethod { get; set; }
+            public SessionVerificationMethod? RequiredSessionVerificationMethod { get; set; }
         }
     }
 }

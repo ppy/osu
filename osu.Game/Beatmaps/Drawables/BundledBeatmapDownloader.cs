@@ -187,6 +187,11 @@ namespace osu.Game.Beatmaps.Drawables
             @"1841885 cYsmix - triangles.osz",
             // winner of https://osu.ppy.sh/home/news/2023-02-01-twin-trials-contest-beatmapping-phase
             @"1971987 James Landino - Aresene's Bazaar.osz",
+            // locus 2025 https://osu.ppy.sh/home/news/2025-08-21-locus-2025-results
+            "2412244 Kry.exe - Rift Walker.osz",
+            "2412260 Koto Spirit - Locus of Hexagram.osz",
+            "2412232 Will Stetson - Of Our Time.osz",
+            "2412292 ArXe - Locus Amoenus (feat. Megurine Luka).osz",
         };
 
         private static readonly string[] bundled_osu =

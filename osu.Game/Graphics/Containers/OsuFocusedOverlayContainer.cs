@@ -15,7 +15,6 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers
 {
-    [Cached(typeof(IPreviewTrackOwner))]
     public abstract partial class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
     {
         protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);

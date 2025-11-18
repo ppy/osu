@@ -18,6 +18,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -71,6 +72,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
+        [Resolved]
+        private MusicController musicController { get; set; } = null!;
+
         private readonly IBindable<MatchmakingScreenState> currentState = new Bindable<MatchmakingScreenState>();
 
         private readonly Bindable<MatchmakingPool[]> availablePools = new Bindable<MatchmakingPool[]>();
@@ -78,7 +82,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private CancellationTokenSource userLookupCancellation = new CancellationTokenSource();
 
+        private Sample? enqueueSample;
+        private Sample? waitingLoopSample;
         private Sample? matchFoundSample;
+
+        private SampleChannel? waitingLoopChannel;
+        private ScheduledDelegate? startLoopPlaybackDelegate;
 
         protected override void LoadComplete()
         {
@@ -155,6 +164,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
+            enqueueSample = audio.Samples.Get(@"Multiplayer/Matchmaking/enqueue");
+            waitingLoopSample = audio.Samples.Get(@"Multiplayer/Matchmaking/waiting-loop");
             matchFoundSample = audio.Samples.Get(@"Multiplayer/Matchmaking/match-found");
         }
 
@@ -247,6 +258,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             mainContent.FadeInFromZero(500, Easing.OutQuint);
             mainContent.Clear();
 
+            startLoopPlaybackDelegate?.Cancel();
+            stopWaitingLoopPlayback();
+
             switch (newState)
             {
                 case MatchmakingScreenState.Idle:
@@ -334,6 +348,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         sendToBackgroundButton.Enabled.Value = true;
                         sendToBackgroundButton.TooltipText = "You will receive a notification when your game is ready. Make sure to watch out for it!";
                     }, 5000);
+
+                    enqueueSample?.Play();
+                    startLoopPlaybackDelegate = Scheduler.AddDelayed(startWaitingLoopPlayback, 2000);
                     break;
 
                 case MatchmakingScreenState.PendingAccept:
@@ -369,6 +386,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         }
                     };
                     matchFoundSample?.Play();
+                    musicController.DuckMomentarily(1250);
                     break;
 
                 case MatchmakingScreenState.AcceptedWaitingForRoom:
@@ -394,6 +412,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                             },
                         }
                     };
+
+                    startWaitingLoopPlayback();
                     break;
 
                 case MatchmakingScreenState.InRoom:
@@ -430,6 +450,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             base.Dispose(isDisposing);
 
+            stopWaitingLoopPlayback();
+
             if (client.IsNotNull())
                 client.MatchmakingLobbyStatusChanged -= onMatchmakingLobbyStatusChanged;
         }
@@ -441,6 +463,24 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             PendingAccept,
             AcceptedWaitingForRoom,
             InRoom
+        }
+
+        private void startWaitingLoopPlayback()
+        {
+            stopWaitingLoopPlayback();
+
+            waitingLoopChannel = waitingLoopSample?.GetChannel();
+            if (waitingLoopChannel == null)
+                return;
+
+            waitingLoopChannel.Looping = true;
+            waitingLoopChannel?.Play();
+        }
+
+        private void stopWaitingLoopPlayback()
+        {
+            waitingLoopChannel?.Stop();
+            waitingLoopChannel?.Dispose();
         }
 
         private partial class BeginQueueingButton : SelectionButton

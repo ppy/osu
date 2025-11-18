@@ -65,8 +65,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 if (text.Text == string.Empty || (lastSamplePlayback != null && Time.Current - lastSamplePlayback < OsuGameBase.SAMPLE_DEBOUNCE_TIME))
                     return;
 
-                textChangedSample?.Play();
-                lastSamplePlayback = Time.Current;
+                if (matchmakingState.Stage is MatchmakingStage.WaitingForClientsJoin or MatchmakingStage.WaitingForClientsBeatmapDownload)
+                {
+                    textChangedSample?.Play();
+                    lastSamplePlayback = Time.Current;
+                }
 
                 LocalisableString textForStatus = getTextForStatus(matchmakingState.Stage);
 

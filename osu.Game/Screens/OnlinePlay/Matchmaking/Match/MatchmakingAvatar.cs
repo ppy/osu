@@ -41,7 +41,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 {
                     RelativeSizeAxes = Axes.Both,
                     Depth = float.MaxValue,
-                    Padding = new MarginPadding(-2),
                     Child = new FastCircle
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -50,20 +49,25 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 });
             }
 
-            AddInternal(new CircularContainer
+            AddInternal(new Container
             {
+                Padding = new MarginPadding(2),
                 RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                Children = new Drawable[]
+                Child = new CircularContainer
                 {
-                    new Box
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.LightSlateGray,
-                    },
-                    new ClickableAvatar(user, true)
-                    {
-                        RelativeSizeAxes = Axes.Both,
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.LightSlateGray,
+                        },
+                        new ClickableAvatar(user, true)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        }
                     }
                 }
             });

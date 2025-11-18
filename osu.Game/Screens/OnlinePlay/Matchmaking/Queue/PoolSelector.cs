@@ -22,7 +22,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 {
     public partial class PoolSelector : CompositeDrawable
     {
-        private const float icon_size = 48;
+        private const float icon_size = 34;
 
         public readonly Bindable<MatchmakingPool[]> AvailablePools = new Bindable<MatchmakingPool[]>();
         public readonly Bindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
@@ -40,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             InternalChild = poolFlow = new FillFlowContainer<SelectorButton>
             {
                 AutoSizeAxes = Axes.X,
-                Height = icon_size * 1.2f,
+                Height = SelectorButton.SIZE.Y + 10,
                 Direction = FillDirection.Horizontal,
                 Spacing = new Vector2(5),
             };
@@ -92,6 +92,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private partial class SelectorButton : OsuAnimatedButton
         {
+            public static readonly Vector2 SIZE = new Vector2(84, 64);
+
             public bool IsSelected => SelectedPool.Value?.Equals(pool) == true;
 
             public readonly Bindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
@@ -104,19 +106,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             private Box flashLayer = null!;
 
+            private OsuSpriteText text = null!;
+
             public SelectorButton(MatchmakingPool pool)
                 : base(HoverSampleSet.ButtonSidebar)
             {
                 this.pool = pool;
 
-                Size = new Vector2(icon_size);
+                Size = SIZE;
             }
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
                 Content.Masking = true;
-                Content.CornerRadius = 20;
+                Content.CornerRadius = 16;
                 Content.CornerExponent = 10;
 
                 Children = new Drawable[]
@@ -134,13 +138,31 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         Alpha = 0,
                         RelativeSizeAxes = Axes.Both,
                     },
-                    new Container
+                    new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding(10),
-                        Children = new[]
+                        Direction = FillDirection.Vertical,
+                        Padding = new MarginPadding(5) { Top = 8 },
+                        Children = new Drawable[]
                         {
-                            iconSprite = createIcon(),
+                            new Container
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                Size = new Vector2(icon_size),
+                                Padding = new MarginPadding(2),
+                                Children = new[]
+                                {
+                                    iconSprite = createIcon(),
+                                }
+                            },
+                            text = new OsuSpriteText
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                Font = OsuFont.Style.Caption2,
+                                Text = pool.Name,
+                            },
                         }
                     },
                 };
@@ -176,12 +198,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 {
                     this.ScaleTo(1.2f, 200, Easing.OutQuint);
                     iconSprite.FadeColour(Color4.Gold, 100, Easing.OutQuint);
+                    text.Font = text.Font.With(weight: FontWeight.Bold);
                     flashLayer.FadeTo(0.1f, 200, Easing.OutQuint);
                 }
                 else
                 {
                     this.ScaleTo(1f, 200, Easing.OutQuint);
                     iconSprite.FadeColour(OsuColour.Gray(0.5f), 100);
+                    text.Font = text.Font.With(weight: FontWeight.Regular);
                     flashLayer.FadeOut(200, Easing.OutQuint);
                 }
             }

@@ -42,6 +42,7 @@ namespace osu.Game.Tests.Chat
                 sentMessages = new List<Message>();
                 silencedUserIds = new List<int>();
 
+                ((DummyAPIAccess)API).LocalUserState.Blocks.Clear();
                 ((DummyAPIAccess)API).HandleRequest = req =>
                 {
                     switch (req)
@@ -61,6 +62,10 @@ namespace osu.Game.Tests.Chat
                         case ChatAckRequest ack:
                             ack.TriggerSuccess(new ChatAckResponse { Silences = silencedUserIds.Select(u => new ChatSilence { UserId = u }).ToArray() });
                             silencedUserIds.Clear();
+                            return true;
+
+                        case GetMessagesRequest getMessages:
+                            getMessages.TriggerSuccess(sentMessages);
                             return true;
 
                         case GetUpdatesRequest updatesRequest:
@@ -159,6 +164,60 @@ namespace osu.Game.Tests.Chat
             AddUntilStep("/me command received", () => channel.Messages.Last().Content.Contains("DANCES"));
             AddStep("post /help command", () => channelManager.PostCommand("HeLp"));
             AddUntilStep("/help command received", () => channel.Messages.Last().Content.Contains("Supported commands"));
+        }
+
+        [Test]
+        public void TestBlockedUserMessagesAreDeletedFromInitialMessageBatch()
+        {
+            Channel channel = null;
+
+            AddStep("create channel", () => channel = createChannel(1, ChannelType.Public));
+            AddStep("post a message from blocked user", () => sentMessages.Add(new Message
+            {
+                ChannelId = channel.Id,
+                Content = "i am blocked",
+                SenderId = 1234
+            }));
+            AddStep("mark user as blocked", () => ((DummyAPIAccess)API).LocalUserState.Blocks.Add(new APIRelation
+            {
+                TargetUser = new APIUser { Username = "blocked", Id = 1234 },
+                TargetID = 1234,
+            }));
+
+            AddStep("join channel and select it", () =>
+            {
+                channelManager.JoinChannel(channel);
+                channelManager.CurrentChannel.Value = channel;
+            });
+            AddAssert("channel has no messages", () => channel.Messages, () => Is.Empty);
+        }
+
+        [Test]
+        public void TestBlockedUserMessagesAreDeletedImmediatelyOnBlock()
+        {
+            Channel channel = null;
+
+            AddStep("create channel", () => channel = createChannel(1, ChannelType.Public));
+
+            AddStep("join channel and select it", () =>
+            {
+                channelManager.JoinChannel(channel);
+                channelManager.CurrentChannel.Value = channel;
+            });
+            AddStep("post a message from blocked user", () => sentMessages.Add(new Message
+            {
+                ChannelId = channel.Id,
+                Content = "i am blocked",
+                SenderId = 1234
+            }));
+            AddUntilStep("channel has message", () => channel.Messages, () => Is.Not.Empty);
+
+            AddStep("block user", () => ((DummyAPIAccess)API).LocalUserState.Blocks.Add(new APIRelation
+            {
+                TargetUser = new APIUser { Username = "blocked", Id = 1234 },
+                TargetID = 1234,
+            }));
+            AddAssert("channel has no messages", () => channel.Messages, () => Is.Empty);
         }
 
         private void handlePostMessageRequest(PostMessageRequest request)

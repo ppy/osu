@@ -43,11 +43,15 @@ namespace osu.Game.Online.Matchmaking
         /// <summary>
         /// The user has raised a candidate playlist item to be played.
         /// </summary>
+        /// <param name="userId">The notifying user.</param>
+        /// <param name="playlistItemId">The playlist item candidate raised, or -1 as a special value that indicates a random selection.</param>
         Task MatchmakingItemSelected(int userId, long playlistItemId);
 
         /// <summary>
         /// The user has removed a candidate playlist item.
         /// </summary>
+        /// <param name="userId">The notifying user.</param>
+        /// <param name="playlistItemId">The playlist item candidate removed, or -1 as a special value that indicates a random selection.</param>
         Task MatchmakingItemDeselected(int userId, long playlistItemId);
     }
 }
