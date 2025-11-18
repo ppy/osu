@@ -173,7 +173,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public Drawable OverlayContent => InternalChild;
 
-            public Drawable FadingContent => (OverlayContent as Container)?.Child;
+            public new Drawable FadingContent => (OverlayContent as Container)?.Child;
         }
     }
 }
