@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Screens.Play.PlayerSettings;
 
@@ -13,19 +14,19 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         private readonly OsuRulesetConfigManager config;
 
-        [SettingSource("Show click markers", SettingControlType = typeof(PlayerCheckbox))]
+        [SettingSource(typeof(PlayerSettingsOverlayStrings), nameof(PlayerSettingsOverlayStrings.ShowClickMarkers), SettingControlType = typeof(PlayerCheckbox))]
         public BindableBool ShowClickMarkers { get; } = new BindableBool();
 
-        [SettingSource("Show frame markers", SettingControlType = typeof(PlayerCheckbox))]
+        [SettingSource(typeof(PlayerSettingsOverlayStrings), nameof(PlayerSettingsOverlayStrings.ShowFrameMarkers), SettingControlType = typeof(PlayerCheckbox))]
         public BindableBool ShowAimMarkers { get; } = new BindableBool();
 
-        [SettingSource("Show cursor path", SettingControlType = typeof(PlayerCheckbox))]
+        [SettingSource(typeof(PlayerSettingsOverlayStrings), nameof(PlayerSettingsOverlayStrings.ShowCursorPath), SettingControlType = typeof(PlayerCheckbox))]
         public BindableBool ShowCursorPath { get; } = new BindableBool();
 
-        [SettingSource("Hide gameplay cursor", SettingControlType = typeof(PlayerCheckbox))]
+        [SettingSource(typeof(PlayerSettingsOverlayStrings), nameof(PlayerSettingsOverlayStrings.HideGameplayCursor), SettingControlType = typeof(PlayerCheckbox))]
         public BindableBool HideSkinCursor { get; } = new BindableBool();
 
-        [SettingSource("Display length", SettingControlType = typeof(PlayerSliderBar<int>))]
+        [SettingSource(typeof(PlayerSettingsOverlayStrings), nameof(PlayerSettingsOverlayStrings.DisplayLength), SettingControlType = typeof(PlayerSliderBar<int>))]
         public BindableInt DisplayLength { get; } = new BindableInt
         {
             MinValue = 200,
@@ -35,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.UI
         };
 
         public ReplayAnalysisSettings(OsuRulesetConfigManager config)
-            : base("Analysis Settings")
+            : base(PlayerSettingsOverlayStrings.AnalysisSettingsTitle)
         {
             this.config = config;
         }

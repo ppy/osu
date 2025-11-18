@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
@@ -19,6 +20,7 @@ using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -48,15 +50,13 @@ namespace osu.Game.Screens.SelectV2
         private ModSettingChangeTracker? settingChangeTracker;
 
         private BeatmapSetOnlineStatusPill statusPill = null!;
-        private Container titleContainer = null!;
         private OsuHoverContainer titleLink = null!;
-        private OsuSpriteText titleLabel = null!;
-        private Container artistContainer = null!;
+        private MarqueeContainer titleLabel = null!;
         private OsuHoverContainer artistLink = null!;
-        private OsuSpriteText artistLabel = null!;
+        private MarqueeContainer artistLabel = null!;
 
-        internal string DisplayedTitle => titleLabel.Text.ToString();
-        internal string DisplayedArtist => artistLabel.Text.ToString();
+        internal string DisplayedTitle { get; private set; } = string.Empty;
+        internal string DisplayedArtist { get; private set; } = string.Empty;
 
         private StatisticPlayCount playCount = null!;
         private FavouriteButton favouriteButton = null!;
@@ -109,7 +109,7 @@ namespace osu.Game.Screens.SelectV2
                             TextSize = OsuFont.Style.Caption1.Size,
                             TextPadding = new MarginPadding { Horizontal = 6, Vertical = 1 },
                         }),
-                        new ShearAligningWrapper(titleContainer = new Container
+                        new ShearAligningWrapper(new Container
                         {
                             Shear = -OsuGame.SHEAR,
                             RelativeSizeAxes = Axes.X,
@@ -117,15 +117,15 @@ namespace osu.Game.Screens.SelectV2
                             Margin = new MarginPadding { Bottom = -4f },
                             Child = titleLink = new OsuHoverContainer
                             {
-                                AutoSizeAxes = Axes.Both,
-                                Child = titleLabel = new TruncatingSpriteText
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Child = titleLabel = new MarqueeContainer
                                 {
-                                    Shadow = true,
-                                    Font = OsuFont.Style.Title,
-                                },
+                                    OverflowSpacing = 50,
+                                }
                             }
                         }),
-                        new ShearAligningWrapper(artistContainer = new Container
+                        new ShearAligningWrapper(new Container
                         {
                             Shear = -OsuGame.SHEAR,
                             RelativeSizeAxes = Axes.X,
@@ -133,12 +133,12 @@ namespace osu.Game.Screens.SelectV2
                             Margin = new MarginPadding { Left = 1f },
                             Child = artistLink = new OsuHoverContainer
                             {
-                                AutoSizeAxes = Axes.Both,
-                                Child = artistLabel = new TruncatingSpriteText
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Child = artistLabel = new MarqueeContainer
                                 {
-                                    Shadow = true,
-                                    Font = OsuFont.Style.Heading2,
-                                },
+                                    OverflowSpacing = 50,
+                                }
                             }
                         }),
                         new ShearAligningWrapper(statisticsFlow = new FillFlowContainer
@@ -213,13 +213,6 @@ namespace osu.Game.Screens.SelectV2
                 .FadeOut(SongSelect.ENTER_DURATION / 3, Easing.In);
         }
 
-        protected override void Update()
-        {
-            base.Update();
-            titleLabel.MaxWidth = titleContainer.DrawWidth - 20;
-            artistLabel.MaxWidth = artistContainer.DrawWidth - 20;
-        }
-
         private void updateDisplay()
         {
             var metadata = working.Value.Metadata;
@@ -228,12 +221,24 @@ namespace osu.Game.Screens.SelectV2
             statusPill.Status = beatmapInfo.Status;
 
             var titleText = new RomanisableString(metadata.TitleUnicode, metadata.Title);
-            titleLabel.Text = titleText;
+            titleLabel.CreateContent = () => new OsuSpriteText
+            {
+                Text = titleText,
+                Shadow = true,
+                Font = OsuFont.Style.Title,
+            };
             titleLink.Action = () => songSelect?.Search(titleText.GetPreferred(localisation.CurrentParameters.Value.PreferOriginalScript));
+            DisplayedTitle = titleText.ToString();
 
             var artistText = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
-            artistLabel.Text = artistText;
+            artistLabel.CreateContent = () => new OsuSpriteText
+            {
+                Text = artistText,
+                Shadow = true,
+                Font = OsuFont.Style.Heading2,
+            };
             artistLink.Action = () => songSelect?.Search(artistText.GetPreferred(localisation.CurrentParameters.Value.PreferOriginalScript));
+            DisplayedArtist = artistText.ToString();
 
             updateLengthAndBpmStatistics();
             updateOnlineDisplay();
@@ -278,8 +283,13 @@ namespace osu.Game.Screens.SelectV2
             }, token);
         }
 
+        private CancellationTokenSource? onlineDisplayCancellationSource;
+
         private void updateOnlineDisplay()
         {
+            onlineDisplayCancellationSource?.Cancel();
+            onlineDisplayCancellationSource = null;
+
             if (onlineLookupResult.Value?.Status != SongSelect.BeatmapSetLookupStatus.Completed)
             {
                 playCount.Value = null;
@@ -291,21 +301,42 @@ namespace osu.Game.Screens.SelectV2
                 playCount.Value = new StatisticPlayCount.Data(onlineBeatmap?.PlayCount ?? -1, onlineBeatmap?.UserPlayCount ?? -1);
                 favouriteButton.SetBeatmapSet(onlineLookupResult.Value.Result);
 
+                onlineDisplayCancellationSource = new CancellationTokenSource();
+                var token = onlineDisplayCancellationSource.Token;
+
                 // the online fetch may have also updated the beatmap's status.
                 // this needs to be checked against the *local* beatmap model rather than the online one, because it's not known here whether the status change has occurred or not
                 // (think scenarios like the beatmap being locally modified).
                 // it also has to be handled explicitly like this because the working beatmap's `BeatmapInfo` will not receive these updates due to being detached
                 // (and because of https://github.com/ppy/osu/blob/4b73afd1957a9161e2956fc4191c8114d9958372/osu.Game/Screens/SelectV2/SongSelect.cs#L487-L488
                 // which prevents working beatmap refetches caused by changes to the realm model of perceived low importance).
-                var status = realm.Run(r =>
+                realm.RunAsync(r =>
                 {
-                    r.Refresh();
                     var refetchedBeatmap = r.Find<BeatmapInfo>(working.Value.BeatmapInfo.ID);
                     return refetchedBeatmap?.Status;
-                });
-                if (status != null)
-                    statusPill.Status = status.Value;
+                }, token).ContinueWith(t =>
+                {
+                    var status = t.GetResultSafely();
+
+                    if (status != null)
+                    {
+                        Schedule(() =>
+                        {
+                            if (token.IsCancellationRequested)
+                                return;
+
+                            statusPill.Status = status.Value;
+                        });
+                    }
+                }, token);
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            onlineDisplayCancellationSource?.Dispose();
+            onlineDisplayCancellationSource = null;
+            base.Dispose(isDisposing);
         }
     }
 }

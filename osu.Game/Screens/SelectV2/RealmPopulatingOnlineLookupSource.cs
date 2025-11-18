@@ -82,7 +82,9 @@ namespace osu.Game.Screens.SelectV2
                 // unfortunately in terms of subscriptions realm treats *every* write to any realm object as a modification,
                 // even if the write was redundant and had no observable effect.
 
-                if (dbBeatmapSet.Status != onlineBeatmapSet.Status)
+                // notably, `LocallyModified` status is preserved on the set until the user performs an explicit action to get rid of it
+                // (be it updating the set or deciding to discard their changes, removing the set and re-downloading it, etc.)
+                if (dbBeatmapSet.Status != onlineBeatmapSet.Status && dbBeatmapSet.Status != BeatmapOnlineStatus.LocallyModified)
                     dbBeatmapSet.Status = onlineBeatmapSet.Status;
 
                 foreach (var dbBeatmap in dbBeatmapSet.Beatmaps)

@@ -64,11 +64,13 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         private readonly Lazy<bool> hasKeyTexture;
 
         private readonly ManiaBeatmap beatmap;
+        private readonly bool isBeatmapConverted;
 
         public ManiaLegacySkinTransformer(ISkin skin, IBeatmap beatmap)
             : base(skin)
         {
             this.beatmap = (ManiaBeatmap)beatmap;
+            isBeatmapConverted = !beatmap.BeatmapInfo.Ruleset.Equals(new ManiaRuleset().RulesetInfo);
 
             isLegacySkin = new Lazy<bool>(() => GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version) != null);
             hasKeyTexture = new Lazy<bool>(() =>
@@ -196,8 +198,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
         public override ISample GetSample(ISampleInfo sampleInfo)
         {
-            // layered hit sounds never play in mania
-            if (sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacySample && legacySample.IsLayered)
+            // layered hit sounds never play in mania-native beatmaps (but do play on converts)
+            if (sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacySample && legacySample.IsLayered && !isBeatmapConverted)
                 return new SampleVirtual();
 
             return base.GetSample(sampleInfo);

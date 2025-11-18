@@ -89,13 +89,13 @@ namespace osu.Game.Online.Metadata
             userStatus.BindValueChanged(status =>
             {
                 if (localUser.Value is not GuestUser)
-                    UpdateStatus(status.NewValue);
+                    UpdateStatus(status.NewValue).FireAndForget();
             }, true);
 
             userActivity.BindValueChanged(activity =>
             {
                 if (localUser.Value is not GuestUser)
-                    UpdateActivity(activity.NewValue);
+                    UpdateActivity(activity.NewValue).FireAndForget();
             }, true);
         }
 
@@ -121,8 +121,8 @@ namespace osu.Game.Online.Metadata
 
             if (localUser.Value is not GuestUser)
             {
-                UpdateActivity(userActivity.Value);
-                UpdateStatus(userStatus.Value);
+                UpdateActivity(userActivity.Value).FireAndForget();
+                UpdateStatus(userStatus.Value).FireAndForget();
             }
 
             if (lastQueueId.Value >= 0)

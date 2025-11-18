@@ -22,6 +22,7 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
@@ -143,6 +144,41 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             void onScreenPushed(IScreen lastScreen, IScreen newScreen) => screensPushed.Add(lastScreen);
         }
 
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestHoveringLeftSideReexpandsGroupSelectionIsIn(bool mouseOverPanel)
+        {
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+            SortAndGroupBy(SortMode.Difficulty, GroupMode.Difficulty);
+
+            AddStep("move mouse to carousel", () => InputManager.MoveMouseTo(Carousel));
+
+            AddUntilStep("expanded group is below 1 star",
+                () => (Carousel.ChildrenOfType<PanelGroupStarDifficulty>().SingleOrDefault(p => p.Expanded.Value)?.Item?.Model as StarDifficultyGroupDefinition)?.Difficulty.Stars,
+                () => Is.EqualTo(0));
+
+            AddStep("select next group", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Right);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            AddUntilStep("expanded group is 3 star",
+                () => (Carousel.ChildrenOfType<PanelGroupStarDifficulty>().SingleOrDefault(p => p.Expanded.Value)?.Item?.Model as StarDifficultyGroupDefinition)?.Difficulty.Stars,
+                () => Is.EqualTo(3));
+
+            if (mouseOverPanel)
+                AddStep("move mouse over left panel", () => InputManager.MoveMouseTo(this.ChildrenOfType<BeatmapTitleWedge>().Single()));
+            else
+                AddStep("move mouse to left side container", () => InputManager.MoveMouseTo(this.ChildrenOfType<Screens.Select.SongSelect.LeftSideInteractionContainer>().Single()));
+
+            AddUntilStep("expanded group is below 1 star",
+                () => (Carousel.ChildrenOfType<PanelGroupStarDifficulty>().Single(p => p.Expanded.Value).Item?.Model as StarDifficultyGroupDefinition)?.Difficulty.Stars,
+                () => Is.EqualTo(0));
+        }
+
         #region Hotkeys
 
         [Test]
@@ -177,7 +213,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("mods selected", () => SelectedMods.Value, () => Has.Count.EqualTo(1));
             AddStep("right click mod button", () =>
             {
-                InputManager.MoveMouseTo(Footer.ChildrenOfType<FooterButtonMods>().Single());
+                InputManager.MoveMouseTo(ScreenFooter.ChildrenOfType<FooterButtonMods>().Single());
                 InputManager.Click(MouseButton.Right);
             });
             AddAssert("not mods selected", () => SelectedMods.Value, () => Has.Count.EqualTo(0));
@@ -584,7 +620,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("previous random invoked", () => previousRandomCalled && !nextRandomCalled);
         }
 
-        private FooterButtonRandom randomButton => Footer.ChildrenOfType<FooterButtonRandom>().Single();
+        private FooterButtonRandom randomButton => ScreenFooter.ChildrenOfType<FooterButtonRandom>().Single();
 
         [Test]
         public void TestFooterOptions()

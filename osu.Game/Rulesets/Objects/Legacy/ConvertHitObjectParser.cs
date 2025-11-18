@@ -476,12 +476,30 @@ namespace osu.Game.Rulesets.Objects.Legacy
         private ConvertHitObject createSlider(Vector2 position, bool newCombo, int comboOffset, PathControlPoint[] controlPoints, double? length, int repeatCount,
                                               IList<IList<HitSampleInfo>> nodeSamples)
         {
+            var path = new SliderPath(controlPoints, length);
+
+            // there are known instances of beatmaps (https://osu.ppy.sh/beatmapsets/594828#osu/1258033) which contain zero-length sliders with non-zero numbers of repeats.
+            // this was exploiting a bug in stable in which the slider repeats would be generated as objects but never actually judged as a hit *or* miss during gameplay,
+            // therefore increasing the theoretical possible max combo to be gained from a slider while in practice never giving that extra combo.
+            // due to lazer ensuring that an object has its nested part fully judged, this would result in broken behaviours
+            // (either the zero-length slider giving hundreds of combo for nothing if the repeats are judged as hit, or insta-failing the player due to HP if judged as miss).
+            // to remedy this in a way that seems least damaging, detect this situation via a heuristic and reset the number of repeats to zero.
+            // this technically *does not* match stable beatmap parsing or conversion, *does not* match in-gameplay behaviour of such broken sliders,
+            // and *will* fail conversion mapping tests, but again, this is supposed to be a least-worst measure to prevent exploits.
+            // it is also applied centrally to all rulesets rather than in specific ruleset converters because this failure scenario
+            // translates across rulesets (osu! and catch are both affected).
+            if (Precision.AlmostEquals(path.Distance, 0))
+            {
+                repeatCount = 0;
+                nodeSamples = [nodeSamples[0], nodeSamples[^1]];
+            }
+
             return lastObject = new ConvertSlider
             {
                 Position = position,
                 NewCombo = firstObject || lastObject is ConvertSpinner || newCombo,
                 ComboOffset = newCombo ? comboOffset : 0,
-                Path = new SliderPath(controlPoints, length),
+                Path = path,
                 NodeSamples = nodeSamples,
                 RepeatCount = repeatCount
             };
@@ -532,7 +550,6 @@ namespace osu.Game.Rulesets.Objects.Legacy
             }
             else
             {
-                // Todo: This should set the normal SampleInfo if the specified sample file isn't found, but that's a pretty edge-case scenario
                 soundTypes.Add(new FileHitSampleInfo(bankInfo.Filename, bankInfo.Volume));
             }
 
@@ -590,7 +607,16 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         public class LegacyHitSampleInfo : HitSampleInfo, IEquatable<LegacyHitSampleInfo>
         {
-            public readonly int CustomSampleBank;
+            public int CustomSampleBank
+            {
+                get
+                {
+                    if (Suffix != null)
+                        return int.Parse(Suffix);
+
+                    return UseBeatmapSamples ? 1 : 0;
+                }
+            }
 
             /// <summary>
             /// Whether this hit sample is layered.
@@ -608,16 +634,33 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public bool BankSpecified;
 
             public LegacyHitSampleInfo(string name, string? bank = null, int volume = 0, bool editorAutoBank = false, int customSampleBank = 0, bool isLayered = false)
-                : base(name, bank ?? SampleControlPoint.DEFAULT_BANK, customSampleBank >= 2 ? customSampleBank.ToString() : null, volume, editorAutoBank)
+                : base(
+                    name,
+                    bank ?? SampleControlPoint.DEFAULT_BANK,
+                    suffix: customSampleBank >= 2 ? customSampleBank.ToString() : null,
+                    volume,
+                    editorAutoBank,
+                    useBeatmapSamples: customSampleBank >= 1)
             {
-                CustomSampleBank = customSampleBank;
                 BankSpecified = !string.IsNullOrEmpty(bank);
                 IsLayered = isLayered;
             }
 
             public sealed override HitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default,
-                                                      Optional<bool> newEditorAutoBank = default)
-                => With(newName, newBank, newVolume, newEditorAutoBank);
+                                                      Optional<bool> newEditorAutoBank = default, Optional<bool> newUseBeatmapSamples = default)
+            {
+                string? suffix = newSuffix.GetOr(Suffix);
+                bool useBeatmapSamples = newUseBeatmapSamples.GetOr(UseBeatmapSamples);
+                int newCustomSampleBank = 0;
+
+                if (suffix != null)
+                    _ = int.TryParse(suffix, out newCustomSampleBank);
+
+                if (newCustomSampleBank == 0 && useBeatmapSamples)
+                    newCustomSampleBank = 1;
+
+                return With(newName, newBank, newVolume, newEditorAutoBank, newCustomSampleBank);
+            }
 
             public virtual LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<int> newVolume = default,
                                                     Optional<bool> newEditorAutoBank = default, Optional<int> newCustomSampleBank = default, Optional<bool> newIsLayered = default)
@@ -636,14 +679,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), CustomSampleBank, IsLayered);
         }
 
-        private class FileHitSampleInfo : LegacyHitSampleInfo, IEquatable<FileHitSampleInfo>
+        public class FileHitSampleInfo : LegacyHitSampleInfo, IEquatable<FileHitSampleInfo>
         {
             public readonly string Filename;
 
             public FileHitSampleInfo(string filename, int volume)
                 // Force CSS=1 to make sure that the LegacyBeatmapSkin does not fall back to the user skin.
-                // Note that this does not change the lookup names, as they are overridden locally.
-                : base(string.Empty, customSampleBank: 1, volume: volume)
+                : base(HIT_NORMAL, SampleControlPoint.DEFAULT_BANK, customSampleBank: 1, volume: volume)
             {
                 Filename = filename;
             }
@@ -652,7 +694,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 Filename,
                 Path.ChangeExtension(Filename, null)
-            };
+            }.Concat(base.LookupNames);
 
             public sealed override LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<int> newVolume = default,
                                                             Optional<bool> newEditorAutoBank = default, Optional<int> newCustomSampleBank = default, Optional<bool> newIsLayered = default)

@@ -42,6 +42,9 @@ namespace osu.Game.Screens.Play
             if (beatmapId <= 0)
                 return null;
 
+            if (Beatmap.Value.BeatmapInfo.Status == BeatmapOnlineStatus.LocallyModified)
+                return null;
+
             if (!Ruleset.Value.IsLegacyRuleset())
                 return null;
 

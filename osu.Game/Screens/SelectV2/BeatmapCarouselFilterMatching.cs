@@ -96,10 +96,23 @@ namespace osu.Game.Screens.SelectV2
             if (!match) return false;
 
             match &= !criteria.Creator.HasFilter || criteria.Creator.Matches(beatmap.Metadata.Author.Username);
-            match &= !criteria.Artist.HasFilter || criteria.Artist.Matches(beatmap.Metadata.Artist) ||
-                     criteria.Artist.Matches(beatmap.Metadata.ArtistUnicode);
-            match &= !criteria.Title.HasFilter || criteria.Title.Matches(beatmap.Metadata.Title) ||
-                     criteria.Title.Matches(beatmap.Metadata.TitleUnicode);
+
+            if (criteria.Artist.HasFilter)
+            {
+                if (criteria.Artist.ExcludeTerm)
+                    match &= criteria.Artist.Matches(beatmap.Metadata.Artist) && criteria.Artist.Matches(beatmap.Metadata.ArtistUnicode);
+                else
+                    match &= criteria.Artist.Matches(beatmap.Metadata.Artist) || criteria.Artist.Matches(beatmap.Metadata.ArtistUnicode);
+            }
+
+            if (criteria.Title.HasFilter)
+            {
+                if (criteria.Title.ExcludeTerm)
+                    match &= criteria.Title.Matches(beatmap.Metadata.Title) && criteria.Title.Matches(beatmap.Metadata.TitleUnicode);
+                else
+                    match &= criteria.Title.Matches(beatmap.Metadata.Title) || criteria.Title.Matches(beatmap.Metadata.TitleUnicode);
+            }
+
             match &= !criteria.DifficultyName.HasFilter || criteria.DifficultyName.Matches(beatmap.DifficultyName);
             match &= !criteria.Source.HasFilter || criteria.Source.Matches(beatmap.Metadata.Source);
 
@@ -107,12 +120,24 @@ namespace osu.Game.Screens.SelectV2
             {
                 foreach (var tagFilter in criteria.UserTags)
                 {
-                    bool anyTagMatched = false;
+                    if (tagFilter.ExcludeTerm)
+                    {
+                        // if `ExcludeTerm` is true, `Matches()` will return true if a user tag *doesn't match* the excluded term.
+                        // thus, every user tag must pass this filter.
+                        foreach (string tag in beatmap.Metadata.UserTags)
+                            match &= tagFilter.Matches(tag);
+                    }
+                    else
+                    {
+                        // if `ExcludeTerm` is false, `Matches()` will return true if a user tag *matches* the expected term.
+                        // the expected behaviour is that a beatmap should be displayed if at least one of the user tags passes the filter.
+                        bool anyTagMatched = false;
 
-                    foreach (string tag in beatmap.Metadata.UserTags)
-                        anyTagMatched |= tagFilter.Matches(tag);
+                        foreach (string tag in beatmap.Metadata.UserTags)
+                            anyTagMatched |= tagFilter.Matches(tag);
 
-                    match &= anyTagMatched;
+                        match &= anyTagMatched;
+                    }
                 }
             }
 

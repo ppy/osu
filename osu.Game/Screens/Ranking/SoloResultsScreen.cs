@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Ranking
             sortedScores = sortedScores.OrderByTotalScore().ToList();
 
             int delta = 0;
-            bool isPartialLeaderboard = leaderboardManager.CurrentCriteria?.Scope != BeatmapLeaderboardScope.Local && result.TopScores.Count >= 50;
+            bool isPartialLeaderboard = result.IsPartial;
 
             for (int i = 0; i < sortedScores.Count; i++)
             {
