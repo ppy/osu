@@ -170,10 +170,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                 float gameplayWidth = host.Window.ClientSize.Width;
                                 float gameplayHeight = host.Window.ClientSize.Height;
 
-                                if (osuConfig.Get<ScalingMode>(OsuSetting.Scaling) == ScalingMode.Everything)
+                                if (scalingMode.Value == ScalingMode.Everything)
                                 {
-                                    gameplayWidth *= osuConfig.Get<float>(OsuSetting.ScalingSizeX);
-                                    gameplayHeight *= osuConfig.Get<float>(OsuSetting.ScalingSizeY);
+                                    gameplayWidth *= scalingSizeX.Value;
+                                    gameplayHeight *= scalingSizeY.Value;
                                 }
 
                                 forceAspectRatio(gameplayWidth / gameplayHeight);
