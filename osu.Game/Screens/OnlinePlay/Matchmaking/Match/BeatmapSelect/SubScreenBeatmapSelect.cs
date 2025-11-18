@@ -79,7 +79,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             beatmapSelectGrid.ItemSelected += item => client.MatchmakingToggleSelection(item.ID);
             client.MatchmakingItemSelected += onItemSelected;
             client.MatchmakingItemDeselected += onItemDeselected;
-            client.SettingsChanged += onSettingsChanged;
 
             Debug.Assert(client.Room != null);
 
@@ -136,20 +135,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             beatmapSelectGrid.SetUserSelection(user, itemId, false);
         }
 
-        private void onSettingsChanged(MultiplayerRoomSettings settings)
-        {
-            if (client.Room!.MatchState is not MatchmakingRoomState matchmakingState)
-                return;
-
-            if (matchmakingState.Stage != MatchmakingStage.ServerBeatmapFinalised)
-                return;
-
-            if (matchmakingState.CandidateItem != -1)
-                return;
-
-            beatmapSelectGrid.RevealRandomItem(client.Room!.CurrentPlaylistItem);
-        }
-
         public void RollFinalBeatmap(long[] candidateItems, long finalItem, MatchmakingCandidateType panelType) =>
             beatmapSelectGrid.RollAndDisplayFinalBeatmap(candidateItems, finalItem, panelType);
 
@@ -161,7 +146,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             {
                 client.MatchmakingItemSelected -= onItemSelected;
                 client.MatchmakingItemDeselected -= onItemDeselected;
-                client.SettingsChanged -= onSettingsChanged;
             }
         }
     }
