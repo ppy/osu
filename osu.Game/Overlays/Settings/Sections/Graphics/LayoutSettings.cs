@@ -255,8 +255,17 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     window.WindowState = Framework.Platform.WindowState.Normal;
                 }
 
-                windowedPositionX.Value = 0.5;
-                windowedPositionY.Value = 0.5;
+                var dBounds = currentDisplay.Value.Bounds;
+                var dUsable = currentDisplay.Value.UsableBounds;
+                int w = size.NewValue.Width;
+                int h = size.NewValue.Height;
+
+                float adjustedY = Math.Max(
+                    dUsable.Y + (dUsable.Height - h) / 2f,
+                    dUsable.Y + (host.Window?.BorderSize.Value.Top ?? 0) // titlebar adjustment
+                );
+                windowedPositionY.Value = dBounds.Height - h != 0 ? (adjustedY - dBounds.Y) / (dBounds.Height - h) : 0;
+                windowedPositionX.Value = dBounds.Width - w != 0 ? (dUsable.X - dBounds.X + (dUsable.Width - w) / 2f) / (dBounds.Width - w) : 0;
             });
 
             sizeWindowed.BindValueChanged(size =>
