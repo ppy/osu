@@ -8,7 +8,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -194,7 +193,6 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 Scheduler.AddDelayed(() =>
                 {
                     grid.PresentRolledBeatmap(finalItem, MatchmakingCandidateType.Random);
-                    grid.RevealRandomItem(items[RNG.Next(items.Length)].PlaylistItem);
                 }, 500);
             });
         }
