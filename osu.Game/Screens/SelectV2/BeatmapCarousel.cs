@@ -459,6 +459,8 @@ namespace osu.Game.Screens.SelectV2
                         // - Background user tag population runs and causes a realm update.
                         //   We don't display user tags so want to ignore this.
                         bool equalForDisplayPurposes =
+                            // covers import-as-update flows, such as updating the beatmap with the latest online versions, or external editing inside editor
+                            oldBeatmap.ID == newBeatmap.ID &&
                             // covers metadata changes
                             oldBeatmap.Hash == newBeatmap.Hash &&
                             // sanity check
@@ -483,6 +485,15 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
+        protected override void FindCarouselItemsForSelection(ref Selection keyboardSelection, ref Selection selection, IList<CarouselItem> items)
+        {
+            if (keyboardSelection.Model != null && grouping.ItemMap.TryGetValue(keyboardSelection.Model, out var keyboardSelectionItem))
+                keyboardSelection = keyboardSelection with { CarouselItem = keyboardSelectionItem.item, Index = keyboardSelectionItem.index };
+
+            if (selection.Model != null && grouping.ItemMap.TryGetValue(selection.Model, out var selectionItem))
+                selection = selection with { CarouselItem = selectionItem.item, Index = selectionItem.index };
+        }
+
         protected override void HandleFilterCompleted()
         {
             base.HandleFilterCompleted();
@@ -497,14 +508,7 @@ namespace osu.Game.Screens.SelectV2
             // The filter might have changed the set of available groups, which means that the current selection may point to a stale group.
             // Check whether that is the case.
             bool groupingRemainsOff = currentGroupedBeatmap?.Group == null && grouping.GroupItems.Count == 0;
-
-            bool groupStillValid = false;
-
-            if (currentGroupedBeatmap?.Group != null)
-            {
-                groupStillValid = grouping.GroupItems.TryGetValue(currentGroupedBeatmap.Group, out var items)
-                                  && items.Any(i => CheckModelEquality(i.Model, currentGroupedBeatmap));
-            }
+            bool groupStillValid = currentGroupedBeatmap?.Group != null && grouping.ItemMap.ContainsKey(currentGroupedBeatmap);
 
             if (groupingRemainsOff || groupStillValid)
             {
@@ -697,9 +701,8 @@ namespace osu.Game.Screens.SelectV2
             if (CheckModelEquality(ExpandedGroup, CurrentGroupedBeatmap.Group))
                 return;
 
-            var groupItem = GetCarouselItems()?.FirstOrDefault(i => CheckModelEquality(i.Model, CurrentGroupedBeatmap.Group));
-            if (groupItem != null)
-                Activate(groupItem);
+            if (grouping.ItemMap.TryGetValue(CurrentGroupedBeatmap.Group, out var groupItem))
+                Activate(groupItem.item);
         }
 
         protected override double? GetScrollTarget()
@@ -710,9 +713,13 @@ namespace osu.Game.Screens.SelectV2
             // attempt a fallback to other possibly expanded panels (set first, then group)
             if (target == null)
             {
-                var items = GetCarouselItems();
-                var targetItem = items?.FirstOrDefault(i => CheckModelEquality(i.Model, ExpandedBeatmapSet))
-                                 ?? items?.FirstOrDefault(i => CheckModelEquality(i.Model, ExpandedGroup));
+                CarouselItem? targetItem = null;
+
+                if (ExpandedBeatmapSet != null && grouping.ItemMap.TryGetValue(ExpandedBeatmapSet, out var setItem))
+                    targetItem = setItem.item;
+
+                if (targetItem == null && ExpandedGroup != null && grouping.ItemMap.TryGetValue(ExpandedGroup, out var groupItem))
+                    targetItem = groupItem.item;
 
                 target = targetItem?.CarouselYPosition;
             }
@@ -922,9 +929,6 @@ namespace osu.Game.Screens.SelectV2
             if (x is BeatmapInfo beatmapInfoX && y is BeatmapInfo beatmapInfoY)
                 return beatmapInfoX.Equals(beatmapInfoY);
 
-            if (x is GroupDefinition groupX && y is GroupDefinition groupY)
-                return groupX.Equals(groupY);
-
             if (x is StarDifficultyGroupDefinition starX && y is StarDifficultyGroupDefinition starY)
                 return starX.Equals(starY);
 
@@ -933,6 +937,14 @@ namespace osu.Game.Screens.SelectV2
 
             if (x is RankedStatusGroupDefinition statusX && y is RankedStatusGroupDefinition statusY)
                 return statusX.Equals(statusY);
+
+            // NOTE: this branch must be AFTER all branches that compare `GroupDefinition` subtypes!
+            // this is an optimisation measure. any subclass of `GroupDefinition` will pass the `is GroupDefinition` check,
+            // and testing a subclass of `GroupDefinition` against any other `GroupDefinition` (or subclass thereof)
+            // will result in a casting cascade of `Equals(GroupDefinition) -> Equals(object) -> Equals(GroupDefinitionSubClass)`
+            // (that last one only if the type check passes)
+            if (x is GroupDefinition groupX && y is GroupDefinition groupY)
+                return groupX.Equals(groupY);
 
             return base.CheckModelEquality(x, y);
         }
