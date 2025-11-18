@@ -228,15 +228,18 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 var buffer = new Bindable<Size>(windowedResolution.Value);
                 resolutionWindowedDropdown.Current = buffer;
 
-                var newResolutions = display.NewValue.DisplayModes
-                                            .Where(m => m.Size.Width >= 800 && m.Size.Height >= 600)
-                                            .OrderByDescending(m => Math.Max(m.Size.Height, m.Size.Width))
-                                            .Select(m => m.Size)
-                                            .Distinct()
-                                            .ToList();
+                var fullscreenResolutions = display.NewValue.DisplayModes
+                                                   .Where(m => m.Size.Width >= 800 && m.Size.Height >= 600)
+                                                   .OrderByDescending(m => Math.Max(m.Size.Height, m.Size.Width))
+                                                   .Select(m => m.Size)
+                                                   .Distinct()
+                                                   .ToList();
+                var windowedResolutions = fullscreenResolutions
+                                          .Where(res => res.Width <= display.NewValue.UsableBounds.Width && res.Height <= display.NewValue.UsableBounds.Height)
+                                          .ToList();
 
-                resolutionsFullscreen.ReplaceRange(1, resolutionsFullscreen.Count - 1, newResolutions);
-                resolutionsWindowed.ReplaceRange(0, resolutionsWindowed.Count, newResolutions);
+                resolutionsFullscreen.ReplaceRange(1, resolutionsFullscreen.Count - 1, fullscreenResolutions);
+                resolutionsWindowed.ReplaceRange(0, resolutionsWindowed.Count, windowedResolutions);
 
                 resolutionWindowedDropdown.Current = windowedResolution;
 
@@ -253,6 +256,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     window.WindowState = Framework.Platform.WindowState.Normal;
                 }
 
+                // Adjust only for top decorations (assuming system titlebar).
+                // Bottom/left/right borders are ignored as invisible padding, which don't align with the screen.
                 var dBounds = currentDisplay.Value.Bounds;
                 var dUsable = currentDisplay.Value.UsableBounds;
                 float topBar = host.Window?.BorderSize.Value.Top ?? 0;
