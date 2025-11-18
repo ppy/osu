@@ -1,13 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -18,14 +16,11 @@ using osu.Game.Overlays;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osuTK;
-using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay
 {
     public partial class FooterButtonPlaylistV2 : ScreenFooterButton, IHasPopover
     {
-        public required Action? CreateNewItem { get; init; }
-
         private readonly Room room;
 
         public FooterButtonPlaylistV2(Room room)
@@ -43,15 +38,10 @@ namespace osu.Game.Screens.OnlinePlay
             Action = this.ShowPopover;
         }
 
-        public Popover GetPopover() => new PlaylistPopover(room)
-        {
-            CreateNewItem = CreateNewItem
-        };
+        public Popover GetPopover() => new PlaylistPopover(room);
 
         private partial class PlaylistPopover : OsuPopover
         {
-            public required Action? CreateNewItem { get; init; }
-
             private readonly Room room;
             private PlaylistsRoomSettingsPlaylist playlist = null!;
 
@@ -66,43 +56,12 @@ namespace osu.Game.Screens.OnlinePlay
             [BackgroundDependencyLoader]
             private void load()
             {
-                Content.Padding = new MarginPadding(5);
+                Content.Padding = new MarginPadding(10);
 
-                Add(new GridContainer
+                Child = playlist = new PlaylistsRoomSettingsPlaylist
                 {
-                    Size = new Vector2(300, 300),
-                    Padding = new MarginPadding { Vertical = 10 },
-                    Content = new[]
-                    {
-                        new Drawable[]
-                        {
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Bottom = 10 },
-                                Child = playlist = new PlaylistsRoomSettingsPlaylist
-                                {
-                                    RelativeSizeAxes = Axes.Both
-                                }
-                            }
-                        },
-                        new Drawable[]
-                        {
-                            new RoundedButton
-                            {
-                                Text = "Add new playlist entry",
-                                RelativeSizeAxes = Axes.Both,
-                                Size = Vector2.One,
-                                Action = () => CreateNewItem?.Invoke()
-                            }
-                        },
-                    },
-                    RowDimensions = new[]
-                    {
-                        new Dimension(),
-                        new Dimension(GridSizeMode.Absolute, 50),
-                    }
-                });
+                    Size = new Vector2(300)
+                };
             }
 
             protected override void LoadComplete()

@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
@@ -29,7 +28,6 @@ namespace osu.Game.Tests.Visual.Playlists
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreLeft,
                     X = -100,
-                    CreateNewItem = () => room.Playlist = room.Playlist.Append(new PlaylistItem(CreateAPIBeatmap())).ToArray()
                 }
             });
         }
