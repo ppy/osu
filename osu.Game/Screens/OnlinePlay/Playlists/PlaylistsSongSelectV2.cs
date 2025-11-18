@@ -195,10 +195,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             buttons.Single(i => i is FooterButtonMods).TooltipText = MultiplayerMatchStrings.RequiredModsButtonTooltip;
 
-            buttons.Insert(0, new FooterButtonPlaylistV2(room)
-            {
-                CreateNewItem = AddNewItem
-            });
+            buttons.Insert(0, new FooterButtonPlaylistV2(room));
 
             buttons.InsertRange(buttons.FindIndex(b => b is FooterButtonMods) + 1,
             [
