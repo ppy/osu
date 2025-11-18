@@ -40,6 +40,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private int rollingHits;
 
         private readonly Container tickContainer;
+        private SkinnableDrawable headPiece;
 
         private Color4 colourIdle;
         private Color4 colourEngaged;
@@ -59,7 +60,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Content.Add(tickContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Depth = float.MinValue
+                Depth = -1,
             });
         }
 
@@ -79,7 +80,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override void RecreatePieces()
         {
+            if (headPiece != null)
+                Content.Remove(headPiece, true);
+
             base.RecreatePieces();
+
+            Content.Add(headPiece = createHeadPiece());
+
             updateColour();
             Height = HitObject.IsStrong ? TaikoStrongableHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE;
         }
@@ -121,6 +128,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override SkinnableDrawable CreateMainPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollBody),
             _ => new ElongatedCirclePiece());
+
+        private SkinnableDrawable createHeadPiece() => new SkinnableDrawable(new TaikoSkinComponentLookup(TaikoSkinComponents.DrumRollHead), _ => Empty())
+        {
+            RelativeSizeAxes = Axes.Y,
+            Depth = -2,
+        };
 
         public override bool OnPressed(KeyBindingPressEvent<TaikoAction> e) => false;
 
@@ -174,7 +187,23 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private void updateColour(double fadeDuration = 0)
         {
             Color4 newColour = Interpolation.ValueAt((float)rollingHits / rolling_hits_for_engaged_colour, colourIdle, colourEngaged, 0, 1);
-            (MainPiece.Drawable as IHasAccentColour)?.FadeAccent(newColour, fadeDuration);
+
+            if (fadeDuration == 0)
+            {
+                // fade duration is 0 when calling via `RecreatePieces()`.
+                // in this case we want to apply the colour *without* using transforms.
+                // using transforms may result in the application of colour being undone via `DrawableHitObject.UpdateState()` clearing transforms.
+                if (MainPiece.Drawable is IHasAccentColour mainPieceWithAccentColour)
+                    mainPieceWithAccentColour.AccentColour = newColour;
+
+                if (headPiece.Drawable is IHasAccentColour headPieceWithAccentColour)
+                    headPieceWithAccentColour.AccentColour = newColour;
+            }
+            else
+            {
+                (MainPiece.Drawable as IHasAccentColour)?.FadeAccent(newColour, fadeDuration);
+                (headPiece.Drawable as IHasAccentColour)?.FadeAccent(newColour, fadeDuration);
+            }
         }
 
         public partial class StrongNestedHit : DrawableStrongNestedHit
