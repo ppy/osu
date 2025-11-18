@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private IDistanceSnapProvider? distanceSnapProvider { get; set; }
 
         [Resolved]
-        private FreehandSliderToolboxGroup? freehandToolboxGroup { get; set; }
+        private SliderToolboxGroup? sliderToolboxGroup { get; set; }
 
         [Resolved]
         private EditorClock? editorClock { get; set; }
@@ -90,29 +90,26 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             inputManager = GetContainingInputManager()!;
 
-            if (freehandToolboxGroup != null)
+            if (sliderToolboxGroup != null)
             {
-                freehandToolboxGroup.Tolerance.BindValueChanged(e =>
+                sliderToolboxGroup.Tolerance.BindValueChanged(e =>
                 {
                     bSplineBuilder.Tolerance = e.NewValue;
                     Scheduler.AddOnce(updateSliderPathFromBSplineBuilder);
                 }, true);
 
-                freehandToolboxGroup.CornerThreshold.BindValueChanged(e =>
+                sliderToolboxGroup.CornerThreshold.BindValueChanged(e =>
                 {
                     bSplineBuilder.CornerThreshold = e.NewValue;
                     Scheduler.AddOnce(updateSliderPathFromBSplineBuilder);
                 }, true);
 
-                freehandToolboxGroup.CircleThreshold.BindValueChanged(e =>
+                sliderToolboxGroup.CircleThreshold.BindValueChanged(e =>
                 {
                     Scheduler.AddOnce(updateSliderPathFromBSplineBuilder);
                 }, true);
             }
         }
-
-        [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime)
         {
@@ -129,15 +126,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case SliderPlacementState.Initial:
                     BeginPlacement();
 
-                    double? nearestSliderVelocity = (editorBeatmap
-                                                     .HitObjects
-                                                     .LastOrDefault(h => h is Slider && h.GetEndTime() < HitObject.StartTime) as Slider)?.SliderVelocityMultiplier;
-
-                    HitObject.SliderVelocityMultiplier = nearestSliderVelocity ?? 1;
+                    HitObject.SliderVelocityMultiplier = sliderToolboxGroup?.SliderVelocity.Value ?? 1;
                     HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
 
-                    // Replacing the DifficultyControlPoint above doesn't trigger any kind of invalidation.
-                    // Without re-applying defaults, velocity won't be updated.
+                    // If defaults aren't re-applied, the slider may display an incorrect length in the timeline
+                    // while being placed in certain scenarios (e.g., if the slider placement tool is selected,
+                    // and then slider velocity is changed through the slider toolbox).
                     ApplyDefaultsToHitObject();
                     break;
 
@@ -481,7 +475,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private Vector2[]? tryCircleArc(List<Vector2> segment)
         {
-            if (segment.Count < 3 || freehandToolboxGroup?.CircleThreshold.Value == 0) return null;
+            if (segment.Count < 3 || sliderToolboxGroup?.CircleThreshold.Value == 0) return null;
 
             // Assume the segment creates a reasonable circular arc and then check if it reasonable
             var points = PathApproximator.BSplineToPiecewiseLinear(segment.ToArray(), bSplineBuilder.Degree);
@@ -554,7 +548,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             loss /= points.Count;
 
-            return loss > freehandToolboxGroup?.CircleThreshold.Value || totalWinding > MathHelper.TwoPi ? null : circleArcControlPoints;
+            return loss > sliderToolboxGroup?.CircleThreshold.Value || totalWinding > MathHelper.TwoPi ? null : circleArcControlPoints;
         }
 
         private enum SliderPlacementState

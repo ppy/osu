@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected readonly OsuGridToolboxGroup OsuGridToolboxGroup = new OsuGridToolboxGroup();
 
         [Cached]
-        protected readonly FreehandSliderToolboxGroup FreehandSliderToolboxGroup = new FreehandSliderToolboxGroup();
+        protected readonly SliderToolboxGroup SliderToolboxGroup = new SliderToolboxGroup();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                         GridToolbox = OsuGridToolboxGroup,
                     },
                     new GenerateToolboxGroup(),
-                    FreehandSliderToolboxGroup
+                    SliderToolboxGroup
                 }
             );
         }
