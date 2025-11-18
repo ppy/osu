@@ -141,16 +141,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 panel.RemoveUser(user);
         });
 
-        public void RevealRandomItem(MultiplayerPlaylistItem item) => whenPanelsLoaded(() =>
-        {
-            playlistItems.TryGetValue(item.ID, out var playlistItem);
-
-            Debug.Assert(playlistItem != null);
-
-            // TODO: make this happen via panel.PresentAsChosenBeatmap
-            // randomPanel.RevealBeatmap(playlistItem.Beatmap, playlistItem.Mods);
-        });
-
         public void RollAndDisplayFinalBeatmap(long[] candidateItemIds, long finalItemId, MatchmakingCandidateType candidateType) => whenPanelsLoaded(() =>
         {
             Debug.Assert(candidateItemIds.Length >= 1);
