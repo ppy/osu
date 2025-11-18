@@ -52,8 +52,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private Bindable<ScalingMode> scalingMode = null!;
         private Bindable<float> scalingSizeX = null!;
         private Bindable<float> scalingSizeY = null!;
-        private Bindable<float> scalingPositionX = new Bindable<float>();
-        private Bindable<float> scalingPositionY = new Bindable<float>();
 
         [Resolved]
         private GameHost host { get; set; }
@@ -91,8 +89,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             scalingMode = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
             scalingSizeX = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX);
             scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
-            scalingPositionX = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionX);
-            scalingPositionY = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionY);
 
             Children = new Drawable[]
             {
@@ -299,13 +295,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 aspectRatioApplication = Schedule(() => forceAspectRatio(aspect.NewValue));
             });
 
-            updateScaling();
-            scalingMode.BindValueChanged(_ => updateScaling());
-            scalingSizeX.BindValueChanged(_ => updateScaling());
-            scalingSizeY.BindValueChanged(_ => updateScaling());
-            scalingPositionX.BindValueChanged(_ => updateScaling());
-            scalingPositionY.BindValueChanged(_ => updateScaling());
-
             pressureThreshold.BindTo(tabletHandler.PressureThreshold);
 
             tablet.BindTo(tabletHandler.Tablet);
@@ -391,20 +380,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             aspectRatioApplication?.Cancel();
             aspectLock.Value = true;
-        }
-
-        private void updateScaling()
-        {
-            if (scalingMode.Value == ScalingMode.Everything)
-            {
-                outputAreaSize.Value = new Vector2(scalingSizeX.Value, scalingSizeY.Value);
-                outputAreaOffset.Value = new Vector2(scalingPositionX.Value, scalingPositionY.Value);
-            }
-            else
-            {
-                outputAreaSize.Value = new Vector2(1, 1);
-                outputAreaOffset.Value = new Vector2(0.5f, 0.5f);
-            }
         }
 
         private void updateAspectRatio() => aspectRatio.Value = currentAspectRatio;
