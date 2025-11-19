@@ -41,30 +41,33 @@ namespace osu.Game.Tournament.Components
                 chatChannel.BindTo(ipc.ChatChannel);
                 chatChannel.BindValueChanged(c =>
                 {
-                    if (string.IsNullOrWhiteSpace(c.NewValue))
-                        return;
-
-                    int id = int.Parse(c.NewValue);
-
-                    if (id <= 0) return;
-
                     if (manager == null)
                     {
                         AddInternal(manager = new ChannelManager(api));
                         Channel.BindTo(manager.CurrentChannel);
                     }
 
-                    foreach (var ch in manager.JoinedChannels.ToList())
-                        manager.LeaveChannel(ch);
-
-                    var channel = new Channel
+                    if (int.TryParse(c.OldValue, out int oldChannelId) && oldChannelId > 0)
                     {
-                        Id = id,
-                        Type = ChannelType.Public
-                    };
+                        var joinedChannel = manager.JoinedChannels.SingleOrDefault(ch => ch.Id == oldChannelId);
+                        if (joinedChannel != null)
+                            manager.LeaveChannel(joinedChannel);
+                    }
 
-                    manager.JoinChannel(channel);
-                    manager.CurrentChannel.Value = channel;
+                    if (string.IsNullOrWhiteSpace(c.NewValue))
+                        return;
+
+                    if (int.TryParse(c.NewValue, out int newChannelId) && newChannelId > 0)
+                    {
+                        var channel = new Channel
+                        {
+                            Id = newChannelId,
+                            Type = ChannelType.Public
+                        };
+
+                        manager.JoinChannel(channel);
+                        manager.CurrentChannel.Value = channel;
+                    }
                 }, true);
             }
         }
