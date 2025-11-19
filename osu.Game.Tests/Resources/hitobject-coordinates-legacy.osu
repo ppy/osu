@@ -1,0 +1,5 @@
+osu file format v14
+
+[HitObjects]
+// Coordinates should be truncated to int values in legacy beatmaps.
+256.99853,256.001,1000,49,0,0:0:0:0:

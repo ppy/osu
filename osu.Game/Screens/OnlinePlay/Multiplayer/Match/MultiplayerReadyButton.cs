@@ -1,14 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
@@ -20,17 +19,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
     public partial class MultiplayerReadyButton : ReadyButton
     {
         [Resolved]
-        private MultiplayerClient multiplayerClient { get; set; }
+        private MultiplayerClient multiplayerClient { get; set; } = null!;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
-        [CanBeNull]
-        private MultiplayerRoom room => multiplayerClient.Room;
+        private MultiplayerRoom? room => multiplayerClient.Room;
 
-        private Sample countdownTickSample;
-        private Sample countdownWarnSample;
-        private Sample countdownWarnFinalSample;
+        private Sample? countdownTickSample;
+        private Sample? countdownWarnSample;
+        private Sample? countdownWarnFinalSample;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -48,13 +46,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             onRoomUpdated();
         }
 
-        private MultiplayerCountdown countdown;
+        private MultiplayerCountdown? countdown;
         private double countdownChangeTime;
-        private ScheduledDelegate countdownUpdateDelegate;
+        private ScheduledDelegate? countdownUpdateDelegate;
 
         private void onRoomUpdated() => Scheduler.AddOnce(() =>
         {
-            MultiplayerCountdown newCountdown = room?.ActiveCountdowns.SingleOrDefault(c => c is MatchStartCountdown);
+            MultiplayerCountdown? newCountdown = room?.ActiveCountdowns.SingleOrDefault(c => c is MatchStartCountdown);
 
             if (newCountdown != countdown)
             {
@@ -171,6 +169,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             get
             {
+                Debug.Assert(countdown != null);
+
                 double timeElapsed = Time.Current - countdownChangeTime;
                 TimeSpan remaining;
 
@@ -224,7 +224,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             base.Dispose(isDisposing);
 
-            if (multiplayerClient != null)
+            if (multiplayerClient.IsNotNull())
                 multiplayerClient.RoomUpdated -= onRoomUpdated;
         }
 

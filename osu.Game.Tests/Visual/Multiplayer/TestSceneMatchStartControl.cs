@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using Moq;
@@ -36,17 +34,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private readonly Bindable<BeatmapAvailability> beatmapAvailability = new Bindable<BeatmapAvailability>();
         private readonly Bindable<Room> room = new Bindable<Room>();
 
-        private MultiplayerRoom multiplayerRoom;
-        private MultiplayerRoomUser localUser;
-        private OngoingOperationTracker ongoingOperationTracker;
+        private MultiplayerRoom multiplayerRoom = null!;
+        private MultiplayerRoomUser localUser = null!;
+        private OngoingOperationTracker ongoingOperationTracker = null!;
 
-        private PopoverContainer content;
-        private MatchStartControl control;
+        private PopoverContainer content = null!;
+        private MatchStartControl control = null!;
 
         private OsuButton readyButton => control.ChildrenOfType<OsuButton>().Single();
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
-            new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent)) { Model = { BindTarget = room } };
 
         [BackgroundDependencyLoader]
         private void load()
@@ -112,25 +107,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 beatmapAvailability.Value = BeatmapAvailability.LocallyAvailable();
 
-                var playlistItem = new PlaylistItem(Beatmap.Value.BeatmapInfo)
+                PlaylistItem item = new PlaylistItem(Beatmap.Value.BeatmapInfo)
                 {
                     RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID
                 };
 
                 room.Value = new Room
                 {
-                    Playlist = { playlistItem },
-                    CurrentPlaylistItem = { Value = playlistItem }
+                    Playlist = [item],
+                    CurrentPlaylistItem = item
                 };
 
-                localUser = new MultiplayerRoomUser(API.LocalUser.Value.Id) { User = API.LocalUser.Value };
+                localUser = new MultiplayerRoomUser(API.LocalUser.Value.Id)
+                {
+                    User = API.LocalUser.Value
+                };
 
                 multiplayerRoom = new MultiplayerRoom(0)
                 {
-                    Playlist =
-                    {
-                        TestMultiplayerClient.CreateMultiplayerPlaylistItem(playlistItem),
-                    },
+                    Playlist = { new MultiplayerPlaylistItem(item) },
                     Users = { localUser },
                     Host = localUser,
                 };
@@ -142,7 +137,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(250, 50),
+                    Size = new Vector2(250, 50)
                 };
             });
         }

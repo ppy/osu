@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
@@ -28,9 +29,9 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         [CanBeNull]
         public PreviewTrack Preview { get; private set; }
 
-        private APIBeatmapSet beatmapSet;
+        private IBeatmapSetInfo beatmapSet;
 
-        public APIBeatmapSet BeatmapSet
+        public IBeatmapSetInfo BeatmapSet
         {
             get => beatmapSet;
             set

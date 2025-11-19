@@ -4,11 +4,10 @@
 using osu.Framework.Allocation;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Scoring;
-using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Screens.Select
 {
-    public partial class LocalScoreDeleteDialog : DangerousActionDialog
+    public partial class LocalScoreDeleteDialog : DeletionDialog
     {
         private readonly ScoreInfo score;
 
@@ -21,8 +20,6 @@ namespace osu.Game.Screens.Select
         private void load(ScoreManager scoreManager)
         {
             BodyText = $"{score.User} ({score.DisplayAccuracy}, {score.Rank})";
-
-            Icon = FontAwesome.Regular.TrashAlt;
             DangerousAction = () => scoreManager.Delete(score);
         }
     }

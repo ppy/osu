@@ -20,6 +20,7 @@ namespace osu.Game.Screens.Edit
         {
             Items = new[]
             {
+                createMenuItem(0f),
                 createMenuItem(0.25f),
                 createMenuItem(0.5f),
                 createMenuItem(0.75f),

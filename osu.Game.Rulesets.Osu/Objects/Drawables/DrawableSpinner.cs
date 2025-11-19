@@ -277,14 +277,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.Update();
 
             if (HandleUserInput)
-            {
-                bool isValidSpinningTime = Time.Current >= HitObject.StartTime && Time.Current <= HitObject.EndTime;
-                bool correctButtonPressed = (OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
-
-                RotationTracker.Tracking = !Result.HasResult
-                                           && correctButtonPressed
-                                           && isValidSpinningTime;
-            }
+                RotationTracker.Tracking = RotationTracker.IsSpinnableTime && !Result.HasResult && correctButtonPressed();
 
             if (spinningSample != null && spinnerFrequencyModulate)
                 spinningSample.Frequency.Value = spinning_sample_modulated_base_frequency + Progress;
@@ -292,11 +285,34 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // Ticks can theoretically be judged at any point in the spinner's duration.
             // A tick must be alive to correctly play back samples,
             // but for performance reasons, we only want to keep the next tick alive.
-            var next = NestedHitObjects.FirstOrDefault(h => !h.Judged);
+            DrawableHitObject nextTick = null;
+
+            foreach (var nested in NestedHitObjects)
+            {
+                if (!nested.Judged)
+                {
+                    nextTick = nested;
+                    break;
+                }
+            }
 
             // See default `LifetimeStart` as set in `DrawableSpinnerTick`.
-            if (next?.LifetimeStart == double.MaxValue)
-                next.LifetimeStart = HitObject.StartTime;
+            if (nextTick?.LifetimeStart == double.MaxValue)
+                nextTick.LifetimeStart = HitObject.StartTime;
+        }
+
+        private bool correctButtonPressed()
+        {
+            if (OsuActionInputManager == null)
+                return false;
+
+            foreach (var action in OsuActionInputManager.PressedActions)
+            {
+                if (action == OsuAction.LeftButton || action == OsuAction.RightButton)
+                    return true;
+            }
+
+            return false;
         }
 
         protected override void UpdateAfterChildren()

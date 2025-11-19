@@ -98,7 +98,7 @@ namespace osu.Game.Overlays
             apiUser.BindValueChanged(_ => Schedule(() =>
             {
                 if (api.IsLoggedIn)
-                    replaceResultsAreaContent(Drawable.Empty());
+                    replaceResultsAreaContent(Empty());
             }));
         }
 

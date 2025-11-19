@@ -56,6 +56,12 @@ namespace osu.Game.Beatmaps.ControlPoints
             set => SampleVolumeBindable.Value = value;
         }
 
+        public SampleControlPoint()
+        {
+            SampleBankBindable.BindValueChanged(_ => RaiseChanged());
+            SampleVolumeBindable.BindValueChanged(_ => RaiseChanged());
+        }
+
         /// <summary>
         /// Create a SampleInfo based on the sample settings in this control point.
         /// </summary>

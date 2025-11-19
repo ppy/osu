@@ -33,6 +33,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public DifficultyPointPiece(HitObject hitObject)
         {
             HitObject = hitObject;
+            Y = -2.5f;
 
             speedMultiplier = (hitObject as IHasSliderVelocity)?.SliderVelocityMultiplierBindable.GetBoundCopy();
         }
@@ -138,7 +139,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(sliderVelocitySlider));
+                ScheduleAfterChildren(() => GetContainingFocusManager()!.ChangeFocus(sliderVelocitySlider));
             }
         }
     }

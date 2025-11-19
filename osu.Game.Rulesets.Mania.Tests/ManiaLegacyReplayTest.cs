@@ -12,8 +12,8 @@ namespace osu.Game.Rulesets.Mania.Tests
     {
         [TestCase(ManiaAction.Key1)]
         [TestCase(ManiaAction.Key1, ManiaAction.Key2)]
-        [TestCase(ManiaAction.Special1)]
-        [TestCase(ManiaAction.Key8)]
+        [TestCase(ManiaAction.Key5)]
+        [TestCase(ManiaAction.Key9)]
         public void TestEncodeDecodeSingleStage(params ManiaAction[] actions)
         {
             var beatmap = new ManiaBeatmap(new StageDefinition(9));
@@ -29,11 +29,11 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         [TestCase(ManiaAction.Key1)]
         [TestCase(ManiaAction.Key1, ManiaAction.Key2)]
-        [TestCase(ManiaAction.Special1)]
-        [TestCase(ManiaAction.Special2)]
-        [TestCase(ManiaAction.Special1, ManiaAction.Special2)]
-        [TestCase(ManiaAction.Special1, ManiaAction.Key5)]
+        [TestCase(ManiaAction.Key3)]
         [TestCase(ManiaAction.Key8)]
+        [TestCase(ManiaAction.Key3, ManiaAction.Key8)]
+        [TestCase(ManiaAction.Key3, ManiaAction.Key6)]
+        [TestCase(ManiaAction.Key10)]
         public void TestEncodeDecodeDualStage(params ManiaAction[] actions)
         {
             var beatmap = new ManiaBeatmap(new StageDefinition(5));

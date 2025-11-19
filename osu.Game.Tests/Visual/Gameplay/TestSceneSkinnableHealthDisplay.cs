@@ -4,7 +4,6 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Testing;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Judgements;
@@ -25,14 +24,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override Drawable CreateDefaultImplementation() => new DefaultHealthDisplay { Scale = new Vector2(0.6f) };
         protected override Drawable CreateLegacyImplementation() => new LegacyHealthDisplay { Scale = new Vector2(0.6f) };
 
-        [SetUpSteps]
-        public void SetUpSteps()
+        public override void SetUpSteps()
         {
             AddStep(@"Reset all", delegate
             {
                 healthProcessor.Health.Value = 1;
                 healthProcessor.Failed += () => false; // health won't be updated if the processor gets into a "fail" state.
             });
+
+            base.SetUpSteps();
         }
 
         protected override void Update()

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -17,8 +18,8 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Tests.Visual;
-using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
@@ -84,6 +85,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
     public partial class TestHitObjectComposer : HitObjectComposer
     {
         public override Playfield Playfield { get; }
+        public override ComposeBlueprintContainer BlueprintContainer => throw new NotImplementedException();
         public override IEnumerable<DrawableHitObject> HitObjects => Enumerable.Empty<DrawableHitObject>();
         public override bool CursorInPlacementArea => false;
 
@@ -96,11 +98,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         public Drawable Child
         {
             set => InternalChild = value;
-        }
-
-        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

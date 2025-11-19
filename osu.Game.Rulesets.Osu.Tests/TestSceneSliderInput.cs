@@ -457,6 +457,74 @@ namespace osu.Game.Rulesets.Osu.Tests
             assertMidSliderJudgementFail();
         }
 
+        [Test]
+        public void TestRewindHandling()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Position = new Vector2(0), Actions = { OsuAction.LeftButton }, Time = time_slider_start },
+                new OsuReplayFrame { Position = new Vector2(175, 0), Actions = { OsuAction.LeftButton }, Time = 3250 },
+                new OsuReplayFrame { Position = new Vector2(175, 0), Actions = { OsuAction.LeftButton }, Time = time_slider_end },
+            }, new Slider
+            {
+                StartTime = time_slider_start,
+                Position = new Vector2(0, 0),
+                Path = new SliderPath(PathType.PERFECT_CURVE, new[]
+                {
+                    Vector2.Zero,
+                    new Vector2(250, 0),
+                }, 250),
+            });
+
+            AddUntilStep("wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
+            AddAssert("no miss judgements recorded", () => judgementResults.All(r => r.Type.IsHit()));
+
+            AddStep("rewind to middle of slider", () => currentPlayer.Seek(time_during_slide_4));
+            AddUntilStep("wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
+            AddAssert("no miss judgements recorded", () => judgementResults.All(r => r.Type.IsHit()));
+        }
+
+        /// <summary>
+        /// Sliders are common to by 1/2 or 1/4 beat length in order to place the circle on the next beat.
+        /// This tests a user pressing the next circle in the window between the last tick and the end of the slider (<see cref="SliderEventGenerator.TAIL_LENIENCY"/>).
+        /// </summary>
+        [Test]
+        public void TestHitNextCircleDuringTailLeniency()
+        {
+            const double bpm = 240;
+            const double beat_length = 60000 / bpm;
+            const double slider_start = time_slider_start;
+            const double slider_end = slider_start + beat_length;
+            const double last_tick_time = slider_end + SliderEventGenerator.TAIL_LENIENCY;
+            const double next_circle_time = slider_end + beat_length / 4;
+
+            performTest(new List<ReplayFrame>
+                {
+                    new OsuReplayFrame { Position = Vector2.Zero, Actions = { OsuAction.LeftButton }, Time = time_slider_start },
+                    new OsuReplayFrame { Position = new Vector2(140, 0), Actions = { OsuAction.RightButton }, Time = last_tick_time + 20 },
+                },
+                [
+                    new Slider
+                    {
+                        StartTime = slider_start,
+                        Position = new Vector2(0, 0),
+                        TickDistanceMultiplier = 10, // no ticks
+                        Path = new SliderPath(PathType.PERFECT_CURVE, new[]
+                        {
+                            Vector2.Zero,
+                            new Vector2(100, 0),
+                        }, 100),
+                    },
+                    new HitCircle
+                    {
+                        StartTime = next_circle_time,
+                        Position = new Vector2(140, 0)
+                    }
+                ], bpm: bpm);
+
+            AddAssert("all judgements are hit", () => judgementResults.All(j => j.Type.IsHit()));
+        }
+
         private void assertAllMaxJudgements()
         {
             AddAssert("All judgements max", () =>
@@ -495,6 +563,11 @@ namespace osu.Game.Rulesets.Osu.Tests
                 }, slider_path_length),
             };
 
+            performTest(frames, [slider], bpm, tickRate);
+        }
+
+        private void performTest(List<ReplayFrame> frames, List<OsuHitObject> objects, double? bpm = null, int? tickRate = null)
+        {
             AddStep("load player", () =>
             {
                 var cpi = new ControlPointInfo();
@@ -504,7 +577,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                 Beatmap.Value = CreateWorkingBeatmap(new Beatmap<OsuHitObject>
                 {
-                    HitObjects = { slider },
+                    HitObjects = objects,
                     BeatmapInfo =
                     {
                         Difficulty = new BeatmapDifficulty

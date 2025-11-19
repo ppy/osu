@@ -15,6 +15,7 @@ using osu.Framework.Text;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -25,8 +26,9 @@ namespace osu.Game.Screens.Play.HUD
         private readonly OsuSpriteText labelText;
 
         public IBindable<float> WireframeOpacity { get; } = new BindableFloat();
-        public Bindable<int> RequiredDisplayDigits { get; } = new BindableInt();
         public Bindable<bool> ShowLabel { get; } = new BindableBool();
+        public Bindable<Color4> LabelColour { get; } = new Bindable<Color4>(Color4.White);
+        public Bindable<Color4> TextColour { get; } = new Bindable<Color4>(Color4.White);
 
         public Container NumberContainer { get; private set; }
 
@@ -35,6 +37,18 @@ namespace osu.Game.Screens.Play.HUD
             get => textPart.Text;
             set => textPart.Text = value;
         }
+
+        /// <summary>
+        /// The template for the wireframe displayed behind the <see cref="Text"/>.
+        /// Any character other than a dot is interpreted to mean a full segmented display "wireframe".
+        /// </summary>
+        public string WireframeTemplate
+        {
+            get => wireframeTemplate;
+            set => wireframesPart.Text = wireframeTemplate = value;
+        }
+
+        private string wireframeTemplate = string.Empty;
 
         public ArgonCounterTextComponent(Anchor anchor, LocalisableString? label = null)
         {
@@ -54,23 +68,23 @@ namespace osu.Game.Screens.Play.HUD
                 NumberContainer = new Container
                 {
                     AutoSizeAxes = Axes.Both,
+                    Anchor = anchor,
+                    Origin = anchor,
                     Children = new[]
                     {
                         wireframesPart = new ArgonCounterSpriteText(wireframesLookup)
                         {
-                            Anchor = anchor,
-                            Origin = anchor,
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
                         },
                         textPart = new ArgonCounterSpriteText(textLookup)
                         {
-                            Anchor = anchor,
-                            Origin = anchor,
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
                         },
                     }
                 }
             };
-
-            RequiredDisplayDigits.BindValueChanged(digits => wireframesPart.Text = new string('#', digits.NewValue));
         }
 
         private string textLookup(char c)
@@ -98,7 +112,7 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            labelText.Colour = colours.Blue0;
+            LabelColour.Value = colours.Blue0;
         }
 
         protected override void LoadComplete()
@@ -109,6 +123,12 @@ namespace osu.Game.Screens.Play.HUD
             {
                 labelText.Alpha = s.NewValue ? 1 : 0;
                 NumberContainer.Y = s.NewValue ? 12 : 0;
+            }, true);
+            LabelColour.BindValueChanged(c => labelText.Colour = c.NewValue, true);
+            TextColour.BindValueChanged(c =>
+            {
+                textPart.Colour = c.NewValue;
+                wireframesPart.Colour = c.NewValue;
             }, true);
         }
 

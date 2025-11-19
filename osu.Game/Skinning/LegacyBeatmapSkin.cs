@@ -11,7 +11,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.IO;
-using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK.Graphics;
 
@@ -50,11 +49,11 @@ namespace osu.Game.Skinning
 
         public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (lookup is SkinComponentsContainerLookup containerLookup)
+            if (lookup is GlobalSkinnableContainerLookup containerLookup)
             {
-                switch (containerLookup.Target)
+                switch (containerLookup.Lookup)
                 {
-                    case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
+                    case GlobalSkinnableContainers.MainHUDComponents:
                         // this should exist in LegacySkin instead, but there isn't a fallback skin for LegacySkins yet.
                         // therefore keep the check here until fallback default legacy skin is supported.
                         if (!this.HasFont(LegacyFont.Score))
@@ -90,11 +89,8 @@ namespace osu.Game.Skinning
 
         public override ISample? GetSample(ISampleInfo sampleInfo)
         {
-            if (sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy && legacy.CustomSampleBank == 0)
-            {
-                // When no custom sample bank is provided, always fall-back to the default samples.
+            if (sampleInfo is HitSampleInfo hitSampleInfo && !hitSampleInfo.UseBeatmapSamples)
                 return null;
-            }
 
             return base.GetSample(sampleInfo);
         }

@@ -11,6 +11,7 @@ using NUnit.Framework;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
@@ -25,8 +26,10 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -36,6 +39,22 @@ namespace osu.Game.Tests.Beatmaps.Formats
         private static readonly DllResourceStore beatmaps_resource_store = TestResources.GetStore();
 
         private static IEnumerable<string> allBeatmaps = beatmaps_resource_store.GetAvailableResources().Where(res => res.EndsWith(".osu", StringComparison.Ordinal));
+
+        [Test]
+        public void TestUnsupportedStoryboardEvents()
+        {
+            const string name = "Resources/storyboard_only_video.osu";
+
+            var decoded = decodeFromLegacy(beatmaps_resource_store.GetStream(name), name);
+            Assert.That(decoded.beatmap.UnhandledEventLines.Count, Is.EqualTo(1));
+            Assert.That(decoded.beatmap.UnhandledEventLines.Single(), Is.EqualTo("Video,0,\"video.avi\""));
+
+            var memoryStream = encodeToLegacy(decoded);
+
+            var storyboard = new LegacyStoryboardDecoder().Decode(new LineBufferedReader(memoryStream));
+            StoryboardLayer video = storyboard.Layers.Single(l => l.Name == "Video");
+            Assert.That(video.Elements.Count, Is.EqualTo(1));
+        }
 
         [TestCaseSource(nameof(allBeatmaps))]
         public void TestEncodeDecodeStability(string name)
@@ -103,11 +122,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
         private void compareBeatmaps((IBeatmap beatmap, TestLegacySkin skin) expected, (IBeatmap beatmap, TestLegacySkin skin) actual)
         {
             // Check all control points that are still considered to be at a global level.
-            Assert.That(expected.beatmap.ControlPointInfo.TimingPoints.Serialize(), Is.EqualTo(actual.beatmap.ControlPointInfo.TimingPoints.Serialize()));
-            Assert.That(expected.beatmap.ControlPointInfo.EffectPoints.Serialize(), Is.EqualTo(actual.beatmap.ControlPointInfo.EffectPoints.Serialize()));
+            Assert.That(actual.beatmap.ControlPointInfo.TimingPoints.Serialize(), Is.EqualTo(expected.beatmap.ControlPointInfo.TimingPoints.Serialize()));
+            Assert.That(actual.beatmap.ControlPointInfo.EffectPoints.Serialize(), Is.EqualTo(expected.beatmap.ControlPointInfo.EffectPoints.Serialize()));
 
             // Check all hitobjects.
-            Assert.That(expected.beatmap.HitObjects.Serialize(), Is.EqualTo(actual.beatmap.HitObjects.Serialize()));
+            Assert.That(actual.beatmap.HitObjects.Serialize(), Is.EqualTo(expected.beatmap.HitObjects.Serialize()));
 
             // Check skin.
             Assert.IsTrue(areComboColoursEqual(expected.skin.Configuration, actual.skin.Configuration));
@@ -167,6 +186,82 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.That(decodedSlider.Path.ControlPoints.Count, Is.EqualTo(5));
         }
 
+        [Test]
+        public void TestOnlyEightComboColoursEncoded()
+        {
+            var beatmapSkin = new LegacyBeatmapSkin(new BeatmapInfo(), null)
+            {
+                Configuration =
+                {
+                    CustomComboColours =
+                    {
+                        new Color4(1, 1, 1, 255),
+                        new Color4(2, 2, 2, 255),
+                        new Color4(3, 3, 3, 255),
+                        new Color4(4, 4, 4, 255),
+                        new Color4(5, 5, 5, 255),
+                        new Color4(6, 6, 6, 255),
+                        new Color4(7, 7, 7, 255),
+                        new Color4(8, 8, 8, 255),
+                        new Color4(9, 9, 9, 255),
+                    }
+                }
+            };
+
+            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy((new Beatmap(), beatmapSkin)), string.Empty);
+            Assert.That(decodedAfterEncode.skin.Configuration.CustomComboColours, Has.Count.EqualTo(8));
+        }
+
+        [Test]
+        public void TestEncodeStabilityOfSliderWithFractionalCoordinates()
+        {
+            Slider originalSlider = new Slider
+            {
+                Position = new Vector2(0.6f),
+                Path = new SliderPath(new[]
+                {
+                    new PathControlPoint(Vector2.Zero, PathType.PERFECT_CURVE),
+                    new PathControlPoint(new Vector2(25.6f, 78.4f)),
+                    new PathControlPoint(new Vector2(55.8f, 34.2f)),
+                })
+            };
+            var beatmap = new Beatmap
+            {
+                HitObjects = { originalSlider }
+            };
+
+            var encoded = encodeToLegacy((beatmap, new TestLegacySkin(beatmaps_resource_store, string.Empty)));
+            var decodedAfterEncode = decodeFromLegacy(encoded, string.Empty, version: LegacyBeatmapEncoder.FIRST_LAZER_VERSION);
+            var decodedSlider = (Slider)decodedAfterEncode.beatmap.HitObjects[0];
+            Assert.That(decodedSlider.Path.ControlPoints.Select(p => p.Position),
+                Is.EquivalentTo(originalSlider.Path.ControlPoints.Select(p => p.Position)));
+        }
+
+        [Test]
+        public void TestEncodeCustomSampleBanks()
+        {
+            var beatmap = new Beatmap
+            {
+                HitObjects =
+                {
+                    new HitCircle { StartTime = 100, Samples = [new HitSampleInfo(HitSampleInfo.HIT_NORMAL)] },
+                    new HitCircle { StartTime = 200, Samples = [new HitSampleInfo(HitSampleInfo.HIT_NORMAL, useBeatmapSamples: true)] },
+                    new HitCircle { StartTime = 300, Samples = [new HitSampleInfo(HitSampleInfo.HIT_NORMAL, suffix: "3", useBeatmapSamples: true)] },
+                }
+            };
+
+            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy((beatmap, new TestLegacySkin(beatmaps_resource_store, string.Empty))), string.Empty);
+
+            Assert.That(decodedAfterEncode.beatmap.HitObjects[0].Samples[0].Suffix, Is.Null);
+            Assert.That(decodedAfterEncode.beatmap.HitObjects[0].Samples[0].UseBeatmapSamples, Is.False);
+
+            Assert.That(decodedAfterEncode.beatmap.HitObjects[1].Samples[0].Suffix, Is.Null);
+            Assert.That(decodedAfterEncode.beatmap.HitObjects[1].Samples[0].UseBeatmapSamples, Is.True);
+
+            Assert.That(decodedAfterEncode.beatmap.HitObjects[2].Samples[0].Suffix, Is.EqualTo("3"));
+            Assert.That(decodedAfterEncode.beatmap.HitObjects[2].Samples[0].UseBeatmapSamples, Is.True);
+        }
+
         private bool areComboColoursEqual(IHasComboColours a, IHasComboColours b)
         {
             // equal to null, no need to SequenceEqual
@@ -189,12 +284,14 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
-        private (IBeatmap beatmap, TestLegacySkin skin) decodeFromLegacy(Stream stream, string name)
+        private (IBeatmap beatmap, TestLegacySkin skin) decodeFromLegacy(Stream stream, string name, int version = LegacyDecoder<Beatmap>.LATEST_VERSION)
         {
             using (var reader = new LineBufferedReader(stream))
             {
-                var beatmap = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(reader);
+                var beatmap = new LegacyBeatmapDecoder(version) { ApplyOffsets = false }.Decode(reader);
                 var beatmapSkin = new TestLegacySkin(beatmaps_resource_store, name);
+                stream.Seek(0, SeekOrigin.Begin);
+                beatmapSkin.Configuration = new LegacySkinDecoder().Decode(reader);
                 return (convert(beatmap), beatmapSkin);
             }
         }

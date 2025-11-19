@@ -156,6 +156,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 slider = (DrawableSlider)createSlider(repeats: 1);
                 Add(slider);
+                slider.HitObject.NodeSamples.Clear();
             });
 
             AddStep("change samples", () => slider.HitObject.Samples = new[]

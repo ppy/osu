@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Mania.UI;
@@ -46,17 +47,18 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 AutoSizeAxes = Axes.Y,
                 Children = new Drawable[]
                 {
+                    // Key images are placed side-to-side on the playfield, therefore ClampToEdge must be used to prevent any gaps between each key.
                     upSprite = new Sprite
                     {
                         Origin = Anchor.BottomCentre,
-                        Texture = skin.GetTexture(upImage),
+                        Texture = skin.GetTexture(upImage, WrapMode.ClampToEdge, default),
                         RelativeSizeAxes = Axes.X,
                         Width = 1
                     },
                     downSprite = new Sprite
                     {
                         Origin = Anchor.BottomCentre,
-                        Texture = skin.GetTexture(downImage),
+                        Texture = skin.GetTexture(downImage, WrapMode.ClampToEdge, default),
                         RelativeSizeAxes = Axes.X,
                         Width = 1,
                         Alpha = 0

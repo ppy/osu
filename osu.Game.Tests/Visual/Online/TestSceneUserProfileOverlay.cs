@@ -2,14 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Taiko;
+using osu.Game.Tests.Resources;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
@@ -24,7 +28,17 @@ namespace osu.Game.Tests.Visual.Online
         [SetUpSteps]
         public void SetUp()
         {
-            AddStep("create profile overlay", () => Child = profile = new UserProfileOverlay());
+            AddStep("create profile overlay", () =>
+            {
+                profile = new UserProfileOverlay();
+
+                Child = new DependencyProvidingContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    CachedDependencies = new (Type, object)[] { (typeof(UserProfileOverlay), profile) },
+                    Child = profile,
+                };
+            });
         }
 
         [Test]
@@ -43,6 +57,16 @@ namespace osu.Game.Tests.Visual.Online
                     if (req is GetUserRequest getUserRequest)
                     {
                         getUserRequest.TriggerSuccess(TEST_USER);
+                        return true;
+                    }
+
+                    if (req is GetUserBeatmapsRequest getUserBeatmapsRequest)
+                    {
+                        getUserBeatmapsRequest.TriggerSuccess(new List<APIBeatmapSet>
+                        {
+                            CreateAPIBeatmapSet(),
+                            CreateAPIBeatmapSet()
+                        });
                         return true;
                     }
 
@@ -111,12 +135,109 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("complete request", () => pendingRequest.TriggerSuccess(TEST_USER));
         }
 
+        [Test]
+        public void TestCustomColourScheme()
+        {
+            int hue = 0;
+
+            AddSliderStep("hue", 0, 360, 222, h => hue = h);
+
+            AddStep("set up request handling", () =>
+            {
+                dummyAPI.HandleRequest = req =>
+                {
+                    if (req is GetUserRequest getUserRequest)
+                    {
+                        getUserRequest.TriggerSuccess(new APIUser
+                        {
+                            Username = $"Colorful #{hue}",
+                            Id = 1,
+                            CountryCode = CountryCode.JP,
+                            CoverUrl = TestResources.COVER_IMAGE_2,
+                            ProfileHue = hue,
+                            PlayMode = "osu",
+                        });
+                        return true;
+                    }
+
+                    return false;
+                };
+            });
+
+            AddStep("show user", () => profile.ShowUser(new APIUser { Id = 1 }));
+        }
+
+        [Test]
+        public void TestCustomColourSchemeWithReload()
+        {
+            int hue = 0;
+            GetUserRequest pendingRequest = null!;
+
+            AddSliderStep("hue", 0, 360, 222, h => hue = h);
+
+            AddStep("set up request handling", () =>
+            {
+                dummyAPI.HandleRequest = req =>
+                {
+                    if (req is GetUserRequest getUserRequest)
+                    {
+                        pendingRequest = getUserRequest;
+                        return true;
+                    }
+
+                    return false;
+                };
+            });
+
+            AddStep("show user", () => profile.ShowUser(new APIUser { Id = 1 }));
+
+            AddWaitStep("wait some", 3);
+            AddStep("complete request", () => pendingRequest.TriggerSuccess(new APIUser
+            {
+                Username = $"Colorful #{hue}",
+                Id = 1,
+                CountryCode = CountryCode.JP,
+                CoverUrl = TestResources.COVER_IMAGE_2,
+                ProfileHue = hue,
+                PlayMode = "osu",
+            }));
+
+            int hue2 = 0;
+
+            AddSliderStep("hue 2", 0, 360, 50, h => hue2 = h);
+            AddStep("show user", () => profile.ShowUser(new APIUser { Id = 2 }));
+            AddWaitStep("wait some", 3);
+
+            AddStep("complete request", () => pendingRequest.TriggerSuccess(new APIUser
+            {
+                Username = $"Colorful #{hue2}",
+                Id = 2,
+                CountryCode = CountryCode.JP,
+                CoverUrl = TestResources.COVER_IMAGE_2,
+                ProfileHue = hue2,
+                PlayMode = "osu",
+            }));
+
+            AddStep("show user different ruleset", () => profile.ShowUser(new APIUser { Id = 2 }, new TaikoRuleset().RulesetInfo));
+            AddWaitStep("wait some", 3);
+
+            AddStep("complete request", () => pendingRequest.TriggerSuccess(new APIUser
+            {
+                Username = $"Colorful #{hue2}",
+                Id = 2,
+                CountryCode = CountryCode.JP,
+                CoverUrl = TestResources.COVER_IMAGE_2,
+                ProfileHue = hue2,
+                PlayMode = "osu",
+            }));
+        }
+
         public static readonly APIUser TEST_USER = new APIUser
         {
             Username = @"Somebody",
             Id = 1,
             CountryCode = CountryCode.JP,
-            CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
+            CoverUrl = TestResources.COVER_IMAGE_1,
             JoinDate = DateTimeOffset.Now.AddDays(-1),
             LastVisit = DateTimeOffset.Now,
             Groups = new[]
@@ -136,6 +257,11 @@ namespace osu.Game.Tests.Visual.Online
                 @"kudosu",
                 @"top_ranks",
                 @"medals"
+            },
+            RankHighest = new APIUser.UserRankHighest
+            {
+                Rank = 1,
+                UpdatedAt = DateTimeOffset.Now,
             },
             Statistics = new UserStatistics
             {
@@ -196,6 +322,15 @@ namespace osu.Game.Tests.Visual.Online
                     ImageUrlLowRes = "https://assets.ppy.sh/profile-badges/contributor.png",
                 },
             },
+            DailyChallengeStatistics = new APIUserDailyChallengeStatistics
+            {
+                DailyStreakCurrent = 231,
+                WeeklyStreakCurrent = 18,
+                DailyStreakBest = 370,
+                WeeklyStreakBest = 51,
+                Top10PercentPlacements = 345,
+                Top50PercentPlacements = 427,
+            },
             Title = "osu!volunteer",
             Colour = "ff0000",
             Achievements = Array.Empty<APIUserAchievement>(),
@@ -212,6 +347,13 @@ namespace osu.Game.Tests.Visual.Online
             Twitter = "test_user",
             Discord = "test_user",
             Website = "https://google.com",
+            Team = new APITeam
+            {
+                Id = 1,
+                Name = "Collective Wangs",
+                ShortName = "WANG",
+                FlagUrl = "https://assets.ppy.sh/teams/flag/1/wanglogo.jpg",
+            }
         };
     }
 }

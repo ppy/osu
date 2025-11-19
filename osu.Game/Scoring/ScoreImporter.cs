@@ -17,6 +17,7 @@ using osu.Game.Scoring.Legacy;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Utils;
 using Realms;
 
 namespace osu.Game.Scoring
@@ -58,7 +59,7 @@ namespace osu.Game.Scoring
                     {
                         // In the case of a missing beatmap, let's attempt to resolve it and show a prompt to the user to download the required beatmap.
                         var req = new GetBeatmapRequest(new BeatmapInfo { MD5Hash = notFound.Hash });
-                        req.Success += res => PostNotification?.Invoke(new MissingBeatmapNotification(res, archive, notFound.Hash));
+                        req.Success += res => PostNotification?.Invoke(new MissingBeatmapNotification(res, notFound.Hash, archive));
                         api.Queue(req);
                     }
 
@@ -90,6 +91,9 @@ namespace osu.Game.Scoring
             ArgumentNullException.ThrowIfNull(model.BeatmapInfo);
             ArgumentNullException.ThrowIfNull(model.Ruleset);
 
+            if (!ModUtils.CheckCompatibleSet(model.Mods))
+                throw new InvalidOperationException(@"The score specifies an incompatible set of mods!");
+
             if (string.IsNullOrEmpty(model.StatisticsJson))
                 model.StatisticsJson = JsonConvert.SerializeObject(model.Statistics);
 
@@ -103,6 +107,14 @@ namespace osu.Game.Scoring
         }
 
         // Very naive local caching to improve performance of large score imports (where the username is usually the same for most or all scores).
+
+        // TODO: `UserLookupCache` cannot currently be used here because of async foibles.
+        // It only supports lookups by user ID (username would require web changes), and even then the ID lookups cannot be used.
+        // That is because that component provides an async interface, and async functions cannot be consumed safely here due to the rigid structure of `RealmArchiveModelImporter`.
+        // The importer has two paths, one async and one sync; the async path runs the sync path in a task.
+        // This means that sometimes `PostImport()` is called from a sync context, and sometimes from an async one, whilst itself being a sync method.
+        // That in turn makes `.GetResultSafely()` not callable inside `PostImport()`, as it will throw when called from an async context,
+        private readonly Dictionary<int, APIUser> idLookupCache = new Dictionary<int, APIUser>();
         private readonly Dictionary<string, APIUser> usernameLookupCache = new Dictionary<string, APIUser>();
 
         protected override void PostImport(ScoreInfo model, Realm realm, ImportParameters parameters)
@@ -127,21 +139,34 @@ namespace osu.Game.Scoring
             if (model.RealmUser.OnlineID == APIUser.SYSTEM_USER_ID)
                 return;
 
-            string username = model.RealmUser.Username;
-
-            if (usernameLookupCache.TryGetValue(username, out var existing))
+            if (model.RealmUser.OnlineID > 1)
             {
-                model.User = existing;
+                model.User = lookupUserById(model.RealmUser.OnlineID) ?? model.User;
                 return;
             }
 
-            var userRequest = new GetUserRequest(username);
+            if (model.OnlineID < 0 && model.LegacyOnlineID <= 0)
+                return;
+
+            model.User = lookupUserByName(model.RealmUser.Username) ?? model.User;
+        }
+
+        private APIUser? lookupUserById(int id)
+        {
+            if (idLookupCache.TryGetValue(id, out var existing))
+            {
+                return existing;
+            }
+
+            var userRequest = new GetUserRequest(id);
 
             api.Perform(userRequest);
 
             if (userRequest.Response is APIUser user)
             {
-                usernameLookupCache.TryAdd(username, new APIUser
+                APIUser cachedUser;
+
+                idLookupCache.TryAdd(id, cachedUser = new APIUser
                 {
                     // Because this is a permanent cache, let's only store the pieces we're interested in,
                     // rather than the full API response. If we start to store more than these three fields
@@ -151,8 +176,41 @@ namespace osu.Game.Scoring
                     CountryCode = user.CountryCode,
                 });
 
-                model.User = user;
+                return cachedUser;
             }
+
+            return null;
+        }
+
+        private APIUser? lookupUserByName(string username)
+        {
+            if (usernameLookupCache.TryGetValue(username, out var existing))
+            {
+                return existing;
+            }
+
+            var userRequest = new GetUserRequest(username);
+
+            api.Perform(userRequest);
+
+            if (userRequest.Response is APIUser user)
+            {
+                APIUser cachedUser;
+
+                usernameLookupCache.TryAdd(username, cachedUser = new APIUser
+                {
+                    // Because this is a permanent cache, let's only store the pieces we're interested in,
+                    // rather than the full API response. If we start to store more than these three fields
+                    // in realm, this should be undone.
+                    Id = user.Id,
+                    Username = user.Username,
+                    CountryCode = user.CountryCode,
+                });
+
+                return cachedUser;
+            }
+
+            return null;
         }
     }
 }

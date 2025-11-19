@@ -8,8 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
-using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
@@ -28,11 +28,15 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         protected IBeatmap Beatmap { get; private set; }
 
+        /// <summary>
+        /// The working beatmap for which difficulty will be calculated.
+        /// </summary>
+        protected readonly IWorkingBeatmap WorkingBeatmap;
+
         private Mod[] playableMods;
         private double clockRate;
 
         private readonly IRulesetInfo ruleset;
-        private readonly IWorkingBeatmap beatmap;
 
         /// <summary>
         /// A yymmdd version which is used to discern when reprocessing is required.
@@ -42,7 +46,7 @@ namespace osu.Game.Rulesets.Difficulty
         protected DifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
         {
             this.ruleset = ruleset;
-            this.beatmap = beatmap;
+            WorkingBeatmap = beatmap;
         }
 
         /// <summary>
@@ -61,7 +65,13 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns>A structure describing the difficulty of the beatmap.</returns>
         public DifficultyAttributes Calculate([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
         {
+            using var timedCancellationSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+            if (!cancellationToken.CanBeCanceled)
+                cancellationToken = timedCancellationSource.Token;
+
             cancellationToken.ThrowIfCancellationRequested();
+            // ReSharper disable once PossiblyMistakenUseOfCancellationToken
             preProcess(mods, cancellationToken);
 
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
@@ -97,7 +107,13 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns>The set of <see cref="TimedDifficultyAttributes"/>.</returns>
         public List<TimedDifficultyAttributes> CalculateTimed([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
         {
+            using var timedCancellationSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+            if (!cancellationToken.CanBeCanceled)
+                cancellationToken = timedCancellationSource.Token;
+
             cancellationToken.ThrowIfCancellationRequested();
+            // ReSharper disable once PossiblyMistakenUseOfCancellationToken
             preProcess(mods, cancellationToken);
 
             var attribs = new List<TimedDifficultyAttributes>();
@@ -107,18 +123,26 @@ namespace osu.Game.Rulesets.Difficulty
 
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
             var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
+            var difficultyObjects = getDifficultyHitObjects().ToArray();
 
-            foreach (var hitObject in getDifficultyHitObjects())
+            int currentIndex = 0;
+
+            foreach (var obj in Beatmap.HitObjects)
             {
-                progressiveBeatmap.HitObjects.Add(hitObject.BaseObject);
+                progressiveBeatmap.HitObjects.Add(obj);
 
-                foreach (var skill in skills)
+                while (currentIndex < difficultyObjects.Length && difficultyObjects[currentIndex].BaseObject.GetEndTime() <= obj.GetEndTime())
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    skill.Process(hitObject);
+                    foreach (var skill in skills)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        skill.Process(difficultyObjects[currentIndex]);
+                    }
+
+                    currentIndex++;
                 }
 
-                attribs.Add(new TimedDifficultyAttributes(hitObject.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
+                attribs.Add(new TimedDifficultyAttributes(obj.GetEndTime(), CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
             }
 
             return attribs;
@@ -157,19 +181,12 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         /// <param name="mods">The original list of <see cref="Mod"/>s.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        private void preProcess([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
+        private void preProcess([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken)
         {
             playableMods = mods.Select(m => m.DeepClone()).ToArray();
+            Beatmap = WorkingBeatmap.GetPlayableBeatmap(ruleset, playableMods, cancellationToken);
 
-            // Only pass through the cancellation token if it's non-default.
-            // This allows for the default timeout to be applied for playable beatmap construction.
-            Beatmap = cancellationToken == default
-                ? beatmap.GetPlayableBeatmap(ruleset, playableMods)
-                : beatmap.GetPlayableBeatmap(ruleset, playableMods, cancellationToken);
-
-            var track = new TrackVirtual(10000);
-            playableMods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
-            clockRate = track.Rate;
+            clockRate = ModUtils.CalculateRateWithMods(playableMods);
         }
 
         /// <summary>
@@ -319,11 +336,97 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.Difficulty = value;
             }
 
-            public List<BreakPeriod> Breaks => baseBeatmap.Breaks;
+            public SortedList<BreakPeriod> Breaks
+            {
+                get => baseBeatmap.Breaks;
+                set => baseBeatmap.Breaks = value;
+            }
+
+            public List<string> UnhandledEventLines => baseBeatmap.UnhandledEventLines;
+
             public double TotalBreakTime => baseBeatmap.TotalBreakTime;
             public IEnumerable<BeatmapStatistic> GetStatistics() => baseBeatmap.GetStatistics();
             public double GetMostCommonBeatLength() => baseBeatmap.GetMostCommonBeatLength();
+            public int BeatmapVersion => baseBeatmap.BeatmapVersion;
             public IBeatmap Clone() => new ProgressiveCalculationBeatmap(baseBeatmap.Clone());
+
+            public double AudioLeadIn
+            {
+                get => baseBeatmap.AudioLeadIn;
+                set => baseBeatmap.AudioLeadIn = value;
+            }
+
+            public float StackLeniency
+            {
+                get => baseBeatmap.StackLeniency;
+                set => baseBeatmap.StackLeniency = value;
+            }
+
+            public bool SpecialStyle
+            {
+                get => baseBeatmap.SpecialStyle;
+                set => baseBeatmap.SpecialStyle = value;
+            }
+
+            public bool LetterboxInBreaks
+            {
+                get => baseBeatmap.LetterboxInBreaks;
+                set => baseBeatmap.LetterboxInBreaks = value;
+            }
+
+            public bool WidescreenStoryboard
+            {
+                get => baseBeatmap.WidescreenStoryboard;
+                set => baseBeatmap.WidescreenStoryboard = value;
+            }
+
+            public bool EpilepsyWarning
+            {
+                get => baseBeatmap.EpilepsyWarning;
+                set => baseBeatmap.EpilepsyWarning = value;
+            }
+
+            public bool SamplesMatchPlaybackRate
+            {
+                get => baseBeatmap.SamplesMatchPlaybackRate;
+                set => baseBeatmap.SamplesMatchPlaybackRate = value;
+            }
+
+            public double DistanceSpacing
+            {
+                get => baseBeatmap.DistanceSpacing;
+                set => baseBeatmap.DistanceSpacing = value;
+            }
+
+            public int GridSize
+            {
+                get => baseBeatmap.GridSize;
+                set => baseBeatmap.GridSize = value;
+            }
+
+            public double TimelineZoom
+            {
+                get => baseBeatmap.TimelineZoom;
+                set => baseBeatmap.TimelineZoom = value;
+            }
+
+            public CountdownType Countdown
+            {
+                get => baseBeatmap.Countdown;
+                set => baseBeatmap.Countdown = value;
+            }
+
+            public int CountdownOffset
+            {
+                get => baseBeatmap.CountdownOffset;
+                set => baseBeatmap.CountdownOffset = value;
+            }
+
+            public int[] Bookmarks
+            {
+                get => baseBeatmap.Bookmarks;
+                set => baseBeatmap.Bookmarks = value;
+            }
 
             #endregion
         }

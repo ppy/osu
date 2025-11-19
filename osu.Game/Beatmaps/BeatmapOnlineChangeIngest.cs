@@ -13,11 +13,11 @@ namespace osu.Game.Beatmaps
     /// </summary>
     public partial class BeatmapOnlineChangeIngest : Component
     {
-        private readonly BeatmapUpdater beatmapUpdater;
+        private readonly IBeatmapUpdater beatmapUpdater;
         private readonly RealmAccess realm;
         private readonly MetadataClient metadataClient;
 
-        public BeatmapOnlineChangeIngest(BeatmapUpdater beatmapUpdater, RealmAccess realm, MetadataClient metadataClient)
+        public BeatmapOnlineChangeIngest(IBeatmapUpdater beatmapUpdater, RealmAccess realm, MetadataClient metadataClient)
         {
             this.beatmapUpdater = beatmapUpdater;
             this.realm = realm;

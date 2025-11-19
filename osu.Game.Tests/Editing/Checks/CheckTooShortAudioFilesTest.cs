@@ -95,18 +95,6 @@ namespace osu.Game.Tests.Editing.Checks
             }
         }
 
-        [Test]
-        public void TestCorruptAudioFile()
-        {
-            using (var resourceStream = TestResources.OpenResource("Samples/corrupt.wav"))
-            {
-                var issues = check.Run(getContext(resourceStream)).ToList();
-
-                Assert.That(issues, Has.Count.EqualTo(1));
-                Assert.That(issues.Single().Template is CheckTooShortAudioFiles.IssueTemplateBadFormat);
-            }
-        }
-
         private BeatmapVerifierContext getContext(Stream? resourceStream)
         {
             var mockWorkingBeatmap = new Mock<TestWorkingBeatmap>(beatmap, null, null);

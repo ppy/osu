@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -29,7 +30,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             set
             {
                 buttonsExpandedWidth = value;
-                buttonArea.Width = value;
                 if (IsLoaded)
                     updateState();
             }
@@ -48,6 +48,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             }
         }
 
+        public IEnumerable<BeatmapCardIconButton> Buttons => buttons;
+
         protected override Container<Drawable> Content => mainContent;
 
         private readonly Container background;
@@ -64,7 +66,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public CollapsibleButtonContainer(APIBeatmapSet beatmapSet)
+        public CollapsibleButtonContainer(APIBeatmapSet beatmapSet, bool allowNavigationToBeatmap = true, bool keepBackgroundLoaded = false)
         {
             downloadTracker = new BeatmapDownloadTracker(beatmapSet);
 
@@ -77,7 +79,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 downloadTracker,
                 background = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Child = new Box
@@ -95,9 +97,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Child = buttons = new Container<BeatmapCardIconButton>
                     {
                         RelativeSizeAxes = Axes.Both,
-                        // Padding of 4 avoids touching the card borders when in the expanded (ie. showing difficulties) state.
-                        // Left override allows the buttons to visually be wider and look better.
-                        Padding = new MarginPadding(4) { Left = 2 },
                         Children = new BeatmapCardIconButton[]
                         {
                             new FavouriteButton(beatmapSet)
@@ -106,7 +105,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Both,
-                                Height = 0.48f,
+                                Height = 0.5f,
                             },
                             new DownloadButton(beatmapSet)
                             {
@@ -114,16 +113,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                 Origin = Anchor.BottomCentre,
                                 State = { BindTarget = downloadTracker.State },
                                 RelativeSizeAxes = Axes.Both,
-                                Height = 0.48f,
+                                Height = 0.5f,
                             },
-                            new GoToBeatmapButton(beatmapSet)
-                            {
-                                Anchor = Anchor.BottomCentre,
-                                Origin = Anchor.BottomCentre,
-                                State = { BindTarget = downloadTracker.State },
-                                RelativeSizeAxes = Axes.Both,
-                                Height = 0.48f,
-                            }
                         }
                     }
                 },
@@ -135,7 +126,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        new BeatmapCardContentBackground(beatmapSet)
+                        new BeatmapCardContentBackground(beatmapSet, keepBackgroundLoaded)
                         {
                             RelativeSizeAxes = Axes.Both,
                             Dimmed = { BindTarget = ShowDetails }
@@ -152,6 +143,15 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     }
                 }
             };
+
+            buttons.Add(new GoToBeatmapButton(beatmapSet, allowNavigationToBeatmap)
+            {
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre,
+                State = { BindTarget = downloadTracker.State },
+                RelativeSizeAxes = Axes.Both,
+                Height = 0.5f,
+            });
         }
 
         protected override void LoadComplete()
@@ -165,9 +165,15 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private void updateState()
         {
-            float targetWidth = Width - (ShowDetails.Value ? ButtonsExpandedWidth : ButtonsCollapsedWidth);
+            buttonArea.Width = buttonsExpandedWidth;
 
-            mainArea.ResizeWidthTo(targetWidth, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            float buttonAreaWidth = ShowDetails.Value ? ButtonsExpandedWidth : ButtonsCollapsedWidth;
+            float mainAreaWidth = Width - buttonAreaWidth;
+
+            mainArea.ResizeWidthTo(mainAreaWidth, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+
+            // By limiting the width we avoid this box showing up as an outline around the drawables that are on top of it.
+            background.ResizeWidthTo(buttonAreaWidth + BeatmapCard.CORNER_RADIUS, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
 
             background.FadeColour(downloadTracker.State.Value == DownloadState.LocallyAvailable ? colours.Lime0 : colourProvider.Background3, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
             buttons.FadeTo(ShowDetails.Value ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);

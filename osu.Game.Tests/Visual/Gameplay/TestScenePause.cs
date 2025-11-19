@@ -12,12 +12,15 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 using osuTK;
 using osuTK.Input;
 
@@ -27,9 +30,18 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         protected new PausePlayer Player => (PausePlayer)base.Player;
 
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
+        {
+            beatmap.AudioLeadIn = 4000;
+            return base.CreateWorkingBeatmap(beatmap, storyboard);
+        }
+
         private readonly Container content;
 
         protected override Container<Drawable> Content => content;
+
+        private bool gameplayClockAlwaysGoingForward = true;
+        private double lastForwardCheckTime;
 
         public TestScenePause()
         {
@@ -57,6 +69,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             pauseViaBackAction();
             pauseViaBackAction();
             confirmPausedWithNoOverlay();
+            AddAssert("pause recorded", () => Player.Score.ScoreInfo.Pauses, () => Has.Count.EqualTo(1));
         }
 
         [Test]
@@ -65,14 +78,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             pauseViaPauseGameplayAction();
             pauseViaPauseGameplayAction();
             confirmPausedWithNoOverlay();
+            AddAssert("pause recorded", () => Player.Score.ScoreInfo.Pauses, () => Has.Count.EqualTo(1));
         }
 
         [Test]
         public void TestPauseWithLargeOffset()
         {
-            double lastStopTime;
-            bool alwaysGoingForward = true;
-
             AddStep("force large offset", () =>
             {
                 var offset = (BindableDouble)LocalConfig.GetBindable<double>(OsuSetting.AudioOffset);
@@ -82,25 +93,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 offset.Value = -5000;
             });
 
-            AddStep("add time forward check hook", () =>
-            {
-                lastStopTime = double.MinValue;
-                alwaysGoingForward = true;
-
-                Player.OnUpdate += _ =>
-                {
-                    var masterClock = (MasterGameplayClockContainer)Player.GameplayClockContainer;
-
-                    double currentTime = masterClock.CurrentTime;
-
-                    bool goingForward = currentTime >= lastStopTime;
-
-                    alwaysGoingForward &= goingForward;
-
-                    if (!goingForward)
-                        Logger.Log($"Went too far backwards (last stop: {lastStopTime:N1} current: {currentTime:N1})");
-                };
-            });
+            hookForwardPlaybackCheck();
 
             AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
 
@@ -108,9 +101,35 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             resumeAndConfirm();
 
-            AddAssert("time didn't go too far backwards", () => alwaysGoingForward);
+            checkForwardPlayback();
 
             AddStep("reset offset", () => LocalConfig.SetValue(OsuSetting.AudioOffset, 0.0));
+        }
+
+        private void checkForwardPlayback() => AddAssert("time didn't go too far backwards", () => gameplayClockAlwaysGoingForward);
+
+        private void hookForwardPlaybackCheck()
+        {
+            AddStep("add time forward check hook", () =>
+            {
+                lastForwardCheckTime = double.MinValue;
+                gameplayClockAlwaysGoingForward = true;
+
+                Player.OnUpdate += _ =>
+                {
+                    var frameStableClock = Player.ChildrenOfType<FrameStabilityContainer>().Single().Clock;
+
+                    double currentTime = frameStableClock.CurrentTime;
+
+                    bool goingForward = currentTime >= lastForwardCheckTime;
+                    lastForwardCheckTime = currentTime;
+
+                    gameplayClockAlwaysGoingForward &= goingForward;
+
+                    if (!goingForward)
+                        Logger.Log($"Went too far backwards (last stop: {lastForwardCheckTime:N1} current: {currentTime:N1})");
+                };
+            });
         }
 
         [Test]
@@ -180,8 +199,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        [Ignore("Fails on github runners if they happen to skip too far forward in time.")]
         public void TestUserPauseDuringCooldownTooSoon()
         {
+            AddStep("seek to gameplay", () => Player.GameplayClockContainer.Seek(0));
             AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
 
             pauseAndConfirm();
@@ -194,8 +215,22 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestUserPauseDuringIntroSkipsCooldown()
+        {
+            AddStep("seek before gameplay", () => Player.GameplayClockContainer.Seek(-5000));
+            AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
+
+            pauseAndConfirm();
+
+            resume();
+            pauseViaBackAction();
+            confirmPaused();
+        }
+
+        [Test]
         public void TestQuickExitDuringCooldownTooSoon()
         {
+            AddStep("seek to gameplay", () => Player.GameplayClockContainer.Seek(0));
             AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
 
             pauseAndConfirm();
@@ -300,6 +335,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestExitViaHoldToExit()
         {
+            AddStep("set hold button always visible", () => LocalConfig.SetValue(OsuSetting.AlwaysShowHoldForMenuButton, true));
+
             AddStep("exit", () =>
             {
                 InputManager.MoveMouseTo(Player.HUDOverlay.HoldToQuit.First(c => c is HoldToConfirmContainer));

@@ -9,9 +9,9 @@ namespace osu.Game.Screens.Edit
 {
     public partial class SaveRequiredPopupDialog : PopupDialog
     {
-        public SaveRequiredPopupDialog(string headerText, Action saveAndAction)
+        public SaveRequiredPopupDialog(Action saveAndAction)
         {
-            HeaderText = headerText;
+            HeaderText = "The beatmap will be saved to continue with this operation.";
 
             Icon = FontAwesome.Regular.Save;
 

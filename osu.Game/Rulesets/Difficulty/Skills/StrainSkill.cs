@@ -26,10 +26,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected virtual int SectionLength => 400;
 
         private double currentSectionPeak; // We also keep track of the peak strain level in the current section.
-
         private double currentSectionEnd;
 
         private readonly List<double> strainPeaks = new List<double>();
+        protected readonly List<double> ObjectStrains = new List<double>(); // Store individual strains
 
         protected StrainSkill(Mod[] mods)
             : base(mods)
@@ -57,7 +57,29 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 currentSectionEnd += SectionLength;
             }
 
-            currentSectionPeak = Math.Max(StrainValueAt(current), currentSectionPeak);
+            double strain = StrainValueAt(current);
+            currentSectionPeak = Math.Max(strain, currentSectionPeak);
+
+            // Store the strain value for the object
+            ObjectStrains.Add(strain);
+        }
+
+        /// <summary>
+        /// Calculates the number of strains weighted against the top strain.
+        /// The result is scaled by clock rate as it affects the total number of strains.
+        /// </summary>
+        public virtual double CountTopWeightedStrains()
+        {
+            if (ObjectStrains.Count == 0)
+                return 0.0;
+
+            double consistentTopStrain = DifficultyValue() / 10; // What would the top strain be if all strain values were identical
+
+            if (consistentTopStrain == 0)
+                return ObjectStrains.Count;
+
+            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
+            return ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
         }
 
         /// <summary>
@@ -93,6 +115,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// including the peak of the current section.
         /// </summary>
         public IEnumerable<double> GetCurrentStrainPeaks() => strainPeaks.Append(currentSectionPeak);
+
+        public IEnumerable<double> GetObjectStrains() => ObjectStrains;
 
         /// <summary>
         /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.

@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -13,11 +14,11 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
@@ -29,11 +30,10 @@ using osuTK;
 
 namespace osu.Game.Screens.Play
 {
-    [Cached(typeof(IPreviewTrackOwner))]
     public partial class SoloSpectatorScreen : SpectatorScreen, IPreviewTrackOwner
     {
         [Resolved]
-        private IAPIProvider api { get; set; } = null!;
+        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; } = null!;
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private SpectatorGameplayState? immediateSpectatorGameplayState;
 
-        private GetBeatmapSetRequest? onlineBeatmapRequest;
+        private ScheduledDelegate? beatmapFetchCallback;
 
         private APIBeatmapSet? beatmapSet;
 
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Play
                             },
                             automaticDownload = new SettingsCheckbox
                             {
-                                LabelText = "Automatically download beatmaps",
+                                LabelText = OnlineSettingsStrings.AutomaticallyDownloadMissingBeatmaps,
                                 Current = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadMissingBeatmaps),
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
@@ -182,7 +182,7 @@ namespace osu.Game.Screens.Play
         {
             if (this.GetChildScreen() is SpectatorPlayerLoader loader)
             {
-                if (loader.GetChildScreen() is SpectatorPlayer player)
+                if (loader.GetChildScreen() is SoloSpectatorPlayer player)
                 {
                     player.AllowFail();
                     resetStartState();
@@ -209,7 +209,7 @@ namespace osu.Game.Screens.Play
         private void clearDisplay()
         {
             watchButton.Enabled.Value = false;
-            onlineBeatmapRequest?.Cancel();
+            beatmapFetchCallback?.Cancel();
             beatmapPanelContainer.Clear();
             previewTrackManager.StopAnyPlaying(this);
         }
@@ -243,15 +243,17 @@ namespace osu.Game.Screens.Play
         {
             Debug.Assert(state.BeatmapID != null);
 
-            onlineBeatmapRequest = new GetBeatmapSetRequest(state.BeatmapID.Value, BeatmapSetLookupType.BeatmapId);
-            onlineBeatmapRequest.Success += beatmapSet => Schedule(() =>
+            beatmapLookupCache.GetBeatmapAsync(state.BeatmapID.Value).ContinueWith(t => beatmapFetchCallback = Schedule(() =>
             {
-                this.beatmapSet = beatmapSet;
-                beatmapPanelContainer.Child = new BeatmapCardNormal(this.beatmapSet, allowExpansion: false);
-                checkForAutomaticDownload();
-            });
+                var beatmap = t.GetResultSafely();
 
-            api.Queue(onlineBeatmapRequest);
+                if (beatmap?.BeatmapSet == null)
+                    return;
+
+                beatmapSet = beatmap.BeatmapSet;
+                beatmapPanelContainer.Child = new BeatmapCardNormal(beatmapSet, allowExpansion: false);
+                checkForAutomaticDownload();
+            }));
         }
 
         private void checkForAutomaticDownload()

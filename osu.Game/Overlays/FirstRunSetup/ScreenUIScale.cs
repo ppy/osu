@@ -23,15 +23,16 @@ using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.Select;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Visual;
 using osuTK;
 
 namespace osu.Game.Overlays.FirstRunSetup
 {
     [LocalisableDescription(typeof(GraphicsSettingsStrings), nameof(GraphicsSettingsStrings.UIScaling))]
-    public partial class ScreenUIScale : FirstRunSetupScreen
+    public partial class ScreenUIScale : WizardScreen
     {
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -100,11 +101,14 @@ namespace osu.Game.Overlays.FirstRunSetup
             }
         }
 
-        private partial class NestedSongSelect : PlaySongSelect
+        private partial class NestedSongSelect : SoloSongSelect
         {
-            protected override bool ControlGlobalMusic => false;
-
             public override bool? ApplyModTrackAdjustments => false;
+
+            public NestedSongSelect()
+            {
+                ControlGlobalMusic = false;
+            }
         }
 
         private partial class UIScaleSlider : RoundedSliderBar<float>
@@ -144,10 +148,12 @@ namespace osu.Game.Overlays.FirstRunSetup
             protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
                 new DependencyContainer(new DependencyIsolationContainer(base.CreateChildDependencies(parent)));
 
+            private ScreenFooter footer;
+
             [BackgroundDependencyLoader]
             private void load(AudioManager audio, TextureStore textures, RulesetStore rulesets)
             {
-                Beatmap.Value = new DummyWorkingBeatmap(audio, textures);
+                Beatmap.Default = Beatmap.Value = new DummyWorkingBeatmap(audio, textures);
 
                 Ruleset.Value = rulesets.AvailableRulesets.First();
 
@@ -166,7 +172,8 @@ namespace osu.Game.Overlays.FirstRunSetup
                             {
                                 RelativePositionAxes = Axes.Both,
                                 Position = new Vector2(0.5f),
-                            })
+                            }),
+                            (typeof(ScreenFooter), footer = new ScreenFooter()),
                         },
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
@@ -178,7 +185,8 @@ namespace osu.Game.Overlays.FirstRunSetup
                                 Children = new Drawable[]
                                 {
                                     stack = new OsuScreenStack(),
-                                    logo
+                                    footer,
+                                    logo,
                                 },
                             },
                         }
@@ -187,6 +195,13 @@ namespace osu.Game.Overlays.FirstRunSetup
 
                 // intentionally load synchronously so it is included in the initial load of the first run screen.
                 stack.PushSynchronously(screen);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                footer.Show();
             }
         }
 

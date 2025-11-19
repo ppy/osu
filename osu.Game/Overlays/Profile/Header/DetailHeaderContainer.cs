@@ -26,47 +26,42 @@ namespace osu.Game.Overlays.Profile.Header
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5,
                 },
-                new Container
+                new GridContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING, Vertical = 10 },
-                    Child = new GridContainer
+                    RowDimensions = new[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        RowDimensions = new[]
+                        new Dimension(GridSizeMode.AutoSize),
+                    },
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.AutoSize),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
                         {
-                            new Dimension(GridSizeMode.AutoSize),
-                        },
-                        ColumnDimensions = new[]
-                        {
-                            new Dimension(),
-                            new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(GridSizeMode.AutoSize),
-                        },
-                        Content = new[]
-                        {
-                            new Drawable[]
+                            new MainDetails
                             {
-                                new MainDetails
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    User = { BindTarget = User }
-                                },
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Y,
-                                    Width = 2,
-                                    Colour = colourProvider.Background6,
-                                    Margin = new MarginPadding { Horizontal = 15 }
-                                },
-                                new ExtendedDetails
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    User = { BindTarget = User }
-                                }
+                                RelativeSizeAxes = Axes.X,
+                                User = { BindTarget = User }
+                            },
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Y,
+                                Width = 2,
+                                Colour = colourProvider.Background6,
+                                Margin = new MarginPadding { Horizontal = 15 }
+                            },
+                            new ExtendedDetails
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                User = { BindTarget = User }
                             }
                         }
                     }

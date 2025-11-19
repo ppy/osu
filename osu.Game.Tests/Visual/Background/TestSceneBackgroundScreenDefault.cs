@@ -304,11 +304,6 @@ namespace osu.Game.Tests.Visual.Background
         {
             private bool? lastLoadTriggerCausedChange;
 
-            public TestBackgroundScreenDefault()
-                : base(false)
-            {
-            }
-
             public override bool Next()
             {
                 bool didChange = base.Next();

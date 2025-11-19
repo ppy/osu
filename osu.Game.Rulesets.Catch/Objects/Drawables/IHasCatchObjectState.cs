@@ -13,17 +13,35 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     public interface IHasCatchObjectState
     {
         PalpableCatchHitObject HitObject { get; }
-
-        double DisplayStartTime { get; }
-
         Bindable<Color4> AccentColour { get; }
-
         Bindable<bool> HyperDash { get; }
-
         Bindable<int> IndexInBeatmap { get; }
-
+        double DisplayStartTime { get; }
+        Vector2 DisplayPosition { get; }
         Vector2 DisplaySize { get; }
-
         float DisplayRotation { get; }
+
+        void RestoreState(CatchObjectState state);
     }
+
+    public static class HasCatchObjectStateExtensions
+    {
+        public static CatchObjectState SaveState(this IHasCatchObjectState target) => new CatchObjectState(
+            target.HitObject,
+            target.AccentColour.Value,
+            target.HyperDash.Value,
+            target.IndexInBeatmap.Value,
+            target.DisplayPosition,
+            target.DisplaySize,
+            target.DisplayRotation);
+    }
+
+    public readonly record struct CatchObjectState(
+        PalpableCatchHitObject HitObject,
+        Color4 AccentColour,
+        bool HyperDash,
+        int IndexInBeatmap,
+        Vector2 DisplayPosition,
+        Vector2 DisplaySize,
+        float DisplayRotation);
 }

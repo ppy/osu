@@ -204,12 +204,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Origin = Anchor.Centre,
                 Direction = FillDirection.Vertical,
                 AutoSizeAxes = Axes.Both,
-                Children = new[]
-                {
-                    new OsuSpriteText { Text = $@"Great: {hitWindows?.WindowFor(HitResult.Great)}" },
-                    new OsuSpriteText { Text = $@"Good: {hitWindows?.WindowFor(HitResult.Ok)}" },
-                    new OsuSpriteText { Text = $@"Meh: {hitWindows?.WindowFor(HitResult.Meh)}" },
-                }
+                ChildrenEnumerable = hitWindows?.GetAllAvailableWindows().Select(w => new OsuSpriteText { Text = $@"{w.result}: {w.length}" }) ?? []
             });
 
             Add(new BarHitErrorMeter
@@ -284,6 +279,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public override IAdjustableAudioComponent Audio { get; }
             public override Playfield Playfield { get; }
+            public override PlayfieldAdjustmentContainer PlayfieldAdjustmentContainer { get; }
             public override Container Overlays { get; }
             public override Container FrameStableComponents { get; }
             public override IFrameStableClock FrameStableClock { get; }

@@ -17,6 +17,9 @@ namespace osu.Game.Overlays.Mods
         private readonly BindableBool incompatible = new BindableBool();
 
         [Resolved]
+        private OverlayColourProvider overlayColourProvider { get; set; } = null!;
+
+        [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
 
         public IncompatibilityDisplayingModPanel(ModState modState)
@@ -55,7 +58,7 @@ namespace osu.Game.Overlays.Mods
 
         #region IHasCustomTooltip
 
-        public ITooltip<Mod> GetCustomTooltip() => new IncompatibilityDisplayingTooltip();
+        public ITooltip<Mod> GetCustomTooltip() => new IncompatibilityDisplayingTooltip(overlayColourProvider);
 
         public Mod TooltipContent => Mod;
 

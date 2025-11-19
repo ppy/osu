@@ -9,6 +9,7 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -16,6 +17,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -26,7 +28,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public partial class SkipOverlay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+    public partial class SkipOverlay : BeatSyncedContainer, IKeyBindingHandler<GlobalAction>
     {
         /// <summary>
         /// The total number of successful skips performed by this overlay.
@@ -37,21 +39,20 @@ namespace osu.Game.Screens.Play
 
         public Action RequestSkip;
 
+        protected FadeContainer FadingContent { get; private set; }
+
         private Button button;
         private ButtonContainer buttonContainer;
-        private Box remainingTimeBox;
+        private Circle remainingTimeBox;
 
-        private FadeContainer fadeContainer;
         private double displayTime;
-
         private bool isClickable;
         private bool skipQueued;
 
         [Resolved]
         private IGameplayClock gameplayClock { get; set; }
 
-        internal bool IsButtonVisible => fadeContainer.State == Visibility.Visible && buttonContainer.State.Value == Visibility.Visible;
-
+        internal bool IsButtonVisible => FadingContent.State == Visibility.Visible && buttonContainer.State.Value == Visibility.Visible;
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         /// <summary>
@@ -77,7 +78,7 @@ namespace osu.Game.Screens.Play
             InternalChild = buttonContainer = new ButtonContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = fadeContainer = new FadeContainer
+                Child = FadingContent = new FadeContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -87,13 +88,13 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
-                        remainingTimeBox = new Box
+                        remainingTimeBox = new Circle
                         {
                             Height = 5,
-                            RelativeSizeAxes = Axes.X,
-                            Colour = colours.Yellow,
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
+                            Colour = colours.Yellow,
+                            RelativeSizeAxes = Axes.X
                         }
                     }
                 }
@@ -107,13 +108,13 @@ namespace osu.Game.Screens.Play
         public override void Hide()
         {
             base.Hide();
-            fadeContainer.Hide();
+            FadingContent.Hide();
         }
 
         public override void Show()
         {
             base.Show();
-            fadeContainer.TriggerShow();
+            FadingContent.TriggerShow();
         }
 
         protected override void LoadComplete()
@@ -136,7 +137,7 @@ namespace osu.Game.Screens.Play
                 RequestSkip?.Invoke();
             };
 
-            fadeContainer.TriggerShow();
+            FadingContent.TriggerShow();
         }
 
         /// <summary>
@@ -183,7 +184,7 @@ namespace osu.Game.Screens.Play
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             if (isClickable && !e.HasAnyButtonPressed)
-                fadeContainer.TriggerShow();
+                FadingContent.TriggerShow();
 
             return base.OnMouseMove(e);
         }
@@ -208,6 +209,18 @@ namespace osu.Game.Screens.Play
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+        }
+
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
+        {
+            base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+
+            if (fadeOutBeginTime <= gameplayClock.CurrentTime)
+                return;
+
+            float progress = (float)(gameplayClock.CurrentTime - displayTime) / (float)(fadeOutBeginTime - displayTime);
+            float newWidth = 1 - Math.Clamp(progress, 0, 1);
+            remainingTimeBox.ResizeWidthTo(newWidth, timingPoint.BeatLength * 3.5, Easing.OutQuint);
         }
 
         public partial class FadeContainer : Container, IStateful<Visibility>

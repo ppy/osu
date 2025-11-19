@@ -84,16 +84,6 @@ Please try changing your audio device to a working setting.");
         public static LocalisableString LinkTypeNotSupported => new TranslatableString(getKey(@"unsupported_link_type"), @"This link type is not yet supported!");
 
         /// <summary>
-        /// "You received a private message from '{0}'. Click to read it!"
-        /// </summary>
-        public static LocalisableString PrivateMessageReceived(string username) => new TranslatableString(getKey(@"private_message_received"), @"You received a private message from '{0}'. Click to read it!", username);
-
-        /// <summary>
-        /// "Your name was mentioned in chat by '{0}'. Click to find out why!"
-        /// </summary>
-        public static LocalisableString YourNameWasMentioned(string username) => new TranslatableString(getKey(@"your_name_was_mentioned"), @"Your name was mentioned in chat by '{0}'. Click to find out why!", username);
-
-        /// <summary>
         /// "{0} invited you to the multiplayer match &quot;{1}&quot;! Click to join."
         /// </summary>
         public static LocalisableString InvitedYouToTheMultiplayer(string username, string roomName) => new TranslatableString(getKey(@"invited_you_to_the_multiplayer"), @"{0} invited you to the multiplayer match ""{1}""! Click to join.", username, roomName);
@@ -114,8 +104,8 @@ Please try changing your audio device to a working setting.");
         public static LocalisableString MismatchingBeatmapForReplay => new TranslatableString(getKey(@"mismatching_beatmap_for_replay"), @"Your local copy of the beatmap for this replay appears to be different than expected. You may need to update or re-download it.");
 
         /// <summary>
-        /// "You are now running osu! {version}.
-        /// Click to see what's new!"
+        /// "You are now running osu! {0}.
+        /// Click to see what&#39;s new!"
         /// </summary>
         public static LocalisableString GameVersionAfterUpdate(string version) => new TranslatableString(getKey(@"game_version_after_update"), @"You are now running osu! {0}.
 Click to see what's new!", version);
@@ -126,14 +116,24 @@ Click to see what's new!", version);
         public static LocalisableString UpdateReadyToInstall => new TranslatableString(getKey(@"update_ready_to_install"), @"Update ready to install. Click to restart!");
 
         /// <summary>
+        /// "This is not an official build of the game. Scores will not be submitted and other online systems may not work as intended."
+        /// </summary>
+        public static LocalisableString NotOfficialBuild => new TranslatableString(getKey(@"not_official_build"), @"This is not an official build of the game. Scores will not be submitted and other online systems may not work as intended.");
+
+        /// <summary>
         /// "Downloading update..."
         /// </summary>
         public static LocalisableString DownloadingUpdate => new TranslatableString(getKey(@"downloading_update"), @"Downloading update...");
 
         /// <summary>
-        /// "Installing update..."
+        /// "This multiplayer room has ended. Click to display room results."
         /// </summary>
-        public static LocalisableString InstallingUpdate => new TranslatableString(getKey(@"installing_update"), @"Installing update...");
+        public static LocalisableString MultiplayerRoomEnded => new TranslatableString(getKey(@"multiplayer_room_ended"), @"This multiplayer room has ended. Click to display room results.");
+
+        /// <summary>
+        /// "Mention"
+        /// </summary>
+        public static LocalisableString Mention => new TranslatableString(getKey(@"mention"), @"Mention");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

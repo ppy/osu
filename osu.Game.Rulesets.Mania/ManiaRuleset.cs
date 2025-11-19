@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Extensions.EnumExtensions;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
@@ -65,6 +66,8 @@ namespace osu.Game.Rulesets.Mania
 
         public override HitObjectComposer CreateHitObjectComposer() => new ManiaHitObjectComposer(this);
 
+        public override IBeatmapVerifier CreateBeatmapVerifier() => new ManiaBeatmapVerifier();
+
         public override ISkin? CreateSkinTransformer(ISkin skin, IBeatmap beatmap)
         {
             switch (skin)
@@ -76,6 +79,7 @@ namespace osu.Game.Rulesets.Mania
                     return new ManiaArgonSkinTransformer(skin, beatmap);
 
                 case DefaultLegacySkin:
+                case RetroSkin:
                     return new ManiaClassicSkinTransformer(skin, beatmap);
 
                 case LegacySkin:
@@ -87,80 +91,80 @@ namespace osu.Game.Rulesets.Mania
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
-            if (mods.HasFlagFast(LegacyMods.Nightcore))
+            if (mods.HasFlag(LegacyMods.Nightcore))
                 yield return new ManiaModNightcore();
-            else if (mods.HasFlagFast(LegacyMods.DoubleTime))
+            else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new ManiaModDoubleTime();
 
-            if (mods.HasFlagFast(LegacyMods.Perfect))
+            if (mods.HasFlag(LegacyMods.Perfect))
                 yield return new ManiaModPerfect();
-            else if (mods.HasFlagFast(LegacyMods.SuddenDeath))
+            else if (mods.HasFlag(LegacyMods.SuddenDeath))
                 yield return new ManiaModSuddenDeath();
 
-            if (mods.HasFlagFast(LegacyMods.Cinema))
+            if (mods.HasFlag(LegacyMods.Cinema))
                 yield return new ManiaModCinema();
-            else if (mods.HasFlagFast(LegacyMods.Autoplay))
+            else if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new ManiaModAutoplay();
 
-            if (mods.HasFlagFast(LegacyMods.Easy))
+            if (mods.HasFlag(LegacyMods.Easy))
                 yield return new ManiaModEasy();
 
-            if (mods.HasFlagFast(LegacyMods.FadeIn))
+            if (mods.HasFlag(LegacyMods.FadeIn))
                 yield return new ManiaModFadeIn();
 
-            if (mods.HasFlagFast(LegacyMods.Flashlight))
+            if (mods.HasFlag(LegacyMods.Flashlight))
                 yield return new ManiaModFlashlight();
 
-            if (mods.HasFlagFast(LegacyMods.HalfTime))
+            if (mods.HasFlag(LegacyMods.HalfTime))
                 yield return new ManiaModHalfTime();
 
-            if (mods.HasFlagFast(LegacyMods.HardRock))
+            if (mods.HasFlag(LegacyMods.HardRock))
                 yield return new ManiaModHardRock();
 
-            if (mods.HasFlagFast(LegacyMods.Hidden))
+            if (mods.HasFlag(LegacyMods.Hidden))
                 yield return new ManiaModHidden();
 
-            if (mods.HasFlagFast(LegacyMods.Key1))
+            if (mods.HasFlag(LegacyMods.Key1))
                 yield return new ManiaModKey1();
 
-            if (mods.HasFlagFast(LegacyMods.Key2))
+            if (mods.HasFlag(LegacyMods.Key2))
                 yield return new ManiaModKey2();
 
-            if (mods.HasFlagFast(LegacyMods.Key3))
+            if (mods.HasFlag(LegacyMods.Key3))
                 yield return new ManiaModKey3();
 
-            if (mods.HasFlagFast(LegacyMods.Key4))
+            if (mods.HasFlag(LegacyMods.Key4))
                 yield return new ManiaModKey4();
 
-            if (mods.HasFlagFast(LegacyMods.Key5))
+            if (mods.HasFlag(LegacyMods.Key5))
                 yield return new ManiaModKey5();
 
-            if (mods.HasFlagFast(LegacyMods.Key6))
+            if (mods.HasFlag(LegacyMods.Key6))
                 yield return new ManiaModKey6();
 
-            if (mods.HasFlagFast(LegacyMods.Key7))
+            if (mods.HasFlag(LegacyMods.Key7))
                 yield return new ManiaModKey7();
 
-            if (mods.HasFlagFast(LegacyMods.Key8))
+            if (mods.HasFlag(LegacyMods.Key8))
                 yield return new ManiaModKey8();
 
-            if (mods.HasFlagFast(LegacyMods.Key9))
+            if (mods.HasFlag(LegacyMods.Key9))
                 yield return new ManiaModKey9();
 
-            if (mods.HasFlagFast(LegacyMods.KeyCoop))
+            if (mods.HasFlag(LegacyMods.KeyCoop))
                 yield return new ManiaModDualStages();
 
-            if (mods.HasFlagFast(LegacyMods.NoFail))
+            if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new ManiaModNoFail();
 
-            if (mods.HasFlagFast(LegacyMods.Random))
+            if (mods.HasFlag(LegacyMods.Random))
                 yield return new ManiaModRandom();
 
-            if (mods.HasFlagFast(LegacyMods.Mirror))
+            if (mods.HasFlag(LegacyMods.Mirror))
                 yield return new ManiaModMirror();
 
-            if (mods.HasFlagFast(LegacyMods.ScoreV2))
-                yield return new ModScoreV2();
+            if (mods.HasFlag(LegacyMods.ScoreV2))
+                yield return new ManiaModScoreV2();
         }
 
         public override LegacyMods ConvertToLegacyMods(Mod[] mods)
@@ -239,6 +243,7 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModEasy(),
                         new ManiaModNoFail(),
                         new MultiMod(new ManiaModHalfTime(), new ManiaModDaycore()),
+                        new ManiaModNoRelease(),
                     };
 
                 case ModType.DifficultyIncrease:
@@ -294,7 +299,7 @@ namespace osu.Game.Rulesets.Mania
                 case ModType.System:
                     return new Mod[]
                     {
-                        new ModScoreV2(),
+                        new ManiaModScoreV2(),
                     };
 
                 default:
@@ -412,17 +417,85 @@ namespace osu.Game.Rulesets.Mania
             }), true)
         };
 
+        /// <seealso cref="ManiaHitWindows"/>
+        public override BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
+        {
+            BeatmapDifficulty adjustedDifficulty = base.GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+
+            // notably, in mania, hit windows are designed to be independent of track playback rate (see `ManiaHitWindows.SpeedMultiplier`).
+            // *however*, to not make matters *too* simple, mania Hard Rock and Easy differ from all other rulesets
+            // in that they apply multipliers *to hit window durations directly* rather than to the Overall Difficulty attribute itself.
+            // because the duration of hit window durations as a function of OD is not a linear function,
+            // this means that multiplying the OD is *not* the same thing as multiplying the hit window duration.
+            // in fact, the second operation is *much* harsher and will produce values much farther outside of normal operating range
+            // (even negative in the case of Easy).
+            // stable handles this wrong on song select and just assumes that it can handle mania EZ / HR the same way as all other rulesets.
+
+            double perfectHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, ManiaHitWindows.PERFECT_WINDOW_RANGE);
+
+            if (mods.Any(m => m is ManiaModHardRock))
+                perfectHitWindow /= ManiaModHardRock.HIT_WINDOW_DIFFICULTY_MULTIPLIER;
+            else if (mods.Any(m => m is ManiaModEasy))
+                perfectHitWindow /= ManiaModEasy.HIT_WINDOW_DIFFICULTY_MULTIPLIER;
+
+            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(perfectHitWindow, ManiaHitWindows.PERFECT_WINDOW_RANGE);
+            adjustedDifficulty.CircleSize = ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), mods);
+
+            return adjustedDifficulty;
+        }
+
+        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
+        {
+            // a special touch-up of key count is required to the original difficulty, since key conversion mods are not `IApplicableToDifficulty`
+            var originalDifficulty = new BeatmapDifficulty(beatmapInfo.Difficulty)
+            {
+                CircleSize = ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), [])
+            };
+            var adjustedDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+            var colours = new OsuColour();
+
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.KeyCount, @"KC", originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 18)
+            {
+                Description = "Affects the number of key columns on the playfield."
+            };
+
+            var hitWindows = new ManiaHitWindows();
+            hitWindows.SetDifficulty(adjustedDifficulty.OverallDifficulty);
+            hitWindows.IsConvert = !beatmapInfo.Ruleset.Equals(RulesetInfo);
+            hitWindows.ClassicModActive = mods.Any(m => m is ManiaModClassic);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10)
+            {
+                Description = "Affects timing requirements for notes.",
+                AdditionalMetrics = hitWindows.GetAllAvailableWindows()
+                                              .Reverse()
+                                              .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
+                                                  $"{window.result.GetDescription().ToUpperInvariant()} hit window",
+                                                  LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result):0.##} ms"),
+                                                  colours.ForHitResult(window.result)
+                                              )).ToArray()
+            };
+
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10)
+            {
+                Description = "Affects the harshness of health drain and the health penalties for missing."
+            };
+        }
+
         public override IRulesetFilterCriteria CreateRulesetFilterCriteria()
         {
             return new ManiaFilterCriteria();
         }
 
-        public override RulesetSetupSection CreateEditorSetupSection() => new ManiaSetupSection();
+        public override IEnumerable<Drawable> CreateEditorSetupSections() =>
+        [
+            new MetadataSection(),
+            new ManiaDifficultySection(),
+            new ResourcesSection(),
+            new DesignSection(),
+        ];
 
-        public override DifficultySection CreateEditorDifficultySection() => new ManiaDifficultySection();
-
-        public int GetKeyCount(IBeatmapInfo beatmapInfo)
-            => ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo));
+        public int GetKeyCount(IBeatmapInfo beatmapInfo, IReadOnlyList<Mod>? mods = null)
+            => ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), mods);
     }
 
     public enum PlayfieldType

@@ -17,12 +17,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
     internal partial class LegacyKiaiGlow : BeatSyncedContainer
     {
-        private bool isKiaiActive;
+        [Resolved]
+        private HealthProcessor? healthProcessor { get; set; }
 
+        private bool isKiaiActive;
         private Sprite sprite = null!;
 
-        [BackgroundDependencyLoader(true)]
-        private void load(ISkinSource skin, HealthProcessor? healthProcessor)
+        [BackgroundDependencyLoader]
+        private void load(ISkinSource skin)
         {
             Child = sprite = new Sprite
             {
@@ -30,9 +32,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
                 Alpha = 0,
-                Scale = new Vector2(0.7f),
+                Scale = new Vector2(TaikoLegacyHitTarget.SCALE),
                 Colour = new Colour4(255, 228, 0, 255),
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             if (healthProcessor != null)
                 healthProcessor.NewJudgement += onNewJudgement;
@@ -58,8 +65,16 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             if (!result.IsHit || !isKiaiActive)
                 return;
 
-            sprite.ScaleTo(0.85f).Then()
-                  .ScaleTo(0.7f, 80, Easing.OutQuad);
+            sprite.ScaleTo(TaikoLegacyHitTarget.SCALE + 0.15f).Then()
+                  .ScaleTo(TaikoLegacyHitTarget.SCALE, 80, Easing.OutQuad);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (healthProcessor != null)
+                healthProcessor.NewJudgement -= onNewJudgement;
         }
     }
 }

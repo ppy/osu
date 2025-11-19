@@ -2,20 +2,23 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK;
+using System.Numerics;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Overlays;
+using Vector2 = osuTK.Vector2;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public partial class RoundedSliderBar<T> : OsuSliderBar<T>
-        where T : struct, IEquatable<T>, IComparable<T>, IConvertible
+        where T : struct, INumber<T>, IMinMaxValue<T>
     {
         protected readonly Nub Nub;
         protected readonly Box LeftBox;
@@ -23,6 +26,8 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Container nubContainer;
 
         private readonly HoverClickSounds hoverClickSounds;
+
+        private readonly Container mainContent;
 
         private Color4 accentColour;
 
@@ -48,10 +53,21 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        /// <summary>
+        /// The action to use to reset the value of <see cref="SliderBar{T}.Current"/> to the default.
+        /// Triggered on double click.
+        /// </summary>
+        public Action ResetToDefault { get; internal set; }
+
         public RoundedSliderBar()
         {
             Height = Nub.HEIGHT;
             RangePadding = Nub.DEFAULT_EXPANDED_SIZE / 2;
+            ResetToDefault = () =>
+            {
+                if (!Current.Disabled)
+                    Current.SetDefault();
+            };
             Children = new Drawable[]
             {
                 new Container
@@ -61,7 +77,7 @@ namespace osu.Game.Graphics.UserInterface
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Padding = new MarginPadding { Horizontal = 2 },
-                    Child = new CircularContainer
+                    Child = mainContent = new CircularContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -98,11 +114,7 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
                         Current = { Value = true },
-                        OnDoubleClicked = () =>
-                        {
-                            if (!Current.Disabled)
-                                Current.SetDefault();
-                        },
+                        OnDoubleClicked = () => ResetToDefault.Invoke(),
                     },
                 },
                 hoverClickSounds = new HoverClickSounds()
@@ -132,6 +144,26 @@ namespace osu.Game.Graphics.UserInterface
                 Alpha = disabled ? 0.3f : 1;
                 hoverClickSounds.Enabled.Value = !disabled;
             }, true);
+        }
+
+        protected override void OnFocus(FocusEvent e)
+        {
+            base.OnFocus(e);
+
+            mainContent.EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = AccentColour.Darken(1),
+                Hollow = true,
+                Radius = 2,
+            };
+        }
+
+        protected override void OnFocusLost(FocusLostEvent e)
+        {
+            base.OnFocusLost(e);
+
+            mainContent.EdgeEffect = default;
         }
 
         protected override bool OnHover(HoverEvent e)

@@ -5,9 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -38,8 +36,7 @@ namespace osu.Game.Screens.Edit.Timing
             kiai.Current.BindValueChanged(_ => saveChanges());
             scrollSpeedSlider.Current.BindValueChanged(_ => saveChanges());
 
-            var drawableRuleset = Beatmap.BeatmapInfo.Ruleset.CreateInstance().CreateDrawableRulesetWith(Beatmap.PlayableBeatmap);
-            if (drawableRuleset is not IDrawableScrollingRuleset scrollingRuleset || scrollingRuleset.VisualisationMethod == ScrollVisualisationMethod.Constant)
+            if (!Beatmap.BeatmapInfo.Ruleset.CreateInstance().EditorShowScrollSpeed)
                 scrollSpeedSlider.Hide();
 
             void saveChanges()
@@ -59,7 +56,7 @@ namespace osu.Game.Screens.Edit.Timing
                 isRebinding = true;
 
                 kiai.Current = newEffectPoint.KiaiModeBindable;
-                scrollSpeedSlider.Current = new BindableDouble
+                scrollSpeedSlider.Current = new BindableDouble(1)
                 {
                     MinValue = 0.01,
                     MaxValue = 10,

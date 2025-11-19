@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -11,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osuTK;
 
 namespace osu.Game.Overlays.Settings
@@ -66,7 +68,7 @@ namespace osu.Game.Overlays.Settings
             [BackgroundDependencyLoader]
             private void load()
             {
-                Size = new Vector2(SettingsSidebar.EXPANDED_WIDTH);
+                Size = new Vector2(EXPANDED_WIDTH);
 
                 Padding = new MarginPadding(40);
 
@@ -94,7 +96,7 @@ namespace osu.Game.Overlays.Settings
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular),
-                                Text = @"back",
+                                Text = CommonStrings.Back.ToLower(),
                             },
                         }
                     }

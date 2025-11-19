@@ -13,6 +13,18 @@ namespace osu.Game.Online
     /// </summary>
     public interface IStatefulUserHubClient
     {
+        /// <summary>
+        /// Invoked when the server requests a client to disconnect.
+        /// </summary>
+        /// <remarks>
+        /// When this request is received, the client must presume any and all further requests to the server
+        /// will either fail or be ignored.
+        /// This method is ONLY to be used for the purposes of:
+        /// <list type="bullet">
+        /// <item>actually physically disconnecting from the server,</item>
+        /// <item>cleaning up / setting up any and all required local client state.</item>
+        /// </list>
+        /// </remarks>
         Task DisconnectRequested();
     }
 }

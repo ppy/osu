@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -19,7 +18,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osuTK;
+using osu.Game.Utils;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -27,20 +26,14 @@ namespace osu.Game.Overlays.Mods
     /// On the mod select overlay, this provides a local updating view of BPM, star rating and other
     /// difficulty attributes so the user can have a better insight into what mods are changing.
     /// </summary>
-    public partial class BeatmapAttributesDisplay : ModFooterInformationDisplay, IHasCustomTooltip<AdjustedAttributesTooltip.Data?>
+    public partial class BeatmapAttributesDisplay : ModFooterInformationDisplay
     {
         private StarRatingDisplay starRatingDisplay = null!;
         private BPMDisplay bpmDisplay = null!;
 
-        private VerticalAttributeDisplay circleSizeDisplay = null!;
-        private VerticalAttributeDisplay drainRateDisplay = null!;
-        private VerticalAttributeDisplay approachRateDisplay = null!;
-        private VerticalAttributeDisplay overallDifficultyDisplay = null!;
-
         public Bindable<IBeatmapInfo?> BeatmapInfo { get; } = new Bindable<IBeatmapInfo?>();
 
-        [Resolved]
-        private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+        public Bindable<IReadOnlyList<Mod>> Mods { get; } = new Bindable<IReadOnlyList<Mod>>();
 
         public BindableBool Collapsed { get; } = new BindableBool(true);
 
@@ -52,63 +45,48 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private OsuGameBase game { get; set; } = null!;
 
-        private IBindable<RulesetInfo> gameRuleset = null!;
+        protected IBindable<RulesetInfo> GameRuleset = null!;
 
         private CancellationTokenSource? cancellationSource;
-        private IBindable<StarDifficulty?> starDifficulty = null!;
-
-        public ITooltip<AdjustedAttributesTooltip.Data?> GetCustomTooltip() => new AdjustedAttributesTooltip();
-
-        public AdjustedAttributesTooltip.Data? TooltipContent { get; private set; }
+        private IBindable<StarDifficulty> starDifficulty = null!;
 
         private const float transition_duration = 250;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            const float shear = ShearedOverlayContainer.SHEAR;
-
             LeftContent.AddRange(new Drawable[]
             {
                 starRatingDisplay = new StarRatingDisplay(default, animated: true)
                 {
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,
-                    Shear = new Vector2(-shear, 0),
+                    Shear = -OsuGame.SHEAR,
                 },
                 bpmDisplay = new BPMDisplay
                 {
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,
-                    Shear = new Vector2(-shear, 0),
+                    Shear = -OsuGame.SHEAR,
                     AutoSizeAxes = Axes.Y,
                     Width = 75,
                 }
             });
 
             RightContent.Alpha = 0;
-            RightContent.AddRange(new Drawable[]
-            {
-                circleSizeDisplay = new VerticalAttributeDisplay("CS") { Shear = new Vector2(-shear, 0), },
-                drainRateDisplay = new VerticalAttributeDisplay("HP") { Shear = new Vector2(-shear, 0), },
-                overallDifficultyDisplay = new VerticalAttributeDisplay("OD") { Shear = new Vector2(-shear, 0), },
-                approachRateDisplay = new VerticalAttributeDisplay("AR") { Shear = new Vector2(-shear, 0), },
-            });
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            mods.BindValueChanged(_ =>
+            Mods.BindValueChanged(_ =>
             {
                 modSettingChangeTracker?.Dispose();
-                modSettingChangeTracker = new ModSettingChangeTracker(mods.Value);
+                modSettingChangeTracker = new ModSettingChangeTracker(Mods.Value);
                 modSettingChangeTracker.SettingChanged += _ => updateValues();
                 updateValues();
             }, true);
-
-            BeatmapInfo.BindValueChanged(_ => updateValues(), true);
 
             Collapsed.BindValueChanged(_ =>
             {
@@ -117,12 +95,33 @@ namespace osu.Game.Overlays.Mods
                 updateCollapsedState();
             });
 
-            gameRuleset = game.Ruleset.GetBoundCopy();
-            gameRuleset.BindValueChanged(_ => updateValues());
+            GameRuleset = game.Ruleset.GetBoundCopy();
+            GameRuleset.BindValueChanged(_ => updateValues());
 
-            BeatmapInfo.BindValueChanged(_ => updateValues(), true);
+            BeatmapInfo.BindValueChanged(_ =>
+            {
+                updateStarDifficultyBindable();
+                updateValues();
+            }, true);
 
             updateCollapsedState();
+        }
+
+        private void updateStarDifficultyBindable()
+        {
+            cancellationSource?.Cancel();
+
+            if (BeatmapInfo.Value == null)
+                return;
+
+            starDifficulty = difficultyCache.GetBindableDifficulty(BeatmapInfo.Value, (cancellationSource = new CancellationTokenSource()).Token);
+            starDifficulty.BindValueChanged(s =>
+            {
+                starRatingDisplay.Current.Value = s.NewValue;
+
+                if (!starRatingDisplay.IsPresent)
+                    starRatingDisplay.FinishTransforms(true);
+            });
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -153,40 +152,28 @@ namespace osu.Game.Overlays.Mods
             if (BeatmapInfo.Value == null)
                 return;
 
-            cancellationSource?.Cancel();
+            double rate = ModUtils.CalculateRateWithMods(Mods.Value);
 
-            starDifficulty = difficultyCache.GetBindableDifficulty(BeatmapInfo.Value, (cancellationSource = new CancellationTokenSource()).Token);
-            starDifficulty.BindValueChanged(s =>
+            bpmDisplay.Current.Value = FormatUtils.RoundBPM(BeatmapInfo.Value.BPM, rate);
+
+            Ruleset ruleset = GameRuleset.Value.CreateInstance();
+            var displayAttributes = ruleset.GetBeatmapAttributesForDisplay(BeatmapInfo.Value, Mods.Value).ToList();
+
+            // if there are not enough attribute displays, make more
+            for (int i = RightContent.Count; i < displayAttributes.Count; i++)
+                RightContent.Add(new VerticalAttributeDisplay { Shear = -OsuGame.SHEAR });
+
+            // populate all attribute displays that need to be visible...
+            for (int i = 0; i < displayAttributes.Count; i++)
             {
-                starRatingDisplay.Current.Value = s.NewValue ?? default;
+                var attribute = displayAttributes[i];
+                var display = (VerticalAttributeDisplay)RightContent[i];
+                display.SetAttribute(attribute);
+            }
 
-                if (!starRatingDisplay.IsPresent)
-                    starRatingDisplay.FinishTransforms(true);
-            });
-
-            double rate = 1;
-            foreach (var mod in mods.Value.OfType<IApplicableToRate>())
-                rate = mod.ApplyToRate(0, rate);
-
-            bpmDisplay.Current.Value = BeatmapInfo.Value.BPM * rate;
-
-            BeatmapDifficulty originalDifficulty = new BeatmapDifficulty(BeatmapInfo.Value.Difficulty);
-
-            foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
-                mod.ApplyToDifficulty(originalDifficulty);
-
-            Ruleset ruleset = gameRuleset.Value.CreateInstance();
-            BeatmapDifficulty adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(originalDifficulty, rate);
-
-            TooltipContent = new AdjustedAttributesTooltip.Data(originalDifficulty, adjustedDifficulty);
-
-            approachRateDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate);
-            overallDifficultyDisplay.AdjustType.Value = VerticalAttributeDisplay.CalculateEffect(originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty);
-
-            circleSizeDisplay.Current.Value = adjustedDifficulty.CircleSize;
-            drainRateDisplay.Current.Value = adjustedDifficulty.DrainRate;
-            approachRateDisplay.Current.Value = adjustedDifficulty.ApproachRate;
-            overallDifficultyDisplay.Current.Value = adjustedDifficulty.OverallDifficulty;
+            // and hide any extra ones
+            for (int i = displayAttributes.Count; i < RightContent.Count; i++)
+                ((VerticalAttributeDisplay)RightContent[i]).SetAttribute(null);
         });
 
         private void updateCollapsedState()
@@ -194,11 +181,11 @@ namespace osu.Game.Overlays.Mods
             RightContent.FadeTo(Collapsed.Value && !IsHovered ? 0 : 1, transition_duration, Easing.OutQuint);
         }
 
-        private partial class BPMDisplay : RollingCounter<double>
+        public partial class BPMDisplay : RollingCounter<int>
         {
             protected override double RollingDuration => 250;
 
-            protected override LocalisableString FormatCount(double count) => count.ToLocalisableString("0 BPM");
+            protected override LocalisableString FormatCount(int count) => count.ToLocalisableString("0 BPM");
 
             protected override OsuSpriteText CreateSpriteText() => new OsuSpriteText
             {

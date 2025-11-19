@@ -1,33 +1,30 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
 using osu.Game.Audio;
-using osu.Game.Graphics;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Skinning;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
     public partial class PauseOverlay : GameplayMenuOverlay
     {
-        public Action OnResume;
-
         public override bool IsPresent => base.IsPresent || pauseLoop.IsPlaying;
 
         public override LocalisableString Header => GameplayMenuOverlayStrings.PausedHeader;
 
-        private SkinnableSound pauseLoop;
+        private SkinnableSound pauseLoop = null!;
 
         protected override Action BackAction => () =>
         {
@@ -37,18 +34,29 @@ namespace osu.Game.Screens.Play
                 OnResume?.Invoke();
         };
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            AddButton(GameplayMenuOverlayStrings.Continue, colours.Green, () => OnResume?.Invoke());
-            AddButton(GameplayMenuOverlayStrings.Retry, colours.YellowDark, () => OnRetry?.Invoke());
-            AddButton(GameplayMenuOverlayStrings.Quit, new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
+        private readonly IBindable<bool> windowActive = new Bindable<bool>(true);
 
+        private float targetVolume => windowActive.Value && State.Value == Visibility.Visible ? 1.0f : 0;
+
+        [BackgroundDependencyLoader]
+        private void load(GameHost? host)
+        {
             AddInternal(pauseLoop = new SkinnableSound(new SampleInfo("Gameplay/pause-loop"))
             {
                 Looping = true,
                 Volume = { Value = 0 }
             });
+
+            if (host != null)
+                windowActive.BindTo(host.IsActive);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Schedule required because host.IsActive doesn't seem to always run on the update thread.
+            windowActive.BindValueChanged(_ => Schedule(() => pauseLoop.VolumeTo(targetVolume, 1000, Easing.Out)));
         }
 
         public void StopAllSamples()
@@ -63,7 +71,7 @@ namespace osu.Game.Screens.Play
         {
             base.PopIn();
 
-            pauseLoop.VolumeTo(1.0f, TRANSITION_DURATION, Easing.InQuint);
+            pauseLoop.VolumeTo(targetVolume, TRANSITION_DURATION, Easing.InQuint);
             pauseLoop.Play();
         }
 
@@ -71,7 +79,7 @@ namespace osu.Game.Screens.Play
         {
             base.PopOut();
 
-            pauseLoop.VolumeTo(0, TRANSITION_DURATION, Easing.OutQuad).Finally(_ => pauseLoop.Stop());
+            pauseLoop.VolumeTo(targetVolume, TRANSITION_DURATION, Easing.OutQuad).Finally(_ => pauseLoop.Stop());
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)

@@ -55,7 +55,7 @@ When in doubt, it's probably best to start with a discussion first. We will esca
 
 While pull requests from unaffiliated contributors are welcome, please note that due to significant community interest and limited review throughput, the core team's primary focus is on the issues which are currently [on the roadmap](https://github.com/orgs/ppy/projects/7/views/6). Reviewing PRs that fall outside of the scope of the roadmap is done on a best-effort basis, so please be aware that it may take a while before a core maintainer gets around to review your change.
 
-The [issue tracker](https://github.com/ppy/osu/issues) should provide plenty of issues to start with. We also have a [`good-first-issue`](https://github.com/ppy/osu/issues?q=is%3Aissue+is%3Aopen+label%3Agood-first-issue) label, although from experience it is not used very often, as it is relatively rare that we can spot an issue that will definitively be a good first issue for a new contributor regardless of their programming experience.
+The [issue tracker](https://github.com/ppy/osu/issues) should provide plenty of issues to start with. We also have a [`good first issue`](https://github.com/ppy/osu/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) label, although from experience it is not used very often, as it is relatively rare that we can spot an issue that will definitively be a good first issue for a new contributor regardless of their programming experience.
 
 In the case of simple issues, a direct PR is okay. However, if you decide to work on an existing issue which doesn't seem trivial, **please ask us first**. This way we can try to estimate if it is a good fit for you and provide the correct direction on how to address it. In addition, note that while we do not rule out external contributors from working on roadmapped issues, we will generally prefer to handle them ourselves unless they're not very time sensitive.
 
@@ -73,6 +73,9 @@ Aside from the above, below is a brief checklist of things to watch out when you
 After you're done with your changes and you wish to open the PR, please observe the following recommendations:
 
 - Please submit the pull request from a [topic branch](https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows#_topic_branch) (not `master`), and keep the *Allow edits from maintainers* check box selected, so that we can push fixes to your PR if necessary.
+- Please pick the following target branch for your pull request:
+    - `pp-dev`, if the change impacts star rating or performance points calculations for any of the rulesets,
+    - `master`, otherwise.
 - Please avoid pushing untested or incomplete code.
 - Please do not force-push or rebase unless we ask you to.
 - Please do not merge `master` continually if there are no conflicts to resolve. We will do this for you when the change is ready for merge.

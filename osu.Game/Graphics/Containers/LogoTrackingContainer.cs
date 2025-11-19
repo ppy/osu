@@ -1,9 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Diagnostics;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.Containers
     {
         public Facade LogoFacade => facade;
 
-        protected OsuLogo Logo { get; private set; }
+        protected OsuLogo? Logo { get; private set; }
 
         private readonly InternalFacade facade = new InternalFacade();
 
@@ -34,18 +34,18 @@ namespace osu.Game.Graphics.Containers
         /// <param name="logo">The instance of the logo to be used for tracking.</param>
         /// <param name="duration">The duration of the initial transform. Default is instant.</param>
         /// <param name="easing">The easing type of the initial transform.</param>
-        public void StartTracking(OsuLogo logo, double duration = 0, Easing easing = Easing.None)
+        public IDisposable StartTracking(OsuLogo logo, double duration = 0, Easing easing = Easing.None)
         {
+            if (Logo != null && Logo != logo)
+                throw new InvalidOperationException("A different logo is already being tracked.");
+
             ArgumentNullException.ThrowIfNull(logo);
 
             if (logo.IsTracking && Logo == null)
                 throw new InvalidOperationException($"Cannot track an instance of {typeof(OsuLogo)} to multiple {typeof(LogoTrackingContainer)}s");
 
-            if (Logo != logo && Logo != null)
-            {
-                // If we're replacing the logo to be tracked, the old one no longer has a tracking container
-                Logo.IsTracking = false;
-            }
+            if (logo.IsTracking)
+                throw new InvalidOperationException("A previous tracking operation is still active. Dispose of its return value before starting a new tracking operation.");
 
             Logo = logo;
             Logo.IsTracking = true;
@@ -55,15 +55,13 @@ namespace osu.Game.Graphics.Containers
 
             startTime = null;
             startPosition = null;
-        }
 
-        /// <summary>
-        /// Stops the logo assigned in <see cref="StartTracking"/> from tracking the facade's position.
-        /// </summary>
-        public void StopTracking()
-        {
-            if (Logo != null)
+            return new InvokeOnDisposal(stopTracking);
+
+            void stopTracking()
             {
+                Debug.Assert(Logo != null);
+
                 Logo.IsTracking = false;
                 Logo = null;
             }
@@ -76,15 +74,15 @@ namespace osu.Game.Graphics.Containers
         /// <remarks>Will only be correct if the logo's <see cref="Drawable.RelativePositionAxes"/> are set to Axes.Both</remarks>
         protected Vector2 ComputeLogoTrackingPosition()
         {
-            var absolutePos = Logo.Parent!.ToLocalSpace(LogoFacade.ScreenSpaceDrawQuad.Centre);
+            var absolutePos = Logo!.Parent!.ToLocalSpace(LogoFacade.ScreenSpaceDrawQuad.Centre);
 
             return new Vector2(absolutePos.X / Logo.Parent!.RelativeToAbsoluteFactor.X,
                 absolutePos.Y / Logo.Parent!.RelativeToAbsoluteFactor.Y);
         }
 
-        protected override void Update()
+        protected override void UpdateAfterChildren()
         {
-            base.Update();
+            base.UpdateAfterChildren();
 
             if (Logo == null)
                 return;

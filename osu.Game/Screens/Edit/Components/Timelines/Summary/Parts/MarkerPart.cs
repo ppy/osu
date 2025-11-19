@@ -4,11 +4,9 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
-using osu.Game.Graphics;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
@@ -26,7 +24,14 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(marker = new MarkerVisualisation());
+            Add(marker = new CentreMarker
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.Centre,
+                RelativePositionAxes = Axes.X,
+                Width = 10,
+                TriangleHeightRatio = 0.5f
+            });
         }
 
         protected override bool OnDragStart(DragStartEvent e) => true;
@@ -67,61 +72,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         protected override void LoadBeatmap(EditorBeatmap beatmap)
         {
             // block base call so we don't clear our marker (can be reused on beatmap change).
-        }
-
-        private partial class MarkerVisualisation : CompositeDrawable
-        {
-            public MarkerVisualisation()
-            {
-                const float box_height = 4;
-
-                Anchor = Anchor.CentreLeft;
-                Origin = Anchor.Centre;
-                RelativePositionAxes = Axes.X;
-                RelativeSizeAxes = Axes.Y;
-                AutoSizeAxes = Axes.X;
-                InternalChildren = new Drawable[]
-                {
-                    new Box
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Size = new Vector2(14, box_height),
-                    },
-                    new Triangle
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.BottomCentre,
-                        Scale = new Vector2(1, -1),
-                        Size = new Vector2(10, 5),
-                        Y = box_height,
-                    },
-                    new Triangle
-                    {
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        Size = new Vector2(10, 5),
-                        Y = -box_height,
-                    },
-                    new Box
-                    {
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        Size = new Vector2(14, box_height),
-                    },
-                    new Box
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Y,
-                        Width = 1.4f,
-                        EdgeSmoothness = new Vector2(1, 0)
-                    }
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours) => Colour = colours.Red1;
         }
     }
 }

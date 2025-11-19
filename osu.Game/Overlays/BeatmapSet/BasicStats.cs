@@ -16,7 +16,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
@@ -26,9 +25,9 @@ namespace osu.Game.Overlays.BeatmapSet
     {
         private readonly Statistic length, bpm, circleCount, sliderCount;
 
-        private APIBeatmapSet beatmapSet;
+        private IBeatmapSetInfo beatmapSet;
 
-        public APIBeatmapSet BeatmapSet
+        public IBeatmapSetInfo BeatmapSet
         {
             get => beatmapSet;
             set

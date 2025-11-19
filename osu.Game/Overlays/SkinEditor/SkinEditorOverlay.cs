@@ -10,9 +10,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Layout;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
@@ -25,10 +28,9 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Select;
+using osu.Game.Screens.SelectV2;
 using osu.Game.Users;
 using osu.Game.Utils;
-using osuTK;
 
 namespace osu.Game.Overlays.SkinEditor
 {
@@ -47,8 +49,14 @@ namespace osu.Game.Overlays.SkinEditor
         [Resolved]
         private IPerformFromScreenRunner? performer { get; set; }
 
+        [Resolved]
+        private IOverlayManager? overlayManager { get; set; }
+
         [Cached]
         public readonly EditorClipboard Clipboard = new EditorClipboard();
+
+        [Cached]
+        private readonly ExternalEditOverlay externalEditOverlay = new ExternalEditOverlay();
 
         [Resolved]
         private OsuGame game { get; set; } = null!;
@@ -66,19 +74,31 @@ namespace osu.Game.Overlays.SkinEditor
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         private OsuScreen? lastTargetScreen;
+        private InvokeOnDisposal? nestedInputManagerDisable;
+        private IDisposable? externalEditOverlayRegistration;
 
-        private Vector2 lastDrawSize;
+        private readonly LayoutValue drawSizeLayout;
 
         public SkinEditorOverlay(ScalingContainer scalingContainer)
         {
             this.scalingContainer = scalingContainer;
             RelativeSizeAxes = Axes.Both;
+
+            AddLayout(drawSizeLayout = new LayoutValue(Invalidation.DrawSize));
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.BeatmapSkins, beatmapSkins);
+            config.BindWith(OsuSetting.HUDVisibilityMode, configVisibilityMode);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            externalEditOverlayRegistration = overlayManager?.RegisterBlockingOverlay(externalEditOverlay);
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -98,14 +118,16 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected override void PopIn()
         {
-            globallyDisableBeatmapSkinSetting();
-
-            if (lastTargetScreen is MainMenu)
-                PresentGameplay();
+            overrideSkinEditorRelevantSettings();
 
             if (skinEditor != null)
             {
+                disableNestedInputManagers();
                 skinEditor.Show();
+
+                if (lastTargetScreen is MainMenu)
+                    PresentGameplay();
+
                 return;
             }
 
@@ -122,6 +144,9 @@ namespace osu.Game.Overlays.SkinEditor
 
                 AddInternal(editor);
 
+                if (lastTargetScreen is MainMenu)
+                    PresentGameplay();
+
                 Debug.Assert(lastTargetScreen != null);
 
                 SetTarget(lastTargetScreen);
@@ -132,8 +157,10 @@ namespace osu.Game.Overlays.SkinEditor
         {
             skinEditor?.Save(false);
             skinEditor?.Hide();
+            nestedInputManagerDisable?.Dispose();
+            nestedInputManagerDisable = null;
 
-            globallyReenableBeatmapSkinSetting();
+            restoreSkinEditorRelevantSettings();
         }
 
         public void PresentGameplay() => presentGameplay(false);
@@ -168,7 +195,7 @@ namespace osu.Game.Overlays.SkinEditor
 
                 // the validity of the current game-wide beatmap + ruleset combination is enforced by song select.
                 // if we're anywhere else, the state is unknown and may not make sense, so forcibly set something that does.
-                if (screen is not PlaySongSelect)
+                if (screen is not SoloSongSelect)
                     ruleset.Value = beatmap.Value.BeatmapInfo.Ruleset;
                 var replayGeneratingMod = ruleset.Value.CreateInstance().GetAutoplayMod();
 
@@ -182,17 +209,17 @@ namespace osu.Game.Overlays.SkinEditor
 
                 if (replayGeneratingMod != null)
                     screen.Push(new EndlessPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods)));
-            }, new[] { typeof(Player), typeof(PlaySongSelect) });
+            }, new[] { typeof(Player), typeof(SoloSongSelect) });
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (game.DrawSize != lastDrawSize)
+            if (!drawSizeLayout.IsValid)
             {
-                lastDrawSize = game.DrawSize;
                 updateScreenSizing();
+                drawSizeLayout.Validate();
             }
         }
 
@@ -223,7 +250,8 @@ namespace osu.Game.Overlays.SkinEditor
                 Scheduler.AddOnce(updateScreenSizing);
 
                 game.Toolbar.Hide();
-                game.CloseAllOverlays();
+                if (externalEditOverlay.State.Value != Visibility.Visible)
+                    game.CloseAllOverlays();
             }
             else
             {
@@ -243,6 +271,9 @@ namespace osu.Game.Overlays.SkinEditor
         /// </summary>
         public void SetTarget(OsuScreen screen)
         {
+            nestedInputManagerDisable?.Dispose();
+            nestedInputManagerDisable = null;
+
             lastTargetScreen = screen;
 
             if (skinEditor == null) return;
@@ -261,7 +292,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             Debug.Assert(skinEditor != null);
 
-            if (!target.IsLoaded)
+            if (!target.IsLoaded || !skinEditor.IsLoaded)
             {
                 Scheduler.AddOnce(setTarget, target);
                 return;
@@ -269,8 +300,10 @@ namespace osu.Game.Overlays.SkinEditor
 
             if (skinEditor.State.Value == Visibility.Visible)
             {
-                skinEditor.Save(false);
+                if (externalEditOverlay.State.Value != Visibility.Visible)
+                    skinEditor.Save(false);
                 skinEditor.UpdateTargetScreen(target);
+                disableNestedInputManagers();
             }
             else
             {
@@ -280,27 +313,67 @@ namespace osu.Game.Overlays.SkinEditor
             }
         }
 
+        private void disableNestedInputManagers()
+        {
+            if (lastTargetScreen == null)
+                return;
+
+            var nestedInputManagers = lastTargetScreen.ChildrenOfType<PassThroughInputManager>().Where(manager => manager.UseParentInput).ToArray();
+            foreach (var inputManager in nestedInputManagers)
+                inputManager.UseParentInput = false;
+            nestedInputManagerDisable = new InvokeOnDisposal(() =>
+            {
+                foreach (var inputManager in nestedInputManagers)
+                    inputManager.UseParentInput = true;
+            });
+        }
+
         private readonly Bindable<bool> beatmapSkins = new Bindable<bool>();
         private LeasedBindable<bool>? leasedBeatmapSkins;
 
-        private void globallyDisableBeatmapSkinSetting()
-        {
-            if (beatmapSkins.Disabled)
-                return;
+        private readonly Bindable<HUDVisibilityMode> configVisibilityMode = new Bindable<HUDVisibilityMode>();
+        private LeasedBindable<HUDVisibilityMode>? leasedVisibilityMode;
 
-            // The skin editor doesn't work well if beatmap skins are being applied to the player screen.
-            // To keep things simple, disable the setting game-wide while using the skin editor.
-            //
-            // This causes a full reload of the skin, which is pretty ugly.
-            // TODO: Investigate if we can avoid this when a beatmap skin is not being applied by the current beatmap.
-            leasedBeatmapSkins = beatmapSkins.BeginLease(true);
-            leasedBeatmapSkins.Value = false;
+        private void overrideSkinEditorRelevantSettings()
+        {
+            if (!beatmapSkins.Disabled)
+            {
+                // The skin editor doesn't work well if beatmap skins are being applied to the player screen.
+                // To keep things simple, disable the setting game-wide while using the skin editor.
+                //
+                // This causes a full reload of the skin, which is pretty ugly.
+                // TODO: Investigate if we can avoid this when a beatmap skin is not being applied by the current beatmap.
+                leasedBeatmapSkins = beatmapSkins.BeginLease(true);
+                leasedBeatmapSkins.Value = false;
+            }
+
+            leasedVisibilityMode = configVisibilityMode.BeginLease(true);
+            leasedVisibilityMode.Value = HUDVisibilityMode.Always;
         }
 
-        private void globallyReenableBeatmapSkinSetting()
+        private void restoreSkinEditorRelevantSettings()
         {
             leasedBeatmapSkins?.Return();
             leasedBeatmapSkins = null;
+
+            leasedVisibilityMode?.Return();
+            leasedVisibilityMode = null;
+        }
+
+        public new void ToggleVisibility()
+        {
+            if (skinEditor?.ExternalEditInProgress == true)
+                return;
+
+            base.ToggleVisibility();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            externalEditOverlayRegistration?.Dispose();
+            externalEditOverlayRegistration = null;
         }
 
         private partial class EndlessPlayer : ReplayPlayer
@@ -325,7 +398,7 @@ namespace osu.Game.Overlays.SkinEditor
                 base.LoadComplete();
 
                 if (!LoadedBeatmapSuccessfully)
-                    Scheduler.AddDelayed(this.Exit, 3000);
+                    Scheduler.AddDelayed(this.Exit, 1000);
             }
 
             protected override void Update()

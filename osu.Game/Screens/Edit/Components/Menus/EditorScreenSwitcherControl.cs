@@ -9,6 +9,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Components.Menus
 {
@@ -21,7 +22,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
 
             TabContainer.RelativeSizeAxes &= ~Axes.X;
             TabContainer.AutoSizeAxes = Axes.X;
-            TabContainer.Padding = new MarginPadding(10);
+            TabContainer.Spacing = Vector2.Zero;
         }
 
         [BackgroundDependencyLoader]
@@ -42,30 +43,51 @@ namespace osu.Game.Screens.Edit.Components.Menus
 
         private partial class TabItem : OsuTabItem
         {
-            private const float transition_length = 250;
+            private readonly Box background;
+            private Color4 backgroundIdleColour;
+            private Color4 backgroundHoverColour;
 
             public TabItem(EditorScreenMode value)
                 : base(value)
             {
-                Text.Margin = new MarginPadding();
+                Text.Margin = new MarginPadding(10);
                 Text.Anchor = Anchor.CentreLeft;
                 Text.Origin = Anchor.CentreLeft;
 
                 Text.Font = OsuFont.TorusAlternate;
 
+                Add(background = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = float.MaxValue,
+                });
+
                 Bar.Expire();
             }
 
-            protected override void OnActivated()
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
             {
-                base.OnActivated();
-                Bar.ScaleTo(new Vector2(1, 5), transition_length, Easing.OutQuint);
+                backgroundIdleColour = colourProvider.Background2;
+                backgroundHoverColour = colourProvider.Background1;
             }
 
-            protected override void OnDeactivated()
+            protected override void LoadComplete()
             {
-                base.OnDeactivated();
-                Bar.ScaleTo(Vector2.One, transition_length, Easing.OutQuint);
+                base.LoadComplete();
+                background.Colour = backgroundIdleColour;
+            }
+
+            protected override void FadeHovered()
+            {
+                base.FadeHovered();
+                background.FadeColour(backgroundHoverColour, TRANSITION_LENGTH, Easing.OutQuint);
+            }
+
+            protected override void FadeUnhovered()
+            {
+                base.FadeUnhovered();
+                background.FadeColour(backgroundIdleColour, TRANSITION_LENGTH, Easing.OutQuint);
             }
         }
     }

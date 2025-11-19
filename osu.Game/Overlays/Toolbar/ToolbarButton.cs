@@ -1,10 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -78,6 +78,8 @@ namespace osu.Game.Overlays.Toolbar
 
         protected readonly Container BackgroundContent;
 
+        private IDisposable? realmSubscription;
+
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
@@ -150,9 +152,9 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.Both, // stops us being considered in parent's autosize
-                    Anchor = TooltipAnchor.HasFlagFast(Anchor.x0) ? Anchor.BottomLeft : Anchor.BottomRight,
+                    Anchor = TooltipAnchor.HasFlag(Anchor.x0) ? Anchor.BottomLeft : Anchor.BottomRight,
                     Origin = TooltipAnchor,
-                    Position = new Vector2(TooltipAnchor.HasFlagFast(Anchor.x0) ? 5 : -5, 5),
+                    Position = new Vector2(TooltipAnchor.HasFlag(Anchor.x0) ? 5 : -5, 5),
                     Alpha = 0,
                     Children = new Drawable[]
                     {
@@ -185,7 +187,8 @@ namespace osu.Game.Overlays.Toolbar
         {
             if (Hotkey != null)
             {
-                realm.SubscribeToPropertyChanged(r => r.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetName == null && rkb.ActionInt == (int)Hotkey.Value), kb => kb.KeyCombinationString, updateKeyBindingTooltip);
+                realmSubscription = realm.SubscribeToPropertyChanged(r => r.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetName == null && rkb.ActionInt == (int)Hotkey.Value),
+                    kb => kb.KeyCombinationString, updateKeyBindingTooltip);
             }
         }
 
@@ -234,6 +237,13 @@ namespace osu.Game.Overlays.Toolbar
             keyBindingTooltip.Text = !string.IsNullOrEmpty(keyBindingString)
                 ? $" ({keyBindingString})"
                 : string.Empty;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            realmSubscription?.Dispose();
         }
     }
 

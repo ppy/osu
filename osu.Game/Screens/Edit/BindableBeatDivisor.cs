@@ -14,7 +14,10 @@ namespace osu.Game.Screens.Edit
 {
     public class BindableBeatDivisor : BindableInt
     {
-        public static readonly int[] PREDEFINED_DIVISORS = { 1, 2, 3, 4, 6, 8, 12, 16 };
+        public static readonly int[] PREDEFINED_DIVISORS = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 16 };
+
+        public const int MINIMUM_DIVISOR = 1;
+        public const int MAXIMUM_DIVISOR = 64;
 
         public Bindable<BeatDivisorPresetCollection> ValidDivisors { get; } = new Bindable<BeatDivisorPresetCollection>(BeatDivisorPresetCollection.COMMON);
 
@@ -30,8 +33,12 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         /// <param name="divisor">The intended divisor.</param>
         /// <param name="preferKnownPresets">Forces changing the valid divisors to a known preset.</param>
-        public void SetArbitraryDivisor(int divisor, bool preferKnownPresets = false)
+        /// <returns>Whether the divisor was successfully set.</returns>
+        public bool SetArbitraryDivisor(int divisor, bool preferKnownPresets = false)
         {
+            if (divisor < MINIMUM_DIVISOR || divisor > MAXIMUM_DIVISOR)
+                return false;
+
             // If the current valid divisor range doesn't contain the proposed value, attempt to find one which does.
             if (preferKnownPresets || !ValidDivisors.Value.Presets.Contains(divisor))
             {
@@ -44,6 +51,7 @@ namespace osu.Game.Screens.Edit
             }
 
             Value = divisor;
+            return true;
         }
 
         private void updateBindableProperties()
@@ -121,6 +129,11 @@ namespace osu.Game.Screens.Edit
                 case 12:
                     return colours.YellowDarker;
 
+                case 5:
+                case 7:
+                case 9:
+                    return colours.GreenLight;
+
                 default:
                     return Color4.Red;
             }
@@ -137,18 +150,18 @@ namespace osu.Game.Screens.Edit
             {
                 case 1:
                 case 2:
-                    return new Vector2(0.6f, 0.9f);
+                    return new Vector2(1, 0.9f);
 
                 case 3:
                 case 4:
-                    return new Vector2(0.5f, 0.8f);
+                    return new Vector2(0.8f, 0.8f);
 
                 case 6:
                 case 8:
-                    return new Vector2(0.4f, 0.7f);
+                    return new Vector2(0.8f, 0.7f);
 
                 default:
-                    return new Vector2(0.3f, 0.6f);
+                    return new Vector2(0.8f, 0.6f);
             }
         }
 

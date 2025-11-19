@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         protected override double RollingDuration => 250;
 
-        [SettingSource("Wireframe opacity", "Controls the opacity of the wire frames behind the digits.")]
+        [SettingSource("Wireframe opacity", "Controls the opacity of the wireframes behind the digits.")]
         public BindableFloat WireframeOpacity { get; } = new BindableFloat(0.25f)
         {
             Precision = 0.01f,
@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play.HUD
             MaxValue = 1,
         };
 
-        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.ShowLabel), nameof(SkinnableComponentStrings.ShowLabelDescription))]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.ShowLabel))]
         public Bindable<bool> ShowLabel { get; } = new BindableBool(true);
 
         public bool UsesFixedAnchor { get; set; }
@@ -75,21 +75,21 @@ namespace osu.Game.Screens.Play.HUD
                             AutoSizeAxes = Axes.Both,
                             Child = wholePart = new ArgonCounterTextComponent(Anchor.TopRight, BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper())
                             {
-                                RequiredDisplayDigits = { Value = 3 },
                                 WireframeOpacity = { BindTarget = WireframeOpacity },
+                                WireframeTemplate = @"###",
                                 ShowLabel = { BindTarget = ShowLabel },
                             }
                         },
                         fractionPart = new ArgonCounterTextComponent(Anchor.TopLeft)
                         {
-                            RequiredDisplayDigits = { Value = 2 },
                             WireframeOpacity = { BindTarget = WireframeOpacity },
+                            WireframeTemplate = @".##",
                             Scale = new Vector2(0.5f),
                         },
                         percentText = new ArgonCounterTextComponent(Anchor.TopLeft)
                         {
                             Text = @"%",
-                            RequiredDisplayDigits = { Value = 1 },
+                            WireframeTemplate = @"#",
                             WireframeOpacity = { BindTarget = WireframeOpacity }
                         },
                     }

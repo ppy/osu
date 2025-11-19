@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 },
                 Autoplay = true,
                 PassCondition = () => true,
-                Beatmap = new Beatmap
+                CreateBeatmap = () => new Beatmap
                 {
                     HitObjects = new List<HitObject>
                     {
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                             StartTime = 5000,
                         }
                     },
-                    Breaks = new List<BreakPeriod>
+                    Breaks =
                     {
                         new BreakPeriod(2000, 4000),
                     }
@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 },
                 Autoplay = true,
                 PassCondition = () => true,
-                Beatmap = new Beatmap
+                CreateBeatmap = () => new Beatmap
                 {
                     HitObjects = new List<HitObject>
                     {
@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 },
                 Autoplay = true,
                 PassCondition = () => true,
-                Beatmap = new Beatmap
+                CreateBeatmap = () => new Beatmap
                 {
                     HitObjects = new List<HitObject>
                     {

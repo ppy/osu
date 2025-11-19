@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using System.Threading;
@@ -10,10 +8,12 @@ using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Lounge;
@@ -25,30 +25,30 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         private readonly Room room = new Room
         {
-            HasPassword = { Value = true }
+            Password = "*"
         };
 
         [Cached]
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
-        private DrawableLoungeRoom drawableRoom;
-        private SearchTextBox searchTextBox;
+        private LoungeRoomPanel panel = null!;
+        private SearchTextBox searchTextBox = null!;
 
         private readonly ManualResetEventSlim allowResponseCallback = new ManualResetEventSlim();
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            var mockLounge = new Mock<LoungeSubScreen>();
+            var mockLounge = new Mock<IOnlinePlayLounge>();
             mockLounge
-                .Setup(l => l.Join(It.IsAny<Room>(), It.IsAny<string>(), It.IsAny<Action<Room>>(), It.IsAny<Action<string>>()))
-                .Callback<Room, string, Action<Room>, Action<string>>((_, _, _, d) =>
+                .Setup(l => l.Join(It.IsAny<Room>(), It.IsAny<string>(), It.IsAny<Action<Room>>(), It.IsAny<Action<string, Exception?>>()))
+                .Callback<Room, string, Action<Room>, Action<string, Exception?>>((_, _, _, d) =>
                 {
                     Task.Run(() =>
                     {
                         allowResponseCallback.Wait(10000);
                         allowResponseCallback.Reset();
-                        Schedule(() => d?.Invoke("Incorrect password"));
+                        Schedule(() => d?.Invoke("Incorrect password", new InvalidPasswordException()));
                     });
                 });
 
@@ -74,10 +74,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Width = 500,
                             Depth = float.MaxValue
                         },
-                        drawableRoom = new DrawableLoungeRoom(room)
+                        panel = new LoungeRoomPanel(room)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            SelectedRoom = new Bindable<Room?>()
                         }
                     }
                 };
@@ -87,27 +88,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestFocusViaKeyboardCommit()
         {
-            DrawableLoungeRoom.PasswordEntryPopover popover = null;
+            LoungeRoomPanel.PasswordEntryPopover? popover = null;
 
             AddAssert("search textbox has focus", () => checkFocus(searchTextBox));
             AddStep("click room twice", () =>
             {
-                InputManager.MoveMouseTo(drawableRoom);
+                InputManager.MoveMouseTo(panel);
                 InputManager.Click(MouseButton.Left);
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("wait for popover", () => (popover = InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().SingleOrDefault()) != null);
+            AddUntilStep("wait for popover", () => (popover = InputManager.ChildrenOfType<LoungeRoomPanel.PasswordEntryPopover>().SingleOrDefault()) != null);
 
             AddAssert("textbox has focus", () => checkFocus(popover.ChildrenOfType<OsuPasswordTextBox>().Single()));
 
             AddStep("enter password", () => popover.ChildrenOfType<OsuPasswordTextBox>().Single().Text = "password");
             AddStep("commit via enter", () => InputManager.Key(Key.Enter));
 
-            AddAssert("popover has focus", () => checkFocus(popover));
+            AddAssert("popover has focus", () => checkFocus(popover!));
 
             AddStep("attempt another enter", () => InputManager.Key(Key.Enter));
 
-            AddAssert("popover still has focus", () => checkFocus(popover));
+            AddAssert("popover still has focus", () => checkFocus(popover!));
 
             AddStep("unblock response", () => allowResponseCallback.Set());
 
@@ -122,16 +123,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestFocusViaMouseCommit()
         {
-            DrawableLoungeRoom.PasswordEntryPopover popover = null;
+            LoungeRoomPanel.PasswordEntryPopover? popover = null;
 
             AddAssert("search textbox has focus", () => checkFocus(searchTextBox));
             AddStep("click room twice", () =>
             {
-                InputManager.MoveMouseTo(drawableRoom);
+                InputManager.MoveMouseTo(panel);
                 InputManager.Click(MouseButton.Left);
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("wait for popover", () => (popover = InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().SingleOrDefault()) != null);
+            AddUntilStep("wait for popover", () => (popover = InputManager.ChildrenOfType<LoungeRoomPanel.PasswordEntryPopover>().SingleOrDefault()) != null);
 
             AddAssert("textbox has focus", () => checkFocus(popover.ChildrenOfType<OsuPasswordTextBox>().Single()));
 
@@ -144,11 +145,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("popover has focus", () => checkFocus(popover));
+            AddAssert("popover has focus", () => checkFocus(popover!));
 
             AddStep("attempt another click", () => InputManager.Click(MouseButton.Left));
 
-            AddAssert("popover still has focus", () => checkFocus(popover));
+            AddAssert("popover still has focus", () => checkFocus(popover!));
 
             AddStep("unblock response", () => allowResponseCallback.Set());
 

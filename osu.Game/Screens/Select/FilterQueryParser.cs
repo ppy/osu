@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Select
     public static class FilterQueryParser
     {
         private static readonly Regex query_syntax_regex = new Regex(
-            @"\b(?<key>\w+)(?<op>(:|=|(>|<)(:|=)?))(?<value>("".*""[!]?)|(\S*))",
+            @"\b(?<key>\w+)(?<op>(!?(:|=)|(>|<)(:|=)?))(?<value>("".*?""[!]?)|(\S*))",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         internal static void ApplyQueries(FilterCriteria criteria, string query)
@@ -40,7 +40,8 @@ namespace osu.Game.Screens.Select
             {
                 case "star":
                 case "stars":
-                    return TryUpdateCriteriaRange(ref criteria.StarDifficulty, op, value, 0.01d / 2);
+                case "sr":
+                    return TryUpdateCriteriaRange(ref criteria.StarDifficulty, op, value, 0);
 
                 case "ar":
                     return TryUpdateCriteriaRange(ref criteria.ApproachRate, op, value);
@@ -56,20 +57,49 @@ namespace osu.Game.Screens.Select
                     return TryUpdateCriteriaRange(ref criteria.OverallDifficulty, op, value);
 
                 case "bpm":
-                    return TryUpdateCriteriaRange(ref criteria.BPM, op, value, 0.01d / 2);
+                    return TryUpdateCriteriaRange(ref criteria.BPM, op, value, 0.5f);
 
                 case "length":
                     return tryUpdateLengthRange(criteria, op, value);
 
-                case "played":
                 case "lastplayed":
                     return tryUpdateDateAgoRange(ref criteria.LastPlayed, op, value);
+
+                case "ranked":
+                    return tryUpdateRankedDateRange(ref criteria.DateRanked, op, value);
+
+                case "submitted":
+                    return tryUpdateRankedDateRange(ref criteria.DateSubmitted, op, value);
+
+                case "played":
+                    if (!tryParseBool(value, out bool played))
+                        return false;
+
+                    // Unplayed beatmaps are filtered on DateTimeOffset.MinValue.
+                    if (op == Operator.NotEqual)
+                        played = !played;
+
+                    if (played)
+                    {
+                        criteria.LastPlayed.Min = DateTimeOffset.MinValue;
+                        criteria.LastPlayed.Max = DateTimeOffset.MaxValue;
+                        criteria.LastPlayed.IsLowerInclusive = false;
+                    }
+                    else
+                    {
+                        criteria.LastPlayed.Min = DateTimeOffset.MinValue;
+                        criteria.LastPlayed.Max = DateTimeOffset.MinValue;
+                        criteria.LastPlayed.IsLowerInclusive = true;
+                        criteria.LastPlayed.IsUpperInclusive = true;
+                    }
+
+                    return true;
 
                 case "divisor":
                     return TryUpdateCriteriaRange(ref criteria.BeatDivisor, op, value, tryParseInt);
 
                 case "status":
-                    return TryUpdateCriteriaRange(ref criteria.OnlineStatus, op, value, tryParseEnum);
+                    return TryUpdateCriteriaSet(ref criteria.OnlineStatus, op, value);
 
                 case "creator":
                 case "author":
@@ -85,6 +115,15 @@ namespace osu.Game.Screens.Select
                 case "diff":
                     return TryUpdateCriteriaText(ref criteria.DifficultyName, op, value);
 
+                case "source":
+                    return TryUpdateCriteriaText(ref criteria.Source, op, value);
+
+                case "tag":
+                    var tagFilter = new FilterCriteria.OptionalTextFilter();
+                    TryUpdateCriteriaText(ref tagFilter, op, value);
+                    criteria.UserTags.Add(tagFilter);
+                    return true;
+
                 default:
                     return criteria.RulesetCriteria?.TryParseCustomKeywordCriteria(key, op, value) ?? false;
             }
@@ -97,6 +136,10 @@ namespace osu.Game.Screens.Select
                 case "=":
                 case ":":
                     return Operator.Equal;
+
+                case "!=":
+                case "!:":
+                    return Operator.NotEqual;
 
                 case "<":
                     return Operator.Less;
@@ -131,6 +174,25 @@ namespace osu.Game.Screens.Select
 
         private static bool tryParseInt(string value, out int result) =>
             int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out result);
+
+        private static bool tryParseBool(string value, out bool result)
+        {
+            switch (value)
+            {
+                case "1":
+                case "yes":
+                    result = true;
+                    return true;
+
+                case "0":
+                case "no":
+                    result = false;
+                    return true;
+
+                default:
+                    return bool.TryParse(value, out result);
+            }
+        }
 
         private static bool tryParseEnum<TEnum>(string value, out TEnum result) where TEnum : struct
         {
@@ -172,6 +234,10 @@ namespace osu.Game.Screens.Select
         {
             switch (op)
             {
+                case Operator.NotEqual:
+                    textFilter.ExcludeTerm = true;
+                    goto case Operator.Equal;
+
                 case Operator.Equal:
                     textFilter.SearchTerm = value;
                     return true;
@@ -199,14 +265,22 @@ namespace osu.Game.Screens.Select
 
         private static bool tryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<float> range, Operator op, float value, float tolerance = 0.05f)
         {
+            range.InvertRange = false;
+
             switch (op)
             {
                 default:
                     return false;
 
+                case Operator.NotEqual:
+                    range.InvertRange = true;
+                    goto case Operator.Equal;
+
                 case Operator.Equal:
                     range.Min = value - tolerance;
                     range.Max = value + tolerance;
+                    if (tolerance == 0)
+                        range.IsLowerInclusive = range.IsUpperInclusive = true;
                     break;
 
                 case Operator.Greater:
@@ -247,14 +321,22 @@ namespace osu.Game.Screens.Select
 
         private static bool tryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<double> range, Operator op, double value, double tolerance = 0.05)
         {
+            range.InvertRange = false;
+
             switch (op)
             {
                 default:
                     return false;
 
+                case Operator.NotEqual:
+                    range.InvertRange = true;
+                    goto case Operator.Equal;
+
                 case Operator.Equal:
                     range.Min = value - tolerance;
                     range.Max = value + tolerance;
+                    if (tolerance == 0)
+                        range.IsLowerInclusive = range.IsUpperInclusive = true;
                     break;
 
                 case Operator.Greater:
@@ -263,6 +345,8 @@ namespace osu.Game.Screens.Select
 
                 case Operator.GreaterOrEqual:
                     range.Min = value - tolerance;
+                    if (tolerance == 0)
+                        range.IsLowerInclusive = true;
                     break;
 
                 case Operator.Less:
@@ -271,6 +355,8 @@ namespace osu.Game.Screens.Select
 
                 case Operator.LessOrEqual:
                     range.Max = value + tolerance;
+                    if (tolerance == 0)
+                        range.IsUpperInclusive = true;
                     break;
             }
 
@@ -300,6 +386,92 @@ namespace osu.Game.Screens.Select
             where T : struct
             => parseFunction.Invoke(val, out var converted) && tryUpdateCriteriaRange(ref range, op, converted);
 
+        /// <summary>
+        /// Attempts to parse a keyword filter of type <typeparamref name="T"/>,
+        /// from the specified <paramref name="op"/> and <paramref name="filterValue"/>.
+        /// If <paramref name="filterValue"/> can be parsed successfully, the function returns <c>true</c>
+        /// and the resulting range constraint is stored into the <paramref name="range"/>'s expected values.
+        /// </summary>
+        /// <param name="range">The <see cref="FilterCriteria.OptionalSet{T}"/> to store the parsed data into, if successful.</param>
+        /// <param name="op">The operator for the keyword filter.</param>
+        /// <param name="filterValue">The value of the keyword filter.</param>
+        public static bool TryUpdateCriteriaSet<T>(ref FilterCriteria.OptionalSet<T> range, Operator op, string filterValue)
+            where T : struct, Enum
+        {
+            var matchingValues = new HashSet<T>();
+
+            if (filterValue.Contains(','))
+            {
+                string[] splitValues = filterValue.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                HashSet<T> parsedValues = new HashSet<T>();
+
+                foreach (string splitValue in splitValues)
+                {
+                    if (!tryParseEnum<T>(splitValue, out var parsedValue))
+                        return false;
+
+                    parsedValues.Add(parsedValue);
+                }
+
+                if (op == Operator.Equal)
+                {
+                    matchingValues.UnionWith(parsedValues);
+                }
+                else if (op == Operator.NotEqual)
+                {
+                    matchingValues.UnionWith(Enum.GetValues<T>());
+                    matchingValues.ExceptWith(parsedValues);
+                }
+                else
+                    return false;
+            }
+            else
+            {
+                if (!tryParseEnum<T>(filterValue, out var pivotValue))
+                    return false;
+
+                var allDefinedValues = Enum.GetValues<T>();
+
+                foreach (var val in allDefinedValues)
+                {
+                    int compareResult = Comparer<T>.Default.Compare(val, pivotValue);
+
+                    switch (op)
+                    {
+                        case Operator.Less:
+                            if (compareResult < 0) matchingValues.Add(val);
+                            break;
+
+                        case Operator.LessOrEqual:
+                            if (compareResult <= 0) matchingValues.Add(val);
+                            break;
+
+                        case Operator.Equal:
+                            if (compareResult == 0) matchingValues.Add(val);
+                            break;
+
+                        case Operator.GreaterOrEqual:
+                            if (compareResult >= 0) matchingValues.Add(val);
+                            break;
+
+                        case Operator.Greater:
+                            if (compareResult > 0) matchingValues.Add(val);
+                            break;
+
+                        case Operator.NotEqual:
+                            if (compareResult != 0) matchingValues.Add(val);
+                            break;
+
+                        default:
+                            return false;
+                    }
+                }
+            }
+
+            range.Values.IntersectWith(matchingValues);
+            return true;
+        }
+
         private static bool tryUpdateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, Operator op, T value)
             where T : struct
         {
@@ -307,6 +479,10 @@ namespace osu.Game.Screens.Select
             {
                 default:
                     return false;
+
+                case Operator.NotEqual:
+                    range.InvertRange = true;
+                    goto case Operator.Equal;
 
                 case Operator.Equal:
                     range.IsLowerInclusive = range.IsUpperInclusive = true;
@@ -388,13 +564,15 @@ namespace osu.Game.Screens.Select
         {
             switch (op)
             {
+                case Operator.NotEqual:
                 case Operator.Equal:
-                    // an equality filter is difficult to define for support here.
+                    // an equality or inequality filter is difficult to define for support here.
                     // if "3 months 2 days ago" means a single concrete time instant, such a filter is basically useless.
                     // if it means a range of 24 hours, then that is annoying to write and also comes with its own implications
                     // (does it mean "time instant 3 months 2 days ago, within 12 hours of tolerance either direction"?
                     // does it mean "the full calendar day, from midnight to midnight, 3 months 2 days ago"?)
                     // as such, for simplicity, just refuse to support this.
+                    // same applies to inequality, but instead 24 hours would be need to be left out
                     return false;
 
                 // for the remaining operators, since the value provided to this function is an "ago" type value
@@ -481,6 +659,170 @@ namespace osu.Game.Screens.Select
                 return false;
 
             return tryUpdateCriteriaRange(ref dateRange, op, dateTimeOffset.Value);
+        }
+
+        /// <summary>
+        /// Helper function for building a UTC date from only the year, month and day.
+        /// UTC is used to keep consistent search results with osu!web.
+        /// </summary>
+        private static DateTimeOffset dateTimeOffsetFromDateOnly(int year, int month, int day) =>
+            new DateTimeOffset(year, month, day, 0, 0, 0, TimeSpan.Zero);
+
+        /// <summary>
+        /// Parses a string containing a ranked or submitted date filter.
+        /// Returns a boolean depending on whether parsing was successful or not.
+        /// Accepted dates are in the formats `yyyy`, `yyyy-mm` and `yyyy-mm-dd`.
+        /// Leading zeros are accepted. Numbers can be separated by `-`, `/`, or `.`
+        /// </summary>
+        /// <param name="dateRange">The <see cref="FilterCriteria.OptionalRange{DateTimeOffset}"/> to store the parsed data into, if successful.</param>
+        /// <param name="op">The operator of the filtering query</param>
+        /// <param name="val">The string value to attempt parsing for.</param>
+        private static bool tryUpdateRankedDateRange(ref FilterCriteria.OptionalRange<DateTimeOffset> dateRange, Operator op, string val)
+        {
+            GroupCollection? match = tryMatchRegex(val, @"^(?<year>\d+)([-/.](?<month>\d+)([-/.](?<day>\d+))?)?$");
+
+            if (match == null)
+                return false;
+
+            int? year = null;
+            int? month = null;
+            int? day = null;
+
+            List<string> keys = new List<string> { @"year", @"month", @"day" };
+
+            foreach (string key in keys)
+            {
+                if (!match.TryGetValue(key, out var group) || !group.Success)
+                    continue;
+
+                if (group.Success)
+                {
+                    if (!tryParseDoubleWithPoint(group.Value, out double value))
+                        return false;
+
+                    switch (key)
+                    {
+                        case @"year":
+                            year = (int)value;
+                            break;
+
+                        case @"month":
+                            month = (int)value;
+                            break;
+
+                        case @"day":
+                            day = (int)value;
+                            break;
+                    }
+                }
+            }
+
+            if (year == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                DateTimeOffset dateTimeOffset;
+                dateRange.InvertRange = false;
+
+                switch (op)
+                {
+                    case Operator.Less:
+                        month ??= 1;
+                        day ??= 1;
+
+                        dateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
+                        return tryUpdateCriteriaRange(ref dateRange, op, dateTimeOffset);
+
+                    case Operator.LessOrEqual:
+                        if (month == null)
+                        {
+                            month = 1;
+                            day = 1;
+                            dateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddYears(1);
+                            return tryUpdateCriteriaRange(ref dateRange, Operator.Less, dateTimeOffset);
+                        }
+
+                        if (day == null)
+                        {
+                            day = 1;
+                            dateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddMonths(1);
+                            return tryUpdateCriteriaRange(ref dateRange, Operator.Less, dateTimeOffset);
+                        }
+
+                        dateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddDays(1);
+                        return tryUpdateCriteriaRange(ref dateRange, Operator.Less, dateTimeOffset);
+
+                    case Operator.GreaterOrEqual:
+                        month ??= 1;
+                        day ??= 1;
+
+                        dateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
+                        return tryUpdateCriteriaRange(ref dateRange, op, dateTimeOffset);
+
+                    case Operator.Greater:
+                        if (month == null)
+                        {
+                            month = 1;
+                            day = 1;
+                            dateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddYears(1);
+                            return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, dateTimeOffset);
+                        }
+
+                        if (day == null)
+                        {
+                            day = 1;
+                            dateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddMonths(1);
+                            return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, dateTimeOffset);
+                        }
+
+                        dateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddDays(1);
+                        return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, dateTimeOffset);
+
+                    case Operator.NotEqual:
+
+                        dateRange.InvertRange = true;
+                        goto case Operator.Equal;
+
+                    case Operator.Equal:
+
+                        DateTimeOffset minDateTimeOffset;
+                        DateTimeOffset maxDateTimeOffset;
+
+                        if (month == null)
+                        {
+                            month = 1;
+                            day = 1;
+                            minDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
+                            maxDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddYears(1);
+                            return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, minDateTimeOffset)
+                                   && tryUpdateCriteriaRange(ref dateRange, Operator.Less, maxDateTimeOffset);
+                        }
+
+                        if (day == null)
+                        {
+                            day = 1;
+                            minDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
+                            maxDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddMonths(1);
+                            return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, minDateTimeOffset)
+                                   && tryUpdateCriteriaRange(ref dateRange, Operator.Less, maxDateTimeOffset);
+                        }
+
+                        minDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value);
+                        maxDateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddDays(1);
+                        return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, minDateTimeOffset)
+                               && tryUpdateCriteriaRange(ref dateRange, Operator.Less, maxDateTimeOffset);
+
+                    default:
+                        return false;
+                }
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return false;
+            }
         }
     }
 }

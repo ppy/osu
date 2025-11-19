@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -164,13 +163,13 @@ namespace osu.Game.Database
             var importTasks = new List<Task>();
 
             Task beatmapImportTask = Task.CompletedTask;
-            if (content.HasFlagFast(StableContent.Beatmaps))
+            if (content.HasFlag(StableContent.Beatmaps))
                 importTasks.Add(beatmapImportTask = new LegacyBeatmapImporter(beatmaps).ImportFromStableAsync(stableStorage));
 
-            if (content.HasFlagFast(StableContent.Skins))
+            if (content.HasFlag(StableContent.Skins))
                 importTasks.Add(new LegacySkinImporter(skins).ImportFromStableAsync(stableStorage));
 
-            if (content.HasFlagFast(StableContent.Collections))
+            if (content.HasFlag(StableContent.Collections))
             {
                 importTasks.Add(beatmapImportTask.ContinueWith(_ => new LegacyCollectionImporter(realmAccess)
                 {
@@ -180,7 +179,7 @@ namespace osu.Game.Database
                 }.ImportFromStorage(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
             }
 
-            if (content.HasFlagFast(StableContent.Scores))
+            if (content.HasFlag(StableContent.Scores))
                 importTasks.Add(beatmapImportTask.ContinueWith(_ => new LegacyScoreImporter(scores).ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
 
             await Task.WhenAll(importTasks.ToArray()).ConfigureAwait(false);

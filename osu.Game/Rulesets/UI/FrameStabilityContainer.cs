@@ -6,8 +6,10 @@ using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
@@ -24,6 +26,8 @@ namespace osu.Game.Rulesets.UI
     {
         public ReplayInputHandler? ReplayInputHandler { get; set; }
 
+        private int invalidBassTimeLogCount;
+
         /// <summary>
         /// The number of CPU milliseconds to spend at most during seek catch-up.
         /// </summary>
@@ -38,7 +42,7 @@ namespace osu.Game.Rulesets.UI
 
         private readonly Bindable<bool> waitingOnFrames = new Bindable<bool>();
 
-        private readonly double gameplayStartTime;
+        public double GameplayStartTime { get; }
 
         private IGameplayClock? parentGameplayClock;
 
@@ -58,6 +62,9 @@ namespace osu.Game.Rulesets.UI
         /// This gets exposed to children as an <see cref="IGameplayClock"/>.
         /// </summary>
         private readonly FramedClock framedClock;
+
+        [Resolved]
+        private OsuGame? game { get; set; }
 
         private readonly Stopwatch stopwatch = new Stopwatch();
 
@@ -81,7 +88,7 @@ namespace osu.Game.Rulesets.UI
 
             framedClock = new FramedClock(manualClock = new ManualClock());
 
-            this.gameplayStartTime = gameplayStartTime;
+            GameplayStartTime = gameplayStartTime;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -111,7 +118,7 @@ namespace osu.Game.Rulesets.UI
                     break;
 
                 base.UpdateSubTree();
-                UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
+                UpdateSubTreeMasking();
             } while (state == PlaybackState.RequiresCatchUp && stopwatch.ElapsedMilliseconds < max_catchup_milliseconds);
 
             return true;
@@ -150,6 +157,31 @@ namespace osu.Game.Rulesets.UI
                     state = PlaybackState.NotValid;
             }
 
+            // TODO: replace IsDebugBuild with a framework flag which asserts we are in a test scene, interactively or otherwise.
+            bool allowReferenceClockSeeks = hasReplayAttached || DebugUtils.IsNUnitRunning || DebugUtils.IsDebugBuild || !FrameStablePlayback;
+
+            // This is a hotfix for ongoing bass issues we are trying to resolve (see https://www.un4seen.com/forum/?topic=20482.msg145474#msg145474)
+            //
+            // In testing this triggers *very* rarely even when set to super low values (10 ms). The cases we're worried about involve multi-second jumps.
+            // A difference of more than 500 ms seems like a sane number we should never exceed.
+            //
+            // Double-checking against the parent clock ensures we don't accidentally freeze time when the game stutters due to a long running frame.
+            if (!allowReferenceClockSeeks && Math.Abs(proposedTime - referenceClock.CurrentTime) > 500 && game?.Clock.ElapsedFrameTime <= 500)
+            {
+                if (invalidBassTimeLogCount < 10)
+                {
+                    invalidBassTimeLogCount++;
+                    Logger.Log("Ignoring likely invalid time value provided by BASS during gameplay");
+                    Logger.Log($"- provided: {referenceClock.CurrentTime:N2}");
+                    Logger.Log($"- expected: {proposedTime:N2}");
+                }
+
+                state = PlaybackState.NotValid;
+                return;
+            }
+
+            invalidBassTimeLogCount = 0;
+
             // if the proposed time is the same as the current time, assume that the clock will continue progressing in the same direction as previously.
             // this avoids spurious flips in direction from -1 to 1 during rewinds.
             if (state == PlaybackState.Valid && proposedTime != manualClock.CurrentTime)
@@ -158,7 +190,7 @@ namespace osu.Game.Rulesets.UI
             double timeBehind = Math.Abs(proposedTime - referenceClock.CurrentTime);
 
             isCatchingUp.Value = timeBehind > 200;
-            waitingOnFrames.Value = state == PlaybackState.NotValid;
+            waitingOnFrames.Value = hasReplayAttached && state == PlaybackState.NotValid;
 
             manualClock.CurrentTime = proposedTime;
             manualClock.Rate = Math.Abs(referenceClock.Rate) * direction;
@@ -236,8 +268,8 @@ namespace osu.Game.Rulesets.UI
                 return;
             }
 
-            if (manualClock.CurrentTime < gameplayStartTime)
-                manualClock.CurrentTime = proposedTime = Math.Min(gameplayStartTime, proposedTime);
+            if (manualClock.CurrentTime < GameplayStartTime)
+                manualClock.CurrentTime = proposedTime = Math.Min(GameplayStartTime, proposedTime);
             else if (Math.Abs(manualClock.CurrentTime - proposedTime) > sixty_frame_time * 1.2f)
             {
                 proposedTime = proposedTime > manualClock.CurrentTime

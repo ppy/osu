@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
             for (int i = 0; i < 4; i++)
             {
-                var judgementResult = new JudgementResult(fourObjectBeatmap.HitObjects[i], fourObjectBeatmap.HitObjects[i].CreateJudgement())
+                var judgementResult = new JudgementResult(fourObjectBeatmap.HitObjects[i], fourObjectBeatmap.HitObjects[i].Judgement)
                 {
                     Type = i == 2 ? minResult : hitResult
                 };
@@ -141,7 +141,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
             for (int i = 0; i < object_count; ++i)
             {
-                var judgementResult = new JudgementResult(largeBeatmap.HitObjects[i], largeBeatmap.HitObjects[i].CreateJudgement())
+                var judgementResult = new JudgementResult(largeBeatmap.HitObjects[i], largeBeatmap.HitObjects[i].Judgement)
                 {
                     Type = HitResult.Great
                 };
@@ -325,11 +325,11 @@ namespace osu.Game.Tests.Rulesets.Scoring
             scoreProcessor = new TestScoreProcessor();
             scoreProcessor.ApplyBeatmap(beatmap);
 
-            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], beatmap.HitObjects[0].CreateJudgement()) { Type = HitResult.Great });
+            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], beatmap.HitObjects[0].Judgement) { Type = HitResult.Great });
             Assert.That(scoreProcessor.Combo.Value, Is.EqualTo(1));
             Assert.That(scoreProcessor.Accuracy.Value, Is.EqualTo(1));
 
-            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[1], beatmap.HitObjects[1].CreateJudgement()) { Type = HitResult.ComboBreak });
+            scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[1], beatmap.HitObjects[1].Judgement) { Type = HitResult.ComboBreak });
             Assert.That(scoreProcessor.Combo.Value, Is.EqualTo(0));
             Assert.That(scoreProcessor.Accuracy.Value, Is.EqualTo(1));
         }
@@ -350,7 +350,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
             for (int i = 0; i < beatmap.HitObjects.Count; i++)
             {
-                scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[i], beatmap.HitObjects[i].CreateJudgement())
+                scoreProcessor.ApplyResult(new JudgementResult(beatmap.HitObjects[i], beatmap.HitObjects[i].Judgement)
                 {
                     Type = i == 0 ? HitResult.Miss : HitResult.Great
                 });
@@ -421,6 +421,65 @@ namespace osu.Game.Tests.Rulesets.Scoring
             Assert.That(scoreProcessor.Rank.Value, Is.EqualTo(ScoreRank.SH));
         }
 
+        [Test]
+        public void TestComboAccounting([Values] bool shuffleResults)
+        {
+            var testBeatmap = new Beatmap
+            {
+                HitObjects = Enumerable.Range(1, 40).Select(i => new TestHitObject(HitResult.Perfect, HitResult.Miss)).ToList<HitObject>(),
+            };
+            scoreProcessor.ApplyBeatmap(testBeatmap);
+
+            var results = new List<JudgementResult>();
+            JudgementResult judgementResult;
+
+            for (int i = 0; i < 25; ++i)
+            {
+                judgementResult = new JudgementResult(testBeatmap.HitObjects[i], new TestJudgement(HitResult.Perfect, HitResult.Miss))
+                {
+                    Type = HitResult.Perfect
+                };
+                results.Add(judgementResult);
+                scoreProcessor.ApplyResult(judgementResult);
+                Assert.That(scoreProcessor.Combo.Value, Is.EqualTo(i + 1));
+            }
+
+            judgementResult = new JudgementResult(testBeatmap.HitObjects[25], new TestJudgement(HitResult.Perfect, HitResult.Miss))
+            {
+                Type = HitResult.Miss
+            };
+            results.Add(judgementResult);
+            scoreProcessor.ApplyResult(judgementResult);
+            Assert.That(scoreProcessor.Combo.Value, Is.EqualTo(0));
+
+            for (int i = 26; i < 40; ++i)
+            {
+                judgementResult = new JudgementResult(testBeatmap.HitObjects[i], new TestJudgement(HitResult.Perfect, HitResult.Miss))
+                {
+                    Type = HitResult.Perfect
+                };
+                results.Add(judgementResult);
+                scoreProcessor.ApplyResult(judgementResult);
+                Assert.That(scoreProcessor.Combo.Value, Is.EqualTo(i - 25));
+            }
+
+            Assert.That(scoreProcessor.MaximumStatistics[HitResult.Perfect], Is.EqualTo(40));
+            Assert.That(scoreProcessor.Combo.Value, Is.EqualTo(14));
+            Assert.That(scoreProcessor.HighestCombo.Value, Is.EqualTo(25));
+
+            // random shuffle is VERY extreme and overkill.
+            // it might not work correctly for any other `ScoreProcessor` property, and the intermediate results likely make no sense.
+            // the goal is only to demonstrate idempotency to zero when reverting all results.
+            var random = new Random(20250519);
+            var toRevert = shuffleResults ? results.OrderBy(_ => random.Next()).ToList() : Enumerable.Reverse(results);
+
+            foreach (var result in toRevert)
+                scoreProcessor.RevertResult(result);
+
+            Assert.That(scoreProcessor.Combo.Value, Is.Zero);
+            Assert.That(scoreProcessor.HighestCombo.Value, Is.Zero);
+        }
+
         private class TestJudgement : Judgement
         {
             public override HitResult MaxResult { get; }
@@ -441,10 +500,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
             private readonly HitResult maxResult;
             private readonly HitResult? minResult;
 
-            public override Judgement CreateJudgement()
-            {
-                return new TestJudgement(maxResult, minResult);
-            }
+            public override Judgement CreateJudgement() => new TestJudgement(maxResult, minResult);
 
             public TestHitObject(HitResult maxResult, HitResult? minResult = null)
             {

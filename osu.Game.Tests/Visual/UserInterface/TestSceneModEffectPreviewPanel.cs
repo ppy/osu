@@ -57,6 +57,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                Mods = { BindTarget = SelectedMods },
             });
 
             AddStep("set beatmap", () =>
@@ -124,7 +125,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             public StarDifficulty? Difficulty { get; set; }
 
             public override Task<StarDifficulty?> GetDifficultyAsync(IBeatmapInfo beatmapInfo, IRulesetInfo? rulesetInfo = null, IEnumerable<Mod>? mods = null,
-                                                                     CancellationToken cancellationToken = default)
+                                                                     CancellationToken cancellationToken = default, int computationDelay = 0)
                 => Task.FromResult(Difficulty);
         }
     }

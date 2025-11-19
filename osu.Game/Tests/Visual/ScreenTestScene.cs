@@ -7,11 +7,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Screens;
+using osu.Game.Screens.Footer;
 
 namespace osu.Game.Tests.Visual
 {
@@ -30,22 +32,42 @@ namespace osu.Game.Tests.Visual
         [Cached(typeof(IDialogOverlay))]
         protected DialogOverlay DialogOverlay { get; private set; }
 
+        [Cached]
+        protected ScreenFooter ScreenFooter { get; private set; }
+
         protected ScreenTestScene()
         {
+            ScreenStackFooter screenStackFooter;
+            ScreenFooter.BackReceptor backReceptor;
+
             base.Content.AddRange(new Drawable[]
             {
+                backReceptor = new ScreenFooter.BackReceptor(),
                 Stack = new OsuScreenStack
                 {
                     Name = nameof(ScreenTestScene),
                     RelativeSizeAxes = Axes.Both
                 },
-                content = new Container { RelativeSizeAxes = Axes.Both },
+                new PopoverContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        content = new Container { RelativeSizeAxes = Axes.Both },
+                        screenStackFooter = new ScreenStackFooter(Stack, backReceptor)
+                        {
+                            BackButtonPressed = () => Stack.Exit()
+                        }
+                    }
+                },
                 overlayContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = DialogOverlay = new DialogOverlay()
-                }
+                },
             });
+
+            ScreenFooter = screenStackFooter.Footer;
 
             Stack.ScreenPushed += (_, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed → {newScreen}");
             Stack.ScreenExited += (_, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed ← {newScreen}");

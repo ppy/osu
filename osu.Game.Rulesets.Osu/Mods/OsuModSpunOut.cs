@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var spinner = (DrawableSpinner)drawable;
 
-            spinner.RotationTracker.Tracking = true;
+            spinner.RotationTracker.Tracking = spinner.RotationTracker.IsSpinnableTime;
 
             // early-return if we were paused to avoid division-by-zero in the subsequent calculations.
             if (Precision.AlmostEquals(spinner.Clock.Rate, 0))
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             // multiply the SPM by 1.01 to ensure that the spinner is completed. if the calculation is left exact,
             // some spinners may not complete due to very minor decimal loss during calculation
             float rotationSpeed = (float)(1.01 * spinner.HitObject.SpinsRequired / spinner.HitObject.Duration);
-            spinner.RotationTracker.AddRotation(MathUtils.RadiansToDegrees((float)rateIndependentElapsedTime * rotationSpeed * MathF.PI * 2.0f));
+            spinner.RotationTracker.AddRotation(float.RadiansToDegrees((float)rateIndependentElapsedTime * rotationSpeed * MathF.PI * 2.0f));
         }
     }
 }

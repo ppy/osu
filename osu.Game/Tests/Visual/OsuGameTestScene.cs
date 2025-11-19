@@ -82,10 +82,11 @@ namespace osu.Game.Tests.Visual
         [TearDownSteps]
         public virtual void TearDownSteps()
         {
-            if (DebugUtils.IsNUnitRunning && Game != null)
+            if (DebugUtils.IsNUnitRunning)
             {
-                AddStep("exit game", () => Game.Exit());
-                AddUntilStep("wait for game exit", () => Game.Parent == null);
+                AddStep("exit game", () => Game?.Exit());
+                AddUntilStep("wait for game exit", () => Game?.Parent == null);
+                AddStep("dispose game", () => Game?.Dispose());
             }
         }
 
@@ -153,6 +154,8 @@ namespace osu.Game.Tests.Visual
 
             public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
 
+            public new Storage Storage => base.Storage;
+
             public new SpectatorClient SpectatorClient => base.SpectatorClient;
 
             // if we don't apply these changes, when running under nUnit the version that gets populated is that of nUnit.
@@ -166,7 +169,7 @@ namespace osu.Game.Tests.Visual
             public TestOsuGame(Storage storage, IAPIProvider api, string[] args = null)
                 : base(args)
             {
-                Storage = storage;
+                base.Storage = storage;
                 API = api;
             }
 

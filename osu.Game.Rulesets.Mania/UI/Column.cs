@@ -1,10 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
@@ -13,6 +12,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Skinning;
@@ -45,11 +45,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal readonly Container TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both };
 
-        private DrawablePool<PoolableHitExplosion> hitExplosionPool;
+        private DrawablePool<PoolableHitExplosion> hitExplosionPool = null!;
         private readonly OrderedHitPolicy hitPolicy;
         public Container UnderlayElements => HitObjectArea.UnderlayElements;
 
-        private GameplaySampleTriggerSource sampleTriggerSource;
+        private GameplaySampleTriggerSource sampleTriggerSource = null!;
 
         /// <summary>
         /// Whether this is a special (ie. scratch) column.
@@ -57,6 +57,11 @@ namespace osu.Game.Rulesets.Mania.UI
         public readonly bool IsSpecial;
 
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Black);
+
+        private IBindable<bool> touchOverlay = null!;
+
+        private float leftColumnSpacing;
+        private float rightColumnSpacing;
 
         public Column(int index, bool isSpecial)
         {
@@ -67,14 +72,18 @@ namespace osu.Game.Rulesets.Mania.UI
             Width = COLUMN_WIDTH;
 
             hitPolicy = new OrderedHitPolicy(HitObjectContainer);
-            HitObjectArea = new ColumnHitObjectArea(HitObjectContainer) { RelativeSizeAxes = Axes.Both };
+            HitObjectArea = new ColumnHitObjectArea
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = HitObjectContainer,
+            };
         }
 
         [Resolved]
-        private ISkinSource skin { get; set; }
+        private ISkinSource skin { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host)
+        private void load(GameHost host, ManiaRulesetConfigManager? rulesetConfig)
         {
             SkinnableDrawable keyArea;
 
@@ -93,8 +102,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements externally
                 // (see `Stage.columnBackgrounds`).
                 BackgroundContainer,
-                TopLevelContainer,
-                new ColumnTouchInputArea(this)
+                TopLevelContainer
             };
 
             var background = new SkinnableDrawable(new ManiaSkinComponentLookup(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
@@ -113,11 +121,22 @@ namespace osu.Game.Rulesets.Mania.UI
             RegisterPool<HeadNote, DrawableHoldNoteHead>(10, 50);
             RegisterPool<TailNote, DrawableHoldNoteTail>(10, 50);
             RegisterPool<HoldNoteBody, DrawableHoldNoteBody>(10, 50);
+
+            if (rulesetConfig != null)
+                touchOverlay = rulesetConfig.GetBindable<bool>(ManiaRulesetSetting.TouchOverlay);
         }
 
         private void onSourceChanged()
         {
             AccentColour.Value = skin.GetManiaSkinConfig<Color4>(LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour, Index)?.Value ?? Color4.Black;
+
+            leftColumnSpacing = skin.GetConfig<ManiaSkinConfigurationLookup, float>(
+                                        new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.LeftColumnSpacing, Index))
+                                    ?.Value ?? Stage.COLUMN_SPACING;
+
+            rightColumnSpacing = skin.GetConfig<ManiaSkinConfigurationLookup, float>(
+                                         new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.RightColumnSpacing, Index))
+                                     ?.Value ?? Stage.COLUMN_SPACING;
         }
 
         protected override void LoadComplete()
@@ -133,7 +152,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             base.Dispose(isDisposing);
 
-            if (skin != null)
+            if (skin.IsNotNull())
                 skin.SourceChanged -= onSourceChanged;
         }
 
@@ -179,40 +198,38 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
-            // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
-            => DrawRectangle.Inflate(new Vector2(Stage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
-
-        public partial class ColumnTouchInputArea : Drawable
         {
-            private readonly Column column;
-
-            [Resolved(canBeNull: true)]
-            private ManiaInputManager maniaInputManager { get; set; }
-
-            private KeyBindingContainer<ManiaAction> keyBindingContainer;
-
-            public ColumnTouchInputArea(Column column)
-            {
-                RelativeSizeAxes = Axes.Both;
-
-                this.column = column;
-            }
-
-            protected override void LoadComplete()
-            {
-                keyBindingContainer = maniaInputManager?.KeyBindingContainer;
-            }
-
-            protected override bool OnTouchDown(TouchDownEvent e)
-            {
-                keyBindingContainer?.TriggerPressed(column.Action.Value);
-                return true;
-            }
-
-            protected override void OnTouchUp(TouchUpEvent e)
-            {
-                keyBindingContainer?.TriggerReleased(column.Action.Value);
-            }
+            // Extend input coverage to the gaps close to this column.
+            var spacingInflation = new MarginPadding { Left = leftColumnSpacing, Right = rightColumnSpacing };
+            return DrawRectangle.Inflate(spacingInflation).Contains(ToLocalSpace(screenSpacePos));
         }
+
+        #region Touch Input
+
+        [Resolved]
+        private ManiaInputManager? maniaInputManager { get; set; }
+
+        private int touchActivationCount;
+
+        protected override bool OnTouchDown(TouchDownEvent e)
+        {
+            // if touch overlay is visible, disallow columns from handling touch directly.
+            if (touchOverlay.Value)
+                return false;
+
+            maniaInputManager?.KeyBindingContainer.TriggerPressed(Action.Value);
+            touchActivationCount++;
+            return true;
+        }
+
+        protected override void OnTouchUp(TouchUpEvent e)
+        {
+            touchActivationCount--;
+
+            if (touchActivationCount == 0)
+                maniaInputManager?.KeyBindingContainer.TriggerReleased(Action.Value);
+        }
+
+        #endregion
     }
 }

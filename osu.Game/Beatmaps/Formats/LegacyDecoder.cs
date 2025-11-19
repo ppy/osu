@@ -16,8 +16,18 @@ namespace osu.Game.Beatmaps.Formats
     public abstract class LegacyDecoder<T> : Decoder<T>
         where T : new()
     {
+        // If this is updated, a new release of `osu-server-beatmap-submission` is required with updated packages.
+        // See usage at https://github.com/ppy/osu-server-beatmap-submission/blob/master/osu.Server.BeatmapSubmission/Services/BeatmapPackageParser.cs#L96-L97.
         public const int LATEST_VERSION = 14;
 
+        public const int MAX_COMBO_COLOUR_COUNT = 8;
+
+        /// <summary>
+        /// The .osu format (beatmap) version.
+        ///
+        /// osu!stable's versions end at <see cref="LATEST_VERSION"/>.
+        /// osu!lazer's versions starts at <see cref="LegacyBeatmapEncoder.FIRST_LAZER_VERSION"/>.
+        /// </summary>
         protected readonly int FormatVersion;
 
         protected LegacyDecoder(int version)
@@ -93,14 +103,8 @@ namespace osu.Game.Beatmaps.Formats
             return line;
         }
 
-        protected void HandleColours<TModel>(TModel output, string line, bool allowAlpha)
+        private Color4 convertSettingStringToColor4(string[] split, bool allowAlpha, KeyValuePair<string, string> pair)
         {
-            var pair = SplitKeyVal(line);
-
-            bool isCombo = pair.Key.StartsWith(@"Combo", StringComparison.Ordinal);
-
-            string[] split = pair.Value.Split(',');
-
             if (split.Length != 3 && split.Length != 4)
                 throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B or R,G,B,A): {pair.Value}");
 
@@ -115,6 +119,20 @@ namespace osu.Game.Beatmaps.Formats
             {
                 throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
             }
+
+            return colour;
+        }
+
+        protected void HandleColours<TModel>(TModel output, string line, bool allowAlpha)
+        {
+            var pair = SplitKeyVal(line);
+
+            string[] split = pair.Value.Split(',');
+            Color4 colour = convertSettingStringToColor4(split, allowAlpha, pair);
+
+            bool isCombo = pair.Key.StartsWith(@"Combo", StringComparison.Ordinal)
+                           && int.TryParse(pair.Key[5..], out int comboIndex)
+                           && comboIndex >= 1 && comboIndex <= MAX_COMBO_COLOUR_COUNT;
 
             if (isCombo)
             {

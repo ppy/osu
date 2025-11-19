@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -15,19 +13,27 @@ using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public partial class PlaylistsPlayer : RoomSubmittingPlayer
     {
-        public Action Exited;
+        public Action? Exited;
+
+        [Cached(typeof(IGameplayLeaderboardProvider))]
+        private readonly PlaylistsGameplayLeaderboardProvider leaderboardProvider;
 
         protected override UserActivity InitialActivity => new UserActivity.InPlaylistGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
-        public PlaylistsPlayer(Room room, PlaylistItem playlistItem, PlayerConfiguration configuration = null)
-            : base(room, playlistItem, configuration)
+        public PlaylistsPlayer(Room room, PlaylistItem playlistItem)
+            : base(room, playlistItem, new PlayerConfiguration
+            {
+                ShowLeaderboard = true,
+            })
         {
+            leaderboardProvider = new PlaylistsGameplayLeaderboardProvider(room, playlistItem);
         }
 
         [BackgroundDependencyLoader]
@@ -43,6 +49,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             var requiredLocalMods = PlaylistItem.RequiredMods.Select(m => m.ToMod(GameplayState.Ruleset));
             if (!requiredLocalMods.All(m => Mods.Value.Any(m.Equals)))
                 throw new InvalidOperationException("Current Mods do not match PlaylistItem's RequiredMods");
+
+            LoadComponentAsync(leaderboardProvider, AddInternal);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -57,8 +65,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override ResultsScreen CreateResults(ScoreInfo score)
         {
-            Debug.Assert(Room.RoomID.Value != null);
-            return new PlaylistsResultsScreen(score, Room.RoomID.Value.Value, PlaylistItem, true);
+            Debug.Assert(Room.RoomID != null);
+            return new PlaylistItemScoreResultsScreen(score, Room.RoomID.Value, PlaylistItem)
+            {
+                AllowRetry = true,
+                IsLocalPlay = true,
+            };
         }
 
         protected override void Dispose(bool isDisposing)

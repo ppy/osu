@@ -19,6 +19,7 @@ using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online;
@@ -55,7 +56,6 @@ namespace osu.Game.Overlays
         private const int transition_length = 500;
         private const float top_bar_height = 40;
         private const float side_bar_width = 190;
-        private const float chat_bar_height = 60;
 
         protected override string PopInSampleName => @"UI/overlay-big-pop-in";
         protected override string PopOutSampleName => @"UI/overlay-big-pop-out";
@@ -136,16 +136,20 @@ namespace osu.Game.Overlays
                                     Padding = new MarginPadding
                                     {
                                         Left = side_bar_width,
-                                        Bottom = chat_bar_height,
+                                        Bottom = ChatTextBar.HEIGHT,
                                     },
                                     Children = new Drawable[]
                                     {
                                         new PopoverContainer
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Child = currentChannelContainer = new Container<DrawableChannel>
+                                            Child = new OsuContextMenuContainer
                                             {
                                                 RelativeSizeAxes = Axes.Both,
+                                                Child = currentChannelContainer = new Container<DrawableChannel>
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                }
                                             }
                                         },
                                         loading = new LoadingLayer(true),
@@ -229,7 +233,8 @@ namespace osu.Game.Overlays
                     return true;
 
                 case PlatformAction.DocumentClose:
-                    channelManager.LeaveChannel(currentChannel.Value);
+                    if (currentChannel.Value?.Type != ChannelType.Team)
+                        channelManager.LeaveChannel(currentChannel.Value);
                     return true;
 
                 case PlatformAction.TabRestore:
@@ -387,10 +392,8 @@ namespace osu.Game.Overlays
                     {
                         channelList.RemoveChannel(channel);
 
-                        if (loadedChannels.ContainsKey(channel))
+                        if (loadedChannels.Remove(channel, out var loaded))
                         {
-                            DrawableChannel loaded = loadedChannels[channel];
-                            loadedChannels.Remove(channel);
                             // DrawableChannel removed from cache must be manually disposed
                             loaded.Dispose();
                         }

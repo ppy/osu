@@ -99,6 +99,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 Scheduler.AddDelayed(applyMiss, 500 + 30);
             });
+            AddUntilStep("wait for sequence", () => !Scheduler.HasPendingTasks);
         }
 
         [Test]
@@ -120,6 +121,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     }
                 }
             });
+            AddUntilStep("wait for sequence", () => !Scheduler.HasPendingTasks);
         }
 
         [Test]

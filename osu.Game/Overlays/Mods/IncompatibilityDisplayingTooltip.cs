@@ -24,13 +24,15 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private Bindable<RulesetInfo> ruleset { get; set; } = null!;
 
-        public IncompatibilityDisplayingTooltip()
+        public IncompatibilityDisplayingTooltip(OverlayColourProvider colourProvider)
+            : base(colourProvider)
         {
             AddRange(new Drawable[]
             {
                 incompatibleText = new OsuSpriteText
                 {
                     Margin = new MarginPadding { Top = 5 },
+                    Colour = colourProvider.Content2,
                     Font = OsuFont.GetFont(weight: FontWeight.Regular),
                     Text = "Incompatible with:"
                 },
@@ -41,12 +43,6 @@ namespace osu.Game.Overlays.Mods
                     Scale = new Vector2(0.7f)
                 }
             });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            incompatibleText.Colour = colours.BlueLight;
         }
 
         protected override void UpdateDisplay(Mod mod)

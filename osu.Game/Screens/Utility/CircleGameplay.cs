@@ -201,8 +201,8 @@ namespace osu.Game.Screens.Utility
                 {
                     double preempt = (float)IBeatmapDifficultyInfo.DifficultyRange(SampleApproachRate.Value, 1800, 1200, 450);
 
-                    approach.Scale = new Vector2(1 + 4 * (float)MathHelper.Clamp((HitTime - Clock.CurrentTime) / preempt, 0, 100));
-                    Alpha = (float)MathHelper.Clamp((Clock.CurrentTime - HitTime + 600) / 400, 0, 1);
+                    approach.Scale = new Vector2(1 + 4 * (float)Math.Clamp((HitTime - Clock.CurrentTime) / preempt, 0, 100));
+                    Alpha = (float)Math.Clamp((Clock.CurrentTime - HitTime + 600) / 400, 0, 1);
 
                     if (Clock.CurrentTime > HitTime + duration)
                         Expire();
@@ -226,7 +226,7 @@ namespace osu.Game.Screens.Utility
 
                 HitEvent = new HitEvent(Clock.CurrentTime - HitTime, 1.0, HitResult.Good, new HitObject
                 {
-                    HitWindows = new HitWindows(),
+                    HitWindows = new DefaultHitWindows(),
                 }, null, null);
 
                 Hit?.Invoke(HitEvent.Value);

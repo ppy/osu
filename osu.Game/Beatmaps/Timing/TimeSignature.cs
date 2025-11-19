@@ -23,8 +23,7 @@ namespace osu.Game.Beatmaps.Timing
 
         public TimeSignature(int numerator)
         {
-            if (numerator < 1)
-                throw new ArgumentOutOfRangeException(nameof(numerator), numerator, "The numerator of a time signature must be positive.");
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(numerator);
 
             Numerator = numerator;
         }

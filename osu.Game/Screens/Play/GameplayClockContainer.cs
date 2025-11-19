@@ -39,6 +39,8 @@ namespace osu.Game.Screens.Play
         /// </remarks>
         public double StartTime { get; protected set; }
 
+        public double GameplayStartTime { get; protected set; }
+
         public IAdjustableAudioComponent AdjustmentsFromMods { get; } = new AudioAdjustments();
 
         private readonly BindableBool isPaused = new BindableBool(true);
@@ -122,8 +124,17 @@ namespace osu.Game.Screens.Play
             StopGameplayClock();
         }
 
-        protected virtual void StartGameplayClock() => GameplayClock.Start();
-        protected virtual void StopGameplayClock() => GameplayClock.Stop();
+        protected virtual void StartGameplayClock()
+        {
+            Logger.Log($"{nameof(GameplayClockContainer)} started via call to {nameof(StartGameplayClock)}");
+            GameplayClock.Start();
+        }
+
+        protected virtual void StopGameplayClock()
+        {
+            Logger.Log($"{nameof(GameplayClockContainer)} stopped via call to {nameof(StopGameplayClock)}");
+            GameplayClock.Stop();
+        }
 
         /// <summary>
         /// Resets this <see cref="GameplayClockContainer"/> and the source to an initial state ready for gameplay.

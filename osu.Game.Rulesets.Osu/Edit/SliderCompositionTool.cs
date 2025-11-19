@@ -10,15 +10,22 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class SliderCompositionTool : HitObjectCompositionTool
+    public class SliderCompositionTool : CompositionTool
     {
         public SliderCompositionTool()
             : base(nameof(Slider))
         {
+            TooltipText = """
+                Left click for new point.
+                Left click twice or S key for new segment.
+                Tab, Shift-Tab, or Alt-1~4 to change current segment type.
+                Right click to finish.
+                Click and drag for drawing mode.
+                """;
         }
 
         public override Drawable CreateIcon() => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders);
 
-        public override PlacementBlueprint CreatePlacementBlueprint() => new SliderPlacementBlueprint();
+        public override HitObjectPlacementBlueprint CreatePlacementBlueprint() => new SliderPlacementBlueprint();
     }
 }
