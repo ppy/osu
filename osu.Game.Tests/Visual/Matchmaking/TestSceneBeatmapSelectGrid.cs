@@ -160,7 +160,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
                 grid.PlayRollAnimation(finalItem, duration: 0);
 
-                Scheduler.AddDelayed(() => grid.PresentRolledBeatmap(finalItem, MatchmakingCandidateType.UserSelection), 500);
+                Scheduler.AddDelayed(() => grid.PresentRolledBeatmap(finalItem, finalItem, MatchmakingCandidateType.UserSelection), 500);
             });
         }
 
@@ -175,7 +175,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
                 grid.PlayRollAnimation(finalItem, duration: 0);
 
-                Scheduler.AddDelayed(() => grid.PresentUnanimouslyChosenBeatmap(finalItem, MatchmakingCandidateType.UserSelection), 500);
+                Scheduler.AddDelayed(() => grid.PresentUnanimouslyChosenBeatmap(finalItem, finalItem, MatchmakingCandidateType.UserSelection), 500);
             });
         }
 
@@ -192,7 +192,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
                 Scheduler.AddDelayed(() =>
                 {
-                    grid.PresentRolledBeatmap(finalItem, MatchmakingCandidateType.Random);
+                    grid.PresentRolledBeatmap(-1, finalItem, MatchmakingCandidateType.Random);
                 }, 500);
             });
         }
