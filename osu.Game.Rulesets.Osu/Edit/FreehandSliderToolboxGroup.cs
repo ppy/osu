@@ -68,15 +68,18 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 toleranceSlider = new ExpandableSlider<int>
                 {
-                    Current = displayTolerance
+                    Current = displayTolerance,
+                    ExpandedLabelText = "Control point spacing",
                 },
                 cornerThresholdSlider = new ExpandableSlider<int>
                 {
-                    Current = displayCornerThreshold
+                    Current = displayCornerThreshold,
+                    ExpandedLabelText = "Corner bias",
                 },
                 circleThresholdSlider = new ExpandableSlider<int>
                 {
-                    Current = displayCircleThreshold
+                    Current = displayCircleThreshold,
+                    ExpandedLabelText = "Perfect curve bias"
                 }
             };
         }
@@ -88,24 +91,18 @@ namespace osu.Game.Rulesets.Osu.Edit
             displayTolerance.BindValueChanged(tolerance =>
             {
                 toleranceSlider.ContractedLabelText = $"C. P. S.: {tolerance.NewValue:N0}";
-                toleranceSlider.ExpandedLabelText = $"Control Point Spacing: {tolerance.NewValue:N0}";
-
                 Tolerance.Value = displayToInternalTolerance(tolerance.NewValue);
             }, true);
 
             displayCornerThreshold.BindValueChanged(threshold =>
             {
-                cornerThresholdSlider.ContractedLabelText = $"C. T.: {threshold.NewValue:N0}";
-                cornerThresholdSlider.ExpandedLabelText = $"Corner Threshold: {threshold.NewValue:N0}";
-
+                cornerThresholdSlider.ContractedLabelText = $"C. B.: {threshold.NewValue:N0}";
                 CornerThreshold.Value = displayToInternalCornerThreshold(threshold.NewValue);
             }, true);
 
             displayCircleThreshold.BindValueChanged(threshold =>
             {
-                circleThresholdSlider.ContractedLabelText = $"P. C. T.: {threshold.NewValue:N0}";
-                circleThresholdSlider.ExpandedLabelText = $"Perfect Curve Threshold: {threshold.NewValue:N0}";
-
+                circleThresholdSlider.ContractedLabelText = $"P. C. B.: {threshold.NewValue:N0}";
                 CircleThreshold.Value = displayToInternalCircleThreshold(threshold.NewValue);
             }, true);
 

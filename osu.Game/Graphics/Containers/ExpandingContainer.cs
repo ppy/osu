@@ -4,7 +4,7 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
+using osu.Framework.Input;
 using osu.Framework.Threading;
 
 namespace osu.Game.Graphics.Containers
@@ -58,6 +58,8 @@ namespace osu.Game.Graphics.Containers
 
         protected virtual OsuScrollContainer CreateScrollContainer() => new OsuScrollContainer();
 
+        private InputManager inputManager = null!;
+        private bool? lastMouseInBounds;
         private ScheduledDelegate? hoverExpandEvent;
 
         protected override void LoadComplete()
@@ -68,37 +70,35 @@ namespace osu.Game.Graphics.Containers
             {
                 this.ResizeWidthTo(v.NewValue ? expandedWidth : contractedWidth, TRANSITION_DURATION, Easing.OutQuint);
             }, true);
+
+            inputManager = GetContainingInputManager()!;
         }
 
-        protected override bool OnHover(HoverEvent e)
+        protected override void Update()
         {
-            updateHoverExpansion();
-            return true;
+            base.Update();
+
+            bool mouseInBounds = Contains(inputManager.CurrentState.Mouse.Position);
+
+            if (lastMouseInBounds != mouseInBounds)
+                updateExpansionState(mouseInBounds);
+
+            lastMouseInBounds = mouseInBounds;
         }
 
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            if (hoverExpandEvent != null)
-            {
-                hoverExpandEvent?.Cancel();
-                hoverExpandEvent = null;
-
-                Expanded.Value = false;
-                return;
-            }
-
-            base.OnHoverLost(e);
-        }
-
-        private void updateHoverExpansion()
+        private void updateExpansionState(bool mouseInBounds)
         {
             if (!ExpandOnHover)
                 return;
 
             hoverExpandEvent?.Cancel();
+            hoverExpandEvent = null;
 
-            if (IsHovered && !Expanded.Value)
+            if (mouseInBounds && !Expanded.Value)
                 hoverExpandEvent = Scheduler.AddDelayed(() => Expanded.Value = true, HoverExpansionDelay);
+
+            if (!mouseInBounds && Expanded.Value)
+                Expanded.Value = false;
         }
     }
 }

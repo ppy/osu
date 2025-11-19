@@ -127,21 +127,25 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     Current = StartPositionX,
                     KeyboardStep = 1,
+                    ExpandedLabelText = "X offset",
                 },
                 startPositionYSlider = new ExpandableSlider<float>
                 {
                     Current = StartPositionY,
                     KeyboardStep = 1,
+                    ExpandedLabelText = "Y offset",
                 },
                 spacingSlider = new ExpandableSlider<float>
                 {
                     Current = Spacing,
                     KeyboardStep = 1,
+                    ExpandedLabelText = "Spacing",
                 },
                 gridLinesRotationSlider = new ExpandableSlider<float>
                 {
                     Current = GridLinesRotation,
                     KeyboardStep = 1,
+                    ExpandedLabelText = "Rotation",
                 },
                 new FillFlowContainer
                 {
@@ -182,14 +186,12 @@ namespace osu.Game.Rulesets.Osu.Edit
             StartPositionX.BindValueChanged(x =>
             {
                 startPositionXSlider.ContractedLabelText = $"X: {x.NewValue:#,0.##}";
-                startPositionXSlider.ExpandedLabelText = $"X Offset: {x.NewValue:#,0.##}";
                 StartPosition.Value = new Vector2(x.NewValue, StartPosition.Value.Y);
             }, true);
 
             StartPositionY.BindValueChanged(y =>
             {
                 startPositionYSlider.ContractedLabelText = $"Y: {y.NewValue:#,0.##}";
-                startPositionYSlider.ExpandedLabelText = $"Y Offset: {y.NewValue:#,0.##}";
                 StartPosition.Value = new Vector2(StartPosition.Value.X, y.NewValue);
             }, true);
 
@@ -202,7 +204,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             Spacing.BindValueChanged(spacing =>
             {
                 spacingSlider.ContractedLabelText = $"S: {spacing.NewValue:#,0.##}";
-                spacingSlider.ExpandedLabelText = $"Spacing: {spacing.NewValue:#,0.##}";
                 SpacingVector.Value = new Vector2(spacing.NewValue);
                 editorBeatmap.GridSize = (int)spacing.NewValue;
             }, true);
@@ -210,7 +211,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             GridLinesRotation.BindValueChanged(rotation =>
             {
                 gridLinesRotationSlider.ContractedLabelText = $"R: {rotation.NewValue:#,0.##}";
-                gridLinesRotationSlider.ExpandedLabelText = $"Rotation: {rotation.NewValue:#,0.##}";
             }, true);
 
             GridType.BindValueChanged(v =>
