@@ -5,8 +5,10 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -60,6 +62,9 @@ namespace osu.Game.Rulesets.Osu.Edit
         private ExpandableSlider<int> toleranceSlider = null!;
         private ExpandableSlider<int> cornerThresholdSlider = null!;
         private ExpandableSlider<int> circleThresholdSlider = null!;
+
+        [Resolved]
+        private IExpandingContainer? expandingContainer { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -115,6 +120,11 @@ namespace osu.Game.Rulesets.Osu.Edit
             CircleThreshold.BindValueChanged(threshold =>
                 displayCircleThreshold.Value = internalToDisplayCircleThreshold(threshold.NewValue)
             );
+
+            expandingContainer?.Expanded.BindValueChanged(v =>
+            {
+                Spacing = v.NewValue ? new Vector2(5) : new Vector2(15);
+            }, true);
 
             float displayToInternalTolerance(float v) => v / 50f;
             int internalToDisplayTolerance(float v) => (int)Math.Round(v * 50f);

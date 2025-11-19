@@ -25,6 +25,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
+using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -74,6 +75,7 @@ namespace osu.Game.Rulesets.Edit
             toolboxContainer.Add(toolboxGroup = new EditorToolboxGroup("snapping")
             {
                 Name = "snapping",
+                Spacing = new Vector2(5),
                 Alpha = DistanceSpacingMultiplier.Disabled ? 0 : 1,
                 Children = new Drawable[]
                 {
@@ -104,6 +106,7 @@ namespace osu.Game.Rulesets.Edit
             DistanceSpacingMultiplier.BindValueChanged(multiplier =>
             {
                 distanceSpacingSlider.ContractedLabelText = $"D. S. ({multiplier.NewValue:0.##x})";
+                distanceSpacingSlider.Current.Value = multiplier.NewValue;
 
                 if (multiplier.NewValue != multiplier.OldValue)
                     onScreenDisplay?.Display(new DistanceSpacingToast(multiplier.NewValue.ToLocalisableString(@"0.##x"), multiplier));
