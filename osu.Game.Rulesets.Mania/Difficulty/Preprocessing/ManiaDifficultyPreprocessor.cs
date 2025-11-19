@@ -19,9 +19,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
     /// </summary>
     public class ManiaDifficultyPreprocessor
     {
-        private const double hit_leniency_base = 0.33;
-        private const double hit_leniency_multiplier = 3.10;
-        private const double hit_leniency_od_base = 56.59;
+        private const double hit_leniency_base = 0.3;
+        private const double hit_leniency_multiplier = 3.0;
+        private const double hit_leniency_od_base = 64.5;
 
         /// <summary>
         /// Entry point for the preprocessing pipeline.
@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 
             CornerPreprocessor.ProcessAndAssign(data);
             LongNoteDensityPreprocessor.ProcessAndAssign(data);
+
+            data.SharedKeyUsage = CrossColumnPreprocessor.ComputeKeyUsage(data);
 
             data.SameColumnPressure = SameColumnPreprocessor.ComputeValues(data);
             data.CrossColumnPressure = CrossColumnPreprocessor.ComputeValues(data);
@@ -143,7 +145,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             Array.Sort(noteHitTimes);
 
             // Get key usage patterns from cross-column preprocessor
-            bool[][] keyUsagePatterns = CrossColumnPreprocessor.ComputeKeyUsage(data);
+            bool[][] keyUsagePatterns = data.SharedKeyUsage ?? CrossColumnPreprocessor.ComputeKeyUsage(data);
             int timePointCount = data.CornerData.BaseTimeCorners.Length;
 
             double[] localNoteCountBase = new double[timePointCount];

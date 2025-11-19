@@ -12,9 +12,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
     public class SameColumnPreprocessor
     {
         private const int smoothing_window_ms = 500;
-        private const double jack_nerf_coefficient = 0.47;
-        private const double jack_nerf_base = 18.45;
-        private const double jack_nerf_power = -33.91;
+        private const double jack_nerf_coefficient = 7e-5;
+        private const double jack_nerf_base = 0.15;
+        private const double jack_nerf_power = -4;
 
         /// <summary>
         /// Computes the same-column pressure values across all time points.

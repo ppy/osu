@@ -12,9 +12,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         private const int key_usage_window_ms = 400;
         private const int smoothing_window_ms = 500;
 
-        private const double stream_boost_min_ratio = 172.41;
-        private const double stream_boost_max_ratio = 370.55;
-        private const double stream_boost_coefficient = 4.89E-8;
+        private const double stream_boost_min_ratio = 160.0;
+        private const double stream_boost_max_ratio = 360.0;
+        private const double stream_boost_coefficient = 1.7E-7;
 
         /// <summary>
         /// Computes the pressing intensity values across all-time points.
@@ -58,35 +58,37 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
             for (int column = 0; column < data.KeyCount; column++)
                 keyUsage[column] = new double[timePoints];
 
+            double[] baseTimeCorners = data.CornerData.BaseTimeCorners;
+
+            // Trackers for progressive scanning
+            int leftWindowIndex = 0;
+            int leftIndex = 0;
+            int rightIndex = 0;
+            int rightWindowIndex = 0;
+
             for (int noteIndex = 0; noteIndex < data.AllNotes.Count; noteIndex++)
             {
                 var note = data.AllNotes[noteIndex];
                 int noteStartTime = (int)Math.Round(note.StartTime);
                 int noteEndTime = (int)Math.Round(note.EndTime);
 
-                int leftWindow400Index = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners,
-                    noteStartTime - key_usage_window_ms);
-                int leftIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, noteStartTime);
-                int rightIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, noteEndTime);
-                int rightWindow400Index = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners,
-                    noteEndTime + key_usage_window_ms);
+                // Progressive Scan: Advance from current position
+                leftWindowIndex = StrainArrayUtils.FindLeftBoundProgressive(baseTimeCorners, ref leftWindowIndex, noteStartTime - key_usage_window_ms);
+                leftIndex = StrainArrayUtils.FindLeftBoundProgressive(baseTimeCorners, ref leftIndex, noteStartTime);
+                rightIndex = StrainArrayUtils.FindLeftBoundProgressive(baseTimeCorners, ref rightIndex, noteEndTime);
+                rightWindowIndex = StrainArrayUtils.FindLeftBoundProgressive(baseTimeCorners, ref rightWindowIndex, noteEndTime + key_usage_window_ms);
 
-                // Base usage value depends on note duration
                 double baseUsage = 3.75 + Math.Min(noteEndTime - noteStartTime, 1500) / 150.0;
-
                 int column = note.Column;
                 if (column < 0 || column >= data.KeyCount) continue;
 
                 double[] columnUsage = keyUsage[column];
-
                 applyFullUsage(columnUsage, leftIndex, rightIndex, timePoints, baseUsage);
 
-                // Gradual falloff in the windows before and after the note
                 const double window_denominator = key_usage_window_ms * key_usage_window_ms;
-
-                applyWindowUsage(columnUsage, data.CornerData.BaseTimeCorners, leftWindow400Index, leftIndex,
+                applyWindowUsage(columnUsage, baseTimeCorners, leftWindowIndex, leftIndex,
                     noteStartTime, baseUsage, window_denominator, timePoints);
-                applyWindowUsage(columnUsage, data.CornerData.BaseTimeCorners, rightIndex, rightWindow400Index,
+                applyWindowUsage(columnUsage, baseTimeCorners, rightIndex, rightWindowIndex,
                     noteEndTime, baseUsage, window_denominator, timePoints);
             }
 

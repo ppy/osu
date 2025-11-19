@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
 
             double[] crossColumnPressure = new double[timePointCount];
             double[] crossHandCoefficients = getCrossHandCoefficients(data.KeyCount);
-            bool[][] keyUsageByTime = ComputeKeyUsage(data);
+            bool[][] keyUsageByTime = data.SharedKeyUsage ?? ComputeKeyUsage(data);
             double[] baseTimeCorners = data.CornerData.BaseTimeCorners;
 
             // Create a lookup table for which keys are active at each time point

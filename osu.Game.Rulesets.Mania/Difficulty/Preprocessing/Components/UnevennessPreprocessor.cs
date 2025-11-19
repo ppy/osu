@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
 {
     public class UnevennessPreprocessor
     {
-        private const int accuracy_smoothing_window_ms = 400;
+        private const int accuracy_smoothing_window_ms = 250;
 
         /// <summary>
         /// Computes the unevenness values across all-time points.
@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         /// </summary>
         public static double[] ComputeValues(ManiaDifficultyContext data)
         {
-            bool[][] keyUsagePatterns = CrossColumnPreprocessor.ComputeKeyUsage(data);
+            bool[][] keyUsagePatterns = data.SharedKeyUsage ?? CrossColumnPreprocessor.ComputeKeyUsage(data);
             double[][] timingDeltasByColumn = computeTimingDeltasByColumn(data);
 
             double[] baseUnevenness = calculateBaseUnevenness(data, keyUsagePatterns, timingDeltasByColumn);
