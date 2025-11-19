@@ -46,6 +46,12 @@ namespace osu.Game.Overlays
 
         public BindableBool Expanded { get; } = new BindableBool(true);
 
+        public Vector2 Spacing
+        {
+            get => content.Spacing;
+            set => content.Spacing = value;
+        }
+
         private OsuSpriteText headerText = null!;
 
         private Container headerContent = null!;
