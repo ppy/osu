@@ -58,26 +58,49 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
+        private LocalisableString caption;
+
         /// <summary>
         /// Caption describing this slider bar, displayed on top of the controls.
         /// </summary>
-        public LocalisableString Caption { get; init; }
+        public LocalisableString Caption
+        {
+            get => caption;
+            set
+            {
+                caption = value;
+
+                if (IsLoaded)
+                    captionText.Caption = value;
+            }
+        }
 
         /// <summary>
         /// Hint text containing an extended description of this slider bar, displayed in a tooltip when hovering the caption.
         /// </summary>
         public LocalisableString HintText { get; init; }
 
+        private float keyboardStep;
+
         /// <summary>
         /// A custom step value for each key press which actuates a change on this control.
         /// </summary>
-        public float KeyboardStep { get; init; }
+        public float KeyboardStep
+        {
+            get => keyboardStep;
+            set
+            {
+                keyboardStep = value;
+                if (IsLoaded)
+                    slider.KeyboardStep = value;
+            }
+        }
 
         private Box background = null!;
         private Box flashLayer = null!;
         private FormTextBox.InnerTextBox textBox = null!;
         private InnerSlider slider = null!;
-        private FormFieldCaption caption = null!;
+        private FormFieldCaption captionText = null!;
         private IFocusManager focusManager = null!;
 
         [Resolved]
@@ -117,11 +140,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     },
                     Children = new Drawable[]
                     {
-                        caption = new FormFieldCaption
+                        captionText = new FormFieldCaption
                         {
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft,
-                            Caption = Caption,
                             TooltipText = HintText,
                         },
                         textBox = new FormNumberBox.InnerNumberBox(allowDecimals: true)
@@ -145,7 +167,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             Origin = Anchor.CentreRight,
                             RelativeSizeAxes = Axes.X,
                             Width = 0.5f,
-                            KeyboardStep = KeyboardStep,
                             Current = currentNumberInstantaneous,
                             OnCommit = () => current.Value = currentNumberInstantaneous.Value,
                         }
@@ -160,6 +181,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            slider.KeyboardStep = keyboardStep;
+            captionText.Caption = caption;
 
             focusManager = GetContainingFocusManager()!;
 
@@ -270,7 +294,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             textBox.Alpha = 1;
 
             background.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background4 : colourProvider.Background5;
-            caption.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
+            captionText.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
             textBox.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
 
             BorderThickness = childHasFocus || IsHovered || slider.IsDragging.Value ? 2 : 0;

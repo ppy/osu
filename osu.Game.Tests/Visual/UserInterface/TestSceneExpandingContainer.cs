@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Settings.Sections;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -19,7 +18,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private TestExpandingContainer container;
         private SettingsToolboxGroup toolboxGroup;
 
-        private ExpandableSlider<float, SizeSlider<float>> slider1;
+        private ExpandableSlider<float> slider1;
         private ExpandableSlider<double> slider2;
 
         [SetUp]
@@ -36,7 +35,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Width = 1,
                     Children = new Drawable[]
                     {
-                        slider1 = new ExpandableSlider<float, SizeSlider<float>>
+                        slider1 = new ExpandableSlider<float>
                         {
                             Current = new BindableFloat
                             {
@@ -62,13 +61,13 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             slider1.Current.BindValueChanged(v =>
             {
-                slider1.ExpandedLabelText = $"Slider One ({v.NewValue:0.##x})";
+                slider1.ExpandedLabelText = "Slider One";
                 slider1.ContractedLabelText = $"S. 1. ({v.NewValue:0.##x})";
             }, true);
 
             slider2.Current.BindValueChanged(v =>
             {
-                slider2.ExpandedLabelText = $"Slider Two ({v.NewValue:N2})";
+                slider2.ExpandedLabelText = "Slider Two";
                 slider2.ContractedLabelText = $"S. 2. ({v.NewValue:N2})";
             }, true);
         });
