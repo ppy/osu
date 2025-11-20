@@ -139,8 +139,8 @@ namespace osu.Desktop
                     host.Run(new TournamentGame());
                 else
                 {
-                    // If we're on windows, attempt to use the NVAPI Low Latency Provider
-                    if (OperatingSystem.IsWindows())
+                    // Attempt to use the NVAPI Low Latency Provider. This should only succeed on systems with NVIDIA GPUs and the proper drivers installed.
+                    if (NVAPI.Available)
                         host.SetLowLatencyProvider(new NVAPILowLatencyProvider());
 
                     host.Run(new OsuGameDesktop(args)
