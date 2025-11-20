@@ -15,7 +15,7 @@ namespace osu.Desktop.LowLatency
     /// </summary>
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     [SupportedOSPlatform("windows")]
-    internal sealed class NVAPILowLatencyProvider : ILowLatencyProvider
+    internal sealed class NVAPIDirect3D11LowLatencyProvider : IDirect3D11LowLatencyProvider
     {
         public bool IsAvailable { get; private set; }
 

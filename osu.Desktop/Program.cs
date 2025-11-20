@@ -141,7 +141,7 @@ namespace osu.Desktop
                 {
                     // Attempt to use the NVAPI Low Latency Provider. This should only succeed on systems with NVIDIA GPUs and the proper drivers installed.
                     if (NVAPI.Available)
-                        host.SetLowLatencyProvider(new NVAPILowLatencyProvider());
+                        host.SetLowLatencyProvider(new NVAPIDirect3D11LowLatencyProvider());
 
                     host.Run(new OsuGameDesktop(args)
                     {
