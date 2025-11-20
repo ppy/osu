@@ -4,6 +4,7 @@
 #nullable disable
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
@@ -20,6 +21,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private ExpandableSlider<float> slider1;
         private ExpandableSlider<double> slider2;
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         [SetUp]
         public void SetUp() => Schedule(() =>
