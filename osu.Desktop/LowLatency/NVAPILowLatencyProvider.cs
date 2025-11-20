@@ -25,6 +25,9 @@ namespace osu.Desktop.LowLatency
         {
             _deviceHandle = nativeDeviceHandle;
             IsAvailable = NVAPI.Available && _deviceHandle != IntPtr.Zero;
+
+            if (!IsAvailable)
+                throw new InvalidOperationException("NVAPI is not available or the provided device handle is invalid.");
         }
 
         public void SetMode(LatencyMode mode)
@@ -36,7 +39,8 @@ namespace osu.Desktop.LowLatency
             bool boost = mode == LatencyMode.Boost;
             var status = NVAPI.SetSleepModeHelper(_deviceHandle, enable, boost, boost, 0);
 
-            Console.WriteLine("NVAPI SetSleepMode status: " + status);
+            if (status != NvStatus.OK)
+                throw new InvalidOperationException($"Failed to set NVAPI low latency (Sleep) mode: {status}");
         }
 
         public void SetMarker(LatencyMarker marker, ulong frameId)
@@ -45,6 +49,9 @@ namespace osu.Desktop.LowLatency
                 return;
 
             var status = NVAPI.SetLatencyMarkerHelper(_deviceHandle, (uint)marker, frameId);
+
+            if (status != NvStatus.OK)
+                throw new InvalidOperationException($"Failed to set NVAPI latency marker: {status}");
         }
 
         public void FrameSleep()
@@ -53,6 +60,9 @@ namespace osu.Desktop.LowLatency
                 return;
 
             var status = NVAPI.FrameSleepHelper(_deviceHandle);
+
+            if (status != NvStatus.OK)
+                throw new InvalidOperationException($"Failed to perform NVAPI frame sleep: {status}");
         }
     }
 }
