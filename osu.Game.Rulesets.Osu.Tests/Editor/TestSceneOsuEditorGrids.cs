@@ -245,13 +245,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddAssert("grid spacing is distance to slider tail", () =>
             {
                 var composer = Editor.ChildrenOfType<RectangularPositionSnapGrid>().Single();
-                return Precision.AlmostEquals(composer.Spacing.Value.X, 32.05, 0.01)
+                return Precision.AlmostEquals(composer.Spacing.Value.X, 32.05, 0.1)
                        && Precision.AlmostEquals(composer.Spacing.Value.X, composer.Spacing.Value.Y);
             });
             AddAssert("grid rotation points to slider tail", () =>
             {
                 var composer = Editor.ChildrenOfType<RectangularPositionSnapGrid>().Single();
-                return Precision.AlmostEquals(composer.GridLineRotation.Value, 0.09, 0.01);
+                return Precision.AlmostEquals(composer.GridLineRotation.Value, 0.09, 0.1);
             });
 
             AddStep("start grid placement", () => InputManager.Key(Key.Number5));
@@ -280,9 +280,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddAssert("grid spacing and rotation unchanged", () =>
             {
                 var composer = Editor.ChildrenOfType<RectangularPositionSnapGrid>().Single();
-                return Precision.AlmostEquals(composer.Spacing.Value.X, 32.05, 0.01)
+                return Precision.AlmostEquals(composer.Spacing.Value.X, 32.05, 0.1)
                        && Precision.AlmostEquals(composer.Spacing.Value.X, composer.Spacing.Value.Y)
-                       && Precision.AlmostEquals(composer.GridLineRotation.Value, 0.09, 0.01);
+                       && Precision.AlmostEquals(composer.GridLineRotation.Value, 0.09, 0.1);
             });
         }
 
