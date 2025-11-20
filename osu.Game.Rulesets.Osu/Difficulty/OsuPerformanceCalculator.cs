@@ -345,7 +345,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
                 // In classic scores we can't know the amount of dropped sliders so we estimate it
-                double fullComboThreshold = attributes.MaxCombo - likelyMissedSliderendPortion * attributes.SliderCount;
+                double fullComboThreshold = attributes.MaxCombo - Math.Min(5 + likelyMissedSliderendPortion * attributes.SliderCount, attributes.SliderCount);
 
                 if (scoreMaxCombo < fullComboThreshold)
                     missCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
