@@ -207,7 +207,8 @@ namespace osu.Game.Overlays
                                     Height = progress_height / 2,
                                     FillColour = colours.Yellow,
                                     BackgroundColour = colours.YellowDarker.Opacity(0.5f),
-                                    OnSeek = musicController.SeekTo
+                                    OnSeek = onSeek,
+                                    OnCommit = onCommit,
                                 }
                             },
                         },
@@ -219,6 +220,23 @@ namespace osu.Game.Overlays
                     }
                 },
             };
+        }
+
+        private double? lastSeekTime;
+
+        private void onSeek(double progress)
+        {
+            if (lastSeekTime == null || Time.Current - lastSeekTime > 500)
+            {
+                musicController.SeekTo(progress);
+                lastSeekTime = Time.Current;
+            }
+        }
+
+        private void onCommit(double progress)
+        {
+            musicController.SeekTo(progress);
+            lastSeekTime = null;
         }
 
         private void togglePlaylist()
