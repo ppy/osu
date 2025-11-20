@@ -13,7 +13,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect;
@@ -131,7 +130,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
             {
                 var (candidateItems, finalItem) = pickRandomItems(5);
 
-                grid.RollAndDisplayFinalBeatmap(candidateItems, finalItem, MatchmakingCandidateType.UserSelection);
+                grid.RollAndDisplayFinalBeatmap(candidateItems, finalItem, finalItem);
             });
         }
 
@@ -160,7 +159,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
                 grid.PlayRollAnimation(finalItem, duration: 0);
 
-                Scheduler.AddDelayed(() => grid.PresentRolledBeatmap(finalItem, finalItem, MatchmakingCandidateType.UserSelection), 500);
+                Scheduler.AddDelayed(() => grid.PresentRolledBeatmap(finalItem, finalItem), 500);
             });
         }
 
@@ -175,7 +174,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
                 grid.PlayRollAnimation(finalItem, duration: 0);
 
-                Scheduler.AddDelayed(() => grid.PresentUnanimouslyChosenBeatmap(finalItem, finalItem, MatchmakingCandidateType.UserSelection), 500);
+                Scheduler.AddDelayed(() => grid.PresentUnanimouslyChosenBeatmap(finalItem, finalItem), 500);
             });
         }
 
@@ -192,7 +191,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
                 Scheduler.AddDelayed(() =>
                 {
-                    grid.PresentRolledBeatmap(-1, finalItem, MatchmakingCandidateType.Random);
+                    grid.PresentRolledBeatmap(-1, finalItem);
                 }, 500);
             });
         }

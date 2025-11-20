@@ -46,7 +46,7 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
         public MatchmakingUserList Users { get; set; } = new MatchmakingUserList();
 
         [Key(5)]
-        public MatchmakingCandidateType CandidateType { get; set; }
+        public long FinalItem { get; set; }
 
         /// <summary>
         /// Advances to the next round.
