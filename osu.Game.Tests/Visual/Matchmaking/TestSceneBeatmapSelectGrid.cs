@@ -17,12 +17,11 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect;
-using osu.Game.Tests.Visual.OnlinePlay;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
-    public partial class TestSceneBeatmapSelectGrid : OnlinePlayTestScene
+    public partial class TestSceneBeatmapSelectGrid : MatchmakingTestScene
     {
         private MatchmakingPlaylistItem[] items = null!;
 
