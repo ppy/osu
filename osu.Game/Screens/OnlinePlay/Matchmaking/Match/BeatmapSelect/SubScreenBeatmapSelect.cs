@@ -13,7 +13,6 @@ using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -135,8 +134,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             beatmapSelectGrid.SetUserSelection(user, itemId, false);
         }
 
-        public void RollFinalBeatmap(long[] candidateItems, long finalItem, MatchmakingCandidateType panelType) =>
-            beatmapSelectGrid.RollAndDisplayFinalBeatmap(candidateItems, finalItem, panelType);
+        public void RollFinalBeatmap(long[] candidateItems, long candidateItem, long finalItem) =>
+            beatmapSelectGrid.RollAndDisplayFinalBeatmap(candidateItems, candidateItem, finalItem);
 
         protected override void Dispose(bool isDisposing)
         {

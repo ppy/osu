@@ -9,7 +9,6 @@ using osu.Framework.Screens;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect;
 using osu.Game.Tests.Visual.Multiplayer;
@@ -105,7 +104,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 long[] candidateItems = selectedItems.ToArray();
                 long finalItem = candidateItems[Random.Shared.Next(candidateItems.Length)];
 
-                screen.RollFinalBeatmap(candidateItems, finalItem, MatchmakingCandidateType.UserSelection);
+                screen.RollFinalBeatmap(candidateItems, finalItem, finalItem);
             });
         }
     }
