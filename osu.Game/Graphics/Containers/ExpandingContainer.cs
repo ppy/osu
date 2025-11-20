@@ -59,7 +59,18 @@ namespace osu.Game.Graphics.Containers
         protected virtual OsuScrollContainer CreateScrollContainer() => new OsuScrollContainer();
 
         private InputManager inputManager = null!;
+
+        /// <summary>
+        /// Tracks whether the mouse was in bounds of this expanding container in the last frame.
+        /// </summary>
         private bool? lastMouseInBounds;
+
+        /// <summary>
+        /// Tracks whether the last expansion of the container was caused by the mouse moving into its bounds
+        /// (as opposed to an external set of `Expanded`, in which case moving the mouse outside of its bounds should not contract).
+        /// </summary>
+        private bool? expandedByMouse;
+
         private ScheduledDelegate? hoverExpandEvent;
 
         protected override void LoadComplete()
@@ -95,10 +106,18 @@ namespace osu.Game.Graphics.Containers
             hoverExpandEvent = null;
 
             if (mouseInBounds && !Expanded.Value)
+            {
                 hoverExpandEvent = Scheduler.AddDelayed(() => Expanded.Value = true, HoverExpansionDelay);
+                expandedByMouse = true;
+            }
 
             if (!mouseInBounds && Expanded.Value)
-                Expanded.Value = false;
+            {
+                if (expandedByMouse == true)
+                    Expanded.Value = false;
+
+                expandedByMouse = false;
+            }
         }
     }
 }
