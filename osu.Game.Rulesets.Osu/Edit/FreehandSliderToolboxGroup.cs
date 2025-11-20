@@ -44,19 +44,22 @@ namespace osu.Game.Rulesets.Osu.Edit
         private readonly BindableInt displayTolerance = new BindableInt(90)
         {
             MinValue = 5,
-            MaxValue = 100
+            MaxValue = 100,
+            Precision = 1,
         };
 
         private readonly BindableInt displayCornerThreshold = new BindableInt(40)
         {
             MinValue = 5,
-            MaxValue = 100
+            MaxValue = 100,
+            Precision = 1,
         };
 
         private readonly BindableInt displayCircleThreshold = new BindableInt(30)
         {
             MinValue = 0,
-            MaxValue = 100
+            MaxValue = 100,
+            Precision = 1,
         };
 
         private ExpandableSlider<int> toleranceSlider = null!;
