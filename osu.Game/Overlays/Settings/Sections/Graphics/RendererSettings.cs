@@ -29,7 +29,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         {
             var renderer = config.GetBindable<RendererType>(FrameworkSetting.Renderer);
             automaticRendererInUse = renderer.Value == RendererType.Automatic;
+
             var reflexMode = config.GetBindable<LatencyMode>(FrameworkSetting.LatencyMode);
+            var frameSyncMode = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync);
 
             Children = new Drawable[]
             {
@@ -60,7 +62,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "NVIDIA Reflex",
                     Current = reflexMode,
                     Keywords = new[] { @"nvidia", @"latency", @"reflex" },
-                    TooltipText = "Reduces latency by leveraging the NVIDIA Reflex API on NVIDIA GPUs.\nRecommended to have On, turn off only if experiencing issues."
+                    TooltipText = "Reduces latency by leveraging the NVIDIA Reflex API on NVIDIA GPUs.\nRecommended to have On, turn Off only if experiencing issues."
                 },
                 new SettingsCheckbox
                 {
@@ -70,16 +72,24 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             };
 
             // Ensure NVIDIA reflex is turned off and hidden if the resolved renderer isn't Direct3D 11
-            if (host.ResolvedRenderer != RendererType.Deferred_Direct3D11 && host.ResolvedRenderer != RendererType.Direct3D11)
+            if (host.ResolvedRenderer is not (RendererType.Deferred_Direct3D11 or RendererType.Direct3D11))
             {
                 reflexMode.Value = LatencyMode.Off;
                 reflexSetting.Hide();
             }
 
+            // Disable frame limiter if reflex is enabled and add notice when reflex boost is enabled
             reflexMode.BindValueChanged(r =>
             {
+                if (r.NewValue != LatencyMode.Off)
+                    frameSyncMode.Disabled = true;
+
+                frameSyncMode.Disabled = false;
+
                 reflexSetting.ClearNoticeText();
-                if (r.NewValue == LatencyMode.Boost) setReflexBoostNotice();
+
+                if (r.NewValue == LatencyMode.Boost)
+                    setReflexBoostNotice();
             }, true);
 
             renderer.BindValueChanged(r =>
