@@ -3,11 +3,10 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results;
-using osu.Game.Tests.Visual.Multiplayer;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
-    public partial class TestScenePanelRoomAward : MultiplayerTestScene
+    public partial class TestScenePanelRoomAward : MatchmakingTestScene
     {
         public override void SetUpSteps()
         {
