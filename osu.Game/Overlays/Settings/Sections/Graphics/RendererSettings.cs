@@ -81,10 +81,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             // Disable frame limiter if reflex is enabled and add notice when reflex boost is enabled
             reflexMode.BindValueChanged(r =>
             {
-                if (r.NewValue != LatencyMode.Off)
-                    frameSyncMode.Disabled = true;
-
-                frameSyncMode.Disabled = false;
+                frameSyncMode.Disabled = r.NewValue != LatencyMode.Off;
 
                 reflexSetting.ClearNoticeText();
 
