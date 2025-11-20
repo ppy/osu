@@ -99,9 +99,9 @@ namespace osu.Game.Screens.Play
                 return false;
             }
 
-            if (!api.IsLoggedIn)
+            if (!api.IsLoggedIn || api.State.Value == APIState.Failing)
             {
-                handleTokenFailure(new InvalidOperationException("API is not online."));
+                handleTokenFailure(new InvalidOperationException("Online functionality is not available."), displayNotification: api.State.Value == APIState.Failing);
                 return false;
             }
 
