@@ -78,8 +78,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             reflexMode.BindValueChanged(r =>
             {
-                host.SetLowLatencyMode(r.NewValue);
-
                 reflexSetting.ClearNoticeText();
                 if (r.NewValue == LatencyMode.Boost) setReflexBoostNotice();
             }, true);
