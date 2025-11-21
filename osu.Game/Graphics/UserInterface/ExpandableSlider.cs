@@ -10,6 +10,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterfaceV2;
 using Vector2 = osuTK.Vector2;
 
 namespace osu.Game.Graphics.UserInterface
@@ -19,49 +20,27 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public partial class ExpandableSlider<T, TSlider> : CompositeDrawable, IExpandable, IHasCurrentValue<T>
         where T : struct, INumber<T>, IMinMaxValue<T>
-        where TSlider : RoundedSliderBar<T>, new()
+        where TSlider : FormSliderBar<T>, new()
     {
-        private readonly OsuSpriteText label;
+        private readonly OsuSpriteText contractedLabel;
         private readonly TSlider slider;
-
-        private LocalisableString contractedLabelText;
 
         /// <summary>
         /// The label text to display when this slider is in a contracted state.
         /// </summary>
         public LocalisableString ContractedLabelText
         {
-            get => contractedLabelText;
-            set
-            {
-                if (value == contractedLabelText)
-                    return;
-
-                contractedLabelText = value;
-
-                if (!Expanded.Value)
-                    label.Text = value;
-            }
+            get => contractedLabel.Text;
+            set => contractedLabel.Text = value;
         }
-
-        private LocalisableString expandedLabelText;
 
         /// <summary>
         /// The label text to display when this slider is in an expanded state.
         /// </summary>
         public LocalisableString ExpandedLabelText
         {
-            get => expandedLabelText;
-            set
-            {
-                if (value == expandedLabelText)
-                    return;
-
-                expandedLabelText = value;
-
-                if (Expanded.Value)
-                    label.Text = value;
-            }
+            get => slider.Caption;
+            set => slider.Caption = value;
         }
 
         public Bindable<T> Current
@@ -95,7 +74,7 @@ namespace osu.Game.Graphics.UserInterface
                 Spacing = new Vector2(0f, 10f),
                 Children = new Drawable[]
                 {
-                    label = new OsuSpriteText(),
+                    contractedLabel = new OsuSpriteText(),
                     slider = new TSlider
                     {
                         RelativeSizeAxes = Axes.X,
@@ -118,7 +97,8 @@ namespace osu.Game.Graphics.UserInterface
 
             Expanded.BindValueChanged(v =>
             {
-                label.Text = v.NewValue ? expandedLabelText : contractedLabelText;
+                contractedLabel.FadeTo(v.NewValue ? 0 : 1);
+
                 slider.FadeTo(v.NewValue ? Current.Disabled ? 0.3f : 1f : 0f, 500, Easing.OutQuint);
                 slider.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
             }, true);
@@ -133,7 +113,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// An <see cref="IExpandable"/> implementation for the UI slider bar control.
     /// </summary>
-    public partial class ExpandableSlider<T> : ExpandableSlider<T, RoundedSliderBar<T>>
+    public partial class ExpandableSlider<T> : ExpandableSlider<T, FormSliderBar<T>>
         where T : struct, INumber<T>, IMinMaxValue<T>
     {
     }
