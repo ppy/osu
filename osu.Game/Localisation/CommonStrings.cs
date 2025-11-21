@@ -202,7 +202,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Delete..."
         /// </summary>
-        public static LocalisableString DeleteEllipsis => new TranslatableString(getKey(@"delete_ellipsis"), @"Delete...");
+        public static LocalisableString DeleteWithConfirmation => new TranslatableString(getKey(@"delete_with_confrmation"), @"Delete...");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
