@@ -116,12 +116,13 @@ namespace osu.Game.Tournament.Screens.Setup
                     Failing = api.IsLoggedIn != true,
                     Description = "In order to access the API and display metadata, signing in is required."
                 },
-                new LabelledDropdown<RulesetInfo?>
+                new LabelledDropdown<RulesetInfo?>(padded: true)
                 {
                     Label = "Ruleset",
                     Description = "Decides what stats are displayed and which ranks are retrieved for players. This requires a restart to reload data for an existing bracket.",
                     Items = rulesets.AvailableRulesets,
                     Current = LadderInfo.Ruleset,
+                    DropdownWidth = 0.5f,
                 },
                 new TournamentSwitcher
                 {
