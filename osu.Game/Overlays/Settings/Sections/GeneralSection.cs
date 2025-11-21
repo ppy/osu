@@ -24,11 +24,11 @@ namespace osu.Game.Overlays.Settings.Sections
         [BackgroundDependencyLoader]
         private void load(UpdateManager? updateManager)
         {
+            Add(new QuickActionSettings());
             Add(new LanguageSettings());
             if (updateManager?.CanCheckForUpdate == true)
                 Add(new UpdateSettings());
             Add(new InstallationSettings());
-            Add(new QuickActionSettings());
         }
     }
 }
