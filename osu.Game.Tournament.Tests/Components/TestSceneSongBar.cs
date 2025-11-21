@@ -61,6 +61,7 @@ namespace osu.Game.Tournament.Tests.Components
 
             AddStep("set mods to HR", () => songBar.Mods = LegacyMods.HardRock);
             AddStep("set mods to DT", () => songBar.Mods = LegacyMods.DoubleTime);
+            AddStep("set mods to HDHRDT", () => songBar.Mods = LegacyMods.Hidden | LegacyMods.HardRock | LegacyMods.DoubleTime);
             AddStep("unset mods", () => songBar.Mods = LegacyMods.None);
 
             AddToggleStep("toggle expanded", expanded => songBar.Expanded = expanded);
