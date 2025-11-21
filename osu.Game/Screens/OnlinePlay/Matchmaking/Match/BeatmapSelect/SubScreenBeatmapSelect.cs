@@ -81,7 +81,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
             Debug.Assert(client.Room != null);
 
-            loadItems(client.Room.Playlist.ToArray()).FireAndForget();
+            loadItems(client.Room.Playlist.Where(item => !item.Expired).ToArray()).FireAndForget();
         }
 
         private async Task loadItems(MultiplayerPlaylistItem[] items)
