@@ -137,7 +137,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             rotation.BindValueChanged(val =>
             {
                 usableAreaContainer.RotateTo(val.NewValue, 100, Easing.OutQuint);
-                tabletContainer.RotateTo(-val.NewValue, 800, Easing.OutQuint);
+                tabletContainer.RotateTo(-val.NewValue, 400, Easing.OutQuint);
 
                 checkBounds();
             }, true);
