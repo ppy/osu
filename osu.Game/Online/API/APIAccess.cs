@@ -203,8 +203,6 @@ namespace osu.Game.Online.API
                         Thread.Sleep(50);
                         continue;
                     }
-
-                    livenessStopwatch.Restart();
                 }
 
                 // hard bail if we can't get a valid access token.
@@ -426,6 +424,7 @@ namespace osu.Game.Online.API
                         localUserState.SetLocalUser(me);
                         SessionVerificationMethod = me.SessionVerificationMethod;
                         state.Value = SessionVerificationMethod == null ? APIState.Online : APIState.RequiresSecondFactorAuth;
+                        livenessStopwatch.Restart();
                         failureCount = 0;
                     };
 
