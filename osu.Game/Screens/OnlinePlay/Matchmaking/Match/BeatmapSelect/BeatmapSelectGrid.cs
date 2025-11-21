@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Toolkit.HighPerformance;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -33,16 +34,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
         public event Action<MultiplayerPlaylistItem>? ItemSelected;
 
-        private readonly Dictionary<long, BeatmapSelectPanel> panelLookup = new Dictionary<long, BeatmapSelectPanel>();
+        private readonly Dictionary<long, MatchmakingSelectPanel> panelLookup = new Dictionary<long, MatchmakingSelectPanel>();
+        private readonly Dictionary<long, MatchmakingPlaylistItem> playlistItems = new Dictionary<long, MatchmakingPlaylistItem>();
+        private MatchmakingSelectPanelRandom randomPanel = null!;
 
         private readonly PanelGridContainer panelGridContainer;
-        private readonly Container<BeatmapSelectPanel> rollContainer;
+        private readonly Container<MatchmakingSelectPanel> rollContainer;
         private readonly OsuScrollContainer scroll;
 
         private bool allowSelection = true;
 
         private readonly Sample?[] spinSamples = new Sample?[5];
         private static readonly int[] spin_sample_sequence = [0, 1, 2, 3, 4, 2, 3, 4];
+        private Sample? randomRevealSample;
         private Sample? resultSample;
         private Sample? swooshSample;
         private double? lastSamplePlayback;
@@ -63,7 +67,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                         Spacing = new Vector2(panel_spacing)
                     },
                 },
-                rollContainer = new Container<BeatmapSelectPanel>
+                rollContainer = new Container<MatchmakingSelectPanel>
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
@@ -77,13 +81,38 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             for (int i = 0; i < spinSamples.Length; i++)
                 spinSamples[i] = audio.Samples.Get($@"Multiplayer/Matchmaking/Selection/roulette-{i}");
 
+            randomRevealSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Selection/random-reveal");
             resultSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Selection/roulette-result");
             swooshSample = audio.Samples.Get(@"SongSelect/options-pop-out");
         }
 
-        protected override void LoadComplete()
+        public void AddItems(IEnumerable<MatchmakingPlaylistItem> items)
         {
-            base.LoadComplete();
+            foreach (var item in items)
+            {
+                playlistItems[item.ID] = item;
+
+                var panel = panelLookup[item.ID] = new MatchmakingSelectPanelBeatmap(item)
+                {
+                    AllowSelection = allowSelection,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Action = i => ItemSelected?.Invoke(i),
+                };
+
+                panelGridContainer.Add(panel);
+                panelGridContainer.SetLayoutPosition(panel, (float)panel.Item.StarRating);
+            }
+
+            panelLookup[-1] = randomPanel = new MatchmakingSelectPanelRandom(new MultiplayerPlaylistItem { ID = -1 })
+            {
+                AllowSelection = allowSelection,
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                Action = i => ItemSelected?.Invoke(i),
+            };
+            panelGridContainer.Add(randomPanel);
+            panelGridContainer.SetLayoutPosition(randomPanel, float.MinValue);
 
             const double enter_duration = 500;
 
@@ -99,32 +128,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
                     panel.FadeInAndEnterFromBelow(duration: enter_duration, delay: delay);
                 }
+
+                panelsLoaded.SetResult();
             });
         }
 
-        public void AddItem(MultiplayerPlaylistItem item)
-        {
-            var panel = panelLookup[item.ID] = new BeatmapSelectPanel(item)
-            {
-                AllowSelection = allowSelection,
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-                Action = ItemSelected,
-            };
-
-            panelGridContainer.Add(panel);
-            panelGridContainer.SetLayoutPosition(panel, (float)item.StarRating);
-        }
-
-        public void RemoveItem(long id)
-        {
-            if (!panelLookup.Remove(id, out var panel))
-                return;
-
-            panel.Expire();
-        }
-
-        public void SetUserSelection(APIUser user, long itemId, bool selected)
+        public void SetUserSelection(APIUser user, long itemId, bool selected) => whenPanelsLoaded(() =>
         {
             if (!panelLookup.TryGetValue(itemId, out var panel))
                 return;
@@ -133,9 +142,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 panel.AddUser(user);
             else
                 panel.RemoveUser(user);
-        }
+        });
 
-        public void RollAndDisplayFinalBeatmap(long[] candidateItemIds, long finalItemId)
+        public void RevealRandomItem(MultiplayerPlaylistItem item) => whenPanelsLoaded(() =>
+        {
+            playlistItems.TryGetValue(item.ID, out var playlistItem);
+
+            Debug.Assert(playlistItem != null);
+
+            randomRevealSample?.Play();
+            randomPanel.RevealBeatmap(playlistItem.Beatmap, playlistItem.Mods);
+        });
+
+        public void RollAndDisplayFinalBeatmap(long[] candidateItemIds, long finalItemId) => whenPanelsLoaded(() =>
         {
             Debug.Assert(candidateItemIds.Length >= 1);
             Debug.Assert(candidateItemIds.Contains(finalItemId));
@@ -162,7 +181,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                     .Delay(roll_duration + present_beatmap_delay)
                     .Schedule(() => PresentRolledBeatmap(finalItemId));
             }
-        }
+        });
 
         internal void TransferCandidatePanelsToRollContainer(long[] candidateItemIds, double duration = hide_duration)
         {
@@ -171,7 +190,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
             var rng = new Random();
 
-            var remainingPanels = new List<BeatmapSelectPanel>();
+            var remainingPanels = new List<MatchmakingSelectPanel>();
 
             foreach (var panel in panelGridContainer.Children.ToArray())
             {
@@ -211,7 +230,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             {
                 var panel = rollContainer.Children[i];
 
-                var position = positions[i] * (BeatmapSelectPanel.SIZE + new Vector2(panel_spacing));
+                var position = positions[i] * (MatchmakingSelectPanel.SIZE + new Vector2(panel_spacing));
 
                 panel.MoveTo(position, duration + stagger * i, new SplitEasingFunction(Easing.InCubic, Easing.OutExpo, 0.3f));
 
@@ -280,7 +299,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             while ((numSteps - 1) % rollContainer.Children.Count != finalItemIndex)
                 numSteps++;
 
-            BeatmapSelectPanel? lastPanel = null;
+            MatchmakingSelectPanel? lastPanel = null;
 
             for (int i = 0; i < numSteps; i++)
             {
@@ -341,7 +360,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             PresentRolledBeatmap(finalItem);
         }
 
-        private partial class PanelGridContainer : FillFlowContainer<BeatmapSelectPanel>
+        private readonly TaskCompletionSource panelsLoaded = new TaskCompletionSource();
+
+        private void whenPanelsLoaded(Action action) => Task.Run(async () =>
+        {
+            await panelsLoaded.Task.ConfigureAwait(false);
+            Schedule(action);
+        });
+
+        private partial class PanelGridContainer : FillFlowContainer<MatchmakingSelectPanel>
         {
             public bool LayoutDisabled;
 

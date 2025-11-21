@@ -90,8 +90,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 var api = (DummyAPIAccess)API;
 
-                api.Friends.Clear();
-                api.Friends.Add(new APIRelation
+                api.LocalUserState.Friends.Clear();
+                api.LocalUserState.Friends.Add(new APIRelation
                 {
                     Mutual = true,
                     RelationType = RelationType.Friend,
@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     new ScoreInfo { User = new APIUser { Username = "Top", Id = 2 }, TotalScore = 900_000, Accuracy = 0.99, MaxCombo = 999 },
                     new ScoreInfo { User = new APIUser { Username = "Second", Id = 14 }, TotalScore = 800_000, Accuracy = 0.9, MaxCombo = 888 },
                     new ScoreInfo { User = friend, TotalScore = 700_000, Accuracy = 0.88, MaxCombo = 777 },
-                }, 3, null);
+                }, scoresRequested: 50, totalScores: 3, null);
             });
 
             createLeaderboard();
@@ -129,8 +129,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 var api = (DummyAPIAccess)API;
 
-                api.Friends.Clear();
-                api.Friends.Add(new APIRelation
+                api.LocalUserState.Friends.Clear();
+                api.LocalUserState.Friends.Add(new APIRelation
                 {
                     Mutual = true,
                     RelationType = RelationType.Friend,
@@ -144,7 +144,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     new ScoreInfo { User = new APIUser { Username = "Top", Id = 2 }, TotalScore = 900_000_000, Accuracy = 0.99, MaxCombo = 999999 },
                     new ScoreInfo { User = new APIUser { Username = "Second", Id = 14 }, TotalScore = 800_000_000, Accuracy = 0.9, MaxCombo = 888888 },
                     new ScoreInfo { User = friend, TotalScore = 700_000_000, Accuracy = 0.88, MaxCombo = 777777 },
-                }, 3, null);
+                }, scoresRequested: 50, totalScores: 3, null);
             });
 
             createLeaderboard();
@@ -170,7 +170,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     scores.Add(new ScoreInfo { User = new APIUser { Username = $"Player {i + 1}" }, TotalScore = RNG.Next(700_000, 1_000_000) });
 
                 // this is dodgy but anything less dodgy is a lot of work
-                ((Bindable<LeaderboardScores?>)leaderboardManager.Scores).Value = LeaderboardScores.Success(scores, scores.Count, null);
+                ((Bindable<LeaderboardScores?>)leaderboardManager.Scores).Value = LeaderboardScores.Success(scores, scoresRequested: 50, scores.Count, null);
                 gameplayState.ScoreProcessor.TotalScore.Value = 0;
             });
 
@@ -208,7 +208,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     new ScoreInfo { User = new APIUser { Username = "smoogipoo", Id = 1040328 }, TotalScore = 800_000, Accuracy = 0.9, MaxCombo = 888 },
                     new ScoreInfo { User = new APIUser { Username = "flyte", Id = 3103765 }, TotalScore = 700_000, Accuracy = 0.9, MaxCombo = 888 },
                     new ScoreInfo { User = new APIUser { Username = "frenzibyte", Id = 14210502 }, TotalScore = 600_000, Accuracy = 0.9, MaxCombo = 777 },
-                }, 4, null);
+                }, scoresRequested: 50, totalScores: 4, null);
             });
 
             createLeaderboard();
@@ -223,7 +223,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 ((Bindable<LeaderboardScores?>)leaderboardManager.Scores).Value = LeaderboardScores.Success(new[]
                 {
                     new ScoreInfo { User = new APIUser { Username = "Quit", Id = 3 }, TotalScore = 100_000, Accuracy = 0.99, MaxCombo = 999 },
-                }, 1, null);
+                }, scoresRequested: 50, totalScores: 1, null);
             });
 
             createLeaderboard();

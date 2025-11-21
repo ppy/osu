@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Online.Chat;
 using osu.Game.Overlays.Settings.Sections.General;
 
 namespace osu.Game.Overlays.Settings.Sections
@@ -44,6 +45,13 @@ namespace osu.Game.Overlays.Settings.Sections
                     TooltipText = GeneralSettingsStrings.LearnMoreAboutLazerTooltip,
                     BackgroundColour = colours.YellowDark,
                     Action = () => game?.ShowWiki(@"Help_centre/Upgrading_to_lazer")
+                },
+                new SettingsButton
+                {
+                    Text = GeneralSettingsStrings.ReportIssue,
+                    TooltipText = GeneralSettingsStrings.ReportIssueTooltip,
+                    BackgroundColour = colours.DarkOrange2,
+                    Action = () => game?.OpenUrlExternally(@"https://osu.ppy.sh/community/forums/topics/create?forum_id=5", LinkWarnMode.NeverWarn)
                 },
                 new LanguageSettings(),
                 new UpdateSettings(),

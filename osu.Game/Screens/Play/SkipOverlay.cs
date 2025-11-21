@@ -38,20 +38,21 @@ namespace osu.Game.Screens.Play
         private readonly double startTime;
 
         public Action RequestSkip;
+
+        protected FadeContainer FadingContent { get; private set; }
+
         private Button button;
         private ButtonContainer buttonContainer;
         private Circle remainingTimeBox;
 
-        private FadeContainer fadeContainer;
         private double displayTime;
-
         private bool isClickable;
         private bool skipQueued;
 
         [Resolved]
         private IGameplayClock gameplayClock { get; set; }
 
-        internal bool IsButtonVisible => fadeContainer.State == Visibility.Visible && buttonContainer.State.Value == Visibility.Visible;
+        internal bool IsButtonVisible => FadingContent.State == Visibility.Visible && buttonContainer.State.Value == Visibility.Visible;
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         /// <summary>
@@ -77,7 +78,7 @@ namespace osu.Game.Screens.Play
             InternalChild = buttonContainer = new ButtonContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = fadeContainer = new FadeContainer
+                Child = FadingContent = new FadeContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -107,13 +108,13 @@ namespace osu.Game.Screens.Play
         public override void Hide()
         {
             base.Hide();
-            fadeContainer.Hide();
+            FadingContent.Hide();
         }
 
         public override void Show()
         {
             base.Show();
-            fadeContainer.TriggerShow();
+            FadingContent.TriggerShow();
         }
 
         protected override void LoadComplete()
@@ -136,7 +137,7 @@ namespace osu.Game.Screens.Play
                 RequestSkip?.Invoke();
             };
 
-            fadeContainer.TriggerShow();
+            FadingContent.TriggerShow();
         }
 
         /// <summary>
@@ -183,7 +184,7 @@ namespace osu.Game.Screens.Play
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             if (isClickable && !e.HasAnyButtonPressed)
-                fadeContainer.TriggerShow();
+                FadingContent.TriggerShow();
 
             return base.OnMouseMove(e);
         }

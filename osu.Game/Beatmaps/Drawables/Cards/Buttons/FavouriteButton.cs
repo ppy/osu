@@ -62,6 +62,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                 current.Value = new BeatmapSetFavouriteState(favourited, current.Value.FavouriteCount + (favourited ? 1 : -1));
 
                 SetLoading(false);
+                api.LocalUserState.UpdateFavouriteBeatmapSets();
             };
             favouriteRequest.Failure += e =>
             {

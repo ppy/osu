@@ -20,12 +20,12 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
-using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
+using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Edit
 
         Bindable<double> IDistanceSnapProvider.DistanceSpacingMultiplier => DistanceSpacingMultiplier;
 
-        private ExpandableSlider<double, SizeSlider<double>> distanceSpacingSlider = null!;
+        private ExpandableSlider<double> distanceSpacingSlider = null!;
         private ExpandableButton currentDistanceSpacingButton = null!;
 
         [Resolved]
@@ -75,14 +75,16 @@ namespace osu.Game.Rulesets.Edit
             toolboxContainer.Add(toolboxGroup = new EditorToolboxGroup("snapping")
             {
                 Name = "snapping",
+                Spacing = new Vector2(5),
                 Alpha = DistanceSpacingMultiplier.Disabled ? 0 : 1,
                 Children = new Drawable[]
                 {
-                    distanceSpacingSlider = new ExpandableSlider<double, SizeSlider<double>>
+                    distanceSpacingSlider = new ExpandableSlider<double>
                     {
                         KeyboardStep = adjust_step,
                         // Manual binding in LoadComplete to handle one-way event flow.
                         Current = DistanceSpacingMultiplier.GetUnboundCopy(),
+                        ExpandedLabelText = "Distance spacing",
                     },
                     currentDistanceSpacingButton = new ExpandableButton
                     {
@@ -104,7 +106,7 @@ namespace osu.Game.Rulesets.Edit
             DistanceSpacingMultiplier.BindValueChanged(multiplier =>
             {
                 distanceSpacingSlider.ContractedLabelText = $"D. S. ({multiplier.NewValue:0.##x})";
-                distanceSpacingSlider.ExpandedLabelText = $"Distance Spacing ({multiplier.NewValue:0.##x})";
+                distanceSpacingSlider.Current.Value = multiplier.NewValue;
 
                 if (multiplier.NewValue != multiplier.OldValue)
                     onScreenDisplay?.Display(new DistanceSpacingToast(multiplier.NewValue.ToLocalisableString(@"0.##x"), multiplier));

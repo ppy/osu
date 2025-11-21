@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -13,7 +12,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
-using osu.Game.Screens.OnlinePlay.Match;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
@@ -21,7 +20,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
     /// <summary>
     /// A brief intro animation that introduces matchmaking to the user.
     /// </summary>
-    public partial class IntroScreen : OsuScreen
+    public partial class ScreenIntro : OsuScreen
     {
         public override bool DisallowExternalBeatmapRulesetChanges => false;
 
@@ -53,9 +52,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
 
         private IDisposable? duckOperation;
 
-        protected override BackgroundScreen CreateBackground() => new MatchmakingIntroBackgroundScreen(colourProvider);
+        protected override BackgroundScreen CreateBackground() => new MatchmakingBackgroundScreen(colourProvider);
 
-        public IntroScreen()
+        public ScreenIntro()
         {
             ValidForResume = false;
         }
@@ -239,28 +238,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
             beatmapWindupChannel?.Stop();
             beatmapImpactChannel?.Stop();
             duckOperation?.Dispose();
-        }
-
-        private partial class MatchmakingIntroBackgroundScreen : RoomBackgroundScreen
-        {
-            private readonly OverlayColourProvider colourProvider;
-
-            public MatchmakingIntroBackgroundScreen(OverlayColourProvider colourProvider)
-                : base(null)
-            {
-                this.colourProvider = colourProvider;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                AddInternal(new Box
-                {
-                    Depth = float.MinValue,
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5.Opacity(0.6f),
-                });
-            }
         }
     }
 }

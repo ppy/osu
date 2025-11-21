@@ -73,6 +73,9 @@ Aside from the above, below is a brief checklist of things to watch out when you
 After you're done with your changes and you wish to open the PR, please observe the following recommendations:
 
 - Please submit the pull request from a [topic branch](https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows#_topic_branch) (not `master`), and keep the *Allow edits from maintainers* check box selected, so that we can push fixes to your PR if necessary.
+- Please pick the following target branch for your pull request:
+    - `pp-dev`, if the change impacts star rating or performance points calculations for any of the rulesets,
+    - `master`, otherwise.
 - Please avoid pushing untested or incomplete code.
 - Please do not force-push or rebase unless we ask you to.
 - Please do not merge `master` continually if there are no conflicts to resolve. We will do this for you when the change is ready for merge.

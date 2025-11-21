@@ -41,7 +41,7 @@ namespace osu.Game.Users
 
             req.Success += () =>
             {
-                api.UpdateLocalBlocks();
+                api.LocalUserState.UpdateBlocks();
             };
 
             req.Failure += e =>
