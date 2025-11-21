@@ -41,6 +41,9 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
             Action = button.Select;
 
             RelativeSizeAxes = Axes.X;
+            Height = Editor.BUTTON_HEIGHT;
+
+            Content.CornerRadius = Editor.BUTTON_CORNER_RADIUS;
         }
 
         [BackgroundDependencyLoader]
@@ -57,8 +60,8 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
                 b.Blending = BlendingParameters.Additive;
                 b.Anchor = Anchor.CentreLeft;
                 b.Origin = Anchor.CentreLeft;
-                b.Size = new Vector2(20);
-                b.X = 10;
+                b.Size = new Vector2(Editor.BUTTON_ICON_SIZE);
+                b.X = (Editor.BUTTON_HEIGHT - Editor.BUTTON_ICON_SIZE) / 2;
             }));
         }
 
@@ -91,7 +94,8 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
             Depth = -1,
             Origin = Anchor.CentreLeft,
             Anchor = Anchor.CentreLeft,
-            X = 40f
+            X = Editor.BUTTON_HEIGHT,
+            Font = Editor.Fonts.Default,
         };
 
         public LocalisableString TooltipText => Button.TooltipText;
