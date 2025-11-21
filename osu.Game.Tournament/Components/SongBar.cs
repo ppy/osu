@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -14,6 +15,7 @@ using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Models;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Utils;
 using osuTK;
@@ -123,27 +125,19 @@ namespace osu.Game.Tournament.Components
                 },
             };
 
-            double bpm = beatmap.BPM;
-            double length = beatmap.Length;
-            string hardRockExtra = "";
+            var rulesetInstance = ruleset.Value.CreateInstance();
+
+            var convertedMods = rulesetInstance.ConvertFromLegacyMods(mods).ToList();
+            var adjustedDifficulty = rulesetInstance.GetAdjustedDisplayDifficulty(beatmap, convertedMods);
+
+            double rate = ModUtils.CalculateRateWithMods(convertedMods);
+            double bpm = FormatUtils.RoundBPM(beatmap.BPM, rate);
+            double length = beatmap.Length / rate;
+
             string srExtra = "";
 
-            float ar = beatmap.Difficulty.ApproachRate;
-
-            if ((mods & LegacyMods.HardRock) > 0)
+            if (convertedMods.Any(x => x is ModHardRock) || convertedMods.Any(x => x is ModDoubleTime))
             {
-                hardRockExtra = "*";
-                srExtra = "*";
-            }
-
-            if ((mods & LegacyMods.DoubleTime) > 0)
-            {
-                // temporary local calculation (taken from OsuDifficultyCalculator)
-                double preempt = (int)IBeatmapDifficultyInfo.DifficultyRange(ar, 1800, 1200, 450) / 1.5;
-                ar = (float)(preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5);
-
-                bpm *= 1.5f;
-                length /= 1.5f;
                 srExtra = "*";
             }
 
@@ -154,9 +148,9 @@ namespace osu.Game.Tournament.Components
                 default:
                     stats = new (string heading, string content)[]
                     {
-                        ("CS", $"{beatmap.Difficulty.CircleSize:0.#}{hardRockExtra}"),
-                        ("AR", $"{ar:0.#}{hardRockExtra}"),
-                        ("OD", $"{beatmap.Difficulty.OverallDifficulty:0.#}{hardRockExtra}"),
+                        ("CS", $"{adjustedDifficulty.CircleSize:0.#}"),
+                        ("AR", $"{adjustedDifficulty.ApproachRate:0.#}"),
+                        ("OD", $"{adjustedDifficulty.OverallDifficulty:0.#}"),
                     };
                     break;
 
@@ -164,16 +158,16 @@ namespace osu.Game.Tournament.Components
                 case 3:
                     stats = new (string heading, string content)[]
                     {
-                        ("OD", $"{beatmap.Difficulty.OverallDifficulty:0.#}{hardRockExtra}"),
-                        ("HP", $"{beatmap.Difficulty.DrainRate:0.#}{hardRockExtra}")
+                        ("OD", $"{adjustedDifficulty.OverallDifficulty:0.#}"),
+                        ("HP", $"{adjustedDifficulty.DrainRate:0.#}")
                     };
                     break;
 
                 case 2:
                     stats = new (string heading, string content)[]
                     {
-                        ("CS", $"{beatmap.Difficulty.CircleSize:0.#}{hardRockExtra}"),
-                        ("AR", $"{ar:0.#}"),
+                        ("CS", $"{adjustedDifficulty.CircleSize:0.#}"),
+                        ("AR", $"{adjustedDifficulty.ApproachRate:0.#}"),
                     };
                     break;
             }
