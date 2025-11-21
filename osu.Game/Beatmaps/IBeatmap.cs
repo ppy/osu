@@ -9,7 +9,6 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Beatmaps
 {
@@ -132,26 +131,6 @@ namespace osu.Game.Beatmaps
 
     public static class BeatmapExtensions
     {
-        /// <summary>
-        /// Finds the maximum achievable combo by hitting all <see cref="HitObject"/>s in a beatmap.
-        /// </summary>
-        public static int GetMaxCombo(this IBeatmap beatmap)
-        {
-            int combo = 0;
-            foreach (var h in beatmap.HitObjects)
-                addCombo(h, ref combo);
-            return combo;
-
-            static void addCombo(HitObject hitObject, ref int combo)
-            {
-                if (hitObject.Judgement.MaxResult.AffectsCombo())
-                    combo++;
-
-                foreach (var nested in hitObject.NestedHitObjects)
-                    addCombo(nested, ref combo);
-            }
-        }
-
         /// <summary>
         /// Find the total milliseconds between the first and last hittable objects.
         /// </summary>
