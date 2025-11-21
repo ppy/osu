@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 
@@ -66,7 +67,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             double seekDestination = markerPos / DrawWidth * editorClock.TrackLength;
             marker.X = (float)seekDestination;
 
-            if (!instant && lastSeekTime != null && Time.Current - lastSeekTime < 500)
+            if (!instant && lastSeekTime != null && Time.Current - lastSeekTime < NowPlayingOverlay.TRACK_DRAG_SEEK_DEBOUNCE)
                 return;
 
             editorClock.SeekSmoothlyTo(seekDestination);
