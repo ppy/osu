@@ -25,7 +25,11 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         #region LegacyBeatmapEncoder
 
-        float IHasXPosition.X => Column;
+        float IHasXPosition.X
+        {
+            get => Column;
+            set => Column = (int)value;
+        }
 
         #endregion
     }

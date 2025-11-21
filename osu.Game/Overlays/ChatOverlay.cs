@@ -19,6 +19,7 @@ using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online;
@@ -142,9 +143,13 @@ namespace osu.Game.Overlays
                                         new PopoverContainer
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Child = currentChannelContainer = new Container<DrawableChannel>
+                                            Child = new OsuContextMenuContainer
                                             {
                                                 RelativeSizeAxes = Axes.Both,
+                                                Child = currentChannelContainer = new Container<DrawableChannel>
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                }
                                             }
                                         },
                                         loading = new LoadingLayer(true),
@@ -228,7 +233,8 @@ namespace osu.Game.Overlays
                     return true;
 
                 case PlatformAction.DocumentClose:
-                    channelManager.LeaveChannel(currentChannel.Value);
+                    if (currentChannel.Value?.Type != ChannelType.Team)
+                        channelManager.LeaveChannel(currentChannel.Value);
                     return true;
 
                 case PlatformAction.TabRestore:

@@ -69,6 +69,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        [FlakyTest]
         public void TestFadeOnIdle()
         {
             createTest();
@@ -144,7 +145,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestDoesntFadeOnMouseDown()
+        [FlakyTest]
+        public void TestDoesNotFadeOnMouseDown()
         {
             createTest();
 
@@ -171,7 +173,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public Drawable OverlayContent => InternalChild;
 
-            public Drawable FadingContent => (OverlayContent as Container)?.Child;
+            public new Drawable FadingContent => (OverlayContent as Container)?.Child;
         }
     }
 }

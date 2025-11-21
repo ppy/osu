@@ -11,6 +11,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual;
 using MemoryStream = System.IO.MemoryStream;
@@ -48,6 +49,45 @@ namespace osu.Game.Tests.Beatmaps.IO
             AddAssert("timing point has truncated offset", () => beatmap.Beatmap.ControlPointInfo.TimingPoints[0].Time, () => Is.EqualTo(284).Within(0.001));
             AddAssert("kiai is snapped", () => beatmap.Beatmap.ControlPointInfo.EffectPoints[0].Time, () => Is.EqualTo(28519).Within(0.001));
             AddAssert("hit object is snapped", () => beatmap.Beatmap.HitObjects[0].StartTime, () => Is.EqualTo(28519).Within(0.001));
+        }
+
+        [Test]
+        public void TestFractionalObjectCoordinatesRounded()
+        {
+            IWorkingBeatmap beatmap = null!;
+            MemoryStream outStream = null!;
+
+            // Ensure importer encoding is correct
+            AddStep("import beatmap", () => beatmap = importBeatmapFromArchives(@"fractional-coordinates.olz"));
+            AddAssert("second slider has fractional position",
+                () => ((IHasXPosition)beatmap.Beatmap.HitObjects[1]).X,
+                () => Is.EqualTo(-3.0517578E-05).Within(0.00001));
+            AddAssert("second slider path has fractional coordinates",
+                () => ((IHasPath)beatmap.Beatmap.HitObjects[1]).Path.ControlPoints[1].Position.X,
+                () => Is.EqualTo(191.999939).Within(0.00001));
+            AddAssert("second hit circle has fractional position",
+                () => ((IHasYPosition)beatmap.Beatmap.HitObjects[3]).Y,
+                () => Is.EqualTo(383.99997).Within(0.00001));
+
+            // Ensure exporter legacy conversion is correct
+            AddStep("export", () =>
+            {
+                outStream = new MemoryStream();
+
+                new LegacyBeatmapExporter(LocalStorage)
+                    .ExportToStream((BeatmapSetInfo)beatmap.BeatmapInfo.BeatmapSet!, outStream, null);
+            });
+
+            AddStep("import beatmap again", () => beatmap = importBeatmapFromStream(outStream));
+            AddAssert("second slider is snapped",
+                () => ((IHasXPosition)beatmap.Beatmap.HitObjects[1]).X,
+                () => Is.EqualTo(0).Within(0.00001));
+            AddAssert("second slider path is snapped",
+                () => ((IHasPath)beatmap.Beatmap.HitObjects[1]).Path.ControlPoints[1].Position.X,
+                () => Is.EqualTo(192).Within(0.00001));
+            AddAssert("second hit circle is snapped",
+                () => ((IHasYPosition)beatmap.Beatmap.HitObjects[3]).Y,
+                () => Is.EqualTo(384).Within(0.00001));
         }
 
         [Test]

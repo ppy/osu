@@ -28,6 +28,11 @@ This includes content that may not be correctly licensed for osu! usage. Browse 
         /// </summary>
         public static LocalisableString UserContentConfirmButtonText => new TranslatableString(getKey(@"understood"), @"I understand");
 
+        /// <summary>
+        /// "Featured Artists are music artists who have collaborated with osu! to make a selection of their tracks available for use in beatmaps. For some osu! releases, we showcase only featured artist beatmaps to better support the surrounding ecosystem."
+        /// </summary>
+        public static LocalisableString FeaturedArtistsTooltip => new TranslatableString(getKey(@"featured_artists_disabled_tooltip"), @"Featured Artists are music artists who have collaborated with osu! to make a selection of their tracks available for use in beatmaps. For some osu! releases, we showcase only featured artist beatmaps to better support the surrounding ecosystem.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

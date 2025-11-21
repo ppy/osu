@@ -67,6 +67,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             if (LastAcceptedAction != null && nonGameplayPeriods.IsInAny(gameplayClock.CurrentTime))
                 LastAcceptedAction = null;
+
+            if (LastAcceptedAction != null && gameplayClock.IsRewinding)
+                LastAcceptedAction = null;
         }
 
         protected abstract bool CheckValidNewAction(OsuAction action);

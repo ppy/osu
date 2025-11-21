@@ -8,7 +8,6 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
@@ -29,10 +28,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onRoomUpdated()
         {
-            if (client.Room == null)
+            if (client.Room == null || client.LocalUser == null)
                 return;
-
-            Debug.Assert(client.LocalUser != null);
 
             // If the user exits gameplay before score submission completes, we'll transition to idle when results has been prepared.
             if (client.LocalUser.State == MultiplayerUserState.Results && this.IsCurrentScreen())
@@ -63,10 +60,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.OnResuming(e);
 
-            if (client.Room == null)
+            if (client.Room == null || client.LocalUser == null)
                 return;
-
-            Debug.Assert(client.LocalUser != null);
 
             if (!(e.Last is MultiplayerPlayerLoader playerLoader))
                 return;
@@ -92,12 +87,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Debug.Assert(client.LocalUser != null);
 
             if (client.LocalUser.State == MultiplayerUserState.Results)
-                client.ChangeState(MultiplayerUserState.Idle);
+                client.ChangeState(MultiplayerUserState.Idle).FireAndForget();
         }
 
         protected override string ScreenTitle => "Multiplayer";
-
-        protected override RoomManager CreateRoomManager() => new MultiplayerRoomManager();
 
         protected override LoungeSubScreen CreateLounge() => new MultiplayerLoungeSubScreen();
 

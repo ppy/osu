@@ -11,6 +11,6 @@ namespace osu.Game.Rulesets.Objects.Types
         /// <summary>
         /// The starting Y-position of this HitObject.
         /// </summary>
-        float Y { get; }
+        float Y { get; set; }
     }
 }

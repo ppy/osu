@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
+using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Logging;
 
 namespace osu.Game.Online.Multiplayer
@@ -16,12 +17,8 @@ namespace osu.Game.Online.Multiplayer
             {
                 if (t.IsFaulted)
                 {
-                    Exception? exception = t.Exception;
-
-                    if (exception is AggregateException ae)
-                        exception = ae.InnerException;
-
-                    Debug.Assert(exception != null);
+                    Debug.Assert(t.Exception != null);
+                    Exception exception = t.Exception.AsSingular();
 
                     if (exception.GetHubExceptionMessage() is string message)
                         // Hub exceptions generally contain something we can show the user directly.

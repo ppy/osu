@@ -16,7 +16,7 @@ namespace osu.Game.Screens.OnlinePlay
 {
     public partial class Header : Container
     {
-        public const float HEIGHT = 80;
+        public const float HEIGHT = 50;
 
         private readonly ScreenStack? stack;
         private readonly MultiHeaderTitle title;

@@ -125,9 +125,10 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Reset any fetched online linking information (and history).
         /// </summary>
-        public void ResetOnlineInfo()
+        public void ResetOnlineInfo(bool resetOnlineId = true)
         {
-            OnlineID = -1;
+            if (resetOnlineId)
+                OnlineID = -1;
             LastOnlineUpdate = null;
             OnlineMD5Hash = string.Empty;
             if (Status != BeatmapOnlineStatus.LocallyModified)
@@ -155,6 +156,12 @@ namespace osu.Game.Beatmaps
         }
 
         public bool Equals(IBeatmapInfo? other) => other is BeatmapInfo b && Equals(b);
+
+        public override int GetHashCode()
+        {
+            // ReSharper disable once NonReadonlyMemberInGetHashCode
+            return ID.GetHashCode();
+        }
 
         public bool AudioEquals(BeatmapInfo? other) => other != null
                                                        && BeatmapSet != null
@@ -230,8 +237,6 @@ namespace osu.Game.Beatmaps
         [Ignored]
         [Obsolete("Use ScoreManager.GetMaximumAchievableComboAsync instead.")]
         public int? MaxCombo { get; set; }
-
-        public int BeatmapVersion;
 
         public BeatmapInfo Clone() => (BeatmapInfo)this.Detach().MemberwiseClone();
 

@@ -7,11 +7,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Online.Chat;
 using osuTK.Graphics;
 
@@ -48,25 +48,20 @@ namespace osu.Game.Overlays.Chat
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = new OsuContextMenuContainer
+            Child = scroll = new ChannelScrollContainer
             {
+                ScrollbarVisible = scrollbarVisible,
                 RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                Child = scroll = new ChannelScrollContainer
+                // Some chat lines have effects that slightly protrude to the bottom,
+                // which we do not want to mask away, hence the padding.
+                Padding = new MarginPadding { Bottom = 5 },
+                Child = ChatLineFlow = new FillFlowContainer
                 {
-                    ScrollbarVisible = scrollbarVisible,
-                    RelativeSizeAxes = Axes.Both,
-                    // Some chat lines have effects that slightly protrude to the bottom,
-                    // which we do not want to mask away, hence the padding.
-                    Padding = new MarginPadding { Bottom = 5 },
-                    Child = ChatLineFlow = new FillFlowContainer
-                    {
-                        Padding = new MarginPadding { Left = 3, Right = 10 },
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                    }
-                },
+                    Padding = new MarginPadding { Left = 3, Right = 10 },
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                }
             };
 
             newMessagesArrived(Channel.Messages);
@@ -116,7 +111,7 @@ namespace osu.Game.Overlays.Chat
             if (chatLine == null)
                 return;
 
-            float center = scroll.GetChildPosInContent(chatLine, chatLine.DrawSize / 2) - scroll.DisplayableContent / 2;
+            double center = scroll.GetChildPosInContent(chatLine, chatLine.DrawSize / 2) - scroll.DisplayableContent / 2;
             scroll.ScrollTo(Math.Clamp(center, 0, scroll.ScrollableExtent));
             chatLine.Highlight();
 
@@ -132,6 +127,7 @@ namespace osu.Game.Overlays.Chat
             Channel.PendingMessageResolved -= pendingMessageResolved;
         }
 
+        [CanBeNull]
         protected virtual ChatLine CreateChatLine(Message m) => new ChatLine(m);
 
         protected virtual DaySeparator CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time);
@@ -155,8 +151,13 @@ namespace osu.Game.Overlays.Chat
             {
                 addDaySeparatorIfRequired(lastMessage, message);
 
-                ChatLineFlow.Add(CreateChatLine(message));
-                lastMessage = message;
+                var chatLine = CreateChatLine(message);
+
+                if (chatLine != null)
+                {
+                    ChatLineFlow.Add(chatLine);
+                    lastMessage = message;
+                }
             }
 
             var staleMessages = chatLines.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();

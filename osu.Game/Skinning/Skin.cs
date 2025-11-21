@@ -221,14 +221,16 @@ namespace osu.Game.Skinning
             jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.LegacyComboCounter", @"osu.Game.Skinning.LegacyComboCounter");
             jsonContent = jsonContent.Replace(@"osu.Game.Skinning.LegacyComboCounter", @"osu.Game.Skinning.LegacyDefaultComboCounter");
             jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.PerformancePointsCounter", @"osu.Game.Skinning.Triangles.TrianglesPerformancePointsCounter");
+            jsonContent = jsonContent.Replace(@"osu.Game.Screens.Play.HUD.UnstableRateCounter", @"osu.Game.Skinning.Triangles.TrianglesUnstableRateCounter");
 
             try
             {
                 // First attempt to deserialise using the new SkinLayoutInfo format
                 layout = JsonConvert.DeserializeObject<SkinLayoutInfo>(jsonContent);
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Log($"Deserialising skin layout to {nameof(SkinLayoutInfo)} failed. Falling back to {nameof(SerialisedDrawableInfo)}[].\nDetails: {ex}");
             }
 
             // If deserialisation using SkinLayoutInfo fails, attempt to deserialise using the old naked list.

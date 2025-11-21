@@ -10,6 +10,9 @@ namespace osu.Game.Online.API.Requests.Responses
 {
     public class APIScoresCollection
     {
+        [JsonProperty(@"score_count")]
+        public int ScoresCount;
+
         [JsonProperty(@"scores")]
         public List<SoloScoreInfo> Scores;
 

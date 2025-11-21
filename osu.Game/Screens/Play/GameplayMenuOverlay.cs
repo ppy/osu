@@ -22,6 +22,8 @@ using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Resources.Localisation.Web;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Play
 {
@@ -166,11 +168,6 @@ namespace osu.Game.Screens.Play
 
         protected override void PopOut() => this.FadeOut(TRANSITION_DURATION, Easing.In);
 
-        // Don't let mouse down events through the overlay or people can click circles while paused.
-        protected override bool OnMouseDown(MouseDownEvent e) => true;
-
-        protected override bool OnMouseMove(MouseMoveEvent e) => true;
-
         protected void AddButton(LocalisableString text, Color4 colour, Action? action)
         {
             var button = new Button
@@ -235,6 +232,14 @@ namespace osu.Game.Screens.Play
                 playInfoText.NewLine();
                 playInfoText.AddText(GameplayMenuOverlayStrings.SongProgress);
                 playInfoText.AddText($"{progress}%", cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
+            }
+
+            if (gameplayState != null)
+            {
+                playInfoText.NewLine();
+                playInfoText.AddText(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy);
+                playInfoText.AddText(": ");
+                playInfoText.AddText(gameplayState!.ScoreProcessor.Accuracy.Value.FormatAccuracy(), cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
             }
         }
 

@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play
 
         public override bool RemoveCompletedTransforms => false;
 
-        public BreakTracker BreakTracker { get; init; } = null!;
+        public required BreakTracker BreakTracker { get; init; }
 
         private readonly Container remainingTimeAdjustmentBox;
         private readonly Container remainingTimeBox;
@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play
 
         private readonly IBindable<Period?> currentPeriod = new Bindable<Period?>();
 
-        public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor)
+        public BreakOverlay(ScoreProcessor scoreProcessor)
         {
             this.scoreProcessor = scoreProcessor;
             RelativeSizeAxes = Axes.Both;
@@ -63,12 +63,6 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new LetterboxOverlay
-                    {
-                        Alpha = letterboxing ? 1 : 0,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    },
                     new CircularContainer
                     {
                         Anchor = Anchor.Centre,
@@ -165,13 +159,12 @@ namespace osu.Game.Screens.Play
             if (currentPeriod.Value == null)
                 return;
 
-            float timeBoxTargetWidth = (float)Math.Max(0, (remainingTimeForCurrentPeriod - timingPoint.BeatLength / currentPeriod.Value.Value.Duration));
+            float timeBoxTargetWidth = (float)Math.Max(0, remainingTimeForCurrentPeriod - timingPoint.BeatLength / currentPeriod.Value.Value.Duration);
             remainingTimeBox.ResizeWidthTo(timeBoxTargetWidth, timingPoint.BeatLength * 3.5, Easing.OutQuint);
         }
 
         private void updateDisplay(ValueChangedEvent<Period?> period)
         {
-            FinishTransforms(true);
             Scheduler.CancelDelayedTasks();
 
             if (period.NewValue == null)
@@ -186,12 +179,12 @@ namespace osu.Game.Screens.Play
 
                 remainingTimeAdjustmentBox
                     .ResizeWidthTo(remaining_time_container_max_size, BREAK_FADE_DURATION, Easing.OutQuint)
-                    .Delay(b.Duration - BREAK_FADE_DURATION)
+                    .Delay(b.Duration)
                     .ResizeWidthTo(0);
 
                 remainingTimeBox.ResizeWidthTo(remainingTimeForCurrentPeriod);
 
-                remainingTimeCounter.CountTo(b.Duration).CountTo(0, b.Duration);
+                remainingTimeCounter.CountTo(b.Duration + BREAK_FADE_DURATION).CountTo(0, b.Duration + BREAK_FADE_DURATION);
 
                 remainingTimeCounter.MoveToX(-50)
                                     .MoveToX(0, BREAK_FADE_DURATION, Easing.OutQuint);
@@ -199,7 +192,7 @@ namespace osu.Game.Screens.Play
                 info.MoveToX(50)
                     .MoveToX(0, BREAK_FADE_DURATION, Easing.OutQuint);
 
-                using (BeginDelayedSequence(b.Duration - BREAK_FADE_DURATION))
+                using (BeginDelayedSequence(b.Duration))
                 {
                     fadeContainer.FadeOut(BREAK_FADE_DURATION);
                     breakArrows.Hide(BREAK_FADE_DURATION);

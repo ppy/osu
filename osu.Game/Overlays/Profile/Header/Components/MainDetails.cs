@@ -4,12 +4,14 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
@@ -22,7 +24,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private readonly Dictionary<ScoreRank, ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, ScoreRankInfo>();
         private ProfileValueDisplay medalInfo = null!;
         private ProfileValueDisplay ppInfo = null!;
-        private ProfileValueDisplay detailGlobalRank = null!;
+        private GlobalRankDisplay detailGlobalRank = null!;
         private ProfileValueDisplay detailCountryRank = null!;
         private RankGraph rankGraph = null!;
 
@@ -39,7 +41,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 AutoSizeAxes = Axes.Y,
                 AutoSizeDuration = 200,
                 AutoSizeEasing = Easing.OutQuint,
-                Masking = true,
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(0, 15),
                 Children = new Drawable[]
@@ -63,10 +64,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         {
                             new[]
                             {
-                                detailGlobalRank = new ProfileValueDisplay(true)
-                                {
-                                    Title = UsersStrings.ShowRankGlobalSimple,
-                                },
+                                detailGlobalRank = new GlobalRankDisplay(),
                                 Empty(),
                                 detailCountryRank = new ProfileValueDisplay(true)
                                 {
@@ -155,23 +153,67 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             var user = data?.User;
 
-            medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
-            ppInfo.Content = user?.Statistics?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";
+            medalInfo.Content.Text = user?.Achievements?.Length.ToString() ?? "0";
+            ppInfo.Content.Text = user?.Statistics?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";
+            ppInfo.Content.TooltipText = getPPInfoTooltipText(user);
 
             foreach (var scoreRankInfo in scoreRankInfos)
                 scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
 
-            detailGlobalRank.Content = user?.Statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
+            detailGlobalRank.HighestRank.Value = user?.RankHighest;
+            detailGlobalRank.UserStatistics.Value = user?.Statistics;
 
-            var rankHighest = user?.RankHighest;
-
-            detailGlobalRank.ContentTooltipText = rankHighest != null
-                ? UsersStrings.ShowRankHighest(rankHighest.Rank.ToLocalisableString("\\##,##0"), rankHighest.UpdatedAt.ToLocalisableString(@"d MMM yyyy"))
-                : string.Empty;
-
-            detailCountryRank.Content = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
+            detailCountryRank.Content.Text = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
+            detailCountryRank.Content.TooltipText = getCountryRankTooltipText(user);
 
             rankGraph.Statistics.Value = user?.Statistics;
+        }
+
+        private static LocalisableString getCountryRankTooltipText(APIUser? user)
+        {
+            var variants = user?.Statistics?.Variants;
+
+            LocalisableString? result = null;
+
+            if (variants?.Count > 0)
+            {
+                foreach (var variant in variants)
+                {
+                    if (variant.CountryRank != null)
+                    {
+                        var variantText = LocalisableString.Interpolate($"{variant.VariantType.GetLocalisableDescription()}: {variant.CountryRank.ToLocalisableString("\\##,##0")}");
+
+                        if (result == null)
+                            result = variantText;
+                        else
+                            result = LocalisableString.Interpolate($"{result}\n{variantText}");
+                    }
+                }
+            }
+
+            return result ?? default;
+        }
+
+        private static LocalisableString getPPInfoTooltipText(APIUser? user)
+        {
+            var variants = user?.Statistics?.Variants;
+
+            LocalisableString? result = null;
+
+            if (variants?.Count > 0)
+            {
+                foreach (var variant in variants)
+                {
+                    var variantText = LocalisableString.Interpolate($"{variant.VariantType.GetLocalisableDescription()}: {variant.PP.ToLocalisableString("#,##0")}");
+
+                    if (result == null)
+                        result = variantText;
+                    else
+                        result = LocalisableString.Interpolate($"{result}\n{variantText}");
+                }
+            }
+
+            return result ?? default;
         }
 
         private partial class ScoreRankInfo : CompositeDrawable

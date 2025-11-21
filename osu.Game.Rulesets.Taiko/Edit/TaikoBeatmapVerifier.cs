@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Rulesets.Taiko.Edit.Checks;
 
@@ -13,7 +14,17 @@ namespace osu.Game.Rulesets.Taiko.Edit
     {
         private readonly List<ICheck> checks = new List<ICheck>
         {
+            // Compose
+            new CheckConcurrentObjects(),
+
+            // Spread
+            new CheckTaikoLowestDiffDrainTime(),
+
+            // Settings
             new CheckTaikoAbnormalDifficultySettings(),
+
+            // Timing
+            new CheckTaikoInconsistentSkipBarLine(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
