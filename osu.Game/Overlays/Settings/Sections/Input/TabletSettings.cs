@@ -126,7 +126,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     Alpha = 0,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(0, 8),
+                    Spacing = new Vector2(0, SettingsSection.ITEM_SPACING),
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
