@@ -171,13 +171,20 @@ namespace osu.Game.Rulesets.Osu.Edit
             };
 
             Spacing.Value = editorBeatmap.GridSize;
+            GridLinesRotation.Value = editorBeatmap.GridRotation;
+
+            if (editorBeatmap.GridOffset != null)
+            {
+                StartPositionX.Value = editorBeatmap.GridOffset.Value.X;
+                StartPositionY.Value = editorBeatmap.GridOffset.Value.Y;
+            }
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            gridTypeButtons.Items.First().Select();
+            gridTypeButtons.Items.ElementAtOrDefault((int)editorBeatmap.GridType)?.Select();
 
             StartPositionX.BindValueChanged(x =>
             {
@@ -197,6 +204,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 StartPositionX.Value = pos.NewValue.X;
                 StartPositionY.Value = pos.NewValue.Y;
+                editorBeatmap.GridOffset = pos.NewValue;
             });
 
             Spacing.BindValueChanged(spacing =>
@@ -204,13 +212,14 @@ namespace osu.Game.Rulesets.Osu.Edit
                 spacingSlider.ContractedLabelText = $"S: {spacing.NewValue:#,0.##}";
                 spacingSlider.ExpandedLabelText = $"Spacing: {spacing.NewValue:#,0.##}";
                 SpacingVector.Value = new Vector2(spacing.NewValue);
-                editorBeatmap.GridSize = (int)spacing.NewValue;
+                editorBeatmap.GridSize = spacing.NewValue;
             }, true);
 
             GridLinesRotation.BindValueChanged(rotation =>
             {
                 gridLinesRotationSlider.ContractedLabelText = $"R: {rotation.NewValue:#,0.##}";
                 gridLinesRotationSlider.ExpandedLabelText = $"Rotation: {rotation.NewValue:#,0.##}";
+                editorBeatmap.GridRotation = rotation.NewValue;
             }, true);
 
             GridType.BindValueChanged(v =>
@@ -218,6 +227,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 GridLinesRotation.Disabled = v.NewValue == PositionSnapGridType.Circle;
 
                 gridTypeButtons.Items[(int)v.NewValue].Select();
+                editorBeatmap.GridType = v.NewValue;
 
                 switch (v.NewValue)
                 {
@@ -296,12 +306,5 @@ namespace osu.Game.Rulesets.Osu.Edit
                 Blending = BlendingParameters.Additive;
             }
         }
-    }
-
-    public enum PositionSnapGridType
-    {
-        Square,
-        Triangle,
-        Circle,
     }
 }
