@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
         /// </summary>
         /// <param name="hitEvents">Sequence of <see cref="HitEvent"/>s to calculate the aim error based on.</param>
         public AimError(IEnumerable<HitEvent> hitEvents)
-            : base("Aim Error")
+            : base("Unstable Rate")
         {
             Value = hitEvents.CalculateAimError();
         }
