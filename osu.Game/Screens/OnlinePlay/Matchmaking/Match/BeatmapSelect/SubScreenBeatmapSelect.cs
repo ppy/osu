@@ -134,8 +134,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             beatmapSelectGrid.SetUserSelection(user, itemId, false);
         }
 
-        public void RollFinalBeatmap(long[] candidateItems, long candidateItem, long finalItem) =>
-            beatmapSelectGrid.RollAndDisplayFinalBeatmap(candidateItems, candidateItem, finalItem);
+        public void RollFinalBeatmap(long[] candidateItems, long candidateItem, long gameplayItem) =>
+            beatmapSelectGrid.RollAndDisplayFinalBeatmap(candidateItems, candidateItem, gameplayItem);
 
         protected override void Dispose(bool isDisposing)
         {
