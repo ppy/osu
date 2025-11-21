@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
+using osu.Game.Screens;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
 using osu.Game.Tests.Visual.Multiplayer;
 
@@ -19,14 +20,15 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
         protected MatchmakingTestScene()
         {
+            BackgroundScreenStack backgroundStack;
+
             base.Content.AddRange(new Drawable[]
             {
-                new MatchmakingBackgroundScreen.Content
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
+                backgroundStack = new BackgroundScreenStack(),
                 Content = new Container { RelativeSizeAxes = Axes.Both }
             });
+
+            backgroundStack.Push(new MatchmakingBackgroundScreen(colourProvider));
         }
     }
 }
