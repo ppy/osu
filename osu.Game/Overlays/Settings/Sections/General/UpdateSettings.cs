@@ -7,20 +7,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Framework.Logging;
-using osu.Framework.Platform;
-using osu.Framework.Screens;
-using osu.Framework.Statistics;
 using osu.Game.Configuration;
-using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Overlays.Settings.Sections.Maintenance;
 using osu.Game.Updater;
-using osu.Game.Utils;
-using SharpCompress.Archives.Zip;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
@@ -45,15 +37,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
-        private Storage exportStorage = null!;
-
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, Storage storage)
+        private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.ReleaseStream, configReleaseStream);
 
             bool isDesktop = RuntimeInfo.IsDesktop;
-            bool supportsExport = RuntimeInfo.OS != RuntimeInfo.Platform.Android;
             bool canCheckUpdates = updateManager?.CanCheckForUpdate == true;
 
             if (canCheckUpdates)
@@ -86,38 +75,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     Action = () => checkForUpdates().FireAndForget()
                 });
             }
-
-            // Loosely update-related maintenance buttons.
-            if (isDesktop)
-            {
-                Add(new SettingsButton
-                {
-                    Text = GeneralSettingsStrings.OpenOsuFolder,
-                    Keywords = new[] { @"logs", @"files", @"access", "directory" },
-                    Action = () => storage.PresentExternally(),
-                });
-            }
-
-            if (supportsExport)
-            {
-                Add(new SettingsButton
-                {
-                    Text = GeneralSettingsStrings.ExportLogs,
-                    Keywords = new[] { @"bug", "report", "logs", "files" },
-                    Action = () => Task.Run(exportLogs),
-                });
-            }
-
-            if (isDesktop)
-            {
-                Add(new SettingsButton
-                {
-                    Text = GeneralSettingsStrings.ChangeFolderLocation,
-                    Action = () => game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
-                });
-            }
-
-            exportStorage = (storage as OsuStorage)?.GetExportStorage() ?? storage.GetStorageForDirectory(@"exports");
         }
 
         private void releaseStreamChanged(ValueChangedEvent<ReleaseStream> stream)
@@ -175,49 +132,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 checkingNotification.Close(false);
                 checkForUpdatesButton.Enabled.Value = true;
             }
-        }
-
-        private void exportLogs()
-        {
-            ProgressNotification notification = new ProgressNotification
-            {
-                State = ProgressNotificationState.Active,
-                Text = "Exporting logs...",
-            };
-
-            notifications?.Post(notification);
-
-            const string archive_filename = "compressed-logs.zip";
-
-            try
-            {
-                GlobalStatistics.OutputToLog();
-                Logger.Flush();
-
-                var logStorage = Logger.Storage;
-
-                using (var outStream = exportStorage.CreateFileSafely(archive_filename))
-                using (var zip = ZipArchive.Create())
-                {
-                    foreach (string? f in logStorage.GetFiles(string.Empty, "*.log"))
-                        FileUtils.AttemptOperation(z => z.AddEntry(f, logStorage.GetStream(f), true), zip);
-
-                    zip.SaveTo(outStream);
-                }
-            }
-            catch
-            {
-                notification.State = ProgressNotificationState.Cancelled;
-
-                // cleanup if export is failed or canceled.
-                exportStorage.Delete(archive_filename);
-                throw;
-            }
-
-            notification.CompletionText = "Exported logs! Click to view.";
-            notification.CompletionClickAction = () => exportStorage.PresentFileExternally(archive_filename);
-
-            notification.State = ProgressNotificationState.Completed;
         }
     }
 }

@@ -27,6 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 new LanguageSettings(),
                 new UpdateSettings(),
+                new InstallationSettings(),
                 new QuickActionSettings(),
             };
         }
