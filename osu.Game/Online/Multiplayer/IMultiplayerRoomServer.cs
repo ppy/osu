@@ -113,6 +113,11 @@ namespace osu.Game.Online.Multiplayer
         Task RemovePlaylistItem(long playlistItemId);
 
         /// <summary>
+        /// Votes to skip the beatmap intro.
+        /// </summary>
+        Task VoteToSkipIntro();
+
+        /// <summary>
         /// Invites a player to the current room.
         /// </summary>
         /// <param name="userId">The user to invite.</param>

@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         private const double star_rating_multiplier = 0.0265;
 
-        public override int Version => 20250306;
+        public override int Version => 20251020;
 
         public OsuDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)

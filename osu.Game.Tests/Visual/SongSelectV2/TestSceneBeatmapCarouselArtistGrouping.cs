@@ -4,9 +4,12 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
+using osu.Game.Tests.Resources;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
@@ -285,6 +288,32 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestSetDoesExpandAgainWhenGroupingTurnedOff()
+        {
+            ApplyToFilterAndWaitForFilter("filter", c => c.SearchText = BeatmapSets[2].Metadata.Title);
+
+            CheckDisplayedGroupsCount(1);
+            CheckDisplayedBeatmapSetsCount(1);
+            CheckDisplayedBeatmapsCount(3);
+
+            CheckHasSelection();
+
+            ApplyToFilterAndWaitForFilter("remove filter", c => c.SearchText = string.Empty);
+            CheckDisplayedGroupsCount(5);
+            CheckDisplayedBeatmapSetsCount(10);
+            CheckDisplayedBeatmapsCount(30);
+
+            ToggleGroupCollapse();
+
+            ApplyToFilterAndWaitForFilter("apply no-op filter", c => c.AllowConvertedBeatmaps = !c.AllowConvertedBeatmaps);
+            AddAssert("group didn't re-expand", () => Carousel.ExpandedGroup, () => Is.Null);
+            AddAssert("beatmap set didn't re-expand", () => Carousel.GetCarouselItems()!.Count(item => item.Model is GroupedBeatmap && item.IsVisible), () => Is.Zero);
+
+            SortAndGroupBy(SortMode.Title, GroupMode.None);
+            AddAssert("beatmap set did re-expand", () => Carousel.GetCarouselItems()!.Count(item => item.Model is GroupedBeatmap && item.IsVisible), () => Is.Not.Zero);
+        }
+
+        [Test]
         public void TestManuallyCollapsingCurrentGroupAndOpeningAnother()
         {
             SelectNextSet();
@@ -295,6 +324,39 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             SelectNextSet();
             SelectNextSet();
             AddUntilStep("no beatmap panels visible", () => GetVisiblePanels<PanelBeatmap>().Count(), () => Is.Zero);
+        }
+
+        [Test]
+        public void TestGroupChangedAfterEngagingArtistGrouping()
+        {
+            RemoveAllBeatmaps();
+            AddStep("add test beatmaps", () =>
+            {
+                for (int i = 0; i < 5; ++i)
+                {
+                    var baseTestBeatmap = TestResources.CreateTestBeatmapSetInfo(3);
+
+                    var metadata = new BeatmapMetadata
+                    {
+                        Artist = $"{(char)('A' + i)} artist",
+                        Title = $"{(char)('A' + 4 - i)} title",
+                    };
+
+                    foreach (var b in baseTestBeatmap.Beatmaps)
+                        b.Metadata = metadata;
+
+                    Realm.Write(r => r.Add(baseTestBeatmap, update: true));
+                    BeatmapSets.Add(baseTestBeatmap.Detach());
+                }
+
+                SortAndGroupBy(SortMode.Title, GroupMode.Title);
+                SelectNextSet();
+                SelectNextSet();
+                WaitForExpandedGroup(1);
+
+                SortAndGroupBy(SortMode.Artist, GroupMode.Artist);
+                WaitForExpandedGroup(3);
+            });
         }
     }
 }

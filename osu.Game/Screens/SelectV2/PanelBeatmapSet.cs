@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -14,6 +15,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Collections;
@@ -38,6 +40,7 @@ namespace osu.Game.Screens.SelectV2
 
         private Box chevronBackground = null!;
         private PanelSetBackground setBackground = null!;
+        private ScheduledDelegate? scheduledBackgroundRetrieval;
 
         private OsuSpriteText titleText = null!;
         private OsuSpriteText artistText = null!;
@@ -191,7 +194,7 @@ namespace osu.Game.Screens.SelectV2
             var beatmapSet = groupedBeatmapSet.BeatmapSet;
 
             // Choice of background image matches BSS implementation (always uses the lowest `beatmap_id` from the set).
-            setBackground.Beatmap = beatmaps.GetWorkingBeatmap(beatmapSet.Beatmaps.MinBy(b => b.OnlineID));
+            scheduledBackgroundRetrieval = Scheduler.AddDelayed(s => setBackground.Beatmap = beatmaps.GetWorkingBeatmap(s.Beatmaps.MinBy(b => b.OnlineID)), beatmapSet, 50);
 
             titleText.Text = new RomanisableString(beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title);
             artistText.Text = new RomanisableString(beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist);
@@ -204,6 +207,8 @@ namespace osu.Game.Screens.SelectV2
         {
             base.FreeAfterUse();
 
+            scheduledBackgroundRetrieval?.Cancel();
+            scheduledBackgroundRetrieval = null;
             setBackground.Beatmap = null;
             updateButton.BeatmapSet = null;
             difficultiesDisplay.BeatmapSet = null;
@@ -292,7 +297,7 @@ namespace osu.Game.Screens.SelectV2
 
             return new TernaryStateToggleMenuItem(collection.Name, MenuItemType.Standard, s =>
             {
-                liveCollection.PerformWrite(c =>
+                Task.Run(() => liveCollection.PerformWrite(c =>
                 {
                     foreach (var b in beatmapSet.Beatmaps)
                     {
@@ -310,7 +315,7 @@ namespace osu.Game.Screens.SelectV2
                                 break;
                         }
                     }
-                });
+                }));
             })
             {
                 State = { Value = state }

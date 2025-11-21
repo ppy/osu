@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 case PositionSnapGridType.Triangle:
                     var triangularPositionSnapGrid = new TriangularPositionSnapGrid();
 
-                    triangularPositionSnapGrid.Spacing.BindTo(OsuGridToolboxGroup.Spacing);
+                    triangularPositionSnapGrid.Spacing.BindTo(OsuGridToolboxGroup.GridLineSpacing);
                     triangularPositionSnapGrid.GridLineRotation.BindTo(OsuGridToolboxGroup.GridLinesRotation);
 
                     positionSnapGrid = triangularPositionSnapGrid;
@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 case PositionSnapGridType.Circle:
                     var circularPositionSnapGrid = new CircularPositionSnapGrid();
 
-                    circularPositionSnapGrid.Spacing.BindTo(OsuGridToolboxGroup.Spacing);
+                    circularPositionSnapGrid.Spacing.BindTo(OsuGridToolboxGroup.GridLineSpacing);
 
                     positionSnapGrid = circularPositionSnapGrid;
                     break;

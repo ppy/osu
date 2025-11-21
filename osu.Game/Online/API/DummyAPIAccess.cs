@@ -20,14 +20,11 @@ namespace osu.Game.Online.API
     {
         public const int DUMMY_USER_ID = 1001;
 
-        public Bindable<APIUser> LocalUser { get; } = new Bindable<APIUser>(new APIUser
-        {
-            Username = @"Local user",
-            Id = DUMMY_USER_ID,
-        });
+        public DummyLocalUserState LocalUserState { get; } = new DummyLocalUserState();
+        public Bindable<APIUser> LocalUser => LocalUserState.User;
 
-        public BindableList<APIRelation> Friends { get; } = new BindableList<APIRelation>();
-        public BindableList<APIRelation> Blocks { get; } = new BindableList<APIRelation>();
+        ILocalUserState IAPIProvider.LocalUserState => LocalUserState;
+        IBindable<APIUser> IAPIProvider.LocalUser => LocalUser;
 
         public DummyNotificationsClient NotificationsClient { get; } = new DummyNotificationsClient();
         INotificationsClient IAPIProvider.NotificationsClient => NotificationsClient;
@@ -208,10 +205,6 @@ namespace osu.Game.Online.API
 
         public void SetState(APIState newState) => state.Value = newState;
 
-        IBindable<APIUser> IAPIProvider.LocalUser => LocalUser;
-        IBindableList<APIRelation> IAPIProvider.Friends => Friends;
-        IBindableList<APIRelation> IAPIProvider.Blocks => Blocks;
-
         /// <summary>
         /// Skip 2FA requirement for next login.
         /// </summary>
@@ -233,6 +226,36 @@ namespace osu.Game.Online.API
 
             // Ensure (as much as we can) that any pending tasks are run.
             Scheduler.Update();
+        }
+
+        public class DummyLocalUserState : ILocalUserState
+        {
+            public Bindable<APIUser> User { get; } = new Bindable<APIUser>(new APIUser
+            {
+                Username = @"Local user",
+                Id = DUMMY_USER_ID,
+            });
+
+            public BindableList<APIRelation> Friends { get; } = new BindableList<APIRelation>();
+            public BindableList<APIRelation> Blocks { get; } = new BindableList<APIRelation>();
+            public BindableList<int> FavouriteBeatmapSets { get; } = new BindableList<int>();
+
+            IBindable<APIUser> ILocalUserState.User => User;
+            IBindableList<APIRelation> ILocalUserState.Friends => Friends;
+            IBindableList<APIRelation> ILocalUserState.Blocks => Blocks;
+            IBindableList<int> ILocalUserState.FavouriteBeatmapSets => FavouriteBeatmapSets;
+
+            public void UpdateFriends()
+            {
+            }
+
+            public void UpdateBlocks()
+            {
+            }
+
+            public void UpdateFavouriteBeatmapSets()
+            {
+            }
         }
     }
 }

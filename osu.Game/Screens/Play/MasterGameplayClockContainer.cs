@@ -115,14 +115,15 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Skip forward to the next valid skip point.
         /// </summary>
-        public void Skip()
+        /// <param name="fullLength"><c>true</c> to skip as close to gameplay as possible, or <c>false</c> to skip only to the next valid skip point.</param>
+        public void Skip(bool fullLength = false)
         {
             if (GameplayClock.CurrentTime > GameplayStartTime - MINIMUM_SKIP_TIME)
                 return;
 
             double skipTarget = GameplayStartTime - MINIMUM_SKIP_TIME;
 
-            if (StartTime < -10000 && GameplayClock.CurrentTime < 0 && skipTarget > 6000)
+            if (!fullLength && StartTime < -10000 && GameplayClock.CurrentTime < 0 && skipTarget > 6000)
                 // double skip exception for storyboards with very long intros
                 skipTarget = 0;
 

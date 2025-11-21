@@ -738,6 +738,16 @@ namespace osu.Game.Tests.NonVisual.Filtering
             new object[] { "submitted=99999", false },
             new object[] { "submitted>=2012-03-05-04", false },
             new object[] { "submitted>=2012/03.05-04", false },
+
+            new object[] { "created<2012", true },
+            new object[] { "created<2012.03", true },
+            new object[] { "created<2012/03/05", true },
+            new object[] { "created<2012-3-5", true },
+
+            new object[] { "created<0", false },
+            new object[] { "created=99999", false },
+            new object[] { "created>=2012-03-05-04", false },
+            new object[] { "created>=2012/03.05-04", false },
         };
 
         [Test]

@@ -233,6 +233,8 @@ namespace osu.Game.Screens.SelectV2
                     // if the beatmap set reference changed under the callback, abort visual updates to avoid showing stale data
                     if (onlineBeatmapSet == null || ReferenceEquals(beatmapSet, onlineBeatmapSet))
                         setBeatmapSet(beatmapSet, withHeartAnimation: hasFavourited);
+
+                    api.LocalUserState.UpdateFavouriteBeatmapSets();
                 };
                 favouriteRequest.Failure += e =>
                 {
