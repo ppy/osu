@@ -29,6 +29,8 @@ namespace osu.Game.Overlays
 {
     public partial class NowPlayingOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
+        public const double TRACK_DRAG_SEEK_DEBOUNCE = 200;
+
         public IconUsage Icon => OsuIcon.Music;
         public LocalisableString Title => NowPlayingStrings.HeaderTitle;
         public LocalisableString Description => NowPlayingStrings.HeaderDescription;
@@ -207,7 +209,8 @@ namespace osu.Game.Overlays
                                     Height = progress_height / 2,
                                     FillColour = colours.Yellow,
                                     BackgroundColour = colours.YellowDarker.Opacity(0.5f),
-                                    OnSeek = musicController.SeekTo
+                                    OnSeek = onSeek,
+                                    OnCommit = onCommit,
                                 }
                             },
                         },
@@ -219,6 +222,23 @@ namespace osu.Game.Overlays
                     }
                 },
             };
+        }
+
+        private double? lastSeekTime;
+
+        private void onSeek(double progress)
+        {
+            if (lastSeekTime == null || Time.Current - lastSeekTime > TRACK_DRAG_SEEK_DEBOUNCE)
+            {
+                musicController.SeekTo(progress);
+                lastSeekTime = Time.Current;
+            }
+        }
+
+        private void onCommit(double progress)
+        {
+            musicController.SeekTo(progress);
+            lastSeekTime = null;
         }
 
         private void togglePlaylist()
