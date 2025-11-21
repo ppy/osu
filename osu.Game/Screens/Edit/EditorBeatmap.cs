@@ -18,11 +18,12 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Edit
 {
-    public partial class EditorBeatmap : TransactionalCommitComponent, IBeatmap, IBeatSnapProvider
+    public partial class EditorBeatmap : TransactionalCommitComponent, IBeatmap, IBeatSnapProvider, IBeatmapEditorChangeHandler
     {
         /// <summary>
         /// Will become <c>true</c> when a new update is queued, and <c>false</c> when all updates have been applied.
@@ -90,16 +91,20 @@ namespace osu.Game.Screens.Edit
 
         public BindableInt PreviewTime { get; }
 
+        [CanBeNull]
+        private readonly IBeatmapEditorChangeHandler changeHandler;
+
         private readonly IBeatmapProcessor beatmapProcessor;
 
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
 
-        public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null, BeatmapInfo beatmapInfo = null)
+        public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null, BeatmapInfo beatmapInfo = null, IBeatmapEditorChangeHandler changeHandler = null)
         {
             PlayableBeatmap = playableBeatmap;
             PlayableBeatmap.ControlPointInfo = ConvertControlPoints(PlayableBeatmap.ControlPointInfo);
 
             this.beatmapInfo = beatmapInfo ?? playableBeatmap.BeatmapInfo;
+            this.changeHandler = changeHandler;
 
             if (beatmapSkin is Skin skin)
             {
@@ -107,7 +112,7 @@ namespace osu.Game.Screens.Edit
                 BeatmapSkin.BeatmapSkinChanged += SaveState;
             }
 
-            beatmapProcessor = new EditorBeatmapProcessor(this, playableBeatmap.BeatmapInfo.Ruleset.CreateInstance());
+            beatmapProcessor = new EditorBeatmapProcessor(this, PlayableBeatmap.BeatmapInfo.Ruleset.CreateInstance(), changeHandler);
 
             foreach (var obj in HitObjects)
                 trackStartTime(obj);
@@ -123,7 +128,9 @@ namespace osu.Game.Screens.Edit
             Bookmarks.BindCollectionChanged((_, _) =>
             {
                 BeginChange();
+                this.changeHandler?.BeginChange();
                 playableBeatmap.Bookmarks = Bookmarks.OrderBy(x => x).Distinct().ToArray();
+                this.changeHandler?.EndChange();
                 EndChange();
             });
 
@@ -131,7 +138,9 @@ namespace osu.Game.Screens.Edit
             PreviewTime.BindValueChanged(s =>
             {
                 BeginChange();
+                this.changeHandler?.BeginChange();
                 BeatmapInfo.Metadata.PreviewTime = s.NewValue;
+                this.changeHandler?.EndChange();
                 EndChange();
             });
 
@@ -317,6 +326,7 @@ namespace osu.Game.Screens.Edit
                 return;
 
             BeginChange();
+            changeHandler?.BeginChange();
 
             foreach (var h in SelectedHitObjects)
             {
@@ -324,6 +334,7 @@ namespace osu.Game.Screens.Edit
                 Update(h);
             }
 
+            changeHandler?.EndChange();
             EndChange();
         }
 
@@ -334,8 +345,10 @@ namespace osu.Game.Screens.Edit
         public void AddRange(IEnumerable<HitObject> hitObjects)
         {
             BeginChange();
+            changeHandler?.BeginChange();
             foreach (var h in hitObjects)
                 Add(h);
+            changeHandler?.EndChange();
             EndChange();
         }
 
@@ -365,7 +378,9 @@ namespace osu.Game.Screens.Edit
             mutableHitObjects.Insert(index, hitObject);
 
             BeginChange();
+            changeHandler?.BeginChange();
             batchPendingInserts.Add(hitObject);
+            changeHandler?.EndChange();
             EndChange();
         }
 
@@ -373,10 +388,11 @@ namespace osu.Game.Screens.Edit
         /// Updates a <see cref="HitObject"/>, invoking <see cref="HitObject.ApplyDefaults"/> and re-processing the beatmap.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to update.</param>
-        public void Update([NotNull] HitObject hitObject)
+        public void Update(HitObject hitObject)
         {
             // updates are debounced regardless of whether a batch is active.
-            batchPendingUpdates.Add(hitObject);
+            if (batchPendingUpdates.Add(hitObject))
+                changeHandler?.Update(hitObject);
 
             updateInProgress.Value = true;
         }
@@ -415,8 +431,10 @@ namespace osu.Game.Screens.Edit
         public void RemoveRange(IEnumerable<HitObject> hitObjects)
         {
             BeginChange();
+            changeHandler?.BeginChange();
             foreach (var h in hitObjects)
                 Remove(h);
+            changeHandler?.EndChange();
             EndChange();
         }
 
@@ -442,7 +460,10 @@ namespace osu.Game.Screens.Edit
             startTimeBindables.Remove(hitObject);
 
             BeginChange();
+            changeHandler?.BeginChange();
             batchPendingDeletes.Add(hitObject);
+            batchPendingUpdates.Remove(hitObject);
+            changeHandler?.EndChange();
             EndChange();
         }
 
@@ -491,6 +512,8 @@ namespace osu.Game.Screens.Edit
             foreach (var h in inserts) HitObjectAdded?.Invoke(h);
             foreach (var h in updates) HitObjectUpdated?.Invoke(h);
 
+            OnStateChange?.Invoke();
+
             updateInProgress.Value = false;
         }
 
@@ -532,5 +555,11 @@ namespace osu.Game.Screens.Edit
         public double GetBeatLengthAtTime(double referenceTime) => ControlPointInfo.TimingPointAt(referenceTime).BeatLength / BeatDivisor;
 
         public int BeatDivisor => beatDivisor?.Value ?? 1;
+
+        public event Action OnStateChange;
+
+        public void RestoreState(int direction) { }
+
+        public void Record(IRevertibleChange change) { }
     }
 }
