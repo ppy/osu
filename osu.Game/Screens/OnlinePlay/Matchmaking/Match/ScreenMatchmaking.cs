@@ -57,7 +57,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
         public override bool ShowFooter => true;
 
-        protected override BackgroundScreen CreateBackground() => new MatchmakingBackgroundScreen();
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        protected override BackgroundScreen CreateBackground() => new MatchmakingBackgroundScreen(colourProvider);
 
         [Cached(typeof(OnlinePlayBeatmapAvailabilityTracker))]
         private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new MultiplayerBeatmapAvailabilityTracker();
