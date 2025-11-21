@@ -95,6 +95,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onUserVotedToSkipIntro(int userId) => Schedule(() =>
         {
+            FadingContent.TriggerShow();
+
             updateText();
 
             countText.ScaleTo(1.5f).ScaleTo(1, 200, Easing.OutSine);
