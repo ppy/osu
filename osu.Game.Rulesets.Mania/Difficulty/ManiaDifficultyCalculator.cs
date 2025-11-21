@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private const double power_mean_weight = 0.55;
 
         private const double rescale_high_threshold = 9.0;
-        private const double rescale_high_factor = 1.0 / 1.2; // should be 1.0 / 1.2 in the future
+        private const double rescale_high_factor = 1.0 / 1.2;
 
         public readonly double[] DifficultyPercentilesHigh = { 0.945, 0.935, 0.925, 0.915 };
         public readonly double[] DifficultyPercentilesMid = { 0.845, 0.835, 0.825, 0.815 };
