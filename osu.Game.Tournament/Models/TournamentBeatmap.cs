@@ -83,7 +83,7 @@ namespace osu.Game.Tournament.Models
 
         string IBeatmapInfo.MD5Hash => throw new NotImplementedException();
 
-        IRulesetInfo IBeatmapInfo.Ruleset => throw new NotImplementedException();
+        IRulesetInfo IBeatmapInfo.Ruleset => new RulesetInfo();
 
         DateTimeOffset IBeatmapSetOnlineInfo.Submitted => throw new NotImplementedException();
 
