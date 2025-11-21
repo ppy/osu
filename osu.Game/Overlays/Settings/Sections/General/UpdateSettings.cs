@@ -43,38 +43,34 @@ namespace osu.Game.Overlays.Settings.Sections.General
             config.BindWith(OsuSetting.ReleaseStream, configReleaseStream);
 
             bool isDesktop = RuntimeInfo.IsDesktop;
-            bool canCheckUpdates = updateManager?.CanCheckForUpdate == true;
 
-            if (canCheckUpdates)
+            // For simplicity, hide the concept of release streams from mobile users.
+            if (isDesktop)
             {
-                // For simplicity, hide the concept of release streams from mobile users.
-                if (isDesktop)
+                Add(releaseStreamDropdown = new SettingsEnumDropdown<ReleaseStream>
                 {
-                    Add(releaseStreamDropdown = new SettingsEnumDropdown<ReleaseStream>
-                    {
-                        LabelText = GeneralSettingsStrings.ReleaseStream,
-                        Current = { Value = configReleaseStream.Value },
-                        Keywords = new[] { @"version" },
-                    });
+                    LabelText = GeneralSettingsStrings.ReleaseStream,
+                    Current = { Value = configReleaseStream.Value },
+                    Keywords = new[] { @"version" },
+                });
 
-                    if (updateManager!.FixedReleaseStream != null)
-                    {
-                        configReleaseStream.Value = updateManager.FixedReleaseStream.Value;
+                if (updateManager!.FixedReleaseStream != null)
+                {
+                    configReleaseStream.Value = updateManager.FixedReleaseStream.Value;
 
-                        releaseStreamDropdown.ShowsDefaultIndicator = false;
-                        releaseStreamDropdown.Items = [updateManager.FixedReleaseStream.Value];
-                        releaseStreamDropdown.SetNoticeText(GeneralSettingsStrings.ChangeReleaseStreamPackageManagerWarning);
-                    }
-
-                    releaseStreamDropdown.Current.BindValueChanged(releaseStreamChanged);
+                    releaseStreamDropdown.ShowsDefaultIndicator = false;
+                    releaseStreamDropdown.Items = [updateManager.FixedReleaseStream.Value];
+                    releaseStreamDropdown.SetNoticeText(GeneralSettingsStrings.ChangeReleaseStreamPackageManagerWarning);
                 }
 
-                Add(checkForUpdatesButton = new SettingsButton
-                {
-                    Text = GeneralSettingsStrings.CheckUpdate,
-                    Action = () => checkForUpdates().FireAndForget()
-                });
+                releaseStreamDropdown.Current.BindValueChanged(releaseStreamChanged);
             }
+
+            Add(checkForUpdatesButton = new SettingsButton
+            {
+                Text = GeneralSettingsStrings.CheckUpdate,
+                Action = () => checkForUpdates().FireAndForget()
+            });
         }
 
         private void releaseStreamChanged(ValueChangedEvent<ReleaseStream> stream)
