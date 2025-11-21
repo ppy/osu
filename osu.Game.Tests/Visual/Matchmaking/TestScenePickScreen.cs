@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
@@ -106,6 +107,26 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
                 screen.RollFinalBeatmap(candidateItems, finalItem);
             });
+        }
+
+        [Test]
+        public void TestExpiredBeatmapNotShown()
+        {
+            SubScreenBeatmapSelect screen = null!;
+
+            AddStep("add screen with expired items", () =>
+            {
+                MultiplayerClient.ClientRoom!.Playlist =
+                [
+                    new MultiplayerPlaylistItem(items[0]) { Expired = true },
+                    new MultiplayerPlaylistItem(items[1])
+                ];
+
+                Child = new ScreenStack(screen = new SubScreenBeatmapSelect());
+            });
+
+            AddUntilStep("items displayed", () => screen.ChildrenOfType<MatchmakingSelectPanelBeatmap>().Any());
+            AddAssert("expired item not shown", () => screen.ChildrenOfType<MatchmakingSelectPanelBeatmap>().Count(), () => Is.EqualTo(1));
         }
     }
 }
