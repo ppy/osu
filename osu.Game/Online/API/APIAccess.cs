@@ -26,6 +26,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Notifications.WebSocket;
+using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Online.API
 {
@@ -71,6 +72,9 @@ namespace osu.Game.Online.API
 
         private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
         private readonly Logger log;
+
+        [CanBeNull]
+        public Action<Notification> PostNotification { get; set; }
 
         public APIAccess(OsuGameBase game, OsuConfigManager config, EndpointConfiguration endpoints, string versionHash)
         {
@@ -216,8 +220,7 @@ namespace osu.Game.Online.API
 
                     if (!alive)
                     {
-                        state.Value = APIState.Failing;
-                        log.Add(reason ?? "Online functionality is not available due to an outage. Sorry for the inconvenience.", LogLevel.Important);
+                        triggerOutage(reason);
                         livenessStopwatch.Stop();
                         continue;
                     }
@@ -268,6 +271,20 @@ namespace osu.Game.Online.API
             return req.ResponseObject.Status == LivenessProbeResponse.LivenessStatus.Up;
         }
 
+        private void triggerOutage(string reason)
+        {
+            state.Value = APIState.Failing;
+            string userFacingMessage = reason ?? "Online functionality is not available due to an outage. Sorry for the inconvenience.";
+
+            Schedule(() =>
+            {
+                if (PostNotification != null)
+                    PostNotification?.Invoke(new OutageNotification(userFacingMessage));
+                else
+                    log.Add(userFacingMessage, LogLevel.Important);
+            });
+        }
+
         /// <summary>
         /// Dequeue from the queue and run each request synchronously until the queue is empty.
         /// </summary>
@@ -309,8 +326,7 @@ namespace osu.Game.Online.API
 
             if (!probeLiveness(out string reason))
             {
-                state.Value = APIState.Failing;
-                log.Add(reason ?? "Online functionality is not available due to an outage. Sorry for the inconvenience.", LogLevel.Important);
+                triggerOutage(reason);
                 return;
             }
 
