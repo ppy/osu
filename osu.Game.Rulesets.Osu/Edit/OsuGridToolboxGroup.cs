@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             MinValue = 0f,
             MaxValue = OsuPlayfield.BASE_SIZE.X,
-            Precision = 0.01f,
+            Precision = 0.1f,
         };
 
         /// <summary>
@@ -48,17 +48,17 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             MinValue = 0f,
             MaxValue = OsuPlayfield.BASE_SIZE.Y,
-            Precision = 0.01f,
+            Precision = 0.1f,
         };
 
         /// <summary>
         /// The spacing between grid lines.
         /// </summary>
-        public BindableFloat Spacing { get; } = new BindableFloat(4f)
+        public BindableFloat GridLineSpacing { get; } = new BindableFloat(4f)
         {
             MinValue = 4f,
             MaxValue = 256f,
-            Precision = 0.01f,
+            Precision = 0.1f,
         };
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             MinValue = -180f,
             MaxValue = 180f,
-            Precision = 0.01f,
+            Precision = 0.1f,
         };
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             float dist = Vector2.Distance(point1, point2);
             while (dist >= max_automatic_spacing)
                 dist /= 2;
-            Spacing.Value = dist;
+            GridLineSpacing.Value = dist;
         }
 
         [BackgroundDependencyLoader]
@@ -127,21 +127,25 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     Current = StartPositionX,
                     KeyboardStep = 1,
+                    ExpandedLabelText = "X offset",
                 },
                 startPositionYSlider = new ExpandableSlider<float>
                 {
                     Current = StartPositionY,
                     KeyboardStep = 1,
+                    ExpandedLabelText = "Y offset",
                 },
                 spacingSlider = new ExpandableSlider<float>
                 {
-                    Current = Spacing,
+                    Current = GridLineSpacing,
                     KeyboardStep = 1,
+                    ExpandedLabelText = "Spacing",
                 },
                 gridLinesRotationSlider = new ExpandableSlider<float>
                 {
                     Current = GridLinesRotation,
                     KeyboardStep = 1,
+                    ExpandedLabelText = "Rotation",
                 },
                 new FillFlowContainer
                 {
@@ -170,7 +174,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 },
             };
 
-            Spacing.Value = editorBeatmap.GridSize;
+            GridLineSpacing.Value = editorBeatmap.GridSize;
         }
 
         protected override void LoadComplete()
@@ -182,14 +186,12 @@ namespace osu.Game.Rulesets.Osu.Edit
             StartPositionX.BindValueChanged(x =>
             {
                 startPositionXSlider.ContractedLabelText = $"X: {x.NewValue:#,0.##}";
-                startPositionXSlider.ExpandedLabelText = $"X Offset: {x.NewValue:#,0.##}";
                 StartPosition.Value = new Vector2(x.NewValue, StartPosition.Value.Y);
             }, true);
 
             StartPositionY.BindValueChanged(y =>
             {
                 startPositionYSlider.ContractedLabelText = $"Y: {y.NewValue:#,0.##}";
-                startPositionYSlider.ExpandedLabelText = $"Y Offset: {y.NewValue:#,0.##}";
                 StartPosition.Value = new Vector2(StartPosition.Value.X, y.NewValue);
             }, true);
 
@@ -199,10 +201,9 @@ namespace osu.Game.Rulesets.Osu.Edit
                 StartPositionY.Value = pos.NewValue.Y;
             });
 
-            Spacing.BindValueChanged(spacing =>
+            GridLineSpacing.BindValueChanged(spacing =>
             {
                 spacingSlider.ContractedLabelText = $"S: {spacing.NewValue:#,0.##}";
-                spacingSlider.ExpandedLabelText = $"Spacing: {spacing.NewValue:#,0.##}";
                 SpacingVector.Value = new Vector2(spacing.NewValue);
                 editorBeatmap.GridSize = (int)spacing.NewValue;
             }, true);
@@ -210,7 +211,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             GridLinesRotation.BindValueChanged(rotation =>
             {
                 gridLinesRotationSlider.ContractedLabelText = $"R: {rotation.NewValue:#,0.##}";
-                gridLinesRotationSlider.ExpandedLabelText = $"Rotation: {rotation.NewValue:#,0.##}";
             }, true);
 
             GridType.BindValueChanged(v =>
@@ -239,6 +239,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 gridTypeButtons.FadeTo(v.NewValue ? 1f : 0f, 500, Easing.OutQuint);
                 gridTypeButtons.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
+
+                Spacing = v.NewValue ? new Vector2(5) : new Vector2(15);
             }, true);
         }
 
@@ -252,7 +254,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             switch (e.Action)
             {
                 case GlobalAction.EditorCycleGridSpacing:
-                    Spacing.Value = Spacing.Value * 2 >= max_automatic_spacing ? Spacing.Value / 8 : Spacing.Value * 2;
+                    GridLineSpacing.Value = GridLineSpacing.Value * 2 >= max_automatic_spacing ? GridLineSpacing.Value / 8 : GridLineSpacing.Value * 2;
                     return true;
 
                 case GlobalAction.EditorCycleGridType:

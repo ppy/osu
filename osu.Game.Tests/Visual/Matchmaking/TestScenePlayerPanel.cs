@@ -11,12 +11,11 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
-using osu.Game.Tests.Visual.Multiplayer;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
-    public partial class TestScenePlayerPanel : MultiplayerTestScene
+    public partial class TestScenePlayerPanel : MatchmakingTestScene
     {
         private PlayerPanel panel = null!;
 
