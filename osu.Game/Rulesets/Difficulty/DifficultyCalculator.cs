@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
-using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps;
@@ -29,11 +28,15 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         protected IBeatmap Beatmap { get; private set; }
 
+        /// <summary>
+        /// The working beatmap for which difficulty will be calculated.
+        /// </summary>
+        protected readonly IWorkingBeatmap WorkingBeatmap;
+
         private Mod[] playableMods;
         private double clockRate;
 
         private readonly IRulesetInfo ruleset;
-        private readonly IWorkingBeatmap beatmap;
 
         /// <summary>
         /// A yymmdd version which is used to discern when reprocessing is required.
@@ -43,7 +46,7 @@ namespace osu.Game.Rulesets.Difficulty
         protected DifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
         {
             this.ruleset = ruleset;
-            this.beatmap = beatmap;
+            WorkingBeatmap = beatmap;
         }
 
         /// <summary>
@@ -62,7 +65,13 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns>A structure describing the difficulty of the beatmap.</returns>
         public DifficultyAttributes Calculate([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
         {
+            using var timedCancellationSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+            if (!cancellationToken.CanBeCanceled)
+                cancellationToken = timedCancellationSource.Token;
+
             cancellationToken.ThrowIfCancellationRequested();
+            // ReSharper disable once PossiblyMistakenUseOfCancellationToken
             preProcess(mods, cancellationToken);
 
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
@@ -98,7 +107,13 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns>The set of <see cref="TimedDifficultyAttributes"/>.</returns>
         public List<TimedDifficultyAttributes> CalculateTimed([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
         {
+            using var timedCancellationSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+            if (!cancellationToken.CanBeCanceled)
+                cancellationToken = timedCancellationSource.Token;
+
             cancellationToken.ThrowIfCancellationRequested();
+            // ReSharper disable once PossiblyMistakenUseOfCancellationToken
             preProcess(mods, cancellationToken);
 
             var attribs = new List<TimedDifficultyAttributes>();
@@ -166,19 +181,12 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         /// <param name="mods">The original list of <see cref="Mod"/>s.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        private void preProcess([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
+        private void preProcess([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken)
         {
             playableMods = mods.Select(m => m.DeepClone()).ToArray();
+            Beatmap = WorkingBeatmap.GetPlayableBeatmap(ruleset, playableMods, cancellationToken);
 
-            // Only pass through the cancellation token if it's non-default.
-            // This allows for the default timeout to be applied for playable beatmap construction.
-            Beatmap = cancellationToken == default
-                ? beatmap.GetPlayableBeatmap(ruleset, playableMods)
-                : beatmap.GetPlayableBeatmap(ruleset, playableMods, cancellationToken);
-
-            var track = new TrackVirtual(10000);
-            playableMods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
-            clockRate = track.Rate;
+            clockRate = ModUtils.CalculateRateWithMods(playableMods);
         }
 
         /// <summary>
@@ -339,6 +347,7 @@ namespace osu.Game.Rulesets.Difficulty
             public double TotalBreakTime => baseBeatmap.TotalBreakTime;
             public IEnumerable<BeatmapStatistic> GetStatistics() => baseBeatmap.GetStatistics();
             public double GetMostCommonBeatLength() => baseBeatmap.GetMostCommonBeatLength();
+            public int BeatmapVersion => baseBeatmap.BeatmapVersion;
             public IBeatmap Clone() => new ProgressiveCalculationBeatmap(baseBeatmap.Clone());
 
             public double AudioLeadIn

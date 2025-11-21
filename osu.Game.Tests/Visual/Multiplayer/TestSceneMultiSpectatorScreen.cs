@@ -17,8 +17,10 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
@@ -27,6 +29,7 @@ using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -42,6 +45,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private BeatmapManager beatmapManager { get; set; } = null!;
 
         private MultiSpectatorScreen spectatorScreen = null!;
+        private Room room = null!;
 
         private readonly List<MultiplayerRoomUser> playingUsers = new List<MultiplayerRoomUser>();
 
@@ -63,6 +67,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             base.SetUpSteps();
 
             AddStep("clear playing users", () => playingUsers.Clear());
+
+            AddStep("create room", () => room = CreateDefaultRoom());
+            AddStep("join room", () => JoinRoom(room));
+            WaitForJoined();
         }
 
         [TestCase(1)]
@@ -297,7 +305,68 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestMostInSyncUserIsAudioSource()
+        [Explicit("Test relies on timing of arriving frames to exercise assertions which doesn't work headless.")]
+        public void TestMaximisedUserIsAudioSource()
+        {
+            start(new[] { PLAYER_1_ID, PLAYER_2_ID });
+            loadSpectateScreen();
+
+            // With no frames, the synchronisation state will be TooFarAhead.
+            // In this state, all players should be muted.
+            assertMuted(PLAYER_1_ID, true);
+            assertMuted(PLAYER_2_ID, true);
+
+            // Send frames for both players.
+            sendFrames(PLAYER_1_ID, 20);
+            sendFrames(PLAYER_2_ID, 40);
+
+            waitUntilRunning(PLAYER_1_ID);
+            AddStep("maximise player 1", () =>
+            {
+                InputManager.MoveMouseTo(getInstance(PLAYER_1_ID));
+                InputManager.Click(MouseButton.Left);
+            });
+            assertMuted(PLAYER_1_ID, false);
+            assertMuted(PLAYER_2_ID, true);
+
+            waitUntilPaused(PLAYER_1_ID);
+            assertMuted(PLAYER_1_ID, false);
+            assertMuted(PLAYER_2_ID, true);
+
+            AddStep("minimise player 1", () =>
+            {
+                InputManager.MoveMouseTo(getInstance(PLAYER_1_ID));
+                InputManager.Click(MouseButton.Left);
+            });
+            assertMuted(PLAYER_1_ID, true);
+            assertMuted(PLAYER_2_ID, false);
+
+            AddStep("maximise player 2", () =>
+            {
+                InputManager.MoveMouseTo(getInstance(PLAYER_2_ID));
+                InputManager.Click(MouseButton.Left);
+            });
+            assertMuted(PLAYER_1_ID, true);
+            assertMuted(PLAYER_2_ID, false);
+
+            waitUntilPaused(PLAYER_2_ID);
+            sendFrames(PLAYER_1_ID, 60);
+
+            assertMuted(PLAYER_1_ID, true);
+            assertMuted(PLAYER_2_ID, false);
+
+            AddStep("minimise player 2", () =>
+            {
+                InputManager.MoveMouseTo(getInstance(PLAYER_2_ID));
+                InputManager.Click(MouseButton.Left);
+            });
+            assertMuted(PLAYER_1_ID, false);
+            assertMuted(PLAYER_2_ID, true);
+        }
+
+        [Test]
+        [FlakyTest]
+        public void TestMostInSyncUserIsAudioSourceIfNoneMaximised()
         {
             start(new[] { PLAYER_1_ID, PLAYER_2_ID });
             loadSpectateScreen();
@@ -372,7 +441,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             sendFrames(getPlayerIds(4), 300);
 
-            AddUntilStep("wait for correct track speed", () => Beatmap.Value.Track.Rate, () => Is.EqualTo(1.5));
+            AddUntilStep("wait for correct track speed",
+                () => this.ChildrenOfType<MultiSpectatorPlayer>().All(player => player.ClockAdjustmentsFromMods.AggregateTempo.Value == 1.5));
         }
 
         [Test]
@@ -428,6 +498,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
             b.Storyboard.GetLayer("Background").Add(sprite);
         });
 
+        [Test]
+        public void TestFRankDisplay()
+        {
+            int[] userIds = getPlayerIds(1);
+
+            start(userIds);
+            loadSpectateScreen();
+
+            sendFrames(userIds, 1000);
+            AddUntilStep("player has F rank", () => this.ChildrenOfType<MultiSpectatorPlayer>().All(msp => msp.GameplayState.ScoreProcessor.Rank.Value == ScoreRank.F));
+        }
+
         private void testLeadIn(Action<WorkingBeatmap>? applyToBeatmap = null)
         {
             start(PLAYER_1_ID);
@@ -455,7 +537,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 applyToBeatmap?.Invoke(Beatmap.Value);
 
-                LoadScreen(spectatorScreen = new MultiSpectatorScreen(SelectedRoom.Value!, playingUsers.ToArray()));
+                LoadScreen(spectatorScreen = new MultiSpectatorScreen(room, playingUsers.ToArray()));
             });
 
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded && (!waitForPlayerLoad || spectatorScreen.AllPlayersLoaded));
@@ -553,7 +635,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private PlayerArea getInstance(int userId) => spectatorScreen.ChildrenOfType<PlayerArea>().Single(p => p.UserId == userId);
 
-        private GameplayLeaderboardScore getLeaderboardScore(int userId) => spectatorScreen.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.OnlineID == userId);
+        private DrawableGameplayLeaderboardScore getLeaderboardScore(int userId) => spectatorScreen.Leaderboard.ChildrenOfType<DrawableGameplayLeaderboardScore>().Single(s => s.User?.OnlineID == userId);
 
         private int[] getPlayerIds(int count) => Enumerable.Range(PLAYER_1_ID, count).ToArray();
     }

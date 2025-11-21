@@ -49,6 +49,7 @@ using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Chat;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
@@ -82,8 +83,6 @@ namespace osu.Game
 
         public const string OSU_PROTOCOL = "osu://";
 
-        public const string CLIENT_STREAM_NAME = @"lazer";
-
         /// <summary>
         /// The filename of the main client database.
         /// </summary>
@@ -91,7 +90,7 @@ namespace osu.Game
 
         public const int SAMPLE_CONCURRENCY = 6;
 
-        public const double SFX_STEREO_STRENGTH = 0.75;
+        public const double SFX_STEREO_STRENGTH = 0.6;
 
         /// <summary>
         /// Length of debounce (in milliseconds) for commonly occuring sample playbacks that could stack.
@@ -108,6 +107,8 @@ namespace osu.Game
         public virtual EndpointConfiguration CreateEndpoints() =>
             UseDevelopmentServer ? new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
 
+        protected override OnlineStore CreateOnlineStore() => new TrustedDomainOnlineStore();
+
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
         /// <summary>
@@ -117,8 +118,6 @@ namespace osu.Game
 
         public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
-        internal const string BUILD_SUFFIX = "lazer";
-
         public virtual string Version
         {
             get
@@ -126,8 +125,16 @@ namespace osu.Game
                 if (!IsDeployedBuild)
                     return @"local " + (DebugUtils.IsDebugBuild ? @"debug" : @"release");
 
-                var version = AssemblyVersion;
-                return $@"{version.Major}.{version.Minor}.{version.Build}-{BUILD_SUFFIX}";
+                string informationalVersion = Assembly.GetEntryAssembly()?
+                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+                    .InformationalVersion;
+
+                // Example: [assembly: AssemblyInformationalVersion("2025.613.0-tachyon+d934e574b2539e8787956c3c9ecce9dadebb10ee")]
+                if (!string.IsNullOrEmpty(informationalVersion))
+                    return informationalVersion.Split('+').First();
+
+                Version version = AssemblyVersion;
+                return $@"{version.Major}.{version.Minor}.{version.Build}-lazer";
             }
         }
 
@@ -201,6 +208,7 @@ namespace osu.Game
 
         private UserLookupCache userCache;
         private BeatmapLookupCache beatmapCache;
+        protected LeaderboardManager LeaderboardManager { get; private set; }
 
         private RulesetConfigCache rulesetConfigCache;
 
@@ -278,7 +286,7 @@ namespace osu.Game
             dependencies.CacheAs(Storage);
 
             var largeStore = new LargeTextureStore(Host.Renderer, Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
-            largeStore.AddTextureSource(Host.CreateTextureLoaderStore(new OnlineStore()));
+            largeStore.AddTextureSource(Host.CreateTextureLoaderStore(CreateOnlineStore()));
             dependencies.Cache(largeStore);
 
             dependencies.CacheAs(LocalConfig);
@@ -295,7 +303,7 @@ namespace osu.Game
 
             EndpointConfiguration endpoints = CreateEndpoints();
 
-            MessageFormatter.WebsiteRootUrl = endpoints.WebsiteRootUrl;
+            MessageFormatter.WebsiteRootUrl = endpoints.WebsiteUrl;
 
             frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
             frameworkLocale.BindValueChanged(_ => updateLanguage());
@@ -315,6 +323,7 @@ namespace osu.Game
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, API, LocalConfig));
 
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, API, Audio, Resources, Host, defaultBeatmap, difficultyCache, performOnlineLookups: true));
+            dependencies.CacheAs<IWorkingBeatmapCache>(BeatmapManager);
 
             dependencies.Cache(BeatmapDownloader = new BeatmapModelDownloader(BeatmapManager, API));
             dependencies.Cache(ScoreDownloader = new ScoreModelDownloader(ScoreManager, API));
@@ -361,6 +370,9 @@ namespace osu.Game
 
             dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
             dependencies.CacheAs(Beatmap);
+
+            dependencies.Cache(LeaderboardManager = new LeaderboardManager());
+            base.Content.Add(LeaderboardManager);
 
             // add api components to hierarchy.
             if (API is APIAccess apiAccess)
@@ -418,26 +430,32 @@ namespace osu.Game
 
             Ruleset.BindValueChanged(onRulesetChanged);
             Beatmap.BindValueChanged(onBeatmapChanged);
+
+            // make config aware of how to lookup skins for on-screen display purposes.
+            // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.
+            LocalConfig.LookupSkinName = id => SkinManager.Query(s => s.ID == id)?.ToString() ?? "Unknown";
+            LocalConfig.LookupKeyBindings = l => KeyBindingStore.GetBindingsStringFor(l);
         }
 
         private void updateLanguage() => CurrentLanguage.Value = LanguageExtensions.GetLanguageFor(frameworkLocale.Value, localisationParameters.Value);
 
         private void addFilesWarning()
         {
-            var realmStore = new RealmFileStore(realm, Storage);
-
             const string filename = "IMPORTANT READ ME.txt";
 
-            if (!realmStore.Storage.Exists(filename))
+            if (!Storage.Exists(filename))
             {
-                using (var stream = realmStore.Storage.CreateFileSafely(filename))
+                using (var stream = Storage.CreateFileSafely(filename))
                 using (var textWriter = new StreamWriter(stream))
                 {
-                    textWriter.WriteLine(@"This folder contains all your user files (beatmaps, skins, replays etc.)");
-                    textWriter.WriteLine(@"Please do not touch or delete this folder!!");
+                    textWriter.WriteLine(@"This folder contains all your user files and configuration.");
+                    textWriter.WriteLine(@"Please DO NOT make manual changes to this folder.");
                     textWriter.WriteLine();
-                    textWriter.WriteLine(@"If you are really looking to completely delete user data, please delete");
-                    textWriter.WriteLine(@"the parent folder including all other files and directories");
+                    textWriter.WriteLine(@"- If you want to back up your game files, please back up THE ENTIRETY OF THIS DIRECTORY.");
+                    textWriter.WriteLine(@"- If you want to delete all of your game files, please delete THE ENTIRETY OF THIS DIRECTORY.");
+                    textWriter.WriteLine();
+                    textWriter.WriteLine(@"To be very clear, the ""files/"" directory inside this directory stores all the raw pieces of your beatmaps, skins, and replays.");
+                    textWriter.WriteLine(@"Importantly, it is NOT the only directory you need a backup of to avoid losing data. If you copy only the ""files/"" directory, YOU WILL LOSE DATA.");
                     textWriter.WriteLine();
                     textWriter.WriteLine(@"For more information on how these files are organised,");
                     textWriter.WriteLine(@"see https://github.com/ppy/osu/wiki/User-file-storage");
@@ -449,8 +467,6 @@ namespace osu.Game
 
         protected virtual void InitialiseFonts()
         {
-            AddFont(Resources, @"Fonts/osuFont");
-
             AddFont(Resources, @"Fonts/Torus/Torus-Regular");
             AddFont(Resources, @"Fonts/Torus/Torus-Light");
             AddFont(Resources, @"Fonts/Torus/Torus-SemiBold");
@@ -471,9 +487,10 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Inter/Inter-BoldItalic");
 
             AddFont(Resources, @"Fonts/Noto/Noto-Basic");
-            AddFont(Resources, @"Fonts/Noto/Noto-Hangul");
+            AddFont(Resources, @"Fonts/Noto/Noto-Bopomofo");
             AddFont(Resources, @"Fonts/Noto/Noto-CJK-Basic");
             AddFont(Resources, @"Fonts/Noto/Noto-CJK-Compatibility");
+            AddFont(Resources, @"Fonts/Noto/Noto-Hangul");
             AddFont(Resources, @"Fonts/Noto/Noto-Thai");
 
             AddFont(Resources, @"Fonts/Venera/Venera-Light");

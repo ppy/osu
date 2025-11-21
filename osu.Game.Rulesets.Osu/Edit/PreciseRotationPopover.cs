@@ -96,11 +96,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
-            ScheduleAfterChildren(() =>
-            {
-                angleInput.TakeFocus();
-                angleInput.SelectAll();
-            });
+            ScheduleAfterChildren(() => angleInput.TakeFocus());
             angleInput.Current.BindValueChanged(angle => rotationInfo.Value = rotationInfo.Value with { Degrees = angle.NewValue });
 
             rotationHandler.CanRotateAroundSelectionOrigin.BindValueChanged(e =>
@@ -161,6 +157,10 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             rotationInfo.BindValueChanged(rotation =>
             {
+                // can happen if the popover is dismissed by a keyboard key press while dragging UI controls
+                if (!rotationHandler.OperationInProgress.Value)
+                    return;
+
                 rotationHandler.Update(rotation.NewValue.Degrees, getOriginPosition(rotation.NewValue));
             });
         }

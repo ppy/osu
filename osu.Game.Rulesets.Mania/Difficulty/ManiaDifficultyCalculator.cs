@@ -27,7 +27,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private const double difficulty_multiplier = 0.018;
 
         private readonly bool isForCurrentRuleset;
-        private readonly double originalOverallDifficulty;
 
         public override int Version => 20241007;
 
@@ -35,7 +34,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             : base(ruleset, beatmap)
         {
             isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.MatchesOnlineID(ruleset);
-            originalOverallDifficulty = beatmap.BeatmapInfo.Difficulty.OverallDifficulty;
         }
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
@@ -48,11 +46,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             ManiaDifficultyAttributes attributes = new ManiaDifficultyAttributes
             {
-                StarRating = skills[0].DifficultyValue() * difficulty_multiplier,
+                StarRating = skills.OfType<Strain>().Single().DifficultyValue() * difficulty_multiplier,
                 Mods = mods,
-                // In osu-stable mania, rate-adjustment mods don't affect the hit window.
-                // This is done the way it is to introduce fractional differences in order to match osu-stable for the time being.
-                GreatHitWindow = Math.Ceiling((int)(getHitWindow300(mods) * clockRate) / clockRate),
                 MaxCombo = beatmap.HitObjects.Sum(maxComboForObject),
             };
 
@@ -70,13 +65,22 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             var sortedObjects = beatmap.HitObjects.ToArray();
+            int totalColumns = ((ManiaBeatmap)beatmap).TotalColumns;
 
             LegacySortHelper<HitObject>.Sort(sortedObjects, Comparer<HitObject>.Create((a, b) => (int)Math.Round(a.StartTime) - (int)Math.Round(b.StartTime)));
 
             List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
+            List<DifficultyHitObject>[] perColumnObjects = new List<DifficultyHitObject>[totalColumns];
+
+            for (int column = 0; column < totalColumns; column++)
+                perColumnObjects[column] = new List<DifficultyHitObject>();
 
             for (int i = 1; i < sortedObjects.Length; i++)
-                objects.Add(new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1], clockRate, objects, objects.Count));
+            {
+                var currentObject = new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1], clockRate, objects, perColumnObjects, objects.Count);
+                objects.Add(currentObject);
+                perColumnObjects[currentObject.Column].Add(currentObject);
+            }
 
             return objects;
         }
@@ -122,30 +126,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                     new ManiaModKey9(),
                     new MultiMod(new ManiaModKey9(), new ManiaModDualStages()),
                 }).ToArray();
-            }
-        }
-
-        private double getHitWindow300(Mod[] mods)
-        {
-            if (isForCurrentRuleset)
-            {
-                double od = Math.Min(10.0, Math.Max(0, 10.0 - originalOverallDifficulty));
-                return applyModAdjustments(34 + 3 * od, mods);
-            }
-
-            if (Math.Round(originalOverallDifficulty) > 4)
-                return applyModAdjustments(34, mods);
-
-            return applyModAdjustments(47, mods);
-
-            static double applyModAdjustments(double value, Mod[] mods)
-            {
-                if (mods.Any(m => m is ManiaModHardRock))
-                    value /= 1.4;
-                else if (mods.Any(m => m is ManiaModEasy))
-                    value *= 1.4;
-
-                return value;
             }
         }
     }

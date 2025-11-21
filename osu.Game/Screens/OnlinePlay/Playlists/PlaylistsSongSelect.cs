@@ -39,7 +39,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             ID = room.Playlist.Count == 0 ? 0 : room.Playlist.Max(p => p.ID) + 1,
             RulesetID = Ruleset.Value.OnlineID,
             RequiredMods = Mods.Value.Select(m => new APIMod(m)).ToArray(),
-            AllowedMods = FreeMods.Value.Select(m => new APIMod(m)).ToArray()
+            AllowedMods = FreeMods.Value.Select(m => new APIMod(m)).ToArray(),
+            Freestyle = Freestyle.Value
         };
     }
 }

@@ -16,6 +16,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Solo;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -235,6 +236,31 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestNoSubmissionWhenScoreZero()
+        {
+            prepareTestAPI(true);
+
+            createPlayerTest();
+
+            AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+
+            AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
+            AddUntilStep("wait for first result", () => Player.Results.Count > 0);
+
+            AddStep("add fake non-scoring hit", () =>
+            {
+                Player.ScoreProcessor.RevertResult(Player.Results.First());
+                Player.ScoreProcessor.ApplyResult(new OsuJudgementResult(Beatmap.Value.Beatmap.HitObjects.First(), new IgnoreJudgement())
+                {
+                    Type = HitResult.IgnoreHit,
+                });
+            });
+
+            AddStep("exit", () => Player.Exit());
+            AddAssert("ensure no submission", () => Player.SubmittedScore == null);
+        }
+
+        [Test]
         public void TestSubmissionOnExit()
         {
             prepareTestAPI(true);
@@ -279,6 +305,26 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 var beatmap = createTestBeatmap(r);
                 beatmap.BeatmapInfo.ResetOnlineInfo();
+                return beatmap;
+            });
+
+            AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+
+            addFakeHit();
+
+            AddStep("exit", () => Player.Exit());
+            AddAssert("ensure no submission", () => Player.SubmittedScore == null);
+        }
+
+        [Test]
+        public void TestNoSubmissionOnLocallyModifiedBeatmapWithOnlineId()
+        {
+            prepareTestAPI(true);
+
+            createPlayerTest(false, r =>
+            {
+                var beatmap = createTestBeatmap(r);
+                beatmap.BeatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
                 return beatmap;
             });
 

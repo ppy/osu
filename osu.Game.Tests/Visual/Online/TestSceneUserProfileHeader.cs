@@ -18,6 +18,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Tests.Resources;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
@@ -79,7 +80,7 @@ namespace osu.Game.Tests.Visual.Online
                 Id = 1001,
                 Username = "IAmOnline",
                 LastVisit = DateTimeOffset.Now,
-                IsOnline = true,
+                WasRecentlyOnline = true,
             }, new OsuRuleset().RulesetInfo));
 
             AddStep("Show offline user", () => header.User.Value = new UserProfileData(new APIUser
@@ -87,7 +88,7 @@ namespace osu.Game.Tests.Visual.Online
                 Id = 1002,
                 Username = "IAmOffline",
                 LastVisit = DateTimeOffset.Now.AddDays(-10),
-                IsOnline = false,
+                WasRecentlyOnline = false,
             }, new OsuRuleset().RulesetInfo));
         }
 
@@ -136,7 +137,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Id = 727,
                 Username = "SomeoneIndecisive",
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
+                CoverUrl = TestResources.COVER_IMAGE_1,
                 Groups = new[]
                 {
                     new APIUserGroup { Colour = "#EB47D0", ShortName = "DEV", Name = "Developers" },
@@ -162,7 +163,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Id = 728,
                 Username = "Certain Guy",
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c2.jpg",
+                CoverUrl = TestResources.COVER_IMAGE_2,
                 Statistics = new UserStatistics
                 {
                     IsRanked = false,
@@ -442,7 +443,7 @@ namespace osu.Game.Tests.Visual.Online
                     Task.Run(() =>
                     {
                         requestLock.Wait(3000);
-                        dummyAPI.Friends.Add(apiRelation);
+                        dummyAPI.LocalUserState.Friends.Add(apiRelation);
                         req.TriggerSuccess(new AddFriendResponse
                         {
                             UserRelation = apiRelation
@@ -452,11 +453,11 @@ namespace osu.Game.Tests.Visual.Online
                     return true;
                 };
             });
-            AddStep("clear friend list", () => dummyAPI.Friends.Clear());
+            AddStep("clear friend list", () => dummyAPI.LocalUserState.Friends.Clear());
             AddStep("Show non-friend user", () => header.User.Value = new UserProfileData(nonFriend, new OsuRuleset().RulesetInfo));
             AddStep("Click followers button", () => this.ChildrenOfType<FollowersButton>().First().TriggerClick());
             AddStep("Complete request", () => requestLock.Set());
-            AddUntilStep("Friend added", () => API.Friends.Any(f => f.TargetID == nonFriend.OnlineID));
+            AddUntilStep("Friend added", () => API.LocalUserState.Friends.Any(f => f.TargetID == nonFriend.OnlineID));
         }
 
         [Test]
@@ -485,7 +486,7 @@ namespace osu.Game.Tests.Visual.Online
                     Task.Run(() =>
                     {
                         requestLock.Wait(3000);
-                        dummyAPI.Friends.Add(apiRelation);
+                        dummyAPI.LocalUserState.Friends.Add(apiRelation);
                         req.TriggerSuccess(new AddFriendResponse
                         {
                             UserRelation = apiRelation
@@ -495,11 +496,11 @@ namespace osu.Game.Tests.Visual.Online
                     return true;
                 };
             });
-            AddStep("clear friend list", () => dummyAPI.Friends.Clear());
+            AddStep("clear friend list", () => dummyAPI.LocalUserState.Friends.Clear());
             AddStep("Show non-friend user", () => header.User.Value = new UserProfileData(nonFriend, new OsuRuleset().RulesetInfo));
             AddStep("Click followers button", () => this.ChildrenOfType<FollowersButton>().First().TriggerClick());
             AddStep("Complete request", () => requestLock.Set());
-            AddUntilStep("Friend added", () => API.Friends.Any(f => f.TargetID == nonFriend.OnlineID));
+            AddUntilStep("Friend added", () => API.LocalUserState.Friends.Any(f => f.TargetID == nonFriend.OnlineID));
         }
     }
 }

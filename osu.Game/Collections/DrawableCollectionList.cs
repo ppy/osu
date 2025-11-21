@@ -96,7 +96,6 @@ namespace osu.Game.Collections
                 lastCreated = collections[changes.InsertedIndices[0]].ID;
 
             foreach (int i in changes.NewModifiedIndices)
-
             {
                 var updatedItem = collections[i];
 

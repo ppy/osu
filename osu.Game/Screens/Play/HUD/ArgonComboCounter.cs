@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play.HUD
             MaxValue = 1,
         };
 
-        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.ShowLabel), nameof(SkinnableComponentStrings.ShowLabelDescription))]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.ShowLabel))]
         public Bindable<bool> ShowLabel { get; } = new BindableBool(true);
 
         [BackgroundDependencyLoader]

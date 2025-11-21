@@ -21,14 +21,9 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
             {
                 new SettingsCheckbox
                 {
-                    ClassicDefault = true,
-                    LabelText = UserInterfaceStrings.RightMouseScroll,
-                    Current = config.GetBindable<bool>(OsuSetting.SongSelectRightMouseScroll),
-                },
-                new SettingsCheckbox
-                {
                     LabelText = UserInterfaceStrings.ShowConvertedBeatmaps,
                     Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
+                    Keywords = new[] { "converts", "converted" }
                 },
                 new SettingsEnumDropdown<RandomSelectAlgorithm>
                 {

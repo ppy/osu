@@ -4,7 +4,6 @@
 #nullable disable
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -20,6 +19,7 @@ using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
+using CommonStrings = osu.Game.Localisation.CommonStrings;
 
 namespace osu.Game.Screens.Play
 {
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Play
             this.mods.BindTo(mods);
         }
 
-        private IBindable<StarDifficulty?> starDifficulty;
+        private IBindable<StarDifficulty> starDifficulty;
 
         private FillFlowContainer versionFlow;
         private StarRatingDisplay starRatingDisplay;
@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Play
                                 },
                                 new Drawable[]
                                 {
-                                    new MetadataLineLabel("Mapper"),
+                                    new MetadataLineLabel(CommonStrings.Mapper),
                                     new MetadataLineInfo(metadata.Author.Username)
                                 }
                             }
@@ -191,25 +191,15 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            if (starDifficulty.Value != null)
+            starDifficulty.BindValueChanged(d =>
             {
-                starRatingDisplay.Current.Value = starDifficulty.Value.Value;
-                starRatingDisplay.Show();
-            }
-            else
-                starRatingDisplay.Hide();
-
-            starDifficulty.ValueChanged += d =>
-            {
-                Debug.Assert(d.NewValue != null);
-
-                starRatingDisplay.Current.Value = d.NewValue.Value;
+                starRatingDisplay.Current.Value = d.NewValue;
 
                 versionFlow.AutoSizeDuration = 300;
                 versionFlow.AutoSizeEasing = Easing.OutQuint;
 
                 starRatingDisplay.FadeIn(300, Easing.InQuint);
-            };
+            }, true);
         }
 
         private partial class MetadataLineLabel : OsuSpriteText

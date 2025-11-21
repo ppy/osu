@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
@@ -79,7 +80,7 @@ namespace osu.Game.Collections
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Text = "Manage collections",
+                                            Text = CollectionsStrings.ManageCollectionsTitle,
                                             Font = OsuFont.GetFont(size: 30),
                                             Padding = new MarginPadding { Vertical = 10 },
                                         },

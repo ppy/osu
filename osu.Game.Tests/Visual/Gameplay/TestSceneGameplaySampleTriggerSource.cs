@@ -65,30 +65,30 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 new HitCircle
                 {
-                    HitWindows = new HitWindows(),
+                    HitWindows = new DefaultHitWindows(),
                     StartTime = t += spacing,
                     Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
                 },
                 new HitCircle
                 {
-                    HitWindows = new HitWindows(),
+                    HitWindows = new DefaultHitWindows(),
                     StartTime = t += spacing,
                     Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_WHISTLE) }
                 },
                 new HitCircle
                 {
-                    HitWindows = new HitWindows(),
+                    HitWindows = new DefaultHitWindows(),
                     StartTime = t += spacing,
                     Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, HitSampleInfo.BANK_SOFT) },
                 },
                 new HitCircle
                 {
-                    HitWindows = new HitWindows(),
+                    HitWindows = new DefaultHitWindows(),
                     StartTime = t += spacing,
                 },
                 new Slider
                 {
-                    HitWindows = new HitWindows(),
+                    HitWindows = new DefaultHitWindows(),
                     StartTime = t += spacing,
                     Path = new SliderPath(PathType.LINEAR, new[] { Vector2.Zero, Vector2.UnitY * 200 }),
                     Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_WHISTLE, HitSampleInfo.BANK_SOFT) },

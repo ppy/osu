@@ -4,6 +4,7 @@
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
@@ -18,7 +19,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         private double skillMultiplier => 1.1;
         private double strainDecayBase => 0.4;
 
-        private readonly bool singleColourStamina;
+        public readonly bool SingleColourStamina;
+        private readonly bool isConvert;
 
         private double currentStrain;
 
@@ -27,10 +29,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         /// </summary>
         /// <param name="mods">Mods for use in skill calculations.</param>
         /// <param name="singleColourStamina">Reads when Stamina is from a single coloured pattern.</param>
-        public Stamina(Mod[] mods, bool singleColourStamina)
+        /// <param name="isConvert">Determines if the currently evaluated beatmap is converted.</param>
+        public Stamina(Mod[] mods, bool singleColourStamina, bool isConvert)
             : base(mods)
         {
-            this.singleColourStamina = singleColourStamina;
+            SingleColourStamina = singleColourStamina;
+            this.isConvert = isConvert;
         }
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
@@ -38,18 +42,28 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += StaminaEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
+            double staminaDifficulty = StaminaEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
 
             // Safely prevents previous strains from shifting as new notes are added.
             var currentObject = current as TaikoDifficultyHitObject;
-            int index = currentObject?.Colour.MonoStreak?.HitObjects.IndexOf(currentObject) ?? 0;
+            int index = currentObject?.ColourData.MonoStreak?.HitObjects.IndexOf(currentObject) ?? 0;
 
-            if (singleColourStamina)
-                return currentStrain / (1 + Math.Exp(-(index - 10) / 2.0));
+            double monoLengthBonus = isConvert ? 1.0 : 1.0 + 0.5 * DifficultyCalculationUtils.ReverseLerp(index, 5, 20);
 
-            return currentStrain;
+            // Mono-streak bonus is only applied to colour-based stamina to reward longer sequences of same-colour hits within patterns.
+            if (!SingleColourStamina)
+                staminaDifficulty *= monoLengthBonus;
+
+            currentStrain += staminaDifficulty;
+
+            // For converted maps, difficulty often comes entirely from long mono streams with no colour variation.
+            // To avoid over-rewarding these maps based purely on stamina strain, we dampen the strain value once the index exceeds 10.
+            return SingleColourStamina ? DifficultyCalculationUtils.Logistic(-(index - 10) / 2.0, currentStrain) : currentStrain;
         }
 
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => singleColourStamina ? 0 : currentStrain * strainDecay(time - current.Previous(0).StartTime);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) =>
+            SingleColourStamina
+                ? 0
+                : currentStrain * strainDecay(time - current.Previous(0).StartTime);
     }
 }

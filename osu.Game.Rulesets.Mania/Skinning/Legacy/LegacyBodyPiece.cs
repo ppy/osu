@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             var wrapMode = bodyStyle == LegacyNoteBodyStyle.Stretch ? WrapMode.ClampToEdge : WrapMode.Repeat;
 
             direction.BindTo(scrollingInfo.Direction);
-            isHitting.BindTo(holdNote.IsHitting);
+            isHitting.BindTo(holdNote.IsHolding);
 
             bodySprite = skin.GetAnimation(imageName, wrapMode, wrapMode, true, true, frameLength: 30)?.With(d =>
             {

@@ -3,14 +3,15 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.OnlinePlay
@@ -20,10 +21,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     /// </summary>
     public abstract partial class OnlinePlayTestScene : ScreenTestScene, IOnlinePlayTestSceneDependencies
     {
-        public Bindable<Room?> SelectedRoom => OnlinePlayDependencies.SelectedRoom;
-        public IRoomManager RoomManager => OnlinePlayDependencies.RoomManager;
         public OngoingOperationTracker OngoingOperationTracker => OnlinePlayDependencies.OngoingOperationTracker;
-        public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker => OnlinePlayDependencies.AvailabilityTracker;
         public TestUserLookupCache UserLookupCache => OnlinePlayDependencies.UserLookupCache;
         public BeatmapLookupCache BeatmapLookupCache => OnlinePlayDependencies.BeatmapLookupCache;
 
@@ -37,6 +35,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         private readonly Container content;
         private readonly Container drawableDependenciesContainer;
         private DelegatedDependencyContainer dependencies = null!;
+        private int currentRoomId;
 
         protected OnlinePlayTestScene()
         {
@@ -92,6 +91,35 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// Any custom dependencies required for online play sub-classes should be added here.
         /// </remarks>
         protected virtual OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new OnlinePlayTestSceneDependencies();
+
+        protected Room[] GenerateRooms(int count, RulesetInfo? ruleset = null, bool withPassword = false, bool withPinnedRooms = false)
+        {
+            Room[] rooms = new Room[count];
+
+            // Can't reference Osu ruleset project here.
+            if (ruleset == null)
+            {
+                using var assemblyRulesetStore = new AssemblyRulesetStore();
+                ruleset = assemblyRulesetStore.GetRuleset(0)!;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                rooms[i] = new Room
+                {
+                    RoomID = currentRoomId++,
+                    Name = $@"Room {currentRoomId}",
+                    Host = new APIUser { Username = @"Host" },
+                    Duration = TimeSpan.FromSeconds(10),
+                    Password = withPassword ? @"password" : null,
+                    PlaylistItemStats = new Room.RoomPlaylistItemStats { RulesetIDs = [ruleset.OnlineID] },
+                    Playlist = [new PlaylistItem(new BeatmapInfo { Metadata = new BeatmapMetadata() }) { RulesetID = ruleset.OnlineID }],
+                    Pinned = withPinnedRooms && i % 2 == 0,
+                };
+            }
+
+            return rooms;
+        }
 
         /// <summary>
         /// A <see cref="IReadOnlyDependencyContainer"/> providing a mutable lookup source for online play dependencies.

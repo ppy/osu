@@ -82,8 +82,18 @@ jobs:
         run: dotnet build -c Debug -warnaserror osu.Desktop.slnf
 
       - name: Test
-        run: dotnet test $pwd/**/*.Tests/bin/Debug/*/*.Tests.dll --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx" -- NUnit.ConsoleOut=0
-        shell: pwsh
+        run: >
+          dotnet test
+          osu.Game.Tests/bin/Debug/**/osu.Game.Tests.dll
+          osu.Game.Rulesets.Osu.Tests/bin/Debug/**/osu.Game.Rulesets.Osu.Tests.dll
+          osu.Game.Rulesets.Taiko.Tests/bin/Debug/**/osu.Game.Rulesets.Taiko.Tests.dll
+          osu.Game.Rulesets.Catch.Tests/bin/Debug/**/osu.Game.Rulesets.Catch.Tests.dll
+          osu.Game.Rulesets.Mania.Tests/bin/Debug/**/osu.Game.Rulesets.Mania.Tests.dll
+          osu.Game.Tournament.Tests/bin/Debug/**/osu.Game.Tournament.Tests.dll
+          Templates/**/*.Tests/bin/Debug/**/*.Tests.dll
+          --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx"
+          --
+          NUnit.ConsoleOut=0
 
       # Attempt to upload results even if test fails.
       # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#always
@@ -114,17 +124,14 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Install .NET workloads
-        # since windows image 20241113.3.0, not specifying a version here
-        # installs the .NET 7 version of android workload for very unknown reasons.
-        # revisit once we upgrade to .NET 9, it's probably fixed there.
-        run: dotnet workload install android --version (dotnet --version)
+        run: dotnet workload install android
 
       - name: Compile
         run: dotnet build -c Debug osu.Android.slnf
 
   build-only-ios:
     name: Build only (iOS)
-    runs-on: macos-latest
+    runs-on: macos-15
     timeout-minutes: 60
     steps:
       - name: Checkout
@@ -136,7 +143,12 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Install .NET Workloads
-        run: dotnet workload install ios --from-rollback-file https://raw.githubusercontent.com/ppy/osu-framework/refs/heads/master/workloads.json
+        run: dotnet workload install ios
+
+      # https://github.com/dotnet/macios/issues/19157
+      # https://github.com/actions/runner-images/issues/12758
+      - name: Use Xcode 16.4
+        run: sudo xcode-select -switch /Applications/Xcode_16.4.app
 
       - name: Build
-        run: dotnet build -c Debug osu.iOS
+        run: dotnet build -c Debug osu.iOS.slnf

@@ -31,7 +31,11 @@ namespace osu.Game.Overlays.Chat.Listing
 
         public bool FilteringActive { get; set; }
         public IEnumerable<LocalisableString> FilterTerms => new LocalisableString[] { Channel.Name, Channel.Topic ?? string.Empty };
-        public bool MatchingFilter { set => this.FadeTo(value ? 1f : 0f, 100); }
+
+        public bool MatchingFilter
+        {
+            set => this.FadeTo(value ? 1f : 0f, 100);
+        }
 
         protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds();
 

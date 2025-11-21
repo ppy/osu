@@ -1,10 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
+using System.Collections.Generic;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Mods;
 
@@ -35,21 +37,40 @@ namespace osu.Game.Rulesets.Catch.Mods
         [SettingSource("Spicy Patterns", "Adjust the patterns as if Hard Rock is enabled.")]
         public BindableBool HardRockOffsets { get; } = new BindableBool();
 
-        public override string SettingDescription
+        public override string ExtendedIconInformation
         {
             get
             {
-                string circleSize = CircleSize.IsDefault ? string.Empty : $"CS {CircleSize.Value:N1}";
-                string approachRate = ApproachRate.IsDefault ? string.Empty : $"AR {ApproachRate.Value:N1}";
-                string spicyPatterns = HardRockOffsets.IsDefault ? string.Empty : "Spicy patterns";
+                if (!IsExactlyOneSettingChanged(CircleSize, ApproachRate, OverallDifficulty, DrainRate))
+                    return string.Empty;
 
-                return string.Join(", ", new[]
-                {
-                    circleSize,
-                    base.SettingDescription,
-                    approachRate,
-                    spicyPatterns,
-                }.Where(s => !string.IsNullOrEmpty(s)));
+                if (!CircleSize.IsDefault) return format("CS", CircleSize);
+                if (!ApproachRate.IsDefault) return format("AR", ApproachRate);
+                if (!OverallDifficulty.IsDefault) return format("OD", OverallDifficulty);
+                if (!DrainRate.IsDefault) return format("HP", DrainRate);
+
+                return string.Empty;
+
+                string format(string acronym, DifficultyBindable bindable)
+                    => $"{acronym}{bindable.Value!.Value.ToStandardFormattedString(1)}";
+            }
+        }
+
+        public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
+        {
+            get
+            {
+                if (!CircleSize.IsDefault)
+                    yield return ("Circle size", $"{CircleSize.Value:N1}");
+
+                foreach (var setting in base.SettingDescription)
+                    yield return setting;
+
+                if (!ApproachRate.IsDefault)
+                    yield return ("Approach rate", $"{ApproachRate.Value:N1}");
+
+                if (!HardRockOffsets.IsDefault)
+                    yield return ("Spicy patterns", "On");
             }
         }
 

@@ -51,8 +51,11 @@ dotnet_diagnostic.IDE1006.severity = warning
 # Too many noisy warnings for parsing/formatting numbers
 dotnet_diagnostic.CA1305.severity = none
 
+# messagepack complains about "osu" not being title cased due to reserved words
+dotnet_diagnostic.CS8981.severity = none
+
 # CA1507: Use nameof to express symbol names
-# Flaggs serialization name attributes
+# Flags serialization name attributes
 dotnet_diagnostic.CA1507.severity = suggestion
 
 # CA1806: Do not ignore method results

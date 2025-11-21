@@ -59,6 +59,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString LockAspectRatio => new TranslatableString(getKey(@"lock_aspect_ratio"), @"Lock aspect ratio");
 
+        /// <summary>
+        /// "Tip pressure for click"
+        /// </summary>
+        public static LocalisableString TipPressureForClick => new TranslatableString(getKey(@"tip_pressure_for_click"), "Tip pressure for click");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

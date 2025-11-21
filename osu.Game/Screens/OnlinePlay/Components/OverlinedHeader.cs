@@ -53,13 +53,11 @@ namespace osu.Game.Screens.OnlinePlay.Components
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 2,
-                        Margin = new MarginPadding { Bottom = 2 }
                     },
                     new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Horizontal,
-                        Margin = new MarginPadding { Top = 5 },
                         Spacing = new Vector2(10, 0),
                         Children = new Drawable[]
                         {

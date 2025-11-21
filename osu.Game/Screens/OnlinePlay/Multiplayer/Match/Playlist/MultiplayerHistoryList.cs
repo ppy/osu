@@ -18,6 +18,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         public MultiplayerHistoryList()
         {
             ShowItemOwners = true;
+            AllowShowingResults = true;
         }
 
         protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new HistoryFillFlowContainer

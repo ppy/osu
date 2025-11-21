@@ -41,7 +41,7 @@ namespace osu.Game.Overlays
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public Action<Notification>? ForwardNotificationToPermanentStore { get; set; }
+        public required Action<Notification> ForwardNotificationToPermanentStore { get; init; }
 
         public int UnreadCount => Notifications.Count(n => !n.WasClosed && !n.Read);
 
@@ -91,7 +91,12 @@ namespace osu.Game.Overlays
         public void FlushAllToasts()
         {
             foreach (var notification in toastFlow.ToArray())
+            {
+                if (notification.IsCritical)
+                    continue;
+
                 forwardNotification(notification);
+            }
         }
 
         public void Post(Notification notification)
@@ -142,8 +147,15 @@ namespace osu.Game.Overlays
             notification.MoveToOffset(new Vector2(400, 0), NotificationOverlay.TRANSITION_LENGTH, Easing.OutQuint);
             notification.FadeOut(NotificationOverlay.TRANSITION_LENGTH, Easing.OutQuint).OnComplete(_ =>
             {
+                if (notification.Transient)
+                {
+                    notification.IsInToastTray = false;
+                    notification.Close(false);
+                    return;
+                }
+
                 RemoveInternal(notification, false);
-                ForwardNotificationToPermanentStore?.Invoke(notification);
+                ForwardNotificationToPermanentStore(notification);
 
                 notification.FadeIn(300, Easing.OutQuint);
             });
@@ -167,7 +179,7 @@ namespace osu.Game.Overlays
                 }
 
                 height = toastFlow.DrawHeight + 120;
-                alpha = MathHelper.Clamp(toastFlow.DrawHeight / 41, 0, 1) * maxNotificationAlpha;
+                alpha = Math.Clamp(toastFlow.DrawHeight / 41, 0, 1) * maxNotificationAlpha;
             }
 
             toastContentBackground.Height = (float)Interpolation.DampContinuously(toastContentBackground.Height, height, 10, Clock.ElapsedFrameTime);

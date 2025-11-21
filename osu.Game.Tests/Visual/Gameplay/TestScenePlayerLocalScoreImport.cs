@@ -257,6 +257,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("score in database", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID) != null));
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
+        }
+
         private class CustomRuleset : OsuRuleset, ILegacyRuleset
         {
             public override string Description => "custom";

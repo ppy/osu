@@ -19,6 +19,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
+    [Cached]
     public partial class ManiaHitObjectComposer : ScrollingHitObjectComposer<ManiaHitObject>
     {
         private DrawableManiaEditorRuleset drawableRuleset = null!;
@@ -64,11 +65,11 @@ namespace osu.Game.Rulesets.Mania.Edit
                 return;
 
             List<ManiaHitObject> remainingHitObjects = EditorBeatmap.HitObjects.Cast<ManiaHitObject>().Where(h => h.StartTime >= timestamp).ToList();
-            string[] objectDescriptions = objectDescription.Split(',').ToArray();
+            string[] objectDescriptions = objectDescription.Split(',');
 
             for (int i = 0; i < objectDescriptions.Length; i++)
             {
-                string[] split = objectDescriptions[i].Split('|').ToArray();
+                string[] split = objectDescriptions[i].Split('|');
                 if (split.Length != 2)
                     continue;
 

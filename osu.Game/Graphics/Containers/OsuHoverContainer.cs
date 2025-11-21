@@ -15,9 +15,11 @@ namespace osu.Game.Graphics.Containers
     {
         protected const float FADE_DURATION = 500;
 
-        protected Color4 HoverColour;
+        public Color4? HoverColour { get; set; }
+        private Color4 fallbackHoverColour;
 
-        protected Color4 IdleColour = Color4.White;
+        public Color4? IdleColour { get; set; }
+        private Color4 fallbackIdleColour;
 
         protected virtual IEnumerable<Drawable> EffectTargets => new[] { Content };
 
@@ -67,18 +69,18 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            if (HoverColour == default)
-                HoverColour = colours.Yellow;
+            fallbackHoverColour = colours.Yellow;
+            fallbackIdleColour = Color4.White;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            EffectTargets.ForEach(d => d.FadeColour(IdleColour));
+            EffectTargets.ForEach(d => d.FadeColour(IdleColour ?? fallbackIdleColour));
         }
 
-        private void fadeIn() => EffectTargets.ForEach(d => d.FadeColour(HoverColour, FADE_DURATION, Easing.OutQuint));
+        private void fadeIn() => EffectTargets.ForEach(d => d.FadeColour(HoverColour ?? fallbackHoverColour, FADE_DURATION, Easing.OutQuint));
 
-        private void fadeOut() => EffectTargets.ForEach(d => d.FadeColour(IdleColour, FADE_DURATION, Easing.OutQuint));
+        private void fadeOut() => EffectTargets.ForEach(d => d.FadeColour(IdleColour ?? fallbackIdleColour, FADE_DURATION, Easing.OutQuint));
     }
 }

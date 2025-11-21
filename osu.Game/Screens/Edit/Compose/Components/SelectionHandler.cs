@@ -152,14 +152,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public virtual SelectionRotationHandler CreateRotationHandler() => new SelectionRotationHandler();
 
         /// <summary>
-        /// Handles the selected items being scaled.
-        /// </summary>
-        /// <param name="scale">The delta scale to apply, in local coordinates.</param>
-        /// <param name="anchor">The point of reference where the scale is originating from.</param>
-        /// <returns>Whether any items could be scaled.</returns>
-        public virtual bool HandleScale(Vector2 scale, Anchor anchor) => false;
-
-        /// <summary>
         /// Creates the handler to use for scale operations.
         /// </summary>
         public virtual SelectionScaleHandler CreateScaleHandler() => new SelectionScaleHandler();
@@ -263,15 +255,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
             selectedBlueprints.Remove(blueprint);
         }
 
+        protected virtual bool ShouldQuickDelete(MouseButtonEvent e) => e.Button == MouseButton.Middle || (e.ShiftPressed && e.Button == MouseButton.Right);
+
         /// <summary>
         /// Handle a blueprint requesting selection.
         /// </summary>
         /// <param name="blueprint">The blueprint.</param>
         /// <param name="e">The mouse event responsible for selection.</param>
-        /// <returns>Whether a selection was performed.</returns>
+        /// <returns>Whether an action was performed.</returns>
         internal virtual bool MouseDownSelectionRequested(SelectionBlueprint<T> blueprint, MouseButtonEvent e)
         {
-            if (e.Button == MouseButton.Middle || (e.ShiftPressed && e.Button == MouseButton.Right))
+            if (ShouldQuickDelete(e))
             {
                 handleQuickDeletion(blueprint);
                 return true;

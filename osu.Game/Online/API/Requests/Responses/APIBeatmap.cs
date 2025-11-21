@@ -32,6 +32,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"playcount")]
         public int PlayCount { get; set; }
 
+        [JsonProperty(@"current_user_playcount")]
+        public int UserPlayCount { get; set; }
+
         [JsonProperty(@"passcount")]
         public int PassCount { get; set; }
 
@@ -95,6 +98,12 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"failtimes")]
         public APIFailTimes? FailTimes { get; set; }
 
+        [JsonProperty(@"top_tag_ids")]
+        public APIBeatmapTag[]? TopTags { get; set; }
+
+        [JsonProperty(@"current_user_tag_ids")]
+        public long[]? OwnTagIds { get; set; }
+
         [JsonProperty(@"max_combo")]
         public int? MaxCombo { get; set; }
 
@@ -102,6 +111,9 @@ namespace osu.Game.Online.API.Requests.Responses
         public DateTimeOffset LastUpdated { get; set; }
 
         public double BPM { get; set; }
+
+        [JsonProperty(@"owners")]
+        public BeatmapOwner[] BeatmapOwners { get; set; } = Array.Empty<BeatmapOwner>();
 
         #region Implementation of IBeatmapInfo
 
@@ -170,6 +182,15 @@ namespace osu.Game.Online.API.Requests.Responses
 
             // ReSharper disable once NonReadonlyMemberInGetHashCode
             public override int GetHashCode() => OnlineID;
+        }
+
+        public class BeatmapOwner
+        {
+            [JsonProperty(@"id")]
+            public int Id { get; set; }
+
+            [JsonProperty(@"username")]
+            public string Username { get; set; } = string.Empty;
         }
     }
 }

@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
-using osu.Game.Online.Rooms.RoomStatuses;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
@@ -99,7 +98,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             if (room.Host?.Id == api.LocalUser.Value.Id)
             {
-                if (deletionGracePeriodRemaining > TimeSpan.Zero && room.Status is not RoomStatusEnded)
+                if (deletionGracePeriodRemaining > TimeSpan.Zero && !room.HasEnded)
                 {
                     closeButton.FadeIn();
                     using (BeginDelayedSequence(deletionGracePeriodRemaining.Value.TotalMilliseconds))

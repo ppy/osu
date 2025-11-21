@@ -294,6 +294,92 @@ namespace osu.Game.Tests.Skins.IO
 
         #endregion
 
+        [Test]
+        public async Task TestExternallyMountingWithSubDirectory()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+
+                    var zipStream = new MemoryStream();
+                    using var zip = ZipArchive.Create();
+                    zip.AddEntry("folder/test.png", new MemoryStream(new byte[] { 0xDE, 0xAD, 0xBE, 0xEF }));
+                    zip.SaveTo(zipStream);
+
+                    var import = await loadSkinIntoOsu(osu, new ImportTask(zipStream, "test skin.osk"));
+
+                    var skinManager = osu.Dependencies.Get<SkinManager>();
+                    var externalEdit = await skinManager.BeginExternalEditing(import.PerformRead(s => s.Detach())); // should not fail
+
+                    Assert.That(Directory.Exists(externalEdit.MountedPath));
+
+                    var directoryInfo = new DirectoryInfo(externalEdit.MountedPath);
+
+                    Assert.That(directoryInfo.GetFiles().Select(f => f.Name), Is.EquivalentTo(new[]
+                    {
+                        "skin.ini",
+                    }));
+
+                    var subDirectory = directoryInfo.GetDirectories().Single();
+                    Assert.That(subDirectory.Name, Is.EqualTo("folder"));
+                    Assert.That(subDirectory.GetFiles().Select(f => f.Name), Is.EquivalentTo(new[]
+                    {
+                        "test.png",
+                    }));
+
+                    Task finishTask = Task.CompletedTask;
+                    host.UpdateThread.Scheduler.Add(() => finishTask = externalEdit.Finish());
+                    await finishTask;
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        /// <remarks>
+        /// Note that this test passing / failing is platform / OS-specific (if it is to fail, it'll fail on windows).
+        /// </remarks>
+        [Test]
+        public async Task TestExternallyMountingImportWithInvalidFilename()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+
+                    var zipStream = new MemoryStream();
+                    using var zip = ZipArchive.Create();
+                    zip.AddEntry("test?.png", new MemoryStream(new byte[] { 0xDE, 0xAD, 0xBE, 0xEF }));
+                    zip.SaveTo(zipStream);
+
+                    var import = await loadSkinIntoOsu(osu, new ImportTask(zipStream, "test skin.osk"));
+
+                    var skinManager = osu.Dependencies.Get<SkinManager>();
+                    var externalEdit = await skinManager.BeginExternalEditing(import.PerformRead(s => s.Detach())); // should not fail
+
+                    Assert.That(Directory.Exists(externalEdit.MountedPath));
+                    Assert.That(new DirectoryInfo(externalEdit.MountedPath).GetFiles().Select(f => f.Name), Is.EquivalentTo(new[]
+                    {
+                        "skin.ini",
+                        "test.png"
+                    }));
+
+                    Task finishTask = Task.CompletedTask;
+                    host.UpdateThread.Scheduler.Add(() => finishTask = externalEdit.Finish());
+                    await finishTask;
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
         private void assertCorrectMetadata(Live<SkinInfo> import1, string name, string creator, decimal version, OsuGameBase osu)
         {
             import1.PerformRead(i =>

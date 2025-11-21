@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
+using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
@@ -33,6 +34,9 @@ namespace osu.Game.Screens.Play
             int rulesetId = Ruleset.Value.OnlineID;
 
             if (beatmapId <= 0)
+                return null;
+
+            if (Beatmap.Value.BeatmapInfo.Status == BeatmapOnlineStatus.LocallyModified)
                 return null;
 
             if (!Ruleset.Value.IsLegacyRuleset())

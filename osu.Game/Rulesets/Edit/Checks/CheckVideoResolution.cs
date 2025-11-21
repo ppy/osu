@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.IO;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
-using osu.Game.IO.FileAbstraction;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Storyboards;
+using osu.Game.Utils;
 using TagLib;
 using File = TagLib.File;
 
@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         private const int max_video_height = 720;
 
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Resources, "Too high video resolution.");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Resources, "Too high video resolution.", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
@@ -30,8 +30,8 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var beatmapSet = context.Beatmap.BeatmapInfo.BeatmapSet;
-            var videoPaths = getVideoPaths(context.WorkingBeatmap.Storyboard);
+            var beatmapSet = context.CurrentDifficulty.Playable.BeatmapInfo.BeatmapSet;
+            var videoPaths = getVideoPaths(context.CurrentDifficulty.Working.Storyboard);
 
             foreach (string filename in videoPaths)
             {
@@ -44,8 +44,8 @@ namespace osu.Game.Rulesets.Edit.Checks
 
                 try
                 {
-                    using (Stream data = context.WorkingBeatmap.GetStream(storagePath))
-                    using (File tagFile = File.Create(new StreamFileAbstraction(filename, data)))
+                    using (Stream data = context.CurrentDifficulty.Working.GetStream(storagePath))
+                    using (File tagFile = TagLibUtils.GetTagLibFile(filename, data))
                     {
                         int height = tagFile.Properties.VideoHeight;
                         int width = tagFile.Properties.VideoWidth;

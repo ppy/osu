@@ -5,7 +5,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -37,13 +36,15 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private readonly Bindable<Vector2> areaSize = new Bindable<Vector2>();
         private readonly IBindable<TabletInfo> tablet = new Bindable<TabletInfo>();
 
-        private readonly BindableNumber<float> offsetX = new BindableNumber<float> { MinValue = 0 };
-        private readonly BindableNumber<float> offsetY = new BindableNumber<float> { MinValue = 0 };
+        private readonly BindableNumber<float> offsetX = new BindableNumber<float> { MinValue = 0, Precision = 1 };
+        private readonly BindableNumber<float> offsetY = new BindableNumber<float> { MinValue = 0, Precision = 1 };
 
-        private readonly BindableNumber<float> sizeX = new BindableNumber<float> { MinValue = 10 };
-        private readonly BindableNumber<float> sizeY = new BindableNumber<float> { MinValue = 10 };
+        private readonly BindableNumber<float> sizeX = new BindableNumber<float> { MinValue = 10, Precision = 1 };
+        private readonly BindableNumber<float> sizeY = new BindableNumber<float> { MinValue = 10, Precision = 1 };
 
-        private readonly BindableNumber<float> rotation = new BindableNumber<float> { MinValue = 0, MaxValue = 360 };
+        private readonly BindableNumber<float> rotation = new BindableNumber<float> { MinValue = 0, MaxValue = 360, Precision = 1 };
+
+        private readonly BindableNumber<float> pressureThreshold = new BindableNumber<float> { MinValue = 0.0f, MaxValue = 1.0f, Precision = 0.005f };
 
         [Resolved]
         private GameHost host { get; set; }
@@ -111,15 +112,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             AutoSizeAxes = Axes.Y,
                         }.With(t =>
                         {
-                            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows || RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
-                            {
-                                t.NewLine();
-                                var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedString(TabletSettingsStrings.NoTabletDetectedDescription(
-                                    RuntimeInfo.OS == RuntimeInfo.Platform.Windows
-                                        ? @"https://opentabletdriver.net/Wiki/FAQ/Windows"
-                                        : @"https://opentabletdriver.net/Wiki/FAQ/Linux")));
-                                t.AddLinks(formattedSource.Text, formattedSource.Links);
-                            }
+                            t.NewLine();
+
+                            const string url = @"https://opentabletdriver.net/Wiki/FAQ/General";
+                            var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedString(TabletSettingsStrings.NoTabletDetectedDescription(url)));
+
+                            t.AddLinks(formattedSource.Text, formattedSource.Links);
                         }),
                     }
                 },
@@ -213,6 +211,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             Current = sizeY,
                             CanBeShown = { BindTarget = enabled }
                         },
+                        new SettingsPercentageSlider<float>
+                        {
+                            TransferValueOnCommit = true,
+                            LabelText = TabletSettingsStrings.TipPressureForClick,
+                            Current = pressureThreshold,
+                            CanBeShown = { BindTarget = enabled }
+                        },
                     }
                 },
             };
@@ -266,6 +271,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 aspectRatioApplication?.Cancel();
                 aspectRatioApplication = Schedule(() => forceAspectRatio(aspect.NewValue));
             });
+
+            pressureThreshold.BindTo(tabletHandler.PressureThreshold);
 
             tablet.BindTo(tabletHandler.Tablet);
             tablet.BindValueChanged(val => Schedule(() =>

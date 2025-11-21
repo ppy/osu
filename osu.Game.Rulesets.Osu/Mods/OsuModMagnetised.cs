@@ -9,6 +9,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -19,11 +20,11 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModMagnetised : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
+    public class OsuModMagnetised : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Name => "Magnetised";
         public override string Acronym => "MG";
-        public override IconUsage? Icon => FontAwesome.Solid.Magnet;
+        public override IconUsage? Icon => OsuIcon.ModMagnetised;
         public override ModType Type => ModType.Fun;
         public override LocalisableString Description => "No need to chase the circles – your cursor is a magnet!";
         public override double ScoreMultiplier => 0.5;

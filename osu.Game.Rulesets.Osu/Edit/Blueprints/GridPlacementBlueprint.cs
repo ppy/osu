@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
     public partial class GridPlacementBlueprint : PlacementBlueprint
     {
         [Resolved]
-        private HitObjectComposer? hitObjectComposer { get; set; }
+        private OsuHitObjectComposer? hitObjectComposer { get; set; }
 
         private OsuGridToolboxGroup gridToolboxGroup = null!;
         private Vector2 originalOrigin;
@@ -36,9 +36,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
 
             base.EndPlacement(commit);
 
-            // You typically only place the grid once, so we switch back to the last tool after placement.
-            if (commit && hitObjectComposer is OsuHitObjectComposer osuHitObjectComposer)
-                osuHitObjectComposer.SetLastTool();
+            // You typically only place the grid once, so we switch back to the last tool after placement -
+            // but only if the tool hasn't changed from under us (which is possible, as external tool changes will commit any ongoing placements, including this one)
+            if (commit && hitObjectComposer?.BlueprintContainer.CurrentTool is GridFromPointsTool)
+                hitObjectComposer.SetLastTool();
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -95,12 +96,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
             base.OnDragEnd(e);
         }
 
-        public override SnapType SnapType => ~SnapType.GlobalGrids;
-
-        public override void UpdateTimeAndPosition(SnapResult result)
+        public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime)
         {
             if (State.Value == Visibility.Hidden)
-                return;
+                return new SnapResult(screenSpacePosition, fallbackTime);
+
+            var result = hitObjectComposer?.TrySnapToNearbyObjects(screenSpacePosition) ?? new SnapResult(screenSpacePosition, fallbackTime);
 
             var pos = ToLocalSpace(result.ScreenSpacePosition);
 
@@ -120,6 +121,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
                     gridToolboxGroup.SetGridFromPoints(gridToolboxGroup.StartPosition.Value, pos);
                 }
             }
+
+            return result;
         }
 
         protected override void PopOut()

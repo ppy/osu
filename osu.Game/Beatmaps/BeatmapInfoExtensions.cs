@@ -1,15 +1,28 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Beatmaps
 {
     public static class BeatmapInfoExtensions
     {
+        /// <summary>
+        /// Given an <see cref="IBeatmap"/>, update length, BPM and object counts.
+        /// </summary>
+        public static void UpdateStatisticsFromBeatmap(this BeatmapInfo beatmapInfo, IBeatmap beatmap)
+        {
+            beatmapInfo.Length = beatmap.CalculatePlayableLength();
+            beatmapInfo.BPM = 60000 / beatmap.GetMostCommonBeatLength();
+            beatmapInfo.EndTimeObjectCount = beatmap.HitObjects.Count(h => h is IHasDuration);
+            beatmapInfo.TotalObjectCount = beatmap.HitObjects.Count;
+        }
+
         /// <summary>
         /// A user-presentable display title representing this beatmap.
         /// </summary>
@@ -52,6 +65,20 @@ namespace osu.Game.Beatmaps
         private static string getVersionString(IBeatmapInfo beatmapInfo) => string.IsNullOrEmpty(beatmapInfo.DifficultyName) ? string.Empty : $"[{beatmapInfo.DifficultyName}]";
 
         /// <summary>
+        /// Whether gameplay is allowed for this beatmap with the provided ruleset (via conversion or direct compatibility).
+        /// </summary>
+        public static bool AllowGameplayWithRuleset(this IBeatmapInfo beatmap, RulesetInfo ruleset, bool allowConversion)
+        {
+            if (beatmap.Ruleset.ShortName == ruleset.ShortName)
+                return true;
+
+            if (allowConversion && beatmap.Ruleset.OnlineID == 0 && ruleset.OnlineID != 0)
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
         /// Get the beatmap info page URL, or <c>null</c> if unavailable.
         /// </summary>
         public static string? GetOnlineURL(this IBeatmapInfo beatmapInfo, IAPIProvider api, IRulesetInfo? ruleset = null)
@@ -59,7 +86,7 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo.OnlineID <= 0 || beatmapInfo.BeatmapSet == null)
                 return null;
 
-            return $@"{api.WebsiteRootUrl}/beatmapsets/{beatmapInfo.BeatmapSet.OnlineID}#{ruleset?.ShortName ?? beatmapInfo.Ruleset.ShortName}/{beatmapInfo.OnlineID}";
+            return $@"{api.Endpoints.WebsiteUrl}/beatmapsets/{beatmapInfo.BeatmapSet.OnlineID}#{ruleset?.ShortName ?? beatmapInfo.Ruleset.ShortName}/{beatmapInfo.OnlineID}";
         }
     }
 }

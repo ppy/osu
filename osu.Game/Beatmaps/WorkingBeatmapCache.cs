@@ -20,6 +20,7 @@ using osu.Framework.Platform;
 using osu.Framework.Statistics;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
@@ -89,7 +90,7 @@ namespace osu.Game.Beatmaps
 
         public virtual WorkingBeatmap GetWorkingBeatmap([CanBeNull] BeatmapInfo beatmapInfo)
         {
-            if (beatmapInfo?.BeatmapSet == null)
+            if (beatmapInfo == null || ReferenceEquals(beatmapInfo, DefaultBeatmap.BeatmapInfo))
                 return DefaultBeatmap;
 
             lock (workingCache)
@@ -152,14 +153,25 @@ namespace osu.Game.Beatmaps
                         return null;
                     }
 
-                    if (stream.ComputeMD5Hash() != BeatmapInfo.MD5Hash)
+                    string streamMD5 = stream.ComputeMD5Hash();
+                    string streamSHA2 = stream.ComputeSHA2Hash();
+
+                    if (streamMD5 != BeatmapInfo.MD5Hash)
                     {
                         Logger.Log($"Beatmap failed to load (file {BeatmapInfo.Path} does not have the expected hash).", level: LogLevel.Error);
                         return null;
                     }
 
                     using (var reader = new LineBufferedReader(stream))
-                        return Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
+                    {
+                        var beatmap = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
+
+                        beatmap.BeatmapInfo.MD5Hash = streamMD5;
+                        beatmap.BeatmapInfo.Hash = streamSHA2;
+                        beatmap.BeatmapInfo.UpdateStatisticsFromBeatmap(beatmap);
+
+                        return beatmap;
+                    }
                 }
                 catch (Exception e)
                 {
@@ -330,27 +342,10 @@ namespace osu.Game.Beatmaps
             {
                 // Matches stable implementation, because it's probably simpler than trying to do anything else.
                 // This may need to be reconsidered after we begin storing storyboards in the new editor.
-                return windowsFilenameStrip(
-                    (metadata.Artist.Length > 0 ? metadata.Artist + @" - " + metadata.Title : Path.GetFileNameWithoutExtension(metadata.AudioFile))
-                    + (metadata.Author.Username.Length > 0 ? @" (" + metadata.Author.Username + @")" : string.Empty)
-                    + @".osb");
-
-                string windowsFilenameStrip(string entry)
-                {
-                    // Inlined from Path.GetInvalidFilenameChars() to ensure the windows characters are used (to match stable).
-                    char[] invalidCharacters =
-                    {
-                        '\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07',
-                        '\x08', '\x09', '\x0A', '\x0B', '\x0C', '\x0D', '\x0E', '\x0F', '\x10', '\x11', '\x12',
-                        '\x13', '\x14', '\x15', '\x16', '\x17', '\x18', '\x19', '\x1A', '\x1B', '\x1C', '\x1D',
-                        '\x1E', '\x1F', '\x22', '\x3C', '\x3E', '\x7C', ':', '*', '?', '\\', '/'
-                    };
-
-                    foreach (char c in invalidCharacters)
-                        entry = entry.Replace(c.ToString(), string.Empty);
-
-                    return entry;
-                }
+                string baseFilename = (metadata.Artist.Length > 0 ? metadata.Artist + @" - " + metadata.Title : Path.GetFileNameWithoutExtension(metadata.AudioFile))
+                                      + (metadata.Author.Username.Length > 0 ? @" (" + metadata.Author.Username + @")" : string.Empty)
+                                      + @".osb";
+                return baseFilename.GetValidFilename();
             }
         }
     }

@@ -18,6 +18,7 @@ namespace osu.Game.Screens.Edit.Components
     public partial class TimeInfoContainer : BottomBarContainer
     {
         private OsuSpriteText bpm = null!;
+        private OsuSpriteText progress = null!;
 
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
@@ -36,25 +37,43 @@ namespace osu.Game.Screens.Edit.Components
                 bpm = new OsuSpriteText
                 {
                     Colour = colours.Orange1,
+                    Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold, fixedWidth: true),
+                    Spacing = new Vector2(-1, 0),
+                    Position = new Vector2(0, 4),
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.TopRight,
+                },
+                progress = new OsuSpriteText
+                {
+                    Colour = colours.Purple1,
+                    Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold, fixedWidth: true),
+                    Spacing = new Vector2(-1, 0),
                     Anchor = Anchor.CentreLeft,
-                    Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
                     Position = new Vector2(2, 4),
                 }
             };
         }
 
         private double? lastBPM;
+        private double? lastProgress;
 
         protected override void Update()
         {
             base.Update();
 
             double newBPM = editorBeatmap.ControlPointInfo.TimingPointAt(editorClock.CurrentTime).BPM;
+            double newProgress = (int)(editorClock.CurrentTime / editorClock.TrackLength * 100);
 
             if (lastBPM != newBPM)
             {
                 lastBPM = newBPM;
                 bpm.Text = @$"{newBPM:0} BPM";
+            }
+
+            if (lastProgress != newProgress)
+            {
+                lastProgress = newProgress;
+                progress.Text = @$"{newProgress:0}%";
             }
         }
 

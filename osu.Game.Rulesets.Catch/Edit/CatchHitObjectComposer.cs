@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -18,15 +19,15 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
+    [Cached]
     public partial class CatchHitObjectComposer : ScrollingHitObjectComposer<CatchHitObject>, IKeyBindingHandler<GlobalAction>
     {
-        private const float distance_snap_radius = 50;
+        public const float DISTANCE_SNAP_RADIUS = 50;
 
         private CatchDistanceSnapGrid distanceSnapGrid = null!;
 
@@ -72,7 +73,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         protected override Drawable CreateHitObjectInspector() => new CatchHitObjectInspector(DistanceSnapProvider);
 
-        protected override IEnumerable<TernaryButton> CreateTernaryButtons()
+        protected override IEnumerable<Drawable> CreateTernaryButtons()
             => base.CreateTernaryButtons()
                    .Concat(DistanceSnapProvider.CreateTernaryButtons());
 
@@ -136,22 +137,12 @@ namespace osu.Game.Rulesets.Catch.Edit
             DistanceSnapProvider.HandleToggleViaKey(key);
         }
 
-        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
+        public SnapResult? TryDistanceSnap(Vector2 screenSpacePosition)
         {
-            var result = base.FindSnappedPositionAndTime(screenSpacePosition, snapType);
+            if (distanceSnapGrid.IsPresent && distanceSnapGrid.GetSnappedPosition(screenSpacePosition) is SnapResult snapResult)
+                return snapResult;
 
-            result.ScreenSpacePosition.X = screenSpacePosition.X;
-
-            if (snapType.HasFlag(SnapType.RelativeGrids))
-            {
-                if (distanceSnapGrid.IsPresent && distanceSnapGrid.GetSnappedPosition(result.ScreenSpacePosition) is SnapResult snapResult &&
-                    Vector2.Distance(snapResult.ScreenSpacePosition, result.ScreenSpacePosition) < distance_snap_radius)
-                {
-                    result = snapResult;
-                }
-            }
-
-            return result;
+            return null;
         }
 
         private PalpableCatchHitObject? getLastSnappableHitObject(double time)
@@ -229,5 +220,40 @@ namespace osu.Game.Rulesets.Catch.Edit
             distanceSnapGrid.StartTime = sourceHitObject.GetEndTime();
             distanceSnapGrid.StartX = sourceHitObject.EffectiveX;
         }
+
+        #region Clipboard handling
+
+        public override string ConvertSelectionToString()
+            => string.Join(',', EditorBeatmap.SelectedHitObjects.Cast<CatchHitObject>().OrderBy(h => h.StartTime).Select(h => (h.IndexInCurrentCombo + 1).ToString()));
+
+        // 1,2,3,4 ...
+        private static readonly Regex selection_regex = new Regex(@"^\d+(,\d+)*$", RegexOptions.Compiled);
+
+        public override void SelectFromTimestamp(double timestamp, string objectDescription)
+        {
+            if (!selection_regex.IsMatch(objectDescription))
+                return;
+
+            List<CatchHitObject> remainingHitObjects = EditorBeatmap.HitObjects.Cast<CatchHitObject>().Where(h => h.StartTime >= timestamp).ToList();
+            string[] splitDescription = objectDescription.Split(',');
+
+            for (int i = 0; i < splitDescription.Length; i++)
+            {
+                if (!int.TryParse(splitDescription[i], out int combo) || combo < 1)
+                    continue;
+
+                CatchHitObject? current = remainingHitObjects.FirstOrDefault(h => h.IndexInCurrentCombo + 1 == combo);
+
+                if (current == null)
+                    continue;
+
+                EditorBeatmap.SelectedHitObjects.Add(current);
+
+                if (i < splitDescription.Length - 1)
+                    remainingHitObjects = remainingHitObjects.Where(h => h != current && h.StartTime >= current.StartTime).ToList();
+            }
+        }
+
+        #endregion
     }
 }
