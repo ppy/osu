@@ -8,6 +8,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings.Sections.General;
+using osu.Game.Updater;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
@@ -21,15 +22,13 @@ namespace osu.Game.Overlays.Settings.Sections
         };
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(UpdateManager? updateManager)
         {
-            Children = new Drawable[]
-            {
-                new LanguageSettings(),
-                new UpdateSettings(),
-                new InstallationSettings(),
-                new QuickActionSettings(),
-            };
+            Add(new LanguageSettings());
+            if (updateManager?.CanCheckForUpdate == true)
+                Add(new UpdateSettings());
+            Add(new InstallationSettings());
+            Add(new QuickActionSettings());
         }
     }
 }
