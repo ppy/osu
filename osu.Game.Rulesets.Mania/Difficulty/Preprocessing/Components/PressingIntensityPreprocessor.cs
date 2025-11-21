@@ -60,12 +60,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
 
             double[] baseTimeCorners = data.CornerData.BaseTimeCorners;
 
-            // Trackers for progressive scanning
-            int leftWindowIndex = 0;
-            int leftIndex = 0;
-            int rightIndex = 0;
-            int rightWindowIndex = 0;
-
             for (int noteIndex = 0; noteIndex < data.AllNotes.Count; noteIndex++)
             {
                 var note = data.AllNotes[noteIndex];
@@ -73,10 +67,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
                 int noteEndTime = (int)Math.Round(note.EndTime);
 
                 // Progressive Scan: Advance from current position
-                leftWindowIndex = StrainArrayUtils.FindLeftBoundProgressive(baseTimeCorners, ref leftWindowIndex, noteStartTime - key_usage_window_ms);
-                leftIndex = StrainArrayUtils.FindLeftBoundProgressive(baseTimeCorners, ref leftIndex, noteStartTime);
-                rightIndex = StrainArrayUtils.FindLeftBoundProgressive(baseTimeCorners, ref rightIndex, noteEndTime);
-                rightWindowIndex = StrainArrayUtils.FindLeftBoundProgressive(baseTimeCorners, ref rightWindowIndex, noteEndTime + key_usage_window_ms);
+                int leftWindowIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners,
+                    noteStartTime - key_usage_window_ms);
+                int leftIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, noteStartTime);
+                int rightIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, noteEndTime);
+                int rightWindowIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners,
+                    noteEndTime + key_usage_window_ms);
 
                 double baseUsage = 3.75 + Math.Min(noteEndTime - noteStartTime, 1500) / 150.0;
                 int column = note.Column;

@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaDifficultyCalculator : DifficultyCalculator
     {
-        private const double difficulty_multiplier = 0.9827163333895287;
+        private const double difficulty_multiplier = 1;
         private const double final_scaling_factor = 0.975;
         private const double strain_threshold = 0.01;
 
@@ -154,17 +154,28 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 }
 
                 double clampedSameColumn = Math.Min(sameColumn, 8.0 + 0.85 * sameColumn);
+
+                // Adjust unevenness impact based on how many keys are active
                 double unevennessKeyAdjustment = 1.0;
                 if (unevenness > 0.0 && activeKeyCount > 0.0)
                     unevennessKeyAdjustment = Math.Pow(unevenness, 3.0 / activeKeyCount);
+
+                // Combine unevenness with same-column difficulty
                 double unevennessSameColumnComponent = unevennessKeyAdjustment * clampedSameColumn;
                 double firstComponent = 0.4 * Math.Pow(unevennessSameColumnComponent, 1.5);
+
+                // Combine unevenness with pressing intensity and release difficulty
                 double releaseComponent = release * 35.0 / (localNoteCount + 8.0);
                 double unevennessPressingReleaseComponent = Math.Pow(unevenness, 2.0 / 3.0) * (0.8 * pressingIntensity + releaseComponent);
                 double secondComponent = 0.6 * Math.Pow(unevennessPressingReleaseComponent, 1.5);
+
+                // Main strain difficulty combining both components
                 double totalStrainDifficulty = Math.Pow(firstComponent + secondComponent, 2.0 / 3.0);
+
+                // Cross-column coordination component
                 double twistComponent = (unevennessKeyAdjustment * crossColumn) / (crossColumn + totalStrainDifficulty + 1.0);
                 double poweredTwist = twistComponent > 0.0 ? twistComponent * Math.Sqrt(twistComponent) : 0.0;
+
                 double finalStrain = 2.7 * Math.Sqrt(totalStrainDifficulty) * poweredTwist + totalStrainDifficulty * 0.27;
 
                 strainCache[cacheKey] = finalStrain;

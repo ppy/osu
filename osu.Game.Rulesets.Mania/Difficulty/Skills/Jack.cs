@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
     public class Jack : StrainSkill
     {
-        private const double strain_decay_base = 0.22;
+        private const double strain_decay_base = 0.42;
 
         private double currentStrain;
 

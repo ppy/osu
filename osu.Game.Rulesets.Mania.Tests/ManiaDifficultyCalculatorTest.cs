@@ -68,6 +68,19 @@ namespace osu.Game.Rulesets.Mania.Tests
         public void TestWeenyDT(double expectedStarRating, int expectedMaxCombo, string name)
             => Test(expectedStarRating, expectedMaxCombo, name, new ManiaModDoubleTime());
 
+        [TestCase(9.448, 6165, "ragnarok")]
+        public void TestRagnarok(double expectedStarRating, int expectedMaxCombo, string name)
+            => Test(expectedStarRating, expectedMaxCombo, name);
+
+        [TestCase(5.23, 6165, "cat_loving")]
+        public void TestNotCopy(double expectedStarRating, int expectedMaxCombo, string name)
+            => Test(expectedStarRating, expectedMaxCombo, name);
+
+
+        [TestCase(5.23, 6165, "cat_loving_copy")]
+        public void TestCopy(double expectedStarRating, int expectedMaxCombo, string name)
+            => Test(expectedStarRating, expectedMaxCombo, name);
+
 
         /*[TestCase(2.797245912537965d, 242, "diffcalc-test")]
         public void TestClockRateAdjusted(double expectedStarRating, int expectedMaxCombo, string name)

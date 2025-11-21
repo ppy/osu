@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Density;
 
