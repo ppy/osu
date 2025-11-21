@@ -16,6 +16,7 @@ namespace osu.Game.Graphics.UserInterface
         public bool Seeking { get; private set; }
 
         public Action<double> OnSeek;
+        public Action<double> OnCommit;
 
         private readonly Box fill;
         private readonly Box background;
@@ -80,12 +81,14 @@ namespace osu.Game.Graphics.UserInterface
         protected override void OnUserChange(double value)
         {
             Seeking = true;
+            OnSeek?.Invoke(value);
+            base.OnUserChange(value);
         }
 
         protected override bool Commit()
         {
-            OnSeek?.Invoke(CurrentNumber.Value);
             Seeking = false;
+            OnCommit?.Invoke(CurrentNumber.Value);
             return base.Commit();
         }
     }

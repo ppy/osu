@@ -62,7 +62,7 @@ namespace osu.Game.Screens.SelectV2
 
                 Debug.Assert(beatmap.BeatmapSet != null);
                 addHeader(SongSelectStrings.ForAllDifficulties, beatmap.BeatmapSet.ToString());
-                addButton(SongSelectStrings.DeleteBeatmap, FontAwesome.Solid.Trash, () => SongSelect?.Delete(beatmap.BeatmapSet), colours.Red1);
+                addButton(CommonStrings.DeleteWithConfirmation, FontAwesome.Solid.Trash, () => SongSelect?.Delete(beatmap.BeatmapSet), colours.Red1);
 
                 addHeader(SongSelectStrings.ForSelectedDifficulty, beatmap.DifficultyName);
 
