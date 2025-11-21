@@ -29,6 +29,8 @@ namespace osu.Game.Overlays
 {
     public partial class NowPlayingOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
+        public const double TRACK_DRAG_SEEK_DEBOUNCE = 200;
+
         public IconUsage Icon => OsuIcon.Music;
         public LocalisableString Title => NowPlayingStrings.HeaderTitle;
         public LocalisableString Description => NowPlayingStrings.HeaderDescription;
@@ -226,7 +228,7 @@ namespace osu.Game.Overlays
 
         private void onSeek(double progress)
         {
-            if (lastSeekTime == null || Time.Current - lastSeekTime > 500)
+            if (lastSeekTime == null || Time.Current - lastSeekTime > TRACK_DRAG_SEEK_DEBOUNCE)
             {
                 musicController.SeekTo(progress);
                 lastSeekTime = Time.Current;
