@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double wide_angle_multiplier = 1.5;
         private const double acute_angle_multiplier = 2.24;
         private const double velocity_change_multiplier = 0.75;
-        private const double wiggle_multiplier = 1.02;
+        private const double wiggle_multiplier = 0.53;
 
         public const double SLIDER_MULTIPLIER = 1.27;
 
@@ -112,9 +112,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // https://www.desmos.com/calculator/dp0v0nvowc
                 wiggleBonus = angleBonus
                               * Math.Pow(DifficultyCalculationUtils.ReverseLerp(currDistance, diameter * 3, diameter), 1.8)
-                              * DifficultyCalculationUtils.Smootherstep(currAngle, double.DegreesToRadians(110), double.DegreesToRadians(60))
-                              * Math.Pow(DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter * 3, diameter), 1.8)
-                              * DifficultyCalculationUtils.Smootherstep(lastAngle, double.DegreesToRadians(110), double.DegreesToRadians(60));
+                              * Math.Pow(DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter * 3, diameter), 1.8);
 
                 if (osuLast2Obj != null)
                 {
