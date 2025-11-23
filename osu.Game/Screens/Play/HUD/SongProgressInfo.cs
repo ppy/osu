@@ -156,8 +156,8 @@ namespace osu.Game.Screens.Play.HUD
 
             if (currentSecond != previousSecond && songCurrentTime < songLength)
             {
-                timeCurrent.Text = formatTime(TimeSpan.FromSeconds(currentSecond / Math.Max(gameplayClock.Rate, 0.001)));
-                timeLeft.Text = formatTime(TimeSpan.FromMilliseconds((endTime - time) / Math.Max(gameplayClock.Rate, 0.001)));
+                timeCurrent.Text = formatTime(TimeSpan.FromSeconds(currentSecond / Math.Max(gameplayClock?.Rate ?? 0, 0.001)));
+                timeLeft.Text = formatTime(TimeSpan.FromMilliseconds((endTime - time) / Math.Max(gameplayClock?.Rate ?? 0, 0.001)));
 
                 previousSecond = currentSecond;
             }
