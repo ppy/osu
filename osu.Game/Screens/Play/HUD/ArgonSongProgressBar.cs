@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play.HUD
 
                 double progress = Math.Clamp(lastMouseX, 0, DrawWidth) / DrawWidth;
 
-                TimeSpan currentSpan = TimeSpan.FromMilliseconds(Math.Round((EndTime - StartTime) * progress));
+                TimeSpan currentSpan = TimeSpan.FromMilliseconds(Math.Round((EndTime - StartTime) * progress) / GameplayClock.Rate);
 
                 int seconds = currentSpan.Duration().Seconds;
                 int minutes = (int)Math.Floor(currentSpan.Duration().TotalMinutes);
