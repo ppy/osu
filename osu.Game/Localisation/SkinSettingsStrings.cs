@@ -54,6 +54,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString BeatmapHitsounds => new TranslatableString(getKey(@"beatmap_hitsounds"), @"Beatmap hitsounds");
 
+        /// <summary>
+        /// "Ignore skin hitsounds"
+        /// </summary>
+        public static LocalisableString IgnoreSkinHitsounds => new TranslatableString(getKey(@"ignore_skin_hitsounds"), @"Ignore skin hitsounds");
+
+        /// <summary>
+        /// "When enabled, hitsounds from the current skin will be ignored and the default skin hitsounds will be used instead."
+        /// </summary>
+        public static LocalisableString IgnoreSkinHitsoundsTooltip => new TranslatableString(getKey(@"ignore_skin_hitsounds_tooltip"), @"When enabled, hitsounds from the current skin will be ignored and the default skin hitsounds will be used instead.");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }

@@ -9,11 +9,14 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.UI;
 
@@ -30,6 +33,9 @@ namespace osu.Game.Skinning
 
         [CanBeNull]
         private readonly ISkin beatmapSkin;
+
+        private Bindable<bool> ignoreSkinHitsounds;
+        private ISkin defaultClassicSkin;
 
         /// <remarks>
         /// This container already re-exposes all parent <see cref="ISkinSource"/> sources in a ruleset-usable form.
@@ -50,12 +56,17 @@ namespace osu.Game.Skinning
         }
 
         [BackgroundDependencyLoader]
-        private void load(SkinManager skinManager)
+        private void load(SkinManager skinManager, OsuConfigManager config)
         {
-            InternalChild = new BeatmapSkinProvidingContainer(GetRulesetTransformedSkin(beatmapSkin), GetRulesetTransformedSkin(skinManager.DefaultClassicSkin))
+            defaultClassicSkin = skinManager.DefaultClassicSkin;
+            ignoreSkinHitsounds = config.GetBindable<bool>(OsuSetting.IgnoreSkinHitsounds);
+
+            InternalChild = new BeatmapSkinProvidingContainer(GetRulesetTransformedSkin(beatmapSkin), GetRulesetTransformedSkin(defaultClassicSkin))
             {
                 Child = Content,
             };
+
+            ignoreSkinHitsounds.BindValueChanged(_ => TriggerSourceChanged());
         }
 
         private ResourceStoreBackedSkin rulesetResourcesSkin;
@@ -66,6 +77,15 @@ namespace osu.Game.Skinning
                 rulesetResourcesSkin = new ResourceStoreBackedSkin(resources, parent.Get<GameHost>(), parent.Get<AudioManager>());
 
             return base.CreateChildDependencies(parent);
+        }
+
+        protected override bool AllowSampleLookup(ISampleInfo sampleInfo)
+        {
+            // If IgnoreSkinHitsounds is enabled, only allow hitsounds from the default skin
+            if (ignoreSkinHitsounds?.Value == true && sampleInfo is HitSampleInfo)
+                return false;
+
+            return base.AllowSampleLookup(sampleInfo);
         }
 
         protected override void RefreshSources()
