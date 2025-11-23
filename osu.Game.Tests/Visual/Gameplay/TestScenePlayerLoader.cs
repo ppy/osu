@@ -430,7 +430,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             clickNotification();
 
-            AddAssert("check " + volumeName, assert);
+            AddUntilStep("check " + volumeName, assert);
 
             restoreVolumes();
 
