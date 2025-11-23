@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             AddToggleStep("allow selection", value => panel!.AllowSelection = value);
 
-            AddStep("reveal beatmap", () => panel!.RevealBeatmap(CreateAPIBeatmap(), []));
+            AddStep("reveal beatmap", () => panel!.PresentAsChosenBeatmap(new MatchmakingPlaylistItem(new MultiplayerPlaylistItem(), CreateAPIBeatmap(), [])));
         }
 
         [Test]

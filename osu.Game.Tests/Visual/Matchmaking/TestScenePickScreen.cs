@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 long[] candidateItems = selectedItems.ToArray();
                 long finalItem = candidateItems[Random.Shared.Next(candidateItems.Length)];
 
-                screen.RollFinalBeatmap(candidateItems, finalItem);
+                screen.RollFinalBeatmap(candidateItems, finalItem, finalItem);
             });
         }
 
