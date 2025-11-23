@@ -9,7 +9,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
@@ -22,8 +21,8 @@ namespace osu.Game.Screens.Edit.Compose
 {
     public partial class ComposeScreen : EditorScreenWithTimeline, IGameplaySettings
     {
-        [Resolved]
-        private Clipboard hostClipboard { get; set; } = null!;
+        [Resolved(canBeNull: true)]
+        private OsuGame game { get; set; }
 
         [Resolved]
         private EditorClock clock { get; set; }
@@ -138,7 +137,7 @@ namespace osu.Game.Screens.Edit.Compose
             // regardless of whether anything was even selected at all.
             // UX-wise this is generally strange and unexpected, but make it work anyways to preserve muscle memory.
             // note that this means that `getTimestamp()` must handle no-selection case, too.
-            hostClipboard.SetText(getTimestamp());
+            game?.CopyToClipboard(getTimestamp());
 
             if (CanCopy.Value)
                 clipboard.Value = new ClipboardContent(EditorBeatmap).Serialize();
