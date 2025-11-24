@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -31,7 +32,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         private const int round_count = 5;
 
         private OsuScrollContainer scroll = null!;
-        private FillFlowContainer flow = null!;
+        private FillFlowContainer<StageSegment> flow = null!;
 
         private CurrentRoundDisplay roundDisplay = null!;
 
@@ -48,8 +49,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             {
                 new Box
                 {
-                    Colour = colourProvider.Dark6,
+                    Colour = ColourInfo.GradientHorizontal(colourProvider.Dark6, colourProvider.Dark6.Opacity(0.5f)),
                     RelativeSizeAxes = Axes.Both,
+                    Alpha = 0.7f
                 },
                 new Container
                 {
@@ -63,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                             ClampExtension = 0,
                             RelativeSizeAxes = Axes.X,
                             Height = HEIGHT,
-                            Child = flow = new FillFlowContainer
+                            Child = flow = new FillFlowContainer<StageSegment>
                             {
                                 Padding = new MarginPadding { Horizontal = 2000 },
                                 AutoSizeAxes = Axes.Both,
@@ -83,15 +85,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                             Y = 32,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
-                        },
-                        new Box
-                        {
-                            Colour = ColourInfo.GradientHorizontal(
-                                colourProvider.Dark4,
-                                colourProvider.Dark5.Opacity(0)
-                            ),
-                            RelativeSizeAxes = Axes.Y,
-                            Width = 240,
                         },
                         roundDisplay = new CurrentRoundDisplay
                         {
