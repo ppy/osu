@@ -11,7 +11,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public partial class ExpandableButton : RoundedButton, IExpandable
+    public sealed partial class ExpandableButton : RoundedButton, IExpandable
     {
         private float actualHeight;
 
