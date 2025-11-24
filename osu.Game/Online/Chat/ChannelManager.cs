@@ -70,6 +70,7 @@ namespace osu.Game.Online.Chat
         [Resolved]
         private UserLookupCache users { get; set; }
 
+        private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
         private readonly IBindableList<APIRelation> localUserBlocks = new BindableList<APIRelation>();
         private ScheduledDelegate scheduledAck;
@@ -95,11 +96,30 @@ namespace osu.Game.Online.Chat
             chatClient.PresenceReceived += () => Schedule(initializeChannels);
             chatClient.RequestPresence();
 
+            localUser.BindTo(api.LocalUser);
+            localUser.BindValueChanged(userChanged);
+
             apiState.BindTo(api.State);
             apiState.BindValueChanged(_ => SendAck(), true);
 
             localUserBlocks.BindTo(api.LocalUserState.Blocks);
             localUserBlocks.BindCollectionChanged((_, args) => Schedule(() => onBlocksChanged(args)));
+        }
+
+        private void userChanged(ValueChangedEvent<APIUser> userChange)
+        {
+            if (userChange.OldValue?.Equals(userChange.NewValue) == true)
+                return;
+
+            CurrentChannel.Value = null;
+
+            foreach (var joinedChannel in joinedChannels)
+                joinedChannel.Joined.Value = false;
+
+            joinedChannels.Clear();
+            // additionally clear the history of last joined channels so that the new user can't reopen the old user's channels
+            // (would likely fail web-side on perms anyway, but why even get that far)
+            closedChannels.Clear();
         }
 
         /// <summary>
