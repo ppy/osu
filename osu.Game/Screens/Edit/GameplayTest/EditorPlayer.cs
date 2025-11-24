@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
@@ -180,10 +181,16 @@ namespace osu.Game.Screens.Edit.GameplayTest
             switch (e.Action)
             {
                 case GlobalAction.EditorTestPlayToggleAutoplay:
+                    if (PauseOverlay?.State.Value == Visibility.Visible || DrawableRuleset.ResumeOverlay?.State.Value == Visibility.Visible)
+                        return true;
+
                     toggleAutoplay();
                     return true;
 
                 case GlobalAction.EditorTestPlayToggleQuickPause:
+                    if (PauseOverlay?.State.Value == Visibility.Visible || DrawableRuleset.ResumeOverlay?.State.Value == Visibility.Visible)
+                        return true;
+
                     toggleQuickPause();
                     return true;
 
