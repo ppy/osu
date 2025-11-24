@@ -357,7 +357,8 @@ namespace osu.Game.Graphics.UserInterface
                                 Icon = FontAwesome.Solid.ChevronDown,
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
-                                Size = new Vector2(16),
+                                Size = new Vector2(10),
+                                Margin = new MarginPadding { Right = 2 },
                             },
                         }
                     }
