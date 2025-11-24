@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
@@ -35,8 +36,6 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
         [Cached(typeof(IGameplayLeaderboardProvider))]
         private EmptyGameplayLeaderboardProvider leaderboardProvider = new EmptyGameplayLeaderboardProvider();
-
-        private bool quickPauseActive;
 
         public EditorPlayer(Editor editor)
             : base(new PlayerConfiguration { ShowResults = false })
@@ -182,14 +181,14 @@ namespace osu.Game.Screens.Edit.GameplayTest
             switch (e.Action)
             {
                 case GlobalAction.EditorTestPlayToggleAutoplay:
-                    if (GameplayClockContainer.IsPaused.Value && !quickPauseActive)
+                    if (PauseOverlay?.State.Value == Visibility.Visible || DrawableRuleset.ResumeOverlay?.State.Value == Visibility.Visible)
                         return true;
 
                     toggleAutoplay();
                     return true;
 
                 case GlobalAction.EditorTestPlayToggleQuickPause:
-                    if (GameplayClockContainer.IsPaused.Value && !quickPauseActive)
+                    if (PauseOverlay?.State.Value == Visibility.Visible || DrawableRuleset.ResumeOverlay?.State.Value == Visibility.Visible)
                         return true;
 
                     toggleQuickPause();
@@ -235,12 +234,10 @@ namespace osu.Game.Screens.Edit.GameplayTest
 
         private void toggleQuickPause()
         {
-            quickPauseActive = !quickPauseActive;
-
-            if (quickPauseActive)
-                GameplayClockContainer.Stop();
-            else
+            if (GameplayClockContainer.IsPaused.Value)
                 GameplayClockContainer.Start();
+            else
+                GameplayClockContainer.Stop();
         }
 
         private void quickExit(bool useCurrentTime)
