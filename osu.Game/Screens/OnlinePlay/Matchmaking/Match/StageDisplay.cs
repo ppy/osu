@@ -113,7 +113,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         protected override void Update()
         {
             base.Update();
-            var bubble = flow.OfType<StageSegment>().FirstOrDefault(b => b.Active);
+            var bubble = flow.FirstOrDefault(b => b.Active);
 
             if (bubble != null)
             {
