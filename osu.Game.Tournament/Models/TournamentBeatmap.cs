@@ -32,7 +32,7 @@ namespace osu.Game.Tournament.Models
 
         public BeatmapSetOnlineCovers Covers { get; set; }
 
-        public APIRuleset Ruleset { get; set; } = new APIRuleset();
+        public IRulesetInfo Ruleset { get; set; } = new APIRuleset();
 
         public TournamentBeatmap()
         {
@@ -50,7 +50,7 @@ namespace osu.Game.Tournament.Models
             Covers = beatmap.BeatmapSet?.Covers ?? new BeatmapSetOnlineCovers();
             EndTimeObjectCount = beatmap.EndTimeObjectCount;
             TotalObjectCount = beatmap.TotalObjectCount;
-            Ruleset = (APIRuleset)beatmap.Ruleset;
+            Ruleset = beatmap.Ruleset;
         }
 
         public bool Equals(IBeatmapInfo? other) => other is TournamentBeatmap b && this.MatchesOnlineID(b);
