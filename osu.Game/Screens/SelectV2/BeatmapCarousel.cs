@@ -693,18 +693,6 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
-        public void ExpandGroupForCurrentSelection()
-        {
-            if (CurrentGroupedBeatmap?.Group == null)
-                return;
-
-            if (CheckModelEquality(ExpandedGroup, CurrentGroupedBeatmap.Group))
-                return;
-
-            if (grouping.ItemMap.TryGetValue(CurrentGroupedBeatmap.Group, out var groupItem))
-                Activate(groupItem.item);
-        }
-
         protected override double? GetScrollTarget()
         {
             double? target = base.GetScrollTarget();
