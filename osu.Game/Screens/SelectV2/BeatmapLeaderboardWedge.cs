@@ -237,17 +237,19 @@ namespace osu.Game.Screens.SelectV2
 
             SetState(LeaderboardState.Retrieving);
 
+            var fetchScope = Scope.Value;
+
             refetchOperation?.Cancel();
             refetchOperation = Scheduler.AddDelayed(() =>
             {
                 var fetchBeatmapInfo = beatmap.Value.BeatmapInfo;
                 var fetchRuleset = ruleset.Value ?? fetchBeatmapInfo.Ruleset;
-                var fetchSorting = Scope.Value == BeatmapLeaderboardScope.Local ? Sorting.Value : LeaderboardSortMode.Score;
+                var fetchSorting = fetchScope == BeatmapLeaderboardScope.Local ? Sorting.Value : LeaderboardSortMode.Score;
 
                 // For now, we forcefully refresh to keep things simple.
                 // In the future, removing this requirement may be deemed useful, but will need ample testing of edge case scenarios
                 // (like returning from gameplay after setting a new score, returning to song select after main menu).
-                leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, Scope.Value, FilterBySelectedMods.Value ? mods.Value.ToArray() : null, fetchSorting),
+                leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, fetchScope, FilterBySelectedMods.Value ? mods.Value.ToArray() : null, fetchSorting),
                     forceRefresh: true);
 
                 if (!initialFetchComplete)
@@ -257,7 +259,7 @@ namespace osu.Game.Screens.SelectV2
                     fetchedScores.BindValueChanged(_ => updateScores(), true);
                     initialFetchComplete = true;
                 }
-            }, initialFetchComplete ? 300 : 0);
+            }, initialFetchComplete && fetchScope != BeatmapLeaderboardScope.Local ? 300 : 0);
         }
 
         private void updateScores()
