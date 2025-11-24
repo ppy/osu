@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Play
         [CanBeNull]
         private UserStatisticsWatcher userStatisticsWatcher { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         [CanBeNull]
         private INotificationOverlay notifications { get; set; }
 
