@@ -122,6 +122,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             }
         }
 
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            foreach (var segment in flow)
+            {
+                if (segment.Active)
+                    return;
+
+                float offset = segment.ToSpaceOfOtherDrawable(Vector2.Zero, this).X;
+
+                segment.Alpha = float.Clamp(offset / 300, 0.1f, 0.5f);
+            }
+        }
+
         private partial class StageScrollContainer : OsuScrollContainer
         {
             public override bool HandlePositionalInput => false;
