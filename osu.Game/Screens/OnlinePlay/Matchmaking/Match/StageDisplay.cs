@@ -9,6 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
@@ -151,47 +152,55 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             {
                 Size = new Vector2(76);
 
+                progress = new CircularProgress
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Colour = colours.Colour2,
+                    InnerRadius = 0.1f,
+                    RelativeSizeAxes = Axes.Both,
+                    RoundedCaps = true,
+                };
                 InternalChildren = new Drawable[]
                 {
                     new Circle
                     {
-                        Colour = ColourInfo.GradientVertical(
-                            colours.Dark2,
-                            colours.Dark4
-                        ),
+                        Colour = colours.Dark4,
                         RelativeSizeAxes = Axes.Both,
                     },
-                    progress = new CircularProgress
+                    (progress = new CircularProgress
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Colour = ColourInfo.GradientVertical(
-                            colours.Light1,
-                            colours.Dark2
-                        ),
+                        Colour = colours.Colour2,
                         InnerRadius = 0.1f,
-                        RelativeSizeAxes = Axes.Both,
-                    },
+                        Size = Size,
+                    }).WithEffect(new GlowEffect
+                    {
+                        Colour = colours.Colour2,
+                        BlurSigma = new Vector2(10),
+                        Strength = 2f,
+                        Placement = EffectPlacement.Behind,
+                        PadExtent = true,
+                    }),
                     innerCircle = new Circle
                     {
                         Alpha = 0.2f,
                         Blending = BlendingParameters.Additive,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Colour = ColourInfo.GradientVertical(
-                            colours.Dark1,
-                            colours.Dark2
-                        ),
+                        Colour = colours.Dark1,
                         Scale = new Vector2(0.9f),
                         RelativeSizeAxes = Axes.Both,
                     },
                     new OsuSpriteText
                     {
-                        Y = 10,
+                        Y = 13,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Font = OsuFont.Style.Caption2,
                         Text = "Round",
+                        Colour = colours.Content2
                     },
                     text = new OsuSpriteText
                     {
