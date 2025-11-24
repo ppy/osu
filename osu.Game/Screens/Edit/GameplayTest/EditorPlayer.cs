@@ -183,14 +183,14 @@ namespace osu.Game.Screens.Edit.GameplayTest
             {
                 case GlobalAction.EditorTestPlayToggleAutoplay:
                     if (GameplayClockContainer.IsPaused.Value && !quickPauseActive)
-                        return false;
+                        return true;
 
                     toggleAutoplay();
                     return true;
 
                 case GlobalAction.EditorTestPlayToggleQuickPause:
                     if (GameplayClockContainer.IsPaused.Value && !quickPauseActive)
-                        return false;
+                        return true;
 
                     toggleQuickPause();
                     return true;
