@@ -238,10 +238,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     round = value.Value;
 
                     this.ScaleTo(6, 1000, Easing.OutPow10)
-                        .MoveToY(-300, 1000, Easing.OutPow10)
+                        .MoveToY(300, 1000, Easing.OutPow10)
                         .Then()
-                        .MoveToY(0, 500, Easing.InQuart)
-                        .ScaleTo(1, 500, Easing.InQuart);
+                        .MoveToY(0, 500, new CubicBezierEasingFunction(0.8, 0, 0.6, 1))
+                        .ScaleTo(1, 500, new CubicBezierEasingFunction(0.8, 0, 0.6, 1));
 
                     swishChannel = swishSample?.GetChannel();
 
