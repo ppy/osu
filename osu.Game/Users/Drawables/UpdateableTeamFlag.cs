@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
@@ -79,7 +78,7 @@ namespace osu.Game.Users.Drawables
             }
 
             [BackgroundDependencyLoader]
-            private void load(LargeTextureStore textures)
+            private void load(AvatarStore avatars)
             {
                 InternalChildren = new Drawable[]
                 {
@@ -92,7 +91,7 @@ namespace osu.Game.Users.Drawables
                     new Sprite
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Texture = textures.Get(team.FlagUrl),
+                        Texture = avatars.GetTeamAvatar(team),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         FillMode = FillMode.Fit,

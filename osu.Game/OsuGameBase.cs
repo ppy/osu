@@ -62,6 +62,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
+using osu.Game.Users.Drawables;
 using osu.Game.Utils;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 
@@ -343,6 +344,8 @@ namespace osu.Game
 
             dependencies.Cache(userCache = new UserLookupCache());
             base.Content.Add(userCache);
+
+            dependencies.Cache(new AvatarStore(Host, userCache));
 
             dependencies.Cache(beatmapCache = new BeatmapLookupCache());
             base.Content.Add(beatmapCache);

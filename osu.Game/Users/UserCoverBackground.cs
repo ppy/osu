@@ -9,8 +9,8 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Users.Drawables;
 using osuTK.Graphics;
 
 namespace osu.Game.Users
@@ -51,7 +51,7 @@ namespace osu.Game.Users
             }
 
             [BackgroundDependencyLoader]
-            private void load(LargeTextureStore textures)
+            private void load(AvatarStore avatarStore)
             {
                 if (user == null)
                 {
@@ -66,7 +66,7 @@ namespace osu.Game.Users
                     InternalChild = new Sprite
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Texture = textures.Get(user.CoverUrl),
+                        Texture = avatarStore.GetUserCover(user),
                         FillMode = FillMode.Fill,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
