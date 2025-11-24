@@ -324,8 +324,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             private Box leftBox = null!;
             private Box rightBox = null!;
-            private Circle nub = null!;
-            private const float nub_width = 10;
+            private InnerSliderNub nub = null!;
+            public const float NUB_WIDTH = 10;
 
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -335,7 +335,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 Height = 40;
                 RelativeSizeAxes = Axes.X;
-                RangePadding = nub_width / 2;
+                RangePadding = NUB_WIDTH / 2;
 
                 Children = new Drawable[]
                 {
@@ -364,12 +364,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     {
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Horizontal = RangePadding, },
-                        Child = nub = new Circle
+                        Child = nub = new InnerSliderNub
                         {
-                            Width = nub_width,
-                            RelativeSizeAxes = Axes.Y,
-                            RelativePositionAxes = Axes.X,
-                            Origin = Anchor.TopCentre,
+                            ResetToDefault = () =>
+                            {
+                                if (!Current.Disabled)
+                                    Current.SetDefault();
+                            }
                         }
                     },
                     new HoverClickSounds()
@@ -450,6 +451,28 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     OnCommit?.Invoke();
 
                 return result;
+            }
+        }
+
+        private partial class InnerSliderNub : Circle
+        {
+            public Action? ResetToDefault { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Width = InnerSlider.NUB_WIDTH;
+                RelativeSizeAxes = Axes.Y;
+                RelativePositionAxes = Axes.X;
+                Origin = Anchor.TopCentre;
+            }
+
+            protected override bool OnClick(ClickEvent e) => true; // must be handled for double click handler to ever fire
+
+            protected override bool OnDoubleClick(DoubleClickEvent e)
+            {
+                ResetToDefault?.Invoke();
+                return true;
             }
         }
     }
