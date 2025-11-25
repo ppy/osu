@@ -95,7 +95,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double ratingMultiplier = 1.0;
 
-            // It is important to also consider accuracy difficulty when doing that.
             ratingMultiplier *= 0.75 + Math.Pow(Math.Max(0, overallDifficulty), 2.2) / 800;
 
             return readingRating * Math.Sqrt(ratingMultiplier);

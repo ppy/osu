@@ -79,6 +79,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 hiddenDifficulty = Math.Pow(hiddenDifficulty, 0.65) * hidden_multiplier;
 
                 var previousObj = currObj.Previous(0);
+
                 // Buff perfect stacks only if current note is completely invisible at the time you click the previous note.
                 if (currObj.LazyJumpDistance == 0 && currObj.OpacityAt(previousObj.BaseObject.StartTime + preempt, hidden) == 0 && previousObj.StartTime + preempt > currObj.StartTime)
                     hiddenDifficulty += hidden_multiplier * 1303 / Math.Pow(currObj.AdjustedDeltaTime, 1.5); // Perfect stacks are harder the less time between notes

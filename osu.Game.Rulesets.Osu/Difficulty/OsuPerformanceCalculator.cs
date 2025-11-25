@@ -337,9 +337,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double readingValue = Reading.DifficultyToPerformance(attributes.ReadingDifficulty);
 
             if (effectiveMissCount > 0)
-            {
                 readingValue *= calculateMissPenalty(effectiveMissCount + aimEstimatedSliderBreaks, attributes.ReadingDifficultNoteCount);
-            }
 
             // Scale the reading value with accuracy _harshly_.
             readingValue *= Math.Pow(accuracy, 3);
