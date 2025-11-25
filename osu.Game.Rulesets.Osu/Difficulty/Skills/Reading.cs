@@ -24,7 +24,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private readonly double clockRate;
         private readonly bool hasHiddenMod;
         private readonly double preempt;
-        private double skillMultiplier => 2.0;
 
         public Reading(IBeatmap beatmap, Mod[] mods, double clockRate)
             : base(mods)
@@ -37,6 +36,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentDifficulty;
         private double noteWeightSum;
+
+        private double skillMultiplier => 2.0;
         private double strainDecayBase => 0.8;
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
