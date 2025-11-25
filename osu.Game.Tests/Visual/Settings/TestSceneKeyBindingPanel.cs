@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddStep("schedule button clicks", () =>
             {
-                var clearButton = firstRow.ChildrenOfType<KeyBindingRow.ClearButton>().Single();
+                var clearButton = firstRow.ChildrenOfType<DangerousRoundedButton>().Single();
 
                 InputManager.MoveMouseTo(clearButton);
 
@@ -179,7 +179,7 @@ namespace osu.Game.Tests.Visual.Settings
             {
                 AddStep("click clear button", () =>
                 {
-                    var clearButton = multiBindingRow.ChildrenOfType<KeyBindingRow.ClearButton>().Single();
+                    var clearButton = multiBindingRow.ChildrenOfType<DangerousRoundedButton>().Single();
 
                     InputManager.MoveMouseTo(clearButton);
                     InputManager.Click(MouseButton.Left);
@@ -386,7 +386,7 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("clear binding", () =>
             {
                 var row = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == "Left (centre)"));
-                row.ChildrenOfType<KeyBindingRow.ClearButton>().Single().TriggerClick();
+                row.ChildrenOfType<DangerousRoundedButton>().Single().TriggerClick();
             });
             scrollToAndStartBinding("Left (rim)");
             AddStep("bind M1", () => InputManager.Click(MouseButton.Left));
@@ -462,7 +462,7 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("clear binding", () =>
             {
                 var row = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == "Left (centre)"));
-                row.ChildrenOfType<KeyBindingRow.ClearButton>().Single().TriggerClick();
+                row.ChildrenOfType<DangerousRoundedButton>().Single().TriggerClick();
             });
         }
 
