@@ -117,11 +117,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // If sliders in the map are hard - it's likely for player to drop sliderends
             // If map has easy sliders - it's more likely for player to sliderbreak
-            double likelyMissedSliderendPortion = 0.03 + 0.12 * Math.Pow(Math.Min(attributes.AimTopWeightedSliderFactor, 1), 2);
+            double likelyMissedSliderendPortion = 0.04 + 0.06 * Math.Pow(Math.Min(attributes.AimTopWeightedSliderFactor, 1), 2);
 
             // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
             // In classic scores we can't know the amount of dropped sliders so we estimate it
-            double fullComboThreshold = attributes.MaxCombo - Math.Min(5 + likelyMissedSliderendPortion * attributes.SliderCount, attributes.SliderCount);
+            double fullComboThreshold = attributes.MaxCombo - Math.Min(4 + likelyMissedSliderendPortion * attributes.SliderCount, attributes.SliderCount);
 
             if (score.MaxCombo < fullComboThreshold)
                 missCount = Math.Pow(fullComboThreshold / Math.Max(1.0, score.MaxCombo), 2.5);
