@@ -113,10 +113,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (noteDifficulties.Count == 0)
                 return 0.0;
 
-            double consistentTopNote = DifficultyValue() / noteWeightSum; // What would the top note be if all note values were identical
-
             if (noteWeightSum == 0)
                 return 0.0;
+
+            double consistentTopNote = DifficultyValue() / noteWeightSum; // What would the top note be if all note values were identical
 
             if (consistentTopNote == 0)
                 return 0;
