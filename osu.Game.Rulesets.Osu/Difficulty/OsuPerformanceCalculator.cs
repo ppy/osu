@@ -142,6 +142,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
             double readingValue = computeReadingValue(osuAttributes);
+
             double totalValue =
                 Math.Pow(
                     Math.Pow(aimValue, 1.1) +
