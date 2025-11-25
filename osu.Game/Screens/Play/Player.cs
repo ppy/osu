@@ -1172,6 +1172,8 @@ namespace osu.Game.Screens.Play
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
+            Debug.Assert(!ValidForResume);
+
             screenSuspension?.RemoveAndDisposeImmediately();
 
             // If these are not disposed, audio volume dimming can get stuck.
