@@ -235,15 +235,13 @@ namespace osu.Game.Online.Metadata
                 {
                     if (userId == api.LocalUser.Value.OnlineID)
                         localUserPresence = presence.Value;
-                    else
-                        userPresences[userId] = presence.Value;
+                    userPresences[userId] = presence.Value;
                 }
                 else
                 {
                     if (userId == api.LocalUser.Value.OnlineID)
                         localUserPresence = default;
-                    else
-                        userPresences.Remove(userId);
+                    userPresences.Remove(userId);
                 }
             });
 
