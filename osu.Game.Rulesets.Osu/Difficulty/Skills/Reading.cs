@@ -39,7 +39,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double noteWeightSum;
         private double strainDecayBase => 0.8;
 
-        public static double DifficultyToPerformance(double difficulty) => 25 * Math.Pow(difficulty, 2);
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 
         public override void Process(DifficultyHitObject current)
@@ -124,5 +123,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // Use a weighted sum of all notes. Constants are arbitrary and give nice values
             return noteDifficulties.Sum(s => 1.1 / (1 + Math.Exp(-5 * (s / consistentTopNote - 1.15))));
         }
+
+        public static double DifficultyToPerformance(double difficulty) => 25 * Math.Pow(difficulty, 2);
     }
 }
