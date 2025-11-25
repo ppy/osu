@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var currObj = (OsuDifficultyHitObject)current;
             double constantAngleNerfFactor = getConstantAngleNerfFactor(currObj);
-            double velocity = Math.Max(1, currObj.MinimumJumpDistance / currObj.AdjustedDeltaTime); // Only allow velocity to buff
+            double velocity = Math.Max(1, currObj.LazyJumpDistance / currObj.AdjustedDeltaTime); // Only allow velocity to buff
 
             double pastObjectDifficultyInfluence = 0.0;
 
