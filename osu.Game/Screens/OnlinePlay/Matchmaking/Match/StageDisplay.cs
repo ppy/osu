@@ -19,6 +19,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Overlays;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 {
@@ -48,11 +49,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         {
             InternalChildren = new Drawable[]
             {
-                new Box
+                new BufferedContainer(cachedFrameBuffer: true)
                 {
-                    Colour = ColourInfo.GradientHorizontal(colourProvider.Dark6, colourProvider.Dark6.Opacity(0.5f)),
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.7f
+                    Colour = ColourInfo.GradientVertical(Color4.White, Color4.Transparent),
+                    Alpha = 0.8f,
+                    Child = new Box
+                    {
+                        Colour = ColourInfo.GradientHorizontal(colourProvider.Dark6, colourProvider.Dark6.Opacity(0.5f)),
+                        RelativeSizeAxes = Axes.Both,
+                    }
                 },
                 new Container
                 {
