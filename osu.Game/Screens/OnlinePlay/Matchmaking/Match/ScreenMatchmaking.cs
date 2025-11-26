@@ -13,7 +13,6 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
@@ -57,8 +56,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
         public override bool ShowFooter => true;
 
-        [Resolved]
-        private OverlayColourProvider colourProvider { get; set; } = null!;
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
         protected override BackgroundScreen CreateBackground() => new MatchmakingBackgroundScreen(colourProvider);
 
@@ -124,7 +123,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
             sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
 
@@ -143,8 +142,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding
                             {
-                                Horizontal = WaveOverlayContainer.WIDTH_PADDING,
-                                Top = row_padding,
+                                Horizontal = HORIZONTAL_OVERFLOW_PADDING,
                             },
                             RowDimensions = new[]
                             {
@@ -155,21 +153,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                             Content = new Drawable[]?[]
                             {
                                 [
-                                    new Container
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Masking = true,
-                                        CornerRadius = 10,
-                                        Children = new Drawable[]
-                                        {
-                                            new Box
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Colour = colourProvider.Background6,
-                                            },
-                                            new ScreenStack(),
-                                        }
-                                    }
+                                    new ScreenStack(),
                                 ],
                                 null,
                                 [
