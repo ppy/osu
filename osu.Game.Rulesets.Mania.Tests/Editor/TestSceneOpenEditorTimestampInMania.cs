@@ -18,15 +18,11 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         public void TestNormalSelection()
         {
             addStepClickLink("00:05:920 (5920|3,6623|3,6857|2,7326|1)");
-            AddAssert("selected group", () => checkSnapAndSelectColumn(5_920, new List<(int, int)>
-                { (5_920, 3), (6_623, 3), (6_857, 2), (7_326, 1) }
-            ));
+            AddAssert("selected group", () => checkSnapAndSelectColumn(5_920, [(5_920, 3), (6_623, 3), (6_857, 2), (7_326, 1)]));
 
             addReset();
             addStepClickLink("00:42:716 (42716|3,43420|2,44123|0,44357|1,45295|1)");
-            AddAssert("selected ungrouped", () => checkSnapAndSelectColumn(42_716, new List<(int, int)>
-                { (42_716, 3), (43_420, 2), (44_123, 0), (44_357, 1), (45_295, 1) }
-            ));
+            AddAssert("selected ungrouped", () => checkSnapAndSelectColumn(42_716, [(42_716, 3), (43_420, 2), (44_123, 0), (44_357, 1), (45_295, 1)]));
 
             addReset();
             AddStep("add notes to row", () =>
@@ -41,15 +37,20 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                 EditorBeatmap.AddRange(new[] { second, third, forth });
             });
             addStepClickLink("00:11:545 (11545|0,11545|1,11545|2,11545|3)");
-            AddAssert("selected in row", () => checkSnapAndSelectColumn(11_545, new List<(int, int)>
-                { (11_545, 0), (11_545, 1), (11_545, 2), (11_545, 3) }
-            ));
+            AddAssert("selected in row", () => checkSnapAndSelectColumn(11_545, [(11_545, 0), (11_545, 1), (11_545, 2), (11_545, 3)]));
 
             addReset();
             addStepClickLink("01:36:623 (96623|1,97560|1,97677|1,97795|1,98966|1)");
-            AddAssert("selected in column", () => checkSnapAndSelectColumn(96_623, new List<(int, int)>
-                { (96_623, 1), (97_560, 1), (97_677, 1), (97_795, 1), (98_966, 1) }
-            ));
+            AddAssert("selected in column", () => checkSnapAndSelectColumn(96_623, [(96_623, 1), (97_560, 1), (97_677, 1), (97_795, 1), (98_966, 1)]));
+        }
+
+        [Test]
+        public void TestRoundingToNearestMillisecondApplied()
+        {
+            AddStep("resnap note to have fractional coordinates",
+                () => EditorBeatmap.HitObjects.OfType<ManiaHitObject>().Single(ho => ho.StartTime == 85_373 && ho.Column == 1).StartTime = 85_373.125);
+            addStepClickLink("01:25:373 (85373|1)");
+            AddAssert("selected note", () => checkSnapAndSelectColumn(85_373.125, [(85_373.125, 1)]));
         }
 
         [Test]
@@ -75,7 +76,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
         private void addReset() => addStepClickLink("00:00:000", "reset", false);
 
-        private bool checkSnapAndSelectColumn(double startTime, IReadOnlyCollection<(int, int)>? columnPairs = null)
+        private bool checkSnapAndSelectColumn(double startTime, IReadOnlyCollection<(double, int)>? columnPairs = null)
         {
             bool checkColumns = columnPairs != null
                 ? EditorBeatmap.SelectedHitObjects.All(x => columnPairs.Any(col => isNoteAt(x, col.Item1, col.Item2)))

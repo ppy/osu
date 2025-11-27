@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
@@ -171,7 +172,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             => new OsuBlueprintContainer(this);
 
         public override string ConvertSelectionToString()
-            => string.Join(',', selectedHitObjects.Cast<OsuHitObject>().OrderBy(h => h.StartTime).Select(h => (h.IndexInCurrentCombo + 1).ToString()));
+            => string.Join(',', selectedHitObjects.Cast<OsuHitObject>().OrderBy(h => h.StartTime)
+                                                  .Select(h => (h.IndexInCurrentCombo + 1).ToString(CultureInfo.InvariantCulture)));
 
         // 1,2,3,4 ...
         private static readonly Regex selection_regex = new Regex(@"^\d+(,\d+)*$", RegexOptions.Compiled);
