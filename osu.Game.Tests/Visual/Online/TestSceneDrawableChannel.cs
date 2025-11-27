@@ -236,7 +236,8 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("add 3 messages", () =>
             {
-                channel.AddNewMessages(new Message
+                channel.AddNewMessages(
+                    new Message
                     {
                         ChannelId = channel.Id,
                         Content = "Message 0",
