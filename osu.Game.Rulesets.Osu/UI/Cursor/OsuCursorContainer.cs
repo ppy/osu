@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 var newScale = new Vector2(e.NewValue);
 
                 rippleVisualiser.CursorScale = newScale;
-                cursorTrail.Scale = newScale;
+                if (cursorTrail.Drawable is CursorTrail trail) trail.CursorScale = newScale;
             }, true);
         }
 
