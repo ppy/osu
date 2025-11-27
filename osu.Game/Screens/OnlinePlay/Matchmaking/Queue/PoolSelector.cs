@@ -92,7 +92,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private partial class SelectorButton : OsuAnimatedButton
         {
-            public static readonly Vector2 SIZE = new Vector2(84, 64);
+            public static readonly Vector2 SIZE = new Vector2(84, 78);
 
             public bool IsSelected => SelectedPool.Value?.Equals(pool) == true;
 
@@ -105,8 +105,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             private Drawable iconSprite = null!;
 
             private Box flashLayer = null!;
-
-            private OsuSpriteText text = null!;
 
             public SelectorButton(MatchmakingPool pool)
                 : base(HoverSampleSet.ButtonSidebar)
@@ -122,6 +120,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 Content.Masking = true;
                 Content.CornerRadius = 16;
                 Content.CornerExponent = 10;
+
+                Ruleset? rulesetInstance = rulesetStore.GetRuleset(pool.RulesetId)?.CreateInstance();
+
+                string rulesetName = rulesetInstance?.Description ?? string.Empty;
+                if (pool.Variant != 0)
+                    rulesetName += $" {pool.Variant}K";
 
                 Children = new Drawable[]
                 {
@@ -156,13 +160,28 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                     iconSprite = createIcon(),
                                 }
                             },
-                            text = new OsuSpriteText
+                            new FillFlowContainer
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Font = OsuFont.Style.Caption2,
-                                Text = pool.Name,
-                            },
+                                RelativeSizeAxes = Axes.Both,
+                                Direction = FillDirection.Vertical,
+                                Children = new Drawable[]
+                                {
+                                    new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                        Font = OsuFont.Style.Caption1.With(weight: FontWeight.Bold),
+                                        Text = rulesetName,
+                                    },
+                                    new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                        Font = OsuFont.Style.Caption2,
+                                        Text = pool.Name
+                                    }
+                                }
+                            }
                         }
                     },
                 };
@@ -198,14 +217,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 {
                     this.ScaleTo(1.2f, 200, Easing.OutQuint);
                     iconSprite.FadeColour(Color4.Gold, 100, Easing.OutQuint);
-                    text.Font = text.Font.With(weight: FontWeight.Bold);
                     flashLayer.FadeTo(0.1f, 200, Easing.OutQuint);
                 }
                 else
                 {
                     this.ScaleTo(1f, 200, Easing.OutQuint);
                     iconSprite.FadeColour(OsuColour.Gray(0.5f), 100);
-                    text.Font = text.Font.With(weight: FontWeight.Regular);
                     flashLayer.FadeOut(200, Easing.OutQuint);
                 }
             }
