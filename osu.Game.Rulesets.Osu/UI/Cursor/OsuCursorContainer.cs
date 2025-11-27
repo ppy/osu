@@ -31,6 +31,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly SkinnableDrawable cursorTrail;
 
+        private Vector2 cursorScale;
+
         private readonly CursorRippleVisualiser rippleVisualiser;
 
         public OsuCursorContainer()
@@ -61,10 +63,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             ActiveCursor.CursorScale.BindValueChanged(e =>
             {
-                var newScale = new Vector2(e.NewValue);
+                cursorScale = new Vector2(e.NewValue);
 
-                rippleVisualiser.CursorScale = newScale;
-                if (cursorTrail.Drawable is CursorTrail trail) trail.CursorScale = newScale;
+                rippleVisualiser.CursorScale = cursorScale;
+                if (cursorTrail.Drawable is CursorTrail trail) trail.CursorScale = cursorScale;
             }, true);
         }
 
@@ -86,6 +88,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             {
                 trail.NewPartScale = ActiveCursor.CurrentExpandedScale;
                 trail.PartRotation = ActiveCursor.CurrentRotation;
+                trail.CursorScale = cursorScale;
             }
         }
 
