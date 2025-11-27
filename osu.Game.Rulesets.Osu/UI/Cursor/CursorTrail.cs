@@ -49,6 +49,18 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         /// </summary>
         protected bool AllowPartRotation { get; set; }
 
+        private Vector2 cursorScale;
+
+        public Vector2 CursorScale
+        {
+            get => cursorScale;
+            set
+            {
+                cursorScale = value;
+                Invalidate(Invalidation.DrawNode);
+            }
+        }
+
         /// <summary>
         /// The trail part texture origin.
         /// </summary>
@@ -233,6 +245,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             private float time;
             private float fadeExponent;
             private float angle;
+            private Vector2 cursorScale;
 
             private readonly TrailPart[] parts = new TrailPart[max_sprites];
             private Vector2 originPosition;
@@ -253,6 +266,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 time = Source.time;
                 fadeExponent = Source.FadeExponent;
                 angle = Source.AllowPartRotation ? float.DegreesToRadians(Source.PartRotation) : 0;
+                cursorScale = Source.cursorScale;
 
                 originPosition = Vector2.Zero;
 
@@ -307,7 +321,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     vertexBatch.Add(new TexturedTrailVertex
                     {
                         Position = rotateAround(
-                            new Vector2(part.Position.X - texture.DisplayWidth * originPosition.X * part.Scale.X, part.Position.Y + texture.DisplayHeight * (1 - originPosition.Y) * part.Scale.Y),
+                            new Vector2(
+                                part.Position.X - texture.DisplayWidth * originPosition.X * part.Scale.X * cursorScale.X,
+                                part.Position.Y + texture.DisplayHeight * (1 - originPosition.Y) * part.Scale.Y * cursorScale.Y),
                             part.Position, sin, cos),
                         TexturePosition = textureRect.BottomLeft,
                         TextureRect = new Vector4(0, 0, 1, 1),
@@ -318,8 +334,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     vertexBatch.Add(new TexturedTrailVertex
                     {
                         Position = rotateAround(
-                            new Vector2(part.Position.X + texture.DisplayWidth * (1 - originPosition.X) * part.Scale.X,
-                                part.Position.Y + texture.DisplayHeight * (1 - originPosition.Y) * part.Scale.Y), part.Position, sin, cos),
+                            new Vector2(
+                                part.Position.X + texture.DisplayWidth * (1 - originPosition.X) * part.Scale.X * cursorScale.X,
+                                part.Position.Y + texture.DisplayHeight * (1 - originPosition.Y) * part.Scale.Y * cursorScale.Y),
+                            part.Position, sin, cos),
                         TexturePosition = textureRect.BottomRight,
                         TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.BottomRight.Linear,
@@ -329,7 +347,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     vertexBatch.Add(new TexturedTrailVertex
                     {
                         Position = rotateAround(
-                            new Vector2(part.Position.X + texture.DisplayWidth * (1 - originPosition.X) * part.Scale.X, part.Position.Y - texture.DisplayHeight * originPosition.Y * part.Scale.Y),
+                            new Vector2(
+                                part.Position.X + texture.DisplayWidth * (1 - originPosition.X) * part.Scale.X * cursorScale.X,
+                                part.Position.Y - texture.DisplayHeight * originPosition.Y * part.Scale.Y * cursorScale.Y),
                             part.Position, sin, cos),
                         TexturePosition = textureRect.TopRight,
                         TextureRect = new Vector4(0, 0, 1, 1),
@@ -340,7 +360,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     vertexBatch.Add(new TexturedTrailVertex
                     {
                         Position = rotateAround(
-                            new Vector2(part.Position.X - texture.DisplayWidth * originPosition.X * part.Scale.X, part.Position.Y - texture.DisplayHeight * originPosition.Y * part.Scale.Y),
+                            new Vector2(
+                                part.Position.X - texture.DisplayWidth * originPosition.X * part.Scale.X * cursorScale.X,
+                                part.Position.Y - texture.DisplayHeight * originPosition.Y * part.Scale.Y * cursorScale.Y),
                             part.Position, sin, cos),
                         TexturePosition = textureRect.TopLeft,
                         TextureRect = new Vector4(0, 0, 1, 1),
