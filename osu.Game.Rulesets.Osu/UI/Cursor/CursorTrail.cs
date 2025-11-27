@@ -164,18 +164,20 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             return base.OnMouseMove(e);
         }
 
-        protected void AddTrail(Vector2 screenSpacePosition)
+        protected void AddTrail(Vector2 position)
         {
+            position = ToLocalSpace(position);
+
             if (InterpolateMovements)
             {
                 if (!lastPosition.HasValue)
                 {
-                    lastPosition = screenSpacePosition;
+                    lastPosition = position;
                     resampler.AddPosition(lastPosition.Value);
                     return;
                 }
 
-                foreach (Vector2 pos2 in resampler.AddPosition(screenSpacePosition))
+                foreach (Vector2 pos2 in resampler.AddPosition(position))
                 {
                     Trace.Assert(lastPosition.HasValue);
 
@@ -196,14 +198,14 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             }
             else
             {
-                lastPosition = screenSpacePosition;
+                lastPosition = position;
                 addPart(lastPosition.Value);
             }
         }
 
-        private void addPart(Vector2 screenSpacePosition)
+        private void addPart(Vector2 localSpacePosition)
         {
-            parts[currentIndex].ScreenSpacePosition = screenSpacePosition;
+            parts[currentIndex].Position = localSpacePosition;
             parts[currentIndex].Time = time + 1;
             parts[currentIndex].Scale = NewPartScale;
             ++parts[currentIndex].InvalidationID;
@@ -215,7 +217,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private struct TrailPart
         {
-            public Vector2 ScreenSpacePosition;
+            public Vector2 Position;
             public float Time;
             public Vector2 Scale;
             public long InvalidationID;
@@ -302,13 +304,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     if (time - part.Time >= 1)
                         continue;
 
-                    Vector2 localSpacePosition = Vector2Extensions.Transform(part.ScreenSpacePosition, DrawInfo.MatrixInverse);
-
                     vertexBatch.Add(new TexturedTrailVertex
                     {
                         Position = rotateAround(
-                            new Vector2(localSpacePosition.X - texture.DisplayWidth * originPosition.X * part.Scale.X, localSpacePosition.Y + texture.DisplayHeight * (1 - originPosition.Y) * part.Scale.Y),
-                            localSpacePosition, sin, cos),
+                            new Vector2(part.Position.X - texture.DisplayWidth * originPosition.X * part.Scale.X, part.Position.Y + texture.DisplayHeight * (1 - originPosition.Y) * part.Scale.Y),
+                            part.Position, sin, cos),
                         TexturePosition = textureRect.BottomLeft,
                         TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.BottomLeft.Linear,
@@ -318,8 +318,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     vertexBatch.Add(new TexturedTrailVertex
                     {
                         Position = rotateAround(
-                            new Vector2(localSpacePosition.X + texture.DisplayWidth * (1 - originPosition.X) * part.Scale.X,
-                                localSpacePosition.Y + texture.DisplayHeight * (1 - originPosition.Y) * part.Scale.Y), localSpacePosition, sin, cos),
+                            new Vector2(part.Position.X + texture.DisplayWidth * (1 - originPosition.X) * part.Scale.X,
+                                part.Position.Y + texture.DisplayHeight * (1 - originPosition.Y) * part.Scale.Y), part.Position, sin, cos),
                         TexturePosition = textureRect.BottomRight,
                         TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.BottomRight.Linear,
@@ -329,8 +329,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     vertexBatch.Add(new TexturedTrailVertex
                     {
                         Position = rotateAround(
-                            new Vector2(localSpacePosition.X + texture.DisplayWidth * (1 - originPosition.X) * part.Scale.X, localSpacePosition.Y - texture.DisplayHeight * originPosition.Y * part.Scale.Y),
-                            localSpacePosition, sin, cos),
+                            new Vector2(part.Position.X + texture.DisplayWidth * (1 - originPosition.X) * part.Scale.X, part.Position.Y - texture.DisplayHeight * originPosition.Y * part.Scale.Y),
+                            part.Position, sin, cos),
                         TexturePosition = textureRect.TopRight,
                         TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.TopRight.Linear,
@@ -340,8 +340,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     vertexBatch.Add(new TexturedTrailVertex
                     {
                         Position = rotateAround(
-                            new Vector2(localSpacePosition.X - texture.DisplayWidth * originPosition.X * part.Scale.X, localSpacePosition.Y - texture.DisplayHeight * originPosition.Y * part.Scale.Y),
-                            localSpacePosition, sin, cos),
+                            new Vector2(part.Position.X - texture.DisplayWidth * originPosition.X * part.Scale.X, part.Position.Y - texture.DisplayHeight * originPosition.Y * part.Scale.Y),
+                            part.Position, sin, cos),
                         TexturePosition = textureRect.TopLeft,
                         TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.TopLeft.Linear,
