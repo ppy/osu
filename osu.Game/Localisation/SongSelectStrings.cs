@@ -110,6 +110,11 @@ namespace osu.Game.Localisation
         public static LocalisableString UseTheseMods => new TranslatableString(getKey(@"use_these_mods"), @"Use these mods");
 
         /// <summary>
+        /// "Watch replay"
+        /// </summary>
+        public static LocalisableString WatchReplay => new TranslatableString(getKey(@"watch_replay"), @"Watch replay");
+
+        /// <summary>
         /// "For all difficulties"
         /// </summary>
         public static LocalisableString ForAllDifficulties => new TranslatableString(getKey(@"for_all_difficulties"), @"For all difficulties");

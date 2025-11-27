@@ -628,6 +628,8 @@ namespace osu.Game.Screens.SelectV2
 
                 if (Score.Files.Count <= 0) return items.ToArray();
 
+                items.Add(new OsuMenuItemSpacer());
+                items.Add(new OsuMenuItem(SongSelectStrings.WatchReplay, MenuItemType.Standard, () => game?.PresentScore(Score, ScorePresentType.Gameplay)));
                 items.Add(new OsuMenuItem(CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(Score)));
                 items.Add(new OsuMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
 
