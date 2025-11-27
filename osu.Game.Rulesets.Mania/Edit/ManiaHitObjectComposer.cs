@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
@@ -56,7 +57,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public override string ConvertSelectionToString()
             => string.Join(',', EditorBeatmap.SelectedHitObjects.Cast<ManiaHitObject>().OrderBy(h => h.StartTime)
-                                             .Select(h => FormattableString.Invariant($"{h.StartTime}|{h.Column}")));
+                                             .Select(h => FormattableString.Invariant($"{Math.Round(h.StartTime)}|{h.Column}")));
 
         // 123|0,456|1,789|2 ...
         private static readonly Regex selection_regex = new Regex(@"^\d+\|\d+(,\d+\|\d+)*$", RegexOptions.Compiled);
@@ -75,10 +76,10 @@ namespace osu.Game.Rulesets.Mania.Edit
                 if (split.Length != 2)
                     continue;
 
-                if (!double.TryParse(split[0], out double time) || !int.TryParse(split[1], out int column))
+                if (!int.TryParse(split[0], out int time) || !int.TryParse(split[1], out int column))
                     continue;
 
-                ManiaHitObject? current = remainingHitObjects.FirstOrDefault(h => h.StartTime == time && h.Column == column);
+                ManiaHitObject? current = remainingHitObjects.FirstOrDefault(h => Precision.AlmostEquals(h.StartTime, time, 0.5) && h.Column == column);
 
                 if (current == null)
                     continue;
