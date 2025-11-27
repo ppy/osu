@@ -79,22 +79,6 @@ namespace osu.Game.Overlays.Chat
             highlightedMessage.BindValueChanged(_ => processMessageHighlighting(), true);
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            long? lastMinutes = null;
-
-            foreach (var line in chatLines)
-            {
-                long minutes = line.Message.Timestamp.ToUnixTimeSeconds() / 60;
-
-                line.RequiresTimestamp = minutes != lastMinutes;
-
-                lastMinutes = minutes;
-            }
-        }
-
         /// <summary>
         /// Processes any pending message in <see cref="highlightedMessage"/>.
         /// </summary>
