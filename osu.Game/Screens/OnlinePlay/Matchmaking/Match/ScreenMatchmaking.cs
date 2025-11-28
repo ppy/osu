@@ -192,6 +192,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             if (this.IsCurrentScreen() && client.Room == null)
             {
                 Logger.Log($"{this} exiting due to loss of room or connection");
+                exitConfirmed = true;
                 this.Exit();
             }
         }
