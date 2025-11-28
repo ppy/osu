@@ -424,6 +424,8 @@ namespace osu.Game.Screens.Play
 
             IsBreakTime.BindTo(breakTracker.IsBreakTime);
             IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
+
+            config.BindWith(OsuSetting.KeepGameplayAfterFailed, keepPlayAfterFailed);
         }
 
         protected virtual GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart);
@@ -947,6 +949,8 @@ namespace osu.Game.Screens.Play
 
         private FailAnimationContainer failAnimationContainer;
 
+        private readonly BindableBool keepPlayAfterFailed = new BindableBool();
+
         private bool onFail()
         {
             // Failing after the quit sequence has started may cause weird side effects with the fail animation / effects.
@@ -968,6 +972,15 @@ namespace osu.Game.Screens.Play
             Debug.Assert(!GameplayState.HasFailed);
             Debug.Assert(!GameplayState.HasPassed);
             Debug.Assert(!GameplayState.HasQuit);
+
+            if (keepPlayAfterFailed.Value)
+            {
+                // mark score as F rank and continue playing.
+                // let ScoreProcessor continue to apply judgements as same as MultiplayerPlayer
+                ScoreProcessor.FailScore(Score.ScoreInfo);
+                ScoreProcessor.ApplyNewJudgementsWhenFailed = true;
+                return;
+            }
 
             GameplayState.HasFailed = true;
 
