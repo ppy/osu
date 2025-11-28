@@ -159,20 +159,22 @@ namespace osu.Game.Beatmaps.Drawables
                 countText.Alpha = collapsed ? 1 : 0;
                 countText.Text = beatmaps.Length.ToLocalisableString(@"N0");
 
+                var visibleBeatmaps = beatmaps
+                                      .Where(b => !(b is BeatmapInfo bi && bi.Hidden))
+                                      .ToArray();
+
                 var dots = this.OfType<DifficultyDot>().ToArray();
 
-                for (int i = 0; i < max_difficulties_before_collapsing; i++)
+                for (int i = 0; i < dots.Length; i++)
                 {
-                    var dot = dots[i];
-
-                    if (collapsed || i >= beatmaps.Length)
+                    if (collapsed || i >= visibleBeatmaps.Length)
                     {
-                        dot.Alpha = 0;
+                        dots[i].Alpha = 0;
                         continue;
                     }
 
-                    dot.Alpha = 1;
-                    dot.StarDifficulty = beatmaps[i].StarRating;
+                    dots[i].Alpha = 1;
+                    dots[i].StarDifficulty = visibleBeatmaps[i].StarRating;
                 }
             }
         }
