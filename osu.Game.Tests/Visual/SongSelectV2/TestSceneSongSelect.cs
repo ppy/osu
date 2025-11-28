@@ -408,6 +408,147 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestAutoplayShortcutReplacesCinema()
+        {
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+            AddStep("press right", () => InputManager.Key(Key.Right)); // press right to select in carousel, also remove.
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            ChangeMods(new OsuModCinema());
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("only autoplay selected", () => SongSelect.Mods.Value.Single() is ModAutoplay);
+
+            AddUntilStep("wait for return to ss", () => SongSelect.IsCurrentScreen());
+
+            AddAssert("cinema still selected", () => SongSelect.Mods.Value.Single() is ModCinema);
+        }
+
+        [Test]
+        public void TestCinemaShortcut()
+        {
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+            AddStep("press right", () => InputManager.Key(Key.Right)); // press right to select in carousel, also remove.
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            AddStep("press ctrl+shift+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("cinema selected", () => SongSelect.Mods.Value.Single() is ModCinema);
+
+            AddUntilStep("wait for return to ss", () => SongSelect.IsCurrentScreen());
+
+            AddAssert("no mods selected", () => SongSelect.Mods.Value.Count == 0);
+        }
+
+        [Test]
+        public void TestCinemaShortcutKeepsCinemaIfSelectedAlready()
+        {
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+            AddStep("press right", () => InputManager.Key(Key.Right)); // press right to select in carousel, also remove.
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            ChangeMods(new OsuModCinema());
+
+            AddStep("press ctrl+shift+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("cinema selected", () => SongSelect.Mods.Value.Single() is ModCinema);
+
+            AddUntilStep("wait for return to ss", () => SongSelect.IsCurrentScreen());
+
+            AddAssert("cinema still selected", () => SongSelect.Mods.Value.Single() is ModCinema);
+        }
+
+        [Test]
+        public void TestCinemaShortcutReturnsInitialModsOnExit()
+        {
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+            AddStep("press right", () => InputManager.Key(Key.Right)); // press right to select in carousel, also remove.
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            ChangeMods(new OsuModRelax());
+
+            AddStep("press ctrl+shift+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("only cinema selected", () => SongSelect.Mods.Value.Single() is ModCinema);
+
+            AddUntilStep("wait for return to ss", () => SongSelect.IsCurrentScreen());
+
+            AddAssert("relax returned", () => SongSelect.Mods.Value.Single() is ModRelax);
+        }
+
+        [Test]
+        public void TestCinemaShortcutReplacesAutoplay()
+        {
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+            AddStep("press right", () => InputManager.Key(Key.Right)); // press right to select in carousel, also remove.
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            ChangeMods(new OsuModAutoplay());
+
+            AddStep("press ctrl+shift+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("only cinema selected", () => SongSelect.Mods.Value.Single() is ModCinema);
+
+            AddUntilStep("wait for return to ss", () => SongSelect.IsCurrentScreen());
+
+            AddAssert("autoplay still selected", () => SongSelect.Mods.Value.Single() is ModAutoplay);
+        }
+
+        [Test]
         public void TestModSelectCannotBeOpenedAfterConfirmingSelection()
         {
             ImportBeatmapForRuleset(0);
