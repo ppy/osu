@@ -62,6 +62,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             }
         }
 
+        /// <summary>
+        /// Whether new parts should be added to the trail
+        /// </summary>
+        public bool Enabled = true;
+
         private readonly TrailPart[] parts = new TrailPart[max_sprites];
         private Anchor trailOrigin = Anchor.Centre;
         private int currentIndex;
@@ -205,12 +210,23 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private void addPart(Vector2 localSpacePosition)
         {
+            if (!Enabled)
+                return;
+
             parts[currentIndex].Position = localSpacePosition;
             parts[currentIndex].Time = time + 1;
             parts[currentIndex].Scale = NewPartScale;
             ++parts[currentIndex].InvalidationID;
 
             currentIndex = (currentIndex + 1) % max_sprites;
+        }
+
+        public void ClearParts()
+        {
+            for (int i = 0; i < parts.Length; i++)
+                parts[i] = default;
+
+            currentIndex = 0;
         }
 
         protected override DrawNode CreateDrawNode() => new TrailDrawNode(this);

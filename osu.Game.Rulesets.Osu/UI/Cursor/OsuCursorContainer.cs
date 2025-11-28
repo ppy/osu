@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly Bindable<bool> showTrail = new Bindable<bool>(true);
 
-        private readonly SkinnableDrawable cursorTrail;
+        protected readonly SkinnableDrawable CursorTrail;
 
         private readonly CursorRippleVisualiser rippleVisualiser;
 
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 RelativeSizeAxes = Axes.Both,
                 Children = new CompositeDrawable[]
                 {
-                    cursorTrail = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling),
+                    CursorTrail = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling),
                     rippleVisualiser = new CursorRippleVisualiser(),
                     new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.CursorParticles), confineMode: ConfineMode.NoScaling),
                 }
@@ -57,14 +57,14 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             base.LoadComplete();
 
-            showTrail.BindValueChanged(v => cursorTrail.FadeTo(v.NewValue ? 1 : 0, 200), true);
+            showTrail.BindValueChanged(v => CursorTrail.FadeTo(v.NewValue ? 1 : 0, 200), true);
 
             ActiveCursor.CursorScale.BindValueChanged(e =>
             {
                 var newScale = new Vector2(e.NewValue);
 
                 rippleVisualiser.CursorScale = newScale;
-                cursorTrail.Scale = newScale;
+                CursorTrail.Scale = newScale;
             }, true);
         }
 
@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             base.Update();
 
-            if (cursorTrail.Drawable is CursorTrail trail)
+            if (CursorTrail.Drawable is CursorTrail trail)
             {
                 trail.NewPartScale = ActiveCursor.CurrentExpandedScale;
                 trail.PartRotation = ActiveCursor.CurrentRotation;
