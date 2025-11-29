@@ -18,6 +18,11 @@ namespace osu.Game.Database
         public bool Batch { get; set; }
 
         /// <summary>
+        /// Whether this import should use copy on write cloning if available.
+        /// </summary>
+        public bool PreferCopyOnWrite { get; set; }
+
+        /// <summary>
         /// Whether this import should use hard links rather than file copy operations if available.
         /// </summary>
         public bool PreferHardLinks { get; set; }
