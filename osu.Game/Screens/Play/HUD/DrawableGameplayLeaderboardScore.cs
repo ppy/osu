@@ -357,7 +357,7 @@ namespace osu.Game.Screens.Play.HUD
             else if (Tracked)
             {
                 widthExtension = true;
-                setTrackedPanelColour(BackgroundColour);
+                setPanelColour(BackgroundColour ?? colours.Orange2);
             }
             else if (isFriend)
             {
@@ -378,13 +378,6 @@ namespace osu.Game.Screens.Play.HUD
             leftLayerGradient.Colour = ColourInfo.GradientVertical(baseColour.Opacity(0.2f), baseColour.Opacity(0.5f));
             rightLayerGradient.Colour = ColourInfo.GradientVertical(baseColour.Opacity(0.1f), baseColour.Opacity(0.3f));
             scorePanel.BorderColour = ColourInfo.GradientVertical(baseColour.Opacity(0.2f), baseColour);
-        }
-
-        private void setTrackedPanelColour(Color4? backgroundColour)
-        {
-            leftLayerGradient.Colour = ColourInfo.GradientVertical((backgroundColour ?? colours.Blue2).Opacity(0.3f), backgroundColour ?? colours.Blue2);
-            rightLayerGradient.Colour = ColourInfo.GradientVertical((backgroundColour ?? colours.Blue4).Opacity(0.25f), (backgroundColour ?? colours.Blue3).Opacity(0.6f));
-            scorePanel.BorderColour = ColourInfo.GradientVertical((backgroundColour ?? colours.Blue1).Opacity(0.2f), backgroundColour ?? colours.Blue1);
         }
 
         protected override void Update()
