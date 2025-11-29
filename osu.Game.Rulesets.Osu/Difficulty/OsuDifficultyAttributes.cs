@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -8,6 +9,7 @@ using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
@@ -151,6 +153,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             HitCircleCount = onlineInfo.CircleCount;
             SliderCount = onlineInfo.SliderCount;
             SpinnerCount = onlineInfo.SpinnerCount;
+        }
+
+        public override SkillValue[] GetSkillValues()
+        {
+            double aimPerformanceWithoutSliders = Math.Pow(OsuStrainSkill.DifficultyToPerformance(AimDifficulty * SliderFactor), 2);
+            double aimPerformanceOnlySliders = Math.Pow(OsuStrainSkill.DifficultyToPerformance(AimDifficulty), 2) - aimPerformanceWithoutSliders;
+
+            double speedPerformance = Math.Pow(OsuStrainSkill.DifficultyToPerformance(SpeedDifficulty), 2);
+            double flashlightPerformance = Math.Pow(Flashlight.DifficultyToPerformance(FlashlightDifficulty), 2);
+
+            return [
+                new SkillValue { Value = aimPerformanceOnlySliders, SkillName = "Slider Aim" },
+                new SkillValue { Value = aimPerformanceWithoutSliders, SkillName = "Aim" },
+                new SkillValue { Value = speedPerformance, SkillName = "Speed" },
+                new SkillValue { Value = flashlightPerformance, SkillName = "Flashlight" }
+            ];
         }
 
         #region Newtonsoft.Json implicit ShouldSerialize() methods
