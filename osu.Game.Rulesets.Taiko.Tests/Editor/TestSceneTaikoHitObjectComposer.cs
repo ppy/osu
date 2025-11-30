@@ -34,6 +34,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
         {
             [Cached(typeof(EditorBeatmap))]
             [Cached(typeof(IBeatSnapProvider))]
+            [Cached(typeof(IBeatmapEditorChangeHandler))]
             public readonly EditorBeatmap EditorBeatmap;
 
             public TestComposer()

@@ -295,6 +295,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         {
             [Cached(typeof(EditorBeatmap))]
             [Cached(typeof(IBeatSnapProvider))]
+            [Cached(typeof(IBeatmapEditorChangeHandler))]
             public readonly EditorBeatmap EditorBeatmap;
 
             public readonly ManiaHitObjectComposer Composer;
