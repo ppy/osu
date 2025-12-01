@@ -44,12 +44,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuCurrObj.LazyJumpDistance > diameter)
             {
                 // Controls distance scaling for high spaced flow aim
-                flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.4);
+                flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.45);
             }
             else
             {
                 // Controls distance scaling for low spaced flow aim
-                flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.8);
+                flowDifficulty *= Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.7);
             }
 
             // Flow aim is harder on High BPM
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             flowDifficulty += angleBonus;
 
-            flowDifficulty *= flow_multiplier;
+            flowDifficulty *= flow_multiplier * Math.Sqrt(osuCurrObj.SmallCircleBonus);
 
             if (osuLast0Obj.BaseObject is Slider && withSliderTravelDistance)
             {
@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 flowDifficulty += sliderBonus * AimEvaluator.SLIDER_MULTIPLIER;
             }
 
-            return flowDifficulty * osuCurrObj.SmallCircleBonus;
+            return flowDifficulty;
         }
 
         private static double getOverlapness(OsuDifficultyHitObject odho1, OsuDifficultyHitObject odho2)
