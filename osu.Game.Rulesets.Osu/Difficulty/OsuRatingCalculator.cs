@@ -48,7 +48,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 aimRating = Math.Pow(aimRating, touch_device_multiplier);
                 snapAimRating = Math.Pow(snapAimRating, touch_device_multiplier);
-                // no reduce on flow aim rating is intentional
+
+                // Flow aim doesn't gets easier with touchdevice, so we will use it as a baseline until proper calculation can be done
+                aimRating = Math.Max(aimRating, flowAimRating);
             }
 
             if (mods.Any(m => m is OsuModRelax))
@@ -88,9 +90,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0;
 
             double flowAimRating = CalculateDifficultyRating(flowAimDifficultyValue);
-
-            if (mods.Any(m => m is OsuModTouchDevice))
-                flowAimRating = Math.Pow(flowAimRating, touch_device_multiplier);
 
             return computeRawAimRating(flowAimRating);
         }
