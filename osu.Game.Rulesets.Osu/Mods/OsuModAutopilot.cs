@@ -102,6 +102,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (nextObject is DrawableSpinner replaySpinner)
                 {
                     var spinner = replaySpinner.HitObject;
+                    
                     if (timeElapsedBetweenHitObjects >= 0)
                     {
                         double rate = calculateSpinnerRate(spinner);
