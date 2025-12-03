@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -17,14 +18,12 @@ using osu.Framework.Extensions.PolygonExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Layout;
 using osu.Framework.Logging;
 using osu.Framework.Utils;
-using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.Multiplayer;
 using osuTK;
@@ -74,9 +73,14 @@ namespace osu.Game.Graphics.Carousel
         public bool IsFiltering => !filterTask.IsCompleted;
 
         /// <summary>
+        /// Whether absolute scrolling is currently triggered.
+        /// </summary>
+        public bool AbsoluteScrolling => Scroll.AbsoluteScrolling;
+
+        /// <summary>
         /// The number of times filter operations have been triggered.
         /// </summary>
-        internal int FilterCount { get; private set; }
+        public int FilterCount { get; private set; }
 
         /// <summary>
         /// The number of displayable items currently being tracked (before filtering).
@@ -103,7 +107,7 @@ namespace osu.Game.Graphics.Carousel
         /// The selection is never reset due to not existing. It can be set to anything.
         /// If no matching carousel item exists, there will be no visually selected item while waiting for potential new item which matches.
         /// </remarks>
-        public object? CurrentSelection
+        protected object? CurrentSelection
         {
             get => currentSelection.Model;
             set
@@ -115,14 +119,21 @@ namespace osu.Game.Graphics.Carousel
                     if (currentSelection.Model != null)
                         HandleItemDeselected(currentSelection.Model);
 
-                    currentKeyboardSelection = new Selection(value);
-                    currentSelection = currentKeyboardSelection;
+                    currentSelection = new Selection(value);
+                    currentKeyboardSelection = currentSelection;
                     selectionValid.Invalidate();
                 }
-                else if (currentKeyboardSelection.Model != value)
+
+                // Check keyboard selection equality separately.
+                //
+                // If current selection set to an already-selected value, we want to ensure
+                // that keyboard selection (which basically represents the "visual" tracking of selection)
+                // is still reset back to the newly set value.
+                //
+                // The main case this handles is when a set header is clicked and we want to make sure one of its
+                // "children" are re-selected.
+                if (!CheckModelEquality(currentKeyboardSelection.Model, value))
                 {
-                    // Even if the current selection matches, let's ensure the keyboard selection is reset
-                    // to the newly selected object. This matches user expectations (for now).
                     currentKeyboardSelection = currentSelection;
                     selectionValid.Invalidate();
                 }
@@ -149,7 +160,18 @@ namespace osu.Game.Graphics.Carousel
         /// <summary>
         /// Scroll carousel to the selected item if available.
         /// </summary>
-        public void ScrollToSelection() => scrollToSelection.Invalidate();
+        /// <param name="immediate">
+        /// Whether the scroll position should immediately be shifted to the target, delegating animation to visible panels.
+        /// This should be true for operations like filtering - where panels are changing visibility state - to avoid large jumps in animation.
+        /// </param>
+        public void ScrollToSelection(bool immediate = false)
+        {
+            // if an immediate scroll is already requested, don't override it with a slower scroll
+            if (scrollToSelection == PendingScrollOperation.Immediate)
+                return;
+
+            scrollToSelection = immediate ? PendingScrollOperation.Immediate : PendingScrollOperation.Standard;
+        }
 
         /// <summary>
         /// Returns the vertical spacing between two given carousel items. Negative value can be used to create an overlapping effect.
@@ -201,6 +223,12 @@ namespace osu.Game.Graphics.Carousel
         }
 
         /// <summary>
+        /// Called when <see cref="Items"/> changes in any way.
+        /// </summary>
+        /// <returns>Whether a re-filter is required.</returns>
+        protected virtual bool HandleItemsChanged(NotifyCollectionChangedEventArgs args) => true;
+
+        /// <summary>
         /// Fired after a filter operation completed.
         /// </summary>
         protected virtual void HandleFilterCompleted()
@@ -232,6 +260,13 @@ namespace osu.Game.Graphics.Carousel
         /// <returns>The drawable representation if it exists.</returns>
         protected Drawable? GetMaterialisedDrawableForItem(CarouselItem item) =>
             Scroll.Panels.SingleOrDefault(p => ((ICarouselPanel)p).Item == item);
+
+        /// <summary>
+        /// When a user is traversing the carousel via group selection keys, assert whether the item provided is a valid target.
+        /// </summary>
+        /// <param name="item">The candidate item.</param>
+        /// <returns>Whether the provided item is a valid group target. If <c>false</c>, more panels will be checked in the user's requested direction until a valid target is found.</returns>
+        protected virtual bool CheckValidForGroupSelection(CarouselItem item) => false;
 
         /// <summary>
         /// When a user is traversing the carousel via set selection keys, assert whether the item provided is a valid target.
@@ -274,17 +309,21 @@ namespace osu.Game.Graphics.Carousel
 
         #region Initialisation
 
-        protected readonly CarouselScrollContainer Scroll;
+        protected readonly ScrollContainer Scroll;
 
         protected Carousel()
         {
-            InternalChild = Scroll = new CarouselScrollContainer
+            InternalChild = Scroll = new ScrollContainer
             {
                 Masking = false,
                 RelativeSizeAxes = Axes.Both,
             };
 
-            Items.BindCollectionChanged((_, _) => filterAfterItemsChanged.Invalidate());
+            Items.BindCollectionChanged((_, args) =>
+            {
+                if (HandleItemsChanged(args))
+                    filterAfterItemsChanged.Invalidate();
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -300,7 +339,7 @@ namespace osu.Game.Graphics.Carousel
         /// <summary>
         /// Retrieve a list of all <see cref="CarouselItem"/>s currently displayed.
         /// </summary>
-        protected IReadOnlyCollection<CarouselItem>? GetCarouselItems() => carouselItems;
+        public IList<CarouselItem>? GetCarouselItems() => carouselItems;
 
         private List<CarouselItem>? carouselItems;
 
@@ -340,11 +379,6 @@ namespace osu.Game.Graphics.Carousel
                     {
                         log($"Performing {filter.GetType().ReadableName()}");
                         items = await filter.Run(items, cts.Token).ConfigureAwait(false);
-
-                        // To avoid shooting ourselves in the foot, ensure that we manifest a list after each filter.
-                        //
-                        // A future improvement may be passing a reference list through each filter rather than copying each time,
-                        // but this is the safest approach.
                     }
 
                     log("Updating Y positions");
@@ -377,7 +411,7 @@ namespace osu.Game.Graphics.Carousel
 
                 refreshAfterSelection();
                 if (!Scroll.UserScrolling)
-                    ScrollToSelection();
+                    ScrollToSelection(immediate: true);
 
                 NewItemsPresented?.Invoke(carouselItems);
             });
@@ -430,8 +464,7 @@ namespace osu.Game.Graphics.Carousel
                 // matching with exact modifier consideration (so Ctrl+Enter would be ignored).
                 case Key.Enter:
                 case Key.KeypadEnter:
-                    activateSelection();
-                    return true;
+                    return activateSelection();
             }
 
             return base.OnKeyDown(e);
@@ -442,8 +475,7 @@ namespace osu.Game.Graphics.Carousel
             switch (e.Action)
             {
                 case GlobalAction.Select:
-                    activateSelection();
-                    return true;
+                    return activateSelection();
 
                 // the selection traversal handlers below are scheduled to avoid an issue
                 // wherein if the update frame rate is low, keeping one of the actions below pressed leads to selection moving back to the start / end.
@@ -451,35 +483,101 @@ namespace osu.Game.Graphics.Carousel
                 // if the selection is changed more than once during an update frame,
                 // which can happen if repeat inputs are enqueued for processing at a rate faster than the update refresh rate.
                 // `refreshAfterSelection()` is the method responsible for updating the index of the selected item here which runs once per frame.
+                case GlobalAction.SelectPrevious:
+                    Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Keyboard, -1));
+                    return true;
 
                 case GlobalAction.SelectNext:
-                    Scheduler.AddOnce(traverseKeyboardSelection, 1);
-                    return true;
-
-                case GlobalAction.SelectPrevious:
-                    Scheduler.AddOnce(traverseKeyboardSelection, -1);
-                    return true;
-
-                case GlobalAction.ActivateNextSet:
-                    Scheduler.AddOnce(traverseSetSelection, 1);
+                    Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Keyboard, 1));
                     return true;
 
                 case GlobalAction.ActivatePreviousSet:
-                    Scheduler.AddOnce(traverseSetSelection, -1);
+                    Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Set, -1));
+                    return true;
+
+                case GlobalAction.ActivateNextSet:
+                    Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Set, 1));
+                    return true;
+
+                case GlobalAction.ExpandPreviousGroup:
+                    Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Group, -1));
+                    return true;
+
+                case GlobalAction.ExpandNextGroup:
+                    Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Group, 1));
+                    return true;
+
+                case GlobalAction.ToggleCurrentGroup:
+                    if (carouselItems == null || carouselItems.Count == 0)
+                        return true;
+
+                    if (currentKeyboardSelection.CarouselItem == null || currentKeyboardSelection.Index == null)
+                        return true;
+
+                    if (CheckValidForGroupSelection(currentKeyboardSelection.CarouselItem))
+                    {
+                        // If keyboard selection is a group, toggle group and then change keyboard selection to actual selection.
+                        Activate(currentKeyboardSelection.CarouselItem);
+                    }
+                    else
+                    {
+                        // If current keyboard selection is not a group, toggle the closest group and move keyboard selection to that group.
+                        for (int i = currentKeyboardSelection.Index.Value; i >= 0; i--)
+                        {
+                            var newItem = carouselItems[i];
+
+                            if (CheckValidForGroupSelection(newItem))
+                            {
+                                Activate(newItem);
+                                return true;
+                            }
+                        }
+                    }
+
                     return true;
             }
 
             return false;
+
+            void traverseFromKey(TraversalOperation traversal)
+            {
+                switch (traversal.Type)
+                {
+                    case TraversalType.Keyboard:
+                        traverseKeyboardSelection(traversal.Direction);
+                        break;
+
+                    case TraversalType.Set:
+                        traverseSetSelection(traversal.Direction);
+                        break;
+
+                    case TraversalType.Group:
+                        traverseGroupSelection(traversal.Direction);
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
         }
+
+        private enum TraversalType { Keyboard, Set, Group }
+
+        private record TraversalOperation(TraversalType Type, int Direction);
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 
-        private void activateSelection()
+        private bool activateSelection()
         {
             if (currentKeyboardSelection.CarouselItem != null)
+            {
                 Activate(currentKeyboardSelection.CarouselItem);
+                return true;
+            }
+
+            return false;
         }
 
         private void traverseKeyboardSelection(int direction)
@@ -520,22 +618,37 @@ namespace osu.Game.Graphics.Carousel
         }
 
         /// <summary>
-        /// Select the next valid selection relative to a current selection.
+        /// Select the next valid group selection relative to a current selection.
+        /// This is generally for keyboard based traversal.
+        /// </summary>
+        /// <param name="direction">Positive for downwards, negative for upwards.</param>
+        /// <returns>Whether selection was possible.</returns>
+        private void traverseGroupSelection(int direction) => traverseSelection(direction, CheckValidForGroupSelection);
+
+        /// <summary>
+        /// Select the next valid set selection relative to a current selection.
         /// This is generally for keyboard based traversal.
         /// </summary>
         /// <param name="direction">Positive for downwards, negative for upwards.</param>
         /// <returns>Whether selection was possible.</returns>
         private void traverseSetSelection(int direction)
         {
-            if (carouselItems == null || carouselItems.Count == 0) return;
-
             // If the user has a different keyboard selection and requests
             // set selection, first transfer the keyboard selection to actual selection.
+            //
+            // It is assumed that selecting a set will immediately change selection to one of its children.
             if (currentKeyboardSelection.CarouselItem != null && currentSelection.CarouselItem != currentKeyboardSelection.CarouselItem)
             {
                 Activate(currentKeyboardSelection.CarouselItem);
                 return;
             }
+
+            traverseSelection(direction, CheckValidForSetSelection);
+        }
+
+        private void traverseSelection(int direction, Func<CarouselItem, bool> predicate)
+        {
+            if (carouselItems == null || carouselItems.Count == 0) return;
 
             int originalIndex;
             int newIndex;
@@ -553,7 +666,7 @@ namespace osu.Game.Graphics.Carousel
                 // make sure to go back to the set header this item belongs to, so that the block below doesn't find it and stop too early.
                 if (direction < 0)
                 {
-                    while (newIndex > 0 && !CheckValidForSetSelection(carouselItems[newIndex]))
+                    while (newIndex > 0 && !predicate(carouselItems[newIndex]))
                         newIndex--;
                 }
             }
@@ -569,12 +682,29 @@ namespace osu.Game.Graphics.Carousel
 
                 var newItem = carouselItems[newIndex];
 
-                if (CheckValidForSetSelection(newItem))
+                if (!newItem.IsExpanded && predicate(newItem))
                 {
-                    HandleItemActivated(newItem);
+                    Activate(newItem);
                     return;
                 }
             } while (true);
+        }
+
+        #endregion
+
+        #region Scrolling
+
+        /// <summary>
+        /// Scrolling to selection relies on <see cref="currentKeyboardSelection"/> being fully populated.
+        /// This flag ensures it runs after <see cref="refreshAfterSelection"/> validates this.
+        /// </summary>
+        private PendingScrollOperation scrollToSelection = PendingScrollOperation.None;
+
+        private enum PendingScrollOperation
+        {
+            None,
+            Standard,
+            Immediate,
         }
 
         #endregion
@@ -587,7 +717,7 @@ namespace osu.Game.Graphics.Carousel
 
         private void loadSamples(AudioManager audio)
         {
-            sampleKeyboardTraversal = audio.Samples.Get(@"UI/button-hover");
+            sampleKeyboardTraversal = audio.Samples.Get(@"SongSelect/select-difficulty");
         }
 
         private void playTraversalSound()
@@ -607,6 +737,11 @@ namespace osu.Game.Graphics.Carousel
         /// The currently selected <see cref="CarouselItem"/>, if any is selected.
         /// </summary>
         protected CarouselItem? CurrentSelectionItem => currentSelection.CarouselItem;
+
+        /// <summary>
+        /// The index in <see cref="GetCarouselItems"/> of the current selection, if available.
+        /// </summary>
+        protected int? CurrentSelectionIndex => currentSelection.Index;
 
         /// <summary>
         /// Becomes invalid when the current selection has changed and needs to be updated visually.
@@ -650,18 +785,19 @@ namespace osu.Game.Graphics.Carousel
             // We are performing two important operations here:
             // - Update all Y positions. After a selection occurs, panels may have changed visibility state and therefore Y positions.
             // - Link selected models to CarouselItems. If a selection changed, this is where we find the relevant CarouselItems for further use.
+            FindCarouselItemsForSelection(ref currentKeyboardSelection, ref currentSelection, carouselItems);
+
             for (int i = 0; i < count; i++)
             {
                 var item = carouselItems[i];
-
                 updateItemYPosition(item, ref lastVisible, ref yPos);
-
-                if (CheckModelEquality(item.Model, currentKeyboardSelection.Model!))
-                    currentKeyboardSelection = new Selection(currentKeyboardSelection.Model, item, item.CarouselYPosition, i);
-
-                if (CheckModelEquality(item.Model, currentSelection.Model!))
-                    currentSelection = new Selection(currentSelection.Model, item, item.CarouselYPosition, i);
             }
+
+            if (currentKeyboardSelection.CarouselItem is CarouselItem currentKeyboardSelectionItem)
+                currentKeyboardSelection = currentKeyboardSelection with { YPosition = currentKeyboardSelectionItem.CarouselYPosition + currentKeyboardSelectionItem.DrawHeight / 2 };
+
+            if (currentSelection.CarouselItem is CarouselItem currentSelectionItem)
+                currentSelection = currentSelection with { YPosition = currentSelectionItem.CarouselYPosition + currentSelectionItem.DrawHeight / 2 };
 
             // Update the total height of all items (to make the scroll container scrollable through the full height even though
             // most items are not displayed / loaded).
@@ -671,6 +807,27 @@ namespace osu.Game.Graphics.Carousel
             // That means that we should offset the immediate scroll position by any change in Y position for the selection.
             if (prevKeyboard.YPosition != null && currentKeyboardSelection.YPosition != null && currentKeyboardSelection.YPosition != prevKeyboard.YPosition)
                 Scroll.OffsetScrollPosition((float)(currentKeyboardSelection.YPosition!.Value - prevKeyboard.YPosition.Value));
+        }
+
+        protected virtual void FindCarouselItemsForSelection(ref Selection keyboardSelection, ref Selection selection, IList<CarouselItem> items)
+        {
+            for (int i = 0; i < items.Count; i++)
+            {
+                var item = items[i];
+
+                bool isKeyboardSelection = CheckModelEquality(item.Model, keyboardSelection.Model!);
+                bool isSelection = CheckModelEquality(item.Model, selection.Model!);
+
+                // while we don't know the Y position of the item yet, as it's about to be updated,
+                // consumers (specifically `BeatmapCarousel.GetSpacingBetweenPanels()`) benefit from `CurrentSelectionItem` already pointing
+                // at the correct item to avoid redundant local equality checks.
+                // the Y positions will be filled in after they're computed.
+                if (isKeyboardSelection)
+                    keyboardSelection = new Selection(keyboardSelection.Model, item, null, i);
+
+                if (isSelection)
+                    selection = new Selection(selection.Model, item, null, i);
+            }
         }
 
         #endregion
@@ -701,12 +858,6 @@ namespace osu.Game.Graphics.Carousel
         /// </summary>
         private readonly Cached filterReusesPanels = new Cached();
 
-        /// <summary>
-        /// Scrolling to selection relies on <see cref="currentKeyboardSelection"/> being fully populated.
-        /// This flag ensures it runs after <see cref="refreshAfterSelection"/> validates this.
-        /// </summary>
-        private readonly Cached scrollToSelection = new Cached();
-
         protected override void Update()
         {
             base.Update();
@@ -732,9 +883,7 @@ namespace osu.Game.Graphics.Carousel
 
             if (range != displayedRange)
             {
-                Logger.Log($"Updating displayed range of carousel from {displayedRange} to {range}");
                 displayedRange = range;
-
                 updateDisplayedRange(range);
             }
 
@@ -769,14 +918,19 @@ namespace osu.Game.Graphics.Carousel
         {
             base.UpdateAfterChildren();
 
-            if (!scrollToSelection.IsValid)
+            if (scrollToSelection != PendingScrollOperation.None)
             {
-                if (currentKeyboardSelection.YPosition != null)
-                    Scroll.ScrollTo(currentKeyboardSelection.YPosition.Value - visibleHalfHeight + BleedTop);
+                if (GetScrollTarget() is double scrollTarget)
+                    Scroll.ScrollTo(scrollTarget - visibleHalfHeight + BleedTop, animated: scrollToSelection == PendingScrollOperation.Standard);
 
-                scrollToSelection.Validate();
+                scrollToSelection = PendingScrollOperation.None;
             }
         }
+
+        /// <summary>
+        /// Returns the Y position to scroll to in order to show the most relevant carousel item(s).
+        /// </summary>
+        protected virtual double? GetScrollTarget() => currentKeyboardSelection.YPosition;
 
         protected virtual float GetPanelXOffset(Drawable panel)
         {
@@ -936,171 +1090,11 @@ namespace osu.Game.Graphics.Carousel
         /// <param name="CarouselItem">A related carousel item representation for the model. May be null if selection is not present as an item, or if <see cref="Carousel{T}.refreshAfterSelection"/> has not been run yet.</param>
         /// <param name="YPosition">The Y position of the selection as of the last run of <see cref="Carousel{T}.refreshAfterSelection"/>. May be null if selection is not present as an item, or if <see cref="Carousel{T}.refreshAfterSelection"/> has not been run yet.</param>
         /// <param name="Index">The index of the selection as of the last run of <see cref="Carousel{T}.refreshAfterSelection"/>. May be null if selection is not present as an item, or if <see cref="Carousel{T}.refreshAfterSelection"/> has not been run yet.</param>
-        private record Selection(object? Model = null, CarouselItem? CarouselItem = null, double? YPosition = null, int? Index = null);
+        protected record Selection(object? Model = null, CarouselItem? CarouselItem = null, double? YPosition = null, int? Index = null);
 
         private record DisplayRange(int First, int Last)
         {
             public static readonly DisplayRange EMPTY = new DisplayRange(-1, -1);
-        }
-
-        /// <summary>
-        /// Implementation of scroll container which handles very large vertical lists by internally using <c>double</c> precision
-        /// for pre-display Y values.
-        /// </summary>
-        protected partial class CarouselScrollContainer : UserTrackingScrollContainer, IKeyBindingHandler<GlobalAction>
-        {
-            public readonly Container Panels;
-
-            public void SetLayoutHeight(float height) => Panels.Height = height;
-
-            /// <summary>
-            /// Allow handling right click scroll outside of the carousel's display area.
-            /// </summary>
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
-
-            public CarouselScrollContainer()
-            {
-                // Managing our own custom layout within ScrollContent causes feedback with public ScrollContainer calculations,
-                // so we must maintain one level of separation from ScrollContent.
-                base.Add(Panels = new Container
-                {
-                    Name = "Layout content",
-                    RelativeSizeAxes = Axes.X,
-                });
-            }
-
-            public override void OffsetScrollPosition(double offset)
-            {
-                base.OffsetScrollPosition(offset);
-
-                foreach (var panel in Panels)
-                    ((ICarouselPanel)panel).DrawYPosition += offset;
-            }
-
-            public override void Clear(bool disposeChildren)
-            {
-                Panels.Height = 0;
-                Panels.Clear(disposeChildren);
-            }
-
-            public override void Add(Drawable drawable)
-            {
-                if (drawable is not ICarouselPanel)
-                    throw new InvalidOperationException($"Carousel panel drawables must implement {typeof(ICarouselPanel)}");
-
-                Panels.Add(drawable);
-            }
-
-            public override double GetChildPosInContent(Drawable d, Vector2 offset)
-            {
-                if (d is not ICarouselPanel panel)
-                    return base.GetChildPosInContent(d, offset);
-
-                return panel.DrawYPosition + offset.X;
-            }
-
-            protected override void ApplyCurrentToContent()
-            {
-                Debug.Assert(ScrollDirection == Direction.Vertical);
-
-                double scrollableExtent = -Current + ScrollableExtent * ScrollContent.RelativeAnchorPosition.Y;
-
-                foreach (var d in Panels)
-                    d.Y = (float)(((ICarouselPanel)d).DrawYPosition + scrollableExtent);
-            }
-
-            #region Scrollbar padding
-
-            public float ScrollbarPaddingTop { get; set; } = 5;
-            public float ScrollbarPaddingBottom { get; set; } = 5;
-
-            protected override float ToScrollbarPosition(double scrollPosition)
-            {
-                if (Precision.AlmostEquals(0, ScrollableExtent))
-                    return 0;
-
-                return (float)(ScrollbarPaddingTop + (ScrollbarMovementExtent - (ScrollbarPaddingTop + ScrollbarPaddingBottom)) * (scrollPosition / ScrollableExtent));
-            }
-
-            protected override float FromScrollbarPosition(float scrollbarPosition)
-            {
-                if (Precision.AlmostEquals(0, ScrollbarMovementExtent))
-                    return 0;
-
-                return (float)(ScrollableExtent * ((scrollbarPosition - ScrollbarPaddingTop) / (ScrollbarMovementExtent - (ScrollbarPaddingTop + ScrollbarPaddingBottom))));
-            }
-
-            #endregion
-
-            #region Absolute scrolling
-
-            private bool absoluteScrolling;
-
-            protected override bool IsDragging => base.IsDragging || absoluteScrolling;
-
-            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
-            {
-                switch (e.Action)
-                {
-                    case GlobalAction.AbsoluteScrollSongList:
-                        beginAbsoluteScrolling(e);
-                        return true;
-                }
-
-                return false;
-            }
-
-            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
-            {
-                switch (e.Action)
-                {
-                    case GlobalAction.AbsoluteScrollSongList:
-                        endAbsoluteScrolling();
-                        break;
-                }
-            }
-
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                if (e.Button == MouseButton.Right)
-                {
-                    // To avoid conflicts with context menus, disallow absolute scroll if it looks like things will fall over.
-                    if (GetContainingInputManager()!.HoveredDrawables.OfType<IHasContextMenu>().Any())
-                        return false;
-
-                    beginAbsoluteScrolling(e);
-                }
-
-                return base.OnMouseDown(e);
-            }
-
-            protected override void OnMouseUp(MouseUpEvent e)
-            {
-                if (e.Button == MouseButton.Right)
-                    endAbsoluteScrolling();
-                base.OnMouseUp(e);
-            }
-
-            protected override bool OnMouseMove(MouseMoveEvent e)
-            {
-                if (absoluteScrolling)
-                {
-                    ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
-                    return true;
-                }
-
-                return base.OnMouseMove(e);
-            }
-
-            private void beginAbsoluteScrolling(UIEvent e)
-            {
-                ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
-                absoluteScrolling = true;
-            }
-
-            private void endAbsoluteScrolling() => absoluteScrolling = false;
-
-            #endregion
         }
 
         #endregion

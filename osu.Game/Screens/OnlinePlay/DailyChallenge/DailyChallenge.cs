@@ -44,7 +44,6 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 {
-    [Cached(typeof(IPreviewTrackOwner))]
     public partial class DailyChallenge : OsuScreen, IPreviewTrackOwner, IHandlePresentBeatmap
     {
         private readonly Room room;
