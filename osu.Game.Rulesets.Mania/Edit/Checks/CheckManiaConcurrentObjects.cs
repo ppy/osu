@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Checks
     {
         public override IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var hitObjects = context.Beatmap.HitObjects;
+            var hitObjects = context.CurrentDifficulty.Playable.HitObjects;
 
             for (int i = 0; i < hitObjects.Count - 1; ++i)
             {
@@ -28,14 +28,18 @@ namespace osu.Game.Rulesets.Mania.Edit.Checks
                         continue;
 
                     // Two hitobjects cannot be concurrent without also being concurrent with all objects in between.
-                    // So if the next object is not concurrent, then we know no future objects will be either.
-                    if (!AreConcurrent(hitobject, nextHitobject))
+                    // So if the next object is not concurrent or almost concurrent, then we know no future objects will be either.
+                    if (!AreConcurrent(hitobject, nextHitobject) && !AreAlmostConcurrent(hitobject, nextHitobject))
                         break;
 
-                    if (hitobject.GetType() == nextHitobject.GetType())
-                        yield return new IssueTemplateConcurrentSame(this).Create(hitobject, nextHitobject);
-                    else
-                        yield return new IssueTemplateConcurrentDifferent(this).Create(hitobject, nextHitobject);
+                    if (AreConcurrent(hitobject, nextHitobject))
+                    {
+                        yield return new IssueTemplateConcurrent(this).Create(hitobject, nextHitobject);
+                    }
+                    else if (AreAlmostConcurrent(hitobject, nextHitobject))
+                    {
+                        yield return new IssueTemplateAlmostConcurrent(this).Create(hitobject, nextHitobject);
+                    }
                 }
             }
         }

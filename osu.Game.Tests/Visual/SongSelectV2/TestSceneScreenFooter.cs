@@ -114,11 +114,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddWaitStep("wait for transition", 3);
 
             AddStep("show overlay", () => externalOverlay.Show());
-            AddAssert("content displayed in footer", () => screenFooter.ChildrenOfType<TestShearedOverlayContainer.TestFooterContent>().Single().IsPresent);
+            contentDisplayed();
             AddUntilStep("other buttons hidden", () => screenFooter.ChildrenOfType<ScreenFooterButton>().Skip(1).All(b => b.Child.Parent!.Y > 0));
 
             AddStep("hide overlay", () => externalOverlay.Hide());
-            AddUntilStep("content hidden from footer", () => screenFooter.ChildrenOfType<TestShearedOverlayContainer.TestFooterContent>().SingleOrDefault()?.IsPresent != true);
+            contentHidden();
             AddUntilStep("other buttons returned", () => screenFooter.ChildrenOfType<ScreenFooterButton>().Skip(1).All(b => b.ChildrenOfType<Container>().First().Y == 0));
         }
 
@@ -133,11 +133,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("add external overlay", () => contentContainer.Add(externalOverlay = new TestShearedOverlayContainer()));
             AddStep("show external overlay", () => externalOverlay.Show());
             AddAssert("footer shown", () => screenFooter.State.Value == Visibility.Visible);
-            AddAssert("content displayed in footer", () => screenFooter.ChildrenOfType<TestShearedOverlayContainer.TestFooterContent>().Single().IsPresent);
+            contentDisplayed();
 
             AddStep("hide external overlay", () => externalOverlay.Hide());
             AddAssert("footer hidden", () => screenFooter.State.Value == Visibility.Hidden);
-            AddUntilStep("content hidden from footer", () => screenFooter.ChildrenOfType<TestShearedOverlayContainer.TestFooterContent>().SingleOrDefault()?.IsPresent != true);
+            contentHidden();
 
             AddStep("show footer", () => screenFooter.Show());
             AddAssert("content still hidden from footer", () => screenFooter.ChildrenOfType<TestShearedOverlayContainer.TestFooterContent>().SingleOrDefault()?.IsPresent != true);
@@ -216,15 +216,25 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddWaitStep("wait for transition", 3);
 
             AddStep("show overlay", () => externalOverlay.Show());
-            AddAssert("content displayed in footer", () => screenFooter.ChildrenOfType<TestShearedOverlayContainer.TestFooterContent>().Single().IsPresent);
+            contentDisplayed();
             AddUntilStep("other buttons hidden", () => screenFooter.ChildrenOfType<ScreenFooterButton>().Skip(1).All(b => b.Child.Parent!.Y > 0));
 
             AddStep("resize active button", () => this.ChildrenOfType<ScreenFooterButton>().First().ResizeWidthTo(240, 300, Easing.OutQuint));
             AddStep("resize active button back", () => this.ChildrenOfType<ScreenFooterButton>().First().ResizeWidthTo(116, 300, Easing.OutQuint));
 
             AddStep("hide overlay", () => externalOverlay.Hide());
-            AddUntilStep("content hidden from footer", () => screenFooter.ChildrenOfType<TestShearedOverlayContainer.TestFooterContent>().SingleOrDefault()?.IsPresent != true);
+            contentHidden();
             AddUntilStep("other buttons returned", () => screenFooter.ChildrenOfType<ScreenFooterButton>().Skip(1).All(b => b.ChildrenOfType<Container>().First().Y == 0));
+        }
+
+        private void contentHidden()
+        {
+            AddUntilStep("content hidden from footer", () => screenFooter.ChildrenOfType<TestShearedOverlayContainer.TestFooterContent>().SingleOrDefault()?.IsPresent != true);
+        }
+
+        private void contentDisplayed()
+        {
+            AddUntilStep("content displayed in footer", () => screenFooter.ChildrenOfType<TestShearedOverlayContainer.TestFooterContent>().Single().IsPresent);
         }
 
         private partial class TestShearedOverlayContainer : ShearedOverlayContainer
@@ -261,7 +271,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 [BackgroundDependencyLoader]
                 private void load()
                 {
-                    RelativeSizeAxes = Axes.Both;
+                    AutoSizeAxes = Axes.Both;
 
                     InternalChild = new FillFlowContainer
                     {

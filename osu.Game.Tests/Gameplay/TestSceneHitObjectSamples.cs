@@ -64,11 +64,9 @@ namespace osu.Game.Tests.Gameplay
         /// <summary>
         /// Tests that a hitobject which provides a custom sample set of 2 retrieves the following samples from the beatmap skin:
         /// normal-hitnormal2
-        /// normal-hitnormal
         /// hitnormal
         /// </summary>
         [TestCase("normal-hitnormal2")]
-        [TestCase("normal-hitnormal")]
         [TestCase("hitnormal")]
         public void TestDefaultCustomSampleFromBeatmap(string expectedSample)
         {
@@ -129,6 +127,22 @@ namespace osu.Game.Tests.Gameplay
         }
 
         /// <summary>
+        /// Tests that a hitobject which specifies a specific sample file which doesn't exist (or isn't allowed to be looked up)
+        /// falls back to a normal sample.
+        /// </summary>
+        [Test]
+        public void TestFileSampleFallsBackToNormal()
+        {
+            const string expected_sample = "normal-hitnormal";
+
+            SetupSkins(null, expected_sample);
+
+            CreateTestWithBeatmap("file-beatmap-sample.osu");
+
+            AssertUserLookup(expected_sample);
+        }
+
+        /// <summary>
         /// Tests that a default hitobject and control point causes <see cref="TestDefaultSampleFromUserSkin"/>.
         /// </summary>
         [Test]
@@ -162,7 +176,6 @@ namespace osu.Game.Tests.Gameplay
         /// Tests that a control point that provides a custom sample of 2 causes <see cref="TestDefaultCustomSampleFromBeatmap"/>.
         /// </summary>
         [TestCase("normal-hitnormal2")]
-        [TestCase("normal-hitnormal")]
         [TestCase("hitnormal")]
         public void TestControlPointCustomSampleFromBeatmap(string sampleName)
         {

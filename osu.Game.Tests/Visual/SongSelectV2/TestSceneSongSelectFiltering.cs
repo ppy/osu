@@ -89,6 +89,33 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestFilterSingleResult_ReselectedAfterRulesetSwitches()
+        {
+            LoadSongSelect();
+
+            ImportBeatmapForRuleset(0);
+            ImportBeatmapForRuleset(0);
+
+            AddStep("disable converts", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
+            AddStep("set filter text", () => filterTextBox.Current.Value = $"\"{Beatmaps.GetAllUsableBeatmapSets().Last().Metadata.Title}\"");
+
+            AddWaitStep("wait for debounce", 5);
+            AddUntilStep("wait for filter", () => !Carousel.IsFiltering);
+            AddUntilStep("selection is second beatmap set", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(Beatmaps.GetAllUsableBeatmapSets().Last().Beatmaps.First()));
+
+            AddStep("select last difficulty", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmap.Value.BeatmapSetInfo.Beatmaps.Last()));
+            AddUntilStep("selection is last difficulty of second beatmap set", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(Beatmaps.GetAllUsableBeatmapSets().Last().Beatmaps.Last()));
+
+            ChangeRuleset(1);
+            AddUntilStep("wait for filter", () => !Carousel.IsFiltering);
+            AddUntilStep("selection is default", () => Beatmap.IsDefault);
+
+            ChangeRuleset(0);
+            AddUntilStep("wait for filter", () => !Carousel.IsFiltering);
+            AddUntilStep("selection is last difficulty of second beatmap set", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(Beatmaps.GetAllUsableBeatmapSets().Last().Beatmaps.Last()));
+        }
+
+        [Test]
         public void TestFilterOnResumeAfterChange()
         {
             ImportBeatmapForRuleset(0);
@@ -117,14 +144,14 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             // TODO: old test has this step, but there doesn't seem to be any purpose for it.
             // AddUntilStep("random map selected", () => Beatmap.Value != defaultBeatmap);
 
-            AddStep(@"Sort by Artist", () => Config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Artist));
-            AddStep(@"Sort by Title", () => Config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Title));
-            AddStep(@"Sort by Author", () => Config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Author));
-            AddStep(@"Sort by DateAdded", () => Config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.DateAdded));
-            AddStep(@"Sort by BPM", () => Config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.BPM));
-            AddStep(@"Sort by Length", () => Config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Length));
-            AddStep(@"Sort by Difficulty", () => Config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Difficulty));
-            AddStep(@"Sort by Source", () => Config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Source));
+            SortBy(SortMode.Artist);
+            SortBy(SortMode.Title);
+            SortBy(SortMode.Author);
+            SortBy(SortMode.DateAdded);
+            SortBy(SortMode.BPM);
+            SortBy(SortMode.Length);
+            SortBy(SortMode.Difficulty);
+            SortBy(SortMode.Source);
         }
 
         [Test]
@@ -302,11 +329,29 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             checkMatchedBeatmaps(2);
 
-            AddAssert("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.Not.EqualTo(hiddenBeatmap));
+            AddUntilStep("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.Not.EqualTo(hiddenBeatmap));
 
             AddStep("restore", () => Beatmaps.Restore(hiddenBeatmap!));
 
             checkMatchedBeatmaps(3);
+        }
+
+        [Test]
+        public void TestCantHideAllBeatmaps()
+        {
+            LoadSongSelect();
+            ImportBeatmapForRuleset(0);
+
+            checkMatchedBeatmaps(3);
+
+            AddStep("hide selected", () => Beatmaps.Hide(Beatmap.Value.BeatmapInfo));
+            checkMatchedBeatmaps(2);
+
+            AddStep("hide selected", () => Beatmaps.Hide(Beatmap.Value.BeatmapInfo));
+            checkMatchedBeatmaps(1);
+
+            AddAssert("hide fails", () => Beatmaps.Hide(Beatmap.Value.BeatmapInfo), () => Is.False);
+            checkMatchedBeatmaps(1);
         }
 
         private NoResultsPlaceholder? getPlaceholder() => SongSelect.ChildrenOfType<NoResultsPlaceholder>().FirstOrDefault();

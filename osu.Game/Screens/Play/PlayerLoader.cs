@@ -26,12 +26,14 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Localisation;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Volume;
 using osu.Game.Performance;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Skinning;
 using osu.Game.Users;
 using osu.Game.Utils;
@@ -57,7 +59,7 @@ namespace osu.Game.Screens.Play
         // this makes the game stay in portrait mode when restarting gameplay rather than switching back to landscape.
         public override bool RequiresPortraitOrientation => CurrentPlayer?.RequiresPortraitOrientation == true;
 
-        public override float BackgroundParallaxAmount => quickRestart ? 0 : 1;
+        public override float BackgroundParallaxAmount => QuickRestart ? 0 : 1;
 
         // Here because IsHovered will not update unless we do so.
         public override bool HandlePositionalInput => true;
@@ -95,6 +97,8 @@ namespace osu.Game.Screens.Play
         private SkinnableSound sampleRestart = null!;
 
         private Box? quickRestartBlackLayer;
+
+        private ScheduledDelegate? quickRestartBackButtonRestore;
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
@@ -156,7 +160,7 @@ namespace osu.Game.Screens.Play
 
         private PlayerLoaderDisclaimer? epilepsyWarning;
 
-        private bool quickRestart;
+        protected bool QuickRestart { get; private set; }
 
         private IDisposable? highPerformanceSession;
 
@@ -174,6 +178,9 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private IHighPerformanceSessionManager? highPerformanceSessionManager { get; set; }
+
+        [Resolved]
+        private LeaderboardManager? leaderboardManager { get; set; }
 
         public PlayerLoader(Func<Player> createPlayer)
         {
@@ -269,6 +276,23 @@ namespace osu.Game.Screens.Play
 
             showStoryboards.BindValueChanged(val => epilepsyWarning?.FadeTo(val.NewValue ? 1 : 0, 250, Easing.OutQuint), true);
             epilepsyWarning?.FinishTransforms(true);
+
+            // this re-fetch has two purposes:
+            // - is a safety against potential unexpected screen transitions, making sure that the leaderboard
+            //   displayed during gameplay definitely matches the beatmap and ruleset being played
+            //   (as the solo gameplay leaderboard provider uses the global leaderboard manager to populate itself)
+            // - the sort mode is not specified and defaults to `Score` which is good because gameplay leaderboards only support sorting by score.
+            //   this may change at some point in the future, at which point specifying a sort mode should be considered.
+            refetchLeaderboard(force: false);
+        }
+
+        private void refetchLeaderboard(bool force)
+        {
+            leaderboardManager?.FetchWithCriteria(new LeaderboardCriteria(
+                Beatmap.Value.BeatmapInfo,
+                Ruleset.Value,
+                leaderboardManager?.CurrentCriteria?.Scope ?? BeatmapLeaderboardScope.Global,
+                leaderboardManager?.CurrentCriteria?.ExactMods), force);
         }
 
         #region Screen handling
@@ -369,7 +393,7 @@ namespace osu.Game.Screens.Play
 
             logo.ScaleTo(new Vector2(0.15f), duration, Easing.OutQuint);
 
-            if (quickRestart)
+            if (QuickRestart)
             {
                 logo.Delay(quick_restart_initial_delay)
                     .FadeIn(350);
@@ -419,7 +443,7 @@ namespace osu.Game.Screens.Play
 
             // We need to perform this check here rather than in OnHover as any number of children of VisualSettings
             // may also be handling the hover events.
-            if (inputManager.HoveredDrawables.Contains(VisualSettings) || quickRestart)
+            if (inputManager.HoveredDrawables.Contains(VisualSettings) || QuickRestart)
             {
                 // Preview user-defined background dim and blur when hovered on the visual settings panel.
                 ApplyToBackground(b =>
@@ -458,7 +482,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             CurrentPlayer = createPlayer();
-            CurrentPlayer.Configuration.AutomaticallySkipIntro |= quickRestart;
+            CurrentPlayer.Configuration.AutomaticallySkipIntro |= QuickRestart;
             CurrentPlayer.RestartCount = restartCount++;
             CurrentPlayer.PrepareLoaderForRestart = prepareForRestart;
 
@@ -475,16 +499,21 @@ namespace osu.Game.Screens.Play
 
         private void prepareForRestart(bool quickRestartRequested)
         {
-            quickRestart = quickRestartRequested;
+            QuickRestart = quickRestartRequested;
             hideOverlays = true;
             ValidForResume = true;
+            // when retrying, it is desired to refetch the global state leaderboard so that the user's previous score can show up on the leaderboard, if it needs to.
+            // that said, only do this when the user is *not* quick-retrying.
+            // this avoids the quick retry becoming longer than it needs to (because an extra API request has to complete before gameplay can start),
+            // and if the user is quick-retrying, their last score is most likely not important for global leaderboards, or the user won't care.
+            refetchLeaderboard(force: !quickRestartRequested);
         }
 
         private void contentIn(double delayBeforeSideDisplays = 0)
         {
             MetadataInfo.Loading = true;
 
-            if (quickRestart)
+            if (QuickRestart)
             {
                 BackButtonVisibility.Value = false;
 
@@ -507,7 +536,8 @@ namespace osu.Game.Screens.Play
                     .ScaleTo(1)
                     .FadeInFromZero(500, Easing.OutQuint);
 
-                this.Delay(quick_restart_initial_delay).Schedule(() => BackButtonVisibility.Value = true);
+                quickRestartBackButtonRestore?.Cancel();
+                quickRestartBackButtonRestore = Scheduler.AddDelayed(() => BackButtonVisibility.Value = true, quick_restart_initial_delay);
             }
             else
             {
@@ -624,7 +654,7 @@ namespace osu.Game.Screens.Play
                 },
                 // When a quick restart is activated, the metadata content will display some time later if it's taking too long.
                 // To avoid it appearing too briefly, if it begins to fade in let's induce a standard delay.
-                quickRestart && content.Alpha == 0 ? 0 : 500);
+                QuickRestart && content.Alpha == 0 ? 0 : 500);
         }
 
         private void cancelLoad()
@@ -715,6 +745,10 @@ namespace osu.Game.Screens.Play
 
         #region Low battery warning
 
+        /// <summary>
+        /// This is intentionally higher than 20%, which is usually when OS level notifications
+        /// interrupt the active application to warn the user.
+        /// </summary>
         private const double low_battery_threshold = 0.25;
 
         private Bindable<bool> batteryWarningShownOnce = null!;

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -76,6 +77,8 @@ namespace osu.Game.Overlays.Toolbar
         protected FillFlowContainer Flow;
 
         protected readonly Container BackgroundContent;
+
+        private IDisposable? realmSubscription;
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
@@ -184,7 +187,8 @@ namespace osu.Game.Overlays.Toolbar
         {
             if (Hotkey != null)
             {
-                realm.SubscribeToPropertyChanged(r => r.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetName == null && rkb.ActionInt == (int)Hotkey.Value), kb => kb.KeyCombinationString, updateKeyBindingTooltip);
+                realmSubscription = realm.SubscribeToPropertyChanged(r => r.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetName == null && rkb.ActionInt == (int)Hotkey.Value),
+                    kb => kb.KeyCombinationString, updateKeyBindingTooltip);
             }
         }
 
@@ -233,6 +237,13 @@ namespace osu.Game.Overlays.Toolbar
             keyBindingTooltip.Text = !string.IsNullOrEmpty(keyBindingString)
                 ? $" ({keyBindingString})"
                 : string.Empty;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            realmSubscription?.Dispose();
         }
     }
 

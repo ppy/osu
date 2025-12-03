@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
@@ -24,13 +25,13 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
-using osuTK.Graphics;
 using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
@@ -38,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
     public abstract partial class RoomPanel : CompositeDrawable, IHasContextMenu
     {
         protected const float CORNER_RADIUS = 10;
-        private const float height = 100;
+        private const float height = 80;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -54,11 +55,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         protected readonly Bindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
         protected Container ButtonsContainer { get; private set; } = null!;
 
+        protected bool ShowExternalLink { get; init; } = true;
+
         private DrawableRoomParticipantsList? drawableRoomParticipantsList;
         private RoomSpecialCategoryPill? specialCategoryPill;
-        private PasswordProtectedIcon? passwordIcon;
+        private CornerIcon? passwordIcon;
+        private CornerIcon? pinnedIcon;
         private EndDateInfo? endDateInfo;
-        private SpriteText? roomName;
+        private RoomNameLine? roomName;
         private DelayedLoadWrapper wrapper = null!;
         private CancellationTokenSource? beatmapLookupCancellation;
 
@@ -76,16 +80,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             Masking = true;
             CornerRadius = CORNER_RADIUS;
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Shadow,
-                Colour = Color4.Black.Opacity(40),
-                Radius = 5,
-            };
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colours)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
             ButtonsContainer = new Container
             {
@@ -95,13 +93,20 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 AutoSizeAxes = Axes.X
             };
 
+            EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Shadow,
+                Colour = colourProvider.Background6.Opacity(0.4f),
+                Radius = 4,
+            };
+
             InternalChildren = new Drawable[]
             {
                 // This resolves internal 1px gaps due to applying the (parenting) corner radius and masking across multiple filling background sprites.
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.Background5,
+                    Colour = colourProvider.Background5,
                 },
                 CreateBackground().With(d =>
                 {
@@ -114,7 +119,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         Name = @"Room content",
                         RelativeSizeAxes = Axes.Both,
                         // This negative padding resolves 1px gaps between this background and the background above.
-                        Padding = new MarginPadding { Left = 20, Vertical = -0.5f },
+                        Padding = new MarginPadding { Left = 10, Vertical = -0.5f },
                         Child = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -125,7 +130,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = colours.Background5,
+                                    Colour = colourProvider.Background5,
                                     Width = 0.2f,
                                 },
                                 new Box
@@ -133,7 +138,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = ColourInfo.GradientHorizontal(colours.Background5, colours.Background5.Opacity(0.3f)),
+                                    Colour = ColourInfo.GradientHorizontal(colourProvider.Background5, colourProvider.Background5.Opacity(0.3f)),
                                     Width = 0.8f,
                                 },
                                 new GridContainer
@@ -154,8 +159,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                 RelativeSizeAxes = Axes.Both,
                                                 Padding = new MarginPadding
                                                 {
-                                                    Left = 20,
-                                                    Right = DrawableRoomParticipantsList.SHEAR_WIDTH,
+                                                    Left = 10,
+                                                    Right = 10,
                                                     Vertical = 5
                                                 },
                                                 Children = new Drawable[]
@@ -204,11 +209,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                 Direction = FillDirection.Vertical,
                                                                 Children = new Drawable[]
                                                                 {
-                                                                    roomName = new TruncatingSpriteText
-                                                                    {
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        Font = OsuFont.GetFont(size: 28)
-                                                                    },
+                                                                    roomName = new RoomNameLine(),
                                                                     new RoomStatusText(Room)
                                                                     {
                                                                         Beatmap = { BindTarget = currentBeatmap }
@@ -255,7 +256,28 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                         }
                                     }
                                 },
-                                passwordIcon = new PasswordProtectedIcon { Alpha = 0 }
+                                passwordIcon = new CornerIcon
+                                {
+                                    Alpha = 0,
+                                    Background = { Colour = colours.Gray8, },
+                                    Icon =
+                                    {
+                                        Icon = FontAwesome.Solid.Lock,
+                                        Colour = colours.Gray3,
+                                        Rotation = 45,
+                                    },
+                                },
+                                pinnedIcon = new CornerIcon
+                                {
+                                    Alpha = 0,
+                                    Background = { Colour = colours.Orange2 },
+                                    Icon =
+                                    {
+                                        Icon = FontAwesome.Solid.Thumbtack,
+                                        Colour = colours.Gray3,
+                                        Rotation = 45,
+                                    },
+                                }
                             },
                         },
                     }, 0)
@@ -279,10 +301,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 wrapper.FadeInFromZero(200);
 
+                updateRoomID();
                 updateRoomName();
                 updateRoomCategory();
                 updateRoomType();
                 updateRoomHasPassword();
+                updateRoomPinned();
             };
 
             SelectedItem.BindValueChanged(onSelectedItemChanged, true);
@@ -292,6 +316,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             switch (e.PropertyName)
             {
+                case nameof(Room.RoomID):
+                    updateRoomID();
+                    break;
+
                 case nameof(Room.Name):
                     updateRoomName();
                     break;
@@ -306,6 +334,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 case nameof(Room.HasPassword):
                     updateRoomHasPassword();
+                    break;
+
+                case nameof(Room.Pinned):
+                    updateRoomPinned();
                     break;
             }
         }
@@ -335,6 +367,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                               }), cancellationSource.Token);
         }
 
+        private void updateRoomID()
+        {
+            if (roomName != null && ShowExternalLink)
+                roomName.Link = Room.GetOnlineURL(api);
+        }
+
         private void updateRoomName()
         {
             if (roomName != null)
@@ -361,6 +399,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 passwordIcon.Alpha = Room.HasPassword ? 1 : 0;
         }
 
+        private void updateRoomPinned()
+        {
+            if (pinnedIcon != null)
+                pinnedIcon.Alpha = Room.Pinned ? 1 : 0;
+        }
+
         private int numberOfAvatars = 7;
 
         public int NumberOfAvatars
@@ -381,17 +425,17 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             {
                 var items = new List<MenuItem>();
 
-                if (Room.RoomID.HasValue)
+                string? url = Room.GetOnlineURL(api);
+
+                if (url != null)
                 {
                     items.AddRange([
-                        new OsuMenuItem("View in browser", MenuItemType.Standard, () => game?.OpenUrlExternally(formatRoomUrl(Room.RoomID.Value))),
-                        new OsuMenuItem("Copy link", MenuItemType.Standard, () => game?.CopyToClipboard(formatRoomUrl(Room.RoomID.Value)))
+                        new OsuMenuItem("View in browser", MenuItemType.Standard, () => game?.OpenUrlExternally(url)),
+                        new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyToClipboard(url))
                     ]);
                 }
 
                 return items.ToArray();
-
-                string formatRoomUrl(long id) => $@"{api.Endpoints.WebsiteUrl}/multiplayer/rooms/{id}";
             }
         }
 
@@ -473,12 +517,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         {
                             statusText = new OsuSpriteText
                             {
-                                Font = OsuFont.Default.With(size: 16),
+                                Font = OsuFont.Style.Caption2,
                                 Colour = colours.Lime1
                             },
                             beatmapText = new LinkFlowContainer(s =>
                             {
-                                s.Font = OsuFont.Default.With(size: 16);
+                                s.Font = OsuFont.Style.Caption2;
                                 s.Colour = colours.Lime1;
                             })
                             {
@@ -524,10 +568,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        public partial class PasswordProtectedIcon : CompositeDrawable
+        public partial class CornerIcon : CompositeDrawable
         {
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            public SpriteIcon Icon { get; }
+            public Box Background { get; }
+
+            public CornerIcon()
             {
                 Anchor = Anchor.TopRight;
                 Origin = Anchor.TopRight;
@@ -536,24 +582,88 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 InternalChildren = new Drawable[]
                 {
-                    new Box
+                    Background = new Box
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopCentre,
-                        Colour = colours.Gray5,
                         Rotation = 45,
                         RelativeSizeAxes = Axes.Both,
                         Width = 2,
                     },
-                    new SpriteIcon
+                    Icon = new SpriteIcon
                     {
-                        Icon = FontAwesome.Solid.Lock,
                         Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
+                        Origin = Anchor.Centre,
+                        Position = new Vector2(-13, 13),
                         Margin = new MarginPadding(6),
                         Size = new Vector2(14),
                     }
                 };
+            }
+        }
+
+        public partial class RoomNameLine : FillFlowContainer
+        {
+            private readonly TruncatingSpriteText spriteText;
+            private readonly ExternalLinkButton linkButton;
+
+            public LocalisableString Text
+            {
+                get => spriteText.Text;
+                set => spriteText.Text = value;
+            }
+
+            private string? link;
+
+            public string? Link
+            {
+                get => link;
+                set
+                {
+                    link = value;
+                    updateLink();
+                }
+            }
+
+            public RoomNameLine()
+            {
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+                Direction = FillDirection.Horizontal;
+
+                Children = new Drawable[]
+                {
+                    spriteText = new TruncatingSpriteText
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Font = OsuFont.Style.Heading2,
+                    },
+                    linkButton = new ExternalLinkButton
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Margin = new MarginPadding { Horizontal = 6, Bottom = 4 },
+                        Alpha = 0f,
+                    },
+                };
+            }
+
+            private void updateLink()
+            {
+                if (link == null)
+                    linkButton.Hide();
+                else
+                {
+                    linkButton.Show();
+                    linkButton.Link = link;
+                }
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+                spriteText.MaxWidth = DrawWidth - linkButton.LayoutSize.X;
             }
         }
     }
