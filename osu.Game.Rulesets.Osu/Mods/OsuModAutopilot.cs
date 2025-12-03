@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     var spinner = replaySpinner.HitObject;
                     if (timeElapsedBetweenHitObjects >= 0)
                     {
-                        double rate = CalculateSpinnerRate(spinner);
+                        double rate = calculateSpinnerRate(spinner);
                         spinSpinner(replaySpinner, rate);
                     }
                 }
@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     double spans = prog * (slider.RepeatCount + 1);
 
                     double frac = spans % 1;
-                    if ((int)spans % 2 == 1) 
+                    if ((int)spans % 2 == 1)
                         frac = 1 - frac;
 
                     Vector2 pathPos = sliderDrawable.Position + (slider.Path.PositionAt(frac) * sliderDrawable.Scale);
@@ -158,7 +158,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             moveTowards(target, availableTime);
         }
 
-        private double CalculateSpinnerRate(Spinner spinner)
+        private double calculateSpinnerRate(Spinner spinner)
         {
             double calculatedSpeed = 1.01 * (spinner.MaximumBonusSpins + spinner.SpinsRequiredForBonus) / spinner.Duration;
             return calculatedSpeed / playfield.Clock.Rate;
@@ -200,7 +200,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return;
             }
 
-            double rate = CalculateSpinnerRate(spinner);
+            double rate = calculateSpinnerRate(spinner);
             spinSpinner(spinnerDrawable, rate);
 
             double angle = 2 * Math.PI * (timeElapsedBetweenHitObjects * rate);
