@@ -38,12 +38,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             typeof(ModTouchDevice)
         };
 
-        // Think of this constant as this way.
-        // If we are "hitwindow_start_offset" ms or less away from the start of the hitwindow, we switch to the variable scaledTime
-        // in handleTime.
-        private const double hitwindow_start_offset = 40;
+        // If we are this many ms or less away from the start of the hitwindow, we switch to the scaled time in handleTime.
+        private const double hitwindow_start_offset = 25;
 
-        // The spinner radius value from OsuAutoGeneratorBase
+        // Spinner radius value from OsuAutoGeneratorBase
         private const float spinner_radius = 50;
 
         private OsuInputManager inputManager = null!;
@@ -55,6 +53,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         private (double HitWindowStart, double HitWindowEnd) hitWindow = (0, 0);
         private double timeElapsedBetweenHitObjects;
 
+        private double currentTime => playfield.Clock.CurrentTime;
+
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             // Grab the input manager to disable the user's cursor, and for future use
@@ -65,13 +65,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             hasReplayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
 
-            // Is not needed, but simply sets the cursor location for autopilot as where the player left it before loading in gameplay.
             void onLoadCompleteHandler(Drawable drawable)
             {
                 Vector2 screenStart = inputManager.CurrentState.Mouse.Position;
                 Vector2 fieldStart = playfield.ScreenSpaceToGamefield(screenStart);
-                double timeStart = playfield.Clock.CurrentTime;
-                lastHitInfo = (fieldStart, timeStart);
+                lastHitInfo = (fieldStart, currentTime);
 
                 playfield.OnLoadComplete -= onLoadCompleteHandler;
             }
@@ -90,8 +88,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
-            double currentTime = playfield.Clock.CurrentTime;
-
             var nextObject = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(d => !d.Judged);
 
             if (nextObject == null)
@@ -106,12 +102,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (nextObject is DrawableSpinner replaySpinner)
                 {
                     var spinner = replaySpinner.HitObject;
-
-                    // Don't start spinning until position is reached.
                     if (timeElapsedBetweenHitObjects >= 0)
                     {
-                        double calculatedSpeed = 1.01 * (spinner.MaximumBonusSpins + spinner.SpinsRequiredForBonus) / spinner.Duration;
-                        double rate = calculatedSpeed / playfield.Clock.Rate;
+                        double rate = CalculateSpinnerRate(spinner);
                         spinSpinner(replaySpinner, rate);
                     }
                 }
@@ -126,7 +119,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             hitWindow = (start - mehWindow, start + mehWindow);
 
-            // The position of the current alive object.
             var target = nextObject.Position;
 
             // If the hitobject doesn't appear during the time it was judged, the cursor will teleport.
@@ -134,12 +126,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (nextObject.Entry?.LifetimeStart > lastHitInfo.Time)
             {
                 lastHitInfo.Time = nextObject.Entry.LifetimeStart;
-
-                // For cases (like the barrel roll mod), set last hit position again.
                 lastHitInfo.Position = playfield.ToLocalSpace(inputManager.CurrentState.Mouse.Position);
             }
 
-            // Based on the hit object type, things work differently.
             switch (nextObject)
             {
                 case DrawableSpinner spinnerDrawable:
@@ -152,40 +141,39 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     var slider = sliderDrawable.HitObject;
 
-                    // This if statement is needed or else the cursor will teleport to the HeadCircle of slider.
-                    if (timeElapsedBetweenHitObjects < slider.Duration)
-                    {
-                        double prog = Math.Clamp(timeElapsedBetweenHitObjects / slider.Duration, 0, 1);
-                        double spans = prog * (slider.RepeatCount + 1);
-                        spans = (spans > 1 && spans % 2 > 1) ? 1 - (spans % 1) : spans % 1;
+                    double prog = Math.Clamp(timeElapsedBetweenHitObjects / slider.Duration, 0, 1);
+                    double spans = prog * (slider.RepeatCount + 1);
 
-                        Vector2 pathPos = sliderDrawable.Position + (slider.Path.PositionAt(spans) * sliderDrawable.Scale);
+                    double frac = spans % 1;
+                    if ((int)spans % 2 == 1) 
+                        frac = 1 - frac;
 
-                        applyCursor(pathPos);
-                    }
+                    Vector2 pathPos = sliderDrawable.Position + (slider.Path.PositionAt(frac) * sliderDrawable.Scale);
+                    applyCursor(pathPos);
 
                     return;
             }
 
-            // Compute how many ms remain for cursor movement toward the hit-object
             double availableTime = handleTime();
-
             moveTowards(target, availableTime);
+        }
+
+        private double CalculateSpinnerRate(Spinner spinner)
+        {
+            double calculatedSpeed = 1.01 * (spinner.MaximumBonusSpins + spinner.SpinsRequiredForBonus) / spinner.Duration;
+            return calculatedSpeed / playfield.Clock.Rate;
         }
 
         private double handleTime()
         {
-            // We want the cursor to eventually reach the center of the HitCircle.
-            // However, when it's inside the HitWindow, we want to the cursor to be fast enough
-            // where the player can't tap it, but slow enough so it doesn't seem like the cursor is teleporting.
+            // The cursor should reach the HitCircle, but inside the hit window
+            // it needs to move fast enough that a player can't tap it early,
+            // while still keeping the movement visually smooth.
             double hitWindowStart = hitWindow.HitWindowStart;
             double hitWindowEnd = hitWindow.HitWindowEnd;
             double lastJudgedTime = lastHitInfo.Time;
 
-            // In scaledTime, the time given isn't how many milliseconds we are from something, but the percentage we passed from hitWindowStart
-            // to hitWindowEnd which the percentage is applied to give a time from 1 ms to hitwindow_start_offset.
-            // By the logic that we add hitwindow_start_offset to hitWindowStart, it should always reach the circle before
-            // judgement has passed, even if we literally have zero milliseconds of time in the hitwindow.
+            // scaledTime: convert the remaining portion of the hit window into a value between 1 and hitwindow_start_offset.
             double scaledTime = 1 + (Math.Clamp((hitWindowEnd - lastJudgedTime) / (hitWindowEnd - hitWindowStart + hitwindow_start_offset), 0, 1) * (hitwindow_start_offset - 1));
 
             // If we are too close to the hitWindow, switch to scaledTime.
@@ -193,7 +181,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 ? scaledTime
                 : hitWindowStart - lastJudgedTime;
 
-            // Don’t let it go below 1
             return Math.Max(timeLeft, 1);
         }
 
@@ -202,25 +189,18 @@ namespace osu.Game.Rulesets.Osu.Mods
             var spinner = spinnerDrawable.HitObject;
             spinnerDrawable.HandleUserInput = false;
 
-            // Before spinner starts, move to position.
             if (timeElapsedBetweenHitObjects < 0)
             {
-                Vector2 spinnerTargetPosition = spinner.Position + new Vector2(
-                    -(float)Math.Sin(0) * spinner_radius,
-                    -(float)Math.Cos(0) * spinner_radius);
+                Vector2 spinnerTargetPosition = spinner.Position + new Vector2(0, -spinner_radius);
 
-                // Since spinner's don't have hit window, we need to add the duration.
                 hitWindow.HitWindowEnd = hitWindow.HitWindowStart + spinner.Duration;
                 double duration = handleTime();
 
                 moveTowards(spinnerTargetPosition, duration);
-
                 return;
             }
 
-            double calculatedSpeed = 1.01 * (spinner.MaximumBonusSpins + spinner.SpinsRequiredForBonus) / spinner.Duration;
-            double rate = calculatedSpeed / playfield.Clock.Rate;
-
+            double rate = CalculateSpinnerRate(spinner);
             spinSpinner(spinnerDrawable, rate);
 
             double angle = 2 * Math.PI * (timeElapsedBetweenHitObjects * rate);
@@ -233,22 +213,19 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void spinSpinner(DrawableSpinner spinnerDrawable, double rate)
         {
-            // Automatically spin spinner.
             spinnerDrawable.RotationTracker.AddRotation(float.RadiansToDegrees((float)playfield.Clock.ElapsedFrameTime * (float)rate * MathF.PI * 2.0f));
         }
 
         private void moveTowards(Vector2 target, double timeMs)
         {
             var (lastHitPosition, lastJudgedTime) = lastHitInfo;
-            double currentTime = playfield.Clock.CurrentTime;
 
             double elapsed = currentTime - lastJudgedTime;
 
-            // The percentage of time between the lastJudgedObject and the time to reach the next HitObject's HitWindow.
-            // Example: If the percentage of time is around 40%, the cursor should travel atleast 40% of the distance.
+            // How far we are (as a percentage) between the last judged object and
+            // the start of the next object's hit window. The cursor moves proportionally to this percentage.
             double progress = Math.Clamp(elapsed / timeMs, 0, 1);
 
-            // Compute the new cursor position by Lerp.
             Vector2 newPos = Vector2.Lerp(lastHitPosition, target, (float)progress);
 
             applyCursor(newPos);
