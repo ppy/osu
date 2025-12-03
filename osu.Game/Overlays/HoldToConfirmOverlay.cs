@@ -53,7 +53,6 @@ namespace osu.Game.Overlays
             {
                 double target = p.NewValue * finalFillAlpha;
 
-                audioVolume.Value = 1 - target;
                 overlay.Alpha = (float)target;
             };
 
