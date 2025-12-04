@@ -540,6 +540,10 @@ namespace osu.Game.Skinning
                 case "Menu/fountain-star":
                     componentName = "star2";
                     break;
+
+                case @"Intro/Welcome/welcome_text":
+                    componentName = @"welcome_text";
+                    break;
             }
 
             Texture? texture = null;
