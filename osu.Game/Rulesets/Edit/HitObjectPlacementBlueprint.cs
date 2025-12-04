@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -87,6 +88,13 @@ namespace osu.Game.Rulesets.Edit
                 placementHandler.CommitPlacement(HitObject);
             else
                 placementHandler.HidePlacement();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            Colour = IsValidForPlacement ? Colour4.White : Colour4.Red;
         }
 
         /// <summary>
