@@ -1,9 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets.Osu;
@@ -33,6 +35,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Children = new Drawable[]
                     {
                         new MultiplayerSkipOverlay(120000)
+                        {
+                            RequestSkip = () => MultiplayerClient.VoteToSkipIntro().WaitSafely(),
+                        }
                     },
                 };
 
@@ -47,26 +52,83 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             for (int i = 0; i < 4; i++)
             {
-                int i2 = i;
+                int userId = i;
 
-                AddStep($"join user {i2}", () =>
+                AddStep($"join user {userId}", () =>
                 {
                     MultiplayerClient.AddUser(new APIUser
                     {
-                        Id = i2,
-                        Username = $"User {i2}"
+                        Id = userId,
+                        Username = $"User {userId}"
                     });
 
-                    MultiplayerClient.ChangeUserState(i2, MultiplayerUserState.Playing);
+                    MultiplayerClient.ChangeUserState(userId, MultiplayerUserState.Playing);
                 });
             }
 
-            AddStep("local user votes", () => MultiplayerClient.VoteToSkipIntro().WaitSafely());
+            AddStep("user 0 votes", () => MultiplayerClient.UserVoteToSkipIntro(0).WaitSafely());
+            AddStep("local user votes", () => this.ChildrenOfType<MultiplayerSkipOverlay.Button>().Single().TriggerClick());
+            AddStep("user 1 votes", () => MultiplayerClient.UserVoteToSkipIntro(1).WaitSafely());
+        }
 
+        [Test]
+        public void TestLeavingBeforeLocalVote()
+        {
             for (int i = 0; i < 4; i++)
             {
-                int i2 = i;
-                AddStep($"user {i2} votes", () => MultiplayerClient.UserVoteToSkipIntro(i2).WaitSafely());
+                int userId = i;
+
+                AddStep($"join user {userId}", () =>
+                {
+                    MultiplayerClient.AddUser(new APIUser
+                    {
+                        Id = userId,
+                        Username = $"User {userId}"
+                    });
+
+                    MultiplayerClient.ChangeUserState(userId, MultiplayerUserState.Playing);
+                });
+            }
+
+            AddStep("user 0 votes", () => MultiplayerClient.UserVoteToSkipIntro(0).WaitSafely());
+            AddStep("user 1 leaves", () => MultiplayerClient.RemoveUser(new APIUser { Id = 1 }));
+            AddStep("user 2 leaves", () => MultiplayerClient.RemoveUser(new APIUser { Id = 2 }));
+            AddStep("user 3 leaves", () => MultiplayerClient.RemoveUser(new APIUser { Id = 3 }));
+            AddStep("user 0 leaves", () => MultiplayerClient.RemoveUser(new APIUser { Id = 0 }));
+        }
+
+        [Test]
+        public void TestLeavingAfterLocalVote()
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                int userId = i;
+
+                AddStep($"join user {userId}", () =>
+                {
+                    MultiplayerClient.AddUser(new APIUser
+                    {
+                        Id = userId,
+                        Username = $"User {userId}"
+                    });
+
+                    MultiplayerClient.ChangeUserState(userId, MultiplayerUserState.Playing);
+                });
+            }
+
+            AddStep("local user votes", () => this.ChildrenOfType<MultiplayerSkipOverlay.Button>().Single().TriggerClick());
+            AddStep("user 0 votes", () => MultiplayerClient.UserVoteToSkipIntro(0).WaitSafely());
+            AddStep("user 1 leaves", () => MultiplayerClient.RemoveUser(new APIUser { Id = 1 }));
+            AddStep("user 2 leaves", () => MultiplayerClient.RemoveUser(new APIUser { Id = 2 }));
+            AddStep("user 3 leaves", () => MultiplayerClient.RemoveUser(new APIUser { Id = 3 }));
+            AddStep("user 0 leaves", () => MultiplayerClient.RemoveUser(new APIUser { Id = 0 }));
+        }
+
+        public partial class TestMultiplayerSkipOverlay : MultiplayerSkipOverlay
+        {
+            public TestMultiplayerSkipOverlay()
+                : base(120000)
+            {
             }
         }
     }
