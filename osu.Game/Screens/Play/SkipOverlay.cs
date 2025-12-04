@@ -93,7 +93,7 @@ namespace osu.Game.Screens.Play
                             Height = 5,
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
-                            Colour = colours.Yellow,
+                            Colour = colours.Orange3,
                             RelativeSizeAxes = Axes.X
                         }
                     }
@@ -328,8 +328,8 @@ namespace osu.Game.Screens.Play
             [BackgroundDependencyLoader]
             private void load(OsuColour colours, AudioManager audio)
             {
-                colourNormal = colours.Yellow;
-                colourHover = colours.YellowDark;
+                colourNormal = colours.Orange3;
+                colourHover = colours.Orange4;
 
                 sampleConfirm = audio.Samples.Get(@"UI/submit-select");
 
@@ -355,6 +355,11 @@ namespace osu.Game.Screens.Play
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = colourNormal,
+                            },
+                            new TrianglesV2
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = ColourInfo.GradientVertical(colourNormal.Lighten(0.2f), colourNormal)
                             },
                             flow = new FillFlowContainer
                             {
