@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Utils;
 using osuTK;
@@ -35,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         public Bindable<bool> IsScalingSlider { get; private set; } = new BindableBool();
 
         [Resolved]
-        private IEditorChangeHandler? changeHandler { get; set; }
+        private IBeatmapEditorChangeHandler? changeHandler { get; set; }
 
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider? snapProvider { get; set; }
@@ -109,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 foreach (var (ho, originalState) in objectsInScale)
                 {
-                    ho.Position = GeometryUtils.GetScaledPosition(scale, actualOrigin, originalState.Position, axisRotation);
+                    new PositionChange(ho, GeometryUtils.GetScaledPosition(scale, actualOrigin, originalState.Position, axisRotation)).Apply(changeHandler);
                 }
             }
 
@@ -162,15 +163,16 @@ namespace osu.Game.Rulesets.Osu.Edit
             // Maintain the path types in case they were defaulted to bezier at some point during scaling
             for (int i = 0; i < slider.Path.ControlPoints.Count; i++)
             {
-                slider.Path.ControlPoints[i].Position = GeometryUtils.GetScaledPosition(scale, Vector2.Zero, originalInfo.PathControlPointPositions[i], axisRotation);
-                slider.Path.ControlPoints[i].Type = originalInfo.PathControlPointTypes[i];
+                new PathControlPointPositionChange(slider.Path.ControlPoints[i],
+                    GeometryUtils.GetScaledPosition(scale, Vector2.Zero, originalInfo.PathControlPointPositions[i], axisRotation)).Apply(changeHandler);
+                new PathControlPointTypeChange(slider.Path.ControlPoints[i], originalInfo.PathControlPointTypes[i]).Apply(changeHandler);
             }
 
             // Snap the slider's length to the current beat divisor
             // to calculate the final resulting duration / bounding box before the final checks.
-            slider.SnapTo(snapProvider);
+            new SnapToChange<Slider>(slider, snapProvider).Apply(changeHandler);
 
-            slider.Position = GeometryUtils.GetScaledPosition(scale, origin, originalInfo.Position, axisRotation);
+            new PositionChange(slider, GeometryUtils.GetScaledPosition(scale, origin, originalInfo.Position, axisRotation)).Apply(changeHandler);
 
             //if sliderhead or sliderend end up outside playfield, revert scaling.
             Quad scaledQuad = GeometryUtils.GetSurroundingQuad(new OsuHitObject[] { slider });
@@ -180,12 +182,14 @@ namespace osu.Game.Rulesets.Osu.Edit
                 return;
 
             for (int i = 0; i < slider.Path.ControlPoints.Count; i++)
-                slider.Path.ControlPoints[i].Position = originalInfo.PathControlPointPositions[i];
+            {
+                new PathControlPointPositionChange(slider.Path.ControlPoints[i], originalInfo.PathControlPointPositions[i]).Apply(changeHandler);
+            }
 
-            slider.Position = originalInfo.Position;
+            new PositionChange(slider, originalInfo.Position).Apply(changeHandler);
 
             // Snap the slider's length again to undo the potentially-invalid length applied by the previous snap.
-            slider.SnapTo(snapProvider);
+            new SnapToChange<Slider>(slider, snapProvider).Apply(changeHandler);
         }
 
         private (bool X, bool Y) isQuadInBounds(Quad quad)
@@ -323,7 +327,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 delta.Y -= quad.BottomRight.Y - OsuPlayfield.BASE_SIZE.Y;
 
             foreach (var (h, _) in objectsInScale!)
-                h.Position += delta;
+                new PositionChange(h, h.Position + delta).Apply(changeHandler);
         }
 
         private struct OriginalHitObjectState
