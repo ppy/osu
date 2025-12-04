@@ -7,6 +7,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
@@ -27,7 +28,12 @@ namespace osu.Game.Tests.Visual.Editing
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
-        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset, false);
+        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
+        {
+            var beatmap = new TestBeatmap(ruleset, false);
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint());
+            return beatmap;
+        }
 
         private GlobalActionContainer globalActionContainer => this.ChildrenOfType<GlobalActionContainer>().Single();
 
