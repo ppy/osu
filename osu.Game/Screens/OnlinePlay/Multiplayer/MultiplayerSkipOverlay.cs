@@ -249,7 +249,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 }
                 else
                 {
-                    box.FadeColour(IsHovered ? colours.Orange4 : colours.Orange3, 500, Easing.OutQuint);
+                    box.FadeColour(IsHovered ? colours.Orange3.Lighten(0.2f) : colours.Orange3, 500, Easing.OutQuint);
                     triangles.FadeColour(ColourInfo.GradientVertical(colours.Orange3.Lighten(0.2f), colours.Orange3), 500, Easing.OutQuint);
                 }
             }

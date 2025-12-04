@@ -338,7 +338,7 @@ namespace osu.Game.Screens.Play
             private void load(OsuColour colours, AudioManager audio)
             {
                 colourNormal = colours.Orange3;
-                colourHover = colours.Orange4;
+                colourHover = colours.Orange3.Lighten(0.2f);
 
                 sampleConfirm = audio.Samples.Get(@"UI/submit-select");
 
