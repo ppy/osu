@@ -192,6 +192,8 @@ namespace osu.Game.Beatmaps.Drawables
             "2412260 Koto Spirit - Locus of Hexagram.osz",
             "2412232 Will Stetson - Of Our Time.osz",
             "2412292 ArXe - Locus Amoenus (feat. Megurine Luka).osz",
+            "2412328 Akiri - Vespera Stella.osz",
+            "2412331 takehirotei - Haiboku no Altra Vita.osz",
         };
 
         private static readonly string[] bundled_osu =
