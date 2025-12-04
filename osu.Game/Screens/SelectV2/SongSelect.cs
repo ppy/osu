@@ -811,7 +811,8 @@ namespace osu.Game.Screens.SelectV2
             // Probably needs more thought because this needs to be in every `ApplyToBackground` currently to restore sane defaults.
             backgroundModeBeatmap.FadeColour(Color4.White, 250);
 
-            backgroundModeBeatmap.BlurAmount.Value = revealingBackground == null && configBackgroundBlur.Value ? 20 : 0f;
+            bool backgroundRevealActive = revealingBackground?.State == ScheduledDelegate.RunState.Running || revealingBackground?.State == ScheduledDelegate.RunState.Complete;
+            backgroundModeBeatmap.BlurAmount.Value = configBackgroundBlur.Value && !backgroundRevealActive ? 20 : 0f;
         });
 
         #endregion
