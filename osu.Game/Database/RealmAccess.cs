@@ -25,6 +25,7 @@ using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
+using osu.Game.IO;
 using osu.Game.Models;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -331,6 +332,16 @@ namespace osu.Game.Database
                     fi.LastWriteTime = DateTime.Now;
             }
             catch { }
+
+            // Check for requisite disk space
+            try
+            {
+                DiskUsage.EnsureSufficientSpace(storage.GetFullPath(string.Empty));
+            }
+            catch (IOException)
+            {
+                Logger.Log("Your device is running low on disk space! Please free up some space to avoid potential issues.", LoggingTarget.Runtime, LogLevel.Important);
+            }
 
             try
             {
