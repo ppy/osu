@@ -163,7 +163,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 this.Delay(ARRANGE_DELAY)
                     .Schedule(() => ArrangeItemsForRollAnimation())
                     .Delay(arrange_duration)
-                    .Schedule(() => PlayRollAnimation(gameplayItemId, roll_duration))
+                    .Schedule(() => PlayRollAnimation(candidateItemId, roll_duration))
                     .Delay(roll_duration + present_beatmap_delay)
                     .Schedule(() => PresentRolledBeatmap(candidateItemId, gameplayItemId));
             }
