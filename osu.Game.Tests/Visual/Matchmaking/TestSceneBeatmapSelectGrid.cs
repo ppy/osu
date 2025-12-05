@@ -235,6 +235,22 @@ namespace osu.Game.Tests.Visual.Matchmaking
             });
         }
 
+        [Test]
+        public void TestRollAnimationFinalRandom()
+        {
+            AddStep("play animation", () =>
+            {
+                (long[] candidateItems, _) = pickRandomItems(5);
+
+                candidateItems = candidateItems.Append(-1).ToArray();
+                long finalItem = items.First(i => !candidateItems.Contains(i.ID)).ID;
+
+                grid.RollAndDisplayFinalBeatmap(candidateItems, -1, finalItem);
+            });
+
+            AddWaitStep("wait for animation", 10);
+        }
+
         private (long[] candidateItems, long finalItem) pickRandomItems(int count)
         {
             long[] candidateItems = items.Select(it => it.ID).ToArray();
