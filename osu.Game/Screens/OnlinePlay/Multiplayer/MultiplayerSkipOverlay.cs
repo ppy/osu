@@ -303,6 +303,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 Enabled.Value = false;
                 return true;
             }
+
+            protected override void UpdateAfterChildren()
+            {
+                base.UpdateAfterChildren();
+
+                countText.Scale = new Vector2(Math.Min(0.85f * aspect.DrawWidth / countText.DrawWidth, 1));
+            }
         }
     }
 }
