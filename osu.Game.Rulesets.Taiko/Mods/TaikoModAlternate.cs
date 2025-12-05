@@ -164,7 +164,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 return true;
             }
 
-            if (action == TaikoAction.LeftRim&& (lastAcceptedRimAction == null || lastAcceptedRimAction != TaikoAction.LeftRim))
+            if (action == TaikoAction.LeftRim && (lastAcceptedRimAction == null || lastAcceptedRimAction != TaikoAction.LeftRim))
             {
                 lastAcceptedRimAction = action;
                 return true;
