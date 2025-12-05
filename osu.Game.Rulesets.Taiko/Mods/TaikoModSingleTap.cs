@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public override bool Ranked => true;
         public override double ScoreMultiplier => 1.0;
-        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(TaikoModCinema) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(TaikoModCinema), typeof(TaikoModAlternate) };
         public override ModType Type => ModType.Conversion;
 
         private DrawableTaikoRuleset ruleset = null!;

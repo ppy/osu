@@ -159,6 +159,7 @@ namespace osu.Game.Rulesets.Taiko
                         new TaikoModClassic(),
                         new TaikoModSwap(),
                         new TaikoModSingleTap(),
+                        new TaikoModAlternate(),
                         new TaikoModConstantSpeed(),
                     };
 
