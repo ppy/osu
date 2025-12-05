@@ -50,7 +50,12 @@ namespace osu.Game.Screens.Play
         protected Circle RemainingTimeBox { get; private set; }
 
         private double displayTime;
+
+        /// <summary>
+        /// Becomes <see langword="false"/> when the overlay starts fading out.
+        /// </summary>
         private bool isClickable;
+
         private bool skipQueued;
 
         [Resolved]
