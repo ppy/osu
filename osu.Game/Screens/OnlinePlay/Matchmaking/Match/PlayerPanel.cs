@@ -542,6 +542,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             }
         }
 
+        private void onBeatmapAvailabilityChanged(MultiplayerRoomUser user, BeatmapAvailability availability) => Scheduler.Add(() =>
+        {
+            if (!user.Equals(RoomUser))
+                return;
+
+            if (availability.State == DownloadState.Downloading)
+                downloadProgressBar.FadeIn(200, Easing.OutPow10);
+            else
+                downloadProgressBar.FadeOut(200, Easing.OutPow10);
+
+            downloadProgressBar.ResizeWidthTo(availability.DownloadProgress ?? 0, 200, Easing.OutPow10);
+        });
+
         private void playJumpSample(bool rejumping)
         {
             bool isLocalUser = User.OnlineID == client.LocalUser?.UserID;
