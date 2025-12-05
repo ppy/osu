@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Play
         private OsuClickableContainer button;
 
         private ButtonContainer buttonContainer;
-        protected Circle RemainingTimeBox;
+        protected Circle RemainingTimeBox { get; private set; }
 
         private double displayTime;
         private bool isClickable;
