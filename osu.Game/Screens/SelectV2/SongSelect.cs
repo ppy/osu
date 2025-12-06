@@ -158,6 +158,8 @@ namespace osu.Game.Screens.SelectV2
         private Bindable<bool> configBackgroundBlur = null!;
         private Bindable<bool> showConvertedBeatmaps = null!;
 
+        private DependencyContainer dependencies = null!;
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)
         {
@@ -296,6 +298,8 @@ namespace osu.Game.Screens.SelectV2
                 modSelectOverlay,
             });
 
+            dependencies.Cache(filterControl);
+
             configBackgroundBlur = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur);
             configBackgroundBlur.BindValueChanged(e =>
             {
@@ -307,6 +311,9 @@ namespace osu.Game.Screens.SelectV2
 
             showConvertedBeatmaps = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
         }
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         private void requestRecommendedSelection(IEnumerable<GroupedBeatmap> groupedBeatmaps)
         {
