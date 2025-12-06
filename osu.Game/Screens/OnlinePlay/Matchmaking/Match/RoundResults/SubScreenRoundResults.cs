@@ -23,6 +23,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
+using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.RoundResults
 {
@@ -145,26 +146,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.RoundResults
         {
             public RoundResultsScorePanel(ScoreInfo score)
             {
-                AutoSizeAxes = Axes.Both;
-                InternalChild = new InstantSizingScorePanel(score);
+                Size = new Vector2(ScorePanel.CONTRACTED_WIDTH, ScorePanel.CONTRACTED_HEIGHT);
+
+                InternalChild = new ScorePanel(score);
             }
 
             public override bool PropagateNonPositionalInputSubTree => false;
             public override bool PropagatePositionalInputSubTree => false;
-
-            private partial class InstantSizingScorePanel : ScorePanel
-            {
-                public InstantSizingScorePanel(ScoreInfo score, bool isNewLocalScore = false)
-                    : base(score, isNewLocalScore)
-                {
-                }
-
-                protected override void LoadComplete()
-                {
-                    base.LoadComplete();
-                    FinishTransforms(true);
-                }
-            }
         }
 
         private partial class PanelContainer : Container<RoundResultsScorePanel>
