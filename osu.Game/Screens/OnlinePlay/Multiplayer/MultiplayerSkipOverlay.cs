@@ -68,7 +68,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onUserStateChanged(MultiplayerRoomUser user, MultiplayerUserState state) => Schedule(updateCount);
 
-        private void onUserVotedToSkipIntro(int userId) => Schedule(() =>
+        private void onUserVotedToSkipIntro(int userId, bool voted) => Schedule(() =>
         {
             FadingContent.TriggerShow();
             updateCount();
