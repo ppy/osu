@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             base.SetUpSteps();
 
-            AddStep($"Set gameplay cursor size: 1", () => LocalConfig.SetValue(OsuSetting.GameplayCursorSize, initial_cursor_size));
+            AddStep("Set gameplay cursor size: 1", () => LocalConfig.SetValue(OsuSetting.GameplayCursorSize, initial_cursor_size));
             AddStep("resume player", () => Player.GameplayClockContainer.Start());
             AddUntilStep("clock running", () => Player.GameplayClockContainer.IsRunning);
         }
