@@ -66,7 +66,7 @@ namespace osu.Game.Localisation
         [Description(@"Magyar")]
         hu,
 
-        [Description(@"Bahasa Indonesia")]
+        [Description(@"Indonesia")]
         id,
 
         [Description(@"Italiano")]
