@@ -23,6 +23,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
+using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.RoundResults
 {
@@ -31,8 +32,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.RoundResults
     /// </summary>
     public partial class SubScreenRoundResults : MatchmakingSubScreen
     {
-        private const int panel_spacing = 5;
-
         public override PanelDisplayStyle PlayersDisplayStyle => PanelDisplayStyle.Hidden;
         public override Drawable? PlayersDisplayArea => null;
 
@@ -51,7 +50,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.RoundResults
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
-        private AutoScrollContainer scrollContainer = null!;
+        private PanelContainer panelContainer = null!;
         private LoadingSpinner loadingSpinner = null!;
 
         [BackgroundDependencyLoader]
@@ -59,7 +58,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.RoundResults
         {
             InternalChildren = new Drawable[]
             {
-                scrollContainer = new AutoScrollContainer
+                panelContainer = new PanelContainer
                 {
                     RelativeSizeAxes = Axes.Both
                 },
@@ -136,78 +135,57 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.RoundResults
 
         private void setScores(ScoreInfo[] scores) => Scheduler.Add(() =>
         {
-            Container panels;
-
-            scrollContainer.Child = panels = new Container
+            panelContainer.ChildrenEnumerable = scores.Select(s => new RoundResultsScorePanel(s)
             {
-                RelativeSizeAxes = Axes.Y,
-                Width = scores.Length * (ScorePanel.CONTRACTED_WIDTH + panel_spacing),
-                ChildrenEnumerable = scores.Select(s => new RoundResultsScorePanel(s)
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft
-                })
-            };
-
-            for (int i = 0; i < panels.Count; i++)
-            {
-                panels[i].MoveToX(panels.DrawWidth * 2)
-                         .Delay(i * 100)
-                         .MoveToX((ScorePanel.CONTRACTED_WIDTH + panel_spacing) * i, 500, Easing.OutQuint);
-            }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre
+            });
         });
 
         private partial class RoundResultsScorePanel : CompositeDrawable
         {
             public RoundResultsScorePanel(ScoreInfo score)
             {
-                AutoSizeAxes = Axes.Both;
-                InternalChild = new InstantSizingScorePanel(score);
+                Size = new Vector2(ScorePanel.CONTRACTED_WIDTH, ScorePanel.CONTRACTED_HEIGHT);
+
+                InternalChild = new ScorePanel(score);
             }
 
             public override bool PropagateNonPositionalInputSubTree => false;
             public override bool PropagatePositionalInputSubTree => false;
-
-            private partial class InstantSizingScorePanel : ScorePanel
-            {
-                public InstantSizingScorePanel(ScoreInfo score, bool isNewLocalScore = false)
-                    : base(score, isNewLocalScore)
-                {
-                }
-
-                protected override void LoadComplete()
-                {
-                    base.LoadComplete();
-                    FinishTransforms(true);
-                }
-            }
         }
 
-        private partial class AutoScrollContainer : UserTrackingScrollContainer
+        private partial class PanelContainer : Container<RoundResultsScorePanel>
         {
-            private const float initial_offset = -0.5f;
-            private const double scroll_duration = 20000;
+            protected override Container<RoundResultsScorePanel> Content => flowContainer;
 
-            private double? scrollStartTime;
+            private readonly Container centreingContainer;
+            private readonly Container<RoundResultsScorePanel> flowContainer;
 
-            public AutoScrollContainer()
-                : base(Direction.Horizontal)
+            public PanelContainer()
             {
+                InternalChild = new OsuScrollContainer(Direction.Horizontal)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = centreingContainer = new Container
+                    {
+                        RelativeSizeAxes = Axes.Y,
+                        Child = flowContainer = new FillFlowContainer<RoundResultsScorePanel>
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Y,
+                            AutoSizeAxes = Axes.X,
+                            Spacing = new Vector2(5)
+                        }
+                    }
+                };
             }
 
             protected override void Update()
             {
                 base.Update();
-
-                if (!UserScrolling && Children.Count > 0)
-                {
-                    scrollStartTime ??= Time.Current;
-
-                    double scrollOffset = (Time.Current - scrollStartTime.Value) / scroll_duration;
-
-                    if (scrollOffset < 1)
-                        ScrollTo(DrawWidth * (initial_offset + scrollOffset), false);
-                }
+                centreingContainer.Width = Math.Max(DrawWidth, flowContainer.DrawWidth);
             }
         }
     }
