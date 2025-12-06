@@ -31,12 +31,10 @@ namespace osu.Game.Users.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(LargeTextureStore textures)
+        private void load(AvatarStore avatarStore, LargeTextureStore textures)
         {
             if (user != null && user.OnlineID > 1)
-                // TODO: The fallback here should not need to exist. Users should be looked up and populated via UserLookupCache or otherwise
-                // in remaining cases where this is required (chat tabs, local leaderboard), at which point this should be removed.
-                Texture = textures.Get((user as APIUser)?.AvatarUrl ?? $@"https://a.ppy.sh/{user.OnlineID}");
+                Texture = user is APIUser apiUser && apiUser.AvatarUrl != null ? avatarStore.GetUserAvatar(apiUser) : avatarStore.GetUserAvatar(user.OnlineID);
 
             Texture ??= textures.Get(@"Online/avatar-guest");
         }
