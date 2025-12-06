@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Penalize angle repetition.
                 wideAngleBonus *= 1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3));
 
-                // Apply wiggle bonus for jumps that are [radius, 3*diameter] in distance, with < 110 angle
+                // Apply wiggle bonus for jumps that are [radius, 3*diameter] in distance
                 // https://www.desmos.com/calculator/dp0v0nvowc
                 wiggleBonus = angleBonus
                               * Math.Pow(DifficultyCalculationUtils.ReverseLerp(currDistance, diameter * 3, diameter), 1.8)
@@ -212,10 +212,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
-            // Don't buff doubles jumps as you don't snap in this case (except very close to itself doubles, that need to have some distance bonus to be calculated as flow)
+            // Don't buff doubles jumps as you don't snap in this case
             double lowSpacingFactor = DifficultyCalculationUtils.ReverseLerp(smallDistanceObj.LazyJumpDistance, radius * 2, radius);
 
-            // Don't increase snap distance when previous jump is very big, as it leads to cheese being overrewarded
+            // We want to nerf only when difference between jumps is very big, as in this case the main snapping action is the bigger jump
             double bigDistanceDifferenceFactor = DifficultyCalculationUtils.ReverseLerp(biggerDistanceObj.LazyJumpDistance, diameter, diameter * 2);
 
             // And don't nerf bursts with this
