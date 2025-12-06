@@ -172,7 +172,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         private static double calculateSnappingDifficulty(double currDistance, OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuLastObj)
         {
-            const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
             // Additional reward for wide angles being hard to snap on high BPM
@@ -190,6 +189,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 highSpacingAdjust *= DifficultyCalculationUtils.ReverseLerp(currDistance, diameter * 2, diameter * 4);
 
                 angleSnapDifficultyBonus *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.Angle ?? 0, Math.PI / 3 + highSpacingAdjust, Math.PI / 2 + highSpacingAdjust);
+
+                // We need to nerf angle snap from both sides - bigger and smaller, as not snapping means angle doesn't matter
+                angleSnapDifficultyBonus *= calculateDoublesMultiplier(osuCurrObj, osuLastObj);
+                angleSnapDifficultyBonus *= calculateDoublesMultiplier(osuLastObj, osuCurrObj);
             }
 
             double bpm = DifficultyCalculationUtils.BPMToMilliseconds(osuCurrObj.AdjustedDeltaTime, 2);
@@ -198,19 +201,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Jumps need to have some spacing to be snapped
             double distanceSnapDifficultyBonus = currDistance < snapThreshold ? (snapThreshold * 0.65 + currDistance * 0.35) - currDistance : 0;
 
-            // Don't buff doubles jumps as you don't snap in this case (except very close to itself doubles, that need to have some distance bonus to be calculated as flow)
-            double lowSpacingFactor = DifficultyCalculationUtils.ReverseLerp(currDistance, radius * 2, radius);
+            // Only nerf distance for the double itself, not the big jump
+            distanceSnapDifficultyBonus *= calculateDoublesMultiplier(osuCurrObj, osuLastObj);
 
-            // Make nerf much smaller if it's not doubles
-            double notOverlappingAdjust = diameter * 2 * (1 - lowSpacingFactor);
+            return distanceSnapDifficultyBonus + angleSnapDifficultyBonus;
+        }
+
+        private static double calculateDoublesMultiplier(OsuDifficultyHitObject smallDistanceObj, OsuDifficultyHitObject biggerDistanceObj)
+        {
+            const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
+            const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
+
+            // Don't buff doubles jumps as you don't snap in this case (except very close to itself doubles, that need to have some distance bonus to be calculated as flow)
+            double lowSpacingFactor = DifficultyCalculationUtils.ReverseLerp(smallDistanceObj.LazyJumpDistance, radius * 2, radius);
 
             // Don't increase snap distance when previous jump is very big, as it leads to cheese being overrewarded
-            double bigDistanceDifferenceFactor = DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, notOverlappingAdjust + diameter, notOverlappingAdjust + diameter * 2);
+            double bigDistanceDifferenceFactor = DifficultyCalculationUtils.ReverseLerp(biggerDistanceObj.LazyJumpDistance, diameter, diameter * 2);
 
             // And don't nerf bursts with this
-            bigDistanceDifferenceFactor *= DifficultyCalculationUtils.ReverseLerpTwoDirectional(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime, 1.95, 1.5);
+            bigDistanceDifferenceFactor *= DifficultyCalculationUtils.ReverseLerpTwoDirectional(smallDistanceObj.AdjustedDeltaTime, biggerDistanceObj.AdjustedDeltaTime, 1.95, 1.5);
 
-            return (distanceSnapDifficultyBonus + angleSnapDifficultyBonus) * (1 - bigDistanceDifferenceFactor);
+            return (1 - bigDistanceDifferenceFactor * lowSpacingFactor);
         }
 
         private static double calcWideAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(40), double.DegreesToRadians(140));
