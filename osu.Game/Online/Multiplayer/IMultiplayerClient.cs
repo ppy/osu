@@ -153,7 +153,7 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// Signals that a user has requested to skip the beatmap intro.
         /// </summary>
-        Task UserVotedToSkipIntro(int userId);
+        Task UserVotedToSkipIntro(int userId, bool voted);
 
         /// <summary>
         /// Signals that the vote to skip the beatmap intro has passed.
