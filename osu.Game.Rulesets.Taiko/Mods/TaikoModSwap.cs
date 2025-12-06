@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override ModType Type => ModType.Conversion;
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModRandom)).ToArray();
+        public override bool Ranked => true;
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
