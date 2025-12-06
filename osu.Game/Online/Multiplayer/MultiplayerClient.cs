@@ -1114,7 +1114,7 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMatchmakingClient.MatchmakingItemSelected(int userId, long playlistItemId)
         {
-            Scheduler.Add(() =>
+            handleRoomRequest(() =>
             {
                 MatchmakingItemSelected?.Invoke(userId, playlistItemId);
                 RoomUpdated?.Invoke();
@@ -1125,7 +1125,7 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMatchmakingClient.MatchmakingItemDeselected(int userId, long playlistItemId)
         {
-            Scheduler.Add(() =>
+            handleRoomRequest(() =>
             {
                 MatchmakingItemDeselected?.Invoke(userId, playlistItemId);
                 RoomUpdated?.Invoke();
