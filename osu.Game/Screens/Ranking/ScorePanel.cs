@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Height of the panel when contracted.
         /// </summary>
-        private const float contracted_height = 385;
+        public const float CONTRACTED_HEIGHT = 385;
 
         /// <summary>
         /// Width of the panel when expanded.
@@ -259,7 +259,7 @@ namespace osu.Game.Screens.Ranking
                     break;
 
                 case PanelState.Contracted:
-                    Size = new Vector2(CONTRACTED_WIDTH, contracted_height);
+                    Size = new Vector2(CONTRACTED_WIDTH, CONTRACTED_HEIGHT);
 
                     topLayerBackground.FadeColour(contracted_top_layer_colour, RESIZE_DURATION, Easing.OutQuint);
                     middleLayerBackground.FadeColour(contracted_middle_layer_colour, RESIZE_DURATION, Easing.OutQuint);
