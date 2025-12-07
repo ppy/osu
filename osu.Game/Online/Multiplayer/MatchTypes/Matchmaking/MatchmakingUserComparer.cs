@@ -23,42 +23,37 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
             ArgumentNullException.ThrowIfNull(x);
             ArgumentNullException.ThrowIfNull(y);
 
-            // X appears earlier in the list if it has more points.
-            if (x.Points > y.Points)
-                return -1;
+            // Degenerate case: prefer players that have participated in more rounds.
+            int compare = y.Rounds.Count.CompareTo(x.Rounds.Count);
+            if (compare != 0)
+                return compare;
 
-            // Y appears earlier in the list if it has more points.
-            if (y.Points > x.Points)
-                return 1;
+            // Base case: players with more points win the match.
+            compare = y.Points.CompareTo(x.Points);
+            if (compare != 0)
+                return compare;
 
-            // Tiebreaker 1 (likely): From each user's point-of-view, their earliest and best placement.
+            // Tiebreaker 1: prefer players who won in earlier rounds.
             for (int r = 1; r <= rounds; r++)
             {
-                MatchmakingRound? xRound;
-                x.Rounds.RoundsDictionary.TryGetValue(r, out xRound);
+                x.Rounds.RoundsDictionary.TryGetValue(r, out var xRound);
+                y.Rounds.RoundsDictionary.TryGetValue(r, out var yRound);
 
-                MatchmakingRound? yRound;
-                y.Rounds.RoundsDictionary.TryGetValue(r, out yRound);
-
-                // Nothing to do if both players haven't played this round.
                 if (xRound == null && yRound == null)
                     continue;
 
-                // X appears later in the list if it hasn't played this round.
                 if (xRound == null)
                     return 1;
 
-                // Y appears later in the list if it hasn't played this round.
                 if (yRound == null)
                     return -1;
 
-                // X appears earlier in the list if it has a better placement in the round.
-                int compare = xRound.Placement.CompareTo(yRound.Placement);
+                compare = xRound.Placement.CompareTo(yRound.Placement);
                 if (compare != 0)
                     return compare;
             }
 
-            // Tiebreaker 2 (unlikely): User ID.
+            // Tiebreaker 2: all users have the same placement across all rounds.
             return x.UserId.CompareTo(y.UserId);
         }
     }
