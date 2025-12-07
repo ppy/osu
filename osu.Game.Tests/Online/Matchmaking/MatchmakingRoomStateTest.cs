@@ -125,6 +125,27 @@ namespace osu.Game.Tests.Online.Matchmaking
         }
 
         [Test]
+        public void RoundTieBreakerMissingRound()
+        {
+            var state = new MatchmakingRoomState();
+
+            state.AdvanceRound();
+            state.RecordScores(
+            [
+                new SoloScoreInfo { UserID = 1, TotalScore = 1000 },
+            ], placement_points);
+
+            state.AdvanceRound();
+            state.RecordScores(
+            [
+                new SoloScoreInfo { UserID = 2, TotalScore = 1000 },
+            ], placement_points);
+
+            Assert.AreEqual(1, state.Users.GetOrAdd(1).Placement);
+            Assert.AreEqual(2, state.Users.GetOrAdd(2).Placement);
+        }
+
+        [Test]
         public void UserIdTieBreaker()
         {
             var state = new MatchmakingRoomState();
@@ -148,6 +169,38 @@ namespace osu.Game.Tests.Online.Matchmaking
             Assert.AreEqual(4, state.Users.GetOrAdd(4).Placement);
             Assert.AreEqual(5, state.Users.GetOrAdd(5).Placement);
             Assert.AreEqual(6, state.Users.GetOrAdd(6).Placement);
+        }
+
+        [Test]
+        public void ParticipationLoss()
+        {
+            // Points are not relevant for this test.
+            int[] placementPoints = [0, 0];
+
+            var state = new MatchmakingRoomState();
+
+            state.AdvanceRound();
+            state.RecordScores(
+            [
+                new SoloScoreInfo { UserID = 1, TotalScore = 1000 },
+                new SoloScoreInfo { UserID = 2, TotalScore = 100 },
+            ], placementPoints);
+
+            state.AdvanceRound();
+            state.RecordScores(
+            [
+                new SoloScoreInfo { UserID = 1, TotalScore = 1000 },
+                new SoloScoreInfo { UserID = 2, TotalScore = 100 },
+            ], placementPoints);
+
+            state.AdvanceRound();
+            state.RecordScores(
+            [
+                new SoloScoreInfo { UserID = 2, TotalScore = 100 },
+            ], placementPoints);
+
+            Assert.AreEqual(1, state.Users.GetOrAdd(2).Placement);
+            Assert.AreEqual(2, state.Users.GetOrAdd(1).Placement);
         }
     }
 }
