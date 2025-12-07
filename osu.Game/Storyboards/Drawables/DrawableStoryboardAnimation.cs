@@ -89,6 +89,13 @@ namespace osu.Game.Storyboards.Drawables
             LifetimeEnd = animation.EndTimeForDisplay;
         }
 
+        // Match stable behavior with alpha values > 1 during interpolation (eg. overshoot easings like InOutElastic etc.)
+        protected override void Update()
+        {
+            base.Update();
+            if (Alpha > 1) Alpha = 0;
+        }
+        
         [Resolved]
         private ISkinSource skin { get; set; }
 
