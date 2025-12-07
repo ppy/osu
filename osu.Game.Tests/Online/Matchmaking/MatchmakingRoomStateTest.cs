@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
@@ -148,6 +149,34 @@ namespace osu.Game.Tests.Online.Matchmaking
             Assert.AreEqual(4, state.Users.GetOrAdd(4).Placement);
             Assert.AreEqual(5, state.Users.GetOrAdd(5).Placement);
             Assert.AreEqual(6, state.Users.GetOrAdd(6).Placement);
+        }
+
+        [Test]
+        public void AbandonOrder()
+        {
+            var state = new MatchmakingRoomState();
+
+            state.AdvanceRound();
+            state.RecordScores(
+            [
+                new SoloScoreInfo { UserID = 1, TotalScore = 1000 },
+                new SoloScoreInfo { UserID = 2, TotalScore = 500 },
+            ], placement_points);
+
+            Assert.AreEqual(1, state.Users.GetOrAdd(1).Placement);
+            Assert.AreEqual(2, state.Users.GetOrAdd(2).Placement);
+
+            state.Users.GetOrAdd(1).AbandonedAt = DateTimeOffset.Now;
+            state.RecordScores([], placement_points);
+
+            Assert.AreEqual(2, state.Users.GetOrAdd(1).Placement);
+            Assert.AreEqual(1, state.Users.GetOrAdd(2).Placement);
+
+            state.Users.GetOrAdd(2).AbandonedAt = DateTimeOffset.Now - TimeSpan.FromMinutes(1);
+            state.RecordScores([], placement_points);
+
+            Assert.AreEqual(1, state.Users.GetOrAdd(1).Placement);
+            Assert.AreEqual(2, state.Users.GetOrAdd(2).Placement);
         }
     }
 }
