@@ -74,6 +74,13 @@ namespace osu.Game.Storyboards.Drawables
         public override bool IsPresent
             => !float.IsNaN(DrawPosition.X) && !float.IsNaN(DrawPosition.Y) && base.IsPresent;
 
+        // Match stable behavior with alpha values > 1 during interpolation (eg. overshoot easings like InOutElastic etc.)
+        protected override void Update()
+        {
+            base.Update();
+            if (Alpha > 1) Alpha = 0;
+        }
+
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
 
