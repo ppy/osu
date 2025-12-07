@@ -36,5 +36,11 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
         /// </summary>
         [Key(3)]
         public MatchmakingRoundList Rounds { get; set; } = new MatchmakingRoundList();
+
+        /// <summary>
+        /// The time at which this user abandoned the match.
+        /// </summary>
+        [Key(4)]
+        public DateTimeOffset? AbandonedAt { get; set; }
     }
 }
