@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// A fill flow containing the player settings groups, exposed for the ability to hide it from inheritors of the player loader.
         /// </summary>
-        protected FillFlowContainer<PlayerSettingsGroup> PlayerSettings { get; private set; } = null!;
+        protected FillFlowContainer PlayerSettings { get; private set; } = null!;
 
         protected VisualSettings VisualSettings { get; private set; } = null!;
 
@@ -233,7 +233,7 @@ namespace osu.Game.Screens.Play
                     Width = SettingsToolboxGroup.CONTAINER_WIDTH + padding * 2,
                     Padding = new MarginPadding { Vertical = padding },
                     Masking = false,
-                    Child = PlayerSettings = new FillFlowContainer<PlayerSettingsGroup>
+                    Child = PlayerSettings = new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Vertical,
