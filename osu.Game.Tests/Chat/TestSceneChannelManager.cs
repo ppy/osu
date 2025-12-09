@@ -220,6 +220,31 @@ namespace osu.Game.Tests.Chat
             AddAssert("channel has no messages", () => channel.Messages, () => Is.Empty);
         }
 
+        [Test]
+        public void TestPrivateChannelsPurgedOnUserChange()
+        {
+            var pmChannel = createChannel(1002, ChannelType.PM);
+            AddStep("join a few private channels", () =>
+            {
+                channelManager.JoinChannel(createChannel(1001, ChannelType.PM));
+                channelManager.JoinChannel(createChannel(1003, ChannelType.Team));
+                channelManager.JoinChannel(pmChannel);
+            });
+            AddStep("close a PM channel", () => channelManager.LeaveChannel(pmChannel));
+
+            AddStep("switch user", () =>
+            {
+                ((DummyAPIAccess.DummyLocalUserState)API.LocalUserState).User.Value = new APIUser
+                {
+                    Id = 9009,
+                    Username = "someone_else"
+                };
+            });
+
+            AddAssert("not joined to private channels of previous user",
+                () => !channelManager.JoinedChannels.Select(ch => ch.Id).Any(id => id >= 1001 && id <= 1003));
+        }
+
         private void handlePostMessageRequest(PostMessageRequest request)
         {
             var message = new Message(++currentMessageId)
@@ -250,7 +275,7 @@ namespace osu.Game.Tests.Chat
             }
         }
 
-        private Channel createChannel(int id, ChannelType type) => new Channel(new APIUser())
+        private Channel createChannel(int id, ChannelType type) => new Channel(new APIUser { Id = id })
         {
             Id = id,
             Name = $"Channel {id}",

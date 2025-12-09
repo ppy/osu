@@ -286,6 +286,9 @@ namespace osu.Game.Screens.Menu
             if (e.Key >= Key.F1 && e.Key <= Key.F35)
                 return false;
 
+            if (e.Key >= Key.Mute && e.Key <= Key.TrackNext)
+                return false;
+
             switch (e.Key)
             {
                 case Key.Escape:
