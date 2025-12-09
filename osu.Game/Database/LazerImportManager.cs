@@ -24,6 +24,7 @@ namespace osu.Game.Database
     /// </summary>
     public class LazerImportManager
     {
+        private RealmFileStore realmFileStore;
         private readonly RealmAccess realmAccess;
         private readonly INotificationOverlay notifications;
         private readonly Storage storage;
@@ -33,6 +34,7 @@ namespace osu.Game.Database
             this.realmAccess = realmAccess;
             this.notifications = notifications;
             this.storage = storage;
+            realmFileStore = new RealmFileStore(realmAccess, storage);
         }
 
         /// <summary>
@@ -41,20 +43,6 @@ namespace osu.Game.Database
         /// <param name="sourcePath">The root directory of the source installation (containing 'client.realm' and 'files').</param>
         public async Task ImportFrom(string sourcePath)
         {
-            var filesNotification = new ProgressNotification
-            {
-                Text = "Importing files (physical)...",
-                State = ProgressNotificationState.Active
-            };
-            notifications.Post(filesNotification);
-
-            await copyFiles(filesNotification, sourcePath).ConfigureAwait(false);
-
-            filesNotification.CompletionText = "Files copied!";
-            filesNotification.State = ProgressNotificationState.Completed;
-
-            if (filesNotification.State == ProgressNotificationState.Cancelled) return;
-
             realmAccess.Write(destRealm =>
             {
                 var sourceConfig = new RealmConfiguration(Path.Combine(sourcePath, "client.realm"))
@@ -65,7 +53,7 @@ namespace osu.Game.Database
 
                 using (var sourceRealm = Realm.GetInstance(sourceConfig))
                 {
-                    importRealmFiles(sourceRealm, destRealm);
+                    copyFiles(sourceRealm, destRealm, sourcePath);
 
                     importBeatmaps(sourceRealm, destRealm);
 
@@ -78,8 +66,15 @@ namespace osu.Game.Database
             });
         }
 
-        private async Task copyFiles(ProgressNotification notification, string sourcePath)
+        private void copyFiles(Realm sourceRealm, Realm destRealm, string sourcePath)
         {
+            var notification = new ProgressNotification
+            {
+                Text = "Importing files...",
+                State = ProgressNotificationState.Active
+            };
+            notifications.Post(notification);
+
             string sourceFilesPath = Path.Combine(sourcePath, "files");
             var destFilesStorage = storage!.GetStorageForDirectory("files");
 
@@ -91,10 +86,7 @@ namespace osu.Game.Database
 
             List<string> filesToCopy;
 
-            using (var realm = Realm.GetInstance(sourceConfig))
-            {
-                filesToCopy = realm.All<RealmFile>().AsEnumerable().Select(f => f.Hash).ToList();
-            }
+            filesToCopy = sourceRealm.All<RealmFile>().AsEnumerable().Select(f => f.Hash).ToList();
 
             int total = filesToCopy.Count;
             int current = 0;
@@ -106,59 +98,23 @@ namespace osu.Game.Database
 
                 string folder1 = hash.Substring(0, 1);
                 string folder2 = hash.Substring(0, 2);
-                string relativePath = Path.Combine(folder1, folder2, hash);
+                string sourceFilePath = Path.Combine(sourceFilesPath, folder1, folder2, hash);
 
-                if (!destFilesStorage.Exists(relativePath))
+                using (var data = File.OpenRead(sourceFilePath))
                 {
-                    string sourceFilePath = Path.Combine(sourceFilesPath, folder1, folder2, hash);
-
-                    if (File.Exists(sourceFilePath))
-                    {
-                        using (var src = new FileStream(sourceFilePath, FileMode.Open, FileAccess.Read))
-                        using (var dst = destFilesStorage.CreateFileSafely(relativePath))
-                        {
-                            await src.CopyToAsync(dst).ConfigureAwait(false);
-                        }
-                    }
+                    // hardlinks don't actually work (will fix later)
+                    realmFileStore.Add(data, destRealm, preferHardLinks: true);
                 }
 
                 current++;
                 notification.Text = $"Copying files ({current}/{uniqueHashes.Count})";
                 notification.Progress = (float)current / uniqueHashes.Count;
             }
-        }
 
-        private void importRealmFiles(Realm sourceRealm, Realm destRealm)
-        {
-            var sourceFiles = sourceRealm.All<RealmFile>();
-            int total = sourceFiles.Count();
-            int current = 0;
-
-            var notification = new ProgressNotification
-            {
-                Text = "Importing file metadata...",
-                State = ProgressNotificationState.Active
-            };
-            notifications.Post(notification);
-
-            var existingHashes = new HashSet<string>(destRealm.All<RealmFile>().AsEnumerable().Select(f => f.Hash));
-            foreach (var file in sourceFiles)
-            {
-                if (notification.State == ProgressNotificationState.Cancelled) return;
-
-                if (!existingHashes.Contains(file.Hash))
-                {
-                    destRealm.Add(new RealmFile { Hash = file.Hash });
-                    existingHashes.Add(file.Hash);
-                }
-
-                current++;
-                notification.Text = $"Importing file metadata ({current} of {total})";
-                notification.Progress = (float)current / total;
-            }
-
-            notification.CompletionText = "File metadata imported!";
+            notification.CompletionText = "Files copied!";
             notification.State = ProgressNotificationState.Completed;
+
+            if (notification.State == ProgressNotificationState.Cancelled) return;
         }
 
         private void importBeatmaps(Realm sourceRealm, Realm destRealm)
