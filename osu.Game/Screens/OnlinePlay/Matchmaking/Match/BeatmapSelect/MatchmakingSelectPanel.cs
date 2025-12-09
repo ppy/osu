@@ -37,7 +37,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
         private const float border_width = 3;
 
-        private Container scaleContainer = null!;
+        protected Container ScaleContainer = null!;
         private Drawable lighting = null!;
         private Container border = null!;
 
@@ -52,7 +52,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         {
             InternalChildren = new Drawable[]
             {
-                scaleContainer = new Container
+                ScaleContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             if (AllowSelection && e.Button == MouseButton.Left)
-                scaleContainer.ScaleTo(0.95f, 400, Easing.OutExpo);
+                ScaleContainer.ScaleTo(0.95f, 400, Easing.OutExpo);
 
             return base.OnMouseDown(e);
         }
@@ -148,7 +148,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             base.OnMouseUp(e);
 
             if (e.Button == MouseButton.Left)
-                scaleContainer.ScaleTo(1f, 500, Easing.OutElasticHalf);
+                ScaleContainer.ScaleTo(1f, 500, Easing.OutElasticHalf);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -182,9 +182,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             border.FadeOut(500, Easing.OutQuint);
         }
 
+        public abstract void PresentAsChosenBeatmap(MatchmakingPlaylistItem playlistItem);
+
         public void FadeInAndEnterFromBelow(double duration = 500, double delay = 0, float distance = 200)
         {
-            scaleContainer
+            ScaleContainer
                 .FadeOut()
                 .MoveToY(distance)
                 .Delay(delay)
@@ -196,7 +198,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
         {
             AllowSelection = false;
 
-            scaleContainer.Delay(delay)
+            ScaleContainer.Delay(delay)
                           .ScaleTo(0, duration, easing)
                           .FadeOut(duration);
 

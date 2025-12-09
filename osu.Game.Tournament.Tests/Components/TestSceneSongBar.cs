@@ -5,6 +5,10 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 
@@ -52,6 +56,7 @@ namespace osu.Game.Tournament.Tests.Components
                 beatmap.ApproachRate = 6.8f;
                 beatmap.OverallDifficulty = 5.5f;
                 beatmap.StarRating = 4.56f;
+                beatmap.DrainRate = 1.23f;
                 beatmap.Length = 123456;
                 beatmap.BPM = 133;
                 beatmap.OnlineID = ladderBeatmap.OnlineID;
@@ -61,11 +66,18 @@ namespace osu.Game.Tournament.Tests.Components
 
             AddStep("set mods to HR", () => songBar.Mods = LegacyMods.HardRock);
             AddStep("set mods to DT", () => songBar.Mods = LegacyMods.DoubleTime);
+            AddStep("set mods to HDHRDT", () => songBar.Mods = LegacyMods.Hidden | LegacyMods.HardRock | LegacyMods.DoubleTime);
+
             AddStep("unset mods", () => songBar.Mods = LegacyMods.None);
 
             AddToggleStep("toggle expanded", expanded => songBar.Expanded = expanded);
 
             AddStep("set null beatmap", () => songBar.Beatmap = null);
+
+            AddStep("set ruleset to osu", () => Ruleset.Value = new OsuRuleset().RulesetInfo);
+            AddStep("set ruleset to taiko", () => Ruleset.Value = new TaikoRuleset().RulesetInfo);
+            AddStep("set ruleset to catch", () => Ruleset.Value = new CatchRuleset().RulesetInfo);
+            AddStep("set ruleset to mania", () => Ruleset.Value = new ManiaRuleset().RulesetInfo);
         }
     }
 }

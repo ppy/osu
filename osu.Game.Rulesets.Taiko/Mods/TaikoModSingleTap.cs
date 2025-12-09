@@ -29,6 +29,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override IconUsage? Icon => OsuIcon.ModSingleTap;
         public override LocalisableString Description => @"One key for dons, one key for kats.";
 
+        public override bool Ranked => true;
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(TaikoModCinema) };
         public override ModType Type => ModType.Conversion;

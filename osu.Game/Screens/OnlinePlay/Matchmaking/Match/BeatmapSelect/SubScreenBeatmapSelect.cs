@@ -13,7 +13,6 @@ using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -79,11 +78,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             beatmapSelectGrid.ItemSelected += item => client.MatchmakingToggleSelection(item.ID);
             client.MatchmakingItemSelected += onItemSelected;
             client.MatchmakingItemDeselected += onItemDeselected;
-            client.SettingsChanged += onSettingsChanged;
 
             Debug.Assert(client.Room != null);
 
-            loadItems(client.Room.Playlist.ToArray()).FireAndForget();
+            loadItems(client.Room.Playlist.Where(item => !item.Expired).ToArray()).FireAndForget();
         }
 
         private async Task loadItems(MultiplayerPlaylistItem[] items)
@@ -136,21 +134,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             beatmapSelectGrid.SetUserSelection(user, itemId, false);
         }
 
-        private void onSettingsChanged(MultiplayerRoomSettings settings)
-        {
-            if (client.Room!.MatchState is not MatchmakingRoomState matchmakingState)
-                return;
-
-            if (matchmakingState.Stage != MatchmakingStage.ServerBeatmapFinalised)
-                return;
-
-            if (matchmakingState.CandidateItem != -1)
-                return;
-
-            beatmapSelectGrid.RevealRandomItem(client.Room!.CurrentPlaylistItem);
-        }
-
-        public void RollFinalBeatmap(long[] candidateItems, long finalItem) => beatmapSelectGrid.RollAndDisplayFinalBeatmap(candidateItems, finalItem);
+        public void RollFinalBeatmap(long[] candidateItems, long candidateItem, long gameplayItem) =>
+            beatmapSelectGrid.RollAndDisplayFinalBeatmap(candidateItems, candidateItem, gameplayItem);
 
         protected override void Dispose(bool isDisposing)
         {
@@ -160,7 +145,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             {
                 client.MatchmakingItemSelected -= onItemSelected;
                 client.MatchmakingItemDeselected -= onItemDeselected;
-                client.SettingsChanged -= onSettingsChanged;
             }
         }
     }
