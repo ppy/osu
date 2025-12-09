@@ -51,6 +51,34 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestSpriteFadeOverflowBehaviour()
+        {
+            AddStep("create sprite", () => SetContents(_ =>
+            {
+                var layer = storyboard.GetLayer("Background");
+
+                var sprite = new StoryboardSprite(lookup_name, Anchor.TopLeft, new Vector2(256, 192));
+                sprite.Commands.AddAlpha(Easing.None, Time.Current, Time.Current + 2000, 0, 2);
+
+                layer.Elements.Clear();
+                layer.Add(sprite);
+
+                return new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        storyboard.CreateDrawable()
+                    }
+                };
+            }));
+
+            AddUntilStep("sprite reached high opacity once", () => sprites.All(sprite => sprite.ChildrenOfType<Sprite>().All(s => s.Alpha > 0.8f)));
+            AddUntilStep("sprite reset to low opacity", () => sprites.All(sprite => sprite.ChildrenOfType<Sprite>().All(s => s.Alpha < 0.2f)));
+            AddUntilStep("sprite reached high opacity twice", () => sprites.All(sprite => sprite.ChildrenOfType<Sprite>().All(s => s.Alpha > 0.8f)));
+        }
+
+        [Test]
         public void TestLookupFromStoryboard()
         {
             AddStep("allow storyboard lookup", () =>
