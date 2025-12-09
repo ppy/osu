@@ -25,8 +25,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(TaikoModCinema) };
         public override ModType Type => ModType.Conversion;
 
-        private const double flash_duration = 1000;
-
         private DrawableTaikoRuleset ruleset = null!;
 
         protected TaikoPlayfield Playfield { get; set; } = null!;
@@ -92,13 +90,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             if (NonGameplayPeriods.IsInAny(GameplayClock.CurrentTime))
                 return true;
 
-            if (CheckValidNewAction(action))
-            {
-                LastAcceptedAction = action;
-                return true;
-            }
-
-            return false;
+            return CheckValidNewAction(action);
         }
 
         private partial class InputInterceptor : Component, IKeyBindingHandler<TaikoAction>

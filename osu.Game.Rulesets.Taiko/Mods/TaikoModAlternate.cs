@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             if (NonGameplayPeriods.IsInAny(GameplayClock.CurrentTime))
                 return true;
 
-            var currentHitObject = Playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.Result?.HasResult != true)?.HitObject;
+            var currentHitObject = Playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.AllJudged != true)?.HitObject;
 
             // If next hit object is strong, a swell, or a drumroll, allow usage of all actions.
             // Since the player may lose place of which side they used last, we let them use either for the next note.
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             if (NonGameplayPeriods.IsInAny(GameplayClock.CurrentTime))
                 return true;
 
-            var currentHitObject = Playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.Result?.HasResult != true)?.HitObject;
+            var currentHitObject = Playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.AllJudged != true)?.HitObject;
 
             // Let players use any key on and after swells or drumrolls.
             if (currentHitObject is Swell or DrumRoll)
