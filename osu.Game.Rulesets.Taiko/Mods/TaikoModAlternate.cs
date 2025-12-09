@@ -3,28 +3,17 @@
 
 using osu.Framework.Localisation;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play;
-using osu.Game.Utils;
-using osu.Game.Rulesets.Taiko.UI;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public partial class TaikoModAlternate : Mod, IApplicableToDrawableRuleset<TaikoHitObject>, IUpdatableByPlayfield
+    public partial class TaikoModAlternate : InputBlockingMod
     {
         public override string Name => @"Alternate";
         public override string Acronym => @"AL";
@@ -32,87 +21,37 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override IconUsage? Icon => OsuIcon.ModAlternate;
 
         public override double ScoreMultiplier => 1.0;
-        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(TaikoModCinema), typeof(TaikoModSingleTap) };
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(TaikoModSingleTap) }).ToArray();
         public override ModType Type => ModType.Conversion;
         public override bool Ranked => true;
 
-        private DrawableTaikoRuleset ruleset = null!;
-
-        private TaikoPlayfield playfield { get; set; } = null!;
-
-        private TaikoAction? lastAcceptedAction { get; set; }
-        private TaikoAction? lastAcceptedCenterAction { get; set; }
-        private TaikoAction? lastAcceptedRimAction { get; set; }
-
-        /// <summary>
-        /// A tracker for periods where single tap should not be enforced (i.e. non-gameplay periods).
-        /// </summary>
-        /// <remarks>
-        /// This is different from <see cref="Player.IsBreakTime"/> in that the periods here end strictly at the first object after the break, rather than the break's end time.
-        /// </remarks>
-        private PeriodTracker nonGameplayPeriods = null!;
-
-        private IFrameStableClock gameplayClock = null!;
-
         [SettingSource("Playstyle", "Change the playstyle used to determine alternating.", 1)]
-        public Bindable<Playstyle> UserPlaystyle { get; } = new Bindable<Playstyle>(Playstyle.KDDK);
+        public Bindable<Playstyle> UserPlaystyle { get; } = new Bindable<Playstyle>();
 
-        public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
-        {
-            ruleset = (DrawableTaikoRuleset)drawableRuleset;
-            ruleset.KeyBindingInputManager.Add(new InputInterceptor(this));
-            playfield = (TaikoPlayfield)ruleset.Playfield;
-
-            var periods = new List<Period>();
-
-            if (drawableRuleset.Objects.Any())
-            {
-                periods.Add(new Period(int.MinValue, getValidJudgementTime(ruleset.Objects.First()) - 1));
-
-                foreach (BreakPeriod b in drawableRuleset.Beatmap.Breaks)
-                    periods.Add(new Period(b.StartTime, getValidJudgementTime(ruleset.Objects.First(h => h.StartTime >= b.EndTime)) - 1));
-
-                static double getValidJudgementTime(HitObject hitObject) => hitObject.StartTime - hitObject.HitWindows.WindowFor(HitResult.Ok);
-            }
-
-            nonGameplayPeriods = new PeriodTracker(periods);
-
-            gameplayClock = drawableRuleset.FrameStableClock;
-        }
-
-        public void Update(Playfield playfield)
-        {
-            if (!nonGameplayPeriods.IsInAny(gameplayClock.CurrentTime)) return;
-
-            lastAcceptedAction = null;
-            lastAcceptedCenterAction = null;
-            lastAcceptedRimAction = null;
-        }
-
-        private bool checkCorrectAction(TaikoAction action) => UserPlaystyle.Value == Playstyle.KDDK ? checkCorrectActionKDDK(action) : checkCorrectActionDDKK(action);
+        protected override bool CheckValidNewAction(TaikoAction action) => UserPlaystyle.Value == Playstyle.KDDK ? checkCorrectActionKDDK(action) : checkCorrectActionDDKK(action);
 
         private bool checkCorrectActionKDDK(TaikoAction action)
         {
-            if (nonGameplayPeriods.IsInAny(gameplayClock.CurrentTime))
+            if (NonGameplayPeriods.IsInAny(GameplayClock.CurrentTime))
                 return true;
 
-            var currentHitObject = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.Result?.HasResult != true)?.HitObject;
+            var currentHitObject = Playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.Result?.HasResult != true)?.HitObject;
 
             // If next hit object is strong, a swell, or a drumroll, allow usage of all actions.
             // Since the player may lose place of which side they used last, we let them use either for the next note.
             if (currentHitObject is Swell || currentHitObject is DrumRoll || (currentHitObject is TaikoStrongableHitObject hitObject && hitObject.IsStrong))
             {
-                lastAcceptedAction = null;
+                LastAcceptedAction = null;
                 return true;
             }
 
             switch (action)
             {
                 case TaikoAction.LeftCentre or TaikoAction.LeftRim
-                    when lastAcceptedAction == null || (lastAcceptedAction != TaikoAction.LeftCentre && lastAcceptedAction != TaikoAction.LeftRim):
+                    when LastAcceptedAction == null || (LastAcceptedAction != TaikoAction.LeftCentre && LastAcceptedAction != TaikoAction.LeftRim):
                 case TaikoAction.RightCentre or TaikoAction.RightRim
-                    when lastAcceptedAction == null || (lastAcceptedAction != TaikoAction.RightCentre && lastAcceptedAction != TaikoAction.RightRim):
-                    lastAcceptedAction = action;
+                    when LastAcceptedAction == null || (LastAcceptedAction != TaikoAction.RightCentre && LastAcceptedAction != TaikoAction.RightRim):
+                    LastAcceptedAction = action;
                     return true;
 
                 default:
@@ -122,65 +61,47 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private bool checkCorrectActionDDKK(TaikoAction action)
         {
-            if (nonGameplayPeriods.IsInAny(gameplayClock.CurrentTime))
+            if (NonGameplayPeriods.IsInAny(GameplayClock.CurrentTime))
                 return true;
 
-            var currentHitObject = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.Result?.HasResult != true)?.HitObject;
+            var currentHitObject = Playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.Result?.HasResult != true)?.HitObject;
 
             // Let players use any key on and after swells or drumrolls.
             if (currentHitObject is Swell or DrumRoll)
             {
-                lastAcceptedCenterAction = null;
-                lastAcceptedRimAction = null;
+                LastAcceptedCentreAction = null;
+                LastAcceptedRimAction = null;
 
                 return true;
             }
 
             // If the current hit object is strong, allow usage of all actions. Strong drum rolls are ignored in this check.
             // Since the player may lose place of which side they used last, we let them use either for the next note.
-            if (currentHitObject is TaikoStrongableHitObject hitObject && hitObject.IsStrong && hitObject is not DrumRoll)
+            if (currentHitObject is TaikoStrongableHitObject hitObject && hitObject.IsStrong)
             {
                 // We reset the side that was hit because the other side should not have lost its place.
                 if (action is TaikoAction.LeftCentre or TaikoAction.RightCentre)
-                    lastAcceptedCenterAction = null;
+                    LastAcceptedCentreAction = null;
                 else if (action is TaikoAction.LeftRim or TaikoAction.RightRim)
-                    lastAcceptedRimAction = null;
+                    LastAcceptedRimAction = null;
 
                 return true;
             }
 
             switch (action)
             {
-                case TaikoAction.LeftCentre when lastAcceptedCenterAction == null || lastAcceptedCenterAction != TaikoAction.LeftCentre:
-                case TaikoAction.RightCentre when lastAcceptedCenterAction == null || lastAcceptedCenterAction != TaikoAction.RightCentre:
-                    lastAcceptedCenterAction = action;
+                case TaikoAction.LeftCentre when LastAcceptedCentreAction == null || LastAcceptedCentreAction != TaikoAction.LeftCentre:
+                case TaikoAction.RightCentre when LastAcceptedCentreAction == null || LastAcceptedCentreAction != TaikoAction.RightCentre:
+                    LastAcceptedCentreAction = action;
                     return true;
 
-                case TaikoAction.LeftRim when lastAcceptedRimAction == null || lastAcceptedRimAction != TaikoAction.LeftRim:
-                case TaikoAction.RightRim when lastAcceptedRimAction == null || lastAcceptedRimAction != TaikoAction.RightRim:
-                    lastAcceptedRimAction = action;
+                case TaikoAction.LeftRim when LastAcceptedRimAction == null || LastAcceptedRimAction != TaikoAction.LeftRim:
+                case TaikoAction.RightRim when LastAcceptedRimAction == null || LastAcceptedRimAction != TaikoAction.RightRim:
+                    LastAcceptedRimAction = action;
                     return true;
 
                 default:
                     return false;
-            }
-        }
-
-        private partial class InputInterceptor : Component, IKeyBindingHandler<TaikoAction>
-        {
-            private readonly TaikoModAlternate mod;
-
-            public InputInterceptor(TaikoModAlternate mod)
-            {
-                this.mod = mod;
-            }
-
-            public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
-                // if the pressed action is incorrect, block it from reaching gameplay.
-                => !mod.checkCorrectAction(e.Action);
-
-            public void OnReleased(KeyBindingReleaseEvent<TaikoAction> e)
-            {
             }
         }
 
