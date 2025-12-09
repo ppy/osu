@@ -98,29 +98,26 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             var currentHitObject = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.Result?.HasResult != true)?.HitObject;
 
-            // If next hit object is strong or a swell, allow usage of all actions. Strong drum rolls are ignored in this check.
+            // If next hit object is strong, a swell, or a drumroll, allow usage of all actions.
             // Since the player may lose place of which side they used last, we let them use either for the next note.
-            if (currentHitObject is Swell || (currentHitObject is TaikoStrongableHitObject hitObject && hitObject.IsStrong && hitObject is not DrumRoll))
+            if (currentHitObject is Swell || currentHitObject is DrumRoll || (currentHitObject is TaikoStrongableHitObject hitObject && hitObject.IsStrong))
             {
                 lastAcceptedAction = null;
                 return true;
             }
 
-            if ((action == TaikoAction.LeftCentre || action == TaikoAction.LeftRim)
-                && (lastAcceptedAction == null || (lastAcceptedAction != TaikoAction.LeftCentre && lastAcceptedAction != TaikoAction.LeftRim)))
+            switch (action)
             {
-                lastAcceptedAction = action;
-                return true;
-            }
+                case TaikoAction.LeftCentre or TaikoAction.LeftRim
+                    when lastAcceptedAction == null || (lastAcceptedAction != TaikoAction.LeftCentre && lastAcceptedAction != TaikoAction.LeftRim):
+                case TaikoAction.RightCentre or TaikoAction.RightRim
+                    when lastAcceptedAction == null || (lastAcceptedAction != TaikoAction.RightCentre && lastAcceptedAction != TaikoAction.RightRim):
+                    lastAcceptedAction = action;
+                    return true;
 
-            if ((action == TaikoAction.RightCentre || action == TaikoAction.RightRim)
-                && (lastAcceptedAction == null || (lastAcceptedAction != TaikoAction.RightCentre && lastAcceptedAction != TaikoAction.RightRim)))
-            {
-                lastAcceptedAction = action;
-                return true;
+                default:
+                    return false;
             }
-
-            return false;
         }
 
         private bool checkCorrectActionDDKK(TaikoAction action)
@@ -130,8 +127,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             var currentHitObject = playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.Result?.HasResult != true)?.HitObject;
 
-            // Let players use any key on and after swells.
-            if (currentHitObject is Swell)
+            // Let players use any key on and after swells or drumrolls.
+            if (currentHitObject is Swell or DrumRoll)
             {
                 lastAcceptedCenterAction = null;
                 lastAcceptedRimAction = null;
@@ -152,31 +149,21 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 return true;
             }
 
-            if (action == TaikoAction.LeftCentre && (lastAcceptedCenterAction == null || lastAcceptedCenterAction != TaikoAction.LeftCentre))
+            switch (action)
             {
-                lastAcceptedCenterAction = action;
-                return true;
-            }
+                case TaikoAction.LeftCentre when lastAcceptedCenterAction == null || lastAcceptedCenterAction != TaikoAction.LeftCentre:
+                case TaikoAction.RightCentre when lastAcceptedCenterAction == null || lastAcceptedCenterAction != TaikoAction.RightCentre:
+                    lastAcceptedCenterAction = action;
+                    return true;
 
-            if (action == TaikoAction.RightCentre && (lastAcceptedCenterAction == null || lastAcceptedCenterAction != TaikoAction.RightCentre))
-            {
-                lastAcceptedCenterAction = action;
-                return true;
-            }
+                case TaikoAction.LeftRim when lastAcceptedRimAction == null || lastAcceptedRimAction != TaikoAction.LeftRim:
+                case TaikoAction.RightRim when lastAcceptedRimAction == null || lastAcceptedRimAction != TaikoAction.RightRim:
+                    lastAcceptedRimAction = action;
+                    return true;
 
-            if (action == TaikoAction.LeftRim && (lastAcceptedRimAction == null || lastAcceptedRimAction != TaikoAction.LeftRim))
-            {
-                lastAcceptedRimAction = action;
-                return true;
+                default:
+                    return false;
             }
-
-            if (action == TaikoAction.RightRim && (lastAcceptedRimAction == null || lastAcceptedRimAction != TaikoAction.RightRim))
-            {
-                lastAcceptedRimAction = action;
-                return true;
-            }
-
-            return false;
         }
 
         private partial class InputInterceptor : Component, IKeyBindingHandler<TaikoAction>
