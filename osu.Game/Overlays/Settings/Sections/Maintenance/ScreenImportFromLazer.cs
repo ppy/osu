@@ -18,6 +18,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -50,21 +51,38 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private RoundedButton importButton = null!;
         private TextFlowContainer statusText = null!;
 
+        // Checkboxes
         private OsuCheckbox checkboxBeatmaps = null!;
         private OsuCheckbox checkboxScores = null!;
         private OsuCheckbox checkboxSkins = null!;
         private OsuCheckbox checkboxCollections = null!;
-
-        private OsuSpriteText beatmapStat = null!;
-        private OsuSpriteText scoreStat = null!;
-        private OsuSpriteText skinStat = null!;
-        private OsuSpriteText collectionStat = null!;
 
         private string? validLazerPath;
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            checkboxBeatmaps = new OsuCheckbox
+            {
+                LabelText = "Beatmaps",
+                Current = { Value = false, Disabled = true }
+            };
+            checkboxScores = new OsuCheckbox
+            {
+                LabelText = "Scores",
+                Current = { Value = false, Disabled = true }
+            };
+            checkboxSkins = new OsuCheckbox
+            {
+                LabelText = "Skins",
+                Current = { Value = false, Disabled = true }
+            };
+            checkboxCollections = new OsuCheckbox
+            {
+                LabelText = "Collections",
+                Current = { Value = false, Disabled = true }
+            };
+
             InternalChildren = new Drawable[]
             {
                 new Box
@@ -146,63 +164,41 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                             {
                                                 new Box { RelativeSizeAxes = Axes.Both, Colour = colourProvider.Background5 },
 
-                                                new FillFlowContainer
+                                                new OsuScrollContainer
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
+                                                    ScrollbarVisible = true,
                                                     Padding = new MarginPadding { Top = 20, Left = 20, Right = 20, Bottom = 80 },
-                                                    Direction = FillDirection.Vertical,
-                                                    Spacing = new Vector2(0, 10),
-                                                    Children = new Drawable[]
+                                                    Child = new FillFlowContainer
                                                     {
-                                                        new OsuSpriteText
+                                                        RelativeSizeAxes = Axes.X,
+                                                        AutoSizeAxes = Axes.Y,
+                                                        Direction = FillDirection.Vertical,
+                                                        Spacing = new Vector2(0, 10),
+                                                        Children = new Drawable[]
                                                         {
-                                                            Text = "Import Options",
-                                                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
-                                                            Colour = colourProvider.Content1
-                                                        },
+                                                            new OsuSpriteText
+                                                            {
+                                                                Text = "Import Options",
+                                                                Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                                                                Colour = colourProvider.Content1
+                                                            },
 
-                                                        new Box { RelativeSizeAxes = Axes.X, Height = 1, Colour = colourProvider.Light4, Margin = new MarginPadding { Vertical = 5 } },
+                                                            new Box { RelativeSizeAxes = Axes.X, Height = 1, Colour = colourProvider.Light4, Margin = new MarginPadding { Vertical = 5 } },
 
-                                                        checkboxBeatmaps = new OsuCheckbox
-                                                        {
-                                                            LabelText = "Beatmaps",
-                                                            Current = { Value = true }
-                                                        },
-                                                        checkboxScores = new OsuCheckbox
-                                                        {
-                                                            LabelText = "Scores",
-                                                            Current = { Value = true }
-                                                        },
-                                                        checkboxSkins = new OsuCheckbox
-                                                        {
-                                                            LabelText = "Skins",
-                                                            Current = { Value = true }
-                                                        },
-                                                        checkboxCollections = new OsuCheckbox
-                                                        {
-                                                            LabelText = "Collections",
-                                                            Current = { Value = true }
-                                                        },
+                                                            checkboxBeatmaps,
+                                                            checkboxScores,
+                                                            checkboxSkins,
+                                                            checkboxCollections,
 
-                                                        new Box { RelativeSizeAxes = Axes.X, Height = 1, Colour = colourProvider.Light4, Margin = new MarginPadding { Vertical = 10 } },
+                                                            new Box { RelativeSizeAxes = Axes.X, Height = 1, Colour = colourProvider.Light4, Margin = new MarginPadding { Vertical = 10 } },
 
-                                                        new OsuSpriteText
-                                                        {
-                                                            Text = "Found Data",
-                                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
-                                                            Colour = colourProvider.Content1
-                                                        },
-
-                                                        beatmapStat = new OsuSpriteText { Text = "Beatmaps: -", Font = OsuFont.GetFont(size: 14), Colour = colourProvider.Content2 },
-                                                        scoreStat = new OsuSpriteText { Text = "Scores: -", Font = OsuFont.GetFont(size: 14), Colour = colourProvider.Content2 },
-                                                        skinStat = new OsuSpriteText { Text = "Skins: -", Font = OsuFont.GetFont(size: 14), Colour = colourProvider.Content2 },
-                                                        collectionStat = new OsuSpriteText { Text = "Collections: -", Font = OsuFont.GetFont(size: 14), Colour = colourProvider.Content2 },
-
-                                                        statusText = new TextFlowContainer
-                                                        {
-                                                            RelativeSizeAxes = Axes.X,
-                                                            AutoSizeAxes = Axes.Y,
-                                                            Colour = colours.Red1
+                                                            statusText = new TextFlowContainer
+                                                            {
+                                                                RelativeSizeAxes = Axes.X,
+                                                                AutoSizeAxes = Axes.Y,
+                                                                Colour = colours.Red1
+                                                            }
                                                         }
                                                     }
                                                 },
@@ -238,7 +234,8 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             importButton.Enabled.Value = false;
             statusText.Text = "Checking...";
-            resetStats();
+
+            resetLabels();
             validLazerPath = null;
 
             Task.Run(() =>
@@ -270,13 +267,11 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         Schedule(() =>
                         {
                             statusText.Text = "";
-                            beatmapStat.Text = $"Beatmaps: {countMaps:N0}";
-                            scoreStat.Text = $"Scores: {countScores:N0}";
-                            skinStat.Text = $"Skins: {countSkins:N0}";
-                            collectionStat.Text = $"Collections: {countCollections:N0}";
 
-                            beatmapStat.Colour = countMaps > 0 ? colourProvider.Content1 : colourProvider.Content2;
-                            scoreStat.Colour = countScores > 0 ? colourProvider.Content1 : colourProvider.Content2;
+                            updateCheckbox(checkboxBeatmaps, "Beatmaps", countMaps);
+                            updateCheckbox(checkboxScores, "Scores", countScores);
+                            updateCheckbox(checkboxSkins, "Skins", countSkins);
+                            updateCheckbox(checkboxCollections, "Collections", countCollections);
 
                             validLazerPath = proposedPath;
                             importButton.Enabled.Value = true;
@@ -291,12 +286,47 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             });
         }
 
-        private void resetStats()
+        private void resetLabels()
         {
-            beatmapStat.Text = "Beatmaps: -";
-            scoreStat.Text = "Scores: -";
-            skinStat.Text = "Skins: -";
-            collectionStat.Text = "Collections: -";
+            checkboxBeatmaps.Current.Disabled = false;
+            checkboxScores.Current.Disabled = false;
+            checkboxSkins.Current.Disabled = false;
+            checkboxCollections.Current.Disabled = false;
+
+            checkboxBeatmaps.LabelText = "Beatmaps";
+            checkboxScores.LabelText = "Scores";
+            checkboxSkins.LabelText = "Skins";
+            checkboxCollections.LabelText = "Collections";
+
+            checkboxBeatmaps.Current.Value = false;
+            checkboxScores.Current.Value = false;
+            checkboxSkins.Current.Value = false;
+            checkboxCollections.Current.Value = false;
+
+            checkboxBeatmaps.Current.Disabled = true;
+            checkboxScores.Current.Disabled = true;
+            checkboxSkins.Current.Disabled = true;
+            checkboxCollections.Current.Disabled = true;
+        }
+
+        private void updateCheckbox(OsuCheckbox checkbox, string name, int count)
+        {
+            checkbox.Current.Disabled = false;
+
+            if (count > 0)
+            {
+                checkbox.LabelText = $"{name} ({count:N0})";
+                checkbox.Current.Value = true;
+                checkbox.Alpha = 1;
+            }
+            else
+            {
+                checkbox.LabelText = $"{name} (None found)";
+                checkbox.Current.Value = false;
+
+                checkbox.Current.Disabled = true;
+                checkbox.Alpha = 0.5f;
+            }
         }
 
         private void startImport()
@@ -307,6 +337,13 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             bool importScores = checkboxScores.Current.Value;
             bool importSkins = checkboxSkins.Current.Value;
             bool importCollections = checkboxCollections.Current.Value;
+
+            if (!importBeatmaps && !importScores && !importSkins && !importCollections)
+            {
+                statusText.Text = "Please select at least one item to import.";
+                statusText.FadeIn(100).Then().Delay(2000).FadeOut(500);
+                return;
+            }
 
             var lazerImportManager = new LazerImportManager(realmAccess, notifications, storage);
 
