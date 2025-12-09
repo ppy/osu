@@ -131,7 +131,7 @@ namespace osu.Game.Online.Multiplayer
         public event Action<int, long>? MatchmakingItemDeselected;
         public event Action<MatchRoomState>? MatchRoomStateChanged;
 
-        public event Action<int>? UserVotedToSkipIntro;
+        public event Action<int, bool>? UserVotedToSkipIntro;
         public event Action? VoteToSkipIntroPassed;
 
         public event Action<MultiplayerRoomUser, BeatmapAvailability>? BeatmapAvailabilityChanged;
@@ -854,10 +854,6 @@ namespace osu.Game.Online.Multiplayer
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
-
-                foreach (var user in Room.Users)
-                    user.VotedToSkipIntro = false;
-
                 GameplayStarted?.Invoke();
             });
 
@@ -928,7 +924,7 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
-        Task IMultiplayerClient.UserVotedToSkipIntro(int userId)
+        Task IMultiplayerClient.UserVotedToSkipIntro(int userId, bool voted)
         {
             handleRoomRequest(() =>
             {
@@ -940,9 +936,8 @@ namespace osu.Game.Online.Multiplayer
                 if (user == null)
                     return;
 
-                user.VotedToSkipIntro = true;
-
-                UserVotedToSkipIntro?.Invoke(userId);
+                user.VotedToSkipIntro = voted;
+                UserVotedToSkipIntro?.Invoke(userId, voted);
             });
 
             return Task.CompletedTask;
