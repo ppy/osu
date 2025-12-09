@@ -89,13 +89,19 @@ namespace osu.Game.Storyboards.Drawables
             LifetimeEnd = animation.EndTimeForDisplay;
         }
 
-        // Match stable behavior with alpha values > 1 during interpolation (eg. overshoot easings like InOutElastic etc.)
         protected override void Update()
         {
             base.Update();
+
+            // In stable, alpha transforms exceeding values of 1 would result in sprites disappearing from view.
+            // Over the years, storyboard(ers) have taken advantage of this to create "flicker" patterns.
+            // This is quite a common technique, so we are reproducing it here for now.
+            //
+            // NOTE TO FUTURE VISTIORS: If we do ever update the storyboard spec, we may want to move such flicker effects to their
+            // own transform type, and make this a legacy behaviour. It feels very flimsy.
             if (Alpha > 1) Alpha = 0;
         }
-        
+
         [Resolved]
         private ISkinSource skin { get; set; }
 
