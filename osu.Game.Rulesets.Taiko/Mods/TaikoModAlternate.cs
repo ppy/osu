@@ -28,13 +28,16 @@ namespace osu.Game.Rulesets.Taiko.Mods
         [SettingSource("Playstyle", "Change the playstyle used to determine alternating.", 1)]
         public Bindable<Playstyle> UserPlaystyle { get; } = new Bindable<Playstyle>();
 
-        protected override bool CheckValidNewAction(TaikoAction action) => UserPlaystyle.Value == Playstyle.KDDK ? checkCorrectActionKDDK(action) : checkCorrectActionDDKK(action);
-
-        private bool checkCorrectActionKDDK(TaikoAction action)
+        protected override bool CheckValidNewAction(TaikoAction action)
         {
             if (NonGameplayPeriods.IsInAny(GameplayClock.CurrentTime))
                 return true;
 
+            return UserPlaystyle.Value == Playstyle.KDDK ? checkCorrectActionKDDK(action) : checkCorrectActionDDKK(action);
+        }
+
+        private bool checkCorrectActionKDDK(TaikoAction action)
+        {
             var currentHitObject = Playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.AllJudged != true)?.HitObject;
 
             // If next hit object is strong, a swell, or a drumroll, allow usage of all actions.
@@ -61,9 +64,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private bool checkCorrectActionDDKK(TaikoAction action)
         {
-            if (NonGameplayPeriods.IsInAny(GameplayClock.CurrentTime))
-                return true;
-
             var currentHitObject = Playfield.HitObjectContainer.AliveObjects.FirstOrDefault(h => h.AllJudged != true)?.HitObject;
 
             // Let players use any key on and after swells or drumrolls.
