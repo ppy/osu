@@ -50,6 +50,11 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private RoundedButton importButton = null!;
         private TextFlowContainer statusText = null!;
 
+        private OsuCheckbox checkboxBeatmaps = null!;
+        private OsuCheckbox checkboxScores = null!;
+        private OsuCheckbox checkboxSkins = null!;
+        private OsuCheckbox checkboxCollections = null!;
+
         private OsuSpriteText beatmapStat = null!;
         private OsuSpriteText scoreStat = null!;
         private OsuSpriteText skinStat = null!;
@@ -154,6 +159,29 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                                             Text = "Import Options",
                                                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
                                                             Colour = colourProvider.Content1
+                                                        },
+
+                                                        new Box { RelativeSizeAxes = Axes.X, Height = 1, Colour = colourProvider.Light4, Margin = new MarginPadding { Vertical = 5 } },
+
+                                                        checkboxBeatmaps = new OsuCheckbox
+                                                        {
+                                                            LabelText = "Beatmaps",
+                                                            Current = { Value = true }
+                                                        },
+                                                        checkboxScores = new OsuCheckbox
+                                                        {
+                                                            LabelText = "Scores",
+                                                            Current = { Value = true }
+                                                        },
+                                                        checkboxSkins = new OsuCheckbox
+                                                        {
+                                                            LabelText = "Skins",
+                                                            Current = { Value = true }
+                                                        },
+                                                        checkboxCollections = new OsuCheckbox
+                                                        {
+                                                            LabelText = "Collections",
+                                                            Current = { Value = true }
                                                         },
 
                                                         new Box { RelativeSizeAxes = Axes.X, Height = 1, Colour = colourProvider.Light4, Margin = new MarginPadding { Vertical = 10 } },
@@ -275,6 +303,11 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         {
             if (validLazerPath == null || storage == null) return;
 
+            bool importBeatmaps = checkboxBeatmaps.Current.Value;
+            bool importScores = checkboxScores.Current.Value;
+            bool importSkins = checkboxSkins.Current.Value;
+            bool importCollections = checkboxCollections.Current.Value;
+
             var lazerImportManager = new LazerImportManager(realmAccess, notifications, storage);
 
             string sourcePath = validLazerPath;
@@ -284,7 +317,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             {
                 try
                 {
-                    await lazerImportManager.ImportFrom(sourcePath).ConfigureAwait(false);
+                    await lazerImportManager.ImportFrom(sourcePath, importBeatmaps, importScores, importSkins, importCollections).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {

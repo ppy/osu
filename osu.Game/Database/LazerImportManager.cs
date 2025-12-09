@@ -41,7 +41,11 @@ namespace osu.Game.Database
         /// Imports content from a separate osu!lazer data directory.
         /// </summary>
         /// <param name="sourcePath">The root directory of the source installation (containing 'client.realm' and 'files').</param>
-        public async Task ImportFrom(string sourcePath)
+        /// <param name="shouldImportBeatmaps">Whether to import beatmaps or not</param>
+        /// <param name="shouldImportScores">Whether to import scores or not</param>
+        /// <param name="shouldImportSkins">Whether to import skins or not</param>
+        /// <param name="shouldImportCollections">Whether to import collections or not</param>
+        public Task ImportFrom(string sourcePath, bool shouldImportBeatmaps, bool shouldImportScores, bool shouldImportSkins, bool shouldImportCollections)
         {
             realmAccess.Write(destRealm =>
             {
@@ -53,17 +57,27 @@ namespace osu.Game.Database
 
                 using (var sourceRealm = Realm.GetInstance(sourceConfig))
                 {
-                    copyFiles(sourceRealm, destRealm, sourcePath);
+                    // only copy files that rely on files
+                    if (shouldImportBeatmaps || shouldImportScores || shouldImportSkins)
+                    {
+                        copyFiles(sourceRealm, destRealm, sourcePath);
+                    }
 
-                    importBeatmaps(sourceRealm, destRealm);
+                    if (shouldImportBeatmaps)
+                        importBeatmaps(sourceRealm, destRealm);
 
-                    importScores(sourceRealm, destRealm);
+                    if (shouldImportScores)
+                        importScores(sourceRealm, destRealm);
 
-                    importSkins(sourceRealm, destRealm);
+                    if (shouldImportScores)
+                        importSkins(sourceRealm, destRealm);
 
-                    importCollections(sourceRealm, destRealm);
+                    if (shouldImportCollections)
+                        importCollections(sourceRealm, destRealm);
                 }
             });
+
+            return Task.CompletedTask;
         }
 
         private void copyFiles(Realm sourceRealm, Realm destRealm, string sourcePath)
