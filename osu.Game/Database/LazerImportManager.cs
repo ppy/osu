@@ -57,10 +57,46 @@ namespace osu.Game.Database
 
                 using (var sourceRealm = Realm.GetInstance(sourceConfig))
                 {
-                    // only copy files that rely on files
-                    if (shouldImportBeatmaps || shouldImportScores || shouldImportSkins)
+                    // gather files to copy over
+                    var filesToImport = new HashSet<string>();
+
+                    if (shouldImportBeatmaps)
                     {
-                        copyFiles(sourceRealm, destRealm, sourcePath);
+                        var beatmaps = sourceRealm.All<BeatmapSetInfo>();
+                        foreach (var b in beatmaps)
+                        {
+                            if (!string.IsNullOrEmpty(b.Hash) && b.Hash.Length >= 2)
+                                filesToImport.Add(b.Hash);
+
+                            foreach (var f in b.Files)
+                                filesToImport.Add(f.File.Hash);
+                        }
+                    }
+
+                    if (shouldImportScores)
+                    {
+                        var scores = sourceRealm.All<ScoreInfo>();
+                        foreach (var s in scores)
+                        {
+                            if (!string.IsNullOrEmpty(s.Hash) && s.Hash.Length >= 2)
+                                filesToImport.Add(s.Hash);
+
+                            foreach (var f in s.Files)
+                                filesToImport.Add(f.File.Hash);
+                        }
+                    }
+
+                    if (shouldImportSkins)
+                    {
+                        var skins = sourceRealm.All<SkinInfo>();
+                        foreach (var s in skins)
+                            foreach (var f in s.Files)
+                                filesToImport.Add(f.File.Hash);
+                    }
+
+                    if (filesToImport.Count > 0)
+                    {
+                        copyFiles(destRealm, sourcePath, filesToImport);
                     }
 
                     if (shouldImportBeatmaps)
@@ -69,7 +105,7 @@ namespace osu.Game.Database
                     if (shouldImportScores)
                         importScores(sourceRealm, destRealm);
 
-                    if (shouldImportScores)
+                    if (shouldImportSkins)
                         importSkins(sourceRealm, destRealm);
 
                     if (shouldImportCollections)
@@ -80,7 +116,7 @@ namespace osu.Game.Database
             return Task.CompletedTask;
         }
 
-        private void copyFiles(Realm sourceRealm, Realm destRealm, string sourcePath)
+        private void copyFiles(Realm destRealm, string sourcePath, HashSet<string> filesToCopy)
         {
             var notification = new ProgressNotification
             {
@@ -90,23 +126,11 @@ namespace osu.Game.Database
             notifications.Post(notification);
 
             string sourceFilesPath = Path.Combine(sourcePath, "files");
-            var destFilesStorage = storage!.GetStorageForDirectory("files");
 
-            var sourceConfig = new RealmConfiguration(Path.Combine(sourcePath, "client.realm"))
-            {
-                IsReadOnly = true,
-                SchemaVersion = RealmAccess.schema_version
-            };
-
-            List<string> filesToCopy;
-
-            filesToCopy = sourceRealm.All<RealmFile>().AsEnumerable().Select(f => f.Hash).ToList();
-
-            int total = filesToCopy.Count;
             int current = 0;
-            var uniqueHashes = new HashSet<string>(filesToCopy);
+            int total = filesToCopy.Count;
 
-            foreach (string hash in uniqueHashes)
+            foreach (string hash in filesToCopy)
             {
                 if (notification.State == ProgressNotificationState.Cancelled) return;
 
@@ -114,21 +138,21 @@ namespace osu.Game.Database
                 string folder2 = hash.Substring(0, 2);
                 string sourceFilePath = Path.Combine(sourceFilesPath, folder1, folder2, hash);
 
-                using (var data = File.OpenRead(sourceFilePath))
+                if (File.Exists(sourceFilePath))
                 {
-                    // hardlinks don't actually work (will fix later)
-                    realmFileStore.Add(data, destRealm, preferHardLinks: true);
+                    using (var data = File.OpenRead(sourceFilePath))
+                    {
+                        realmFileStore.Add(data, destRealm, preferHardLinks: true);
+                    }
                 }
 
                 current++;
-                notification.Text = $"Copying files ({current}/{uniqueHashes.Count})";
-                notification.Progress = (float)current / uniqueHashes.Count;
+                notification.Text = $"Copying files ({current}/{total})";
+                notification.Progress = (float)current / total;
             }
 
             notification.CompletionText = "Files copied!";
             notification.State = ProgressNotificationState.Completed;
-
-            if (notification.State == ProgressNotificationState.Cancelled) return;
         }
 
         private void importBeatmaps(Realm sourceRealm, Realm destRealm)
@@ -151,7 +175,6 @@ namespace osu.Game.Database
             {
                 if (notification.State == ProgressNotificationState.Cancelled) return;
 
-                // early return if beatmap (ID) already exists
                 if (existingIDs.Contains(set.ID))
                 {
                     current++;
@@ -212,7 +235,6 @@ namespace osu.Game.Database
             {
                 if (notification.State == ProgressNotificationState.Cancelled) return;
 
-                // early return if score (ID) already exists
                 if (existingIDs.Contains(score.ID))
                 {
                     current++;
@@ -278,7 +300,6 @@ namespace osu.Game.Database
             {
                 if (notification.State == ProgressNotificationState.Cancelled) return;
 
-                // early return if skin (ID) already exists
                 if (existingIDs.Contains(skin.ID))
                 {
                     current++;
@@ -369,7 +390,5 @@ namespace osu.Game.Database
             notification.CompletionText = "Collections imported!";
             notification.State = ProgressNotificationState.Completed;
         }
-
-
     }
 }
