@@ -603,7 +603,7 @@ namespace osu.Game.Online.API
             cancellationToken.Cancel();
         }
 
-        private class WebRequestFlushedException : Exception
+        internal class WebRequestFlushedException : Exception
         {
             public WebRequestFlushedException(APIState state)
                 : base($@"Request failed from flush operation (state {state})")

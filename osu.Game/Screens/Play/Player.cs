@@ -320,7 +320,7 @@ namespace osu.Game.Screens.Play
                     OnRetry = Configuration.AllowUserInteraction ? () => Restart() : null,
                     OnQuit = () => PerformExitWithConfirmation(),
                 },
-                new HotkeyExitOverlay
+                exitOverlay = new HotkeyExitOverlay
                 {
                     Action = () =>
                     {
@@ -338,7 +338,7 @@ namespace osu.Game.Screens.Play
             {
                 rulesetSkinProvider.AddRange(new Drawable[]
                 {
-                    new HotkeyRetryOverlay
+                    retryOverlay = new HotkeyRetryOverlay
                     {
                         Action = () =>
                         {
@@ -1033,6 +1033,9 @@ namespace osu.Game.Screens.Play
 
         private double? lastPauseActionTime;
 
+        private HotkeyRetryOverlay retryOverlay;
+        private HotkeyExitOverlay exitOverlay;
+
         protected bool PauseCooldownActive =>
             PlayingState.Value == LocalUserPlayingState.Playing && lastPauseActionTime.HasValue && GameplayClockContainer.CurrentTime < lastPauseActionTime + PauseCooldownDuration;
 
@@ -1169,7 +1172,13 @@ namespace osu.Game.Screens.Play
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
+            Debug.Assert(!ValidForResume);
+
             screenSuspension?.RemoveAndDisposeImmediately();
+
+            // If these are not disposed, audio volume dimming can get stuck.
+            retryOverlay?.RemoveAndDisposeImmediately();
+            exitOverlay?.RemoveAndDisposeImmediately();
 
             fadeOut();
             base.OnSuspending(e);

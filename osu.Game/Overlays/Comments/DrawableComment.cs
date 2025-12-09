@@ -20,13 +20,11 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Comments.Buttons;
 using osu.Game.Overlays.Dialog;
-using osu.Game.Overlays.OSD;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
@@ -83,10 +81,7 @@ namespace osu.Game.Overlays.Comments
         private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private Clipboard clipboard { get; set; } = null!;
-
-        [Resolved]
-        private OnScreenDisplay? onScreenDisplay { get; set; }
+        private OsuGame? game { get; set; }
 
         public DrawableComment(Comment comment, IReadOnlyList<CommentableMeta> meta)
         {
@@ -329,7 +324,7 @@ namespace osu.Game.Overlays.Comments
             if (WasDeleted)
                 makeDeleted();
 
-            actionsContainer.AddLink(CommonStrings.ButtonsPermalink, copyUrl);
+            actionsContainer.AddLink(CommonStrings.ButtonsPermalink, () => game?.CopyToClipboard($@"{api.Endpoints.APIUrl}/comments/{Comment.Id}"));
             actionsContainer.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
             actionsContainer.AddLink(CommonStrings.ButtonsReply.ToLower(), toggleReply);
             actionsContainer.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
@@ -415,12 +410,6 @@ namespace osu.Game.Overlays.Comments
                 actionsContainer.Show();
             });
             api.Queue(request);
-        }
-
-        private void copyUrl()
-        {
-            clipboard.SetText($@"{api.Endpoints.APIUrl}/comments/{Comment.Id}");
-            onScreenDisplay?.Display(new CopiedToClipboardToast());
         }
 
         private void toggleReply()
