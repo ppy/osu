@@ -15,7 +15,9 @@ using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Tests.Resources;
 using osuTK;
 
@@ -188,6 +190,40 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
 
             Assert.IsInstanceOf(typeof(JsonBeatmapDecoder), decoder);
+        }
+
+        [Test]
+        public void TestGenericBeatmap()
+        {
+            var converted = new OsuBeatmapConverter(decodeAsJson(normal), new OsuRuleset()).Convert();
+
+            var processor = new OsuBeatmapProcessor(converted);
+
+            processor.PreProcess();
+            foreach (var o in converted.HitObjects)
+                o.ApplyDefaults(converted.ControlPointInfo, converted.Difficulty);
+            processor.PostProcess();
+
+            var beatmap = converted.Serialize().Deserialize<Beatmap<OsuHitObject>>();
+
+            var slider = beatmap.HitObjects[0] as Slider;
+
+            Assert.IsNotNull(slider);
+            Assert.AreEqual(90, slider.Path.Distance);
+            Assert.AreEqual(new Vector2(192, 168), slider.Position);
+            Assert.AreEqual(956, beatmap.HitObjects[0].StartTime);
+            Assert.IsTrue(beatmap.HitObjects[0].Samples.Any(s => s.Name == HitSampleInfo.HIT_NORMAL));
+
+            var circle = beatmap.HitObjects[1] as HitCircle;
+
+            Assert.IsNotNull(circle);
+            Assert.AreEqual(new Vector2(304, 56), circle.Position);
+            Assert.AreEqual(1285, beatmap.HitObjects[1].StartTime);
+            Assert.IsTrue(beatmap.HitObjects[1].Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP));
+
+            var taikoBeatmap = converted.Serialize().Deserialize<Beatmap<TaikoHitObject>>();
+
+            Assert.IsEmpty(taikoBeatmap.HitObjects);
         }
 
         /// <summary>
