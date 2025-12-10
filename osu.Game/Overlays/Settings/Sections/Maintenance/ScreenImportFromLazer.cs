@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private SettingsCheckbox checkboxSkins = null!;
         private SettingsCheckbox checkboxCollections = null!;
 
-        private string? validLazerPath;
+        private string? fullLazerPath;
 
         private const float duration = 300;
         private const float button_height = 50;
@@ -201,11 +201,11 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             statusText.Text = "Checking...";
 
             resetLabels();
-            validLazerPath = null;
+            fullLazerPath = null;
 
             Task.Run(() =>
             {
-                string proposedPath = directory.FullName;
+                string proposedPath = Path.GetFullPath(directory.FullName);
                 string realmPath = Path.Combine(proposedPath, "client.realm");
 
                 if (!File.Exists(realmPath))
@@ -238,7 +238,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                             updateCheckbox(checkboxSkins, "Skins", countSkins);
                             updateCheckbox(checkboxCollections, "Collections", countCollections);
 
-                            validLazerPath = proposedPath;
+                            fullLazerPath = proposedPath;
                             importButton.Enabled.Value = true;
                         });
                     }
@@ -296,7 +296,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         private void startImport()
         {
-            if (validLazerPath == null || storage == null) return;
+            if (fullLazerPath == null || storage == null) return;
 
             bool importBeatmaps = checkboxBeatmaps.Current.Value;
             bool importScores = checkboxScores.Current.Value;
@@ -312,14 +312,13 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             var lazerImportManager = new LazerImportManager(realmAccess, notifications, storage);
 
-            string sourcePath = validLazerPath;
             this.Exit();
 
             Task.Run(async () =>
             {
                 try
                 {
-                    await lazerImportManager.ImportFrom(sourcePath, importBeatmaps, importScores, importSkins, importCollections).ConfigureAwait(false);
+                    await lazerImportManager.ImportFrom(fullLazerPath, importBeatmaps, importScores, importSkins, importCollections).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
