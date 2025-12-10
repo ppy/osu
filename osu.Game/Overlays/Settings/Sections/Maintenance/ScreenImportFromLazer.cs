@@ -9,7 +9,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -20,7 +19,6 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Scoring;
 using osu.Game.Screens;
@@ -32,6 +30,8 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
     public partial class ScreenImportFromLazer : OsuScreen
     {
+        public override bool HideOverlaysOnEnter => true;
+
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
@@ -47,178 +47,129 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
+        private Container contentContainer = null!;
         private DirectorySelector directorySelector = null!;
         private RoundedButton importButton = null!;
         private TextFlowContainer statusText = null!;
 
-        // Checkboxes
-        private OsuCheckbox checkboxBeatmaps = null!;
-        private OsuCheckbox checkboxScores = null!;
-        private OsuCheckbox checkboxSkins = null!;
-        private OsuCheckbox checkboxCollections = null!;
+        private SettingsCheckbox checkboxBeatmaps = null!;
+        private SettingsCheckbox checkboxScores = null!;
+        private SettingsCheckbox checkboxSkins = null!;
+        private SettingsCheckbox checkboxCollections = null!;
 
         private string? validLazerPath;
+
+        private const float duration = 300;
+        private const float button_height = 50;
+        private const float button_vertical_margin = 15;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            checkboxBeatmaps = new OsuCheckbox
+            checkboxBeatmaps = new SettingsCheckbox
             {
                 LabelText = "Beatmaps",
                 Current = { Value = false, Disabled = true }
             };
-            checkboxScores = new OsuCheckbox
+            checkboxScores = new SettingsCheckbox
             {
                 LabelText = "Scores",
                 Current = { Value = false, Disabled = true }
             };
-            checkboxSkins = new OsuCheckbox
+            checkboxSkins = new SettingsCheckbox
             {
                 LabelText = "Skins",
                 Current = { Value = false, Disabled = true }
             };
-            checkboxCollections = new OsuCheckbox
+            checkboxCollections = new SettingsCheckbox
             {
                 LabelText = "Collections",
                 Current = { Value = false, Disabled = true }
             };
 
-            InternalChildren = new Drawable[]
+            InternalChild = contentContainer = new Container
             {
-                new Box
+                Masking = true,
+                CornerRadius = 10,
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Size = new Vector2(0.9f, 0.8f),
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background4,
-                },
-                new GridContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    RowDimensions = new[]
+                    directorySelector = new OsuDirectorySelector
                     {
-                        new Dimension(GridSizeMode.Absolute, 80),
-                        new Dimension(),
+                        RelativeSizeAxes = Axes.Both,
+                        Width = 0.65f,
                     },
-                    Content = new[]
+                    new Container
                     {
-                        new Drawable[]
+                        RelativeSizeAxes = Axes.Both,
+                        Width = 0.35f,
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        Children = new Drawable[]
                         {
+                            new Box
+                            {
+                                Colour = colourProvider.Background4,
+                                RelativeSizeAxes = Axes.Both
+                            },
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Horizontal = 20 },
-                                Children = new Drawable[]
+                                Padding = new MarginPadding { Bottom = button_height + button_vertical_margin * 2 },
+                                Child = new OsuScrollContainer
                                 {
-                                    new OsuSpriteText
+                                    RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding { Top = 20, Left = 20, Right = 20 },
+                                    Child = new FillFlowContainer
                                     {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Text = "Import from osu!lazer",
-                                        Font = OsuFont.Torus.With(size: 24, weight: FontWeight.SemiBold),
-                                        Colour = colourProvider.Content1,
-                                    },
-                                    new IconButton
-                                    {
-                                        Anchor = Anchor.CentreRight,
-                                        Origin = Anchor.CentreRight,
-                                        Icon = FontAwesome.Solid.Times,
-                                        Action = this.Exit,
-                                        TooltipText = "Back"
-                                    }
-                                }
-                            }
-                        },
-                        new Drawable[]
-                        {
-                            new GridContainer
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Horizontal = 30, Bottom = 30 },
-                                ColumnDimensions = new[]
-                                {
-                                    new Dimension(GridSizeMode.Distributed, 0.6f),
-                                    new Dimension(GridSizeMode.Absolute, 20),
-                                    new Dimension(GridSizeMode.Distributed, 0.4f),
-                                },
-                                Content = new[]
-                                {
-                                    new Drawable[]
-                                    {
-                                        new Container
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Direction = FillDirection.Vertical,
+                                        Spacing = new Vector2(0, 5),
+                                        Children = new Drawable[]
                                         {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Masking = true,
-                                            CornerRadius = 10,
-                                            Children = new Drawable[]
+                                            new OsuSpriteText
                                             {
-                                                new Box { RelativeSizeAxes = Axes.Both, Colour = colourProvider.Background3 },
-                                                directorySelector = new OsuDirectorySelector { RelativeSizeAxes = Axes.Both }
-                                            }
-                                        },
-                                        null!,
-                                        new Container
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Masking = true,
-                                            CornerRadius = 10,
-                                            Children = new Drawable[]
+                                                Text = "Import Options",
+                                                Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                                                Colour = colourProvider.Content1,
+                                                Margin = new MarginPadding { Bottom = 10 }
+                                            },
+                                            checkboxBeatmaps,
+                                            checkboxScores,
+                                            checkboxSkins,
+                                            checkboxCollections,
+                                            new Box
                                             {
-                                                new Box { RelativeSizeAxes = Axes.Both, Colour = colourProvider.Background5 },
-
-                                                new OsuScrollContainer
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    ScrollbarVisible = true,
-                                                    Padding = new MarginPadding { Top = 20, Left = 20, Right = 20, Bottom = 80 },
-                                                    Child = new FillFlowContainer
-                                                    {
-                                                        RelativeSizeAxes = Axes.X,
-                                                        AutoSizeAxes = Axes.Y,
-                                                        Direction = FillDirection.Vertical,
-                                                        Spacing = new Vector2(0, 10),
-                                                        Children = new Drawable[]
-                                                        {
-                                                            new OsuSpriteText
-                                                            {
-                                                                Text = "Import Options",
-                                                                Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
-                                                                Colour = colourProvider.Content1
-                                                            },
-
-                                                            new Box { RelativeSizeAxes = Axes.X, Height = 1, Colour = colourProvider.Light4, Margin = new MarginPadding { Vertical = 5 } },
-
-                                                            checkboxBeatmaps,
-                                                            checkboxScores,
-                                                            checkboxSkins,
-                                                            checkboxCollections,
-
-                                                            new Box { RelativeSizeAxes = Axes.X, Height = 1, Colour = colourProvider.Light4, Margin = new MarginPadding { Vertical = 10 } },
-
-                                                            statusText = new TextFlowContainer
-                                                            {
-                                                                RelativeSizeAxes = Axes.X,
-                                                                AutoSizeAxes = Axes.Y,
-                                                                Colour = colours.Red1
-                                                            }
-                                                        }
-                                                    }
-                                                },
-
-                                                importButton = new RoundedButton
-                                                {
-                                                    Anchor = Anchor.BottomCentre,
-                                                    Origin = Anchor.BottomCentre,
-                                                    RelativeSizeAxes = Axes.X,
-                                                    Width = 0.9f,
-                                                    Height = 50,
-                                                    Margin = new MarginPadding { Bottom = 20 },
-                                                    Text = "Start Import",
-                                                    Action = startImport,
-                                                    Enabled = { Value = false }
-                                                }
+                                                RelativeSizeAxes = Axes.X,
+                                                Height = 1,
+                                                Colour = colourProvider.Light4,
+                                                Margin = new MarginPadding { Vertical = 10 }
+                                            },
+                                            statusText = new TextFlowContainer
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Colour = colours.Red1
                                             }
                                         }
                                     }
                                 }
+                            },
+                            importButton = new RoundedButton
+                            {
+                                Text = "Start Import",
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.BottomCentre,
+                                RelativeSizeAxes = Axes.X,
+                                Height = button_height,
+                                Width = 0.9f,
+                                Margin = new MarginPadding { Bottom = button_vertical_margin },
+                                Action = startImport,
+                                Enabled = { Value = false }
                             }
                         }
                     }
@@ -226,6 +177,20 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             };
 
             directorySelector.CurrentPath.BindValueChanged(e => validatePath(e.NewValue), true);
+        }
+
+        public override void OnEntering(ScreenTransitionEvent e)
+        {
+            base.OnEntering(e);
+            contentContainer.ScaleTo(0.95f).ScaleTo(1, duration, Easing.OutQuint);
+            this.FadeInFromZero(duration);
+        }
+
+        public override bool OnExiting(ScreenExitEvent e)
+        {
+            contentContainer.ScaleTo(0.95f, duration, Easing.OutQuint);
+            this.FadeOut(duration, Easing.OutQuint);
+            return base.OnExiting(e);
         }
 
         private void validatePath(DirectoryInfo directory)
@@ -309,7 +274,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             checkboxCollections.Current.Disabled = true;
         }
 
-        private void updateCheckbox(OsuCheckbox checkbox, string name, int count)
+        private void updateCheckbox(SettingsCheckbox checkbox, string name, int count)
         {
             checkbox.Current.Disabled = false;
 
