@@ -64,26 +64,16 @@ namespace osu.Game.Database
                     {
                         var beatmaps = sourceRealm.All<BeatmapSetInfo>();
                         foreach (var b in beatmaps)
-                        {
-                            if (!string.IsNullOrEmpty(b.Hash) && b.Hash.Length >= 2)
-                                filesToImport.Add(b.Hash);
-
                             foreach (var f in b.Files)
                                 filesToImport.Add(f.File.Hash);
-                        }
                     }
 
                     if (shouldImportScores)
                     {
                         var scores = sourceRealm.All<ScoreInfo>();
                         foreach (var s in scores)
-                        {
-                            if (!string.IsNullOrEmpty(s.Hash) && s.Hash.Length >= 2)
-                                filesToImport.Add(s.Hash);
-
                             foreach (var f in s.Files)
                                 filesToImport.Add(f.File.Hash);
-                        }
                     }
 
                     if (shouldImportSkins)
