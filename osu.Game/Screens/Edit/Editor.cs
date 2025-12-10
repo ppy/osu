@@ -181,6 +181,8 @@ namespace osu.Game.Screens.Edit
 
         private BottomBar bottomBar;
 
+        private RulesetEditorMenuBarItems rulesetMenuBarItems;
+
         [CanBeNull] // Should be non-null once it can support custom rulesets.
         private EditorChangeHandler changeHandler;
 
@@ -327,9 +329,6 @@ namespace osu.Game.Screens.Edit
             var bookmarkController = new BookmarkController();
             AddInternal(bookmarkController);
 
-            OsuMenuItem undoMenuItem;
-            OsuMenuItem redoMenuItem;
-
             editorBackgroundDim = config.GetBindable<float>(OsuSetting.EditorDim);
             editorShowStoryboard = config.GetBindable<bool>(OsuSetting.EditorShowStoryboard);
             editorHitMarkers = config.GetBindable<bool>(OsuSetting.EditorShowHitMarkers);
@@ -351,6 +350,8 @@ namespace osu.Game.Screens.Edit
                 if (enabled.NewValue)
                     editorAutoSeekOnPlacement.Value = false;
             });
+
+            AddInternal(rulesetMenuBarItems = editorBeatmap.BeatmapInfo.Ruleset.CreateInstance().CreateEditorMenuBarItems());
 
             AddInternal(new OsuContextMenuContainer
             {
@@ -388,72 +389,15 @@ namespace osu.Game.Screens.Edit
                                     },
                                     new MenuItem(CommonStrings.MenuBarEdit)
                                     {
-                                        Items = new[]
-                                        {
-                                            undoMenuItem = new EditorMenuItem(CommonStrings.Undo, MenuItemType.Standard, Undo) { Hotkey = new Hotkey(PlatformAction.Undo) },
-                                            redoMenuItem = new EditorMenuItem(CommonStrings.Redo, MenuItemType.Standard, Redo) { Hotkey = new Hotkey(PlatformAction.Redo) },
-                                            new OsuMenuItemSpacer(),
-                                            cutMenuItem = new EditorMenuItem(CommonStrings.Cut, MenuItemType.Standard, Cut) { Hotkey = new Hotkey(PlatformAction.Cut) },
-                                            copyMenuItem = new EditorMenuItem(CommonStrings.Copy, MenuItemType.Standard, Copy) { Hotkey = new Hotkey(PlatformAction.Copy) },
-                                            pasteMenuItem = new EditorMenuItem(CommonStrings.Paste, MenuItemType.Standard, Paste) { Hotkey = new Hotkey(PlatformAction.Paste) },
-                                            cloneMenuItem = new EditorMenuItem(CommonStrings.Clone, MenuItemType.Standard, Clone) { Hotkey = new Hotkey(GlobalAction.EditorCloneSelection) },
-                                        }
+                                        Items = createEditMenuItems().ToList(),
                                     },
                                     new MenuItem(CommonStrings.MenuBarView)
                                     {
-                                        Items = new[]
-                                        {
-                                            new MenuItem(EditorStrings.Timeline)
-                                            {
-                                                Items =
-                                                [
-                                                    new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
-                                                    new ToggleMenuItem(EditorStrings.TimelineShowTimingChanges)
-                                                    {
-                                                        State = { BindTarget = editorTimelineShowTimingChanges }
-                                                    },
-                                                    new ToggleMenuItem(EditorStrings.TimelineShowTicks)
-                                                    {
-                                                        State = { BindTarget = editorTimelineShowTicks }
-                                                    },
-                                                    new ToggleMenuItem(EditorStrings.TimelineShowBreaks)
-                                                    {
-                                                        State = { BindTarget = editorTimelineShowBreaks }
-                                                    },
-                                                ]
-                                            },
-                                            new OsuMenuItemSpacer(),
-                                            new BackgroundDimMenuItem(editorBackgroundDim),
-                                            new ToggleMenuItem("Show storyboard")
-                                            {
-                                                State = { BindTarget = editorShowStoryboard },
-                                            },
-                                            new OsuMenuItemSpacer(),
-                                            new ToggleMenuItem(EditorStrings.ShowHitMarkers)
-                                            {
-                                                State = { BindTarget = editorHitMarkers },
-                                            },
-                                            new ToggleMenuItem(EditorStrings.AutoSeekOnPlacement)
-                                            {
-                                                State = { BindTarget = editorAutoSeekOnPlacement },
-                                            },
-                                            new ToggleMenuItem(EditorStrings.LimitedDistanceSnap)
-                                            {
-                                                State = { BindTarget = editorLimitedDistanceSnap },
-                                            },
-                                            new ToggleMenuItem(EditorStrings.ContractSidebars)
-                                            {
-                                                State = { BindTarget = editorContractSidebars }
-                                            },
-                                        }
+                                        Items = createViewMenuItems(config).ToList(),
                                     },
                                     new MenuItem(EditorStrings.Timing)
                                     {
-                                        Items = new MenuItem[]
-                                        {
-                                            new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime),
-                                            bookmarkController.Menu,
-                                        }
+                                        Items = createTimingMenuItems(bookmarkController).ToList(),
                                     }
                                 }
                             },
@@ -470,9 +414,6 @@ namespace osu.Game.Screens.Edit
                     MutationTracker,
                 }
             });
-
-            changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
-            changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
             editorBackgroundDim.BindValueChanged(_ => setUpBackground());
         }
@@ -1323,6 +1264,99 @@ namespace osu.Game.Screens.Edit
 
             yield return new OsuMenuItemSpacer();
             yield return new EditorMenuItem(CommonStrings.Exit, MenuItemType.Standard, this.Exit);
+
+            foreach (var item in createRulesetMenuItems(EditorMenuBarItemType.File))
+                yield return item;
+        }
+
+        private IEnumerable<MenuItem> createEditMenuItems()
+        {
+            OsuMenuItem undoMenuItem = new EditorMenuItem(CommonStrings.Undo, MenuItemType.Standard, Undo) { Hotkey = new Hotkey(PlatformAction.Undo) };
+            OsuMenuItem redoMenuItem = new EditorMenuItem(CommonStrings.Redo, MenuItemType.Standard, Redo) { Hotkey = new Hotkey(PlatformAction.Redo) };
+
+            changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
+            changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
+
+            yield return undoMenuItem;
+            yield return redoMenuItem;
+            yield return new OsuMenuItemSpacer();
+            yield return cutMenuItem = new EditorMenuItem(CommonStrings.Cut, MenuItemType.Standard, Cut) { Hotkey = new Hotkey(PlatformAction.Cut) };
+            yield return copyMenuItem = new EditorMenuItem(CommonStrings.Copy, MenuItemType.Standard, Copy) { Hotkey = new Hotkey(PlatformAction.Copy) };
+            yield return pasteMenuItem = new EditorMenuItem(CommonStrings.Paste, MenuItemType.Standard, Paste) { Hotkey = new Hotkey(PlatformAction.Paste) };
+            yield return cloneMenuItem = new EditorMenuItem(CommonStrings.Clone, MenuItemType.Standard, Clone) { Hotkey = new Hotkey(GlobalAction.EditorCloneSelection) };
+
+            foreach (var item in createRulesetMenuItems(EditorMenuBarItemType.Edit))
+                yield return item;
+        }
+
+        private IEnumerable<MenuItem> createViewMenuItems(OsuConfigManager config)
+        {
+            yield return new MenuItem(EditorStrings.Timeline)
+            {
+                Items =
+                [
+                    new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
+                    new ToggleMenuItem(EditorStrings.TimelineShowTimingChanges)
+                    {
+                        State = { BindTarget = editorTimelineShowTimingChanges }
+                    },
+                    new ToggleMenuItem(EditorStrings.TimelineShowTicks)
+                    {
+                        State = { BindTarget = editorTimelineShowTicks }
+                    },
+                    new ToggleMenuItem(EditorStrings.TimelineShowBreaks)
+                    {
+                        State = { BindTarget = editorTimelineShowBreaks }
+                    },
+                ]
+            };
+            yield return new OsuMenuItemSpacer();
+            yield return new BackgroundDimMenuItem(editorBackgroundDim);
+            yield return new ToggleMenuItem("Show storyboard")
+            {
+                State = { BindTarget = editorShowStoryboard },
+            };
+            yield return new OsuMenuItemSpacer();
+            yield return new ToggleMenuItem(EditorStrings.ShowHitMarkers)
+            {
+                State = { BindTarget = editorHitMarkers },
+            };
+            yield return new ToggleMenuItem(EditorStrings.AutoSeekOnPlacement)
+            {
+                State = { BindTarget = editorAutoSeekOnPlacement },
+            };
+            yield return new ToggleMenuItem(EditorStrings.LimitedDistanceSnap)
+            {
+                State = { BindTarget = editorLimitedDistanceSnap },
+            };
+            yield return new ToggleMenuItem(EditorStrings.ContractSidebars)
+            {
+                State = { BindTarget = editorContractSidebars }
+            };
+
+            foreach (var item in createRulesetMenuItems(EditorMenuBarItemType.View))
+                yield return item;
+        }
+
+        private IEnumerable<MenuItem> createTimingMenuItems(BookmarkController bookmarkController)
+        {
+            yield return new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime);
+            yield return bookmarkController.Menu;
+
+            foreach (var item in createRulesetMenuItems(EditorMenuBarItemType.Timing))
+                yield return item;
+        }
+
+        private IEnumerable<MenuItem> createRulesetMenuItems(EditorMenuBarItemType type)
+        {
+            var menuItems = rulesetMenuBarItems.CreateMenuItems(type).ToList();
+
+            // Ruleset-specific menu items should always be separated by a spacer from the default ones
+            if (menuItems.Count > 0)
+                yield return new OsuMenuItemSpacer();
+
+            foreach (var menuItem in menuItems)
+                yield return menuItem;
         }
 
         private EditorMenuItem createExportMenu()
