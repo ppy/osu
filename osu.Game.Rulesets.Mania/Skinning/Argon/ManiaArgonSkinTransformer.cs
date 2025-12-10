@@ -57,6 +57,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                                 if (spectatorList != null)
                                     spectatorList.Position = new Vector2(36, -66);
+
+                                foreach (var d in container.OfType<ISerialisableDrawable>())
+                                    d.UsesFixedAnchor = true;
                             })
                             {
                                 new DrawableGameplayLeaderboard(),
