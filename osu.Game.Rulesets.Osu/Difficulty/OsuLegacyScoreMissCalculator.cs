@@ -16,14 +16,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private readonly ScoreInfo score;
         private readonly OsuDifficultyAttributes attributes;
 
-        private readonly bool scoreV2;
-
         public OsuLegacyScoreMissCalculator(ScoreInfo scoreInfo, OsuDifficultyAttributes attributes)
         {
             score = scoreInfo;
             this.attributes = attributes;
-
-            scoreV2 = score.Mods.Any(m => m is ModScoreV2);
         }
 
         public double Calculate()
@@ -31,32 +27,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (attributes.MaxCombo == 0 || score.LegacyTotalScore == null)
                 return 0;
 
-            // Start from mod multiplier
-            double scoreMultiplier = getLegacyModMultiplier();
-
-            // We need to get only combo portion of ScoreV2, since this is rescaled ScoreV1 we need to compute misscount
-            double scoreLegacyTotalScore = score.LegacyTotalScore.Value - (scoreV2 ? 300000 * Math.Pow(score.Accuracy, 10) * scoreMultiplier : 0);
-
-            // Add base multiplier. We do it for ScoreV2 as well, since we would scale by maximum score anyway
-            scoreMultiplier *= attributes.LegacyScoreBaseMultiplier;
-
+            double scoreV1Multiplier = attributes.LegacyScoreBaseMultiplier * getLegacyScoreMultiplier();
             double relevantComboPerObject = calculateRelevantScoreComboPerObject();
+
             double maximumMissCount = calculateMaximumComboBasedMissCount();
 
-            double scoreObtainedDuringMaxCombo = calculateScoreAtCombo(score.MaxCombo, relevantComboPerObject, scoreMultiplier);
-
-            // If ScoreV2 - we scale it by maximum score. Don't multiply max score by mod multiplier, since we need to keep mod multiplier in the score
-            if (scoreV2) scoreObtainedDuringMaxCombo *= 700000 / attributes.MaximumLegacyComboScore;
-
-            double remainingScore = scoreLegacyTotalScore - scoreObtainedDuringMaxCombo;
+            double scoreObtainedDuringMaxCombo = calculateScoreAtCombo(score.MaxCombo, relevantComboPerObject, scoreV1Multiplier);
+            double remainingScore = score.LegacyTotalScore.Value - scoreObtainedDuringMaxCombo;
 
             if (remainingScore <= 0)
                 return maximumMissCount;
 
             double remainingCombo = attributes.MaxCombo - score.MaxCombo;
-            double expectedRemainingScore = calculateScoreAtCombo(remainingCombo, relevantComboPerObject, scoreMultiplier);
-
-            if (scoreV2) expectedRemainingScore *= 700000 / attributes.MaximumLegacyComboScore;
+            double expectedRemainingScore = calculateScoreAtCombo(remainingCombo, relevantComboPerObject, scoreV1Multiplier);
 
             double scoreBasedMissCount = expectedRemainingScore / remainingScore;
 
@@ -86,19 +69,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double comboScore = relevantComboPerObject > 0 ? (2 * (relevantComboPerObject - 1) + (estimatedObjects - 1) * relevantComboPerObject) * estimatedObjects / 2 : 0;
 
             // We then apply the accuracy and ScoreV1 multipliers to the resulting score.
-            comboScore *= scoreV1Multiplier * 300 / 25;
-
-            // For scoreV2 we need only combo score not scaled by accuracy.
-            // This is technically incorrect because scoreV2 is using different formula,
-            // but we have to sacrifice estimation precision, since it's not as important here.
-            if (scoreV2) return comboScore;
+            comboScore *= score.Accuracy * 300 / 25 * scoreV1Multiplier;
 
             double objectsHit = (totalHits - countMiss) * combo / attributes.MaxCombo;
 
             // Score also has a non-combo portion we need to create the final score value.
-            double nonComboScore = (300 + attributes.NestedScorePerObject) * objectsHit;
+            double nonComboScore = (300 + attributes.NestedScorePerObject) * score.Accuracy * objectsHit;
 
-            return (comboScore + nonComboScore) * score.Accuracy;
+            return comboScore + nonComboScore;
         }
 
         /// <summary>
@@ -166,8 +144,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// <remarks>
         /// Logic copied from <see cref="OsuLegacyScoreSimulator.GetLegacyScoreMultiplier"/>.
         /// </remarks>
-        private double getLegacyModMultiplier()
+        private double getLegacyScoreMultiplier()
         {
+            bool scoreV2 = score.Mods.Any(m => m is ModScoreV2);
+
             double multiplier = 1.0;
 
             foreach (var mod in score.Mods)
