@@ -228,7 +228,7 @@ namespace osu.Game.Overlays
 
         private void onSeek(double progress)
         {
-            if (lastSeekTime == null || Time.Current - lastSeekTime > TRACK_DRAG_SEEK_DEBOUNCE)
+            if (!musicController.IsPlaying || lastSeekTime == null || Time.Current - lastSeekTime > TRACK_DRAG_SEEK_DEBOUNCE)
             {
                 musicController.SeekTo(progress);
                 lastSeekTime = Time.Current;
