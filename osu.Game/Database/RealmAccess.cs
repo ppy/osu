@@ -38,6 +38,7 @@ using osu.Game.Utils;
 using osuTK.Input;
 using Realms;
 using Realms.Exceptions;
+using FileInfo = System.IO.FileInfo;
 
 namespace osu.Game.Database
 {
