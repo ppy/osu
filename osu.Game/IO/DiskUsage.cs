@@ -25,7 +25,7 @@ namespace osu.Game.IO
             if (!Directory.Exists(checkPath))
                 throw new DirectoryNotFoundException($"The directory '{checkPath}' does not exist or could not be found.");
 
-            string? validPathRoot = Path.GetPathRoot(checkPath);
+            string? validPathRoot = Path.GetFullPath(checkPath);
 
             if (string.IsNullOrEmpty(validPathRoot))
                 throw new IOException($"The directory '{checkPath}' is not a valid path.");
@@ -35,7 +35,7 @@ namespace osu.Game.IO
             long availableFreeSpace = activeDriveInfo.AvailableFreeSpace;
 
 #if DEBUG
-            Logger.Log($"Available disk space: {availableFreeSpace / 1048576L} MiB");
+            Logger.Log($"Available disk space for ({validPathRoot}): {availableFreeSpace / 1048576L} MiB");
 #endif
 
             if (availableFreeSpace < requiredSpace)
