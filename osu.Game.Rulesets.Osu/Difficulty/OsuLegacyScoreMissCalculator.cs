@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private readonly ScoreInfo score;
         private readonly OsuDifficultyAttributes attributes;
 
-        private bool scoreV2;
+        private readonly bool scoreV2;
 
         public OsuLegacyScoreMissCalculator(ScoreInfo scoreInfo, OsuDifficultyAttributes attributes)
         {
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double comboScore = relevantComboPerObject > 0 ? (2 * (relevantComboPerObject - 1) + (estimatedObjects - 1) * relevantComboPerObject) * estimatedObjects / 2 : 0;
 
             // We then apply the accuracy and ScoreV1 multipliers to the resulting score.
-            comboScore *= 300 / 25 * scoreV1Multiplier;
+            comboScore *= scoreV1Multiplier * 300 / 25;
 
             // For scoreV2 we need only combo score not scaled by accuracy.
             // This is technically incorrect because scoreV2 is using different formula,
