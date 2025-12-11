@@ -24,6 +24,7 @@ using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Notifications.WebSocket;
@@ -33,6 +34,7 @@ using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Toolbar;
+using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Configuration;
@@ -1329,6 +1331,34 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("nothing selected", () => Game.Beatmap.IsDefault);
             AddStep("present deleted beatmap", () => Game.PresentBeatmap(beatmap));
             AddAssert("still nothing selected", () => Game.Beatmap.IsDefault);
+        }
+
+        [Test]
+        public void TestVolumeMeterDragDoesNotDismissFocusedOverlay()
+        {
+            AddStep("show beatmap overlay", () => Game.ShowBeatmapSet(1));
+            AddUntilStep("beatmap overlay still visible",
+                () => Game.ChildrenOfType<BeatmapSetOverlay>().SingleOrDefault()?.State.Value,
+                () => Is.EqualTo(Visibility.Visible));
+            AddStep("set game volume to max", () => Game.Dependencies.Get<FrameworkConfigManager>().SetValue(FrameworkSetting.VolumeUniversal, 1d));
+            AddStep("move to centre", () => InputManager.MoveMouseTo(Game));
+            AddStep("alt-scroll down", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.ScrollVerticalBy(-1);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+            AddUntilStep("wait for volume overlay to show", () => Game.ChildrenOfType<VolumeOverlay>().SingleOrDefault()?.State.Value, () => Is.EqualTo(Visibility.Visible));
+            AddStep("start dragging meter", () =>
+            {
+                InputManager.MoveMouseTo(Game.ChildrenOfType<VolumeMeter>().First().ChildrenOfType<OsuSpriteText>().First());
+                InputManager.PressButton(MouseButton.Left);
+            });
+            AddStep("drag away", () => InputManager.MoveMouseTo(Game.ChildrenOfType<VolumeMeter>().First().ChildrenOfType<OsuSpriteText>().First(), new Vector2(0, -100)));
+            AddStep("release mouse", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddAssert("beatmap overlay still visible",
+                () => Game.ChildrenOfType<BeatmapSetOverlay>().SingleOrDefault()?.State.Value,
+                () => Is.EqualTo(Visibility.Visible));
         }
 
         private Func<Player> playToResults()
