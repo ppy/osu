@@ -18,21 +18,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private bool scoreV2;
 
-        private int countGreat;
-        private int countOk;
-        private int countMeh;
-        private int countMiss;
-
         public OsuLegacyScoreMissCalculator(ScoreInfo scoreInfo, OsuDifficultyAttributes attributes)
         {
             score = scoreInfo;
             this.attributes = attributes;
 
             scoreV2 = score.Mods.Any(m => m is ModScoreV2);
-            countGreat = score.Statistics.GetValueOrDefault(HitResult.Great);
-            countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
-            countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
-            countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
         }
 
         public double Calculate()
@@ -81,6 +72,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         private double calculateScoreAtCombo(double combo, double relevantComboPerObject, double scoreV1Multiplier)
         {
+            int countGreat = score.Statistics.GetValueOrDefault(HitResult.Great);
+            int countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
+            int countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
+            int countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
+
+            int totalHits = countGreat + countOk + countMeh + countMiss;
+
             double estimatedObjects = combo / relevantComboPerObject - 1;
 
             // The combo portion of ScoreV1 follows arithmetic progression
@@ -127,8 +125,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         private double calculateMaximumComboBasedMissCount()
         {
+            int countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
+
             if (attributes.SliderCount <= 0)
                 return countMiss;
+
+            int countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
+            int countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
 
             int totalImperfectHits = countOk + countMeh + countMiss;
 
@@ -213,7 +216,5 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return multiplier;
         }
-
-        private int totalHits => countGreat + countOk + countMeh + countMiss;
     }
 }
