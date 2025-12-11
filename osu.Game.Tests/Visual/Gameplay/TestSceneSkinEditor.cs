@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -376,6 +377,23 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("three hit error meters present",
                 () => skinEditor.ChildrenOfType<SkinBlueprint>().Count(b => b.Item is BarHitErrorMeter),
                 () => Is.EqualTo(3));
+        }
+
+        [Test]
+        public void TestCopyPasteIdempotency()
+        {
+            string state = null!;
+            AddStep("select everything", () => InputManager.Keys(PlatformAction.SelectAll));
+            AddStep("dump state", () =>
+            {
+                state = JsonConvert.SerializeObject(skinEditor.SelectedComponents.Cast<Drawable>().Select(s => s.CreateSerialisedInfo()).ToArray());
+            });
+            AddStep("copy", () => InputManager.Keys(PlatformAction.Copy));
+            AddStep("delete", () => InputManager.Keys(PlatformAction.Delete));
+            AddStep("paste", () => InputManager.Keys(PlatformAction.Paste));
+            AddAssert("pasted state equals dumped",
+                () => JsonConvert.SerializeObject(skinEditor.SelectedComponents.Cast<Drawable>().Select(s => s.CreateSerialisedInfo()).ToArray()),
+                () => Is.EqualTo(state));
         }
 
         private SkinnableContainer globalHUDTarget => Player.ChildrenOfType<SkinnableContainer>()
