@@ -39,7 +39,7 @@ namespace osu.Game.IO
 #endif
 
             if (availableFreeSpace < requiredSpace)
-                throw new IOException($"Insufficient disk space available! Required: {requiredSpace} | Available: {availableFreeSpace}");
+                throw new IOException($"Insufficient disk space available! Required: {requiredSpace / 1048576L} MiB | Available: {availableFreeSpace / 1048576L} MiB");
         }
 
         public static Task EnsureSufficientSpaceAsync(string checkDirectory, long requiredSpace = required_space_default)
