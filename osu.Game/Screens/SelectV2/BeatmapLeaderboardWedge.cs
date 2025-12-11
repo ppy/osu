@@ -407,15 +407,27 @@ namespace osu.Game.Screens.SelectV2
 
         private LeaderboardState displayedState;
 
+        private ScheduledDelegate? loadingShowDelegate;
+
         protected void SetState(LeaderboardState state)
         {
             if (state == displayedState)
                 return;
 
             if (state == LeaderboardState.Retrieving)
-                loading.Show();
+            {
+                // Slight delay so this doesn't display for a few silly frames for local score retrievals.
+                loadingShowDelegate ??= Scheduler.AddDelayed(() => loading.Show(), 200);
+            }
             else
+            {
+                loadingShowDelegate?.Cancel();
+                loadingShowDelegate = null;
+
                 loading.Hide();
+            }
+
+            loading.Hide();
 
             displayedState = state;
 
