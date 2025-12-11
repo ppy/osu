@@ -42,9 +42,9 @@ namespace osu.Game.IO
                 throw new IOException($"Insufficient disk space available! Required: {requiredSpace} | Available: {availableFreeSpace}");
         }
 
-        public static async Task EnsureSufficientSpaceAsync(string checkDirectory, long requiredSpace = required_space_default)
+        public static Task EnsureSufficientSpaceAsync(string checkDirectory, long requiredSpace = required_space_default)
         {
-            await Task.Run(() => EnsureSufficientSpace(checkDirectory, requiredSpace)).ConfigureAwait(false);
+            return Task.Run(() => EnsureSufficientSpace(checkDirectory, requiredSpace));
         }
     }
 }
