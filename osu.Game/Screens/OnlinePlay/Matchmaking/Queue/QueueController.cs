@@ -169,6 +169,20 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             {
                 Text = "Searching for opponents...";
 
+                Activated = () =>
+                {
+                    performer?.PerformFromScreen(s =>
+                    {
+                        if (s is ScreenIntro || s is ScreenQueue)
+                            return;
+
+                        s.Push(new ScreenIntro());
+                    }, [typeof(ScreenIntro), typeof(ScreenQueue)]);
+
+                    // Closed when appropriate by SearchInForeground().
+                    return false;
+                };
+
                 CompletionClickAction = () =>
                 {
                     client.MatchmakingAcceptInvitation().FireAndForget();
