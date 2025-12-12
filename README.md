@@ -4,69 +4,67 @@
 
 # osu!
 
-[![Build status](https://github.com/ppy/osu/actions/workflows/ci.yml/badge.svg?branch=master&event=push)](https://github.com/ppy/osu/actions/workflows/ci.yml)
+[![Build status](https://github.com/ppy/osu/actions/workflows/ci.yml/badge.svg?branch=master\&event=push)](https://github.com/ppy/osu/actions/workflows/ci.yml)
 [![GitHub release](https://img.shields.io/github/release/ppy/osu.svg)](https://github.com/ppy/osu/releases/latest)
 [![CodeFactor](https://www.codefactor.io/repository/github/ppy/osu/badge)](https://www.codefactor.io/repository/github/ppy/osu)
-[![dev chat](https://discordapp.com/api/guilds/188630481301012481/widget.png?style=shield)](https://discord.gg/ppy)
+[![dev chat](https://discord.com/api/guilds/188630481301012481/widget.png?style=shield)](https://discord.gg/ppy)
 [![Crowdin](https://d322cqt584bo4o.cloudfront.net/osu-web/localized.svg)](https://crowdin.com/project/osu-web)
 
-A free-to-win rhythm game. Rhythm is just a *click* away!
+A free-to-play rhythm game. Rhythm is just a *click* away!
 
-This is the future – and final – iteration of the [osu!](https://osu.ppy.sh) game client which marks the beginning of an open era! Currently known by and released under the release codename "*lazer*". As in sharper than cutting-edge.
+This is the next—and final—iteration of the [osu!](https://osu.ppy.sh) client, currently released under the codename **"lazer"**. Lazer represents the evolution of osu!, sharper than ever and fully open-source.
+
+---
 
 ## Status
 
-This project is under constant development, but we do our best to keep things in a stable state. Players are encouraged to install from a release alongside their stable *osu!* client. This project will continue to evolve until we eventually reach the point where most users prefer it over the previous "osu!stable" release.
+*osu!* is under continuous development. We strive to maintain stability, and players are encouraged to install Lazer alongside their stable *osu!* client. Over time, Lazer aims to become the preferred client for most users.
 
-A few resources are available as starting points to getting involved and understanding the project:
+Here are some resources to help you get started with the project:
 
-- Detailed release changelogs are available on the [official osu! site](https://osu.ppy.sh/home/changelog/lazer).
-- You can learn more about our approach to [project management](https://github.com/ppy/osu/wiki/Project-management).
-- Track our current efforts [towards improving the game](https://github.com/orgs/ppy/projects/7/views/6).
+* [Detailed release changelogs](https://osu.ppy.sh/home/changelog/lazer)
+* [Project management overview](https://github.com/ppy/osu/wiki/Project-management)
+* [Current development efforts](https://github.com/orgs/ppy/projects/7/views/6)
+
+---
 
 ## Running osu!
 
-If you are just looking to give the game a whirl, you can grab the latest release for your platform:
+### Latest release
 
-### Latest release:
+You can download the latest release for your platform:
 
-| [Windows 10+ (x64)](https://github.com/ppy/osu/releases/latest/download/install.exe) | macOS 12+ ([Intel](https://github.com/ppy/osu/releases/latest/download/osu.app.Intel.zip), [Apple Silicon](https://github.com/ppy/osu/releases/latest/download/osu.app.Apple.Silicon.zip)) | [Linux (x64)](https://github.com/ppy/osu/releases/latest/download/osu.AppImage) | [iOS 13.4+](https://osu.ppy.sh/home/testflight) | [Android 5+](https://github.com/ppy/osu/releases/latest/download/sh.ppy.osulazer.apk) |
-|--------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| ------------- | ------------- | ------------- |
+| Windows 10+ (x64)                                                           | macOS 12+                                                                                                                                                                       | Linux (x64)                                                                  | iOS 13.4+                                        | Android 5+                                                                          |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| [Download](https://github.com/ppy/osu/releases/latest/download/install.exe) | [Intel](https://github.com/ppy/osu/releases/latest/download/osu.app.Intel.zip) / [Apple Silicon](https://github.com/ppy/osu/releases/latest/download/osu.app.Apple.Silicon.zip) | [Download](https://github.com/ppy/osu/releases/latest/download/osu.AppImage) | [TestFlight](https://osu.ppy.sh/home/testflight) | [Download](https://github.com/ppy/osu/releases/latest/download/sh.ppy.osulazer.apk) |
 
-You can also generally download a version for your current device from the [osu! site](https://osu.ppy.sh/home/download).
+You can also visit the [osu! download page](https://osu.ppy.sh/home/download) for your device.
 
-If your platform is unsupported or not listed above, there is still a chance you can run the release or manually build it by following the instructions below.
+**iOS users:** The TestFlight link is limited to 10,000 users and fills up quickly. Please check back regularly or follow [peppy on Twitter](https://twitter.com/ppy) for updates. We plan to release the game on mobile app stores soon.
 
-**For iOS/iPadOS users**: The iOS testflight link fills up very fast (Apple has a hard limit of 10,000 users). We reset it occasionally. Please do not ask about this. Check back regularly for link resets or follow [peppy](https://twitter.com/ppy) on twitter for announcements. Our goal is to get the game on mobile app stores very soon so we don't have to live with this limitation.
+---
 
-## Developing a custom ruleset
+## Developing a Custom Ruleset
 
-osu! is designed to allow user-created gameplay variations, called "rulesets". Building one of these allows a developer to harness the power of the osu! beatmap library, game engine, and general UX for a new style of gameplay. To get started working on a ruleset, we have some templates available [here](https://github.com/ppy/osu/tree/master/Templates).
+osu! supports user-created gameplay variations called **rulesets**. Custom rulesets allow developers to use the osu! beatmap library, game engine, and UX for new gameplay styles.
 
-You can see some examples of custom rulesets by visiting the [custom ruleset directory](https://github.com/ppy/osu/discussions/13096).
+* [Ruleset templates](https://github.com/ppy/osu/tree/master/Templates)
+* [Example custom rulesets](https://github.com/ppy/osu/discussions/13096)
+
+---
 
 ## Developing osu!
 
 ### Prerequisites
 
-Please make sure you have the following prerequisites:
-
-- A desktop platform with the [.NET 8.0 SDK](https://dotnet.microsoft.com/download) installed.
-
-When working with the codebase, we recommend using an IDE with intelligent code completion and syntax highlighting, such as the latest version of [Visual Studio](https://visualstudio.microsoft.com/vs/), [JetBrains Rider](https://www.jetbrains.com/rider/), or [Visual Studio Code](https://code.visualstudio.com/) with the [EditorConfig](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig) and [C# Dev Kit](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit) plugin installed.
+* Desktop platform with [.NET 8.0 SDK](https://dotnet.microsoft.com/download) installed
+* Recommended IDEs: [Visual Studio](https://visualstudio.microsoft.com/vs/), [JetBrains Rider](https://www.jetbrains.com/rider/), or [VS Code](https://code.visualstudio.com/) with [EditorConfig](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig) and [C# Dev Kit](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit)
 
 ### Downloading the source code
 
-Clone the repository:
-
-```shell
+```bash
 git clone https://github.com/ppy/osu
 cd osu
-```
-
-To update the source code to the latest commit, run the following command inside the `osu` directory:
-
-```shell
 git pull
 ```
 
@@ -74,47 +72,63 @@ git pull
 
 #### From an IDE
 
-You should load the solution via one of the platform-specific `.slnf` files, rather than the main `.sln`. This will reduce dependencies and hide platforms that you don't care about. Valid `.slnf` files are:
+Open one of the platform-specific `.slnf` files instead of the main `.sln` file. This reduces unnecessary dependencies.
 
-- `osu.Desktop.slnf` (most common)
-- `osu.Android.slnf`
-- `osu.iOS.slnf`
+Valid `.slnf` files:
 
-Run configurations for the recommended IDEs (listed above) are included. You should use the provided Build/Run functionality of your IDE to get things going. When testing or building new components, it's highly encouraged you use the `osu! (Tests)` project/configuration. More information on this is provided [below](#contributing).
+* `osu.Desktop.slnf` (most common)
+* `osu.Android.slnf`
+* `osu.iOS.slnf`
 
-To build for mobile platforms, you will likely need to run `sudo dotnet workload restore` if you haven't done so previously. This will install Android/iOS tooling required to complete the build.
+Run configurations are included. For testing or developing new components, use the `osu! (Tests)` project/configuration.
+
+**Mobile platforms:** If building for mobile, run:
+
+```bash
+sudo dotnet workload restore
+```
+
+This installs Android/iOS tooling required to complete the build.
 
 #### From CLI
 
-You can also build and run *osu!* from the command-line with a single command:
-
-```shell
+```bash
 dotnet run --project osu.Desktop
 ```
 
-When running locally to do any kind of performance testing, make sure to add `-c Release` to the build command, as the overhead of running with the default `Debug` configuration can be large (especially when testing with local framework modifications as below).
+For performance testing, use:
 
-If the build fails, try to restore NuGet packages with `dotnet restore`.
-
-### Testing with resource/framework modifications
-
-Sometimes it may be necessary to cross-test changes in [osu-resources](https://github.com/ppy/osu-resources) or [osu-framework](https://github.com/ppy/osu-framework). This can be quickly achieved using included commands:
-
-Windows:
-
-```ps
-UseLocalFramework.ps1
-UseLocalResources.ps1
+```bash
+dotnet run --project osu.Desktop -c Release
 ```
 
-macOS / Linux:
+If the build fails, restore NuGet packages:
 
-```ps
-UseLocalFramework.sh
-UseLocalResources.sh
+```bash
+dotnet restore
 ```
 
-Note that these commands assume you have the relevant project(s) checked out in adjacent directories:
+---
+
+### Testing with Local Framework or Resource Changes
+
+Sometimes you may need to test changes in [osu-resources](https://github.com/ppy/osu-resources) or [osu-framework](https://github.com/ppy/osu-framework).
+
+**Windows (PowerShell):**
+
+```powershell
+.\UseLocalFramework.ps1
+.\UseLocalResources.ps1
+```
+
+**macOS / Linux:**
+
+```bash
+./UseLocalFramework.sh
+./UseLocalResources.sh
+```
+
+> ⚠️ These scripts assume you have the relevant projects checked out in adjacent directories:
 
 ```
 |- osu            // this repository
@@ -122,26 +136,43 @@ Note that these commands assume you have the relevant project(s) checked out in 
 |- osu-resources
 ```
 
-### Code analysis
+---
 
-Before committing your code, please run a code formatter. This can be achieved by running `dotnet format` in the command line, or using the `Format code` command in your IDE.
+### Code Analysis
 
-We have adopted some cross-platform, compiler integrated analyzers. They can provide warnings when you are editing, building inside IDE or from command line, as-if they are provided by the compiler itself.
+Before committing, run a code formatter:
 
-JetBrains ReSharper InspectCode is also used for wider rule sets. You can run it from PowerShell with `.\InspectCode.ps1`. Alternatively, you can install ReSharper or use Rider to get inline support in your IDE of choice.
+```bash
+dotnet format
+```
+
+You can also use IDE commands or ReSharper InspectCode:
+
+```powershell
+.\InspectCode.ps1
+```
+
+Cross-platform compiler analyzers provide warnings during editing/building.
+
+---
 
 ## Contributing
 
-When it comes to contributing to the project, the two main things you can do to help out are reporting issues and submitting pull requests. Please refer to the [contributing guidelines](CONTRIBUTING.md) to understand how to help in the most effective way possible.
+You can contribute by reporting issues or submitting pull requests. Please read our [contributing guidelines](CONTRIBUTING.md).
 
-If you wish to help with localisation efforts, head over to [crowdin](https://crowdin.com/project/osu-web).
+* Help with localisation via [Crowdin](https://crowdin.com/project/osu-web)
+* Large or regular contributions can be rewarded via [Open Collective expenses](https://opencollective.com/ppy/expenses/new)
+* Questions? Reach out to [peppy](mailto:pe@ppy.sh)
 
-We love to reward quality contributions. If you have made a large contribution, or are a regular contributor, you are welcome to [submit an expense via opencollective](https://opencollective.com/ppy/expenses/new). If you have any questions, feel free to [reach out to peppy](mailto:pe@ppy.sh) before doing so.
+---
 
-## Licence
+## License
 
-*osu!*'s code and framework are licensed under the [MIT licence](https://opensource.org/licenses/MIT). Please see [the licence file](LICENCE) for more information. [tl;dr](https://tldrlegal.com/license/mit-license) you can do whatever you want as long as you include the original copyright and license notice in any copy of the software/source.
+osu!’s code and framework are licensed under the [MIT License](https://opensource.org/licenses/MIT). See the [license file](LICENCE) for details.
 
-Please note that this *does not cover* the usage of the "osu!" or "ppy" branding in any software, resources, advertising or promotion, as this is protected by trademark law.
+> TL;DR: You can do almost anything with the code, as long as you include the original copyright and license notice.
 
-Please also note that game resources are covered by a separate licence. Please see the [ppy/osu-resources](https://github.com/ppy/osu-resources) repository for clarifications.
+**Notes:**
+
+* The "osu!" and "ppy" branding are trademarked and not covered by this license.
+* Game resources are under a separate license: see [ppy/osu-resources](https://github.com/ppy/osu-resources).
