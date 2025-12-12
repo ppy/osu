@@ -55,6 +55,16 @@ namespace osu.Game.Localisation
         public static LocalisableString ToggleMute => new TranslatableString(getKey(@"toggle_mute"), @"Toggle mute");
 
         /// <summary>
+        /// "Toggle effects mute"
+        /// </summary>
+        public static LocalisableString ToggleEffectsMute => new TranslatableString(getKey(@"toggle_effects_mute"), @"Toggle effects mute");
+
+        /// <summary>
+        /// "Toggle music mute"
+        /// </summary>
+        public static LocalisableString ToggleMusicMute => new TranslatableString(getKey(@"toggle_music_mute"), @"Toggle music mute");
+
+        /// <summary>
         /// "Skip cutscene"
         /// </summary>
         public static LocalisableString SkipCutscene => new TranslatableString(getKey(@"skip_cutscene"), @"Skip cutscene");
