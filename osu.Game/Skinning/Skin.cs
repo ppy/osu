@@ -38,7 +38,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// A sample store which can be used to perform user file lookups for this skin.
         /// </summary>
-        protected ISampleStore? Samples { get; }
+        protected internal ISampleStore? Samples { get; }
 
         public readonly Live<SkinInfo> SkinInfo;
 
