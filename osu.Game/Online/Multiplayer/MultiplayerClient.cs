@@ -319,9 +319,6 @@ namespace osu.Game.Online.Multiplayer
 
         public Task LeaveRoom()
         {
-            if (Room == null)
-                return Task.CompletedTask;
-
             // The join may have not completed yet, so certain tasks that either update the room or reference the room should be cancelled.
             // This includes the setting of Room itself along with the initial update of the room settings on join.
             joinCancellationSource?.Cancel();
