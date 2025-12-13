@@ -360,8 +360,8 @@ namespace osu.Game.Screens.SelectV2
         {
             this.MoveToX(150, SongSelect.ENTER_DURATION, Easing.OutQuint)
                 .FadeOut(SongSelect.ENTER_DURATION / 3, Easing.In);
-
         }
+
         internal partial class SongSelectSearchTextBox : ShearedFilterTextBox
         {
             public Action<SavedBeatmapFilter>? ApplyFilter { get; set; }
