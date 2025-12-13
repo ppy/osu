@@ -30,6 +30,7 @@ namespace osu.Game.Tests.Visual.Editing
         private TestDistanceSnapGrid grid;
 
         [Cached(typeof(EditorBeatmap))]
+        [Cached(typeof(IBeatmapEditorChangeHandler))]
         private readonly EditorBeatmap editorBeatmap;
 
         [Cached(typeof(IDistanceSnapProvider))]
