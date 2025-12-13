@@ -156,9 +156,8 @@ namespace osu.Game.Screens.SelectV2
 
         private partial class SavedFilterItem : ClickableContainer
         {
-            private Box background;
-            private SpriteIcon arrow;
-            private OsuSpriteText text;
+            private readonly Box background;
+            private readonly SpriteIcon arrow;
 
             public SavedFilterItem(SavedBeatmapFilter filter, Action<SavedBeatmapFilter> action, Action onDelete)
             {
@@ -185,7 +184,7 @@ namespace osu.Game.Screens.SelectV2
                         Alpha = 0,
                         Margin = new MarginPadding { Left = 3, Right = 3 },
                     },
-                    text = new OsuSpriteText
+                    new OsuSpriteText
                     {
                         Text = filter.Name,
                         Anchor = Anchor.CentreLeft,

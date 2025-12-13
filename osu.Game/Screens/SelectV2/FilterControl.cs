@@ -257,6 +257,7 @@ namespace osu.Game.Screens.SelectV2
             base.Dispose(isDisposing);
             collectionsSubscription?.Dispose();
         }
+
         private void applyFilter(SavedBeatmapFilter filter)
         {
             searchTextBox.Current.Value = filter.SearchQuery;
@@ -283,6 +284,7 @@ namespace osu.Game.Screens.SelectV2
             difficultyRangeSlider.LowerBound.Value = min;
             difficultyRangeSlider.UpperBound.Value = max;
         }
+
         private void saveFilter(string name)
         {
             if (string.IsNullOrEmpty(ruleset.Value?.ShortName))
@@ -300,6 +302,7 @@ namespace osu.Game.Screens.SelectV2
                 RulesetShortName = ruleset.Value.ShortName
             }));
         }
+
         /// <summary>
         /// Creates a <see cref="FilterCriteria"/> based on the current state of the controls.
         /// </summary>
@@ -357,6 +360,7 @@ namespace osu.Game.Screens.SelectV2
         {
             this.MoveToX(150, SongSelect.ENTER_DURATION, Easing.OutQuint)
                 .FadeOut(SongSelect.ENTER_DURATION / 3, Easing.In);
+
         }
         internal partial class SongSelectSearchTextBox : ShearedFilterTextBox
         {
@@ -365,13 +369,11 @@ namespace osu.Game.Screens.SelectV2
             public IBindable<RulesetInfo> Ruleset { get; set; } = null!;
 
             private readonly Box hoverBox;
-            private readonly PopoverTarget popoverTarget;
             private readonly BindableBool popoverVisible = new BindableBool();
-            private readonly SearchFilterButton filterButton;
 
             public SongSelectSearchTextBox()
             {
-                filterButton = new SearchFilterButton
+                var filterButton = new SearchFilterButton
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -392,7 +394,7 @@ namespace osu.Game.Screens.SelectV2
 
                 BackgroundContent.Add(hoverBox);
 
-                AddInternal(popoverTarget = new PopoverTarget
+                var popoverTarget = new PopoverTarget
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.TopRight,
@@ -400,7 +402,9 @@ namespace osu.Game.Screens.SelectV2
                     Y = 1,
                     Size = Vector2.Zero,
                     CreatePopover = createPopover
-                });
+                };
+
+                AddInternal(popoverTarget);
 
                 filterButton.HoverTarget = hoverBox;
                 filterButton.IsPopoverVisible = () => popoverVisible.Value;

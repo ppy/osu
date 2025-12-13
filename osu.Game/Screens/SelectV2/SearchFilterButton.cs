@@ -18,7 +18,7 @@ namespace osu.Game.Screens.SelectV2
         public Func<bool>? IsPopoverVisible { get; set; }
         public Action<bool>? SetPopoverVisible { get; set; }
 
-        private SpriteIcon icon = null!;
+        private SpriteIcon? icon;
         private Vector2 pendingShear;
 
         private bool popoverVisibleOnMouseDown;
@@ -61,9 +61,9 @@ namespace osu.Game.Screens.SelectV2
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (SetPopoverVisible != null)
+            if (SetPopoverVisible is Action<bool> setPopoverVisible)
             {
-                SetPopoverVisible(!popoverVisibleOnMouseDown);
+                setPopoverVisible(!popoverVisibleOnMouseDown);
                 return true;
             }
 
