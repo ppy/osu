@@ -208,15 +208,11 @@ namespace osu.Game.Screens.SelectV2
                 {
                     unrankedBadge.MoveToX(0, duration, easing);
                     unrankedBadge.FadeIn(duration, easing);
-
-                    this.ResizeWidthTo(BUTTON_WIDTH + 5 + unrankedBadge.DrawWidth, duration, easing);
                 }
                 else
                 {
                     unrankedBadge.MoveToX(-unrankedBadge.DrawWidth, duration, easing);
                     unrankedBadge.FadeOut(duration, easing);
-
-                    this.ResizeWidthTo(BUTTON_WIDTH, duration, easing);
                 }
 
                 modDisplayBar.MoveToY(-5, duration, Easing.OutQuint);
