@@ -132,12 +132,12 @@ namespace osu.Game.Screens.Select
                 MultiplierText.FadeColour(Color4.White, 200);
 
             if (Current.Value?.Count > 0)
-                modDisplay.FadeIn();
+                modDisplay.Show();
             else
-                modDisplay.FadeOut();
+                modDisplay.Hide();
 
             bool anyUnrankedMods = Current.Value?.Any(m => !m.Ranked) == true;
-            UnrankedBadge.FadeTo(anyUnrankedMods ? 1 : 0);
+            UnrankedBadge.Alpha = anyUnrankedMods ? 1 : 0;
         });
     }
 }
