@@ -375,6 +375,8 @@ namespace osu.Game.Screens.SelectV2
                 if (!this.IsCurrentScreen())
                     return;
 
+                checkAndApplyRuleset();
+
                 ensureGlobalBeatmapValid();
 
                 ensurePlayingSelected();
@@ -567,6 +569,24 @@ namespace osu.Game.Screens.SelectV2
 
             // Debounce consideration is to avoid beatmap churn on key repeat selection.
             debounceQueueSelection(groupedBeatmap.Beatmap);
+        }
+
+        private bool checkAndApplyRuleset()
+        {
+            if (Beatmap.Value is DummyWorkingBeatmap || Beatmap.Value.BeatmapInfo.AllowGameplayWithRuleset(Ruleset.Value, showConvertedBeatmaps.Value)) return false;
+
+            // try to find a beatmap whose ruleset is current.
+            var beatmapWithinCurrentRuleset = Beatmap.Value.BeatmapSetInfo.Beatmaps.FirstOrDefault(b => b.Ruleset.Equals(Ruleset.Value));
+
+            if (beatmapWithinCurrentRuleset != null)
+            {
+                Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapWithinCurrentRuleset);
+                return false;
+            }
+
+            // if not found, switch to the beatmap's ruleset.
+            Ruleset.Value = Beatmap.Value.BeatmapInfo.Ruleset;
+            return true;
         }
 
         private bool ensureGlobalBeatmapValid()
