@@ -23,10 +23,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             LoadSongSelect();
 
             AddStep("disable converts", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
-            AddStep($"change beatmap to taiko beatmap", () => changeBeatmapFromRuleset(1));
+            AddStep("change beatmap to taiko beatmap", () => changeBeatmapFromRuleset(1));
             AddAssert("current ruleset is taiko", () => Ruleset.Value.OnlineID, () => Is.EqualTo(1));
 
-            AddStep($"change beatmap to osu! beatmap", () => changeBeatmapFromRuleset(0));
+            AddStep("change beatmap to osu! beatmap", () => changeBeatmapFromRuleset(0));
             AddAssert("current ruleset is osu!", () => Ruleset.Value.OnlineID, () => Is.EqualTo(0));
 
             AddStep("enable converts", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
