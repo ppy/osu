@@ -204,7 +204,7 @@ namespace osu.Game.Screens.SelectV2
             }
             else
             {
-                if (Current.Value.Any(m => !m.Ranked))
+                if (Current.Value.Any(m => !m.Ranked && m is not ModAutoplay))
                 {
                     unrankedBadge.MoveToX(0, duration, easing);
                     unrankedBadge.FadeIn(duration, easing);
