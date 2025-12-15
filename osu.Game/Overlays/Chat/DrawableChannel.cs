@@ -12,7 +12,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Online.Chat;
 using osuTK.Graphics;
 
@@ -49,25 +48,20 @@ namespace osu.Game.Overlays.Chat
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = new OsuContextMenuContainer
+            Child = scroll = new ChannelScrollContainer
             {
+                ScrollbarVisible = scrollbarVisible,
                 RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                Child = scroll = new ChannelScrollContainer
+                // Some chat lines have effects that slightly protrude to the bottom,
+                // which we do not want to mask away, hence the padding.
+                Padding = new MarginPadding { Bottom = 5 },
+                Child = ChatLineFlow = new FillFlowContainer
                 {
-                    ScrollbarVisible = scrollbarVisible,
-                    RelativeSizeAxes = Axes.Both,
-                    // Some chat lines have effects that slightly protrude to the bottom,
-                    // which we do not want to mask away, hence the padding.
-                    Padding = new MarginPadding { Bottom = 5 },
-                    Child = ChatLineFlow = new FillFlowContainer
-                    {
-                        Padding = new MarginPadding { Left = 3, Right = 10 },
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                    }
-                },
+                    Padding = new MarginPadding { Left = 3, Right = 10 },
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                }
             };
 
             newMessagesArrived(Channel.Messages);
@@ -83,25 +77,6 @@ namespace osu.Game.Overlays.Chat
 
             highlightedMessage = Channel.HighlightedMessage.GetBoundCopy();
             highlightedMessage.BindValueChanged(_ => processMessageHighlighting(), true);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            long? lastMinutes = null;
-
-            for (int i = 0; i < ChatLineFlow.Count; i++)
-            {
-                if (ChatLineFlow[i] is ChatLine chatline)
-                {
-                    long minutes = chatline.Message.Timestamp.ToUnixTimeSeconds() / 60;
-
-                    chatline.AlternatingBackground = i % 2 == 0;
-                    chatline.RequiresTimestamp = minutes != lastMinutes;
-                    lastMinutes = minutes;
-                }
-            }
         }
 
         /// <summary>
@@ -151,19 +126,28 @@ namespace osu.Game.Overlays.Chat
             // Add up to last Channel.MAX_HISTORY messages
             var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
 
-            Message lastMessage = chatLines.LastOrDefault()?.Message;
+            ChatLine lastLine = chatLines.LastOrDefault();
+            Message lastMessage = lastLine?.Message;
 
             foreach (var message in displayMessages)
             {
                 addDaySeparatorIfRequired(lastMessage, message);
 
-                var chatLine = CreateChatLine(message);
+                ChatLine line = CreateChatLine(message);
 
-                if (chatLine != null)
-                {
-                    ChatLineFlow.Add(chatLine);
-                    lastMessage = message;
-                }
+                if (line == null)
+                    continue;
+
+                long minutes = line.Message.Timestamp.ToUnixTimeSeconds() / 60;
+                long? lastMinutes = lastLine?.Message.Timestamp.ToUnixTimeSeconds() / 60;
+
+                line.AlternatingBackground = lastLine?.AlternatingBackground == false;
+                line.RequiresTimestamp = minutes != lastMinutes;
+
+                ChatLineFlow.Add(line);
+
+                lastMessage = message;
+                lastLine = line;
             }
 
             var staleMessages = chatLines.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
@@ -238,7 +222,41 @@ namespace osu.Game.Overlays.Chat
 
         private void messageRemoved(Message removed) => Schedule(() =>
         {
-            chatLines.FirstOrDefault(c => c.Message == removed)?.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
+            const double fade_time = 600;
+
+            ChatLine removedLine = chatLines.FirstOrDefault(c => c.Message == removed);
+
+            if (removedLine == null)
+                return;
+
+            removedLine.FadeColour(Color4.Red, 400).FadeOut(fade_time).Expire();
+
+            // Resolve new colours and timestamps resulting from the removal.
+            this.Delay(fade_time).Schedule(() =>
+            {
+                ChatLine lastLine = null;
+
+                // Preserve the colours of most-recent messages while updating the ones upwards in the list.
+                foreach (var line in chatLines.Reverse().Except([removedLine]))
+                {
+                    if (lastLine != null)
+                        line.AlternatingBackground = !lastLine.AlternatingBackground;
+
+                    lastLine = line;
+                }
+
+                lastLine = null;
+
+                // Timestamps may migrate to more recent messages.
+                foreach (var line in chatLines.Except([removedLine]))
+                {
+                    long minutes = line.Message.Timestamp.ToUnixTimeSeconds() / 60;
+                    long? lastMinutes = lastLine?.Message.Timestamp.ToUnixTimeSeconds() / 60;
+                    line.RequiresTimestamp = minutes != lastMinutes;
+
+                    lastLine = line;
+                }
+            });
         });
 
         private IEnumerable<ChatLine> chatLines => ChatLineFlow.Children.OfType<ChatLine>();

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
+
 namespace osu.Game.Audio
 {
     /// <summary>
@@ -10,6 +12,7 @@ namespace osu.Game.Audio
     /// <see cref="IPreviewTrackOwner"/>s can cancel the currently playing <see cref="PreviewTrack"/> through the
     /// global <see cref="PreviewTrackManager"/> if they're the owner of the playing <see cref="PreviewTrack"/>.
     /// </remarks>
+    [Cached]
     public interface IPreviewTrackOwner
     {
     }

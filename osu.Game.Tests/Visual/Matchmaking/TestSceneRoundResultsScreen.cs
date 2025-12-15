@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
@@ -13,26 +14,32 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.RoundResults;
-using osu.Game.Tests.Visual.Multiplayer;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Match.RoundResults;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
-    public partial class TestSceneRoundResultsScreen : MultiplayerTestScene
+    public partial class TestSceneRoundResultsScreen : MatchmakingTestScene
     {
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
-            AddStep("join room", () => JoinRoom(CreateDefaultRoom()));
+            AddStep("join room", () => JoinRoom(CreateDefaultRoom(MatchType.Matchmaking)));
             WaitForJoined();
+        }
 
-            setupRequestHandler();
+        [TestCase(2)]
+        [TestCase(4)]
+        [TestCase(8)]
+        [TestCase(16)]
+        public void TestDisplayScores(int scoreCount)
+        {
+            setupRequestHandler(scoreCount);
 
             AddStep("load screen", () =>
             {
-                Child = new ScreenStack(new RoundResultsScreen())
+                Child = new ScreenStack(new SubScreenRoundResults())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -41,7 +48,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
             });
         }
 
-        private void setupRequestHandler()
+        private void setupRequestHandler(int scoreCount)
         {
             AddStep("setup request handler", () =>
             {
@@ -72,7 +79,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                         case IndexPlaylistScoresRequest index:
                             var result = new IndexedMultiplayerScores();
 
-                            for (int i = 0; i < 8; ++i)
+                            for (int i = 0; i < scoreCount; ++i)
                             {
                                 result.Scores.Add(new MultiplayerScore
                                 {

@@ -237,26 +237,29 @@ namespace osu.Game.Screens.Select
 
         private void beatmapSetsChanged(object? beatmaps, NotifyCollectionChangedEventArgs changed)
         {
+            IEnumerable<BeatmapSetInfo>? oldBeatmapSets = changed.OldItems?.Cast<BeatmapSetInfo>();
+            HashSet<Guid> oldBeatmapSetIDs = oldBeatmapSets?.Select(s => s.ID).ToHashSet() ?? [];
+
             IEnumerable<BeatmapSetInfo>? newBeatmapSets = changed.NewItems?.Cast<BeatmapSetInfo>();
+            HashSet<Guid> newBeatmapSetIDs = newBeatmapSets?.Select(s => s.ID).ToHashSet() ?? [];
 
             switch (changed.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    HashSet<Guid> newBeatmapSetIDs = newBeatmapSets!.Select(s => s.ID).ToHashSet();
-
                     setsRequiringRemoval.RemoveWhere(s => newBeatmapSetIDs.Contains(s.ID));
                     setsRequiringUpdate.AddRange(newBeatmapSets!);
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    IEnumerable<BeatmapSetInfo> oldBeatmapSets = changed.OldItems!.Cast<BeatmapSetInfo>();
-                    HashSet<Guid> oldBeatmapSetIDs = oldBeatmapSets.Select(s => s.ID).ToHashSet();
-
                     setsRequiringUpdate.RemoveWhere(s => oldBeatmapSetIDs.Contains(s.ID));
-                    setsRequiringRemoval.AddRange(oldBeatmapSets);
+                    setsRequiringRemoval.AddRange(oldBeatmapSets!);
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
+                    setsRequiringUpdate.RemoveWhere(s => oldBeatmapSetIDs.Contains(s.ID));
+                    setsRequiringRemoval.AddRange(oldBeatmapSets!);
+
+                    setsRequiringRemoval.RemoveWhere(s => newBeatmapSetIDs.Contains(s.ID));
                     setsRequiringUpdate.AddRange(newBeatmapSets!);
                     break;
 

@@ -321,9 +321,21 @@ namespace osu.Game.Beatmaps.Formats
                     int volume = samples.Max(o => o.Volume);
                     string bank = samples.Where(s => s.Name == HitSampleInfo.HIT_NORMAL).Select(s => s.Bank).FirstOrDefault()
                                   ?? samples.Select(s => s.Bank).First();
-                    int customIndex = samples.Any(o => o is ConvertHitObjectParser.LegacyHitSampleInfo)
-                        ? samples.OfType<ConvertHitObjectParser.LegacyHitSampleInfo>().Max(o => o.CustomSampleBank)
-                        : -1;
+
+                    int customIndex = samples.Max(s =>
+                    {
+                        switch (s)
+                        {
+                            case ConvertHitObjectParser.LegacyHitSampleInfo legacy:
+                                return legacy.CustomSampleBank;
+
+                            default:
+                                if (int.TryParse(s.Suffix, out int index))
+                                    return index;
+
+                                return s.UseBeatmapSamples ? 1 : -1;
+                        }
+                    });
 
                     return new LegacyBeatmapDecoder.LegacySampleControlPoint { Time = time, SampleVolume = volume, SampleBank = bank, CustomSampleBank = customIndex };
                 }
@@ -532,7 +544,7 @@ namespace osu.Game.Beatmaps.Formats
             if (!banksOnly)
             {
                 int customSampleBank = toLegacyCustomSampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name)));
-                string sampleFilename = samples.FirstOrDefault(s => string.IsNullOrEmpty(s.Name))?.LookupNames.First() ?? string.Empty;
+                string sampleFilename = samples.FirstOrDefault(s => s is ConvertHitObjectParser.FileHitSampleInfo)?.LookupNames.First() ?? string.Empty;
                 int volume = samples.FirstOrDefault()?.Volume ?? 100;
 
                 // We want to ignore custom sample banks and volume when not encoding to the mania game mode,

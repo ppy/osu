@@ -618,7 +618,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     updateGameplayState();
 
                     if (client.LocalUser.State == MultiplayerUserState.Ready)
-                        client.ChangeState(MultiplayerUserState.Idle);
+                        client.ChangeState(MultiplayerUserState.Idle).FireAndForget();
                     break;
             }
         }

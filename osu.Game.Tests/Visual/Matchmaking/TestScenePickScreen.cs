@@ -5,16 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.OnlinePlay.Matchmaking.Screens.Pick;
-using osu.Game.Tests.Visual.Multiplayer;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
-    public partial class TestScenePickScreen : MultiplayerTestScene
+    public partial class TestScenePickScreen : MatchmakingTestScene
     {
         private readonly IReadOnlyList<APIUser> users = new[]
         {
@@ -58,7 +59,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             AddStep("join room", () =>
             {
-                var room = CreateDefaultRoom();
+                var room = CreateDefaultRoom(MatchType.Matchmaking);
                 room.Playlist = items;
 
                 JoinRoom(room);
@@ -78,9 +79,9 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             var selectedItems = new List<long>();
 
-            PickScreen screen = null!;
+            SubScreenBeatmapSelect screen = null!;
 
-            AddStep("add screen", () => LoadScreen(screen = new PickScreen()));
+            AddStep("add screen", () => Child = new ScreenStack(screen = new SubScreenBeatmapSelect()));
 
             AddStep("select maps", () =>
             {
@@ -103,8 +104,28 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 long[] candidateItems = selectedItems.ToArray();
                 long finalItem = candidateItems[Random.Shared.Next(candidateItems.Length)];
 
-                screen.RollFinalBeatmap(candidateItems, finalItem);
+                screen.RollFinalBeatmap(candidateItems, finalItem, finalItem);
             });
+        }
+
+        [Test]
+        public void TestExpiredBeatmapNotShown()
+        {
+            SubScreenBeatmapSelect screen = null!;
+
+            AddStep("add screen with expired items", () =>
+            {
+                MultiplayerClient.ClientRoom!.Playlist =
+                [
+                    new MultiplayerPlaylistItem(items[0]) { Expired = true },
+                    new MultiplayerPlaylistItem(items[1])
+                ];
+
+                Child = new ScreenStack(screen = new SubScreenBeatmapSelect());
+            });
+
+            AddUntilStep("items displayed", () => screen.ChildrenOfType<MatchmakingSelectPanelBeatmap>().Any());
+            AddAssert("expired item not shown", () => screen.ChildrenOfType<MatchmakingSelectPanelBeatmap>().Count(), () => Is.EqualTo(1));
         }
     }
 }
