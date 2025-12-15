@@ -77,10 +77,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 if (Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) < 1.25 * Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) // If rhythms are the same.
                 {
-                    acuteAngleBonus = osuCurrObj.CalcAngleFunctionStackWeighted(calcAcuteAngleBonus);
+                    acuteAngleBonus = osuCurrObj.CalcAngleFunctionStackAdjusted(calcAcuteAngleBonus);
 
                     // Penalize angle repetition.
-                    acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(osuLastObj.CalcAngleFunctionStackWeighted(calcAcuteAngleBonus), 3)));
+                    acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(osuLastObj.CalcAngleFunctionStackAdjusted(calcAcuteAngleBonus), 3)));
 
                     // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
                     acuteAngleBonus *= angleBonus *
@@ -88,10 +88,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                                        DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, diameter, diameter * 2);
                 }
 
-                wideAngleBonus = osuCurrObj.CalcAngleFunctionStackWeighted(calcWideAngleBonus);
+                wideAngleBonus = osuCurrObj.CalcAngleFunctionStackAdjusted(calcWideAngleBonus);
 
                 // Penalize angle repetition.
-                wideAngleBonus *= 1 - Math.Min(wideAngleBonus, Math.Pow(osuLastObj.CalcAngleFunctionStackWeighted(calcWideAngleBonus), 3));
+                wideAngleBonus *= 1 - Math.Min(wideAngleBonus, Math.Pow(osuLastObj.CalcAngleFunctionStackAdjusted(calcWideAngleBonus), 3));
 
                 // Apply full wide angle bonus for distance more than one diameter
                 wideAngleBonus *= angleBonus * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 0, diameter);
@@ -101,10 +101,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 wiggleBonus = angleBonus
                               * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, radius, diameter)
                               * Math.Pow(DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter * 3, diameter), 1.8)
-                              * DifficultyCalculationUtils.Smootherstep(osuCurrObj.LerpedStackAngle!.Value, double.DegreesToRadians(110), double.DegreesToRadians(60))
+                              * DifficultyCalculationUtils.Smootherstep(osuCurrObj.StackAdjustedAngle!.Value, double.DegreesToRadians(110), double.DegreesToRadians(60))
                               * DifficultyCalculationUtils.Smootherstep(osuLastObj.LazyJumpDistance, radius, diameter)
                               * Math.Pow(DifficultyCalculationUtils.ReverseLerp(osuLastObj.LazyJumpDistance, diameter * 3, diameter), 1.8)
-                              * DifficultyCalculationUtils.Smootherstep(osuLastObj.LerpedStackAngle!.Value, double.DegreesToRadians(110), double.DegreesToRadians(60));
+                              * DifficultyCalculationUtils.Smootherstep(osuLastObj.StackAdjustedAngle!.Value, double.DegreesToRadians(110), double.DegreesToRadians(60));
 
                 if (osuLast2Obj != null)
                 {

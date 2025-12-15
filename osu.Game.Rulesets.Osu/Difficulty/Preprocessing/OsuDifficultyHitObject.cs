@@ -101,16 +101,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double? Angle { get; private set; }
 
-        private double normalWeight;
-
-        private double? stackAngle1;
-        private double stackWeight1;
-
-        private double? stackAngle2;
-        private double stackWeight2;
-
-        public double? LerpedStackAngle => Angle != null ? Angle * normalWeight + stackAngle1 * stackWeight1 + stackAngle2 * stackWeight2 : null;
-
         /// <summary>
         /// Retrieves the full hit window for a Great <see cref="HitResult"/>.
         /// </summary>
@@ -121,14 +111,37 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double SmallCircleBonus { get; private set; }
 
-        private readonly OsuDifficultyHitObject? lastLastDifficultyObject;
-        private readonly OsuDifficultyHitObject? lastDifficultyObject;
+        private double normalWeight;
 
-        public double CalcAngleFunctionStackWeighted(Func<double, double> func, double defaultValue = 0)
+        private double? stackAngle1;
+        private double stackWeight1;
+
+        private double? stackAngle2;
+        private double stackWeight2;
+
+        /// <summary>
+        /// This is a simple version of stack adjusted angle, that just lerps between normal angle and stacked angles based on their weights.
+        /// Use if the function to be applied is linear, or close to linear.
+        /// Use with caution if function is non-linear, but the resulting value is strictly growing or strictly decreasing with angle.
+        /// Never use it if the function changes growth direction with angle on the range [0, PI].
+        /// </summary>
+        public double? StackAdjustedAngle => Angle != null ? Angle * normalWeight + stackAngle1 * stackWeight1 + stackAngle2 * stackWeight2 : null;
+
+        /// <summary>
+        /// More complex version of stack adjusted angle calculation, that applies a function to each angle before lerping them based on their weights.
+        /// Works for any function, as it runs it three times and then weights the results.
+        /// </summary>
+        /// <param name="func">Function that takes angle as a parameter</param>
+        /// <param name="defaultValue">Value that would be returned if angle is null, defaults to 0</param>
+        /// <returns></returns>
+        public double CalcAngleFunctionStackAdjusted(Func<double, double> func, double defaultValue = 0)
         {
             if (Angle == null) return defaultValue;
             return func(Angle!.Value) * normalWeight + func(stackAngle1!.Value) * stackWeight1 + func(stackAngle2!.Value) * stackWeight2;
         }
+
+        private readonly OsuDifficultyHitObject? lastLastDifficultyObject;
+        private readonly OsuDifficultyHitObject? lastDifficultyObject;
 
         public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
