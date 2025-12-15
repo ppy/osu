@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -99,6 +100,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// Calculated as the angle between the circles (current-2, current-1, current).
         /// </summary>
         public double? Angle { get; private set; }
+
+        public double? StackAngle { get; private set; }
+
+        public double StackWeight { get; private set; }
+
+        public double? WeightedStackAngle => Angle != null ? double.Lerp(Angle.Value, StackAngle!.Value, StackWeight) : null;
 
         /// <summary>
         /// Retrieves the full hit window for a Great <see cref="HitResult"/>.
@@ -237,7 +244,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 MinimumJumpDistance = Math.Max(0, Math.Min(LazyJumpDistance - (maximum_slider_radius - assumed_slider_radius), tailJumpDistance - maximum_slider_radius));
             }
 
-            if (lastLastDifficultyObject != null && lastLastDifficultyObject.BaseObject is not Spinner)
+            if (lastDifficultyObject != null && lastLastDifficultyObject != null && lastLastDifficultyObject.BaseObject is not Spinner)
             {
                 Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastDifficultyObject);
 
@@ -248,6 +255,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 float det = v1.X * v2.Y - v1.Y * v2.X;
 
                 Angle = Math.Abs(Math.Atan2(det, dot));
+
+                StackAngle = lastDifficultyObject.Angle ?? Angle;
+
+                // Only consider it stacked if current is very close, but prev isn't that close
+                // If evaluator require correct angle for more than 3 last notes - it should use several stack weights according to it's need
+                StackWeight = DifficultyCalculationUtils.ReverseLerp(LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS)
+                    * DifficultyCalculationUtils.ReverseLerp(lastDifficultyObject.LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_DIAMETER * 2);
             }
         }
 
