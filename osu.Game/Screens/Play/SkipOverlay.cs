@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -52,9 +53,9 @@ namespace osu.Game.Screens.Play
         private double displayTime;
 
         /// <summary>
-        /// Becomes <see langword="false"/> when the overlay starts fading out.
+        /// Whether the gameplay clock is currently at the skippable period.
         /// </summary>
-        private bool isClickable;
+        private readonly BindableBool inSkipPeriod = new BindableBool();
 
         private bool skipQueued;
 
@@ -92,7 +93,7 @@ namespace osu.Game.Screens.Play
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        button = CreateButton(),
+                        button = CreateButton(inSkipPeriod),
                         RemainingTimeBox = new Circle
                         {
                             Height = 5,
@@ -106,10 +107,15 @@ namespace osu.Game.Screens.Play
             };
         }
 
-        protected virtual OsuClickableContainer CreateButton() => new Button
+        /// <summary>
+        /// Creates a skip button.
+        /// </summary>
+        /// <param name="inSkipPeriod">Whether the gameplay clock is currently at the skippable period.</param>
+        protected virtual OsuClickableContainer CreateButton(IBindable<bool> inSkipPeriod) => new Button
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
+            Enabled = { BindTarget = inSkipPeriod },
         };
 
         private const double fade_time = 300;
@@ -187,17 +193,13 @@ namespace osu.Game.Screens.Play
 
             RemainingTimeBox.Width = (float)Interpolation.Lerp(RemainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
-            isClickable = progress > 0;
-
-            if (!isClickable)
-                button.Enabled.Value = false;
-
-            buttonContainer.State.Value = isClickable ? Visibility.Visible : Visibility.Hidden;
+            inSkipPeriod.Value = progress > 0;
+            buttonContainer.State.Value = inSkipPeriod.Value ? Visibility.Visible : Visibility.Hidden;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            if (isClickable && !e.HasAnyButtonPressed)
+            if (inSkipPeriod.Value && !e.HasAnyButtonPressed)
                 FadingContent.TriggerShow();
 
             return base.OnMouseMove(e);
