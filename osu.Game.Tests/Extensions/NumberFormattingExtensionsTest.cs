@@ -17,6 +17,7 @@ namespace osu.Game.Tests.Extensions
         [TestCase(0, true, 0, ExpectedResult = "0%")]
         [TestCase(1, true, 0, ExpectedResult = "1%")]
         [TestCase(50, true, 0, ExpectedResult = "50%")]
+        [SetCulture("")] // invariant culture
         public string TestInteger(int input, bool percent, int decimalDigits)
         {
             return input.ToStandardFormattedString(decimalDigits, percent);
@@ -39,6 +40,7 @@ namespace osu.Game.Tests.Extensions
         [TestCase(0.48333, true, 2, ExpectedResult = "48%")]
         [TestCase(0.48333, true, 4, ExpectedResult = "48.33%")]
         [TestCase(1, true, 0, ExpectedResult = "100%")]
+        [SetCulture("")] // invariant culture
         public string TestDouble(double input, bool percent, int decimalDigits)
         {
             return input.ToStandardFormattedString(decimalDigits, percent);
@@ -46,9 +48,12 @@ namespace osu.Game.Tests.Extensions
 
         [Test]
         [SetCulture("fr-FR")]
-        public void TestCultureInsensitivity()
+        [TestCase(0.4, true, 2, ExpectedResult = "40%")]
+        [TestCase(1e-6, false, 6, ExpectedResult = "0,000001")]
+        [TestCase(0.48333, true, 4, ExpectedResult = "48,33%")]
+        public string TestCultureSensitivity(double input, bool percent, int decimalDigits)
         {
-            Assert.That(0.4.ToStandardFormattedString(maxDecimalDigits: 2, asPercentage: true), Is.EqualTo("40%"));
+            return input.ToStandardFormattedString(decimalDigits, percent);
         }
     }
 }

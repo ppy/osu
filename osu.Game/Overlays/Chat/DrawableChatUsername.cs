@@ -212,7 +212,7 @@ namespace osu.Game.Overlays.Chat
 
                 items.Add(new OsuMenuItemSpacer());
                 items.Add(new OsuMenuItem(UsersStrings.ReportButtonText, MenuItemType.Destructive, ReportRequested));
-                items.Add(api.Blocks.Any(b => b.TargetID == user.OnlineID)
+                items.Add(api.LocalUserState.Blocks.Any(b => b.TargetID == user.OnlineID)
                     ? new OsuMenuItem(UsersStrings.BlocksButtonUnblock, MenuItemType.Standard, () => dialogOverlay?.Push(ConfirmBlockActionDialog.Unblock(user)))
                     : new OsuMenuItem(UsersStrings.BlocksButtonBlock, MenuItemType.Destructive, () => dialogOverlay?.Push(ConfirmBlockActionDialog.Block(user))));
 

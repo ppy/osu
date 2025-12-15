@@ -19,6 +19,7 @@ using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
+using CommonStrings = osu.Game.Localisation.CommonStrings;
 
 namespace osu.Game.Screens.Play
 {
@@ -165,7 +166,7 @@ namespace osu.Game.Screens.Play
                                 },
                                 new Drawable[]
                                 {
-                                    new MetadataLineLabel("Mapper"),
+                                    new MetadataLineLabel(CommonStrings.Mapper),
                                     new MetadataLineInfo(metadata.Author.Username)
                                 }
                             }

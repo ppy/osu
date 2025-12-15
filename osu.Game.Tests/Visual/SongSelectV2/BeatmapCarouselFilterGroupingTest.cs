@@ -271,12 +271,19 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             addBeatmapSet(applyStars(2), beatmapSets, out var beatmap2);
             addBeatmapSet(applyStars(2.1), beatmapSets, out var beatmapAbove2);
             addBeatmapSet(applyStars(7), beatmapSets, out var beatmap7);
+            addBeatmapSet(applyStars(13), beatmapSets, out var beatmap13);
+            addBeatmapSet(applyStars(14.996), beatmapSets, out var beatmapAlmost15);
+            addBeatmapSet(applyStars(15), beatmapSets, out var beatmap15);
+            addBeatmapSet(applyStars(22), beatmapSets, out var beatmap22);
 
             var results = await runGrouping(GroupMode.Difficulty, beatmapSets);
             assertGroup(results, 0, "Below 1 Star", beatmapBelow1.Beatmaps, ref total);
             assertGroup(results, 1, "1 Star", (beatmapAbove1.Beatmaps.Concat(beatmapAlmost2.Beatmaps)), ref total);
             assertGroup(results, 2, "2 Stars", (beatmap2.Beatmaps.Concat(beatmapAbove2.Beatmaps)), ref total);
             assertGroup(results, 3, "7 Stars", beatmap7.Beatmaps, ref total);
+            assertGroup(results, 4, "13 Stars", beatmap13.Beatmaps, ref total);
+            assertGroup(results, 5, "14 Stars", beatmapAlmost15.Beatmaps, ref total);
+            assertGroup(results, 6, "Over 15 Stars", beatmap15.Beatmaps.Concat(beatmap22.Beatmaps), ref total);
             assertTotal(results, total);
         }
 
@@ -366,12 +373,40 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         #endregion
 
-        private static async Task<List<CarouselItem>> runGrouping(GroupMode group, List<BeatmapSetInfo> beatmapSets)
+        #region Favourites grouping
+
+        [Test]
+        public async Task TestFavouritesGrouping()
         {
-            var groupingFilter = new BeatmapCarouselFilterGrouping(
-                () => new FilterCriteria { Group = group },
-                () => new List<BeatmapCollection>(),
-                _ => new Dictionary<Guid, ScoreRank>());
+            int total = 0;
+
+            var beatmapSets = new List<BeatmapSetInfo>();
+            addBeatmapSet(s => s.OnlineID = 1, beatmapSets, out _);
+            addBeatmapSet(s => s.OnlineID = 21, beatmapSets, out var firstFavourite);
+            addBeatmapSet(s => s.OnlineID = 321, beatmapSets, out _);
+            addBeatmapSet(s => s.OnlineID = 4321, beatmapSets, out _);
+            addBeatmapSet(s => s.OnlineID = 54321, beatmapSets, out var secondFavourite);
+
+            favouriteBeatmapSets = [21, 54321];
+
+            var results = await runGrouping(GroupMode.Favourites, beatmapSets);
+            assertGroup(results, 0, "Favourites", firstFavourite.Beatmaps.Concat(secondFavourite.Beatmaps), ref total);
+            assertTotal(results, total);
+        }
+
+        #endregion
+
+        private HashSet<int> favouriteBeatmapSets = [];
+
+        private async Task<List<CarouselItem>> runGrouping(GroupMode group, List<BeatmapSetInfo> beatmapSets)
+        {
+            var groupingFilter = new BeatmapCarouselFilterGrouping
+            {
+                GetCriteria = () => new FilterCriteria { Group = group },
+                GetCollections = () => new List<BeatmapCollection>(),
+                GetLocalUserTopRanks = _ => new Dictionary<Guid, ScoreRank>(),
+                GetFavouriteBeatmapSets = () => favouriteBeatmapSets,
+            };
 
             return await groupingFilter.Run(beatmapSets.SelectMany(s => s.Beatmaps.Select(b => new CarouselItem(b))).ToList(), CancellationToken.None);
         }
@@ -390,7 +425,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             var groupModel = (GroupDefinition)groupItem.Model;
 
-            Assert.That(groupModel.Title, Is.EqualTo(expectedTitle));
+            Assert.That(groupModel.Title.ToString(), Is.EqualTo(expectedTitle));
             Assert.That(itemsInGroup.Select(i => i.Model).OfType<GroupedBeatmap>().Select(gb => gb.Beatmap), Is.EquivalentTo(expectedBeatmaps));
 
             totalItems += itemsInGroup.Count() + 1;

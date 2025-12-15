@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Play
 
         private BreakTracker breakTracker;
 
-        private SkipOverlay skipIntroOverlay;
+        protected SkipOverlay SkipIntroOverlay { get; private set; }
         private SkipOverlay skipOutroOverlay;
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
@@ -316,11 +316,11 @@ namespace osu.Game.Screens.Play
                 },
                 FailOverlay = new FailOverlay
                 {
-                    SaveReplay = async () => await prepareAndImportScoreAsync(true).ConfigureAwait(false),
+                    SaveReplay = Configuration.AllowUserInteraction ? async () => await prepareAndImportScoreAsync(true).ConfigureAwait(false) : null,
                     OnRetry = Configuration.AllowUserInteraction ? () => Restart() : null,
                     OnQuit = () => PerformExitWithConfirmation(),
                 },
-                new HotkeyExitOverlay
+                exitOverlay = new HotkeyExitOverlay
                 {
                     Action = () =>
                     {
@@ -338,7 +338,7 @@ namespace osu.Game.Screens.Play
             {
                 rulesetSkinProvider.AddRange(new Drawable[]
                 {
-                    new HotkeyRetryOverlay
+                    retryOverlay = new HotkeyRetryOverlay
                     {
                         Action = () =>
                         {
@@ -500,10 +500,10 @@ namespace osu.Game.Screens.Play
                     },
                     // display the cursor above some HUD elements.
                     DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
-                    skipIntroOverlay = new SkipOverlay(DrawableRuleset.GameplayStartTime)
+                    SkipIntroOverlay = CreateSkipOverlay(DrawableRuleset.GameplayStartTime).With(o =>
                     {
-                        RequestSkip = performUserRequestedSkip
-                    },
+                        o.RequestSkip = RequestIntroSkip;
+                    }),
                     skipOutroOverlay = new SkipOverlay(GameplayState.Storyboard.LatestEventTime ?? 0)
                     {
                         RequestSkip = () => progressToResults(false),
@@ -522,12 +522,14 @@ namespace osu.Game.Screens.Play
 
             if (!Configuration.AllowSkipping || !DrawableRuleset.AllowGameplayOverlays)
             {
-                skipIntroOverlay.Expire();
+                SkipIntroOverlay.Expire();
                 skipOutroOverlay.Expire();
             }
 
             return container;
         }
+
+        protected virtual SkipOverlay CreateSkipOverlay(double startTime) => new SkipOverlay(startTime);
 
         private void onBreakTimeChanged(ValueChangedEvent<bool> isBreakTime)
         {
@@ -701,13 +703,22 @@ namespace osu.Game.Screens.Play
             return true;
         }
 
-        private void performUserRequestedSkip()
+        protected virtual void RequestIntroSkip()
+        {
+            PerformIntroSkip();
+        }
+
+        /// <summary>
+        /// Skip forward to the next valid skip point.
+        /// </summary>
+        /// <param name="fullLength"><c>true</c> to skip as close to gameplay as possible, or <c>false</c> to skip only to the next valid skip point.</param>
+        protected void PerformIntroSkip(bool fullLength = false)
         {
             // user requested skip
             // disable sample playback to stop currently playing samples and perform skip
             samplePlaybackDisabled.Value = true;
 
-            (GameplayClockContainer as MasterGameplayClockContainer)?.Skip();
+            (GameplayClockContainer as MasterGameplayClockContainer)?.Skip(fullLength);
 
             // return samplePlaybackDisabled.Value to what is defined by the beatmap's current state
             updateSampleDisabledState();
@@ -1022,6 +1033,9 @@ namespace osu.Game.Screens.Play
 
         private double? lastPauseActionTime;
 
+        private HotkeyRetryOverlay retryOverlay;
+        private HotkeyExitOverlay exitOverlay;
+
         protected bool PauseCooldownActive =>
             PlayingState.Value == LocalUserPlayingState.Playing && lastPauseActionTime.HasValue && GameplayClockContainer.CurrentTime < lastPauseActionTime + PauseCooldownDuration;
 
@@ -1153,12 +1167,18 @@ namespace osu.Game.Screens.Play
             GameplayClockContainer.Reset(startClock: true);
 
             if (Configuration.AutomaticallySkipIntro)
-                skipIntroOverlay.SkipWhenReady();
+                SkipIntroOverlay.SkipWhenReady();
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
+            Debug.Assert(!ValidForResume);
+
             screenSuspension?.RemoveAndDisposeImmediately();
+
+            // If these are not disposed, audio volume dimming can get stuck.
+            retryOverlay?.RemoveAndDisposeImmediately();
+            exitOverlay?.RemoveAndDisposeImmediately();
 
             fadeOut();
             base.OnSuspending(e);

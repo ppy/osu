@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -351,7 +352,8 @@ namespace osu.Game.Tests.Visual.Ranking
                             {
                                 Score = userBest,
                                 Position = 133_337,
-                            }
+                            },
+                            ScoresCount = 200_000,
                         });
                         return true;
                 }
@@ -405,7 +407,8 @@ namespace osu.Game.Tests.Visual.Ranking
                             {
                                 Score = userBest,
                                 Position = 133_337,
-                            }
+                            },
+                            ScoresCount = 200_000,
                         });
                         return true;
                 }
@@ -510,7 +513,8 @@ namespace osu.Game.Tests.Visual.Ranking
                             {
                                 Score = userBest,
                                 Position = 133_337,
-                            }
+                            },
+                            ScoresCount = 200_000,
                         });
                         return true;
                 }
@@ -530,6 +534,14 @@ namespace osu.Game.Tests.Visual.Ranking
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
             AddAssert("only one score with ID 12345", () => this.ChildrenOfType<ScorePanel>().Count(s => s.Score.OnlineID == 12345), () => Is.EqualTo(1));
             AddUntilStep("user best position preserved", () => this.ChildrenOfType<ScorePanel>().Any(p => p.ScorePosition.Value == 133_337));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesetStore.IsNotNull())
+                rulesetStore.Dispose();
         }
     }
 }

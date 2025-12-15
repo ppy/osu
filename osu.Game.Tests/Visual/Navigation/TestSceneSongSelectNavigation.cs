@@ -9,18 +9,24 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
+using osu.Game.Database;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Footer;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Beatmaps.IO;
+using osu.Game.Tests.Resources;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Navigation
@@ -215,6 +221,84 @@ namespace osu.Game.Tests.Visual.Navigation
                 return Game.ScreenStack.CurrentScreen is Player;
             });
             AddAssert("leaderboard matches gameplay beatmap", () => Game.ChildrenOfType<LeaderboardManager>().Single().CurrentCriteria?.Beatmap, () => Is.EqualTo(beatmap().BeatmapInfo));
+        }
+
+        [Test]
+        public void TestEnterKeyProgressesToGameplayEvenIfCarouselFilteredOut()
+        {
+            PushAndConfirm(() => new SoloSongSelect());
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadOszIntoOsu(Game, virtualTrack: true).WaitSafely());
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("filter out active beatmap", () => this.ChildrenOfType<SearchTextBox>().First().Text = "abacadabadaeba");
+            AddUntilStep("wait for filter", () => this.ChildrenOfType<BeatmapCarousel>().Single().IsFiltering, () => Is.False);
+
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("player entered", () =>
+            {
+                DismissAnyNotifications();
+                return Game.ScreenStack.CurrentScreen is Player;
+            });
+        }
+
+        [Test]
+        public void TestSelectionNotLostWithConvertedBeatmapsShown()
+        {
+            BeatmapSetInfo beatmapSet = null!;
+            BeatmapInfo selectedBeatmap = null!;
+
+            AddStep("import beatmap", () => beatmapSet = BeatmapImportHelper.LoadOszIntoOsu(Game).GetResultSafely());
+            PushAndConfirm(() => new SoloSongSelect());
+
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("change ruleset to taiko", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Number2);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddStep("show converts", () => Game.LocalConfig.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
+            AddStep("select osu! beatmap", () =>
+            {
+                selectedBeatmap = beatmapSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0);
+                Game.Beatmap.Value = Game.BeatmapManager.GetWorkingBeatmap(selectedBeatmap);
+            });
+
+            pushEscape();
+            AddUntilStep("went back to main menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
+            PushAndConfirm(() => new SoloSongSelect());
+
+            AddUntilStep("selected beatmap is still osu! ruleset", () => Game.Beatmap.Value.BeatmapInfo, () => Is.EqualTo(selectedBeatmap));
+        }
+
+        /// <summary>
+        /// Note: This test was written to demonstrate the failure described at https://github.com/ppy/osu/issues/35023,
+        /// but because the failure scenario there entailed a race condition, it was possible for the test to pass regardless
+        /// unless <see cref="osu.Game.Screens.SelectV2.SongSelect.SELECTION_DEBOUNCE"/> was increased.
+        /// </summary>
+        [Test]
+        public void TestPresentFromResults()
+        {
+            BeatmapSetInfo beatmapToPresent = null!;
+            BeatmapSetInfo beatmapToPlay = null!;
+            AddStep("manually insert beatmap to be presented", () =>
+            {
+                Game.Realm.Write(r =>
+                {
+                    var beatmapSet = TestResources.CreateTestBeatmapSetInfo(3, [r.Find<RulesetInfo>("osu")]);
+                    r.Add(beatmapSet);
+                    beatmapToPresent = beatmapSet.Detach();
+                });
+            });
+            AddStep("import beatmap", () => beatmapToPlay = BeatmapImportHelper.LoadQuickOszIntoOsu(Game).GetResultSafely());
+            AddStep("set global beatmap", () => Game.Beatmap.Value = Game.BeatmapManager.GetWorkingBeatmap(beatmapToPlay.Beatmaps.First()));
+            playToResults();
+            AddStep("present beatmap from results", () => Game.PresentBeatmap(beatmapToPresent));
+            AddUntilStep("back at song select", () => Game.ScreenStack.CurrentScreen is SoloSongSelect);
+            AddUntilStep("presented beatmap is current", () => Game.Beatmap.Value.BeatmapSetInfo.Equals(beatmapToPresent));
         }
 
         private Func<Player> playToResults()

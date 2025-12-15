@@ -16,7 +16,12 @@ namespace osu.Game.Overlays.Settings
         public SettingsButton()
         {
             RelativeSizeAxes = Axes.X;
-            Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS };
+            Margin = new MarginPadding { Vertical = -5 };
+            Padding = new MarginPadding
+            {
+                Left = SettingsPanel.CONTENT_MARGINS,
+                Right = SettingsPanel.CONTENT_MARGINS,
+            };
         }
 
         public IEnumerable<string> Keywords { get; set; } = Array.Empty<string>();

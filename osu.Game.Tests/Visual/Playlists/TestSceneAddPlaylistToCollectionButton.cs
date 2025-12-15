@@ -7,6 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -25,6 +26,7 @@ namespace osu.Game.Tests.Visual.Playlists
 {
     public partial class TestSceneAddPlaylistToCollectionButton : OsuManualInputManagerTestScene
     {
+        private RulesetStore rulesets = null!;
         private BeatmapManager manager = null!;
         private BeatmapSetInfo importedBeatmap = null!;
         private Room room = null!;
@@ -33,7 +35,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
 
@@ -112,5 +114,13 @@ namespace osu.Game.Tests.Visual.Playlists
                 }
             ];
         });
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
+        }
     }
 }

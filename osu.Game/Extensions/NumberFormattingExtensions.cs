@@ -13,6 +13,9 @@ namespace osu.Game.Extensions
         /// <summary>
         /// For a given numeric type, return a formatted string in the standard format we use for display everywhere.
         /// </summary>
+        /// <remarks>
+        /// Number formatting will abide by <see cref="CultureInfo.CurrentCulture"/>.
+        /// </remarks>
         /// <param name="value">The numeric value.</param>
         /// <param name="maxDecimalDigits">The maximum number of decimals to be considered in the original value.</param>
         /// <param name="asPercentage">Whether the output should be a percentage. For integer types, 0-100 is mapped to 0-100%; for other types 0-1 is mapped to 0-100%.</param>
@@ -31,12 +34,12 @@ namespace osu.Game.Extensions
                 if (value is int)
                     floatValue /= 100;
 
-                return floatValue.ToString($@"0.{new string('0', Math.Max(0, significantDigits - 2))}%", CultureInfo.InvariantCulture);
+                return floatValue.ToString($@"0.{new string('0', Math.Max(0, significantDigits - 2))}%", CultureInfo.CurrentCulture);
             }
 
             string negativeSign = Math.Round(floatValue, significantDigits) < 0 ? "-" : string.Empty;
 
-            return FormattableString.Invariant($"{negativeSign}{Math.Abs(floatValue).ToString($"N{significantDigits}")}");
+            return $"{negativeSign}{Math.Abs(floatValue).ToString($"N{significantDigits}", CultureInfo.CurrentCulture)}";
         }
 
         /// <summary>
