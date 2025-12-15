@@ -37,7 +37,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        protected override LocalisableString FormatCount(int count) => count.ToString($@"0'{LegacySpriteText.PP}'");
+        protected override LocalisableString FormatCount(int count) => count.ToString($@"0'{LegacySpriteText.PP_SUFFIX_CHAR}'");
 
         protected sealed override OsuSpriteText CreateSpriteText() => new LegacySpriteText(LegacyFont.Score);
     }
