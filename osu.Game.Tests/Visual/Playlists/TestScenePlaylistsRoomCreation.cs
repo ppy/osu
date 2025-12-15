@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -32,6 +33,7 @@ namespace osu.Game.Tests.Visual.Playlists
 {
     public partial class TestScenePlaylistsRoomCreation : OnlinePlayTestScene
     {
+        private RulesetStore rulesets = null!;
         private BeatmapManager manager = null!;
         private TestPlaylistsRoomSubScreen match = null!;
         private BeatmapSetInfo importedBeatmap = null!;
@@ -40,7 +42,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
         }
@@ -176,6 +178,7 @@ namespace osu.Game.Tests.Visual.Playlists
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
                 ];
+                room.EndDate = DateTimeOffset.Now.AddHours(1);
             });
 
             AddAssert("match has default beatmap", () => match.Beatmap.IsDefault);
@@ -212,7 +215,20 @@ namespace osu.Game.Tests.Visual.Playlists
 
             Debug.Assert(beatmap.BeatmapInfo.BeatmapSet != null);
             importedBeatmap = manager.Import(beatmap.BeatmapInfo.BeatmapSet)!.Value.Detach();
+            Realm.Write(r =>
+            {
+                foreach (var beatmapInfo in r.All<BeatmapInfo>())
+                    beatmapInfo.OnlineMD5Hash = beatmapInfo.MD5Hash;
+            });
         });
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
+        }
 
         private partial class TestPlaylistsRoomSubScreen : PlaylistsRoomSubScreen
         {

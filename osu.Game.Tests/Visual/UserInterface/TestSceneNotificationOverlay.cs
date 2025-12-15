@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -64,7 +64,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep(@"simple #2", sendAmazingNotification);
             AddStep(@"progress #1", sendUploadProgress);
             AddStep(@"progress #2", sendDownloadProgress);
-            AddStep(@"User notification", sendUserNotification);
 
             checkProgressingCount(2);
 
@@ -456,7 +455,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 applyUpdate = false;
 
-                var updateNotification = new UpdateManager.UpdateProgressNotification
+                var updateNotification = new UpdateManager.UpdateDownloadProgressNotification(CancellationToken.None)
                 {
                     CompletionClickAction = () => applyUpdate = true
                 };
@@ -468,9 +467,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             checkProgressingCount(1);
             waitForCompletion();
 
-            UpdateManager.UpdateApplicationCompleteNotification? completionNotification = null;
+            UpdateManager.UpdateReadyNotification? completionNotification = null;
             AddUntilStep("wait for completion notification",
-                () => (completionNotification = notificationOverlay.ChildrenOfType<UpdateManager.UpdateApplicationCompleteNotification>().SingleOrDefault()) != null);
+                () => (completionNotification = notificationOverlay.ChildrenOfType<UpdateManager.UpdateReadyNotification>().SingleOrDefault()) != null);
             AddStep("click notification", () => completionNotification?.TriggerClick());
 
             AddUntilStep("wait for update applied", () => applyUpdate);
@@ -574,16 +573,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
             notificationOverlay.Post(n);
             progressingNotifications.Add(n);
-        }
-
-        private void sendUserNotification()
-        {
-            var user = userLookupCache.GetUserAsync(0).GetResultSafely();
-            if (user == null) return;
-
-            var n = new UserAvatarNotification(user, $"{user.Username} invited you to a multiplayer match!");
-
-            notificationOverlay.Post(n);
         }
 
         private void sendUploadProgress()

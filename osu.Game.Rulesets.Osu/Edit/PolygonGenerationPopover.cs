@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                         Current = new BindableNumber<int>(3)
                         {
                             MinValue = 3,
-                            MaxValue = 10,
+                            MaxValue = 32,
                             Precision = 1,
                         },
                         Instantaneous = true

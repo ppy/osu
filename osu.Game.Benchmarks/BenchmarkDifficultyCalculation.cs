@@ -8,6 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
@@ -17,10 +18,10 @@ namespace osu.Game.Benchmarks
 {
     public class BenchmarkDifficultyCalculation : BenchmarkTest
     {
-        private WorkingBeatmap osuBeatmap = null!;
-        private WorkingBeatmap taikoBeatmap = null!;
-        private WorkingBeatmap catchBeatmap = null!;
-        private WorkingBeatmap maniaBeatmap = null!;
+        private DifficultyCalculator osuCalculator = null!;
+        private DifficultyCalculator taikoCalculator = null!;
+        private DifficultyCalculator catchCalculator = null!;
+        private DifficultyCalculator maniaCalculator = null!;
 
         public override void SetUp()
         {
@@ -29,10 +30,15 @@ namespace osu.Game.Benchmarks
             using var archive = resources.GetStream("Resources/Archives/241526 Soleily - Renatus.osz");
             using var archiveReader = new ZipArchiveReader(archive);
 
-            osuBeatmap = readBeatmap(archiveReader, "Soleily - Renatus (Gamu) [Insane].osu");
-            taikoBeatmap = readBeatmap(archiveReader, "Soleily - Renatus (MMzz) [Oni].osu");
-            catchBeatmap = readBeatmap(archiveReader, "Soleily - Renatus (Deif) [Salad].osu");
-            maniaBeatmap = readBeatmap(archiveReader, "Soleily - Renatus (ExPew) [Another].osu");
+            var osuBeatmap = readBeatmap(archiveReader, "Soleily - Renatus (Gamu) [Insane].osu");
+            var taikoBeatmap = readBeatmap(archiveReader, "Soleily - Renatus (MMzz) [Oni].osu");
+            var catchBeatmap = readBeatmap(archiveReader, "Soleily - Renatus (Deif) [Salad].osu");
+            var maniaBeatmap = readBeatmap(archiveReader, "Soleily - Renatus (ExPew) [Another].osu");
+
+            osuCalculator = new OsuRuleset().CreateDifficultyCalculator(osuBeatmap);
+            taikoCalculator = new TaikoRuleset().CreateDifficultyCalculator(taikoBeatmap);
+            catchCalculator = new CatchRuleset().CreateDifficultyCalculator(catchBeatmap);
+            maniaCalculator = new ManiaRuleset().CreateDifficultyCalculator(maniaBeatmap);
         }
 
         private WorkingBeatmap readBeatmap(ZipArchiveReader archiveReader, string beatmapName)
@@ -48,25 +54,23 @@ namespace osu.Game.Benchmarks
         }
 
         [Benchmark]
-        public void CalculateDifficultyOsu() => new OsuRuleset().CreateDifficultyCalculator(osuBeatmap).Calculate();
+        public void CalculateDifficultyOsu() => osuCalculator.Calculate();
 
         [Benchmark]
-        public void CalculateDifficultyTaiko() => new TaikoRuleset().CreateDifficultyCalculator(taikoBeatmap).Calculate();
+        public void CalculateDifficultyTaiko() => taikoCalculator.Calculate();
 
         [Benchmark]
-        public void CalculateDifficultyCatch() => new CatchRuleset().CreateDifficultyCalculator(catchBeatmap).Calculate();
+        public void CalculateDifficultyCatch() => catchCalculator.Calculate();
 
         [Benchmark]
-        public void CalculateDifficultyMania() => new ManiaRuleset().CreateDifficultyCalculator(maniaBeatmap).Calculate();
+        public void CalculateDifficultyMania() => maniaCalculator.Calculate();
 
         [Benchmark]
         public void CalculateDifficultyOsuHundredTimes()
         {
-            var diffcalc = new OsuRuleset().CreateDifficultyCalculator(osuBeatmap);
-
             for (int i = 0; i < 100; i++)
             {
-                diffcalc.Calculate();
+                osuCalculator.Calculate();
             }
         }
     }
