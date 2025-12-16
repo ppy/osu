@@ -20,6 +20,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
@@ -137,35 +138,44 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     {
                         beatmapAvailabilityTracker,
                         new MultiplayerRoomSounds(),
-                        new GridContainer
+                        new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding
                             {
                                 Horizontal = HORIZONTAL_OVERFLOW_PADDING,
                             },
-                            RowDimensions = new[]
+                            Child = new InverseScalingDrawSizePreservingFillContainer
                             {
-                                new Dimension(),
-                                new Dimension(GridSizeMode.Absolute, row_padding),
-                                new Dimension(GridSizeMode.AutoSize),
-                            },
-                            Content = new Drawable[]?[]
-                            {
-                                [
-                                    new ScreenStack(),
-                                ],
-                                null,
-                                [
-                                    new Container
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Child = new GridContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    RowDimensions = new[]
                                     {
-                                        Name = "Chat Area Space",
-                                        Anchor = Anchor.TopRight,
-                                        Origin = Anchor.TopRight,
-                                        Size = new Vector2(550, 130),
-                                        Margin = new MarginPadding { Bottom = row_padding }
+                                        new Dimension(),
+                                        new Dimension(GridSizeMode.Absolute, row_padding),
+                                        new Dimension(GridSizeMode.AutoSize),
+                                    },
+                                    Content = new Drawable[]?[]
+                                    {
+                                        [
+                                            new ScreenStack(),
+                                        ],
+                                        null,
+                                        [
+                                            new Container
+                                            {
+                                                Name = "Chat Area Space",
+                                                Anchor = Anchor.TopRight,
+                                                Origin = Anchor.TopRight,
+                                                Size = new Vector2(550, 130),
+                                                Margin = new MarginPadding { Bottom = row_padding }
+                                            }
+                                        ]
                                     }
-                                ]
+                                }
                             }
                         }
                     }
@@ -472,8 +482,27 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 InternalChild = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = chat
+                    Child = new InverseScalingDrawSizePreservingFillContainer
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Child = chat
+                    }
                 };
+            }
+        }
+
+        private partial class InverseScalingDrawSizePreservingFillContainer : ScalingContainer.ScalingDrawSizePreservingFillContainer
+        {
+            public InverseScalingDrawSizePreservingFillContainer()
+                : base(true)
+            {
+            }
+
+            protected override void Update()
+            {
+                Size = new Vector2(CurrentScale);
+                Scale = new Vector2(1 / CurrentScale);
             }
         }
     }
