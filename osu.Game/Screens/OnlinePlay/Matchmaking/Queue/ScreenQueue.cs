@@ -187,6 +187,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             base.OnEntering(e);
 
+            musicController.ApplyModTrackAdjustments = false;
+
             controller.SearchInForeground();
 
             client.MatchmakingJoinLobby().FireAndForget();
@@ -198,6 +200,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
+
+            musicController.ApplyModTrackAdjustments = false;
 
             client.MatchmakingJoinLobby().FireAndForget();
         }
