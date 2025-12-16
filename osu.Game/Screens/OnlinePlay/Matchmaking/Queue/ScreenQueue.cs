@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -42,6 +43,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
     public partial class ScreenQueue : OsuScreen
     {
         public override bool ShowFooter => true;
+
+        public override bool? ApplyModTrackAdjustments => false;
 
         private Container mainContent = null!;
 
@@ -187,8 +190,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             base.OnEntering(e);
 
-            musicController.ApplyModTrackAdjustments = false;
-
             controller.SearchInForeground();
 
             client.MatchmakingJoinLobby().FireAndForget();
@@ -200,8 +201,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
-
-            musicController.ApplyModTrackAdjustments = false;
 
             client.MatchmakingJoinLobby().FireAndForget();
         }
