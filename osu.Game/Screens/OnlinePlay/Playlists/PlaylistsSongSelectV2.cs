@@ -149,13 +149,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             freeModSelect.IsValidMod = isValidAllowedMod;
         }
 
-        protected override void OnStart()
-        {
-            if (room.Playlist.Count <= 1)
-                room.Playlist = [createItem()];
-
-            this.Exit();
-        }
+        protected override void OnStart() => AddNewItem();
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
