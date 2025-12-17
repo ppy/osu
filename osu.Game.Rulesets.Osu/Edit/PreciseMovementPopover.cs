@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Utils;
 using osuTK;
 
@@ -30,6 +31,9 @@ namespace osu.Game.Rulesets.Osu.Edit
     {
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
+
+        [Resolved]
+        private IBeatmapEditorChangeHandler? changeHandler { get; set; }
 
         private readonly Dictionary<HitObject, Vector2> initialPositions = new Dictionary<HitObject, Vector2>();
         private RectangleF initialSurroundingQuad;
@@ -92,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override void PopIn()
         {
             base.PopIn();
-            editorBeatmap.BeginChange();
+            changeHandler?.BeginChange();
             initialPositions.AddRange(editorBeatmap.SelectedHitObjects.Where(ho => ho is not Spinner).Select(ho => new KeyValuePair<HitObject, Vector2>(ho, ((IHasPosition)ho).Position)));
             initialSurroundingQuad = GeometryUtils.GetSurroundingQuad(initialPositions.Keys.Cast<IHasPosition>()).AABBFloat;
 
@@ -112,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override void PopOut()
         {
             base.PopOut();
-            if (IsLoaded) editorBeatmap.EndChange();
+            if (IsLoaded) changeHandler?.EndChange();
         }
 
         private void relativeChanged()
@@ -188,9 +192,9 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 var pos = new Vector2(xBindable.Value, yBindable.Value);
                 if (relativeCheckbox.Current.Value)
-                    ((IHasPosition)ho).Position = initialPosition + pos;
+                    new PositionChange((IHasPosition)ho, initialPosition + pos).Apply(changeHandler);
                 else
-                    ((IHasPosition)ho).Position = pos;
+                    new PositionChange((IHasPosition)ho, pos).Apply(changeHandler);
             });
         }
 

@@ -104,10 +104,10 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("remove 2nd timing point", () =>
             {
-                EditorBeatmap.BeginChange();
+                ChangeHandler.BeginChange();
                 var group = EditorBeatmap.ControlPointInfo.GroupAt(2000);
                 EditorBeatmap.ControlPointInfo.RemoveGroup(group);
-                EditorBeatmap.EndChange();
+                ChangeHandler.EndChange();
             });
 
             pressAndCheckTime(Key.Left, 2000);

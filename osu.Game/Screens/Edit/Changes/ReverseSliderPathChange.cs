@@ -3,29 +3,34 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
-namespace osu.Game.Rulesets.Objects
+namespace osu.Game.Screens.Edit.Changes
 {
-    public static class SliderPathExtensions
+    /// <summary>
+    /// Reverse the direction of this path.
+    /// </summary>
+    public class ReverseSliderPathChange : CompositeChange
     {
         /// <summary>
-        /// Snaps the provided <paramref name="hitObject"/>'s duration using the <paramref name="snapProvider"/>.
+        /// The positional offset of the resulting path. It should be added to the start position of the path.
         /// </summary>
-        public static void SnapTo<THitObject>(this THitObject hitObject, IDistanceSnapProvider? snapProvider)
-            where THitObject : HitObject, IHasPath, IHasSliderVelocity
-        {
-            hitObject.Path.ExpectedDistance.Value = snapProvider?.FindSnappedDistance((float)hitObject.Path.CalculatedDistance, hitObject.StartTime, hitObject) ?? hitObject.Path.CalculatedDistance;
-        }
+        public Vector2 PositionalOffset { get; private set; }
+
+        private readonly SliderPath sliderPath;
 
         /// <summary>
         /// Reverse the direction of this path.
         /// </summary>
         /// <param name="sliderPath">The <see cref="SliderPath"/>.</param>
-        /// <param name="positionalOffset">The positional offset of the resulting path. It should be added to the start position of this path.</param>
-        public static void Reverse(this SliderPath sliderPath, out Vector2 positionalOffset)
+        public ReverseSliderPathChange(SliderPath sliderPath)
+        {
+            this.sliderPath = sliderPath;
+        }
+
+        protected override void ApplyChanges()
         {
             var controlPoints = sliderPath.ControlPoints;
 
@@ -33,7 +38,7 @@ namespace osu.Game.Rulesets.Objects
 
             // Inherited points after a linear point, as well as the first control point if it inherited,
             // should be treated as linear points, so their types are temporarily changed to linear.
-            inheritedLinearPoints.ForEach(p => p.Type = PathType.LINEAR);
+            inheritedLinearPoints.ForEach(p => Apply(new PathControlPointTypeChange(p, PathType.LINEAR)));
 
             double[] segmentEnds = sliderPath.GetSegmentEnds().ToArray();
 
@@ -46,11 +51,11 @@ namespace osu.Game.Rulesets.Objects
                     segmentEnds = segmentEnds[..^1];
                 }
 
-                controlPoints.RemoveAt(controlPoints.Count - 1);
+                Apply(new RemovePathControlPointChange(controlPoints, controlPoints.Count - 1));
             }
 
             // Restore original control point types.
-            inheritedLinearPoints.ForEach(p => p.Type = null);
+            inheritedLinearPoints.ForEach(p => Apply(new PathControlPointTypeChange(p, null)));
 
             // Recalculate middle perfect curve control points at the end of the slider path.
             if (controlPoints.Count >= 3 && controlPoints[^3].Type == PathType.PERFECT_CURVE && controlPoints[^2].Type == null && segmentEnds.Any())
@@ -61,30 +66,25 @@ namespace osu.Game.Rulesets.Objects
                 var circleArcPath = new List<Vector2>();
                 sliderPath.GetPathToProgress(circleArcPath, lastSegmentStart / lastSegmentEnd, 1);
 
-                controlPoints[^2].Position = circleArcPath[circleArcPath.Count / 2];
+                Apply(new PathControlPointPositionChange(controlPoints[^2], circleArcPath[circleArcPath.Count / 2]));
             }
 
-            sliderPath.reverseControlPoints(out positionalOffset);
+            reverseControlPoints();
         }
 
-        /// <summary>
-        /// Reverses the order of the provided <see cref="SliderPath"/>'s <see cref="PathControlPoint"/>s.
-        /// </summary>
-        /// <param name="sliderPath">The <see cref="SliderPath"/>.</param>
-        /// <param name="positionalOffset">The positional offset of the resulting path. It should be added to the start position of this path.</param>
-        private static void reverseControlPoints(this SliderPath sliderPath, out Vector2 positionalOffset)
+        private void reverseControlPoints()
         {
             var points = sliderPath.ControlPoints.ToArray();
-            positionalOffset = sliderPath.PositionAt(1);
+            PositionalOffset = sliderPath.PositionAt(1);
 
-            sliderPath.ControlPoints.Clear();
+            Apply(new RemoveRangePathControlPointChange(sliderPath.ControlPoints, 0, sliderPath.ControlPoints.Count));
 
             PathType? lastType = null;
 
             for (int i = 0; i < points.Length; i++)
             {
-                var p = points[i];
-                p.Position -= positionalOffset;
+                var p = new PathControlPoint(points[i].Position, points[i].Type);
+                p.Position -= PositionalOffset;
 
                 // propagate types forwards to last null type
                 if (i == points.Length - 1)
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Objects
                 else if (p.Type != null)
                     (p.Type, lastType) = (lastType, p.Type);
 
-                sliderPath.ControlPoints.Insert(0, p);
+                Apply(new InsertPathControlPointChange(sliderPath.ControlPoints, 0, p));
             }
         }
     }

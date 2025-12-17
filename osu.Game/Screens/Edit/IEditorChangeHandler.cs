@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Screens.Edit.Changes;
 
 namespace osu.Game.Screens.Edit
 {
@@ -49,5 +50,11 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         /// <param name="direction">The direction to restore in. If less than 0, an older state will be used. If greater than 0, a newer state will be used.</param>
         void RestoreState(int direction);
+
+        /// <summary>
+        /// Adds a change to the history. The change should be applied before this method is called.
+        /// </summary>
+        /// <param name="change">Change to be recorded.</param>
+        void Record(IRevertibleChange change);
     }
 }

@@ -103,9 +103,9 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("make change to difficulty", () =>
             {
-                EditorBeatmap.BeginChange();
+                ChangeHandler.BeginChange();
                 EditorBeatmap.BeatmapInfo.DifficultyName = "changin' things";
-                EditorBeatmap.EndChange();
+                ChangeHandler.EndChange();
             });
 
             AddStep("click File", () => this.ChildrenOfType<EditorMenuBar.DrawableEditorBarMenuItem>().First().TriggerClick());

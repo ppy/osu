@@ -10,7 +10,9 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Taiko.Edit.Changes;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Taiko.Edit
@@ -62,7 +64,7 @@ namespace osu.Game.Rulesets.Taiko.Edit
                 if (h is not TaikoStrongableHitObject strongable) return;
 
                 if (strongable.IsStrong != state)
-                    strongable.IsStrong = state;
+                    new IsStrongChange(strongable, state).Apply(ChangeHandler);
             });
         }
 
@@ -74,7 +76,7 @@ namespace osu.Game.Rulesets.Taiko.Edit
             EditorBeatmap.PerformOnSelection(h =>
             {
                 if (h is Hit taikoHit)
-                    taikoHit.Type = state ? HitType.Rim : HitType.Centre;
+                    new HitTypeChange(taikoHit, state ? HitType.Rim : HitType.Centre).Apply(ChangeHandler);
             });
         }
 

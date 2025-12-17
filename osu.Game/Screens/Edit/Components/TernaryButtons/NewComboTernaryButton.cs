@@ -23,6 +23,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Edit.Changes;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Components.TernaryButtons
@@ -121,6 +122,9 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             private EditorBeatmap editorBeatmap { get; set; } = null!;
 
             [Resolved]
+            private IBeatmapEditorChangeHandler? changeHandler { get; set; }
+
+            [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
 
             public SpriteIcon Icon { get; private set; } = null!;
@@ -175,7 +179,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
                 }
             }
 
-            public Popover GetPopover() => new ComboColourPalettePopover(ComboColours, SelectedHitObject.Value.AsNonNull(), editorBeatmap);
+            public Popover GetPopover() => new ComboColourPalettePopover(ComboColours, SelectedHitObject.Value.AsNonNull(), editorBeatmap, changeHandler);
         }
 
         private partial class ComboColourPalettePopover : OsuPopover
@@ -183,12 +187,14 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             private readonly IReadOnlyList<Colour4> comboColours;
             private readonly IHasComboInformation hasComboInformation;
             private readonly EditorBeatmap editorBeatmap;
+            private readonly IBeatmapEditorChangeHandler? changeHandler;
 
-            public ComboColourPalettePopover(IReadOnlyList<Colour4> comboColours, IHasComboInformation hasComboInformation, EditorBeatmap editorBeatmap)
+            public ComboColourPalettePopover(IReadOnlyList<Colour4> comboColours, IHasComboInformation hasComboInformation, EditorBeatmap editorBeatmap, IBeatmapEditorChangeHandler? changeHandler)
             {
                 this.comboColours = comboColours;
                 this.hasComboInformation = hasComboInformation;
                 this.editorBeatmap = editorBeatmap;
+                this.changeHandler = changeHandler;
 
                 AllowableAnchors = [Anchor.CentreRight];
             }
@@ -256,10 +262,10 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
                             // which can return negative results when the first operand is negative
                             newOffset -= (int)Math.Floor((double)newOffset / comboColours.Count) * comboColours.Count;
 
-                            hasComboInformation.ComboOffset = newOffset;
-                            editorBeatmap.BeginChange();
-                            editorBeatmap.Update((HitObject)hasComboInformation);
-                            editorBeatmap.EndChange();
+                            new ComboOffsetChange(hasComboInformation, newOffset).Apply(changeHandler);
+                            changeHandler?.BeginChange();
+                            changeHandler?.Update((HitObject)hasComboInformation);
+                            changeHandler?.EndChange();
                             this.HidePopover();
                         }
                     });

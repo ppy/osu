@@ -9,6 +9,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Changes;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Game.Screens.Edit.GameplayTest;
 using osu.Game.Storyboards;
@@ -46,9 +47,9 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
         {
             AddStep("add objects", () =>
             {
-                EditorBeatmap.Clear();
-                EditorBeatmap.Add(new Swell { StartTime = 500, EndTime = 1500 });
-                EditorBeatmap.Add(new Hit { StartTime = 3000 });
+                new RemoveRangeHitObjectChange(EditorBeatmap, EditorBeatmap.HitObjects).Apply(ChangeHandler);
+                new AddHitObjectChange(EditorBeatmap, new Swell { StartTime = 500, EndTime = 1500 }).Apply(ChangeHandler);
+                new AddHitObjectChange(EditorBeatmap, new Hit { StartTime = 3000 }).Apply(ChangeHandler);
             });
             AddStep("seek to 250", () => EditorClock.Seek(250));
             AddUntilStep("wait for seek", () => EditorClock.CurrentTime, () => Is.EqualTo(250));

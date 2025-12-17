@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Edit
         protected override void WriteCurrentStateToStream(MemoryStream stream)
         {
             using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                new LegacyBeatmapEncoder(editorBeatmap, editorBeatmap.BeatmapSkin).Encode(sw);
+                new LegacyBeatmapEncoder(editorBeatmap, editorBeatmap.BeatmapSkin, true).Encode(sw);
         }
 
         protected override void ApplyStateChange(byte[] previousState, byte[] newState) =>
