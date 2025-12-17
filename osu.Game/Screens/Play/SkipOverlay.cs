@@ -9,7 +9,6 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -20,7 +19,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
@@ -32,7 +30,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public partial class SkipOverlay : BeatSyncedContainer, IKeyBindingHandler<GlobalAction>
+    public partial class SkipOverlay : Container, IKeyBindingHandler<GlobalAction>
     {
         /// <summary>
         /// The total number of successful skips performed by this overlay.
@@ -191,7 +189,7 @@ namespace osu.Game.Screens.Play
 
             double progress = Math.Max(0, 1 - (gameplayClock.CurrentTime - displayTime) / (fadeOutBeginTime - displayTime));
 
-            RemainingTimeBox.Width = (float)Interpolation.Lerp(RemainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
+            RemainingTimeBox.Width = (float)Interpolation.DampContinuously(RemainingTimeBox.Width, progress, 40, Math.Abs(Time.Elapsed));
 
             inSkipPeriod.Value = progress > 0;
             buttonContainer.State.Value = inSkipPeriod.Value ? Visibility.Visible : Visibility.Hidden;
@@ -225,18 +223,6 @@ namespace osu.Game.Screens.Play
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-        }
-
-        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
-        {
-            base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
-
-            if (fadeOutBeginTime <= gameplayClock.CurrentTime)
-                return;
-
-            float progress = (float)(gameplayClock.CurrentTime - displayTime) / (float)(fadeOutBeginTime - displayTime);
-            float newWidth = 1 - Math.Clamp(progress, 0, 1);
-            RemainingTimeBox.ResizeWidthTo(newWidth, timingPoint.BeatLength * 3.5, Easing.OutQuint);
         }
 
         public partial class FadeContainer : Container, IStateful<Visibility>
