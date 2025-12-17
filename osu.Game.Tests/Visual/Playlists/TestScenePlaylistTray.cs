@@ -13,13 +13,12 @@ namespace osu.Game.Tests.Visual.Playlists
     public partial class TestScenePlaylistTray : OnlinePlayTestScene
     {
         private Room room = null!;
-        private PlaylistsSongSelectV2.PlaylistTray tray = null!;
 
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
-            AddStep("add tray", () => Child = tray = new PlaylistsSongSelectV2.PlaylistTray(room = new Room())
+            AddStep("add tray", () => Child = new PlaylistsSongSelectV2.PlaylistTray(room = new Room())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
