@@ -43,6 +43,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
     {
         public override bool ShowFooter => true;
 
+        public override bool? ApplyModTrackAdjustments => false;
+
         private Container mainContent = null!;
 
         private MatchmakingScreenState state;
