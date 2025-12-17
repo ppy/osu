@@ -56,10 +56,10 @@ namespace osu.Game.Screens.SelectV2
         {
             bool match = criteria.Ruleset == null || beatmap.AllowGameplayWithRuleset(criteria.Ruleset!, criteria.AllowConvertedBeatmaps);
 
-            if (beatmap.BeatmapSet?.Equals(criteria.SelectedBeatmapSet) == true)
+            if (criteria.SelectedBeatmapSet != null)
             {
                 // only check ruleset equality or convertability for selected beatmap
-                return match;
+                return beatmap.BeatmapSet?.Equals(criteria.SelectedBeatmapSet) == true && match;
             }
 
             if (!match) return false;

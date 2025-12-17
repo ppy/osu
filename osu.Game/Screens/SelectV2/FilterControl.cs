@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Database;
@@ -36,6 +37,8 @@ namespace osu.Game.Screens.SelectV2
         public const float HEIGHT_FROM_SCREEN_TOP = 141 - corner_radius;
 
         private const float corner_radius = 10;
+
+        public Bindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
 
         private SongSelectSearchTextBox searchTextBox = null!;
         private ShearedToggleButton showConvertedBeatmapsButton = null!;
@@ -158,6 +161,7 @@ namespace osu.Game.Screens.SelectV2
                                 new Dimension(maxSize: 180),
                                 new Dimension(GridSizeMode.Absolute, 5),
                                 new Dimension(),
+                                new Dimension(GridSizeMode.AutoSize),
                             },
                             Content = new[]
                             {
@@ -182,6 +186,10 @@ namespace osu.Game.Screens.SelectV2
                                 }
                             }
                         },
+                        new ScopedBeatmapSetDisplay
+                        {
+                            ScopedBeatmapSet = ScopedBeatmapSet,
+                        }
                     },
                 }
             };
@@ -240,6 +248,7 @@ namespace osu.Game.Screens.SelectV2
 
             localUser.BindValueChanged(_ => updateCriteria());
             localUserFavouriteBeatmapSets.BindCollectionChanged((_, _) => updateCriteria());
+            ScopedBeatmapSet.BindValueChanged(_ => updateCriteria(clearScopedSet: false));
 
             updateCriteria();
         }
@@ -260,6 +269,7 @@ namespace osu.Game.Screens.SelectV2
 
             var criteria = new FilterCriteria
             {
+                SelectedBeatmapSet = ScopedBeatmapSet.Value,
                 Sort = sortDropdown.Current.Value,
                 Group = groupDropdown.Current.Value,
                 AllowConvertedBeatmaps = showConvertedBeatmapsButton.Active.Value,
@@ -282,8 +292,16 @@ namespace osu.Game.Screens.SelectV2
             return criteria;
         }
 
-        private void updateCriteria()
+        private void updateCriteria(bool clearScopedSet = true)
         {
+            if (clearScopedSet && ScopedBeatmapSet.Value != null)
+            {
+                ScopedBeatmapSet.Value = null;
+                // because `ScopedBeatmapSet` has a value change callback bound to it that calls `updateCriteria()` again,
+                // we can just do nothing other than clear it to avoid extra work and duplicated `CriteriaChanged` invocations
+                return;
+            }
+
             currentCriteria = CreateCriteria();
             CriteriaChanged?.Invoke(currentCriteria);
         }
