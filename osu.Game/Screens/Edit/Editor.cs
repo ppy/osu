@@ -480,7 +480,7 @@ namespace osu.Game.Screens.Edit
         [Resolved]
         private MusicController musicController { get; set; }
 
-        protected override BackgroundScreen CreateBackground() => new EditorBackgroundScreen();
+        protected override BackgroundScreen CreateBackground() => new EditorBackgroundScreen(editorBeatmap);
 
         protected override void LoadComplete()
         {

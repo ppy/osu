@@ -58,26 +58,49 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
+        private LocalisableString caption;
+
         /// <summary>
         /// Caption describing this slider bar, displayed on top of the controls.
         /// </summary>
-        public LocalisableString Caption { get; init; }
+        public LocalisableString Caption
+        {
+            get => caption;
+            set
+            {
+                caption = value;
+
+                if (IsLoaded)
+                    captionText.Caption = value;
+            }
+        }
 
         /// <summary>
         /// Hint text containing an extended description of this slider bar, displayed in a tooltip when hovering the caption.
         /// </summary>
         public LocalisableString HintText { get; init; }
 
+        private float keyboardStep;
+
         /// <summary>
         /// A custom step value for each key press which actuates a change on this control.
         /// </summary>
-        public float KeyboardStep { get; init; }
+        public float KeyboardStep
+        {
+            get => keyboardStep;
+            set
+            {
+                keyboardStep = value;
+                if (IsLoaded)
+                    slider.KeyboardStep = value;
+            }
+        }
 
         private Box background = null!;
         private Box flashLayer = null!;
         private FormTextBox.InnerTextBox textBox = null!;
         private InnerSlider slider = null!;
-        private FormFieldCaption caption = null!;
+        private FormFieldCaption captionText = null!;
         private IFocusManager focusManager = null!;
 
         [Resolved]
@@ -117,11 +140,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     },
                     Children = new Drawable[]
                     {
-                        caption = new FormFieldCaption
+                        captionText = new FormFieldCaption
                         {
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft,
-                            Caption = Caption,
                             TooltipText = HintText,
                         },
                         textBox = new FormNumberBox.InnerNumberBox(allowDecimals: true)
@@ -145,7 +167,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             Origin = Anchor.CentreRight,
                             RelativeSizeAxes = Axes.X,
                             Width = 0.5f,
-                            KeyboardStep = KeyboardStep,
                             Current = currentNumberInstantaneous,
                             OnCommit = () => current.Value = currentNumberInstantaneous.Value,
                         }
@@ -160,6 +181,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            slider.KeyboardStep = keyboardStep;
+            captionText.Caption = caption;
 
             focusManager = GetContainingFocusManager()!;
 
@@ -270,7 +294,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             textBox.Alpha = 1;
 
             background.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background4 : colourProvider.Background5;
-            caption.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
+            captionText.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
             textBox.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
 
             BorderThickness = childHasFocus || IsHovered || slider.IsDragging.Value ? 2 : 0;
@@ -300,8 +324,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             private Box leftBox = null!;
             private Box rightBox = null!;
-            private Circle nub = null!;
-            private const float nub_width = 10;
+            private InnerSliderNub nub = null!;
+            public const float NUB_WIDTH = 10;
 
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -311,7 +335,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 Height = 40;
                 RelativeSizeAxes = Axes.X;
-                RangePadding = nub_width / 2;
+                RangePadding = NUB_WIDTH / 2;
 
                 Children = new Drawable[]
                 {
@@ -340,12 +364,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     {
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Horizontal = RangePadding, },
-                        Child = nub = new Circle
+                        Child = nub = new InnerSliderNub
                         {
-                            Width = nub_width,
-                            RelativeSizeAxes = Axes.Y,
-                            RelativePositionAxes = Axes.X,
-                            Origin = Anchor.TopCentre,
+                            ResetToDefault = () =>
+                            {
+                                if (!Current.Disabled)
+                                    Current.SetDefault();
+                            }
                         }
                     },
                     new HoverClickSounds()
@@ -426,6 +451,28 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     OnCommit?.Invoke();
 
                 return result;
+            }
+        }
+
+        private partial class InnerSliderNub : Circle
+        {
+            public Action? ResetToDefault { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Width = InnerSlider.NUB_WIDTH;
+                RelativeSizeAxes = Axes.Y;
+                RelativePositionAxes = Axes.X;
+                Origin = Anchor.TopCentre;
+            }
+
+            protected override bool OnClick(ClickEvent e) => true; // must be handled for double click handler to ever fire
+
+            protected override bool OnDoubleClick(DoubleClickEvent e)
+            {
+                ResetToDefault?.Invoke();
+                return true;
             }
         }
     }

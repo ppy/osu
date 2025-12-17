@@ -78,6 +78,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             client.MatchRoomStateChanged += onRoomStateChanged;
             client.UserJoined += onUserJoined;
             client.UserLeft += onUserLeft;
+            client.UserKicked += onUserLeft;
 
             if (client.Room != null)
             {
@@ -122,7 +123,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
         private void onUserLeft(MultiplayerRoomUser user) => Scheduler.Add(() =>
         {
-            panels.Single(p => p.RoomUser.Equals(user)).Expire();
+            panels.Single(p => p.RoomUser.Equals(user)).HasQuit = true;
             updateDisplay();
         });
 
@@ -207,6 +208,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 client.MatchRoomStateChanged -= onRoomStateChanged;
                 client.UserJoined -= onUserJoined;
                 client.UserLeft -= onUserLeft;
+                client.UserKicked -= onUserLeft;
             }
         }
 
@@ -239,8 +241,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     if (client.Room?.MatchState is not MatchmakingRoomState matchmakingState)
                         continue;
 
-                    if (matchmakingState.Users.UserDictionary.TryGetValue(panels[i].User.Id, out MatchmakingUser? user))
-                        SetLayoutPosition(Children[i], user.Placement);
+                    if (matchmakingState.Users.UserDictionary.TryGetValue(panels[i].User.Id, out MatchmakingUser? user) && user.Placement != null)
+                        SetLayoutPosition(Children[i], user.Placement.Value);
                     else
                         SetLayoutPosition(Children[i], float.MaxValue);
                 }

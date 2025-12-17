@@ -412,6 +412,9 @@ namespace osu.Game.Skinning
                                         leaderboard.Origin = Anchor.CentreLeft;
                                         leaderboard.X = 10;
                                     }
+
+                                    foreach (var d in container.OfType<ISerialisableDrawable>())
+                                        d.UsesFixedAnchor = true;
                                 })
                                 {
                                     new LegacyDefaultComboCounter(),
@@ -448,6 +451,9 @@ namespace osu.Game.Skinning
                                     hitError.Origin = Anchor.CentreLeft;
                                     hitError.Rotation = -90;
                                 }
+
+                                foreach (var d in container.OfType<ISerialisableDrawable>())
+                                    d.UsesFixedAnchor = true;
                             })
                             {
                                 Children = new Drawable[]
@@ -539,6 +545,10 @@ namespace osu.Game.Skinning
             {
                 case "Menu/fountain-star":
                     componentName = "star2";
+                    break;
+
+                case @"Intro/Welcome/welcome_text":
+                    componentName = @"welcome_text";
                     break;
             }
 

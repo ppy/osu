@@ -89,6 +89,33 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestFilterSingleResult_ReselectedAfterRulesetSwitches()
+        {
+            LoadSongSelect();
+
+            ImportBeatmapForRuleset(0);
+            ImportBeatmapForRuleset(0);
+
+            AddStep("disable converts", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
+            AddStep("set filter text", () => filterTextBox.Current.Value = $"\"{Beatmaps.GetAllUsableBeatmapSets().Last().Metadata.Title}\"");
+
+            AddWaitStep("wait for debounce", 5);
+            AddUntilStep("wait for filter", () => !Carousel.IsFiltering);
+            AddUntilStep("selection is second beatmap set", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(Beatmaps.GetAllUsableBeatmapSets().Last().Beatmaps.First()));
+
+            AddStep("select last difficulty", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmap.Value.BeatmapSetInfo.Beatmaps.Last()));
+            AddUntilStep("selection is last difficulty of second beatmap set", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(Beatmaps.GetAllUsableBeatmapSets().Last().Beatmaps.Last()));
+
+            ChangeRuleset(1);
+            AddUntilStep("wait for filter", () => !Carousel.IsFiltering);
+            AddUntilStep("selection is default", () => Beatmap.IsDefault);
+
+            ChangeRuleset(0);
+            AddUntilStep("wait for filter", () => !Carousel.IsFiltering);
+            AddUntilStep("selection is last difficulty of second beatmap set", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(Beatmaps.GetAllUsableBeatmapSets().Last().Beatmaps.Last()));
+        }
+
+        [Test]
         public void TestFilterOnResumeAfterChange()
         {
             ImportBeatmapForRuleset(0);

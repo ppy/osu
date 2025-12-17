@@ -16,12 +16,14 @@ namespace osu.Game.Online.API
         public IBindable<APIUser> User => localUser;
         public IBindableList<APIRelation> Friends => friends;
         public IBindableList<APIRelation> Blocks => blocks;
+        public IBindableList<int> FavouriteBeatmapSets => favouriteBeatmapSets;
 
         private readonly IAPIProvider api;
 
         private readonly Bindable<APIUser> localUser = new Bindable<APIUser>(createGuestUser());
         private readonly BindableList<APIRelation> friends = new BindableList<APIRelation>();
         private readonly BindableList<APIRelation> blocks = new BindableList<APIRelation>();
+        private readonly BindableList<int> favouriteBeatmapSets = new BindableList<int>();
 
         private readonly Bindable<UserStatus> configStatus = new Bindable<UserStatus>();
         private readonly Bindable<bool> configSupporter = new Bindable<bool>();
@@ -60,8 +62,13 @@ namespace osu.Game.Online.API
             localUser.Value = me;
             configSupporter.Value = me.IsSupporter;
 
+            // `last_visit` is assumed to be `null` if and only if the web-side "hide online presence toggle" is enabled
+            if (me.LastVisit == null)
+                configStatus.Value = UserStatus.Offline;
+
             UpdateFriends();
             UpdateBlocks();
+            UpdateFavouriteBeatmapSets();
         }
 
         public void ClearLocalUser()
@@ -76,6 +83,7 @@ namespace osu.Game.Online.API
                 configSupporter.Value = false;
                 friends.Clear();
                 blocks.Clear();
+                favouriteBeatmapSets.Clear();
             });
         }
 
@@ -124,6 +132,24 @@ namespace osu.Game.Online.API
             };
 
             api.Queue(blocksReq);
+        }
+
+        public void UpdateFavouriteBeatmapSets()
+        {
+            if (!api.IsLoggedIn)
+                return;
+
+            var favouritesReq = new GetMyFavouriteBeatmapSetsRequest();
+            favouritesReq.Success += res =>
+            {
+                var existingBeatmapSets = favouriteBeatmapSets.ToHashSet();
+                var updatedBeatmapSets = res.BeatmapSetIds.ToHashSet();
+
+                favouriteBeatmapSets.AddRange(updatedBeatmapSets.Except(existingBeatmapSets));
+                favouriteBeatmapSets.RemoveAll(b => !updatedBeatmapSets.Contains(b));
+            };
+
+            api.Queue(favouritesReq);
         }
     }
 }

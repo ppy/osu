@@ -79,6 +79,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                                     spectatorList.Origin = Anchor.TopLeft;
                                     spectatorList.Position = pos;
                                 }
+
+                                foreach (var d in container.OfType<ISerialisableDrawable>())
+                                    d.UsesFixedAnchor = true;
                             })
                             {
                                 new LegacyDefaultComboCounter(),
@@ -103,6 +106,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 {
                     switch (taikoComponent.Component)
                     {
+                        case TaikoSkinComponents.DrumRollHead:
+                            if (GetTexture("taiko-roll-middle") != null)
+                                return new LegacyCirclePiece();
+
+                            return null;
+
                         case TaikoSkinComponents.DrumRollBody:
                             if (GetTexture("taiko-roll-middle") != null)
                                 return new LegacyDrumRoll();
