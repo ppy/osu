@@ -9,7 +9,7 @@ using osu.Game.Screens.OnlinePlay.Playlists;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestSceneAddToPlaylistFooterButton : OsuTestScene
+    public partial class TestSceneAddToPlaylistFooterButton : OsuTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
