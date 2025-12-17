@@ -10,7 +10,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -19,6 +22,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
@@ -41,12 +45,18 @@ namespace osu.Game.Screens.Play
 
         protected FadeContainer FadingContent { get; private set; }
 
-        private Button button;
+        private OsuClickableContainer button;
+
         private ButtonContainer buttonContainer;
-        private Circle remainingTimeBox;
+        protected Circle RemainingTimeBox { get; private set; }
 
         private double displayTime;
-        private bool isClickable;
+
+        /// <summary>
+        /// Whether the gameplay clock is currently at the skippable period.
+        /// </summary>
+        private readonly BindableBool inSkipPeriod = new BindableBool();
+
         private bool skipQueued;
 
         [Resolved]
@@ -83,23 +93,30 @@ namespace osu.Game.Screens.Play
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        button = new Button
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        remainingTimeBox = new Circle
+                        button = CreateButton(inSkipPeriod),
+                        RemainingTimeBox = new Circle
                         {
                             Height = 5,
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
-                            Colour = colours.Yellow,
+                            Colour = colours.Orange3,
                             RelativeSizeAxes = Axes.X
                         }
                     }
                 }
             };
         }
+
+        /// <summary>
+        /// Creates a skip button.
+        /// </summary>
+        /// <param name="inSkipPeriod">Whether the gameplay clock is currently at the skippable period.</param>
+        protected virtual OsuClickableContainer CreateButton(IBindable<bool> inSkipPeriod) => new Button
+        {
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            Enabled = { BindTarget = inSkipPeriod },
+        };
 
         private const double fade_time = 300;
 
@@ -174,16 +191,15 @@ namespace osu.Game.Screens.Play
 
             double progress = Math.Max(0, 1 - (gameplayClock.CurrentTime - displayTime) / (fadeOutBeginTime - displayTime));
 
-            remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
+            RemainingTimeBox.Width = (float)Interpolation.Lerp(RemainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
-            isClickable = progress > 0;
-            button.Enabled.Value = isClickable;
-            buttonContainer.State.Value = isClickable ? Visibility.Visible : Visibility.Hidden;
+            inSkipPeriod.Value = progress > 0;
+            buttonContainer.State.Value = inSkipPeriod.Value ? Visibility.Visible : Visibility.Hidden;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            if (isClickable && !e.HasAnyButtonPressed)
+            if (inSkipPeriod.Value && !e.HasAnyButtonPressed)
                 FadingContent.TriggerShow();
 
             return base.OnMouseMove(e);
@@ -220,7 +236,7 @@ namespace osu.Game.Screens.Play
 
             float progress = (float)(gameplayClock.CurrentTime - displayTime) / (float)(fadeOutBeginTime - displayTime);
             float newWidth = 1 - Math.Clamp(progress, 0, 1);
-            remainingTimeBox.ResizeWidthTo(newWidth, timingPoint.BeatLength * 3.5, Easing.OutQuint);
+            RemainingTimeBox.ResizeWidthTo(newWidth, timingPoint.BeatLength * 3.5, Easing.OutQuint);
         }
 
         public partial class FadeContainer : Container, IStateful<Visibility>
@@ -328,8 +344,8 @@ namespace osu.Game.Screens.Play
             [BackgroundDependencyLoader]
             private void load(OsuColour colours, AudioManager audio)
             {
-                colourNormal = colours.Yellow;
-                colourHover = colours.YellowDark;
+                colourNormal = colours.Orange3;
+                colourHover = colours.Orange3.Lighten(0.2f);
 
                 sampleConfirm = audio.Samples.Get(@"UI/submit-select");
 
@@ -355,6 +371,11 @@ namespace osu.Game.Screens.Play
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = colourNormal,
+                            },
+                            new TrianglesV2
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = ColourInfo.GradientVertical(colourNormal.Lighten(0.2f), colourNormal)
                             },
                             flow = new FillFlowContainer
                             {

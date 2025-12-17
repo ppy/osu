@@ -36,10 +36,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding(6)
-                        {
-                            Bottom = StageDisplay.HEIGHT + 6,
-                        },
+                        Padding = new MarginPadding { Top = StageDisplay.HEIGHT, Bottom = 6 },
                         Children = new Drawable[]
                         {
                             screenStack = new Framework.Screens.ScreenStack(),
@@ -51,8 +48,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     },
                     new StageDisplay
                     {
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
                         RelativeSizeAxes = Axes.X
                     }
                 };
@@ -108,7 +103,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
                     case MatchmakingStage.ServerBeatmapFinalised:
                         Debug.Assert(screenStack.CurrentScreen is SubScreenBeatmapSelect);
-                        ((SubScreenBeatmapSelect)screenStack.CurrentScreen).RollFinalBeatmap(matchmakingState.CandidateItems, matchmakingState.CandidateItem);
+                        ((SubScreenBeatmapSelect)screenStack.CurrentScreen).RollFinalBeatmap(matchmakingState.CandidateItems, matchmakingState.CandidateItem, matchmakingState.GameplayItem);
                         break;
 
                     case MatchmakingStage.ResultsDisplaying:

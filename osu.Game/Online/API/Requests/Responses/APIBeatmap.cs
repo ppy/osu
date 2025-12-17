@@ -146,6 +146,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
             public string Name => $@"{nameof(APIRuleset)} (ID: {OnlineID})";
 
+            [JsonIgnore]
             public string ShortName
             {
                 get

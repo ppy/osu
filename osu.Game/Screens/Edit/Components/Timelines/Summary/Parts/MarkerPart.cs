@@ -5,7 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
-using osu.Framework.Threading;
+using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 
@@ -34,39 +34,53 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             });
         }
 
+        private double? lastSeekTime;
+
         protected override bool OnDragStart(DragStartEvent e) => true;
 
         protected override void OnDrag(DragEvent e)
         {
-            seekToPosition(e.ScreenSpaceMousePosition);
+            base.OnDrag(e);
+            seekToPosition(e.ScreenSpaceMousePosition, instant: false);
+        }
+
+        protected override void OnDragEnd(DragEndEvent e)
+        {
+            base.OnDragEnd(e);
+            seekToPosition(e.ScreenSpaceMousePosition, instant: true);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            seekToPosition(e.ScreenSpaceMousePosition);
+            seekToPosition(e.ScreenSpaceMousePosition, instant: true);
             return true;
         }
-
-        private ScheduledDelegate? scheduledSeek;
 
         /// <summary>
         /// Seeks the <see cref="SummaryTimeline"/> to the time closest to a position on the screen relative to the <see cref="SummaryTimeline"/>.
         /// </summary>
         /// <param name="screenPosition">The position in screen coordinates.</param>
-        private void seekToPosition(Vector2 screenPosition)
+        /// <param name="instant">Whether the seek should be instant (drag end, mouse button press) or debounced (drag in progress).</param>
+        private void seekToPosition(Vector2 screenPosition, bool instant)
         {
-            scheduledSeek?.Cancel();
-            scheduledSeek = Schedule(() =>
-            {
-                float markerPos = Math.Clamp(ToLocalSpace(screenPosition).X, 0, DrawWidth);
-                editorClock.SeekSmoothlyTo(markerPos / DrawWidth * editorClock.TrackLength);
-            });
+            float markerPos = Math.Clamp(ToLocalSpace(screenPosition).X, 0, DrawWidth);
+            double seekDestination = markerPos / DrawWidth * editorClock.TrackLength;
+            marker.X = (float)seekDestination;
+
+            if (editorClock.IsRunning && !instant && lastSeekTime != null && Time.Current - lastSeekTime < NowPlayingOverlay.TRACK_DRAG_SEEK_DEBOUNCE)
+                return;
+
+            editorClock.SeekSmoothlyTo(seekDestination);
+
+            lastSeekTime = instant ? null : Time.Current;
         }
 
         protected override void Update()
         {
             base.Update();
-            marker.X = (float)editorClock.CurrentTime;
+
+            if (!IsDragged)
+                marker.X = (float)editorClock.CurrentTime;
         }
 
         protected override void LoadBeatmap(EditorBeatmap beatmap)
