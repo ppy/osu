@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("osu.Game.Tests.Dynamic")]
 [assembly: InternalsVisibleTo("osu.Game.Tests.iOS")]
 [assembly: InternalsVisibleTo("osu.Game.Tests.Android")]
+[assembly: InternalsVisibleTo("osu.Game.Tournament.Tests")]
 
 // intended for Moq usage
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

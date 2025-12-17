@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
-    public partial class TestSceneMatchmakingChatDisplay : ScreenTestScene
+    public partial class TestSceneMatchmakingChatDisplay : MatchmakingTestScene
     {
         private MatchmakingChatDisplay? chat;
 

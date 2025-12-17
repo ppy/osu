@@ -16,7 +16,6 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// Request to leave the currently joined room.
         /// </summary>
-        /// <exception cref="NotJoinedRoomException">If the user is not in a room.</exception>
         Task LeaveRoom();
 
         /// <summary>
