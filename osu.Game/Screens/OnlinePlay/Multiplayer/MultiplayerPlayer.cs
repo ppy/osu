@@ -56,7 +56,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 AllowPause = false,
                 AllowRestart = false,
-                AllowSkipping = room.AutoSkip,
                 AutomaticallySkipIntro = room.AutoSkip,
                 ShowLeaderboard = true,
             })
@@ -121,6 +120,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             client.GameplayStarted += onGameplayStarted;
             client.ResultsReady += onResultsReady;
+            client.VoteToSkipIntroPassed += onVoteToSkipIntroPassed;
 
             ScoreProcessor.HasCompleted.BindValueChanged(_ =>
             {
@@ -148,6 +148,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Debug.Assert(client.Room != null);
         }
 
+        protected override SkipOverlay CreateSkipOverlay(double startTime) => new MultiplayerSkipOverlay(startTime);
+
         protected override void StartGameplay()
         {
             // We can enter this screen one of two ways:
@@ -161,7 +163,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.LocalUser?.State == MultiplayerUserState.Loaded)
             {
                 loadingDisplay.Show();
-                client.ChangeState(MultiplayerUserState.ReadyForGameplay);
+                client.ChangeState(MultiplayerUserState.ReadyForGameplay).FireAndForget();
             }
 
             // This will pause the clock, pending the gameplay started callback from the server.
@@ -219,6 +221,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             await Task.WhenAny(resultsReady.Task, Task.Delay(TimeSpan.FromSeconds(60))).ConfigureAwait(false);
         }
 
+        protected override void RequestIntroSkip()
+        {
+            // If the room is set up such that the intro is automatically skipped, there's no need to vote on it.
+            if (Configuration.AutomaticallySkipIntro)
+            {
+                base.RequestIntroSkip();
+                return;
+            }
+
+            // No base call because we aren't skipping yet.
+            client.VoteToSkipIntro().FireAndForget();
+        }
+
+        private void onVoteToSkipIntroPassed()
+        {
+            Schedule(() => PerformIntroSkip(true));
+        }
+
         protected override ResultsScreen CreateResults(ScoreInfo score)
         {
             Debug.Assert(Room.RoomID != null);
@@ -242,6 +262,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 client.GameplayStarted -= onGameplayStarted;
                 client.ResultsReady -= onResultsReady;
+                client.VoteToSkipIntroPassed -= onVoteToSkipIntroPassed;
             }
         }
     }

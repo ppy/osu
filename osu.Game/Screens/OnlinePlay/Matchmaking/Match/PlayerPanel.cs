@@ -7,6 +7,8 @@ using System.Globalization;
 using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,11 +17,13 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
@@ -27,6 +31,7 @@ using osu.Game.Online.Matchmaking.Events;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results;
@@ -47,6 +52,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         private static readonly Vector2 avatar_size = new Vector2(80);
 
         public readonly MultiplayerRoomUser RoomUser;
+
+        /// <summary>
+        /// Perform an action in addition to showing the user's profile.
+        /// This should be used to perform auxiliary tasks and not as a primary action for clicking a user panel (to maintain a consistent UX).
+        /// </summary>
+        public new Action? Action;
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
@@ -81,17 +92,212 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         [Resolved]
         private MetadataClient? metadataClient { get; set; }
 
+        public readonly APIUser User;
+        private readonly Action viewProfile;
+
         private OsuSpriteText rankText = null!;
         private OsuSpriteText scoreText = null!;
 
         private Drawable avatarPositionTarget = null!;
         private Drawable avatarJumpTarget = null!;
-        private MatchmakingAvatar avatar = null!;
+        private Drawable avatar = null!;
         private OsuSpriteText username = null!;
 
         private Container mainContent = null!;
 
+        private Box solidBackgroundLayer = null!;
+        private Drawable background = null!;
+
+        private OsuSpriteText quitText = null!;
+        private BufferedContainer backgroundQuitTarget = null!;
+        private BufferedContainer avatarQuitTarget = null!;
+
+        private Box downloadProgressBar = null!;
+
         private PlayerPanelDisplayMode displayMode = PlayerPanelDisplayMode.Horizontal;
+        private bool hasQuit;
+
+        private enum InteractionSampleType
+        {
+            PlayerJump,
+            PlayerReJump,
+            OtherPlayerJump,
+        }
+
+        private Dictionary<InteractionSampleType, Sample?> interactionSamples = new Dictionary<InteractionSampleType, Sample?>();
+        private readonly Dictionary<InteractionSampleType, SampleChannel?> interactionSampleChannels = new Dictionary<InteractionSampleType, SampleChannel?>();
+        private double samplePitch;
+        private double? lastSamplePlayback;
+
+        public PlayerPanel(MultiplayerRoomUser user)
+            : base(HoverSampleSet.Button)
+        {
+            ArgumentNullException.ThrowIfNull(user.User);
+
+            User = user.User;
+            RoomUser = user;
+
+            base.Action = viewProfile = () =>
+            {
+                Action?.Invoke();
+                profileOverlay?.ShowUser(User);
+            };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            Content.Masking = true;
+            Content.CornerRadius = 10;
+            Content.CornerExponent = 10;
+            Content.Anchor = Anchor.Centre;
+            Content.Origin = Anchor.Centre;
+
+            Child = backgroundQuitTarget = new BufferedContainer
+            {
+                FrameBufferScale = new Vector2(1.5f),
+                RelativeSizeAxes = Axes.Both,
+                Children = new[]
+                {
+                    solidBackgroundLayer = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = colourProvider?.Background5 ?? colours.Gray1
+                    },
+                    background = new UserCoverBackground
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Colour = colours.Gray7,
+                        User = User
+                    },
+                    new Container
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
+                        {
+                            mainContent = new Container
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Both,
+                                Children = new[]
+                                {
+                                    quitText = new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Text = "QUIT",
+                                        Font = OsuFont.Default.With(weight: "Bold", size: 70),
+                                        Rotation = -22.5f,
+                                        Colour = OsuColour.Gray(0.3f),
+                                        Blending = BlendingParameters.Additive
+                                    },
+                                    avatarPositionTarget = new Container
+                                    {
+                                        Origin = Anchor.Centre,
+                                        Size = avatar_size,
+                                        Child = avatarJumpTarget = new Container
+                                        {
+                                            Anchor = Anchor.BottomCentre,
+                                            Origin = Anchor.BottomCentre,
+                                            RelativeSizeAxes = Axes.Both,
+                                            Child = avatar = new Container
+                                            {
+                                                Anchor = Anchor.Centre,
+                                                Origin = Anchor.Centre,
+                                                RelativeSizeAxes = Axes.Both,
+                                                // Needs to be re-buffered as the avatar is proxied outside of the parent buffered container.
+                                                Child = avatarQuitTarget = new BufferedContainer
+                                                {
+                                                    FrameBufferScale = new Vector2(1.5f),
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Child = new MatchmakingAvatar(User, isOwnUser: User.Id == api.LocalUser.Value.Id)
+                                                    {
+                                                        Anchor = Anchor.Centre,
+                                                        Origin = Anchor.Centre,
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Size = Vector2.One
+                                                    }
+                                                }
+                                            },
+                                        }
+                                    },
+                                    rankText = new OsuSpriteText
+                                    {
+                                        Alpha = 0,
+                                        Anchor = Anchor.BottomRight,
+                                        Origin = Anchor.BottomCentre,
+                                        Blending = BlendingParameters.Additive,
+                                        Margin = new MarginPadding(4),
+                                        Text = "-",
+                                        Font = OsuFont.Style.Title.With(size: 55),
+                                    },
+                                    username = new OsuSpriteText
+                                    {
+                                        Alpha = 0,
+                                        Anchor = Anchor.BottomCentre,
+                                        Origin = Anchor.BottomCentre,
+                                        Text = User.Username,
+                                        Font = OsuFont.Style.Heading1,
+                                    },
+                                    scoreText = new OsuSpriteText
+                                    {
+                                        Alpha = 0,
+                                        Margin = new MarginPadding(10),
+                                        Anchor = Anchor.BottomCentre,
+                                        Origin = Anchor.BottomCentre,
+                                        Font = OsuFont.Style.Heading2,
+                                        Text = "0 pts"
+                                    }
+                                }
+                            },
+                            downloadProgressBar = new Box
+                            {
+                                Anchor = Anchor.BottomLeft,
+                                Origin = Anchor.BottomLeft,
+                                RelativeSizeAxes = Axes.X,
+                                Size = new Vector2(0, 4),
+                                Colour = colourProvider?.Content2 ?? colours.Gray3
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Allow avatar to exist outside of masking for when it jumps around and stuff.
+            AddInternal(avatar.CreateProxy());
+
+            interactionSamples = new Dictionary<InteractionSampleType, Sample?>
+            {
+                { InteractionSampleType.PlayerJump, audio.Samples.Get(@"Multiplayer/Matchmaking/player-jump") },
+                { InteractionSampleType.PlayerReJump, audio.Samples.Get(@"Multiplayer/Matchmaking/player-rejump") },
+                { InteractionSampleType.OtherPlayerJump, audio.Samples.Get(@"Multiplayer/Matchmaking/player-jump-other") }
+            };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            updateLayout(true);
+
+            client.MatchRoomStateChanged += onRoomStateChanged;
+            client.MatchEvent += onMatchEvent;
+            client.BeatmapAvailabilityChanged += onBeatmapAvailabilityChanged;
+
+            onRoomStateChanged(client.Room!.MatchState);
+
+            avatar.ScaleTo(0)
+                  .ScaleTo(1, 500, Easing.OutElasticHalf)
+                  .FadeIn(200);
+
+            // pick a random pitch to be used by the player for duration of this session
+            samplePitch = 0.75f + RNG.NextDouble(0f, 0.75f);
+        }
 
         public PlayerPanelDisplayMode DisplayMode
         {
@@ -104,140 +310,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             }
         }
 
-        public readonly APIUser User;
-
-        /// <summary>
-        /// Perform an action in addition to showing the user's profile.
-        /// This should be used to perform auxiliary tasks and not as a primary action for clicking a user panel (to maintain a consistent UX).
-        /// </summary>
-        public new Action? Action;
-
-        protected Action ViewProfile { get; private set; } = null!;
-
-        public Box SolidBackgroundLayer { get; private set; } = null!;
-
-        protected Drawable? Background { get; private set; }
-
-        public PlayerPanel(MultiplayerRoomUser user)
-            : base(HoverSampleSet.Button)
+        public bool HasQuit
         {
-            ArgumentNullException.ThrowIfNull(user.User);
-
-            User = user.User;
-            RoomUser = user;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Add(SolidBackgroundLayer = new Box
+            get => hasQuit;
+            set
             {
-                RelativeSizeAxes = Axes.Both,
-                Colour = colourProvider?.Background5 ?? colours.Gray1
-            });
-
-            Background = new UserCoverBackground
-            {
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Colour = colours.Gray7,
-                User = User
-            };
-            if (Background != null)
-                Add(Background);
-
-            base.Action = ViewProfile = () =>
-            {
-                Action?.Invoke();
-                profileOverlay?.ShowUser(User);
-            };
-
-            Content.Masking = true;
-            Content.CornerRadius = 10;
-            Content.CornerExponent = 10;
-            Content.Anchor = Anchor.Centre;
-            Content.Origin = Anchor.Centre;
-
-            Add(new Container
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                Child = mainContent = new Container
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new[]
-                    {
-                        avatarPositionTarget = new Container
-                        {
-                            Origin = Anchor.Centre,
-                            Size = avatar_size,
-                            Child = avatarJumpTarget = new Container
-                            {
-                                Anchor = Anchor.BottomCentre,
-                                Origin = Anchor.BottomCentre,
-                                RelativeSizeAxes = Axes.Both,
-                                Child = avatar = new MatchmakingAvatar(User, isOwnUser: User.Id == api.LocalUser.Value.Id)
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Size = Vector2.One
-                                }
-                            }
-                        },
-                        rankText = new OsuSpriteText
-                        {
-                            Alpha = 0,
-                            Anchor = Anchor.BottomRight,
-                            Origin = Anchor.BottomCentre,
-                            Blending = BlendingParameters.Additive,
-                            Margin = new MarginPadding(4),
-                            Text = "-",
-                            Font = OsuFont.Style.Title.With(size: 55),
-                        },
-                        username = new OsuSpriteText
-                        {
-                            Alpha = 0,
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            Text = User.Username,
-                            Font = OsuFont.Style.Heading1,
-                        },
-                        scoreText = new OsuSpriteText
-                        {
-                            Alpha = 0,
-                            Margin = new MarginPadding(10),
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            Font = OsuFont.Style.Heading2,
-                            Text = "0 pts"
-                        }
-                    }
-                }
-            });
-
-            // Allow avatar to exist outside of masking for when it jumps around and stuff.
-            AddInternal(avatar.CreateProxy());
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            updateLayout(true);
-
-            client.MatchRoomStateChanged += onRoomStateChanged;
-            client.MatchEvent += onMatchEvent;
-
-            onRoomStateChanged(client.Room!.MatchState);
-
-            avatar.ScaleTo(0)
-                  .ScaleTo(1, 500, Easing.OutElasticHalf)
-                  .FadeIn(200);
+                hasQuit = value;
+                if (IsLoaded)
+                    updateLayout(false);
+            }
         }
 
         private bool horizontal => displayMode == PlayerPanelDisplayMode.Horizontal;
@@ -276,16 +357,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     scoreText.Hide();
                     username.Hide();
 
-                    Background.FadeOut(200, Easing.OutQuint);
-                    SolidBackgroundLayer.FadeOut(200, Easing.OutQuint);
+                    background.FadeOut(200, Easing.OutQuint);
+                    solidBackgroundLayer.FadeOut(200, Easing.OutQuint);
 
                     this.ResizeTo(avatar_size, duration, Easing.OutPow10);
                     break;
 
                 case PlayerPanelDisplayMode.Horizontal:
                 case PlayerPanelDisplayMode.Vertical:
-                    Background.FadeIn(200);
-                    SolidBackgroundLayer.FadeIn(200);
+                    background.FadeIn(200);
+                    solidBackgroundLayer.FadeIn(200);
 
                     using (BeginDelayedSequence(100))
                     {
@@ -307,11 +388,37 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     rankText.MoveTo(horizontal ? new Vector2(-40, -20) : new Vector2(-70, 0), duration, Easing.OutPow10);
                     username.MoveTo(horizontal ? new Vector2(0, -46) : new Vector2(0, -86), duration, Easing.OutPow10);
                     scoreText.MoveTo(horizontal ? new Vector2(0, -16) : new Vector2(0, -56), duration, Easing.OutPow10);
+                    quitText.MoveTo(horizontal ? new Vector2(40, 0) : new Vector2(0, 40), duration, Easing.OutPow10);
                     break;
 
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
+            // quit text doesn't fit on avataronly mode.
+            if (HasQuit && displayMode != PlayerPanelDisplayMode.AvatarOnly)
+                quitText.FadeIn(duration, Easing.OutPow10);
+            else
+                quitText.FadeOut(duration, Easing.OutPow10);
+
+            if (HasQuit)
+            {
+                backgroundQuitTarget.GrayscaleTo(1, duration, Easing.OutPow10);
+                avatarQuitTarget.GrayscaleTo(1, duration, Easing.OutPow10);
+            }
+            else
+            {
+                backgroundQuitTarget.GrayscaleTo(0, duration, Easing.OutPow10);
+                avatarQuitTarget.GrayscaleTo(0, duration, Easing.OutPow10);
+            }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Not sure why this is required but it is.
+            avatarQuitTarget.Alpha = Alpha;
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -348,8 +455,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             if (!matchmakingState.Users.UserDictionary.TryGetValue(User.Id, out MatchmakingUser? userScore))
                 return;
 
-            rankText.Text = userScore.Placement.Ordinalize(CultureInfo.CurrentCulture);
-            rankText.FadeColour(SubScreenResults.ColourForPlacement(userScore.Placement));
+            if (userScore.Placement == null)
+                return;
+
+            rankText.Text = userScore.Placement.Value.Ordinalize(CultureInfo.CurrentCulture);
+            rankText.FadeColour(SubScreenResults.ColourForPlacement(userScore.Placement.Value));
             scoreText.Text = $"{userScore.Points} pts";
         });
 
@@ -396,11 +506,67 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                             scale.Then().ScaleTo(new Vector2(1, 1.05f), 200, Easing.Out)
                                  .Then().ScaleTo(new Vector2(1, 0.95f), 200, Easing.In)
                                  .Then().ScaleTo(Vector2.One, 800, Easing.OutElastic);
+
+                            // only play jump sample if panel is visible
+                            if (Alpha > 0)
+                                playJumpSample(isConsecutive);
+
                             break;
                     }
 
                     break;
             }
+        }
+
+        private void onBeatmapAvailabilityChanged(MultiplayerRoomUser user, BeatmapAvailability availability) => Scheduler.Add(() =>
+        {
+            if (!user.Equals(RoomUser))
+                return;
+
+            if (availability.State == DownloadState.Downloading)
+                downloadProgressBar.FadeIn(200, Easing.OutPow10);
+            else
+                downloadProgressBar.FadeOut(200, Easing.OutPow10);
+
+            downloadProgressBar.ResizeWidthTo(availability.DownloadProgress ?? 0, 200, Easing.OutPow10);
+        });
+
+        private void playJumpSample(bool rejumping)
+        {
+            bool isLocalUser = User.OnlineID == client.LocalUser?.UserID;
+
+            if (isLocalUser)
+                playInteractionSample(rejumping ? InteractionSampleType.PlayerReJump : InteractionSampleType.PlayerJump);
+            else
+                playInteractionSample(InteractionSampleType.OtherPlayerJump);
+        }
+
+        private void playInteractionSample(InteractionSampleType sampleType)
+        {
+            bool enoughTimePassedSinceLastPlayback = lastSamplePlayback == null || Time.Current - lastSamplePlayback.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
+            if (!enoughTimePassedSinceLastPlayback)
+                return;
+
+            Sample? targetSample = interactionSamples[sampleType];
+            SampleChannel? targetChannel = interactionSampleChannels.GetValueOrDefault(sampleType);
+
+            targetChannel?.Stop();
+            targetChannel = targetSample?.GetChannel();
+
+            if (targetChannel == null)
+                return;
+
+            float horizontalPos = BoundingBox.Centre.X / Parent!.ToLocalSpace(Parent!.ScreenSpaceDrawQuad).Width;
+            // rescale balance from 0..1 to -1..1
+            float balance = -1f + horizontalPos * 2f;
+
+            targetChannel.Frequency.Value = samplePitch;
+            targetChannel.Balance.Value = balance * OsuGameBase.SFX_STEREO_STRENGTH;
+            targetChannel.Play();
+
+            interactionSampleChannels[sampleType] = targetChannel;
+
+            lastSamplePlayback = Time.Current;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -411,6 +577,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             {
                 client.MatchRoomStateChanged -= onRoomStateChanged;
                 client.MatchEvent -= onMatchEvent;
+                client.BeatmapAvailabilityChanged -= onBeatmapAvailabilityChanged;
             }
         }
 
@@ -420,7 +587,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             {
                 List<MenuItem> items = new List<MenuItem>
                 {
-                    new OsuMenuItem(ContextMenuStrings.ViewProfile, MenuItemType.Highlighted, ViewProfile)
+                    new OsuMenuItem(ContextMenuStrings.ViewProfile, MenuItemType.Highlighted, viewProfile)
                 };
 
                 if (User.Equals(api.LocalUser.Value))

@@ -5,8 +5,10 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -42,24 +44,30 @@ namespace osu.Game.Rulesets.Osu.Edit
         private readonly BindableInt displayTolerance = new BindableInt(90)
         {
             MinValue = 5,
-            MaxValue = 100
+            MaxValue = 100,
+            Precision = 1,
         };
 
         private readonly BindableInt displayCornerThreshold = new BindableInt(40)
         {
             MinValue = 5,
-            MaxValue = 100
+            MaxValue = 100,
+            Precision = 1,
         };
 
         private readonly BindableInt displayCircleThreshold = new BindableInt(30)
         {
             MinValue = 0,
-            MaxValue = 100
+            MaxValue = 100,
+            Precision = 1,
         };
 
         private ExpandableSlider<int> toleranceSlider = null!;
         private ExpandableSlider<int> cornerThresholdSlider = null!;
         private ExpandableSlider<int> circleThresholdSlider = null!;
+
+        [Resolved]
+        private IExpandingContainer? expandingContainer { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -68,15 +76,18 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 toleranceSlider = new ExpandableSlider<int>
                 {
-                    Current = displayTolerance
+                    Current = displayTolerance,
+                    ExpandedLabelText = "Control point spacing",
                 },
                 cornerThresholdSlider = new ExpandableSlider<int>
                 {
-                    Current = displayCornerThreshold
+                    Current = displayCornerThreshold,
+                    ExpandedLabelText = "Corner bias",
                 },
                 circleThresholdSlider = new ExpandableSlider<int>
                 {
-                    Current = displayCircleThreshold
+                    Current = displayCircleThreshold,
+                    ExpandedLabelText = "Perfect curve bias"
                 }
             };
         }
@@ -88,24 +99,18 @@ namespace osu.Game.Rulesets.Osu.Edit
             displayTolerance.BindValueChanged(tolerance =>
             {
                 toleranceSlider.ContractedLabelText = $"C. P. S.: {tolerance.NewValue:N0}";
-                toleranceSlider.ExpandedLabelText = $"Control Point Spacing: {tolerance.NewValue:N0}";
-
                 Tolerance.Value = displayToInternalTolerance(tolerance.NewValue);
             }, true);
 
             displayCornerThreshold.BindValueChanged(threshold =>
             {
-                cornerThresholdSlider.ContractedLabelText = $"C. T.: {threshold.NewValue:N0}";
-                cornerThresholdSlider.ExpandedLabelText = $"Corner Threshold: {threshold.NewValue:N0}";
-
+                cornerThresholdSlider.ContractedLabelText = $"C. B.: {threshold.NewValue:N0}";
                 CornerThreshold.Value = displayToInternalCornerThreshold(threshold.NewValue);
             }, true);
 
             displayCircleThreshold.BindValueChanged(threshold =>
             {
-                circleThresholdSlider.ContractedLabelText = $"P. C. T.: {threshold.NewValue:N0}";
-                circleThresholdSlider.ExpandedLabelText = $"Perfect Curve Threshold: {threshold.NewValue:N0}";
-
+                circleThresholdSlider.ContractedLabelText = $"P. C. B.: {threshold.NewValue:N0}";
                 CircleThreshold.Value = displayToInternalCircleThreshold(threshold.NewValue);
             }, true);
 
@@ -118,6 +123,11 @@ namespace osu.Game.Rulesets.Osu.Edit
             CircleThreshold.BindValueChanged(threshold =>
                 displayCircleThreshold.Value = internalToDisplayCircleThreshold(threshold.NewValue)
             );
+
+            expandingContainer?.Expanded.BindValueChanged(v =>
+            {
+                Spacing = v.NewValue ? new Vector2(5) : new Vector2(15);
+            }, true);
 
             float displayToInternalTolerance(float v) => v / 50f;
             int internalToDisplayTolerance(float v) => (int)Math.Round(v * 50f);

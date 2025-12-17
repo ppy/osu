@@ -561,6 +561,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public override Task RemovePlaylistItem(long playlistItemId) => RemoveUserPlaylistItem(api.LocalUser.Value.OnlineID, clone(playlistItemId));
 
+        public override Task VoteToSkipIntro()
+        {
+            return UserVoteToSkipIntro(api.LocalUser.Value.OnlineID);
+        }
+
+        public async Task UserVoteToSkipIntro(int userId)
+        {
+            await ((IMultiplayerClient)this).UserVotedToSkipIntro(userId, true).ConfigureAwait(false);
+        }
+
         protected override Task<MultiplayerRoom> CreateRoomInternal(MultiplayerRoom room)
         {
             Room apiRoom = new Room(room)
@@ -851,7 +861,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             await StartCountdown(new MatchmakingStageCountdown
             {
                 Stage = stage,
-                TimeRemaining = TimeSpan.FromSeconds(10)
+                TimeRemaining = TimeSpan.FromSeconds(stage == MatchmakingStage.UserBeatmapSelect ? 30 : 10)
             }).ConfigureAwait(false);
         }
 

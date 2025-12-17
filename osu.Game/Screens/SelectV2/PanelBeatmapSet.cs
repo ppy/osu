@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -272,7 +273,7 @@ namespace osu.Game.Screens.SelectV2
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
                     items.Add(new OsuMenuItem(SongSelectStrings.RestoreAllHidden, MenuItemType.Standard, () => songSelect?.RestoreAllHidden(beatmapSet)));
 
-                items.Add(new OsuMenuItem(SongSelectStrings.DeleteBeatmap, MenuItemType.Destructive, () => songSelect?.Delete(beatmapSet)));
+                items.Add(new OsuMenuItem(CommonStrings.DeleteWithConfirmation, MenuItemType.Destructive, () => songSelect?.Delete(beatmapSet)));
                 return items.ToArray();
             }
         }
@@ -296,7 +297,7 @@ namespace osu.Game.Screens.SelectV2
 
             return new TernaryStateToggleMenuItem(collection.Name, MenuItemType.Standard, s =>
             {
-                liveCollection.PerformWrite(c =>
+                Task.Run(() => liveCollection.PerformWrite(c =>
                 {
                     foreach (var b in beatmapSet.Beatmaps)
                     {
@@ -314,7 +315,7 @@ namespace osu.Game.Screens.SelectV2
                                 break;
                         }
                     }
-                });
+                }));
             })
             {
                 State = { Value = state }

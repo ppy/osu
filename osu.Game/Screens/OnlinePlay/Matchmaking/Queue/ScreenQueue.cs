@@ -43,6 +43,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
     {
         public override bool ShowFooter => true;
 
+        public override bool? ApplyModTrackAdjustments => false;
+
         private Container mainContent = null!;
 
         private MatchmakingScreenState state;
@@ -354,37 +356,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     break;
 
                 case MatchmakingScreenState.PendingAccept:
-                    mainContent.Child = new FillFlowContainer
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(20),
-                        Children = new Drawable[]
-                        {
-                            new OsuSpriteText
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Text = "Found a match!",
-                                Font = OsuFont.GetFont(size: 32, weight: FontWeight.Regular, typeface: Typeface.TorusAlternate),
-                            },
-                            new SelectionButton(200)
-                            {
-                                DarkerColour = colours.YellowDark,
-                                LighterColour = colours.YellowLight,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Action = () =>
-                                {
-                                    client.MatchmakingAcceptInvitation().FireAndForget();
-                                    SetState(MatchmakingScreenState.AcceptedWaitingForRoom);
-                                },
-                                Text = "Join match!",
-                            }
-                        }
-                    };
+                    client.MatchmakingAcceptInvitation().FireAndForget();
+                    SetState(MatchmakingScreenState.AcceptedWaitingForRoom);
+
                     matchFoundSample?.Play();
                     musicController.DuckMomentarily(1250);
                     break;
@@ -403,7 +377,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Text = "Waiting for all players...",
+                                Text = "Waiting for opponents...",
                                 Font = OsuFont.GetFont(size: 32, weight: FontWeight.Light, typeface: Typeface.TorusAlternate),
                             },
                             new LoadingSpinner

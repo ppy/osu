@@ -79,6 +79,8 @@ namespace osu.Game.Tests.Skins
             "Archives/modified-argon-20250424.osk",
             // Covers "Argon" unstable rate counter
             "Archives/modified-argon-20250809.osk",
+            // Covers legacy style performance points counter
+            "Archives/modified-classic-20250827.osk",
             // Covers "Argon" judgement counter
             "Archives/modified-argon-20250308.osk",
         };

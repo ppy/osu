@@ -146,5 +146,165 @@ namespace osu.Game.Tests.Visual.Online
                 checkCount++;
             }, 10);
         }
+
+        [Test]
+        public void TestAlternatingBackgroundDoesNotChangeAtMaxHistory()
+        {
+            AddStep("fill up the channel", () =>
+            {
+                for (int i = 0; i < Channel.MAX_HISTORY; i++)
+                {
+                    channel.AddNewMessages(new Message
+                    {
+                        ChannelId = channel.Id,
+                        Content = $"Message {i}",
+                        Timestamp = DateTimeOffset.Now,
+                        Sender = new APIUser
+                        {
+                            Id = 3,
+                            Username = "LocalUser " + RNG.Next(0, int.MaxValue - 100).ToString("N")
+                        }
+                    });
+                }
+            });
+
+            AddUntilStep($"{Channel.MAX_HISTORY} messages present", () => drawableChannel.ChildrenOfType<ChatLine>().Count(), () => Is.EqualTo(Channel.MAX_HISTORY));
+
+            ChatLine? lastLine = null;
+            bool lastLineAlternatingBackground = false;
+
+            AddStep("grab last line", () =>
+            {
+                lastLine = drawableChannel.ChildrenOfType<ChatLine>().Last();
+                lastLineAlternatingBackground = lastLine.AlternatingBackground;
+            });
+
+            AddStep("add another message", () => channel.AddNewMessages(new Message
+            {
+                ChannelId = channel.Id,
+                Content = "One final message",
+                Timestamp = DateTimeOffset.Now,
+                Sender = new APIUser
+                {
+                    Id = 3,
+                    Username = "LocalUser " + RNG.Next(0, int.MaxValue - 100).ToString("N")
+                }
+            }));
+
+            AddAssert("second-last message has same background", () => lastLine!.AlternatingBackground, () => Is.EqualTo(lastLineAlternatingBackground));
+        }
+
+        [Test]
+        public void TestAlternatingBackgroundUpdatedOnRemoval()
+        {
+            AddStep("add 3 messages", () =>
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    channel.AddNewMessages(new Message
+                    {
+                        ChannelId = channel.Id,
+                        Content = $"Message {i}",
+                        Timestamp = DateTimeOffset.Now,
+                        Sender = new APIUser
+                        {
+                            Id = i,
+                            Username = "LocalUser " + RNG.Next(0, int.MaxValue - 100).ToString("N")
+                        }
+                    });
+                }
+            });
+
+            AddUntilStep("3 messages present", () => drawableChannel.ChildrenOfType<ChatLine>().Count(), () => Is.EqualTo(3));
+            assertAlternatingBackground(0, false);
+            assertAlternatingBackground(1, true);
+            assertAlternatingBackground(2, false);
+
+            AddStep("remove middle message", () => channel.RemoveMessagesFromUser(1));
+            AddUntilStep("2 messages present", () => drawableChannel.ChildrenOfType<ChatLine>().Count(), () => Is.EqualTo(2));
+            assertAlternatingBackground(0, true);
+            assertAlternatingBackground(1, false);
+
+            void assertAlternatingBackground(int lineIndex, bool shouldBeAlternating)
+                => AddAssert($"line {lineIndex} {(shouldBeAlternating ? "has" : "does not have")} alternating background",
+                    () => drawableChannel.ChildrenOfType<ChatLine>().ElementAt(lineIndex).AlternatingBackground,
+                    () => Is.EqualTo(shouldBeAlternating));
+        }
+
+        [Test]
+        public void TestTimestampsUpdateOnRemoval()
+        {
+            AddStep("add 3 messages", () =>
+            {
+                channel.AddNewMessages(
+                    new Message
+                    {
+                        ChannelId = channel.Id,
+                        Content = "Message 0",
+                        Timestamp = new DateTimeOffset(2022, 11, 21, 20, 0, 0, TimeSpan.Zero),
+                        Sender = new APIUser
+                        {
+                            Id = 0,
+                            Username = "LocalUser " + RNG.Next(0, int.MaxValue - 100).ToString("N")
+                        }
+                    },
+                    new Message
+                    {
+                        ChannelId = channel.Id,
+                        Content = "Message 1",
+                        Timestamp = new DateTimeOffset(2022, 11, 21, 20, 0, 0, TimeSpan.Zero).AddSeconds(1),
+                        Sender = new APIUser
+                        {
+                            Id = 1,
+                            Username = "LocalUser " + RNG.Next(0, int.MaxValue - 100).ToString("N")
+                        }
+                    },
+                    new Message
+                    {
+                        ChannelId = channel.Id,
+                        Content = "Message 2",
+                        Timestamp = new DateTimeOffset(2022, 11, 21, 20, 0, 0, TimeSpan.Zero).AddMinutes(1),
+                        Sender = new APIUser
+                        {
+                            Id = 2,
+                            Username = "LocalUser " + RNG.Next(0, int.MaxValue - 100).ToString("N")
+                        }
+                    },
+                    new Message
+                    {
+                        ChannelId = channel.Id,
+                        Content = "Message 3",
+                        Timestamp = new DateTimeOffset(2022, 11, 21, 20, 0, 0, TimeSpan.Zero).AddMinutes(1).AddSeconds(1),
+                        Sender = new APIUser
+                        {
+                            Id = 3,
+                            Username = "LocalUser " + RNG.Next(0, int.MaxValue - 100).ToString("N")
+                        }
+                    }
+                );
+            });
+
+            AddUntilStep("4 messages present", () => drawableChannel.ChildrenOfType<ChatLine>().Count(), () => Is.EqualTo(4));
+            assertTimestamp(0, true);
+            assertTimestamp(1, false);
+            assertTimestamp(2, true);
+            assertTimestamp(3, false);
+
+            AddStep("remove message 0", () => channel.RemoveMessagesFromUser(0));
+            AddUntilStep("3 messages present", () => drawableChannel.ChildrenOfType<ChatLine>().Count(), () => Is.EqualTo(3));
+            assertTimestamp(0, true);
+            assertTimestamp(1, true);
+            assertTimestamp(2, false);
+
+            AddStep("remove message 2", () => channel.RemoveMessagesFromUser(2));
+            AddUntilStep("2 messages present", () => drawableChannel.ChildrenOfType<ChatLine>().Count(), () => Is.EqualTo(2));
+            assertTimestamp(0, true);
+            assertTimestamp(1, true);
+
+            void assertTimestamp(int lineIndex, bool shouldHaveTimestamp)
+                => AddAssert($"line {lineIndex} {(shouldHaveTimestamp ? "has" : "does not have")} timestamp",
+                    () => drawableChannel.ChildrenOfType<ChatLine>().ElementAt(lineIndex).RequiresTimestamp,
+                    () => Is.EqualTo(shouldHaveTimestamp));
+        }
     }
 }
