@@ -31,6 +31,9 @@ namespace osu.Game.Overlays
     {
         public const float CONTENT_MARGINS = 20;
 
+        // extra margin to give room to the revert-to-default button in settings controls.
+        public const float CONTENT_MARGINS_RIGHT = 30;
+
         public const float TRANSITION_LENGTH = 600;
 
         private const float sidebar_width = SettingsSidebar.EXPANDED_WIDTH;
