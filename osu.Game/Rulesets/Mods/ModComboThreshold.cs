@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Mods
         public override LocalisableString Description => "Maintain your combo above the threshold or restart.";
         public override bool Ranked => true;
 
+        public Bindable<ComboThresholdMode> Mode { get; } = new Bindable<ComboThresholdMode>(ComboThresholdMode.CurrentCombo);
+
         [SettingSource("Minimum Combo", "The minimum combo threshold to maintain")]
         public BindableInt MinimumCombo { get; } = new BindableInt(50)
         {
@@ -59,12 +61,31 @@ namespace osu.Game.Rulesets.Mods
                 highestCombo = comboAfterJudgement;
             }
 
-            if (!result.Type.IncreasesCombo() && highestCombo > 0 && highestCombo < MinimumCombo.Value)
+            switch (Mode.Value)
             {
-                return true;
+                case ComboThresholdMode.MaxCombo:
+                    if (!result.Type.IncreasesCombo() && highestCombo > 0 && highestCombo < MinimumCombo.Value)
+                    {
+                        return true;
+                    }
+
+                    break;
+
+                case ComboThresholdMode.CurrentCombo:
+                    if (!result.Type.IncreasesCombo() && comboAfterJudgement < MinimumCombo.Value && highestCombo >= MinimumCombo.Value)
+                    {
+                        return true;
+                    }
+                    break;
             }
 
             return false;
+        }
+
+        public enum ComboThresholdMode
+        {
+            MaxCombo,
+            CurrentCombo
         }
     }
 }
