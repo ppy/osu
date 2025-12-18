@@ -36,7 +36,6 @@ namespace osu.Game.Rulesets.Mods
         {
             typeof(ModSuddenDeath),
             typeof(ModPerfect),
-            typeof(ModAccuracyChallenge)
         }).ToArray();
 
         private int highestCombo;
