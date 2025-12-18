@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
 using osu.Framework.Allocation;
@@ -22,7 +23,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public partial class FormSliderBar<T> : CompositeDrawable, IHasCurrentValue<T>
+    public partial class FormSliderBar<T> : CompositeDrawable, IHasCurrentValue<T>, IFormControl
         where T : struct, INumber<T>, IMinMaxValue<T>
     {
         public Bindable<T> Current
@@ -194,7 +195,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
             slider.IsDragging.BindValueChanged(_ => updateState());
             slider.Focused.BindValueChanged(_ => updateState());
 
-            current.ValueChanged += e => currentNumberInstantaneous.Value = e.NewValue;
+            current.ValueChanged += e =>
+            {
+                currentNumberInstantaneous.Value = e.NewValue;
+                ValueChanged?.Invoke();
+            };
+
             current.MinValueChanged += v => currentNumberInstantaneous.MinValue = v;
             current.MaxValueChanged += v => currentNumberInstantaneous.MaxValue = v;
             current.PrecisionChanged += v => currentNumberInstantaneous.Precision = v;
@@ -475,5 +481,15 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 return true;
             }
         }
+
+        public IEnumerable<LocalisableString> FilterTerms => new[] { Caption, HintText };
+
+        public event Action? ValueChanged;
+
+        public bool IsValueDefault => Current.IsDefault;
+
+        public void SetValueDefault() => Current.SetDefault();
+
+        public bool IsDisabled => Current.Disabled;
     }
 }
