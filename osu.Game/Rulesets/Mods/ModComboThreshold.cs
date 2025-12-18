@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Mods
         };
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]
-        {
+         {
             typeof(ModSuddenDeath),
             typeof(ModPerfect),
         }).ToArray();
