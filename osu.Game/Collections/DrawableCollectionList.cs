@@ -118,9 +118,6 @@ namespace osu.Game.Collections
         /// The scroll container for this <see cref="DrawableCollectionList"/>.
         /// Contains the main flow of <see cref="DrawableCollectionListItem"/> and attaches a placeholder item to the end of the list.
         /// </summary>
-        /// <remarks>
-        /// Use <see cref="ReplacePlaceholder"/> to transfer the placeholder into the main list.
-        /// </remarks>
         private partial class Scroll : OsuScrollContainer
         {
             protected override Container<Drawable> Content => content;
