@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -30,6 +31,7 @@ namespace osu.Game.Tests.Visual.Settings
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         private FormSliderBar<float> sliderBar = null!;
+        private FormSliderBar<float> classicSliderBar = null!;
 
         private SearchContainer searchContainer = null!;
 
@@ -171,7 +173,7 @@ namespace osu.Game.Tests.Visual.Settings
                                         {
                                             ShowDefaultRevertButton = false
                                         },
-                                        new SettingsItemV2(new FormSliderBar<float>
+                                        new SettingsItemV2(classicSliderBar = new FormSliderBar<float>
                                         {
                                             Caption = "Slider with classic default",
                                             Current = new BindableFloat
@@ -183,7 +185,7 @@ namespace osu.Game.Tests.Visual.Settings
                                             },
                                         })
                                         {
-                                            HasClassicDefault = true,
+                                            ApplyClassicDefault = () => classicSliderBar.Current.Value = 2,
                                         },
                                     },
                                 },
@@ -216,10 +218,16 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         [Test]
-        public void TestFilter()
+        public void TestClassicDefault()
         {
+            AddStep("modify irrelevant setting", () => sliderBar.Current.Value = 4);
+            AddStep("apply classic defaults", () => this.ChildrenOfType<ISettingsItem>().Where(i => i.HasClassicDefault).ForEach(s => s.ApplyClassicDefault()));
+            AddStep("apply regular defaults", () => this.ChildrenOfType<ISettingsItem>().Where(i => i.HasClassicDefault).ForEach(s => s.ApplyDefault()));
             AddStep("set classic filter", () => searchContainer.SearchTerm = SettingsItemV2.CLASSIC_DEFAULT_SEARCH_TERM);
+            AddStep("apply classic defaults", () => this.ChildrenOfType<ISettingsItem>().Where(i => i.HasClassicDefault).ForEach(s => s.ApplyClassicDefault()));
+            AddStep("apply regular defaults", () => this.ChildrenOfType<ISettingsItem>().Where(i => i.HasClassicDefault).ForEach(s => s.ApplyDefault()));
             AddStep("set no filter", () => searchContainer.SearchTerm = string.Empty);
+            AddAssert("irrelevant setting left out", () => sliderBar.Current.Value, () => Is.EqualTo(4));
         }
 
         /// <summary>
