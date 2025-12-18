@@ -35,10 +35,11 @@ namespace osu.Game.Rulesets.Mods
         };
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]
-         {
+        {
             typeof(ModSuddenDeath),
             typeof(ModPerfect),
-        }).ToArray();
+        }
+        ).ToArray();
 
         private int highestCombo;
 
@@ -53,8 +54,8 @@ namespace osu.Game.Rulesets.Mods
                 return false;
 
             int comboAfterJudgement = result.Type.IncreasesCombo()
-                ? result.ComboAtJudgement + 1
-                : 0;
+            ? result.ComboAtJudgement + 1
+            : 0;
 
             if (comboAfterJudgement > highestCombo)
             {
@@ -90,4 +91,3 @@ namespace osu.Game.Rulesets.Mods
         }
     }
 }
-
