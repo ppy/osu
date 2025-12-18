@@ -20,7 +20,6 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
@@ -489,20 +488,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                         Child = chat
                     }
                 };
-            }
-        }
-
-        private partial class InverseScalingDrawSizePreservingFillContainer : ScalingContainer.ScalingDrawSizePreservingFillContainer
-        {
-            public InverseScalingDrawSizePreservingFillContainer()
-                : base(true)
-            {
-            }
-
-            protected override void Update()
-            {
-                Size = new Vector2(CurrentScale);
-                Scale = new Vector2(1 / CurrentScale);
             }
         }
     }
