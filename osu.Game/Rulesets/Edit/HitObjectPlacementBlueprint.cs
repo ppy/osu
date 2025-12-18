@@ -129,8 +129,11 @@ namespace osu.Game.Rulesets.Edit
                     // Inherit the bank from the previous hit object
                     HitObject.Samples = HitObject.Samples.Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: lastHitNormal.Bank) : s).ToList();
 
-                // Inherit the volume from the previous hit object
-                HitObject.Samples = HitObject.Samples.Select(s => s.With(newVolume: lastHitNormal.Volume)).ToList();
+                // Inherit the volume and sample set info from the previous hit object
+                HitObject.Samples = HitObject.Samples.Select(s => s.With(
+                    newVolume: lastHitNormal.Volume,
+                    newSuffix: lastHitNormal.Suffix,
+                    newUseBeatmapSamples: lastHitNormal.UseBeatmapSamples)).ToList();
             }
 
             if (HitObject is IHasRepeats hasRepeats)
