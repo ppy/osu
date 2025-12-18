@@ -6,8 +6,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Localisation;
 using osuTK;
 
 namespace osu.Game.Overlays.Settings
@@ -63,6 +65,8 @@ namespace osu.Game.Overlays.Settings
             base.LoadComplete();
             Enabled.BindValueChanged(_ => updateDisplay(), true);
         }
+
+        public override LocalisableString TooltipText => CommonStrings.RevertToDefault;
 
         protected override bool OnHover(HoverEvent e)
         {
