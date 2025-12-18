@@ -32,6 +32,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public LocalisableString HintText { get; init; }
 
+        /// <summary>
+        /// The maximum height of the dropdown's menu.
+        /// By default, this is set to 200px high. Set to <see cref="float.PositiveInfinity"/> to remove such limit.
+        /// </summary>
+        public float MaxHeight { get; set; } = 200;
+
         private FormDropdownHeader header = null!;
 
         [BackgroundDependencyLoader]
@@ -73,7 +79,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
             Dropdown = this,
         };
 
-        protected override DropdownMenu CreateMenu() => new FormDropdownMenu();
+        protected override DropdownMenu CreateMenu() => new FormDropdownMenu
+        {
+            MaxHeight = MaxHeight,
+        };
 
         private partial class FormDropdownHeader : DropdownHeader
         {
