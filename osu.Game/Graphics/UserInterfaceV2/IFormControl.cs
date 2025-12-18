@@ -20,12 +20,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// <summary>
         /// Whether the value of this control is in a default state.
         /// </summary>
-        bool IsValueDefault { get; }
+        bool IsDefault { get; }
 
         /// <summary>
         /// If enabled, resets the control to its default state.
         /// </summary>
-        void SetValueDefault();
+        void SetDefault();
 
         /// <summary>
         /// Whether the control is currently disabled.

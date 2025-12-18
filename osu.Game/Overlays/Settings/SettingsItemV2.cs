@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Settings
         {
             base.LoadComplete();
 
-            controlDefault.Value = control.IsValueDefault;
+            controlDefault.Value = control.IsDefault;
             controlEnabled.Value = !control.IsDisabled;
 
             controlDefault.BindValueChanged(_ => updateDefaultState());
@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.Settings
         protected override void Update()
         {
             base.Update();
-            controlDefault.Value = control.IsValueDefault;
+            controlDefault.Value = control.IsDefault;
             controlEnabled.Value = !control.IsDisabled;
         }
 
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Settings
         public void ApplyDefault()
         {
             if (!control.IsDisabled)
-                control.SetValueDefault();
+                control.SetDefault();
         }
 
         public event Action SettingChanged

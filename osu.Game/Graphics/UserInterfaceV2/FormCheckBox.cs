@@ -167,9 +167,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public event Action? ValueChanged;
 
-        public bool IsValueDefault => Current.IsDefault;
+        public bool IsDefault => Current.IsDefault;
 
-        public void SetValueDefault() => Current.SetDefault();
+        public void SetDefault() => Current.SetDefault();
 
         public bool IsDisabled => Current.Disabled;
     }
