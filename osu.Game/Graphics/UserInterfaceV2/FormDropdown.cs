@@ -2,7 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -17,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public partial class FormDropdown<T> : OsuDropdown<T>
+    public partial class FormDropdown<T> : OsuDropdown<T>, IFormControl
     {
         /// <summary>
         /// Caption describing this slider bar, displayed on top of the controls.
@@ -39,6 +42,31 @@ namespace osu.Game.Graphics.UserInterfaceV2
             header.Caption = Caption;
             header.HintText = HintText;
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Current.BindValueChanged(_ => ValueChanged?.Invoke());
+        }
+
+        public virtual IEnumerable<LocalisableString> FilterTerms
+        {
+            get
+            {
+                yield return Caption;
+
+                foreach (var item in Items)
+                    yield return item?.ToString() ?? string.Empty;
+            }
+        }
+
+        public event Action? ValueChanged;
+
+        public bool IsValueDefault => Current.IsDefault;
+
+        public void SetValueDefault() => Current.SetDefault();
+
+        public bool IsDisabled => Current.Disabled;
 
         protected override DropdownHeader CreateHeader() => header = new FormDropdownHeader
         {
@@ -243,6 +271,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
     public partial class FormEnumDropdown<T> : FormDropdown<T>
         where T : struct, Enum
     {
+        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(Items.Select(i => i.GetLocalisableDescription()));
+
         public FormEnumDropdown()
         {
             Items = Enum.GetValues<T>();
