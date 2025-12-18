@@ -71,7 +71,9 @@ namespace osu.Game.Collections
                 var createdItem = flow.Children.SingleOrDefault(item => item.Model.Value.ID == lastCreated);
 
                 if (createdItem != null)
-                    scroll.ScrollTo(createdItem);
+                {
+                    ScheduleAfterChildren(() => scroll.ScrollIntoView(createdItem));
+                }
 
                 lastCreated = null;
             }
