@@ -572,7 +572,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 foreach ((string sampleName, var bindable) in selectionSampleStates)
                 {
-                    yield return new DrawableTernaryButton
+                    yield return new DrawableTernaryButton(null)
                     {
                         Current = bindable,
                         Description = string.Empty,
