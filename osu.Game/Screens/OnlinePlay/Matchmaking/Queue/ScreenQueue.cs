@@ -478,7 +478,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private partial class SelectionButton : ShearedButton, IKeyBindingHandler<GlobalAction>
         {
-            public SelectionButton(float? width = null, float height = DEFAULT_HEIGHT)
+            protected SelectionButton(float? width = null, float height = DEFAULT_HEIGHT)
                 : base(width, height)
             {
             }
