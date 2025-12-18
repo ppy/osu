@@ -76,6 +76,7 @@ namespace osu.Game.Rulesets.Mods
                     {
                         return true;
                     }
+
                     break;
             }
 
@@ -89,3 +90,4 @@ namespace osu.Game.Rulesets.Mods
         }
     }
 }
+
