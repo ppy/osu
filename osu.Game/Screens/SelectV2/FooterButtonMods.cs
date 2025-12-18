@@ -189,8 +189,7 @@ namespace osu.Game.Screens.SelectV2
 
         private void updateDisplay()
         {
-            // Autoplay should not trigger the mod display bar.
-            if (!Current.Value.Any(m => m is not ModAutoplay))
+            if (Current.Value.Count == 0)
             {
                 modDisplayBar.MoveToY(20, duration, easing);
                 modDisplayBar.FadeOut(duration, easing);
@@ -205,8 +204,8 @@ namespace osu.Game.Screens.SelectV2
             }
             else
             {
-                // Only show the "Unranked" badge for mods other than Autoplay.
-                if (Current.Value.Any(m => !m.Ranked && m is not ModAutoplay))
+                // Only show the "Unranked" badge for user-playable mods.
+                if (Current.Value.Any(m => !m.Ranked && m.UserPlayable))
                 {
                     unrankedBadge.MoveToX(0, duration, easing);
                     unrankedBadge.FadeIn(duration, easing);
