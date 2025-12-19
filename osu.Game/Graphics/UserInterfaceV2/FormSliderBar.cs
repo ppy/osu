@@ -207,6 +207,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 }
 
                 currentNumberInstantaneous.Disabled = disabled;
+                textBox.ReadOnly = disabled;
+                updateState();
             };
 
             current.CopyTo(currentNumberInstantaneous);
@@ -283,7 +285,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected override bool OnClick(ClickEvent e)
         {
-            focusManager.ChangeFocus(textBox);
+            if (!Current.Disabled)
+                focusManager.ChangeFocus(textBox);
             return true;
         }
 
@@ -380,7 +383,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                updateState();
+                Current.BindDisabledChanged(_ => updateState(), true);
             }
 
             protected override void UpdateAfterChildren()
@@ -434,8 +437,17 @@ namespace osu.Game.Graphics.UserInterfaceV2
             private void updateState()
             {
                 rightBox.Colour = colourProvider.Background6;
-                leftBox.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Dark2;
-                nub.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1 : colourProvider.Light4;
+
+                if (Current.Disabled)
+                {
+                    leftBox.Colour = colourProvider.Dark3;
+                    nub.Colour = colourProvider.Dark1;
+                }
+                else
+                {
+                    leftBox.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Dark2;
+                    nub.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1 : colourProvider.Light4;
+                }
             }
 
             protected override void UpdateValue(float value)
