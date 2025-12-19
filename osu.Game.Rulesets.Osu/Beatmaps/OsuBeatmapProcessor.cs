@@ -151,7 +151,10 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 
                         double endTime = objectN.GetEndTime();
 
-                        if (objectI.StartTime - endTime > stackThreshold)
+                        // truncation to integer is required to match stable
+                        // compare https://github.com/peppy/osu-stable-reference/blob/08e3dafd525934cf48880b08e91c24ce4ad8b761/osu!/GameplayElements/HitObjectManager.cs#L1725
+                        // - both quantities being subtracted there are integers
+                        if ((int)objectI.StartTime - (int)endTime > stackThreshold)
                             // We are no longer within stacking range of the previous object.
                             break;
 
