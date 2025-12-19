@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     float distance = diff.Length;
                     Vector2 direction = diff / distance;
 
-                    float interval = Texture.DisplayWidth / 2.5f * IntervalMultiplier;
+                    float interval = Texture.DisplayWidth * CursorScale.X / 2.5f * IntervalMultiplier;
                     float stopAt = distance - (AvoidDrawingNearCursor ? interval : 0);
 
                     for (float d = interval; d < stopAt; d += interval)
