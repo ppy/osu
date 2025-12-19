@@ -105,23 +105,13 @@ namespace osu.Game.Overlays.Settings
 
         #region ISettingsItem
 
-        public bool HasClassicDefault { get; private set; }
-
-        private Action? applyClassicDefault;
+        public bool HasClassicDefault => ApplyClassicDefault != null;
 
         /// <summary>
         /// If set, this setting is considered as having a "classic" default value,
         /// and this is the function for overwriting the control with that value.
         /// </summary>
-        public Action? ApplyClassicDefault
-        {
-            get => applyClassicDefault;
-            set
-            {
-                applyClassicDefault = value;
-                HasClassicDefault = true;
-            }
-        }
+        public Action? ApplyClassicDefault { get; set; }
 
         void ISettingsItem.ApplyClassicDefault() => ApplyClassicDefault?.Invoke();
 
