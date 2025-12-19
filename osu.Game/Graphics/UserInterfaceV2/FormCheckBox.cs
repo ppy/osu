@@ -147,20 +147,18 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void updateState()
         {
-            background.Colour = Current.Disabled ? colourProvider.Background4 : colourProvider.Background5;
-            caption.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
-            checkbox.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
-            text.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
+            caption.Colour = Current.Disabled ? colourProvider.Background1 : colourProvider.Content2;
+            text.Colour = Current.Disabled ? colourProvider.Background1 : colourProvider.Content1;
 
             text.Text = Current.Value ? CommonStrings.Enabled : CommonStrings.Disabled;
 
-            if (!Current.Disabled)
-            {
-                BorderThickness = IsHovered ? 2 : 0;
+            // use FadeColour to override any existing colour transform (i.e. FlashColour on click).
+            background.FadeColour(IsHovered
+                ? ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4)
+                : colourProvider.Background5);
 
-                if (IsHovered)
-                    BorderColour = colourProvider.Light4;
-            }
+            BorderThickness = IsHovered ? 2 : 0;
+            BorderColour = Current.Disabled ? colourProvider.Dark1 : colourProvider.Light4;
         }
 
         public IEnumerable<LocalisableString> FilterTerms => Caption.Yield();
