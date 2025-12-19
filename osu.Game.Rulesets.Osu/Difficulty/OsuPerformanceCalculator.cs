@@ -332,7 +332,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeReadingValue(OsuDifficultyAttributes attributes)
         {
-            double readingValue = Reading.DifficultyToPerformance(attributes.ReadingDifficulty);
+            double readingValue = OsuStrainSkill.DifficultyToPerformance(attributes.ReadingDifficulty);
 
             if (effectiveMissCount > 0)
                 readingValue *= calculateMissPenalty(effectiveMissCount + aimEstimatedSliderBreaks, attributes.ReadingDifficultNoteCount);

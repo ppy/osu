@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             ratingMultiplier *= 0.75 + Math.Pow(Math.Max(0, overallDifficulty), 2.2) / 800;
 
-            return readingRating * Math.Sqrt(ratingMultiplier);
+            return readingRating * Math.Cbrt(ratingMultiplier);
         }
 
         public double ComputeFlashlightRating(double flashlightDifficultyValue)

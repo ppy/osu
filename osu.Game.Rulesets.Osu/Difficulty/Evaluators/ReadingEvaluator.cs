@@ -15,12 +15,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class ReadingEvaluator
     {
         private const double reading_window_size = 3000; // 3 seconds
-        private const double distance_influence_threshold = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.35; // 1.35 circles distance between centers
-        private const double hidden_multiplier = 0.85;
-        private const double density_multiplier = 0.8;
-        private const double density_difficulty_base = 3.0;
-        private const double preempt_balancing_factor = 200000;
-        private const double preempt_starting_point = 475; // AR 9.83 in milliseconds
+        private const double distance_influence_threshold = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.5; // 1.5 circles distance between centers
+        private const double hidden_multiplier = 0.28;
+        private const double density_multiplier = 2.4;
+        private const double density_difficulty_base = 2.5;
+        private const double preempt_balancing_factor = 140000;
+        private const double preempt_starting_point = 500; // AR 9.66 in milliseconds
 
         public static double EvaluateDifficultyOf(int totalObjects, DifficultyHitObject current, double clockRate, double preempt, bool hidden)
         {
@@ -49,13 +49,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // Value higher note densities exponentially
-            double noteDensityDifficulty = Math.Pow(pastObjectDifficultyInfluence, 1.45) * 0.9 * constantAngleNerfFactor * velocity;
+            double noteDensityDifficulty = Math.Pow(pastObjectDifficultyInfluence, 1.45) * 1.0 * constantAngleNerfFactor * velocity;
 
             // Award only denser than average maps.
             noteDensityDifficulty = Math.Max(0, noteDensityDifficulty - density_difficulty_base);
 
             // Apply a soft cap to general density reading to account for partial memorization
-            noteDensityDifficulty = Math.Pow(noteDensityDifficulty, 0.8) * density_multiplier;
+            noteDensityDifficulty = Math.Pow(noteDensityDifficulty, 0.45) * density_multiplier;
 
             double hiddenDifficulty = 0.0;
 
@@ -64,25 +64,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double timeSpentInvisible = getDurationSpentInvisible(currObj) / clockRate;
 
                 // Value time spent invisible exponentially
-                double timeSpentInvisibleFactor = Math.Pow(timeSpentInvisible, 2.1) * 0.0001;
+                double timeSpentInvisibleFactor = Math.Pow(timeSpentInvisible, 2.25) * 0.0065;
 
                 // Buff current note if upcoming notes are dense
                 // This is on the basis that part of hidden difficulty is the uncertainty of the current cursor position in relation to future notes
                 double futureObjectDifficultyInfluence = retrieveCurrentVisibleObjects(totalObjects, currObj, preempt);
 
                 // Account for both past and current densities
-                double densityFactor = Math.Pow(Math.Max(1, futureObjectDifficultyInfluence + pastObjectDifficultyInfluence - 2), 2.2) * 3.1;
+                double densityFactor = Math.Pow(futureObjectDifficultyInfluence + pastObjectDifficultyInfluence, 3.3) * 4;
 
-                hiddenDifficulty += (timeSpentInvisibleFactor + densityFactor) * constantAngleNerfFactor * velocity * 0.007;
+                hiddenDifficulty += (timeSpentInvisibleFactor + densityFactor) * constantAngleNerfFactor * velocity * 0.01;
 
                 // Apply a soft cap to general HD reading to account for partial memorization
-                hiddenDifficulty = Math.Pow(hiddenDifficulty, 0.65) * hidden_multiplier;
+                hiddenDifficulty = Math.Pow(hiddenDifficulty, 0.45) * hidden_multiplier;
 
                 var previousObj = currObj.Previous(0);
 
                 // Buff perfect stacks only if current note is completely invisible at the time you click the previous note.
                 if (currObj.LazyJumpDistance == 0 && currObj.OpacityAt(previousObj.BaseObject.StartTime + preempt, hidden) == 0 && previousObj.StartTime + preempt > currObj.StartTime)
-                    hiddenDifficulty += hidden_multiplier * 1303 / Math.Pow(currObj.AdjustedDeltaTime, 1.5); // Perfect stacks are harder the less time between notes
+                    hiddenDifficulty += hidden_multiplier * 7500 / Math.Pow(currObj.AdjustedDeltaTime, 1.5); // Perfect stacks are harder the less time between notes
             }
 
             double preemptDifficulty = 0.0;
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             preemptDifficulty *= constantAngleNerfFactor * velocity;
 
-            double difficulty = preemptDifficulty + hiddenDifficulty + noteDensityDifficulty;
+            double difficulty = DifficultyCalculationUtils.Norm(1.5, preemptDifficulty, hiddenDifficulty, noteDensityDifficulty);
 
             return difficulty;
         }
@@ -173,7 +173,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 if (loopObj.Angle.IsNotNull() && current.Angle.IsNotNull())
                 {
                     double angleDifference = Math.Abs(current.Angle.Value - loopObj.Angle.Value);
-                    constantAngleCount += Math.Cos(3 * Math.Min(Math.PI / 6, angleDifference)) * longIntervalFactor;
+                    double stackFactor = DifficultyCalculationUtils.Smootherstep(loopObj.LazyJumpDistance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
+
+                    constantAngleCount += Math.Cos(3 * Math.Min(Math.PI / 6, angleDifference * stackFactor)) * longIntervalFactor;
                 }
 
                 currentTimeGap = current.StartTime - loopObj.StartTime;
