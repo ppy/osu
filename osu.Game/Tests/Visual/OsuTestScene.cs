@@ -49,6 +49,11 @@ namespace osu.Game.Tests.Visual
         [Cached]
         protected Bindable<IReadOnlyList<Mod>> SelectedMods { get; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
+        [Cached]
+        private readonly OverlayColourProvider colourProvider;
+
+        protected virtual OverlayColourScheme ColourScheme => OverlayColourScheme.Pink;
+
         protected new DependencyContainer Dependencies { get; private set; }
 
         protected IResourceStore<byte[]> Resources;
@@ -189,6 +194,8 @@ namespace osu.Game.Tests.Visual
         protected OsuTestScene()
         {
             base.Content.Add(content = new DrawSizePreservingFillContainer());
+
+            colourProvider = new OverlayColourProvider(ColourScheme);
         }
 
         public virtual void RecycleLocalStorage(bool isDisposing)

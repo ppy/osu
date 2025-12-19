@@ -171,6 +171,9 @@ namespace osu.Game
         [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
 
+        [Cached]
+        private readonly OverlayColourProvider overlayColourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
+
         protected SentryLogger SentryLogger;
 
         public virtual StableStorage GetStorageForStableInstall() => null;
