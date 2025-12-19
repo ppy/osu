@@ -71,6 +71,7 @@ namespace osu.Game.Overlays.Settings
 
         private void updateDisplay()
         {
+            // Explicitly use ClearTransforms to clear any existing auto-size transform before modifying size / flag.
             ClearTransforms();
 
             if (Current.Value == null)
