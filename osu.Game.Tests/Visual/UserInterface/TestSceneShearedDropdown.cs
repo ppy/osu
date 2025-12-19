@@ -13,11 +13,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public partial class TestSceneShearedDropdown : ThemeComparisonTestScene
     {
-        public TestSceneShearedDropdown()
-            : base(false)
-        {
-        }
-
         protected override Drawable CreateContent() => new Container
         {
             RelativeSizeAxes = Axes.Both,

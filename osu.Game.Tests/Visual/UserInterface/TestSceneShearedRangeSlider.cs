@@ -35,11 +35,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private ShearedRangeSlider shearedRangeSlider = null!;
 
-        public TestSceneShearedRangeSlider()
-            : base(false)
-        {
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();

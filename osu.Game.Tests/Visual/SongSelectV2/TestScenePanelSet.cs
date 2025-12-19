@@ -25,11 +25,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         private BeatmapSetInfo beatmapSet = null!;
 
-        public TestScenePanelSet()
-            : base(false)
-        {
-        }
-
         [SetUp]
         public void SetUp() => Schedule(() =>
         {

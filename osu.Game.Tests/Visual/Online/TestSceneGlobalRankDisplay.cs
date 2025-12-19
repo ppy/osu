@@ -15,11 +15,6 @@ namespace osu.Game.Tests.Visual.Online
 {
     public partial class TestSceneGlobalRankDisplay : ThemeComparisonTestScene
     {
-        public TestSceneGlobalRankDisplay()
-            : base(false)
-        {
-        }
-
         protected override Drawable CreateContent() => new FillFlowContainer
         {
             RelativeSizeAxes = Axes.Both,

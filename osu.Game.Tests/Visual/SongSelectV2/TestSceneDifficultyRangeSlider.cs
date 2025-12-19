@@ -30,11 +30,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             Precision = 0.1f
         };
 
-        public TestSceneDifficultyRangeSlider()
-            : base(false)
-        {
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();

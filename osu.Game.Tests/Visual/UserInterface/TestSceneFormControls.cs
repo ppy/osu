@@ -17,11 +17,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public partial class TestSceneFormControls : ThemeComparisonTestScene
     {
-        public TestSceneFormControls()
-            : base(false)
-        {
-        }
-
         protected override Drawable CreateContent() => new OsuContextMenuContainer
         {
             RelativeSizeAxes = Axes.Both,

@@ -16,11 +16,6 @@ namespace osu.Game.Tests.Visual.Online
 {
     public partial class TestSceneDrawableComment : ThemeComparisonTestScene
     {
-        public TestSceneDrawableComment()
-            : base(false)
-        {
-        }
-
         protected override Drawable CreateContent() => new OsuScrollContainer(Direction.Vertical)
         {
             RelativeSizeAxes = Axes.Both,
