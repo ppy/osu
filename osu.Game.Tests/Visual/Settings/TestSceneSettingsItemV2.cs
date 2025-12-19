@@ -171,7 +171,7 @@ namespace osu.Game.Tests.Visual.Settings
                                             },
                                         })
                                         {
-                                            ShowDefaultRevertButton = false
+                                            ShowRevertToDefaultButton = false
                                         },
                                         new SettingsItemV2(classicSliderBar = new FormSliderBar<float>
                                         {
