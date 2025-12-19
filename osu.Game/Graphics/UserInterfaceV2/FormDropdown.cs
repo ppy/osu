@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -61,8 +59,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 yield return Caption;
 
-                foreach (var item in Items)
-                    yield return item?.ToString() ?? string.Empty;
+                foreach (var item in MenuItems)
+                    yield return item.Text.Value;
             }
         }
 
@@ -280,8 +278,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
     public partial class FormEnumDropdown<T> : FormDropdown<T>
         where T : struct, Enum
     {
-        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(Items.Select(i => i.GetLocalisableDescription()));
-
         public FormEnumDropdown()
         {
             Items = Enum.GetValues<T>();
