@@ -29,8 +29,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase("1124896")]
         [TestCase("1341554")]
         [TestCase("2593923")]
-        // [TestCase("2730824")] TODO: investigate later
-        // [TestCase("4235513")] TODO: investigate later
         [TestCase("801165")]
         public void Test(string name) => base.Test(name);
 
