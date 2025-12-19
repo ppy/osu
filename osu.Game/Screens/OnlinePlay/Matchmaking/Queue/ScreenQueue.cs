@@ -43,6 +43,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
     {
         public override bool ShowFooter => true;
 
+        public override bool? ApplyModTrackAdjustments => false;
+
         private Container mainContent = null!;
 
         private MatchmakingScreenState state;
@@ -93,51 +95,55 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             base.LoadComplete();
 
-            InternalChildren = new Drawable[]
+            InternalChild = new InverseScalingDrawSizePreservingFillContainer
             {
-                cloud = new CloudVisualisation
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    Y = -100,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(0.6f)
-                },
-                new MatchmakingAvatar(api.LocalUser.Value, true)
-                {
-                    Y = -100,
-                    Scale = new Vector2(3),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                },
-                new Container
-                {
-                    RelativePositionAxes = Axes.Y,
-                    Y = 0.25f,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    AutoSizeAxes = Axes.Both,
-                    CornerRadius = 10f,
-                    Masking = true,
-                    Children = new Drawable[]
+                    cloud = new CloudVisualisation
                     {
-                        new Box
+                        Y = -100,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        Size = new Vector2(0.6f)
+                    },
+                    new MatchmakingAvatar(api.LocalUser.Value, true)
+                    {
+                        Y = -100,
+                        Scale = new Vector2(3),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                    new Container
+                    {
+                        RelativePositionAxes = Axes.Y,
+                        Y = 0.25f,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        AutoSizeAxes = Axes.Both,
+                        CornerRadius = 10f,
+                        Masking = true,
+                        Children = new Drawable[]
                         {
-                            Colour = colourProvider.Background3,
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        mainContent = new Container
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Alpha = 0,
-                            AutoSizeAxes = Axes.Both,
-                            AutoSizeDuration = 300,
-                            AutoSizeEasing = Easing.OutQuint,
-                            Padding = new MarginPadding(20),
-                        },
-                    }
-                },
+                            new Box
+                            {
+                                Colour = colourProvider.Background3,
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                            mainContent = new Container
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Alpha = 0,
+                                AutoSizeAxes = Axes.Both,
+                                AutoSizeDuration = 300,
+                                AutoSizeEasing = Easing.OutQuint,
+                                Padding = new MarginPadding(20),
+                            },
+                        }
+                    },
+                }
             };
 
             currentState.BindTo(controller.CurrentState);
@@ -474,7 +480,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private partial class SelectionButton : ShearedButton, IKeyBindingHandler<GlobalAction>
         {
-            public SelectionButton(float? width = null, float height = DEFAULT_HEIGHT)
+            protected SelectionButton(float? width = null, float height = DEFAULT_HEIGHT)
                 : base(width, height)
             {
             }
