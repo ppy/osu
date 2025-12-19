@@ -189,26 +189,22 @@ namespace osu.Game.Graphics.UserInterfaceV2
             textBox.ReadOnly = disabled;
             textBox.Alpha = 1;
 
-            caption.Colour = disabled ? colourProvider.Foreground1 : colourProvider.Content2;
+            caption.Colour = disabled ? colourProvider.Background1 : colourProvider.Content2;
             textBox.Colour = disabled ? colourProvider.Foreground1 : colourProvider.Content1;
 
-            if (!disabled)
-            {
-                BorderThickness = IsHovered || textBox.Focused.Value ? 2 : 0;
+            BorderThickness = IsHovered || textBox.Focused.Value ? 2 : 0;
+
+            if (disabled)
+                BorderColour = colourProvider.Dark1;
+            else
                 BorderColour = textBox.Focused.Value ? colourProvider.Highlight1 : colourProvider.Light4;
 
-                if (textBox.Focused.Value)
-                    background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
-                else if (IsHovered)
-                    background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
-                else
-                    background.Colour = colourProvider.Background5;
-            }
+            if (textBox.Focused.Value)
+                background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
+            else if (IsHovered)
+                background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
             else
-            {
-                BorderThickness = 0;
-                background.Colour = colourProvider.Background4;
-            }
+                background.Colour = colourProvider.Background5;
         }
 
         internal partial class InnerTextBox : OsuTextBox

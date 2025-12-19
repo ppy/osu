@@ -302,12 +302,15 @@ namespace osu.Game.Graphics.UserInterfaceV2
             textBox.Alpha = 1;
             textBox.ReadOnly = Current.Disabled;
 
-            background.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background4 : colourProvider.Background5;
-            captionText.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
-            textBox.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
+            captionText.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background1 : colourProvider.Content2;
+            textBox.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background1 : colourProvider.Content1;
 
             BorderThickness = childHasFocus || IsHovered || slider.IsDragging.Value ? 2 : 0;
-            BorderColour = childHasFocus ? colourProvider.Highlight1 : colourProvider.Light4;
+
+            if (Current.Disabled)
+                BorderColour = colourProvider.Dark1;
+            else
+                BorderColour = childHasFocus ? colourProvider.Highlight1 : colourProvider.Light4;
 
             if (childHasFocus)
                 background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
