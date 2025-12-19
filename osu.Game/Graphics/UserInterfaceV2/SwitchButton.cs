@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -26,10 +25,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private readonly Box fill;
         private readonly Container switchContainer;
         private readonly Drawable switchCircle;
-        private readonly CircularBorderContainer circularContainer;
+        private readonly CircularContainer circularContainer;
 
-        private Color4 enabledColour;
-        private Color4 disabledColour;
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         private Sample? sampleChecked;
         private Sample? sampleUnchecked;
@@ -38,7 +37,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             Size = new Vector2(45, 20);
 
-            InternalChild = circularContainer = new CircularBorderContainer
+            InternalChild = circularContainer = new CircularContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 BorderColour = Color4.White,
@@ -73,14 +72,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider? colourProvider, OsuColour colours, AudioManager audio)
+        private void load(AudioManager audio)
         {
-            enabledColour = colourProvider?.Highlight1 ?? colours.BlueDark;
-            disabledColour = colourProvider?.Background3 ?? colours.Gray3;
-
-            switchContainer.Colour = enabledColour;
-            fill.Colour = disabledColour;
-
             sampleChecked = audio.Samples.Get(@"UI/check-on");
             sampleUnchecked = audio.Samples.Get(@"UI/check-off");
         }
@@ -89,27 +82,29 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             base.LoadComplete();
 
-            Current.BindValueChanged(updateState, true);
+            Current.BindDisabledChanged(_ => updateColours());
+            Current.BindValueChanged(_ => updateState(), true);
+
             FinishTransforms(true);
         }
 
-        private void updateState(ValueChangedEvent<bool> state)
+        private void updateState()
         {
-            switchCircle.MoveToX(state.NewValue ? switchContainer.DrawWidth - switchCircle.DrawWidth : 0, 200, Easing.OutQuint);
-            fill.FadeTo(state.NewValue ? 1 : 0, 250, Easing.OutQuint);
+            switchCircle.MoveToX(Current.Value ? switchContainer.DrawWidth - switchCircle.DrawWidth : 0, 200, Easing.OutQuint);
+            fill.FadeTo(Current.Value ? 1 : 0, 250, Easing.OutQuint);
 
-            updateBorder();
+            updateColours();
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            updateBorder();
+            updateColours();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            updateBorder();
+            updateColours();
             base.OnHoverLost(e);
         }
 
@@ -123,15 +118,34 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 sampleUnchecked?.Play();
         }
 
-        private void updateBorder()
+        private void updateColours()
         {
-            circularContainer.TransformBorderTo((Current.Value ? enabledColour : disabledColour).Lighten(IsHovered ? 0.3f : 0));
-        }
+            ColourInfo targetSwitchColour;
+            ColourInfo targetBorderColour;
 
-        private partial class CircularBorderContainer : CircularContainer
-        {
-            public void TransformBorderTo(ColourInfo colour)
-                => this.TransformTo(nameof(BorderColour), colour, 250, Easing.OutQuint);
+            if (Current.Disabled)
+            {
+                if (Current.Value)
+                    targetBorderColour = colourProvider.Dark1.Opacity(0.5f);
+                else
+                    targetBorderColour = colourProvider.Background2.Opacity(0.5f);
+
+                targetSwitchColour = colourProvider.Dark1.Opacity(0.5f);
+                fill.Colour = colourProvider.Background5;
+            }
+            else
+            {
+                if (Current.Value)
+                    targetBorderColour = IsHovered ? colourProvider.Highlight1.Lighten(0.3f) : colourProvider.Highlight1;
+                else
+                    targetBorderColour = IsHovered ? colourProvider.Background1 : colourProvider.Background2;
+
+                targetSwitchColour = colourProvider.Highlight1;
+                fill.Colour = colourProvider.Background4;
+            }
+
+            switchContainer.FadeColour(targetSwitchColour, 250, Easing.OutQuint);
+            circularContainer.TransformTo(nameof(BorderColour), targetBorderColour, 250, Easing.OutQuint);
         }
     }
 }
