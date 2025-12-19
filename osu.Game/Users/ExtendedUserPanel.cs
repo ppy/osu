@@ -40,7 +40,7 @@ namespace osu.Game.Users
         [BackgroundDependencyLoader]
         private void load()
         {
-            BorderColour = ColourProvider?.Light1 ?? Colours.GreyVioletLighter;
+            BorderColour = ColourProvider.Light1;
         }
 
         protected override void LoadComplete()

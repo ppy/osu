@@ -74,11 +74,11 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             [BackgroundDependencyLoader(true)]
-            private void load(OverlayColourProvider? colourProvider, OsuColour colours, AudioManager audio)
+            private void load(OverlayColourProvider colourProvider, OsuColour colours, AudioManager audio)
             {
-                BackgroundColour = colourProvider?.Background5 ?? Color4.Black;
-                HoverColour = colourProvider?.Light4 ?? colours.PinkDarker;
-                SelectionColour = colourProvider?.Background3 ?? colours.PinkDarker.Opacity(0.5f);
+                BackgroundColour = colourProvider.Background5;
+                HoverColour = colourProvider.Light4;
+                SelectionColour = colourProvider.Background3;
 
                 sampleOpen = audio.Samples.Get(@"UI/dropdown-open");
                 sampleClose = audio.Samples.Get(@"UI/dropdown-close");
@@ -268,10 +268,10 @@ namespace osu.Game.Graphics.UserInterface
                         };
                     }
 
-                    [BackgroundDependencyLoader(true)]
-                    private void load(OverlayColourProvider? colourProvider)
+                    [BackgroundDependencyLoader]
+                    private void load(OverlayColourProvider colourProvider)
                     {
-                        Chevron.Colour = colourProvider?.Background5 ?? Color4.Black;
+                        Chevron.Colour = colourProvider.Background5;
                     }
 
                     private bool hovering;
@@ -368,10 +368,7 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             [Resolved]
-            private OverlayColourProvider? colourProvider { get; set; }
-
-            [Resolved]
-            private OsuColour colours { get; set; } = null!;
+            private OverlayColourProvider colourProvider { get; set; } = null!;
 
             protected override void LoadComplete()
             {
@@ -399,8 +396,8 @@ namespace osu.Game.Graphics.UserInterface
             private void updateColour()
             {
                 bool hovered = Enabled.Value && IsHovered;
-                var hoveredColour = colourProvider?.Light4 ?? colours.PinkDarker;
-                var unhoveredColour = colourProvider?.Background5 ?? Color4.Black;
+                var hoveredColour = colourProvider.Light4;
+                var unhoveredColour = colourProvider.Background5;
 
                 Colour = Color4.White;
                 Alpha = Enabled.Value ? 1 : 0.3f;
@@ -448,10 +445,10 @@ namespace osu.Game.Graphics.UserInterface
                     }
 
                     [BackgroundDependencyLoader]
-                    private void load(OverlayColourProvider? colourProvider)
+                    private void load(OverlayColourProvider colourProvider)
                     {
-                        BackgroundUnfocused = colourProvider?.Background5 ?? new Color4(10, 10, 10, 255);
-                        BackgroundFocused = colourProvider?.Background5 ?? new Color4(10, 10, 10, 255);
+                        BackgroundUnfocused = colourProvider.Background5;
+                        BackgroundFocused = colourProvider.Background5;
                     }
 
                     protected override void OnFocus(FocusEvent e)

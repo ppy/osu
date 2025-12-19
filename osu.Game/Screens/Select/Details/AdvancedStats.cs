@@ -27,6 +27,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Overlays.Mods;
@@ -240,6 +241,9 @@ namespace osu.Game.Screens.Select.Details
             [Resolved]
             private OsuColour colours { get; set; }
 
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
             public LocalisableString Title
             {
                 get => name.Text;
@@ -362,7 +366,7 @@ namespace osu.Game.Screens.Select.Details
                 TooltipContent = attribute;
             }
 
-            public ITooltip<RulesetBeatmapAttribute> GetCustomTooltip() => new BeatmapAttributeTooltip();
+            public ITooltip<RulesetBeatmapAttribute> GetCustomTooltip() => new BeatmapAttributeTooltip(colourProvider);
 
             [CanBeNull]
             public RulesetBeatmapAttribute TooltipContent { get; set; }

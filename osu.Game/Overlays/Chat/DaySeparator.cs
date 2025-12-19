@@ -24,8 +24,8 @@ namespace osu.Game.Overlays.Chat
 
         public readonly DateTimeOffset Date;
 
-        [Resolved(CanBeNull = true)]
-        private OverlayColourProvider? colourProvider { get; set; }
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public DaySeparator(DateTimeOffset date)
         {
@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Chat
                                         Origin = Anchor.Centre,
                                         RelativeSizeAxes = Axes.X,
                                         Height = LineHeight,
-                                        Colour = colourProvider?.Background5 ?? Colour4.White,
+                                        Colour = colourProvider.Background5,
                                     },
                                     Empty(),
                                     new OsuSpriteText
@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.Chat
                                         Origin = Anchor.CentreRight,
                                         Text = Date.ToLocalTime().ToLocalisableString(@"dd MMMM yyyy").ToUpper(),
                                         Font = OsuFont.Torus.With(size: TextSize, weight: FontWeight.SemiBold),
-                                        Colour = colourProvider?.Content1 ?? Colour4.White,
+                                        Colour = colourProvider.Content1,
                                     },
                                 }
                             },
@@ -94,7 +94,7 @@ namespace osu.Game.Overlays.Chat
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.X,
                             Height = LineHeight,
-                            Colour = colourProvider?.Background5 ?? Colour4.White,
+                            Colour = colourProvider.Background5,
                         },
                     }
                 }

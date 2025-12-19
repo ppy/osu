@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Comments
         private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private OverlayColourProvider? colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public CommentReportButton(Comment comment)
         {
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Comments
                 loading.Hide();
 
                 link.Clear(true);
-                link.AddText(UsersStrings.ReportThanks, s => s.Colour = colourProvider?.Content2 ?? Colour4.White);
+                link.AddText(UsersStrings.ReportThanks, s => s.Colour = colourProvider.Content2);
                 link.Show();
 
                 this.FadeOut(2000, Easing.InQuint).Expire();

@@ -22,10 +22,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
         protected override HueSelector CreateHueSelector() => new OsuHueSelector();
         protected override SaturationValueSelector CreateSaturationValueSelector() => new OsuSaturationValueSelector();
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider? colourProvider, OsuColour osuColour)
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
         {
-            Background.Colour = colourProvider?.Dark5 ?? osuColour.GreySeaFoamDark;
+            Background.Colour = colourProvider.Dark5;
 
             Content.Padding = new MarginPadding(spacing);
             Content.Spacing = new Vector2(0, spacing);

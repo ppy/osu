@@ -104,14 +104,14 @@ namespace osu.Game.Rulesets.UI
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, OverlayColourProvider? colourProvider)
+        private void load(OsuColour colours, OverlayColourProvider colourProvider)
         {
             var modTypeColour = colours.ForModType(Mod.Type);
 
-            inactiveBackgroundColour = colourProvider?.Background5 ?? colours.Gray3;
+            inactiveBackgroundColour = colourProvider.Background5;
             activeBackgroundColour = modTypeColour;
 
-            inactiveForegroundColour = colourProvider?.Background2 ?? colours.Gray5;
+            inactiveForegroundColour = colourProvider.Background2;
             activeForegroundColour = Interpolation.ValueAt<Colour4>(0.1f, Colour4.Black, modTypeColour, 0, 1);
         }
 

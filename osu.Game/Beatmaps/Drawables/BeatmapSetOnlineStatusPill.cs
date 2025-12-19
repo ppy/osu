@@ -62,10 +62,7 @@ namespace osu.Game.Beatmaps.Drawables
         private const double animation_duration = 400;
 
         [Resolved]
-        private OsuColour colours { get; set; } = null!;
-
-        [Resolved(CanBeNull = true)]
-        private OverlayColourProvider? colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public BeatmapSetOnlineStatusPill()
         {
@@ -127,15 +124,10 @@ namespace osu.Game.Beatmaps.Drawables
             if (Alpha == 0)
                 duration = 0;
 
-            Color4 statusTextColour;
-
-            if (colourProvider != null)
-                statusTextColour = status == BeatmapOnlineStatus.Graveyard ? colourProvider.Background1 : colourProvider.Background3;
-            else
-                statusTextColour = status == BeatmapOnlineStatus.Graveyard ? colours.GreySeaFoamLight : Color4.Black;
+            Color4 statusTextColour = status == BeatmapOnlineStatus.Graveyard ? colourProvider.Background1 : colourProvider.Background3;
 
             statusText.FadeColour(statusTextColour, duration, Easing.OutQuint);
-            background.FadeColour(OsuColour.ForBeatmapSetOnlineStatus(Status) ?? colourProvider?.Light1 ?? colours.GreySeaFoamLighter, duration, Easing.OutQuint);
+            background.FadeColour(OsuColour.ForBeatmapSetOnlineStatus(Status) ?? colourProvider.Light1, duration, Easing.OutQuint);
 
             statusText.Text = Status.GetLocalisableDescription().ToUpper();
         }

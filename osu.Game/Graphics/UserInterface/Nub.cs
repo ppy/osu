@@ -54,12 +54,12 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider? colourProvider, OsuColour colours)
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
         {
-            AccentColour = colourProvider?.Highlight1 ?? colours.Pink;
-            GlowingAccentColour = colourProvider?.Highlight1.Lighten(0.2f) ?? colours.PinkLighter;
-            GlowColour = colourProvider?.Highlight1 ?? colours.PinkLighter;
+            AccentColour = colourProvider.Highlight1;
+            GlowingAccentColour = colourProvider.Highlight1.Lighten(0.2f);
+            GlowColour = colourProvider.Highlight1;
 
             main.EdgeEffect = new EdgeEffectParameters
             {

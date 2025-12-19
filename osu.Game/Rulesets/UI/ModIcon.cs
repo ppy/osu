@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.UI
         private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private OverlayColourProvider? colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         private Color4 backgroundColour;
 

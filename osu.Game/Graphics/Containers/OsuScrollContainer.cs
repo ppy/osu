@@ -119,12 +119,12 @@ namespace osu.Game.Graphics.Containers
                 Child = box = new Box { RelativeSizeAxes = Axes.Both };
             }
 
-            [BackgroundDependencyLoader(true)]
-            private void load(OverlayColourProvider? colourProvider, OsuColour colours)
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider, OsuColour colours)
             {
                 Colour = defaultColour = colours.Gray8;
                 hoverColour = colours.GrayF;
-                highlightColour = colourProvider?.Highlight1 ?? colours.Green;
+                highlightColour = colourProvider.Highlight1;
             }
 
             public override void ResizeTo(float val, int duration = 0, Easing easing = Easing.None)

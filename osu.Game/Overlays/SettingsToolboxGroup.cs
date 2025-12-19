@@ -80,7 +80,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider? colourProvider)
+        private void load(OverlayColourProvider colourProvider)
         {
             CornerRadius = corner_radius;
 
@@ -90,7 +90,7 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0.1f,
-                    Colour = colourProvider?.Background4 ?? Color4.Black,
+                    Colour = colourProvider.Background4,
                 },
                 new FillFlowContainer
                 {

@@ -78,7 +78,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         private IDialogOverlay? dialogOverlay { get; set; }
 
         [Resolved]
-        private OverlayColourProvider? colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         [Resolved]
         private IPerformFromScreenRunner? performer { get; set; }
@@ -162,7 +162,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     solidBackgroundLayer = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider?.Background5 ?? colours.Gray1
+                        Colour = colourProvider.Background5
                     },
                     background = new UserCoverBackground
                     {
@@ -261,7 +261,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                                 Origin = Anchor.BottomLeft,
                                 RelativeSizeAxes = Axes.X,
                                 Size = new Vector2(0, 4),
-                                Colour = colourProvider?.Content2 ?? colours.Gray3
+                                Colour = colourProvider.Content2
                             }
                         }
                     }

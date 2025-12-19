@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
@@ -78,18 +77,18 @@ namespace osu.Game.Graphics.UserInterface
             Current.DisabledChanged += disabled => { Alpha = disabled ? 0.3f : 1; };
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider? colourProvider, OsuColour colour, AudioManager audio)
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider, AudioManager audio)
         {
-            BackgroundUnfocused = colourProvider?.Background5 ?? Color4.Black.Opacity(0.5f);
-            BackgroundFocused = colourProvider?.Background4 ?? OsuColour.Gray(0.3f).Opacity(0.8f);
-            BackgroundCommit = BorderColour = colourProvider?.Highlight1 ?? colour.Yellow;
-            selectionColour = colourProvider?.Background1 ?? new Color4(249, 90, 255, 255);
+            BackgroundUnfocused = colourProvider.Background5;
+            BackgroundFocused = colourProvider.Background4;
+            BackgroundCommit = BorderColour = colourProvider.Highlight1;
+            selectionColour = colourProvider.Background1;
 
             if (caret != null)
                 caret.SelectionColour = selectionColour;
 
-            Placeholder.Colour = colourProvider?.Foreground1 ?? new Color4(180, 180, 180, 255);
+            Placeholder.Colour = colourProvider.Foreground1;
 
             // Note that `KeyBindingRow` uses similar logic for input feedback, so remember to update there if changing here.
             var textAddedSamples = new Sample?[4];

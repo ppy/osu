@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Chat
         private ChannelManager? chatManager { get; set; }
 
         [Resolved]
-        private OverlayColourProvider? colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         private OsuSpriteText drawableTimestamp = null!;
 
@@ -214,7 +214,7 @@ namespace osu.Game.Overlays.Chat
         {
             base.LoadComplete();
 
-            drawableTimestamp.Colour = colourProvider?.Background1 ?? Colour4.White;
+            drawableTimestamp.Colour = colourProvider.Background1;
 
             updateMessageContent();
             FinishTransforms(true);
@@ -260,10 +260,10 @@ namespace osu.Game.Overlays.Chat
             text.Shadow = false;
             text.Font = text.Font.With(size: font_size, italics: Message.IsAction, weight: isMention ? FontWeight.SemiBold : FontWeight.Medium);
 
-            Color4 messageColour = colourProvider?.Content1 ?? Colour4.White;
+            Color4 messageColour = colourProvider.Content1;
 
             if (isMention)
-                messageColour = colourProvider?.Highlight1 ?? Color4.Orange;
+                messageColour = colourProvider.Highlight1;
             else if (Message.IsAction && !string.IsNullOrEmpty(message.Sender.Colour))
                 messageColour = Color4Extensions.FromHex(message.Sender.Colour);
 
