@@ -47,7 +47,8 @@ namespace osu.Game.Screens.SelectV2
 
             public SpreadDisplay()
             {
-                AutoSizeAxes = Axes.Both;
+                AutoSizeAxes = Axes.X;
+                RelativeSizeAxes = Axes.Y;
                 Content.CornerRadius = 5;
             }
 
@@ -57,6 +58,8 @@ namespace osu.Game.Screens.SelectV2
                 Add(new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(5),
                     Padding = new MarginPadding { Horizontal = 5 },
@@ -132,14 +135,14 @@ namespace osu.Game.Screens.SelectV2
 
             private void updateBeatmap()
             {
-                preceding.Clear();
-                succeeding.Clear();
-
                 if (Beatmap.Value == null || scopedBeatmapSet.Value != null)
                 {
                     this.FadeOut(transition_duration, Easing.OutQuint);
                     return;
                 }
+
+                preceding.Clear();
+                succeeding.Clear();
 
                 var otherStarDifficulties = Beatmap.Value.BeatmapSet!.Beatmaps
                                                    .Except([Beatmap.Value])
@@ -218,7 +221,8 @@ namespace osu.Game.Screens.SelectV2
                 if (!Enabled.Value)
                     return false;
 
-                return base.OnMouseDown(e);
+                base.OnMouseDown(e);
+                return true;
             }
 
             protected override bool OnClick(ClickEvent e)

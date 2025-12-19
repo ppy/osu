@@ -189,6 +189,7 @@ namespace osu.Game.Screens.SelectV2
                         new ScopedBeatmapSetDisplay
                         {
                             ScopedBeatmapSet = ScopedBeatmapSet,
+                            Depth = float.MinValue, // hack to ensure that the scoped display handles `GlobalAction.Back` input before the filter control
                         }
                     },
                 }
