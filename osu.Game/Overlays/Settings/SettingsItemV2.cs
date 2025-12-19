@@ -21,9 +21,9 @@ namespace osu.Game.Overlays.Settings
         private readonly BindableBool controlEnabled = new BindableBool(true);
 
         /// <summary>
-        /// Whether a revert-to-default button should be displayed.
+        /// Whether a revert button should be displayed when the control is modified away from default state.
         /// </summary>
-        public bool ShowDefaultRevertButton { get; init; } = true;
+        public bool ShowRevertToDefaultButton { get; init; } = true;
 
         /// <summary>
         /// A note to display underneath the setting.
@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Settings
 
         private void updateDefaultState()
         {
-            bool showRevertButton = !controlDefault.Value && controlEnabled.Value && ShowDefaultRevertButton;
+            bool showRevertButton = !controlDefault.Value && controlEnabled.Value && ShowRevertToDefaultButton;
 
             if (showRevertButton)
                 revertButton.Show();
