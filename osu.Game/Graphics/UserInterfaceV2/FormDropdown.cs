@@ -171,6 +171,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                         Size = new Vector2(16),
+                        Margin = new MarginPadding { Right = 5 },
                     },
                 };
 
