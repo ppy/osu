@@ -52,7 +52,19 @@ namespace osu.Game.Screens.SelectV2
                 Spacing = new Vector2(0, 5),
             };
 
+            Body.Shear = OsuGame.SHEAR;
+
             Child = flow;
+
+            var filterSection = new FillFlowContainer
+            {
+                Direction = FillDirection.Vertical,
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Spacing = new Vector2(0, 5),
+            };
+
+            flow.Add(filterSection);
 
             // Add saved filters
             var savedFilters = realm?.Realm.All<SavedBeatmapFilter>().Where(f => f.RulesetShortName == ruleset.ShortName);
@@ -64,46 +76,62 @@ namespace osu.Game.Screens.SelectV2
                 AutoSizeAxes = Axes.Y,
             };
 
-            bool hasFilters = false;
+            var separator = new Box
+            {
+                RelativeSizeAxes = Axes.X,
+                Height = 1,
+                Colour = colours.Gray4,
+            };
+
+            var emptyStateText = new OsuSpriteText
+            {
+                Text = "No saved filters",
+                Colour = colours.Gray8,
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                Shear = -OsuGame.SHEAR,
+            };
+
+            void refreshFilterSection()
+            {
+                filterSection.Clear(false);
+
+                if (filtersFlow.Children.Count > 0)
+                {
+                    filterSection.Add(filtersFlow);
+                    filterSection.Add(separator);
+                }
+                else
+                    filterSection.Add(emptyStateText);
+            }
 
             if (savedFilters != null)
             {
                 foreach (var filter in savedFilters)
                 {
-                    hasFilters = true;
+                    var localFilter = filter;
 
-                    filtersFlow.Add(new SavedFilterItem(filter, onSelect, () =>
+                    var item = new SavedFilterItem(localFilter, onSelect, () =>
                     {
-                        realm?.Write(r => r.Remove(filter));
-                        Hide();
-                    }));
+                        realm?.Write(r => r.Remove(localFilter));
+
+                        var toRemove = filtersFlow.Children.OfType<SavedFilterItem>().FirstOrDefault(f => System.Collections.Generic.EqualityComparer<SavedBeatmapFilter>.Default.Equals(f.Filter, localFilter));
+
+                        if (toRemove != null)
+                        {
+                            filtersFlow.Remove(toRemove, true);
+                            refreshFilterSection();
+                        }
+                    });
+
+                    filtersFlow.Add(item);
                 }
             }
 
-            if (hasFilters)
-            {
-                flow.Add(filtersFlow);
-
-                flow.Add(new Box
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 1,
-                    Colour = colours.Gray4,
-                });
-            }
-            else
-            {
-                flow.Add(new OsuSpriteText
-                {
-                    Text = "No saved filters",
-                    Colour = colours.Gray8,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                });
-            }
+            refreshFilterSection();
 
             // Add save section
-            var nameTextBox = new OsuTextBox
+            var nameTextBox = new ShearedTextBox
             {
                 PlaceholderText = "Filter name",
                 RelativeSizeAxes = Axes.X,
@@ -112,7 +140,7 @@ namespace osu.Game.Screens.SelectV2
 
             flow.Add(nameTextBox);
 
-            flow.Add(new RoundedButton
+            flow.Add(new ShearedRoundedButton
             {
                 Text = "Save current filter",
                 RelativeSizeAxes = Axes.X,
@@ -154,13 +182,48 @@ namespace osu.Game.Screens.SelectV2
             });
         }
 
+        private partial class ShearedTextBox : OsuTextBox
+        {
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Schedule(() =>
+                {
+                    TextContainer.Shear = -OsuGame.SHEAR;
+                });
+            }
+
+            protected override SpriteText CreatePlaceholder()
+            {
+                var placeholder = base.CreatePlaceholder();
+                placeholder.Shear = Vector2.Zero;
+                return placeholder;
+            }
+        }
+
+        private partial class ShearedRoundedButton : RoundedButton
+        {
+            protected override SpriteText CreateText() => new OsuSpriteText
+            {
+                Depth = -1,
+                Origin = Anchor.Centre,
+                Anchor = Anchor.Centre,
+                Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                Shear = -OsuGame.SHEAR,
+            };
+        }
+
         private partial class SavedFilterItem : ClickableContainer
         {
+            public SavedBeatmapFilter Filter { get; }
+
             private readonly Box background;
             private readonly SpriteIcon arrow;
 
             public SavedFilterItem(SavedBeatmapFilter filter, Action<SavedBeatmapFilter> action, Action onDelete)
             {
+                Filter = filter;
                 RelativeSizeAxes = Axes.X;
                 Height = 20;
                 Action = () => action(filter);
@@ -182,6 +245,7 @@ namespace osu.Game.Screens.SelectV2
                         Size = new Vector2(8),
                         X = 0,
                         Alpha = 0,
+                        Shear = -OsuGame.SHEAR,
                         Margin = new MarginPadding { Left = 3, Right = 3 },
                     },
                     new OsuSpriteText
@@ -190,6 +254,7 @@ namespace osu.Game.Screens.SelectV2
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         X = 15,
+                        Shear = -OsuGame.SHEAR,
                     },
                     new IconButton
                     {
@@ -199,6 +264,7 @@ namespace osu.Game.Screens.SelectV2
                         Action = onDelete,
                         Scale = new Vector2(0.55f),
                         X = -5,
+                        Shear = -OsuGame.SHEAR,
                     }
                 };
             }
