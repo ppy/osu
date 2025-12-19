@@ -16,7 +16,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 
@@ -45,7 +44,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private Box background = null!;
         private FormFieldCaption caption = null!;
         private OsuSpriteText text = null!;
-        private Nub checkbox = null!;
 
         private Sample? sampleChecked;
         private Sample? sampleUnchecked;
@@ -89,7 +87,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                         },
-                        checkbox = new Nub
+                        new FormSwitchButton
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
@@ -170,5 +168,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public void SetDefault() => Current.SetDefault();
 
         public bool IsDisabled => Current.Disabled;
+
+        private partial class FormSwitchButton : SwitchButton
+        {
+            public override bool PropagatePositionalInputSubTree => false;
+        }
     }
 }
