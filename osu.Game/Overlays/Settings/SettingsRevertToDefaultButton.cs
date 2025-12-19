@@ -82,12 +82,12 @@ namespace osu.Game.Overlays.Settings
 
         public override void Show()
         {
-            this.FadeIn().MoveToX(WIDTH - 10, 300, Easing.OutQuint);
+            this.FadeIn().MoveToX(WIDTH - 10, 200, Easing.OutElasticQuarter);
         }
 
         public override void Hide()
         {
-            this.MoveToX(0, 300, Easing.OutQuint).Then().FadeOut();
+            this.MoveToX(0, 120, Easing.OutExpo).Then().FadeOut();
         }
 
         private void updateDisplay()
