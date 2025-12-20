@@ -249,9 +249,9 @@ namespace osu.Game.Rulesets.Osu
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetOsu };
 
-        public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new OsuDifficultyCalculator(RulesetInfo, beatmap);
+        public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new OsuDifficultyCalculator(RulesetInfo, beatmap, DifficultyTuning);
 
-        public override PerformanceCalculator CreatePerformanceCalculator() => new OsuPerformanceCalculator();
+        public override PerformanceCalculator CreatePerformanceCalculator() => new OsuPerformanceCalculator(DifficultyTuning);
 
         public override HitObjectComposer CreateHitObjectComposer() => new OsuHitObjectComposer(this);
 
