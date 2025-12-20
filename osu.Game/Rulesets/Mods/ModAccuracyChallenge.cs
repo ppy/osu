@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        [SettingSource("Minimum accuracy", "Trigger a failure if your accuracy goes below this value.", SettingControlType = typeof(SettingsPercentageSlider<double>))]
+        [SettingSource("Minimum accuracy", "Trigger a failure if your accuracy goes below this value.", SettingControlType = typeof(MinimumAccuracySlider))]
         public BindableNumber<double> MinimumAccuracy { get; } = new BindableDouble
         {
             MinValue = 0.60,
@@ -101,6 +101,14 @@ namespace osu.Game.Rulesets.Mods
 
             [LocalisableDescription(typeof(GameplayAccuracyCounterStrings), nameof(GameplayAccuracyCounterStrings.AccuracyDisplayModeStandard))]
             Standard,
+        }
+    }
+
+    public partial class MinimumAccuracySlider : SettingsPercentageSlider<double>
+    {
+        public MinimumAccuracySlider()
+        {
+            KeyboardStep = 0.01f;
         }
     }
 }
