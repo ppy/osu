@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Notifications
 
         protected override Container<Drawable> Content => content;
 
-        protected Container MainContent;
+        public Container MainContent;
 
         private readonly DragContainer dragContainer;
 
