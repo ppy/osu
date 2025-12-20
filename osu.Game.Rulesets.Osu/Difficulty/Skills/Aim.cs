@@ -19,8 +19,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         public readonly bool IncludeSliders;
 
-        public Aim(Mod[] mods, bool includeSliders)
-            : base(mods)
+        public Aim(Mod[] mods, OsuDifficultyTuning tuning, bool includeSliders)
+            : base(mods, tuning)
         {
             IncludeSliders = includeSliders;
         }
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplier;
+            currentStrain += AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders, Tuning) * skillMultiplier * Tuning.AimSkillStrainScale;
 
             if (current.BaseObject is Slider)
                 sliderStrains.Add(currentStrain);

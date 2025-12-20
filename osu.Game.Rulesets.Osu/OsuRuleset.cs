@@ -51,6 +51,18 @@ namespace osu.Game.Rulesets.Osu
 {
     public class OsuRuleset : Ruleset, ILegacyRuleset
     {
+        public OsuDifficultyTuning DifficultyTuning { get; }
+
+        public OsuRuleset()
+        {
+            DifficultyTuning = OsuDifficultyTuning.Default;
+        }
+
+        public OsuRuleset(OsuDifficultyTuning tuning)
+        {
+            DifficultyTuning = tuning;
+        }
+
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) => new DrawableOsuRuleset(this, beatmap, mods);
 
         public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
