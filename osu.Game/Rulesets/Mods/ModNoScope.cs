@@ -66,6 +66,11 @@ namespace osu.Game.Rulesets.Mods
 
     public partial class HiddenComboSlider : RoundedSliderBar<int>
     {
+        public HiddenComboSlider()
+        {
+            KeyboardStep = 1;
+        }
+
         public override LocalisableString TooltipText => Current.Value == 0 ? "always hidden" : base.TooltipText;
     }
 }
