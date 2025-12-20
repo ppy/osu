@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 deadzoneSlider = new SettingsSlider<float>
                 {
                     LabelText = JoystickSettingsStrings.DeadzoneThreshold,
-                    KeyboardStep = 0.01f,
+                    KeyboardStep = 0.005f,
                     DisplayAsPercentage = true,
                     Current = localDeadzone,
                 },
