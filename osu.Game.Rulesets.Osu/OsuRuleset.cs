@@ -58,9 +58,9 @@ namespace osu.Game.Rulesets.Osu
             DifficultyTuning = OsuDifficultyTuning.Default;
         }
 
-        public OsuRuleset(OsuDifficultyTuning tuning)
+        public OsuRuleset(OsuDifficultyTuning? tuning = null)
         {
-            DifficultyTuning = tuning;
+            DifficultyTuning = tuning ?? OsuDifficultyTuning.Default;
         }
 
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) => new DrawableOsuRuleset(this, beatmap, mods);
