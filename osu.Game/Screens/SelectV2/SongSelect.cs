@@ -642,7 +642,7 @@ namespace osu.Game.Screens.SelectV2
                 Ruleset.Value = Beatmap.Value.BeatmapInfo.Ruleset;
 
                 // Refresh the carousel to the new ruleset
-                // TODO: `criteriaChanged` will be called via the ruleset bindable callback, so it will replace the loading amination of here.
+                // TODO: `criteriaChanged` will be called via the ruleset bindable callback, so it will replace the loading animation of here.
                 filterDebounce?.Cancel();
                 carousel.Filter(filterControl.CreateCriteria(), true);
 
