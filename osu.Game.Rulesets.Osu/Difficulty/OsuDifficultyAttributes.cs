@@ -91,11 +91,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double MaximumLegacyComboScore { get; set; }
 
         /// <summary>
-        /// The beatmap's drain rate. This doesn't scale with rate-adjusting mods.
-        /// </summary>
-        public double DrainRate { get; set; }
-
-        /// <summary>
         /// The number of hitcircles in the beatmap.
         /// </summary>
         public int HitCircleCount { get; set; }
@@ -157,7 +152,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             MaximumLegacyComboScore = values[ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE];
             SnapAimDifficulty = values[ATTRIB_ID_SNAP_AIM_DIFFICULTY];
             FlowAimDifficulty = values[ATTRIB_ID_FLOW_AIM_DIFFICULTY];
-            DrainRate = onlineInfo.DrainRate;
             HitCircleCount = onlineInfo.CircleCount;
             SliderCount = onlineInfo.SliderCount;
             SpinnerCount = onlineInfo.SpinnerCount;
