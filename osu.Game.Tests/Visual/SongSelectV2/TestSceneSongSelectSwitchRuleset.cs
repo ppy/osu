@@ -24,17 +24,21 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddStep("disable converts", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
             AddStep("change beatmap to taiko beatmap", () => changeBeatmapFromRuleset(1));
+            WaitForFiltering();
             AddAssert("current ruleset is taiko", () => Ruleset.Value.OnlineID, () => Is.EqualTo(1));
 
             AddStep("change beatmap to osu! beatmap", () => changeBeatmapFromRuleset(0));
+            WaitForFiltering();
             AddAssert("current ruleset is osu!", () => Ruleset.Value.OnlineID, () => Is.EqualTo(0));
 
             AddStep("enable converts", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
-
+            WaitForFiltering();
             AddStep("change beatmap to taiko beatmap", () => changeBeatmapFromRuleset(1));
-            AddAssert("current ruleset is taiko", () => Ruleset.Value.OnlineID, () => Is.EqualTo(1));
 
+            AddAssert("current ruleset is taiko", () => Ruleset.Value.OnlineID, () => Is.EqualTo(1));
+            WaitForFiltering();
             AddStep("change beatmap to osu! beatmap", () => changeBeatmapFromRuleset(0));
+            WaitForFiltering();
             AddAssert("current ruleset is taiko (converted)", () => Ruleset.Value.OnlineID, () => Is.EqualTo(1));
         }
 
@@ -47,9 +51,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             ChangeRuleset(1);
             AddStep("change beatmap to osu! beatmap", () => changeBeatmapFromRuleset(0));
+            WaitForFiltering();
             AddAssert("current ruleset is taiko", () => Ruleset.Value.OnlineID, () => Is.EqualTo(1));
 
             AddStep("change beatmap to catch beatmap", () => changeBeatmapFromRuleset(2));
+            WaitForFiltering();
             AddAssert("current ruleset is catch", () => Ruleset.Value.OnlineID, () => Is.EqualTo(2));
         }
     }
