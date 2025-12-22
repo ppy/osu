@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
@@ -38,6 +39,7 @@ namespace osu.Game.Tests.Visual.Playlists
 {
     public partial class TestScenePlaylistsRoomSubScreen : OnlinePlayTestScene
     {
+        private RulesetStore rulesets = null!;
         private BeatmapManager beatmaps = null!;
         private BeatmapSetInfo importedSet = null!;
 
@@ -46,7 +48,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             BeatmapStore beatmapStore;
 
-            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
             Dependencies.CacheAs(beatmapStore = new RealmDetachedBeatmapStore());
             Dependencies.Cache(Realm);
@@ -65,7 +67,8 @@ namespace osu.Game.Tests.Visual.Playlists
                         OnlineID = 1,
                         DifficultyName = "Osu 1",
                         Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
-                        MD5Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
+                        MD5Hash = "11111111",
+                        OnlineMD5Hash = "11111111",
                         Ruleset = new OsuRuleset().RulesetInfo,
                         Metadata =
                         {
@@ -79,7 +82,8 @@ namespace osu.Game.Tests.Visual.Playlists
                         OnlineID = 2,
                         DifficultyName = "Osu 2",
                         Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
-                        MD5Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
+                        MD5Hash = "22222222",
+                        OnlineMD5Hash = "22222222",
                         Ruleset = new OsuRuleset().RulesetInfo,
                         Metadata =
                         {
@@ -93,7 +97,8 @@ namespace osu.Game.Tests.Visual.Playlists
                         OnlineID = 3,
                         DifficultyName = "Taiko 1",
                         Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
-                        MD5Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
+                        MD5Hash = "33333333",
+                        OnlineMD5Hash = "33333333",
                         Ruleset = new TaikoRuleset().RulesetInfo,
                         Metadata =
                         {
@@ -107,7 +112,8 @@ namespace osu.Game.Tests.Visual.Playlists
                         OnlineID = 4,
                         DifficultyName = "Taiko 2",
                         Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
-                        MD5Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
+                        MD5Hash = "44444444",
+                        OnlineMD5Hash = "44444444",
                         Ruleset = new TaikoRuleset().RulesetInfo,
                         Metadata =
                         {
@@ -358,12 +364,14 @@ namespace osu.Game.Tests.Visual.Playlists
                         new PlaylistItem(importedSet.Beatmaps[0])
                         {
                             RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
-                            Freestyle = true
+                            Freestyle = true,
+                            AllowedMods = [new APIMod(new OsuModDoubleTime())]
                         },
                         new PlaylistItem(importedSet.Beatmaps[0])
                         {
                             RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
-                            Freestyle = true
+                            Freestyle = true,
+                            AllowedMods = [new APIMod(new OsuModDoubleTime())]
                         },
                     ]
                 };
@@ -448,12 +456,14 @@ namespace osu.Game.Tests.Visual.Playlists
                         new PlaylistItem(importedSet.Beatmaps[0])
                         {
                             RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
-                            Freestyle = true
+                            Freestyle = true,
+                            AllowedMods = [new APIMod(new OsuModDoubleTime())]
                         },
                         new PlaylistItem(importedSet.Beatmaps[0])
                         {
                             RulesetID = new TaikoRuleset().RulesetInfo.OnlineID,
-                            Freestyle = true
+                            Freestyle = true,
+                            AllowedMods = [new APIMod(new TaikoModDoubleTime())]
                         },
                     ]
                 };
@@ -569,6 +579,14 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("select second playlist item", () => screen.SelectedItem.Value = room.Playlist[1]);
             AddUntilStep("user mods validated", () => screen.UserMods.Value.Count == 1 && screen.UserMods.Value.OfType<OsuModDoubleTime>().Any());
             AddUntilStep("mods set", () => SelectedMods.Value.Count == 1 && SelectedMods.Value.OfType<OsuModDoubleTime>().Any());
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
         }
 
         private partial class TestPlaylistsScreen : OsuScreen

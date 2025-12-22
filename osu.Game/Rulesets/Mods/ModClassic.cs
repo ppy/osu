@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -14,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override double ScoreMultiplier => 0.96;
 
-        public override IconUsage? Icon => FontAwesome.Solid.History;
+        public override IconUsage? Icon => OsuIcon.ModClassic;
 
         public override LocalisableString Description => "Feeling nostalgic?";
 
@@ -30,5 +31,7 @@ namespace osu.Game.Rulesets.Mods
         ///  - Sliders always gives combo for slider end, even on miss (https://github.com/ppy/osu/issues/11769).
         /// </summary>
         public sealed override bool Ranked => false;
+
+        public sealed override bool ValidForFreestyleAsRequiredMod => false;
     }
 }

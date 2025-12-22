@@ -281,6 +281,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             SelectionAdditionBanksEnabled.Value = true;
             SelectionBankStates[HIT_BANK_AUTO].Value = TernaryState.True;
             SelectionAdditionBankStates[HIT_BANK_AUTO].Value = TernaryState.True;
+            foreach (var (_, sampleState) in SelectionSampleStates)
+                sampleState.Value = TernaryState.False;
         }
 
         /// <summary>
@@ -316,7 +318,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void onSelectedItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             // Reset the ternary states when the selection is cleared.
-            if (e.OldStartingIndex >= 0 && e.NewStartingIndex < 0)
+            if (SelectedItems.Count == 0)
                 Scheduler.AddOnce(resetTernaryStates);
             else
                 Scheduler.AddOnce(UpdateTernaryStates);

@@ -77,7 +77,6 @@ namespace osu.Game.Screens.Select.Carousel
                                 },
                             new BeatmapSetOnlineStatusPill
                             {
-                                AutoSizeAxes = Axes.Both,
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                                 TextSize = 11,

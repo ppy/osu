@@ -14,6 +14,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -22,6 +24,7 @@ using osu.Game.Online.Placeholders;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics.User;
 using osuTK;
+using Realms;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
@@ -42,6 +45,9 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; } = null!;
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -231,23 +237,33 @@ namespace osu.Game.Screens.Ranking.Statistics
                 });
             }
 
-            if (AchievedScore != null
-                && newScore.BeatmapInfo!.OnlineID > 0
+            if (newScore.BeatmapInfo!.OnlineID > 0
                 && api.IsLoggedIn)
             {
                 string? preventTaggingReason = null;
 
                 // We may want to iterate on the following conditions further in the future
 
-                if (AchievedScore.Ruleset.OnlineID != AchievedScore.BeatmapInfo!.Ruleset.OnlineID)
+                var localUserScore = AchievedScore ?? realm.Run(r =>
+                    r.GetAllLocalScoresForUser(api.LocalUser.Value.Id)
+                     .Filter($@"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0", newScore.BeatmapInfo.ID)
+                     .AsEnumerable()
+                     .OrderByDescending(score => score.Ruleset.MatchesOnlineID(newScore.BeatmapInfo.Ruleset))
+                     .ThenByDescending(score => score.Rank)
+                     .FirstOrDefault());
+
+                if (localUserScore == null)
+                    preventTaggingReason = "Play the beatmap to contribute to beatmap tags!";
+                else if (localUserScore.Ruleset.OnlineID != newScore.BeatmapInfo!.Ruleset.OnlineID)
                     preventTaggingReason = "Play the beatmap in its original ruleset to contribute to beatmap tags!";
-                else if (AchievedScore.Rank < ScoreRank.C)
+                else if (localUserScore.Rank < ScoreRank.C)
                     preventTaggingReason = "Set a better score to contribute to beatmap tags!";
 
                 if (preventTaggingReason == null)
                 {
                     yield return new StatisticItem("Tag the beatmap!", () => new UserTagControl(newScore.BeatmapInfo)
                     {
+                        Writable = true,
                         RelativeSizeAxes = Axes.X,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -255,12 +271,31 @@ namespace osu.Game.Screens.Ranking.Statistics
                 }
                 else
                 {
-                    yield return new StatisticItem("Tag the beatmap!", () => new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold))
+                    yield return new StatisticItem("Tag the beatmap!", () => new FillFlowContainer<CompositeDrawable>
                     {
+                        Children = new CompositeDrawable[]
+                        {
+                            new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold))
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                TextAnchor = Anchor.Centre,
+                                Text = preventTaggingReason,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            },
+                            new UserTagControl(newScore.BeatmapInfo)
+                            {
+                                Writable = false,
+                                RelativeSizeAxes = Axes.X,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            }
+                        },
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        TextAnchor = Anchor.Centre,
-                        Text = preventTaggingReason,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(4),
                     });
                 }
             }
@@ -285,7 +320,10 @@ namespace osu.Game.Screens.Ranking.Statistics
             this.FadeOut(250, Easing.OutQuint);
 
             if (wasOpened)
+            {
                 popOutSample?.Play();
+                this.HidePopover(); // targeted at the user tag control
+            }
         }
 
         protected override void Dispose(bool isDisposing)

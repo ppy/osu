@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -18,6 +20,8 @@ namespace osu.Game.Rulesets.Catch.Mods
     public partial class CatchModRelax : ModRelax, IApplicableToDrawableRuleset<CatchHitObject>, IApplicableToPlayer
     {
         public override LocalisableString Description => @"Use the mouse to control the catcher.";
+
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(CatchModMovingFast) }).ToArray();
 
         private DrawableCatchRuleset drawableRuleset = null!;
 

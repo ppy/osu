@@ -137,8 +137,8 @@ namespace osu.Game.Screens.Select
                 // TODO: Make this message more certain by ensuring the osu! beatmaps exist before suggesting.
                 if (filter?.Ruleset?.OnlineID != 0 && filter?.AllowConvertedBeatmaps == false)
                 {
-                    textFlow.AddParagraph("- Try");
-                    textFlow.AddLink(" enabling ", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
+                    textFlow.AddParagraph("- Try ");
+                    textFlow.AddLink("enabling ", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
                     textFlow.AddText("automatic conversion!");
                 }
             }
