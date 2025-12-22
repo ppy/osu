@@ -63,6 +63,8 @@ namespace osu.Game.Skinning
 
         public string Name { get; }
 
+        protected IResourceStore<byte[]>? FallbackStore { get; }
+
         /// <summary>
         /// Construct a new skin.
         /// </summary>
@@ -102,6 +104,7 @@ namespace osu.Game.Skinning
                 SkinInfo = skin.ToLiveUnmanaged();
             }
 
+            FallbackStore = fallbackStore;
             if (fallbackStore != null)
                 store.AddStore(fallbackStore);
 
