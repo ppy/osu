@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0;
 
             if (mods.Any(m => m is OsuModTouchDevice))
-                aimDifficultyValue = Math.Pow(aimDifficultyValue, 0.8);
+                aimDifficultyValue = Math.Pow(aimDifficultyValue, 0.8) * 1.3;
 
             if (mods.Any(m => m is OsuModRelax))
                 aimDifficultyValue *= 0.7;
@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0;
 
             if (mods.Any(m => m is OsuModTouchDevice))
-                flashlightDifficultyValue = Math.Pow(flashlightDifficultyValue, 0.8);
+                flashlightDifficultyValue = Math.Pow(flashlightDifficultyValue, 0.8) * 1.9;
 
             if (mods.Any(m => m is OsuModRelax))
                 flashlightDifficultyValue *= 0.5;
