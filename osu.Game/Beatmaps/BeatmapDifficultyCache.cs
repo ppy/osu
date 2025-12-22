@@ -324,7 +324,34 @@ namespace osu.Game.Beatmaps
                 BeatmapInfo = beatmapInfo;
                 // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
                 Ruleset = ruleset ?? BeatmapInfo.Ruleset;
-                OrderedMods = mods?.OrderBy(m => m.Acronym).Select(mod => mod.DeepClone()).ToArray() ?? Array.Empty<Mod>();
+
+                // filter out mods that don't belong to the target ruleset to prevent InvalidCastException
+                // when applying ruleset-specific mods to beatmaps converted to a different ruleset.
+                var targetRuleset = Ruleset;
+                OrderedMods = mods?
+                    .Where(m => isModValidForRuleset(m, targetRuleset))
+                    .OrderBy(m => m.Acronym)
+                    .Select(mod => mod.DeepClone())
+                    .ToArray() ?? Array.Empty<Mod>();
+            }
+
+            /// <summary>
+            /// checks if a mod is valid for the given ruleset.
+            /// </summary>
+            /// <param name="mod">the mod to check.</param>
+            /// <param name="ruleset">the target ruleset.</param>
+            /// <returns>true if the mod can be applied to the ruleset, false otherwise.</returns>
+            private static bool isModValidForRuleset(Mod mod, RulesetInfo ruleset)
+            {
+                string modNamespace = mod.GetType().Namespace ?? string.Empty;
+
+                // universal mods from the base namespace are valid for all rulesets.
+                if (modNamespace == "osu.Game.Rulesets.Mods")
+                    return true;
+
+                // ruleset-specific mods must match the target ruleset.
+                // e.g., "osu.Game.Rulesets.Osu.Mods" should only be applied when ruleset is "osu".
+                return modNamespace.Contains($".{ruleset.ShortName}.", StringComparison.Ordinal);
             }
 
             public bool Equals(DifficultyCacheLookup other)
