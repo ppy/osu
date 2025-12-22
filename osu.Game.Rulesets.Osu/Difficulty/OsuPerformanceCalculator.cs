@@ -214,7 +214,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * drainRate * drainRate);
             else if (score.Mods.OfType<OsuModHidden>().Any(m => m.OnlyFadeApproachCircles.Value) || score.Mods.Any(m => m is OsuModTraceable))
             {
-                aimValue *= 1.0 + OsuRatingCalculator.CalculateVisibilityBonus(approachRate, sliderFactor: attributes.SliderFactor);
+                aimValue *= 1.0 + calculateVisibilityBonus(attributes.SliderFactor);
             }
 
             aimValue *= accuracy;
@@ -250,7 +250,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
             else if (score.Mods.OfType<OsuModHidden>().Any(m => m.OnlyFadeApproachCircles.Value) || score.Mods.Any(m => m is OsuModTraceable))
             {
-                speedValue *= 1.0 + OsuRatingCalculator.CalculateVisibilityBonus(approachRate);
+                speedValue *= 1.0 + calculateVisibilityBonus(approachRate);
             }
 
             double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
@@ -500,6 +500,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             adjustedSpeedValue = double.Lerp(adjustedSpeedValue, speedValue, lerp);
 
             return adjustedSpeedValue / speedValue;
+        }
+
+        /// <summary>
+        /// Calculates a visibility bonus that is applicable to Hidden (with only approach circles faded) and Traceable.
+        /// </summary>
+        private double calculateVisibilityBonus(double sliderFactor = 1)
+        {
+            // Start from normal curve, rewarding lower AR up to AR7
+            double readingBonus = 0.025 * (12.0 - Math.Max(approachRate, 7));
+
+            // We want to reward slider aim on low AR less
+            double sliderVisibilityFactor = Math.Pow(sliderFactor, 3);
+
+            // For AR up to 0 - reduce reward for very low ARs when object is visible
+            if (approachRate < 7)
+                readingBonus += 0.02 * (7.0 - Math.Max(approachRate, 0)) * sliderVisibilityFactor;
+
+            // Starting from AR0 - cap values so they won't grow to infinity
+            if (approachRate < 0)
+                readingBonus += 0.01 * (1 - Math.Pow(1.5, approachRate)) * sliderVisibilityFactor;
+
+            return readingBonus;
         }
 
         // Miss penalty assumes that a player will miss on the hardest parts of a map,

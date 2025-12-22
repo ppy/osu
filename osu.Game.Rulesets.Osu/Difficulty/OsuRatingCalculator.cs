@@ -139,30 +139,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightRating * Math.Sqrt(ratingMultiplier);
         }
 
-        /// <summary>
-        /// Calculates a visibility bonus that is applicable to Hidden and Traceable.
-        /// </summary>
-        public static double CalculateVisibilityBonus(double approachRate, double visibilityFactor = 1, double sliderFactor = 1)
-        {
-            // Start from normal curve, rewarding lower AR up to AR7
-            double readingBonus = 0.025 * (12.0 - Math.Max(approachRate, 7));
-
-            readingBonus *= visibilityFactor;
-
-            // We want to reward slideraim on low AR less
-            double sliderVisibilityFactor = Math.Pow(sliderFactor, 3);
-
-            // For AR up to 0 - reduce reward for very low ARs when object is visible
-            if (approachRate < 7)
-                readingBonus += 0.02 * (7.0 - Math.Max(approachRate, 0)) * sliderVisibilityFactor;
-
-            // Starting from AR0 - cap values so they won't grow to infinity
-            if (approachRate < 0)
-                readingBonus += 0.01 * (1 - Math.Pow(1.5, approachRate)) * sliderVisibilityFactor;
-
-            return readingBonus;
-        }
-
         public static double CalculateDifficultyRating(double difficultyValue) => Math.Sqrt(difficultyValue) * difficulty_multiplier;
     }
 }
