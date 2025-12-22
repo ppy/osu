@@ -1,10 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -19,7 +22,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public partial class FormCheckBox : CompositeDrawable, IHasCurrentValue<bool>
+    public partial class FormCheckBox : CompositeDrawable, IHasCurrentValue<bool>, IFormControl
     {
         public Bindable<bool> Current
         {
@@ -109,6 +112,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 updateState();
                 playSamples();
                 background.FlashColour(ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark2), 800, Easing.OutQuint);
+
+                ValueChanged?.Invoke();
             });
             current.BindDisabledChanged(_ => updateState(), true);
         }
@@ -157,5 +162,15 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     BorderColour = colourProvider.Light4;
             }
         }
+
+        public IEnumerable<LocalisableString> FilterTerms => Caption.Yield();
+
+        public event Action? ValueChanged;
+
+        public bool IsDefault => Current.IsDefault;
+
+        public void SetDefault() => Current.SetDefault();
+
+        public bool IsDisabled => Current.Disabled;
     }
 }
