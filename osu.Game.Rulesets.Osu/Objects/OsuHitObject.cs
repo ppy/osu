@@ -88,6 +88,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             get => stackHeight.Value;
             set => stackHeight.Value = value;
         }
+
         public Vector2 StackDirection = new Vector2(-1f, -1f);
 
         public virtual Vector2 StackOffset => new Vector2(StackHeight * Scale * 6.4f * StackDirection.X, StackHeight * Scale * 6.4f * StackDirection.Y);

@@ -19,8 +19,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         [SettingSource("Flipped axes")]
         public Bindable<MirrorType> Reflection { get; } = new Bindable<MirrorType>();
+
         [SettingSource("Reflect stack direction")]
         public BindableBool MirrorStacks { get; } = new BindableBool();
+
         public bool MirrorStackingDirection => MirrorStacks.Value;
         public override bool Ranked => MirrorStackingDirection;
 
