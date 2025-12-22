@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
 using osu.Framework.Allocation;
@@ -22,7 +23,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public partial class FormSliderBar<T> : CompositeDrawable, IHasCurrentValue<T>
+    public partial class FormSliderBar<T> : CompositeDrawable, IHasCurrentValue<T>, IFormControl
         where T : struct, INumber<T>, IMinMaxValue<T>
     {
         public Bindable<T> Current
@@ -194,7 +195,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
             slider.IsDragging.BindValueChanged(_ => updateState());
             slider.Focused.BindValueChanged(_ => updateState());
 
-            current.ValueChanged += e => currentNumberInstantaneous.Value = e.NewValue;
+            current.ValueChanged += e =>
+            {
+                currentNumberInstantaneous.Value = e.NewValue;
+                ValueChanged?.Invoke();
+            };
+
             current.MinValueChanged += v => currentNumberInstantaneous.MinValue = v;
             current.MaxValueChanged += v => currentNumberInstantaneous.MaxValue = v;
             current.PrecisionChanged += v => currentNumberInstantaneous.Precision = v;
@@ -207,6 +213,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 }
 
                 currentNumberInstantaneous.Disabled = disabled;
+                updateState();
             };
 
             current.CopyTo(currentNumberInstantaneous);
@@ -283,7 +290,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected override bool OnClick(ClickEvent e)
         {
-            focusManager.ChangeFocus(textBox);
+            if (!Current.Disabled)
+                focusManager.ChangeFocus(textBox);
             return true;
         }
 
@@ -292,6 +300,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             bool childHasFocus = slider.Focused.Value || textBox.Focused.Value;
 
             textBox.Alpha = 1;
+            textBox.ReadOnly = Current.Disabled;
 
             background.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background4 : colourProvider.Background5;
             captionText.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
@@ -380,7 +389,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                updateState();
+                Current.BindDisabledChanged(_ => updateState(), true);
             }
 
             protected override void UpdateAfterChildren()
@@ -434,8 +443,17 @@ namespace osu.Game.Graphics.UserInterfaceV2
             private void updateState()
             {
                 rightBox.Colour = colourProvider.Background6;
-                leftBox.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Dark2;
-                nub.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1 : colourProvider.Light4;
+
+                if (Current.Disabled)
+                {
+                    leftBox.Colour = colourProvider.Dark3;
+                    nub.Colour = colourProvider.Dark1;
+                }
+                else
+                {
+                    leftBox.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Highlight1.Opacity(0.3f);
+                    nub.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1 : colourProvider.Light4;
+                }
             }
 
             protected override void UpdateValue(float value)
@@ -475,5 +493,15 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 return true;
             }
         }
+
+        public IEnumerable<LocalisableString> FilterTerms => new[] { Caption, HintText };
+
+        public event Action? ValueChanged;
+
+        public bool IsDefault => Current.IsDefault;
+
+        public void SetDefault() => Current.SetDefault();
+
+        public bool IsDisabled => Current.Disabled;
     }
 }
