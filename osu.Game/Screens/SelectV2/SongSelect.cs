@@ -756,7 +756,9 @@ namespace osu.Game.Screens.SelectV2
 
             logo.Action = () =>
             {
-                SelectAndRun(Beatmap.Value.BeatmapInfo, OnStart);
+                // use carousel's current selection instead of global beatmap to avoid debounce issues
+                var beatmapToPlay = carousel.CurrentGroupedBeatmap?.Beatmap ?? Beatmap.Value.BeatmapInfo;
+                SelectAndRun(beatmapToPlay, OnStart);
                 return false;
             };
         }
