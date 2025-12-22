@@ -108,12 +108,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// Returns the number of relevant objects weighted against the top note.
         /// </summary>
-        public double CountTopWeightedNotes()
+        public double CountTopWeightedNotes(double difficultyValue)
         {
             if (noteDifficulties.Count == 0)
                 return 0.0;
-
-            double difficultyValue = DifficultyValue();
 
             if (noteWeightSum == 0)
                 return 0.0;

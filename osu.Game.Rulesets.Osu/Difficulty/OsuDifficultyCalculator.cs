@@ -56,11 +56,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
             var reading = skills.OfType<Reading>().Single();
 
+            double readingDifficultyValue = reading.DifficultyValue();
+
             double speedNotes = speed.RelevantNoteCount();
 
             double aimDifficultStrainCount = aim.CountTopWeightedStrains();
             double speedDifficultStrainCount = speed.CountTopWeightedStrains();
-            double readingDifficultNoteCount = reading.CountTopWeightedNotes();
+            double readingDifficultNoteCount = reading.CountTopWeightedNotes(readingDifficultyValue);
 
             double aimNoSlidersTopWeightedSliderCount = aimWithoutSliders.CountTopWeightedSliders();
             double aimNoSlidersDifficultStrainCount = aimWithoutSliders.CountTopWeightedStrains();
@@ -83,7 +85,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimDifficultyValue = aim.DifficultyValue();
             double aimNoSlidersDifficultyValue = aimWithoutSliders.DifficultyValue();
             double speedDifficultyValue = speed.DifficultyValue();
-            double readingDifficultyValue = reading.DifficultyValue();
 
             double sliderFactor = aimDifficultyValue > 0 ? OsuRatingCalculator.CalculateDifficultyRating(aimNoSlidersDifficultyValue) / OsuRatingCalculator.CalculateDifficultyRating(aimDifficultyValue) : 1;
 
