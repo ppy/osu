@@ -110,6 +110,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
                     state.CandidateItems = beatmaps.Select(b => b.ID).ToArray();
                     state.CandidateItem = beatmaps[0].ID;
+                    state.GameplayItem = beatmaps[0].ID;
                 }, waitTime: 35);
 
                 changeStage(MatchmakingStage.WaitingForClientsBeatmapDownload);

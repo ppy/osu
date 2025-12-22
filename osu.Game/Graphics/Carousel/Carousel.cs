@@ -785,31 +785,19 @@ namespace osu.Game.Graphics.Carousel
             // We are performing two important operations here:
             // - Update all Y positions. After a selection occurs, panels may have changed visibility state and therefore Y positions.
             // - Link selected models to CarouselItems. If a selection changed, this is where we find the relevant CarouselItems for further use.
+            FindCarouselItemsForSelection(ref currentKeyboardSelection, ref currentSelection, carouselItems);
+
             for (int i = 0; i < count; i++)
             {
                 var item = carouselItems[i];
-
-                bool isKeyboardSelection = CheckModelEquality(item.Model, currentKeyboardSelection.Model!);
-                bool isSelection = CheckModelEquality(item.Model, currentSelection.Model!);
-
-                // while we don't know the Y position of the item yet, as it's about to be updated,
-                // consumers (specifically `BeatmapCarousel.GetSpacingBetweenPanels()`) benefit from `CurrentSelectionItem` already pointing
-                // at the correct item to avoid redundant local equality checks.
-                // the Y positions will be filled in after they're computed.
-                if (isKeyboardSelection)
-                    currentKeyboardSelection = new Selection(currentKeyboardSelection.Model, item, null, i);
-
-                if (isSelection)
-                    currentSelection = new Selection(currentSelection.Model, item, null, i);
-
                 updateItemYPosition(item, ref lastVisible, ref yPos);
-
-                if (isKeyboardSelection)
-                    currentKeyboardSelection = currentKeyboardSelection with { YPosition = item.CarouselYPosition + item.DrawHeight / 2 };
-
-                if (isSelection)
-                    currentSelection = currentSelection with { YPosition = item.CarouselYPosition + item.DrawHeight / 2 };
             }
+
+            if (currentKeyboardSelection.CarouselItem is CarouselItem currentKeyboardSelectionItem)
+                currentKeyboardSelection = currentKeyboardSelection with { YPosition = currentKeyboardSelectionItem.CarouselYPosition + currentKeyboardSelectionItem.DrawHeight / 2 };
+
+            if (currentSelection.CarouselItem is CarouselItem currentSelectionItem)
+                currentSelection = currentSelection with { YPosition = currentSelectionItem.CarouselYPosition + currentSelectionItem.DrawHeight / 2 };
 
             // Update the total height of all items (to make the scroll container scrollable through the full height even though
             // most items are not displayed / loaded).
@@ -819,6 +807,27 @@ namespace osu.Game.Graphics.Carousel
             // That means that we should offset the immediate scroll position by any change in Y position for the selection.
             if (prevKeyboard.YPosition != null && currentKeyboardSelection.YPosition != null && currentKeyboardSelection.YPosition != prevKeyboard.YPosition)
                 Scroll.OffsetScrollPosition((float)(currentKeyboardSelection.YPosition!.Value - prevKeyboard.YPosition.Value));
+        }
+
+        protected virtual void FindCarouselItemsForSelection(ref Selection keyboardSelection, ref Selection selection, IList<CarouselItem> items)
+        {
+            for (int i = 0; i < items.Count; i++)
+            {
+                var item = items[i];
+
+                bool isKeyboardSelection = CheckModelEquality(item.Model, keyboardSelection.Model!);
+                bool isSelection = CheckModelEquality(item.Model, selection.Model!);
+
+                // while we don't know the Y position of the item yet, as it's about to be updated,
+                // consumers (specifically `BeatmapCarousel.GetSpacingBetweenPanels()`) benefit from `CurrentSelectionItem` already pointing
+                // at the correct item to avoid redundant local equality checks.
+                // the Y positions will be filled in after they're computed.
+                if (isKeyboardSelection)
+                    keyboardSelection = new Selection(keyboardSelection.Model, item, null, i);
+
+                if (isSelection)
+                    selection = new Selection(selection.Model, item, null, i);
+            }
         }
 
         #endregion
@@ -1081,7 +1090,7 @@ namespace osu.Game.Graphics.Carousel
         /// <param name="CarouselItem">A related carousel item representation for the model. May be null if selection is not present as an item, or if <see cref="Carousel{T}.refreshAfterSelection"/> has not been run yet.</param>
         /// <param name="YPosition">The Y position of the selection as of the last run of <see cref="Carousel{T}.refreshAfterSelection"/>. May be null if selection is not present as an item, or if <see cref="Carousel{T}.refreshAfterSelection"/> has not been run yet.</param>
         /// <param name="Index">The index of the selection as of the last run of <see cref="Carousel{T}.refreshAfterSelection"/>. May be null if selection is not present as an item, or if <see cref="Carousel{T}.refreshAfterSelection"/> has not been run yet.</param>
-        private record Selection(object? Model = null, CarouselItem? CarouselItem = null, double? YPosition = null, int? Index = null);
+        protected record Selection(object? Model = null, CarouselItem? CarouselItem = null, double? YPosition = null, int? Index = null);
 
         private record DisplayRange(int First, int Last)
         {

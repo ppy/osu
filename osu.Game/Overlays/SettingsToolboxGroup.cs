@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
-using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
@@ -46,6 +45,12 @@ namespace osu.Game.Overlays
 
         public BindableBool Expanded { get; } = new BindableBool(true);
 
+        public Vector2 Spacing
+        {
+            get => content.Spacing;
+            set => content.Spacing = value;
+        }
+
         private OsuSpriteText headerText = null!;
 
         private Container headerContent = null!;
@@ -57,6 +62,9 @@ namespace osu.Game.Overlays
         private InputManager inputManager = null!;
 
         private Drawable? draggedChild;
+
+        private bool? lastMouseInBounds;
+        private bool mouseInBounds => Contains(inputManager.CurrentState.Mouse.Position);
 
         /// <summary>
         /// Create a new instance.
@@ -137,20 +145,6 @@ namespace osu.Game.Overlays
             this.Delay(600).Schedule(updateFadeState);
         }
 
-        protected override bool OnHover(HoverEvent e)
-        {
-            updateFadeState();
-            updateExpandedState(true);
-            return false;
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            updateFadeState();
-            updateExpandedState(true);
-            base.OnHoverLost(e);
-        }
-
         protected override void Update()
         {
             base.Update();
@@ -160,10 +154,16 @@ namespace osu.Game.Overlays
             headerText.Alpha = (float)Interpolation.DampContinuously(headerText.Alpha, headerText.DrawWidth < DrawWidth ? 1 : 0, 40, Time.Elapsed);
 
             // Dragged child finished its drag operation.
-            if (draggedChild != null && inputManager.DraggedDrawable != draggedChild)
-            {
+            bool childDragFinished = draggedChild != null && inputManager.DraggedDrawable != draggedChild;
+
+            if (childDragFinished)
                 draggedChild = null;
+
+            if (childDragFinished || lastMouseInBounds != mouseInBounds)
+            {
                 updateExpandedState(true);
+                updateFadeState();
+                lastMouseInBounds = mouseInBounds;
             }
         }
 
@@ -179,7 +179,7 @@ namespace osu.Game.Overlays
             // potentially continuing to get processed while content has changed to autosize.
             content.ClearTransforms();
 
-            if (Expanded.Value || IsHovered || draggedChild != null)
+            if (Expanded.Value || mouseInBounds || draggedChild != null)
             {
                 content.AutoSizeAxes = Axes.Y;
                 content.AutoSizeDuration = animate ? transition_duration : 0;
@@ -198,8 +198,8 @@ namespace osu.Game.Overlays
         {
             const float fade_duration = 500;
 
-            background.FadeTo(IsHovered ? 1 : 0.1f, fade_duration, Easing.OutQuint);
-            expandButton.FadeTo(IsHovered ? 1 : 0, fade_duration, Easing.OutQuint);
+            background.FadeTo(mouseInBounds ? 1 : 0.1f, fade_duration, Easing.OutQuint);
+            expandButton.FadeTo(mouseInBounds ? 1 : 0, fade_duration, Easing.OutQuint);
         }
     }
 }

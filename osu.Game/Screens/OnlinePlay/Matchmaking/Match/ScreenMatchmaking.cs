@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -12,7 +13,6 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
@@ -29,6 +29,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.Gameplay;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Users;
@@ -47,11 +48,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         /// </summary>
         private const float row_padding = 10;
 
+        private static readonly Vector2 chat_size = new Vector2(550, 130);
+
         public override bool? ApplyModTrackAdjustments => true;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         public override bool ShowFooter => true;
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
+
+        protected override BackgroundScreen CreateBackground() => new MatchmakingBackgroundScreen(colourProvider);
 
         [Cached(typeof(OnlinePlayBeatmapAvailabilityTracker))]
         private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new MultiplayerBeatmapAvailabilityTracker();
@@ -104,14 +112,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             {
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.BottomRight,
-                Size = new Vector2(700, 130),
-                Margin = new MarginPadding { Bottom = 10, Right = WaveOverlayContainer.WIDTH_PADDING - HORIZONTAL_OVERFLOW_PADDING },
+                Size = chat_size,
+                Margin = new MarginPadding
+                {
+                    Right = WaveOverlayContainer.WIDTH_PADDING - HORIZONTAL_OVERFLOW_PADDING,
+                    Bottom = row_padding
+                },
                 Alpha = 0
             };
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
             sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
 
@@ -125,49 +137,44 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     {
                         beatmapAvailabilityTracker,
                         new MultiplayerRoomSounds(),
-                        new GridContainer
+                        new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding
                             {
-                                Horizontal = WaveOverlayContainer.WIDTH_PADDING,
-                                Top = row_padding,
+                                Horizontal = HORIZONTAL_OVERFLOW_PADDING,
                             },
-                            RowDimensions = new[]
+                            Child = new InverseScalingDrawSizePreservingFillContainer
                             {
-                                new Dimension(),
-                                new Dimension(GridSizeMode.Absolute, row_padding),
-                                new Dimension(GridSizeMode.AutoSize),
-                            },
-                            Content = new Drawable[]?[]
-                            {
-                                [
-                                    new Container
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Child = new GridContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    RowDimensions = new[]
                                     {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Masking = true,
-                                        CornerRadius = 10,
-                                        Children = new Drawable[]
-                                        {
-                                            new Box
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Colour = colourProvider.Background6,
-                                            },
+                                        new Dimension(),
+                                        new Dimension(GridSizeMode.Absolute, row_padding),
+                                        new Dimension(GridSizeMode.AutoSize),
+                                    },
+                                    Content = new Drawable[]?[]
+                                    {
+                                        [
                                             new ScreenStack(),
-                                        }
+                                        ],
+                                        null,
+                                        [
+                                            new Container
+                                            {
+                                                Name = "Chat Area Space",
+                                                Anchor = Anchor.TopRight,
+                                                Origin = Anchor.TopRight,
+                                                Size = new Vector2(550, 130),
+                                                Margin = new MarginPadding { Bottom = row_padding }
+                                            }
+                                        ]
                                     }
-                                ],
-                                null,
-                                [
-                                    new Container
-                                    {
-                                        Anchor = Anchor.TopRight,
-                                        Origin = Anchor.TopRight,
-                                        Size = new Vector2(700, 130),
-                                        Margin = new MarginPadding { Bottom = row_padding }
-                                    }
-                                ]
+                                }
                             }
                         }
                     }
@@ -194,6 +201,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             if (this.IsCurrentScreen() && client.Room == null)
             {
                 Logger.Log($"{this} exiting due to loss of room or connection");
+                exitConfirmed = true;
                 this.Exit();
             }
         }
@@ -325,6 +333,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
             return false;
         }
+
+        public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() =>
+        [
+            new HistoryFooterButton(room)
+        ];
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
@@ -463,12 +476,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
                 // This component is added to the screen footer which is only about 50px high.
                 // Therefore, it's given a large absolute size to give the context menu enough space to display correctly.
-                Size = new Vector2(700);
+                Size = new Vector2(chat_size.X);
 
                 InternalChild = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = chat
+                    Child = new InverseScalingDrawSizePreservingFillContainer
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Child = chat
+                    }
                 };
             }
         }

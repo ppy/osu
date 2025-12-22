@@ -131,6 +131,9 @@ namespace osu.Game.Online.Multiplayer
         public event Action<int, long>? MatchmakingItemDeselected;
         public event Action<MatchRoomState>? MatchRoomStateChanged;
 
+        public event Action<int, bool>? UserVotedToSkipIntro;
+        public event Action? VoteToSkipIntroPassed;
+
         public event Action<MultiplayerRoomUser, BeatmapAvailability>? BeatmapAvailabilityChanged;
 
         /// <summary>
@@ -316,9 +319,6 @@ namespace osu.Game.Online.Multiplayer
 
         public Task LeaveRoom()
         {
-            if (Room == null)
-                return Task.CompletedTask;
-
             // The join may have not completed yet, so certain tasks that either update the room or reference the room should be cancelled.
             // This includes the setting of Room itself along with the initial update of the room settings on join.
             joinCancellationSource?.Cancel();
@@ -494,6 +494,8 @@ namespace osu.Game.Online.Multiplayer
         public abstract Task EditPlaylistItem(MultiplayerPlaylistItem item);
 
         public abstract Task RemovePlaylistItem(long playlistItemId);
+
+        public abstract Task VoteToSkipIntro();
 
         Task IMultiplayerClient.RoomStateChanged(MultiplayerRoomState state)
         {
@@ -919,6 +921,36 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
+        Task IMultiplayerClient.UserVotedToSkipIntro(int userId, bool voted)
+        {
+            handleRoomRequest(() =>
+            {
+                Debug.Assert(Room != null);
+
+                var user = Room.Users.SingleOrDefault(u => u.UserID == userId);
+
+                // TODO: user should NEVER be null here, see https://github.com/ppy/osu/issues/17713.
+                if (user == null)
+                    return;
+
+                user.VotedToSkipIntro = voted;
+                UserVotedToSkipIntro?.Invoke(userId, voted);
+            });
+
+            return Task.CompletedTask;
+        }
+
+        Task IMultiplayerClient.VoteToSkipIntroPassed()
+        {
+            handleRoomRequest(() =>
+            {
+                Debug.Assert(Room != null);
+                VoteToSkipIntroPassed?.Invoke();
+            });
+
+            return Task.CompletedTask;
+        }
+
         /// <summary>
         /// Populates the <see cref="APIUser"/> for a given collection of <see cref="MultiplayerRoomUser"/>s.
         /// </summary>
@@ -1077,7 +1109,7 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMatchmakingClient.MatchmakingItemSelected(int userId, long playlistItemId)
         {
-            Scheduler.Add(() =>
+            handleRoomRequest(() =>
             {
                 MatchmakingItemSelected?.Invoke(userId, playlistItemId);
                 RoomUpdated?.Invoke();
@@ -1088,7 +1120,7 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMatchmakingClient.MatchmakingItemDeselected(int userId, long playlistItemId)
         {
-            Scheduler.Add(() =>
+            handleRoomRequest(() =>
             {
                 MatchmakingItemDeselected?.Invoke(userId, playlistItemId);
                 RoomUpdated?.Invoke();

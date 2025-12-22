@@ -26,6 +26,8 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         public int BeatmapItemsCount { get; private set; }
 
+        public IDictionary<object, (CarouselItem item, int index)> ItemMap => itemMap;
+
         /// <summary>
         /// Beatmap sets contain difficulties as related panels. This dictionary holds the relationships between set-difficulties to allow expanding them on selection.
         /// </summary>
@@ -36,6 +38,7 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         public IDictionary<GroupDefinition, HashSet<CarouselItem>> GroupItems => groupMap;
 
+        private Dictionary<object, (CarouselItem, int)> itemMap = new Dictionary<object, (CarouselItem, int)>();
         private Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>> setMap = new Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>>();
         private Dictionary<GroupDefinition, HashSet<CarouselItem>> groupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>();
 
@@ -49,6 +52,7 @@ namespace osu.Game.Screens.SelectV2
             return await Task.Run(() =>
             {
                 // preallocate space for the new mappings using last known estimates
+                var newItemMap = new Dictionary<object, (CarouselItem, int)>(itemMap.Count);
                 var newSetMap = new Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>>(setMap.Count);
                 var newGroupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>(groupMap.Count);
 
@@ -127,6 +131,7 @@ namespace osu.Game.Screens.SelectV2
                     {
                         newItems.Add(i);
 
+                        newItemMap[i.Model] = (i, newItems.Count - 1);
                         currentGroupItems?.Add(i);
                         currentSetItems?.Add(i);
 
@@ -136,6 +141,7 @@ namespace osu.Game.Screens.SelectV2
 
                 cancellationToken.ThrowIfCancellationRequested();
 
+                Interlocked.Exchange(ref itemMap, newItemMap);
                 Interlocked.Exchange(ref setMap, newSetMap);
                 Interlocked.Exchange(ref groupMap, newGroupMap);
                 BeatmapItemsCount = displayedBeatmapsCount;
@@ -209,7 +215,7 @@ namespace osu.Game.Screens.SelectV2
                 case GroupMode.Collections:
                 {
                     var collections = GetCollections();
-                    return getGroupsBy(b => defineGroupByCollection(b, collections), items);
+                    return defineGroupsByCollection(items, collections);
                 }
 
                 case GroupMode.MyMaps:
@@ -396,29 +402,56 @@ namespace osu.Game.Screens.SelectV2
             return new GroupDefinition(0, source).Yield();
         }
 
-        private IEnumerable<GroupDefinition> defineGroupByCollection(BeatmapInfo beatmap, List<BeatmapCollection> collections)
+        private List<GroupMapping> defineGroupsByCollection(List<CarouselItem> carouselItems, List<BeatmapCollection> allCollections)
         {
-            bool anyCollections = false;
+            Dictionary<GroupDefinition, GroupMapping> groupMappings = new Dictionary<GroupDefinition, GroupMapping>();
+            // this is a pre-built mapping of MD5s to a list of collections in which this MD5 is found in.
+            // the reason to pre-build this is that `BeatmapCollection.BeatmapMD5Hashes` is a list and therefore a naive implementation would be slow,
+            // particularly in edge cases where most beatmaps are in more than one collection.
+            Dictionary<string, List<GroupDefinition>> md5ToCollectionsMap = new Dictionary<string, List<GroupDefinition>>();
 
-            for (int i = 0; i < collections.Count; i++)
+            for (int i = 0; i < allCollections.Count; i++)
             {
-                var collection = collections[i];
+                var collection = allCollections[i];
+                // NOTE: the ordering of the incoming collection list is significant and needs to be preserved.
+                // the fallback to ordering by name cannot be relied on.
+                // see xmldoc of `BeatmapCarousel.GetAllCollections()`.
+                var groupDefinition = new GroupDefinition(i, collection.Name);
+                groupMappings[groupDefinition] = new GroupMapping(groupDefinition, []);
 
-                if (collection.BeatmapMD5Hashes.Contains(beatmap.MD5Hash))
+                foreach (string md5 in collection.BeatmapMD5Hashes)
                 {
-                    // NOTE: the ordering of the incoming collection list is significant and needs to be preserved.
-                    // the fallback to ordering by name cannot be relied on.
-                    // see xmldoc of `BeatmapCarousel.GetAllCollections()`.
-                    yield return new GroupDefinition(i, collection.Name);
+                    if (!md5ToCollectionsMap.TryGetValue(md5, out var collections))
+                        md5ToCollectionsMap[md5] = collections = new List<GroupDefinition>();
 
-                    anyCollections = true;
+                    collections.Add(groupDefinition);
                 }
             }
 
-            if (anyCollections)
-                yield break;
+            var notInCollection = new GroupDefinition(int.MaxValue, "Not in collection");
+            groupMappings[notInCollection] = new GroupMapping(notInCollection, []);
 
-            yield return new GroupDefinition(int.MaxValue, "Not in collection");
+            foreach (var item in carouselItems)
+            {
+                var beatmap = (BeatmapInfo)item.Model;
+
+                // as a side note, even reading the `MD5Hash` off a realm model is slow if done enough times,
+                // so it definitely helps that thanks to the mapping it needs to only be retrieved once
+                if (md5ToCollectionsMap.TryGetValue(beatmap.MD5Hash, out var collections))
+                {
+                    foreach (var collection in collections)
+                        groupMappings[collection].ItemsInGroup.Add(item);
+                }
+                else
+                    groupMappings[notInCollection].ItemsInGroup.Add(item);
+            }
+
+            return groupMappings.Values
+                                // safety against potentially empty eagerly-initialised groups
+                                // (could happen if user has a collection with MD5s of maps that aren't locally available)
+                                .Where(mapping => mapping.ItemsInGroup.Count > 0)
+                                .OrderBy(mapping => mapping.Group!.Order)
+                                .ToList();
         }
 
         private IEnumerable<GroupDefinition> defineGroupByOwnMaps(BeatmapInfo beatmap, int? localUserId, string? localUserUsername)

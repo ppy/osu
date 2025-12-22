@@ -41,8 +41,8 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             {
                 Add(wasapiExperimental = new SettingsCheckbox
                 {
-                    LabelText = "Use experimental audio mode",
-                    TooltipText = "This will attempt to initialise the audio engine in a lower latency mode.",
+                    LabelText = AudioSettingsStrings.WasapiLabel,
+                    TooltipText = AudioSettingsStrings.WasapiTooltip,
                     Current = audio.UseExperimentalWasapi,
                     Keywords = new[] { "wasapi", "latency", "exclusive" }
                 });
@@ -64,10 +64,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             if (wasapiExperimental != null)
             {
                 if (wasapiExperimental.Current.Value)
-                {
-                    wasapiExperimental.SetNoticeText(
-                        "Due to reduced latency, your audio offset will need to be adjusted when enabling this setting. Generally expect to subtract 20 - 60 ms from your known value.", true);
-                }
+                    wasapiExperimental.SetNoticeText(AudioSettingsStrings.WasapiNotice, true);
                 else
                     wasapiExperimental.ClearNoticeText();
             }
