@@ -79,22 +79,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             int totalHits = beatmap.HitObjects.Count;
 
-            double aimDifficultyValue = OsuStrainSkill.DifficultyToPerformance(OsuRatingCalculator.CalculateDifficultyRating(aim.DifficultyValue()));
-            double aimNoSlidersDifficultyValue = OsuStrainSkill.DifficultyToPerformance(OsuRatingCalculator.CalculateDifficultyRating(aimWithoutSliders.DifficultyValue()));
-            double speedDifficultyValue = OsuStrainSkill.DifficultyToPerformance(OsuRatingCalculator.CalculateDifficultyRating(speed.DifficultyValue()));
+            double aimBasePerformance = aim.PerformanceValue();
+            double aimNoSlidersBasePerformance = aimWithoutSliders.PerformanceValue();
+            double speedBasePerformance = speed.PerformanceValue();
 
-            double mechanicalDifficultyRating = calculateMechanicalDifficultyRating(aimDifficultyValue, speedDifficultyValue);
-            double sliderFactor = aimDifficultyValue > 0 ? aimNoSlidersDifficultyValue / aimDifficultyValue : 1;
+            double mechanicalDifficultyRating = calculateMechanicalDifficultyRating(aimBasePerformance, speedBasePerformance);
+            double sliderFactor = aimBasePerformance > 0 ? aimNoSlidersBasePerformance / aimBasePerformance : 1;
 
             var osuRatingCalculator = new OsuRatingCalculator(mods, totalHits, approachRate, overallDifficulty, mechanicalDifficultyRating, sliderFactor);
 
-            double aimRating = osuRatingCalculator.ComputeAimRating(aimDifficultyValue);
-            double speedRating = osuRatingCalculator.ComputeSpeedRating(speedDifficultyValue);
+            double aimRating = osuRatingCalculator.ComputeAimRating(aimBasePerformance);
+            double speedRating = osuRatingCalculator.ComputeSpeedRating(speedBasePerformance);
 
             double flashlightRating = 0.0;
 
             if (flashlight is not null)
-                flashlightRating = osuRatingCalculator.ComputeFlashlightRating(Flashlight.DifficultyToPerformance(OsuRatingCalculator.CalculateDifficultyRating(flashlight.DifficultyValue())));
+                flashlightRating = osuRatingCalculator.ComputeFlashlightRating(flashlight.PerformanceValue());
 
             double sliderNestedScorePerObject = LegacyScoreUtils.CalculateNestedScorePerObject(beatmap, totalHits);
             double legacyScoreBaseMultiplier = LegacyScoreUtils.CalculateDifficultyPeppyStars(beatmap);
