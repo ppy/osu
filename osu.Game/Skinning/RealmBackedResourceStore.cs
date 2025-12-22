@@ -16,6 +16,8 @@ namespace osu.Game.Skinning
     public class RealmBackedResourceStore<T> : ResourceStore<byte[]>
         where T : RealmObject, IHasRealmFiles, IHasGuidPrimaryKey
     {
+        public event Action? CacheInvalidated;
+
         private Lazy<Dictionary<string, string>> fileToStoragePathMapping;
 
         private readonly Live<T> liveSource;
@@ -56,7 +58,11 @@ namespace osu.Game.Skinning
         private string? getPathForFile(string filename) =>
             fileToStoragePathMapping.Value.GetValueOrDefault(filename.ToLowerInvariant());
 
-        private void invalidateCache() => fileToStoragePathMapping = new Lazy<Dictionary<string, string>>(initialiseFileCache);
+        private void invalidateCache()
+        {
+            fileToStoragePathMapping = new Lazy<Dictionary<string, string>>(initialiseFileCache);
+            CacheInvalidated?.Invoke();
+        }
 
         private Dictionary<string, string> initialiseFileCache() => liveSource.PerformRead(source =>
         {

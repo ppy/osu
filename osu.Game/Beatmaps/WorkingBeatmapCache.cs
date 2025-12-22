@@ -47,12 +47,13 @@ namespace osu.Game.Beatmaps
         private readonly LargeTextureStore beatmapPanelTextureStore;
         private readonly ITrackStore trackStore;
         private readonly IResourceStore<byte[]> files;
+        private readonly RealmAccess realm;
 
         [CanBeNull]
         private readonly GameHost host;
 
         public WorkingBeatmapCache(ITrackStore trackStore, AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> files, WorkingBeatmap defaultBeatmap = null,
-                                   GameHost host = null)
+                                   GameHost host = null, RealmAccess realm = null)
         {
             DefaultBeatmap = defaultBeatmap;
 
@@ -63,6 +64,7 @@ namespace osu.Game.Beatmaps
             largeTextureStore = new LargeTextureStore(host?.Renderer ?? new DummyRenderer(), host?.CreateTextureLoaderStore(files));
             beatmapPanelTextureStore = new LargeTextureStore(host?.Renderer ?? new DummyRenderer(), new BeatmapPanelBackgroundTextureLoaderStore(host?.CreateTextureLoaderStore(files)));
             this.trackStore = trackStore;
+            this.realm = realm;
         }
 
         public void Invalidate(BeatmapSetInfo info)
@@ -118,7 +120,7 @@ namespace osu.Game.Beatmaps
         ITrackStore IBeatmapResourceProvider.Tracks => trackStore;
         IRenderer IStorageResourceProvider.Renderer => host?.Renderer ?? new DummyRenderer();
         AudioManager IStorageResourceProvider.AudioManager => audioManager;
-        RealmAccess IStorageResourceProvider.RealmAccess => null!;
+        RealmAccess IStorageResourceProvider.RealmAccess => realm;
         IResourceStore<byte[]> IStorageResourceProvider.Files => files;
         IResourceStore<byte[]> IStorageResourceProvider.Resources => resources;
         IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host?.CreateTextureLoaderStore(underlyingStore);

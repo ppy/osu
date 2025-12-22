@@ -101,9 +101,9 @@ namespace osu.Game.Screens.Edit
 
             this.beatmapInfo = beatmapInfo ?? playableBeatmap.BeatmapInfo;
 
-            if (beatmapSkin is Skin skin)
+            if (beatmapSkin is LegacyBeatmapSkin skin)
             {
-                BeatmapSkin = new EditorBeatmapSkin(skin);
+                BeatmapSkin = new EditorBeatmapSkin(playableBeatmap.BeatmapInfo!.BeatmapSet!, skin);
                 BeatmapSkin.BeatmapSkinChanged += SaveState;
             }
 
@@ -532,5 +532,11 @@ namespace osu.Game.Screens.Edit
         public double GetBeatLengthAtTime(double referenceTime) => ControlPointInfo.TimingPointAt(referenceTime).BeatLength / BeatDivisor;
 
         public int BeatDivisor => beatDivisor?.Value ?? 1;
+
+        protected override void Dispose(bool isDisposing)
+        {
+            BeatmapSkin?.Dispose();
+            base.Dispose(isDisposing);
+        }
     }
 }
