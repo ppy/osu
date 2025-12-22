@@ -65,13 +65,22 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             var sortedObjects = beatmap.HitObjects.ToArray();
+            int totalColumns = ((ManiaBeatmap)beatmap).TotalColumns;
 
             LegacySortHelper<HitObject>.Sort(sortedObjects, Comparer<HitObject>.Create((a, b) => (int)Math.Round(a.StartTime) - (int)Math.Round(b.StartTime)));
 
             List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
+            List<DifficultyHitObject>[] perColumnObjects = new List<DifficultyHitObject>[totalColumns];
+
+            for (int column = 0; column < totalColumns; column++)
+                perColumnObjects[column] = new List<DifficultyHitObject>();
 
             for (int i = 1; i < sortedObjects.Length; i++)
-                objects.Add(new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1], clockRate, objects, objects.Count));
+            {
+                var currentObject = new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1], clockRate, objects, perColumnObjects, objects.Count);
+                objects.Add(currentObject);
+                perColumnObjects[currentObject.Column].Add(currentObject);
+            }
 
             return objects;
         }

@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -42,7 +43,14 @@ namespace osu.Game.Screens.Ranking
 
         private readonly Bindable<APIBeatmap?> apiBeatmap = new Bindable<APIBeatmap?>();
 
-        private AddNewTagUserTag addNewTagUserTag = null!;
+        private AddNewTagUserTag? addNewTagUserTag;
+
+        /// <summary>
+        /// Determines whether the user can modify the contained tags
+        /// </summary>
+        public bool Writable { private get; init; }
+
+        private InputManager inputManager = null!;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -88,12 +96,17 @@ namespace osu.Game.Screens.Ranking
                                         AutoSizeAxes = Axes.Y,
                                         Direction = FillDirection.Full,
                                         Spacing = new Vector2(4),
-                                        Child = addNewTagUserTag = new AddNewTagUserTag
-                                        {
-                                            AvailableTags = { BindTarget = relevantTagsById },
-                                            OnTagSelected = toggleVote,
-                                        },
-                                    },
+                                        Children = Writable
+                                            ?
+                                            [
+                                                addNewTagUserTag = new AddNewTagUserTag
+                                                {
+                                                    AvailableTags = { BindTarget = relevantTagsById },
+                                                    OnTagSelected = toggleVote,
+                                                }
+                                            ]
+                                            : []
+                                    }
                                 },
                             },
                         }
@@ -124,6 +137,8 @@ namespace osu.Game.Screens.Ranking
             updateTags();
 
             displayedTags.BindCollectionChanged(displayTags, true);
+
+            inputManager = GetContainingInputManager()!;
         }
 
         private void updateTags()
@@ -191,7 +206,7 @@ namespace osu.Game.Screens.Ranking
                 case NotifyCollectionChangedAction.Reset:
                 {
                     tagFlow.Clear();
-                    tagFlow.Add(addNewTagUserTag);
+                    if (Writable) tagFlow.Add(addNewTagUserTag!);
                     break;
                 }
             }
@@ -199,6 +214,9 @@ namespace osu.Game.Screens.Ranking
 
         private void toggleVote(UserTag tag)
         {
+            if (!Writable)
+                return;
+
             if (tag.Updating.Value)
                 return;
 
@@ -251,7 +269,7 @@ namespace osu.Game.Screens.Ranking
         {
             base.Update();
 
-            if (!layout.IsValid && !IsHovered)
+            if (!layout.IsValid && !Contains(inputManager.CurrentState.Mouse.Position))
             {
                 var sortedTags = new Dictionary<UserTag, int>(
                     displayedTags.OrderByDescending(t => t.VoteCount.Value)

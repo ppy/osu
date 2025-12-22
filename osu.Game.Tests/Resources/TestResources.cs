@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Resources
             {
                 // Create random metadata, then we can check if sorting works based on these
                 Artist = "Some Artist " + RNG.Next(0, 9),
-                Title = $"Some Song (set id {setId:000}) {Guid.NewGuid()}",
+                Title = $"Some Song (set id {setId:000000}) {Guid.NewGuid()}",
                 Author = { Username = "Some Guy " + RNG.Next(0, 9) },
             };
 
