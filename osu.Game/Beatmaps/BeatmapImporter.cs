@@ -182,19 +182,6 @@ namespace osu.Game.Beatmaps
             }
 
             validateOnlineIds(beatmapSet, realm);
-
-            bool hadOnlineIDs = beatmapSet.Beatmaps.Any(b => b.OnlineID > 0);
-
-            // TODO: this may no longer be valid as we aren't doing an online population at this point.
-            // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
-            if (hadOnlineIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineID > 0))
-            {
-                if (beatmapSet.OnlineID > 0)
-                {
-                    beatmapSet.OnlineID = -1;
-                    LogForModel(beatmapSet, "Disassociating beatmap set ID due to loss of all beatmap IDs");
-                }
-            }
         }
 
         protected override void PreImport(BeatmapSetInfo beatmapSet, Realm realm)
@@ -235,6 +222,15 @@ namespace osu.Game.Beatmaps
             }
 
             ProcessBeatmap?.Invoke(model, parameters.Batch ? MetadataLookupScope.LocalCacheFirst : MetadataLookupScope.OnlineFirst);
+
+            bool hadOnlineIDs = model.OnlineID > 0 || model.Beatmaps.Any(b => b.OnlineID > 0);
+
+            // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
+            if (hadOnlineIDs && !model.Beatmaps.Any(b => b.OnlineID > 0))
+            {
+                model.OnlineID = -1;
+                LogForModel(model, "Disassociating beatmap set ID due to loss of all beatmap IDs");
+            }
         }
 
         private void validateOnlineIds(BeatmapSetInfo beatmapSet, Realm realm)
