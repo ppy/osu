@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0;
 
             if (mods.Any(m => m is OsuModAutopilot))
-                speedDifficultyValue *= 0.5;
+                speedDifficultyValue *= 0.125;
 
             if (mods.Any(m => m is OsuModMagnetised))
             {
@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModRelax))
                 flashlightDifficultyValue *= 0.5;
             else if (mods.Any(m => m is OsuModAutopilot))
-                flashlightDifficultyValue *= 0.4;
+                flashlightDifficultyValue *= 0.15;
 
             if (mods.Any(m => m is OsuModMagnetised))
             {
