@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
             double readingValue = computeReadingValue(osuAttributes);
 
-            double totalValue = DifficultyCalculationUtils.Norm(PERFORMANCE_NORM_EXPONENT, aimValue, speedValue, accuracyValue, readingValue,  flashlightValue) * multiplier;
+            double totalValue = DifficultyCalculationUtils.Norm(PERFORMANCE_NORM_EXPONENT, aimValue, speedValue, accuracyValue, readingValue, flashlightValue) * multiplier;
 
             return new OsuPerformanceAttributes
             {
