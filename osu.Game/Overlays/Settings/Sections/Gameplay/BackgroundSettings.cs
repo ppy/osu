@@ -43,6 +43,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = GameplaySettingsStrings.FadePlayfieldWhenHealthLow,
                     Current = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow),
                 },
+                new SettingsEnumDropdown<BackgroundScaleMode>
+                {
+                    LabelText = "Background scaling",
+                    Current = config.GetBindable<BackgroundScaleMode>(OsuSetting.BackgroundScaleMode),
+                },
             };
         }
     }

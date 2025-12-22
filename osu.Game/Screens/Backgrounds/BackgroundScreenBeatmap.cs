@@ -55,6 +55,8 @@ namespace osu.Game.Screens.Backgrounds
 
         private readonly DimmableBackground dimmable;
 
+        private IBindable<BackgroundScaleMode> scaleMode;
+
         protected virtual DimmableBackground CreateFadeContainer() => new DimmableBackground { RelativeSizeAxes = Axes.Both };
 
         public BackgroundScreenBeatmap(WorkingBeatmap beatmap = null)
@@ -71,11 +73,22 @@ namespace osu.Game.Screens.Backgrounds
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
             var background = new BeatmapBackground(beatmap);
             LoadComponent(background);
             switchBackground(background);
+
+            scaleMode = config.GetBindable<BackgroundScaleMode>(OsuSetting.BackgroundScaleMode);
+            scaleMode.BindValueChanged(_ =>
+            {
+                if (beatmap != null)
+                {
+                    var newBackground = new BeatmapBackground(beatmap);
+                    LoadComponent(newBackground);
+                    switchBackground(newBackground);
+                }
+            });
         }
 
         private CancellationTokenSource cancellationSource;

@@ -66,6 +66,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ToolbarClockDisplayMode, ToolbarClockDisplayMode.Full);
 
             SetDefault(OsuSetting.SongSelectBackgroundBlur, false);
+            SetDefault(OsuSetting.BackgroundScaleMode, BackgroundScaleMode.ScaleToFill);
 
             // Online settings
             SetDefault(OsuSetting.Username, string.Empty);
@@ -486,5 +487,19 @@ namespace osu.Game.Configuration
         LastOnlineTagsPopulation,
 
         AutomaticallyAdjustBeatmapOffset,
+        BackgroundScaleMode,
+    }
+
+    public enum BackgroundScaleMode
+    {
+        /// <summary>
+        /// fills the screen by scaling and cropping the background image as necessary (lazer default).
+        /// </summary>
+        ScaleToFill,
+
+        /// <summary>
+        /// scales the background to fit the screen (stable default).
+        /// </summary>
+        ScaleToFit,
     }
 }

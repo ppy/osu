@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transforms;
+using osu.Game.Configuration;
 using osuTK;
 
 namespace osu.Game.Graphics.Backgrounds
@@ -36,15 +37,18 @@ namespace osu.Game.Graphics.Backgrounds
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                FillMode = FillMode.Fill,
             });
         }
 
         [BackgroundDependencyLoader]
-        private void load(LargeTextureStore textures)
+        private void load(LargeTextureStore textures, OsuConfigManager config)
         {
             if (!string.IsNullOrEmpty(textureName))
                 Sprite.Texture = textures.Get(textureName);
+
+            Sprite.FillMode = config.Get<BackgroundScaleMode>(OsuSetting.BackgroundScaleMode) == BackgroundScaleMode.ScaleToFill
+                ? FillMode.Fill
+                : FillMode.Fit;
         }
 
         public Vector2 BlurSigma => Vector2.Divide(bufferedContainer?.BlurSigma ?? Vector2.Zero, blurScale);
