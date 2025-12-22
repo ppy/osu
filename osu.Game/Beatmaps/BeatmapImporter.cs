@@ -184,32 +184,6 @@ namespace osu.Game.Beatmaps
             validateOnlineIds(beatmapSet, realm);
         }
 
-        protected override void PreImport(BeatmapSetInfo beatmapSet, Realm realm)
-        {
-            // We are about to import a new beatmap. Before doing so, ensure that no other set shares the online IDs used by the new one.
-            // Note that this means if the previous beatmap is restored by the user, it will no longer be linked to its online IDs.
-            // If this is ever an issue, we can consider marking as pending delete but not resetting the IDs (but care will be required for
-            // beatmaps, which don't have their own `DeletePending` state).
-
-            if (beatmapSet.OnlineID > 0)
-            {
-                // Required local for iOS. Will cause runtime crash if inlined.
-                int onlineId = beatmapSet.OnlineID;
-
-                // OnlineID should really be unique, but to avoid catastrophic failure let's iterate just to be sure.
-                foreach (var existingSetWithSameOnlineID in realm.All<BeatmapSetInfo>().Where(b => b.OnlineID == onlineId))
-                {
-                    existingSetWithSameOnlineID.DeletePending = true;
-                    existingSetWithSameOnlineID.OnlineID = -1;
-
-                    foreach (var b in existingSetWithSameOnlineID.Beatmaps)
-                        b.ResetOnlineInfo();
-
-                    LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineID ({beatmapSet.OnlineID}). It will be disassociated and marked for deletion.");
-                }
-            }
-        }
-
         protected override void PostImport(BeatmapSetInfo model, Realm realm, ImportParameters parameters)
         {
             base.PostImport(model, realm, parameters);
@@ -230,6 +204,30 @@ namespace osu.Game.Beatmaps
             {
                 model.OnlineID = -1;
                 LogForModel(model, "Disassociating beatmap set ID due to loss of all beatmap IDs");
+            }
+
+            // Before concluding the import, ensure that no other set shares the online IDs used by the new one.
+            // Note that this means if the previous beatmap is restored by the user, it will no longer be linked to its online IDs.
+            // If this is ever an issue, we can consider marking as pending delete but not resetting the IDs (but care will be required for
+            // beatmaps, which don't have their own `DeletePending` state).
+
+            if (model.OnlineID > 0)
+            {
+                // Required local for iOS. Will cause runtime crash if inlined.
+                int onlineId = model.OnlineID;
+                Guid guid = model.ID;
+
+                // OnlineID should really be unique, but to avoid catastrophic failure let's iterate just to be sure.
+                foreach (var existingSetWithSameOnlineID in realm.All<BeatmapSetInfo>().Where(b => b.OnlineID == onlineId && b.ID != guid))
+                {
+                    existingSetWithSameOnlineID.DeletePending = true;
+                    existingSetWithSameOnlineID.OnlineID = -1;
+
+                    foreach (var b in existingSetWithSameOnlineID.Beatmaps)
+                        b.ResetOnlineInfo();
+
+                    LogForModel(model, $"Found existing beatmap set with same OnlineID ({model.OnlineID}). It will be disassociated and marked for deletion.");
+                }
             }
         }
 
