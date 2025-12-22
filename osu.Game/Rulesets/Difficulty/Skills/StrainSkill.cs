@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty.Skills
@@ -64,23 +65,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             ObjectStrains.Add(strain);
         }
 
-        /// <summary>
-        /// Calculates the number of strains weighted against the top strain.
-        /// The result is scaled by clock rate as it affects the total number of strains.
-        /// </summary>
-        public virtual double CountTopWeightedStrains()
-        {
-            if (ObjectStrains.Count == 0)
-                return 0.0;
-
-            double consistentTopStrain = DifficultyValue() / 10; // What would the top strain be if all strain values were identical
-
-            if (consistentTopStrain == 0)
-                return ObjectStrains.Count;
-
-            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
-        }
+        public virtual double CountTopWeightedStrains() => StrainUtils.CountTopWeightedStrains(ObjectStrains, DifficultyValue());
 
         /// <summary>
         /// Saves the current peak strain level to the list of strain peaks, which will be used to calculate an overall difficulty.
