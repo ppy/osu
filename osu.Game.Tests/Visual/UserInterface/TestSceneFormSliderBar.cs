@@ -165,5 +165,47 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
             AddAssert("slider is still at 1", () => slider.Current.Value, () => Is.EqualTo(1));
         }
+
+        [Test]
+        public void TestDisabledImmediately()
+        {
+            FormSliderBar<float> slider = null!;
+
+            AddStep("create content", () =>
+            {
+                Child = new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 0.5f,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(10),
+                    Children = new Drawable[]
+                    {
+                        slider = new FormSliderBar<float>
+                        {
+                            Caption = "Slider",
+                            Current = new BindableFloat
+                            {
+                                MinValue = 0,
+                                MaxValue = 10,
+                                Precision = 0.1f,
+                                Default = 5f,
+                                Disabled = true,
+                            },
+                            TransferValueOnCommit = true,
+                        },
+                    }
+                };
+            });
+
+            AddStep("click on textbox part", () =>
+            {
+                InputManager.MoveMouseTo(slider.ChildrenOfType<FormTextBox.InnerTextBox>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("no text selected", () => slider.ChildrenOfType<FormTextBox.InnerTextBox>().Single().SelectedText, () => Is.Empty);
+        }
     }
 }
