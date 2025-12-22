@@ -169,7 +169,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModAutopilot))
                 return 0.0;
 
-            double aimDifficulty = attributes.AimDifficulty;
+            double aimValue = attributes.AimDifficulty;
 
             if (attributes.SliderCount > 0 && attributes.AimDifficultSliderCount > 0)
             {
@@ -189,10 +189,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 }
 
                 double sliderNerfFactor = (1 - attributes.SliderFactor) * Math.Pow(1 - estimateImproperlyFollowedDifficultSliders / attributes.AimDifficultSliderCount, 3) + attributes.SliderFactor;
-                aimDifficulty *= sliderNerfFactor;
+                aimValue *= sliderNerfFactor;
             }
-
-            double aimValue = OsuStrainSkill.DifficultyToPerformance(aimDifficulty);
 
             double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
                                  (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
@@ -225,7 +223,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModRelax) || speedDeviation == null)
                 return 0.0;
 
-            double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
+            double speedValue = attributes.SpeedDifficulty;
 
             double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
                                  (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
@@ -314,7 +312,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (!score.Mods.Any(h => h is OsuModFlashlight))
                 return 0.0;
 
-            double flashlightValue = Flashlight.DifficultyToPerformance(attributes.FlashlightDifficulty);
+            double flashlightValue = attributes.FlashlightDifficulty;
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
@@ -468,7 +466,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (speedDeviation == null)
                 return 0;
 
-            double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
+            double speedValue = attributes.SpeedDifficulty;
 
             // Decides a point where the PP value achieved compared to the speed deviation is assumed to be tapped improperly. Any PP above this point is considered "excess" speed difficulty.
             // This is used to cause PP above the cutoff to scale logarithmically towards the original speed value thus nerfing the value.
