@@ -476,9 +476,11 @@ namespace osu.Game.Beatmaps
         public Task<ExternalEditOperation<BeatmapSetInfo>> BeginExternalEditing(BeatmapSetInfo model) =>
             beatmapImporter.BeginExternalEditing(model);
 
-        public Task Export(BeatmapSetInfo beatmap) => beatmapExporter.ExportAsync(beatmap.ToLive(Realm));
+        public Task Export(BeatmapSetInfo beatmapSet) => beatmapExporter.ExportAsync(beatmapSet.ToLive(Realm));
 
-        public Task ExportLegacy(BeatmapSetInfo beatmap) => legacyBeatmapExporter.ExportAsync(beatmap.ToLive(Realm));
+        public Task ExportLegacy(BeatmapSetInfo beatmapSet) => legacyBeatmapExporter.ExportAsync(beatmapSet.ToLive(Realm));
+
+        public Task ExportLegacy(BeatmapInfo beatmap) => legacyBeatmapExporter.ExportAsync(beatmap.ToLive(Realm));
 
         private void updateHashAndMarkDirty(BeatmapSetInfo setInfo)
         {
