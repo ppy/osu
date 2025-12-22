@@ -207,7 +207,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 }
 
                 currentNumberInstantaneous.Disabled = disabled;
-                textBox.ReadOnly = disabled;
                 updateState();
             };
 
@@ -295,6 +294,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             bool childHasFocus = slider.Focused.Value || textBox.Focused.Value;
 
             textBox.Alpha = 1;
+            textBox.ReadOnly = Current.Disabled;
 
             background.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background4 : colourProvider.Background5;
             captionText.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
