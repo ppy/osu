@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double currentDifficulty;
         private double noteWeightSum;
 
-        private double skillMultiplier => 2.0;
+        private double skillMultiplier => 2.5;
         private double strainDecayBase => 0.8;
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 // Use a harmonic sum for note which effectively buffs maps with more notes, especially if note difficulties are consistent.
                 // Constants are arbitrary and give good values.
                 // https://www.desmos.com/calculator/5eb60faf4c
-                double weight = (1.0 + (1.0 / (1 + index))) / (Math.Pow(index, 0.8) + 1.0 + (1.0 / (1.0 + index)));
+                double weight = (1.0 + (1.0 / (1 + index))) / (Math.Pow(index, 0.9) + 1.0 + (1.0 / (1.0 + index)));
 
                 noteWeightSum += weight;
 
@@ -126,7 +126,5 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // Use a weighted sum of all notes. Constants are arbitrary and give nice values
             return noteDifficulties.Sum(s => 1.1 / (1 + Math.Exp(-5 * (s / consistentTopNote - 1.15))));
         }
-
-        public static double DifficultyToPerformance(double difficulty) => 25 * Math.Pow(difficulty, 2);
     }
 }
