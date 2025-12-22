@@ -204,6 +204,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString DeleteWithConfirmation => new TranslatableString(getKey(@"delete_with_confrmation"), @"Delete...");
 
+        /// <summary>
+        /// "Random"
+        /// </summary>
+        public static LocalisableString Random => new TranslatableString(getKey(@"random"), @"Random");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
