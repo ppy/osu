@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimDifficultyValue = Math.Pow(aimDifficultyValue, 0.8);
 
             if (mods.Any(m => m is OsuModRelax))
-                aimDifficultyValue *= 0.9;
+                aimDifficultyValue *= 0.7;
 
             if (mods.Any(m => m is OsuModMagnetised))
             {
@@ -124,7 +124,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 flashlightDifficultyValue = Math.Pow(flashlightDifficultyValue, 0.8);
 
             if (mods.Any(m => m is OsuModRelax))
-                flashlightDifficultyValue *= 0.7;
+                flashlightDifficultyValue *= 0.5;
             else if (mods.Any(m => m is OsuModAutopilot))
                 flashlightDifficultyValue *= 0.4;
 
