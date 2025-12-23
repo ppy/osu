@@ -25,7 +25,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public bool DisplayAsPercentage { get; set; }
 
-        public virtual LocalisableString TooltipText { get; private set; }
+        public virtual LocalisableString TooltipText { get; protected set; }
 
         /// <summary>
         /// Maximum number of decimal digits to be displayed in the tooltip.
