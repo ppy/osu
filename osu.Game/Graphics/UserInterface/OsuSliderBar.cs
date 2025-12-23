@@ -33,6 +33,7 @@ namespace osu.Game.Graphics.UserInterface
         private const int max_decimal_digits = 5;
 
         private Sample sample = null!;
+        private Sample sampleDisabled = null!;
 
         private double lastSampleTime;
         private T lastSampleValue;
@@ -41,6 +42,7 @@ namespace osu.Game.Graphics.UserInterface
         private void load(AudioManager audio)
         {
             sample = audio.Samples.Get(@"UI/notch-tick");
+            sampleDisabled = audio.Samples.Get(@"UI/default-select-disabled");
         }
 
         protected override void LoadComplete()
@@ -72,7 +74,7 @@ namespace osu.Game.Graphics.UserInterface
             lastSampleValue = value;
             lastSampleTime = Clock.CurrentTime;
 
-            var channel = sample.GetChannel();
+            var channel = Current.Disabled ? sampleDisabled.GetChannel() : sample.GetChannel();
 
             channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + NormalizedValue * 0.2f;
 

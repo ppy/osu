@@ -47,6 +47,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private Sample? sampleChecked;
         private Sample? sampleUnchecked;
+        private Sample? sampleDisabled;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -99,6 +100,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             sampleChecked = audio.Samples.Get(@"UI/check-on");
             sampleUnchecked = audio.Samples.Get(@"UI/check-off");
+            sampleDisabled = audio.Samples.Get(@"UI/default-select-disabled");
         }
 
         protected override void LoadComplete()
@@ -140,6 +142,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             if (!Current.Disabled)
                 Current.Value = !Current.Value;
+            else
+                sampleDisabled?.Play();
+
             return true;
         }
 
