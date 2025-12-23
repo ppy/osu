@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         /// </summary>
         protected bool AllowPartRotation { get; set; }
 
-        private Vector2 cursorScale;
+        private Vector2 cursorScale = Vector2.One;
 
         public Vector2 CursorScale
         {
@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     float distance = diff.Length;
                     Vector2 direction = diff / distance;
 
-                    float interval = Texture.DisplayWidth / 2.5f * IntervalMultiplier;
+                    float interval = Texture.DisplayWidth * CursorScale.X / 2.5f * IntervalMultiplier;
                     float stopAt = distance - (AvoidDrawingNearCursor ? interval : 0);
 
                     for (float d = interval; d < stopAt; d += interval)
