@@ -34,6 +34,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsEnumDropdown<BackgroundFillMode>
                 {
+                    ClassicDefault = BackgroundFillMode.ScaleToFit,
                     LabelText = GameplaySettingsStrings.BackgroundFillMode,
                     Current = config.GetBindable<BackgroundFillMode>(OsuSetting.BackgroundFillMode),
                 },
