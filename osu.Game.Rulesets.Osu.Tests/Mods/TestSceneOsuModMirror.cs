@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         public void TestStacking([Values] OsuModMirror.MirrorType type, [Values] bool mirrorStackingDirection) => CreateModTest(new ModTestData
         {
             Autoplay = true,
-            CreateBeatmap = () => new OsuBeatmap()
+            CreateBeatmap = () => new OsuBeatmap
             {
                 HitObjects =
                 {
