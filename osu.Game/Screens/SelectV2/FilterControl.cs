@@ -46,6 +46,7 @@ namespace osu.Game.Screens.SelectV2
         private ShearedDropdown<SortMode> sortDropdown = null!;
         private ShearedDropdown<GroupMode> groupDropdown = null!;
         private CollectionDropdown collectionDropdown = null!;
+        private BindableBool separateAllDifficulties = null!;
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
@@ -77,6 +78,8 @@ namespace osu.Game.Screens.SelectV2
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api)
         {
+            separateAllDifficulties = new BindableBool();
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
@@ -208,6 +211,7 @@ namespace osu.Game.Screens.SelectV2
             config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConvertedBeatmapsButton.Active);
             config.BindWith(OsuSetting.SongSelectSortingMode, sortDropdown.Current);
             config.BindWith(OsuSetting.SongSelectGroupMode, groupDropdown.Current);
+            config.BindWith(OsuSetting.SeparateAllDifficulties, separateAllDifficulties);
 
             ruleset.BindValueChanged(_ => updateCriteria());
             mods.BindValueChanged(m =>
@@ -230,6 +234,7 @@ namespace osu.Game.Screens.SelectV2
             difficultyRangeSlider.LowerBound.BindValueChanged(_ => updateCriteria());
             difficultyRangeSlider.UpperBound.BindValueChanged(_ => updateCriteria());
             showConvertedBeatmapsButton.Active.BindValueChanged(_ => updateCriteria());
+            separateAllDifficulties.BindValueChanged(_ => updateCriteria());
             sortDropdown.Current.BindValueChanged(_ => updateCriteria());
             groupDropdown.Current.BindValueChanged(_ => updateCriteria());
             collectionDropdown.Current.BindValueChanged(v =>
@@ -274,6 +279,7 @@ namespace osu.Game.Screens.SelectV2
                 Sort = sortDropdown.Current.Value,
                 Group = groupDropdown.Current.Value,
                 AllowConvertedBeatmaps = showConvertedBeatmapsButton.Active.Value,
+                SeparateAllDifficulties = separateAllDifficulties.Value,
                 Ruleset = ruleset.Value,
                 Mods = mods.Value,
                 CollectionBeatmapMD5Hashes = collectionDropdown.Current.Value?.Collection?.PerformRead(c => c.BeatmapMD5Hashes).ToImmutableHashSet(),
