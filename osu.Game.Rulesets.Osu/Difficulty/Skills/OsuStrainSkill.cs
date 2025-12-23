@@ -57,9 +57,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return difficulty;
         }
 
-        public double PerformanceValue()
+        public double PerformanceValue(double difficultyValue)
         {
-            double difficultyRating = OsuRatingCalculator.CalculateDifficultyRating(DifficultyValue());
+            double difficultyRating = OsuRatingCalculator.CalculateDifficultyRating(difficultyValue);
             return 4.0 * Math.Pow(difficultyRating, 3.0);
         }
     }
