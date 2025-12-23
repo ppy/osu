@@ -23,9 +23,15 @@ namespace osu.Game.Utils
                         {
                         }
                     }
-                }
 
-                return true;
+                    // aside from opening every zip entry not failing, we also require there to *be* at least one entry.
+                    // if there are no entries, the best case is that it's an actual empty zip
+                    // and as such probably useless to whatever wants to use it later.
+                    // the worst case is that it's actually *not* a zip and instead a stream of binary
+                    // which *accidentally* happened to contain the magic sequence of bytes for the zip header (50 4b 05 06),
+                    // and if that's the case, then we are *misclassifying* it as a zip by returning `true` unconditionally.
+                    return arc.Entries.Count > 0;
+                }
             }
             catch (Exception)
             {
@@ -52,9 +58,15 @@ namespace osu.Game.Utils
                         {
                         }
                     }
-                }
 
-                return true;
+                    // aside from opening every zip entry not failing, we also require there to *be* at least one entry.
+                    // if there are no entries, the best case is that it's an actual empty zip
+                    // and as such probably useless to whatever wants to use it later.
+                    // the worst case is that it's actually *not* a zip and instead a stream of binary
+                    // which *accidentally* happened to contain the magic sequence of bytes for the zip header (50 4b 05 06),
+                    // and if that's the case, then we are *misclassifying* it as a zip by returning `true` unconditionally.
+                    return arc.Entries.Count > 0;
+                }
             }
             catch (Exception)
             {
