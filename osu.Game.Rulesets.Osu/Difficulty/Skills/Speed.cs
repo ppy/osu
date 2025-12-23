@@ -64,6 +64,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return ObjectStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxStrain * 12.0 - 6.0))));
         }
 
-        public double CountTopWeightedSliders() => OsuStrainUtils.CountTopWeightedSliders(sliderStrains, DifficultyValue());
+        public double CountTopWeightedSliders(double difficultyValue)
+            => OsuStrainUtils.CountTopWeightedSliders(sliderStrains, difficultyValue);
     }
 }
