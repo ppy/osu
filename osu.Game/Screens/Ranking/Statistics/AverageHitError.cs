@@ -30,8 +30,8 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             LocalisableString getEarlyLateText(double offset) =>
                 offset < 0
-                    ? RankingStatisticsStrings.Early(Math.Abs(offset).ToString(@"N2"))
-                    : RankingStatisticsStrings.Late(Math.Abs(offset).ToString(@"N2"));
+                    ? RankingStatisticsStrings.Early(Math.Abs(offset))
+                    : RankingStatisticsStrings.Late(Math.Abs(offset));
         }
     }
 }
