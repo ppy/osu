@@ -20,14 +20,14 @@ namespace osu.Game.Localisation
         public static LocalisableString UnstableRateTitle => new TranslatableString(getKey(@"unstable_rate_title"), @"Unstable Rate");
 
         /// <summary>
-        /// "early"
+        /// "{0} ms early"
         /// </summary>
-        public static LocalisableString Early => new TranslatableString(getKey(@"early"), @"early");
+        public static LocalisableString Early(string offset) => new TranslatableString(getKey(@"early"), @"{0} ms early", offset);
 
         /// <summary>
-        /// "late"
+        /// "{0} ms late"
         /// </summary>
-        public static LocalisableString Late => new TranslatableString(getKey(@"late"), @"late");
+        public static LocalisableString Late(string offset) => new TranslatableString(getKey(@"late"), @"{0} ms late", offset);
 
         /// <summary>
         /// "(not available)"

@@ -24,8 +24,14 @@ namespace osu.Game.Screens.Ranking.Statistics
             Value = hitEvents.CalculateAverageHitError();
         }
 
-        protected override LocalisableString DisplayValue(double? value) => value == null
-            ? RankingStatisticsStrings.NotAvailable
-            : $"{Math.Abs(value.Value):N2} ms {(value.Value < 0 ? RankingStatisticsStrings.Early : RankingStatisticsStrings.Late)}";
+        protected override LocalisableString DisplayValue(double? value)
+        {
+            return value == null ? RankingStatisticsStrings.NotAvailable : getEarlyLateText(value.Value);
+
+            LocalisableString getEarlyLateText(double offset) =>
+                offset < 0
+                    ? RankingStatisticsStrings.Early(Math.Abs(offset).ToString(@"N2"))
+                    : RankingStatisticsStrings.Late(Math.Abs(offset).ToString(@"N2"));
+        }
     }
 }

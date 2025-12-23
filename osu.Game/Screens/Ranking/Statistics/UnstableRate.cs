@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 using osu.Game.Localisation;
 using osu.Game.Rulesets.Scoring;
@@ -23,6 +24,6 @@ namespace osu.Game.Screens.Ranking.Statistics
             Value = hitEvents.CalculateUnstableRate()?.Result;
         }
 
-        protected override LocalisableString DisplayValue(double? value) => value?.ToString(@"N2") ?? RankingStatisticsStrings.NotAvailable;
+        protected override LocalisableString DisplayValue(double? value) => value?.ToLocalisableString(@"N2") ?? RankingStatisticsStrings.NotAvailable;
     }
 }

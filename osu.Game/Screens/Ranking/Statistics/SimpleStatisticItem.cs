@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
@@ -92,7 +94,13 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// Used to convert <see cref="Value"/> to a text representation.
         /// Defaults to using <see cref="object.ToString"/>.
         /// </summary>
-        protected virtual LocalisableString DisplayValue(TValue value) => value!.ToString() ?? string.Empty;
+        protected virtual LocalisableString DisplayValue(TValue value)
+        {
+            if (value is IFormattable formattable)
+                return formattable.ToLocalisableString();
+
+            return value!.ToString() ?? string.Empty;
+        }
 
         public SimpleStatisticItem(LocalisableString name)
             : base(name)
