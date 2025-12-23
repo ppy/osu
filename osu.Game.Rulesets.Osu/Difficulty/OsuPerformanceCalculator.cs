@@ -202,7 +202,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 aimEstimatedSliderBreaks = calculateEstimatedSliderBreaks(attributes.AimTopWeightedSliderFactor, attributes);
                 double relevantMissCount = Math.Min(effectiveMissCount + aimEstimatedSliderBreaks, totalImperfectHits + countSliderTickMiss);
-                aimValue *= 0.94 / ((aimMisscount / (2 * Math.Sqrt(attributes.AimDifficultStrainCount))) + 1);
+                aimValue *= 0.94 / ((relevantMissCount / (2 * Math.Sqrt(attributes.AimDifficultStrainCount))) + 1);
             }
 
             // TC bonuses are excluded when blinds is present as the increased visual difficulty is unimportant when notes cannot be seen.
@@ -233,7 +233,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 speedEstimatedSliderBreaks = calculateEstimatedSliderBreaks(attributes.SpeedTopWeightedSliderFactor, attributes);
                 double relevantMissCount = Math.Min(effectiveMissCount + speedEstimatedSliderBreaks, totalImperfectHits + countSliderTickMiss);
-                speedValue *= 0.96 / ((speedMisscount / (4 * Math.Pow(Math.Log(attributes.SpeedDifficultStrainCount), 0.94))) + 1);
+                speedValue *= 0.96 / ((relevantMissCount / (4 * Math.Pow(Math.Log(attributes.SpeedDifficultStrainCount), 0.94))) + 1);
             }
 
             // TC bonuses are excluded when blinds is present as the increased visual difficulty is unimportant when notes cannot be seen.
