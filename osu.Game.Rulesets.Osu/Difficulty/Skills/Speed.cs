@@ -82,12 +82,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// Returns the number of relevant objects weighted against the top note.
         /// </summary>
-        public double CountTopWeightedNotes()
+        public double CountTopWeightedNotes(double difficultyValue)
         {
             if (noteDifficulties.Count == 0)
                 return 0.0;
 
-            double consistentTopNote = DifficultyValue() / noteWeights.Sum(); // What would the top note be if all note values were identical
+            double consistentTopNote = difficultyValue / noteWeights.Sum(); // What would the top note be if all note values were identical
 
             if (consistentTopNote == 0)
                 return 0;
@@ -110,12 +110,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return noteDifficulties.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxStrain * 12.0 - 6.0))));
         }
 
-        public double CountTopWeightedSliders()
+        public double CountTopWeightedSliders(double difficultyValue)
         {
             if (sliderStrains.Count == 0)
                 return 0;
 
-            double consistentTopNote = DifficultyValue() / noteWeights.Sum(); // What would the top note be if all note values were identical
+            double consistentTopNote = difficultyValue / noteWeights.Sum(); // What would the top note be if all note values were identical
 
             if (consistentTopNote == 0)
                 return 0;
