@@ -12,7 +12,7 @@ namespace osu.Game.Configuration
         Welcome,
         Triangles,
 
-        [LocalisableDescription(typeof(CommonStrings), nameof(CommonStrings.Random))]
+        [LocalisableDescription(typeof(IntroSequenceStrings), nameof(IntroSequenceStrings.Random))]
         Random
     }
 }
