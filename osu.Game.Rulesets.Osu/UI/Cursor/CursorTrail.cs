@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         /// </summary>
         protected bool AllowPartRotation { get; set; }
 
-        private Vector2 cursorScale;
+        private Vector2 cursorScale = Vector2.One;
 
         public Vector2 CursorScale
         {
