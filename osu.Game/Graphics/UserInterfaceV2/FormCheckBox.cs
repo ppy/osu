@@ -176,6 +176,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private partial class FormSwitchButton : SwitchButton
         {
+            // it doesn't make sense for this to show hover state or respond to input.
+            // FormCheckBox already handles all of that.
             public override bool PropagatePositionalInputSubTree => false;
         }
     }
