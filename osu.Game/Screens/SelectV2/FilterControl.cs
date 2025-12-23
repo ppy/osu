@@ -7,7 +7,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -369,7 +368,6 @@ namespace osu.Game.Screens.SelectV2
             public IBindable<RulesetInfo> Ruleset { get; set; } = null!;
 
             private readonly Box hoverBox;
-            private readonly BindableBool popoverVisible = new BindableBool();
 
             public SongSelectSearchTextBox()
             {
@@ -407,17 +405,8 @@ namespace osu.Game.Screens.SelectV2
                 AddInternal(popoverTarget);
 
                 filterButton.HoverTarget = hoverBox;
-                filterButton.IsPopoverVisible = () => popoverVisible.Value;
-                filterButton.SetPopoverVisible = visible => popoverVisible.Value = visible;
+                filterButton.PopoverTarget = popoverTarget;
                 filterButton.SetIconShear(-Shear);
-
-                popoverVisible.BindValueChanged(visible =>
-                {
-                    if (visible.NewValue)
-                        popoverTarget.ShowPopover();
-                    else
-                        popoverTarget.HidePopover();
-                });
             }
 
             [Resolved]
@@ -429,16 +418,7 @@ namespace osu.Game.Screens.SelectV2
                 hoverBox.Colour = colours.Blue;
             }
 
-            private Popover createPopover()
-            {
-                var popover = new SavedFiltersPopover(f => ApplyFilter?.Invoke(f), n => SaveFilter?.Invoke(n), Ruleset.Value);
-                popover.State.BindValueChanged(state =>
-                {
-                    if (state.NewValue == Visibility.Hidden)
-                        Schedule(() => popoverVisible.Value = false);
-                });
-                return popover;
-            }
+            private Popover createPopover() => new SavedFiltersPopover(f => ApplyFilter?.Invoke(f), n => SaveFilter?.Invoke(n), Ruleset.Value);
 
             protected override InnerSearchTextBox CreateInnerTextBox() => new InnerTextBox();
 

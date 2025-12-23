@@ -2,12 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osuTK;
-using System;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -15,13 +16,10 @@ namespace osu.Game.Screens.SelectV2
     {
         public Drawable? HoverTarget { get; set; }
 
-        public Func<bool>? IsPopoverVisible { get; set; }
-        public Action<bool>? SetPopoverVisible { get; set; }
+        public IHasPopover? PopoverTarget { get; set; }
 
         private SpriteIcon? icon;
         private Vector2 pendingShear;
-
-        private bool popoverVisibleOnMouseDown;
 
         public SearchFilterButton()
         {
@@ -55,19 +53,17 @@ namespace osu.Game.Screens.SelectV2
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            popoverVisibleOnMouseDown = IsPopoverVisible?.Invoke() == true;
+            if (PopoverTarget is Drawable drawable)
+                drawable.HidePopover();
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnClick(ClickEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (SetPopoverVisible is Action<bool> setPopoverVisible)
-            {
-                setPopoverVisible(!popoverVisibleOnMouseDown);
-                return true;
-            }
+            if (IsHovered && PopoverTarget is IHasPopover hasPopover)
+                hasPopover.ShowPopover();
 
-            return base.OnClick(e);
+            base.OnMouseUp(e);
         }
 
         public void SetIconShear(Vector2 shear)
