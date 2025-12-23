@@ -8,6 +8,8 @@ namespace osu.Game.Screens.Edit.Submission
 {
     public class BeatmapSubmissionSettings
     {
+        public GetBeatmapSetRequest? LatestOnlineStateRequest { get; set; }
+
         public Bindable<BeatmapSubmissionTarget> Target { get; } = new Bindable<BeatmapSubmissionTarget>();
 
         public Bindable<bool> NotifyOnDiscussionReplies { get; } = new Bindable<bool>();

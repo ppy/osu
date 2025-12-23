@@ -31,9 +31,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         protected new OsuHitObject LastObject => (OsuHitObject)base.LastObject;
 
         /// <summary>
-        /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 25ms.
+        /// <see cref="DifficultyHitObject.DeltaTime"/> capped to a minimum of <see cref="MIN_DELTA_TIME"/>ms.
         /// </summary>
-        public readonly double StrainTime;
+        public readonly double AdjustedDeltaTime;
 
         /// <summary>
         /// Normalised distance from the "lazy" end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             lastDifficultyObject = index > 0 ? (OsuDifficultyHitObject)objects[index - 1] : null;
 
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
-            StrainTime = Math.Max(DeltaTime, MIN_DELTA_TIME);
+            AdjustedDeltaTime = Math.Max(DeltaTime, MIN_DELTA_TIME);
 
             SmallCircleBonus = Math.Max(1.0, 1.0 + (30 - BaseObject.Radius) / 40);
 
@@ -203,13 +203,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             Vector2 lastCursorPosition = lastDifficultyObject != null ? getEndCursorPosition(lastDifficultyObject) : LastObject.StackedPosition;
 
             LazyJumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
-            MinimumJumpTime = StrainTime;
+            MinimumJumpTime = AdjustedDeltaTime;
             MinimumJumpDistance = LazyJumpDistance;
 
             if (LastObject is Slider lastSlider && lastDifficultyObject != null)
             {
                 double lastTravelTime = Math.Max(lastDifficultyObject.LazyTravelTime / clockRate, MIN_DELTA_TIME);
-                MinimumJumpTime = Math.Max(StrainTime - lastTravelTime, MIN_DELTA_TIME);
+                MinimumJumpTime = Math.Max(AdjustedDeltaTime - lastTravelTime, MIN_DELTA_TIME);
 
                 //
                 // There are two types of slider-to-object patterns to consider in order to better approximate the real movement a player will take to jump between the hitobjects.

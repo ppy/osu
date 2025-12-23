@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -16,6 +17,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.StateChanges;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Backgrounds;
@@ -391,12 +393,27 @@ namespace osu.Game.Screens.Menu
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
+            // HORRIBLE HACK
+            // This is here so that on mobile, the logo can correctly progress from main menu to song select v2 when held.
+            // Once the temporary solution of holding the logo to access song select v2 is removed, this should be too.
+            // Without this, the long-press-to-right-click flow intercepts the hold and converts it to a right click which would not trigger the logo
+            // and therefore not progress to song select.
+            if (e.Button == MouseButton.Right && e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
+                triggerClick();
+            // END OF HORRIBLE HACK
+
             if (e.Button != MouseButton.Left) return;
 
             logoBounceContainer.ScaleTo(1f, 500, Easing.OutElastic);
         }
 
         protected override bool OnClick(ClickEvent e)
+        {
+            triggerClick();
+            return true;
+        }
+
+        private void triggerClick()
         {
             flashLayer.ClearTransforms();
             flashLayer.Alpha = 0.4f;
@@ -408,8 +425,6 @@ namespace osu.Game.Screens.Menu
                 sampleClickChannel = sampleClick.GetChannel();
                 sampleClickChannel.Play();
             }
-
-            return true;
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -458,7 +473,7 @@ namespace osu.Game.Screens.Menu
 
         public void StopSamplePlayback() => sampleClickChannel?.Stop();
 
-        public Drawable ProxyToContainer(Container c)
+        public IDisposable ProxyToContainer(Container c)
         {
             if (currentProxyTarget != null)
                 throw new InvalidOperationException("Previous proxy usage was not returned");
@@ -470,21 +485,19 @@ namespace osu.Game.Screens.Menu
 
             defaultProxyTarget.Remove(proxy, false);
             currentProxyTarget.Add(proxy);
-            return proxy;
-        }
 
-        public void ReturnProxy()
-        {
-            if (currentProxyTarget == null)
-                throw new InvalidOperationException("No usage to return");
+            return new InvokeOnDisposal(returnProxy);
 
-            if (defaultProxyTarget == null)
-                throw new InvalidOperationException($"{nameof(SetupDefaultContainer)} must be called first");
+            void returnProxy()
+            {
+                Debug.Assert(currentProxyTarget != null);
+                Debug.Assert(defaultProxyTarget != null);
 
-            currentProxyTarget.Remove(proxy, false);
-            currentProxyTarget = null;
+                currentProxyTarget.Remove(proxy, false);
+                currentProxyTarget = null;
 
-            defaultProxyTarget.Add(proxy);
+                defaultProxyTarget.Add(proxy);
+            }
         }
 
         public void SetupDefaultContainer(Container container)

@@ -9,6 +9,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Platform;
@@ -37,6 +38,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private readonly ContextMenuContainer contextMenuContainer;
         private readonly BeatmapLeaderboard leaderboard;
 
+        private RulesetStore rulesets = null!;
         private BeatmapManager beatmapManager;
         private ScoreManager scoreManager;
 
@@ -71,7 +73,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            dependencies.Cache(new RealmRulesetStore(Realm));
+            dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
             dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, Realm, API));
             Dependencies.Cache(Realm);
@@ -151,7 +153,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("click delete option", () =>
             {
-                InputManager.MoveMouseTo(contextMenuContainer.ChildrenOfType<DrawableOsuMenuItem>().First(i => string.Equals(i.Item.Text.Value.ToString(), "delete", System.StringComparison.OrdinalIgnoreCase)));
+                InputManager.MoveMouseTo(contextMenuContainer.ChildrenOfType<DrawableOsuMenuItem>()
+                                                             .First(i => string.Equals(i.Item.Text.Value.ToString(), "delete", System.StringComparison.OrdinalIgnoreCase)));
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -177,6 +180,14 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("delete top score", () => scoreManager.Delete(importedScores[0]));
             AddUntilStep("wait for fetch", () => leaderboard.Scores.Any());
             AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineID != importedScores[0].OnlineID));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
         }
     }
 }

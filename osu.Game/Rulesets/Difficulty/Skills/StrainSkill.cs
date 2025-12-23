@@ -68,12 +68,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Calculates the number of strains weighted against the top strain.
         /// The result is scaled by clock rate as it affects the total number of strains.
         /// </summary>
-        public virtual double CountTopWeightedStrains()
+        public virtual double CountTopWeightedStrains(double difficultyValue)
         {
             if (ObjectStrains.Count == 0)
                 return 0.0;
 
-            double consistentTopStrain = DifficultyValue() / 10; // What would the top strain be if all strain values were identical
+            double consistentTopStrain = difficultyValue * (1 - DecayWeight); // What would the top strain be if all strain values were identical
 
             if (consistentTopStrain == 0)
                 return ObjectStrains.Count;
@@ -115,6 +115,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// including the peak of the current section.
         /// </summary>
         public IEnumerable<double> GetCurrentStrainPeaks() => strainPeaks.Append(currentSectionPeak);
+
+        public IEnumerable<double> GetObjectStrains() => ObjectStrains;
 
         /// <summary>
         /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.

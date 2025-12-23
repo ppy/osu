@@ -56,6 +56,9 @@ namespace osu.Game.Rulesets.Mods
                 {
                     var bindable = (IBindable)property.GetValue(this)!;
 
+                    if (bindable.IsDefault)
+                        continue;
+
                     string valueText;
 
                     switch (bindable)
@@ -69,8 +72,7 @@ namespace osu.Game.Rulesets.Mods
                             break;
                     }
 
-                    if (!bindable.IsDefault)
-                        yield return (attr.Label, valueText);
+                    yield return (attr.Label, valueText);
                 }
             }
         }

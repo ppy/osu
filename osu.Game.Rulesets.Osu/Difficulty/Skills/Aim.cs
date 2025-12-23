@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain;
 
-        private double skillMultiplier => 25.6;
+        private double skillMultiplier => 26;
         private double strainDecayBase => 0.15;
 
         private readonly List<double> sliderStrains = new List<double>();
@@ -60,6 +60,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return sliderStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxSliderStrain * 12.0 - 6.0))));
         }
 
-        public double CountTopWeightedSliders() => OsuStrainUtils.CountTopWeightedSliders(sliderStrains, DifficultyValue());
+        public double CountTopWeightedSliders(double difficultyValue)
+            => OsuStrainUtils.CountTopWeightedSliders(sliderStrains, difficultyValue);
     }
 }
