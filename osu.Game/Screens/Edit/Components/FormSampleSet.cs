@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Edit.Components
 
         private IEnumerable<Drawable[]> createTableContent()
         {
-            string[] columns = [HitSampleInfo.HIT_NORMAL, ..HitSampleInfo.ALL_ADDITIONS];
+            string[] columns = HitSampleInfo.ALL_ADDITIONS.Prepend(HitSampleInfo.HIT_NORMAL).ToArray();
             string[] rows = HitSampleInfo.ALL_BANKS;
 
             yield return columns.Select(makeTableHeading).Prepend(Empty()).ToArray();
