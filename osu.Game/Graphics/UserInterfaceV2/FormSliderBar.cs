@@ -386,6 +386,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             public Action? OnCommit { get; set; }
 
+            public sealed override LocalisableString TooltipText => base.TooltipText;
+
             public required Func<T, LocalisableString> TooltipFormat { get; init; }
 
             private Box leftBox = null!;
@@ -530,7 +532,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 return result;
             }
 
-            protected override LocalisableString GetTooltipText(T value) => TooltipFormat(value);
+            protected sealed override LocalisableString GetTooltipText(T value) => TooltipFormat(value);
         }
 
         private partial class InnerSliderNub : Circle
