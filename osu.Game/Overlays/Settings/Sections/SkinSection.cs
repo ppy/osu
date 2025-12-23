@@ -58,6 +58,8 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private IDisposable realmSubscription;
 
+        private readonly string[] settingsKeywords = new[] { @"skins", @"rename", @"export", @"delete", @"layout", @"editor" };
+
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load([CanBeNull] SkinEditorOverlay skinEditor)
         {
@@ -69,7 +71,7 @@ namespace osu.Game.Overlays.Settings.Sections
                     AllowNonContiguousMatching = true,
                     LabelText = SkinSettingsStrings.CurrentSkin,
                     Current = skins.CurrentSkinInfo,
-                    Keywords = new[] { @"skins" },
+                    Keywords = settingsKeywords,
                 },
                 new FillFlowContainer
                 {
@@ -81,15 +83,34 @@ namespace osu.Game.Overlays.Settings.Sections
                     Children = new Drawable[]
                     {
                         // This is all super-temporary until we move skin settings to their own panel / overlay.
-                        new RenameSkinButton { Padding = new MarginPadding(), RelativeSizeAxes = Axes.None, Width = 120 },
-                        new ExportSkinButton { Padding = new MarginPadding(), RelativeSizeAxes = Axes.None, Width = 120 },
-                        new DeleteSkinButton { Padding = new MarginPadding(), RelativeSizeAxes = Axes.None, Width = 110 },
+                        new RenameSkinButton
+                        {
+                            Width = 120,
+                            RelativeSizeAxes = Axes.None,
+                            Padding = new MarginPadding(),
+                            Keywords = settingsKeywords,
+                        },
+                        new ExportSkinButton
+                        {
+                            Width = 120,
+                            RelativeSizeAxes = Axes.None,
+                            Padding = new MarginPadding(),
+                            Keywords = settingsKeywords,
+                        },
+                        new DeleteSkinButton
+                        {
+                            Width = 110,
+                            RelativeSizeAxes = Axes.None,
+                            Padding = new MarginPadding(),
+                            Keywords = settingsKeywords,
+                        },
                     }
                 },
                 new SettingsButton
                 {
                     Text = SkinSettingsStrings.SkinLayoutEditor,
                     Action = () => skinEditor?.ToggleVisibility(),
+                    Keywords = settingsKeywords,
                 },
             };
         }
