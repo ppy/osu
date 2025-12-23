@@ -101,8 +101,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (noteDifficulties.Count == 0)
                 return 0;
 
-            DifficultyValue();
-
             double maxStrain = noteDifficulties.Max();
             if (maxStrain == 0)
                 return 0;
