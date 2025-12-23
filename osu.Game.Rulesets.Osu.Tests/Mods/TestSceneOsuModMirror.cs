@@ -25,13 +25,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 HitObjects =
                 {
-                    new HitCircle() { Position = new Vector2(0) },
-                    new HitCircle() { Position = new Vector2(0), StartTime = 100 },
-                    new HitCircle() { Position = new Vector2(0), StartTime = 200 },
-                    new HitCircle() { Position = new Vector2(50), StartTime = 300 },
-                    new HitCircle() { Position = new Vector2(50), StartTime = 400 },
-                    new HitCircle() { Position = new Vector2(50), StartTime = 500 },
-                    new HitCircle() { Position = new Vector2(50), StartTime = 600 },
+                    new HitCircle { Position = new Vector2(0) },
+                    new HitCircle { Position = new Vector2(0), StartTime = 100 },
+                    new HitCircle { Position = new Vector2(0), StartTime = 200 },
+                    new HitCircle { Position = new Vector2(50), StartTime = 300 },
+                    new HitCircle { Position = new Vector2(50), StartTime = 400 },
+                    new HitCircle { Position = new Vector2(50), StartTime = 500 },
+                    new HitCircle { Position = new Vector2(50), StartTime = 600 },
                 }
             },
             Mods = [new OsuModMirror { Reflection = { Value = type }, MirrorStacks = { Value = mirrorStackingDirection } }],
