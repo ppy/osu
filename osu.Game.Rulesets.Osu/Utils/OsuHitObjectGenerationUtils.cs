@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// <param name="mirrorStackingDirection">Should the direction of stacks also be mirrored</param>
         public static void ReflectHorizontallyAlongPlayfield(OsuHitObject osuObject, bool mirrorStackingDirection = false)
         {
-            osuObject.StackDirection.X *= -1;
+            if (mirrorStackingDirection) osuObject.StackDirection.X *= -1;
             osuObject.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - osuObject.X, osuObject.Position.Y);
 
             if (osuObject is not Slider slider)
@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// <param name="mirrorStackingDirection">Should the direction of stacks also be mirrored</param>
         public static void ReflectVerticallyAlongPlayfield(OsuHitObject osuObject, bool mirrorStackingDirection = false)
         {
-            osuObject.StackDirection.Y *= -1;
+            if (mirrorStackingDirection) osuObject.StackDirection.Y *= -1;
             osuObject.Position = new Vector2(osuObject.Position.X, OsuPlayfield.BASE_SIZE.Y - osuObject.Y);
 
             if (osuObject is not Slider slider)
