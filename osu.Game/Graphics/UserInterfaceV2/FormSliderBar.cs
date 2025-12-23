@@ -372,11 +372,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             if (updatingFromTextBox) return;
 
-            textBox.Text = currentNumberInstantaneous.Value.ToStandardFormattedString(5);
+            textBox.Text = currentNumberInstantaneous.Value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS);
             valueLabel.Text = LabelFormat(currentNumberInstantaneous.Value);
         }
 
-        private LocalisableString defaultLabelFormat(T value) => currentNumberInstantaneous.Value.ToStandardFormattedString(5, DisplayAsPercentage);
+        private LocalisableString defaultLabelFormat(T value) => currentNumberInstantaneous.Value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS, DisplayAsPercentage);
 
         private partial class InnerSlider : OsuSliderBar<T>
         {

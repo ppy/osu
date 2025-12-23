@@ -30,7 +30,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// Maximum number of decimal digits to be displayed in the tooltip.
         /// </summary>
-        private const int max_decimal_digits = 5;
+        public const int MAX_DECIMAL_DIGITS = 5;
 
         private Sample sample = null!;
 
@@ -83,6 +83,6 @@ namespace osu.Game.Graphics.UserInterface
             channel.Play();
         }
 
-        protected virtual LocalisableString GetTooltipText(T value) => value.ToStandardFormattedString(max_decimal_digits, DisplayAsPercentage);
+        protected virtual LocalisableString GetTooltipText(T value) => value.ToStandardFormattedString(MAX_DECIMAL_DIGITS, DisplayAsPercentage);
     }
 }
