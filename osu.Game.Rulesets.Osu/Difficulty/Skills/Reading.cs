@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             HitObject firstDifficultyObject = objectList[idx];
 
-            while (noteDifficulties[idx] == 0)
+            while (noteDifficulties[idx] == 0 && noteDifficulties.Count != 0)
             {
                 idx++;
                 firstDifficultyObject = objectList[idx];
