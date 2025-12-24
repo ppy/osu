@@ -23,11 +23,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private readonly List<double> noteDifficulties = new List<double>();
 
-        private readonly List<double> noteWeights = new List<double>();
-
         private readonly List<double> sliderStrains = new List<double>();
 
         private double currentDifficulty;
+
+        private double noteWeightSum;
+
         private double strainDecayBase => 0.3;
 
         public Speed(Mod[] mods)
@@ -70,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 // https://www.desmos.com/calculator/gquji01mlg
                 double weight = (1.0 + (20.0 / (1 + index))) / (Math.Pow(index, 0.85) + 1.0 + (20.0 / (1.0 + index)));
 
-                noteWeights.Add(weight);
+                noteWeightSum += weight;
 
                 difficulty += note * weight;
                 index += 1;
@@ -87,7 +88,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (noteDifficulties.Count == 0)
                 return 0.0;
 
-            double consistentTopNote = difficultyValue / noteWeights.Sum(); // What would the top note be if all note values were identical
+            if (noteWeightSum == 0)
+                return 0.0;
+
+            double consistentTopNote = difficultyValue / noteWeightSum; // What would the top note be if all note values were identical
 
             if (consistentTopNote == 0)
                 return 0;
@@ -113,7 +117,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (sliderStrains.Count == 0)
                 return 0;
 
-            double consistentTopNote = difficultyValue / noteWeights.Sum(); // What would the top note be if all note values were identical
+            if (noteWeightSum == 0)
+                return 0.0;
+
+            double consistentTopNote = difficultyValue / noteWeightSum; // What would the top note be if all note values were identical
 
             if (consistentTopNote == 0)
                 return 0;
