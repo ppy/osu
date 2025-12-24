@@ -8,7 +8,6 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
@@ -56,7 +55,7 @@ namespace osu.Game.Tournament.Screens.Setup
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(0.2f),
+                    Colour = ColourProvider.Background5,
                 },
                 new OsuScrollContainer
                 {
