@@ -171,10 +171,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                         Size = new Vector2(16),
+                        Margin = new MarginPadding { Right = 5 },
                     },
                 };
 
-                AddInternal(new HoverClickSounds());
+                AddInternal(new HoverClickSounds
+                {
+                    Enabled = { BindTarget = Enabled },
+                });
             }
 
             protected override void LoadComplete()
@@ -210,29 +214,26 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 label.Alpha = string.IsNullOrEmpty(SearchBar.SearchTerm.Value) ? 1 : 0;
 
-                caption.Colour = Dropdown.Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
-                label.Colour = Dropdown.Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
-                chevron.Colour = Dropdown.Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
+                caption.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content2;
+                label.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content1;
+                chevron.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content1;
                 DisabledColour = Colour4.White;
 
                 bool dropdownOpen = Dropdown.Menu.State == MenuState.Open;
 
-                if (!Dropdown.Current.Disabled)
-                {
-                    BorderThickness = IsHovered || dropdownOpen ? 2 : 0;
+                BorderThickness = IsHovered || dropdownOpen ? 2 : 0;
+
+                if (Dropdown.Current.Disabled)
+                    BorderColour = colourProvider.Dark1;
+                else
                     BorderColour = dropdownOpen ? colourProvider.Highlight1 : colourProvider.Light4;
 
-                    if (dropdownOpen)
-                        Background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
-                    else if (IsHovered)
-                        Background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
-                    else
-                        Background.Colour = colourProvider.Background5;
-                }
+                if (dropdownOpen)
+                    Background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
+                else if (IsHovered)
+                    Background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
                 else
-                {
-                    Background.Colour = colourProvider.Background4;
-                }
+                    Background.Colour = colourProvider.Background5;
             }
 
             private void updateChevron()
