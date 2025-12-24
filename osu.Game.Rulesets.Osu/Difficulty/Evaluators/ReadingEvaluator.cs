@@ -29,12 +29,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 return 0;
 
             var currObj = (OsuDifficultyHitObject)current;
+            var nextObj = (OsuDifficultyHitObject)current.Next(0);
             double constantAngleNerfFactor = getConstantAngleNerfFactor(currObj);
             double velocity = Math.Max(1, currObj.LazyJumpDistance / currObj.AdjustedDeltaTime); // Only allow velocity to buff
 
             double pastObjectDifficultyInfluence = getPastObjectDifficultyInfluence(currObj, preempt);
 
-            double noteDensityDifficulty = calculateDensityDifficulty(velocity, constantAngleNerfFactor, pastObjectDifficultyInfluence);
+            double noteDensityDifficulty = calculateDensityDifficulty(currObj, nextObj, velocity, constantAngleNerfFactor, pastObjectDifficultyInfluence, totalObjects, preempt);
 
             double hiddenDifficulty = hidden ? calculateHiddenDifficulty(currObj, pastObjectDifficultyInfluence, totalObjects, preempt, velocity, clockRate, constantAngleNerfFactor) : 0;
 
@@ -45,28 +46,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return difficulty;
         }
 
-        private static double getPastObjectDifficultyInfluence(OsuDifficultyHitObject currObj, double preempt)
-        {
-            double pastObjectDifficultyInfluence = 0;
-
-            foreach (var loopObj in retrievePastVisibleObjects(currObj, preempt))
-            {
-                double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
-
-                // When aiming an object small distances mean previous objects may be cheesed, so it doesn't matter whether they were arranged confusingly.
-                loopDifficulty *= DifficultyCalculationUtils.Smootherstep(loopObj.LazyJumpDistance, 15, distance_influence_threshold);
-
-                // Account less for objects close to the max reading window
-                double timeBetweenCurrAndLoopObj = currObj.StartTime - loopObj.StartTime;
-                double timeNerfFactor = getTimeNerfFactor(timeBetweenCurrAndLoopObj);
-
-                loopDifficulty *= timeNerfFactor;
-                pastObjectDifficultyInfluence += loopDifficulty;
-            }
-
-            return pastObjectDifficultyInfluence;
-        }
-
         /// <summary>
         /// Calculates the density difficulty of the current object and how hard it is to aim it because of it based on:
         /// <list type="bullet">
@@ -75,10 +54,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// <item><description>the influence of the amount of previous objects visible on the screen when the current object appears</description></item>
         /// </list>
         /// </summary>
-        private static double calculateDensityDifficulty(double velocity, double constantAngleNerfFactor, double pastObjectDifficultyInfluence)
+        private static double calculateDensityDifficulty(OsuDifficultyHitObject currObj, OsuDifficultyHitObject? nextObj, double velocity, double constantAngleNerfFactor,
+                                                         double pastObjectDifficultyInfluence, int totalObjects,
+                                                         double preempt)
         {
+            double futureObjectDifficultyInfluence = Math.Sqrt(retrieveCurrentVisibleObjects(totalObjects, currObj, preempt));
+
+            if (nextObj != null)
+            {
+                // Reduce difficulty if movement to next object is small
+                futureObjectDifficultyInfluence *= DifficultyCalculationUtils.Smootherstep(nextObj.LazyJumpDistance, 15, distance_influence_threshold);
+            }
+
             // Value higher note densities exponentially
-            double noteDensityDifficulty = Math.Pow(pastObjectDifficultyInfluence, 1.45) * 1.0 * constantAngleNerfFactor * velocity;
+            double noteDensityDifficulty = Math.Pow(pastObjectDifficultyInfluence + futureObjectDifficultyInfluence, 1.7) * 0.4 * constantAngleNerfFactor * velocity;
 
             // Award only denser than average maps.
             noteDensityDifficulty = Math.Max(0, noteDensityDifficulty - density_difficulty_base);
@@ -146,6 +135,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 hiddenDifficulty += hidden_multiplier * 7500 / Math.Pow(currObj.AdjustedDeltaTime, 1.5); // Perfect stacks are harder the less time between notes
 
             return hiddenDifficulty;
+        }
+
+        private static double getPastObjectDifficultyInfluence(OsuDifficultyHitObject currObj, double preempt)
+        {
+            double pastObjectDifficultyInfluence = 0;
+
+            foreach (var loopObj in retrievePastVisibleObjects(currObj, preempt))
+            {
+                double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
+
+                // When aiming an object small distances mean previous objects may be cheesed, so it doesn't matter whether they were arranged confusingly.
+                loopDifficulty *= DifficultyCalculationUtils.Smootherstep(loopObj.LazyJumpDistance, 15, distance_influence_threshold);
+
+                // Account less for objects close to the max reading window
+                double timeBetweenCurrAndLoopObj = currObj.StartTime - loopObj.StartTime;
+                double timeNerfFactor = getTimeNerfFactor(timeBetweenCurrAndLoopObj);
+
+                loopDifficulty *= timeNerfFactor;
+                pastObjectDifficultyInfluence += loopDifficulty;
+            }
+
+            return pastObjectDifficultyInfluence;
         }
 
         // Returns a list of objects that are visible on screen at the point in time the current object becomes visible.
