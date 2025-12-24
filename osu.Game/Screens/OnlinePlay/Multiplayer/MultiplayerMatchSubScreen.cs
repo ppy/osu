@@ -510,7 +510,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 MultiplayerPlaylistItem item = client.Room.CurrentPlaylistItem;
 
-                var newBeatmap = beatmapManager.QueryBeatmap($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}", item.BeatmapID);
+                var newBeatmap = beatmapManager.QueryOnlineBeatmapId(item.BeatmapID);
 
                 if (!Beatmap.Value.BeatmapSetInfo.Equals(newBeatmap?.BeatmapSet))
                     this.MakeCurrent();
@@ -652,7 +652,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             // Update global gameplay state to correspond to the new selection.
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
-            var localBeatmap = beatmapManager.QueryBeatmap($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}", gameplayBeatmapId);
+            var localBeatmap = beatmapManager.QueryOnlineBeatmapId(gameplayBeatmapId);
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
             Ruleset.Value = ruleset;
             Mods.Value = client.LocalUser.Mods.Concat(item.RequiredMods).Select(m => m.ToMod(rulesetInstance)).ToArray();

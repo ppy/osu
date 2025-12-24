@@ -17,7 +17,6 @@ using osu.Game.Database;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
-using Realms;
 
 namespace osu.Game.Screens.OnlinePlay
 {
@@ -153,13 +152,9 @@ namespace osu.Game.Screens.OnlinePlay
                 }
             }
 
-            IQueryable<BeatmapInfo> queryBeatmap()
-            {
-                // See: BeatmapManager.QueryBeatmap()
-                return realm.Realm.All<BeatmapInfo>()
-                            .Filter($@"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false")
-                            .Filter($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}", beatmap.OnlineID);
-            }
+            IQueryable<BeatmapInfo> queryBeatmap() =>
+                realm.Realm.All<BeatmapInfo>()
+                     .ForOnlineId(beatmap.OnlineID);
         }
 
         protected override void Dispose(bool isDisposing)
