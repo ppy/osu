@@ -153,8 +153,13 @@ namespace osu.Game.Screens.OnlinePlay
                 }
             }
 
-            IQueryable<BeatmapInfo> queryBeatmap() =>
-                realm.Realm.All<BeatmapInfo>().Filter("OnlineID == $0 && MD5Hash == $1 && BeatmapSet.DeletePending == false", beatmap.OnlineID, beatmap.MD5Hash);
+            IQueryable<BeatmapInfo> queryBeatmap()
+            {
+                // See: BeatmapManager.QueryBeatmap()
+                return realm.Realm.All<BeatmapInfo>()
+                            .Filter($@"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false")
+                            .Filter($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}", beatmap.OnlineID);
+            }
         }
 
         protected override void Dispose(bool isDisposing)
