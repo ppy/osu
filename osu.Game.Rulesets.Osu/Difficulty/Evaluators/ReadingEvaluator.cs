@@ -32,12 +32,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var nextObj = (OsuDifficultyHitObject)current.Next(0);
             double constantAngleNerfFactor = getConstantAngleNerfFactor(currObj);
             double velocity = Math.Max(1, currObj.LazyJumpDistance / currObj.AdjustedDeltaTime); // Only allow velocity to buff
+            double currentVisibleObjectDensity = retrieveCurrentVisibleObjectDensity(totalObjects, currObj, preempt);
 
             double pastObjectDifficultyInfluence = getPastObjectDifficultyInfluence(currObj, preempt);
 
-            double noteDensityDifficulty = calculateDensityDifficulty(currObj, nextObj, velocity, constantAngleNerfFactor, pastObjectDifficultyInfluence, totalObjects, preempt);
+            double noteDensityDifficulty = calculateDensityDifficulty(nextObj, velocity, constantAngleNerfFactor, pastObjectDifficultyInfluence, currentVisibleObjectDensity);
 
-            double hiddenDifficulty = hidden ? calculateHiddenDifficulty(currObj, pastObjectDifficultyInfluence, totalObjects, preempt, velocity, clockRate, constantAngleNerfFactor) : 0;
+            double hiddenDifficulty = hidden ? calculateHiddenDifficulty(currObj, pastObjectDifficultyInfluence, currentVisibleObjectDensity, preempt, velocity, clockRate, constantAngleNerfFactor) : 0;
 
             double preemptDifficulty = calculatePreemptDifficulty(velocity, constantAngleNerfFactor, preempt);
 
@@ -51,14 +52,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// <list type="bullet">
         /// <item><description>cursor velocity to the current object,</description></item>
         /// <item><description>how many times the current object's angle was repeated,</description></item>
-        /// <item><description>the influence of the amount of previous objects visible on the screen when the current object appears</description></item>
-        /// </list>
+        /// <item><description>density of objects visible when the current object appears,</description></item>
+        /// <item><description>density of objects visible when the current object needs to be clicked,</description></item>
+        /// /// </list>
         /// </summary>
-        private static double calculateDensityDifficulty(OsuDifficultyHitObject currObj, OsuDifficultyHitObject? nextObj, double velocity, double constantAngleNerfFactor,
-                                                         double pastObjectDifficultyInfluence, int totalObjects,
-                                                         double preempt)
+        private static double calculateDensityDifficulty(OsuDifficultyHitObject? nextObj, double velocity, double constantAngleNerfFactor,
+                                                         double pastObjectDifficultyInfluence, double currentVisibleObjectDensity)
         {
-            double futureObjectDifficultyInfluence = Math.Sqrt(retrieveCurrentVisibleObjects(totalObjects, currObj, preempt));
+            // Consider future densities too because it can make the path the cursor takes less clear
+            double futureObjectDifficultyInfluence = Math.Sqrt(currentVisibleObjectDensity);
 
             if (nextObj != null)
             {
@@ -102,13 +104,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// <list type="bullet">
         /// <item><description>cursor velocity to the current object,</description></item>
         /// <item><description>time the current object spends invisible,</description></item>
-        /// <item><description>the influence of the amount of previous objects visible on the screen when the current object appears,</description></item>
-        /// <item><description>amount of objects visible when the current object needs to be clicked,</description></item>
+        /// <item><description>density of objects visible when the current object appears,</description></item>
+        /// <item><description>density of objects visible when the current object needs to be clicked,</description></item>
         /// <item><description>how many times the current object's angle was repeated,</description></item>
         /// <item><description>if the current object is perfectly stacked to the previous one</description></item>
         /// </list>
         /// </summary>
-        private static double calculateHiddenDifficulty(OsuDifficultyHitObject currObj, double pastObjectDifficultyInfluence, int totalObjects, double preempt, double velocity, double clockRate,
+        private static double calculateHiddenDifficulty(OsuDifficultyHitObject currObj, double pastObjectDifficultyInfluence, double currentVisibleObjectDensity, double preempt, double velocity, double clockRate,
                                                         double constantAngleNerfFactor)
         {
             double timeSpentInvisible = currObj.DurationSpentInvisible() / clockRate;
@@ -116,12 +118,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Value time spent invisible exponentially
             double timeSpentInvisibleFactor = Math.Pow(timeSpentInvisible, 2.25) * 0.0065;
 
-            // Buff current note if upcoming notes are dense
-            // This is on the basis that part of hidden difficulty is the uncertainty of the current cursor position in relation to future notes
-            double futureObjectDifficultyInfluence = retrieveCurrentVisibleObjects(totalObjects, currObj, preempt);
-
             // Account for both past and current densities
-            double densityFactor = Math.Pow(futureObjectDifficultyInfluence + pastObjectDifficultyInfluence, 3.3) * 4;
+            double densityFactor = Math.Pow(currentVisibleObjectDensity + pastObjectDifficultyInfluence, 3.3) * 4;
 
             double hiddenDifficulty = (timeSpentInvisibleFactor + densityFactor) * constantAngleNerfFactor * velocity * 0.01;
 
@@ -175,8 +173,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
         }
 
-        // Returns the density of objects visible at the point in time the current object needs to be clicked.
-        private static double retrieveCurrentVisibleObjects(int totalObjects, OsuDifficultyHitObject current, double preempt)
+        // Returns the density of objects visible at the point in time the current object needs to be clicked capped by the reading window.
+        private static double retrieveCurrentVisibleObjectDensity(int totalObjects, OsuDifficultyHitObject current, double preempt)
         {
             double visibleObjectCount = 0;
 
