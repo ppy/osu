@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit.Components
         public Action<string>? SampleRemoveRequested { get; init; }
 
         private readonly BindableWithCurrent<EditorBeatmapSkin.SampleSet?> current = new BindableWithCurrent<EditorBeatmapSkin.SampleSet?>();
-        private readonly Dictionary<(string sound, string bank), SampleButton> buttons = new Dictionary<(string, string), SampleButton>();
+        private readonly Dictionary<(string name, string bank), SampleButton> buttons = new Dictionary<(string, string), SampleButton>();
 
         private Box background = null!;
         private FormFieldCaption caption = null!;
@@ -145,10 +145,10 @@ namespace osu.Game.Screens.Edit.Components
 
             if (set != null)
             {
-                foreach (var (sound, button) in buttons)
+                foreach (var (sample, button) in buttons)
                 {
-                    button.ExpectedFilename.Value = $@"{sound.bank}-{sound.sound}{(set.SampleSetIndex > 1 ? set.SampleSetIndex : null)}";
-                    button.ActualFilename.Value = set.FindSound(sound.sound, sound.bank);
+                    button.ExpectedFilename.Value = $@"{sample.bank}-{sample.name}{(set.SampleSetIndex > 1 ? set.SampleSetIndex : null)}";
+                    button.ActualFilename.Value = set.FindSampleIfExists(sample.name, sample.bank);
                 }
             }
         }
@@ -217,6 +217,7 @@ namespace osu.Game.Screens.Edit.Components
             private EditorBeatmap? editorBeatmap { get; set; }
 
             private HoverSounds? hoverSounds;
+
             private ISample? sample;
 
             public SampleButton()

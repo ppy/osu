@@ -74,8 +74,8 @@ namespace osu.Game.Screens.Edit
 
             public HashSet<string> Filenames = [];
 
-            public string? FindSound(string soundName, string bankName)
-                => Filenames.SingleOrDefault(f => f.StartsWith($@"{bankName}-{soundName}{(SampleSetIndex > 1 ? SampleSetIndex : null)}", StringComparison.Ordinal));
+            public string? FindSampleIfExists(string sampleName, string bankName)
+                => Filenames.SingleOrDefault(f => f.StartsWith($@"{bankName}-{sampleName}{(SampleSetIndex > 1 ? SampleSetIndex : null)}", StringComparison.Ordinal));
 
             public virtual bool Equals(SampleSet? other) => SampleSetIndex == other?.SampleSetIndex;
             public override int GetHashCode() => SampleSetIndex;
