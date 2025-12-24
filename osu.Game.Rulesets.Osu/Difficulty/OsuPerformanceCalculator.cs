@@ -250,7 +250,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
             else if (score.Mods.OfType<OsuModHidden>().Any(m => m.OnlyFadeApproachCircles.Value) || score.Mods.Any(m => m is OsuModTraceable))
             {
-                speedValue *= 1.0 + calculateVisibilityBonus(approachRate);
+                speedValue *= 1.0 + calculateVisibilityBonus();
             }
 
             double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
