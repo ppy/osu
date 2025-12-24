@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Logging;
+using osu.Game.Beatmaps;
 using Realms;
 
 namespace osu.Game.Database
@@ -102,5 +104,13 @@ namespace osu.Game.Database
         /// Quite often we only care about changes at a collection level. This can be used to guard and early-return when no such changes are in a callback.
         /// </remarks>
         public static bool HasCollectionChanges(this ChangeSet changes) => changes.InsertedIndices.Length > 0 || changes.DeletedIndices.Length > 0 || changes.Moves.Length > 0;
+
+        public static IQueryable<BeatmapInfo> NotDeleted(this IQueryable<BeatmapInfo> beatmaps) =>
+            beatmaps.Filter($@"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false");
+
+        public static IQueryable<BeatmapInfo> ForOnlineId(this IQueryable<BeatmapInfo> beatmaps, int id) =>
+            beatmaps
+                .NotDeleted()
+                .Filter($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}", id);
     }
 }
