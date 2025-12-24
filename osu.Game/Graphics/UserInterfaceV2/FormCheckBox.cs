@@ -16,7 +16,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 
@@ -45,10 +44,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private Box background = null!;
         private FormFieldCaption caption = null!;
         private OsuSpriteText text = null!;
-        private Nub checkbox = null!;
 
         private Sample? sampleChecked;
         private Sample? sampleUnchecked;
+        private Sample? sampleDisabled;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -89,7 +88,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                         },
-                        checkbox = new Nub
+                        new SwitchButton
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
@@ -101,6 +100,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             sampleChecked = audio.Samples.Get(@"UI/check-on");
             sampleUnchecked = audio.Samples.Get(@"UI/check-off");
+            sampleDisabled = audio.Samples.Get(@"UI/default-select-disabled");
         }
 
         protected override void LoadComplete()
@@ -142,25 +142,26 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             if (!Current.Disabled)
                 Current.Value = !Current.Value;
+            else
+                sampleDisabled?.Play();
+
             return true;
         }
 
         private void updateState()
         {
-            background.Colour = Current.Disabled ? colourProvider.Background4 : colourProvider.Background5;
-            caption.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
-            checkbox.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
-            text.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
+            caption.Colour = Current.Disabled ? colourProvider.Background1 : colourProvider.Content2;
+            text.Colour = Current.Disabled ? colourProvider.Background1 : colourProvider.Content1;
 
             text.Text = Current.Value ? CommonStrings.Enabled : CommonStrings.Disabled;
 
-            if (!Current.Disabled)
-            {
-                BorderThickness = IsHovered ? 2 : 0;
+            // use FadeColour to override any existing colour transform (i.e. FlashColour on click).
+            background.FadeColour(IsHovered
+                ? ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4)
+                : colourProvider.Background5);
 
-                if (IsHovered)
-                    BorderColour = colourProvider.Light4;
-            }
+            BorderThickness = IsHovered ? 2 : 0;
+            BorderColour = Current.Disabled ? colourProvider.Dark1 : colourProvider.Light4;
         }
 
         public IEnumerable<LocalisableString> FilterTerms => Caption.Yield();
