@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : Skill
     {
-        private double skillMultiplier => 0.95;
+        private double skillMultiplier => 0.93;
 
         private readonly List<double> noteDifficulties = new List<double>();
 
@@ -41,13 +41,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public override void Process(DifficultyHitObject current)
         {
             currentDifficulty *= strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
+            currentDifficulty += SpeedEvaluator.EvaluateDifficultyOf(current, Mods) * skillMultiplier;
 
-            currentDifficulty += SpeedEvaluator.EvaluateDifficultyOf(current, Mods) * RhythmEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
+            double currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
+
+            double totalDifficulty = currentDifficulty * currentRhythm;
 
             if (current.BaseObject is Slider)
-                sliderStrains.Add(currentDifficulty);
+                sliderStrains.Add(totalDifficulty);
 
-            noteDifficulties.Add(currentDifficulty);
+            noteDifficulties.Add(totalDifficulty);
         }
 
         public override double DifficultyValue()
@@ -97,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0;
 
             // Use a weighted sum of all notes. Constants are arbitrary and give nice values
-            return noteDifficulties.Sum(s => 1.1 / (1 + Math.Exp(-5 * (s / consistentTopNote - 2))));
+            return noteDifficulties.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopNote - 0.88))));
         }
 
         public double RelevantNoteCount()
@@ -126,7 +129,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0;
 
             // Use a weighted sum of all notes. Constants are arbitrary and give nice values
-            return sliderStrains.Sum(s => DifficultyCalculationUtils.Logistic(s / consistentTopNote, 3, 5, 1.1));
+            return sliderStrains.Sum(s => DifficultyCalculationUtils.Logistic(s / consistentTopNote, 0.88, 10, 1.1));
         }
     }
 }
