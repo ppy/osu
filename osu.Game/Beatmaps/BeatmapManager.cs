@@ -329,6 +329,14 @@ namespace osu.Game.Beatmaps
              .FirstOrDefault()?.Detach());
 
         /// <summary>
+        /// Perform a lookup query on available <see cref="BeatmapInfo"/>s for a specific online ID.
+        /// </summary>
+        /// <returns>A matching local beatmap info if existing and in a valid state.</returns>
+        public BeatmapInfo? QueryOnlineBeatmapId(int id) => Realm.Run(r =>
+            r.All<BeatmapInfo>()
+             .ForOnlineId(id).SingleOrDefault()?.Detach());
+
+        /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
         /// </summary>
         public IWorkingBeatmap DefaultBeatmap => workingBeatmapCache.DefaultBeatmap;
