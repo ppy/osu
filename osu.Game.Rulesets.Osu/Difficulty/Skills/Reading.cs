@@ -56,6 +56,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (objectList.Count == 0)
                 return 0;
 
+            if (noteDifficulties.Count == 0)
+                return 0;
+
             double difficulty = 0;
 
             // Notes with 0 difficulty are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
@@ -64,11 +67,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             List<double> notes = peaks.ToList();
 
+            HitObject firstDifficultyObject = objectList[0];
+
             int idx = 0;
 
-            HitObject firstDifficultyObject = objectList[idx];
-
-            while (noteDifficulties[idx] == 0 && noteDifficulties.Count != 0)
+            while (noteDifficulties[idx] == 0)
             {
                 idx++;
                 firstDifficultyObject = objectList[idx];
