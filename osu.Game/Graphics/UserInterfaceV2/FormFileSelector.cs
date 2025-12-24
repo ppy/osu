@@ -24,7 +24,6 @@ using osu.Game.Database;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -37,6 +36,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
         }
 
         private readonly BindableWithCurrent<FileInfo?> current = new BindableWithCurrent<FileInfo?>();
+
+        private readonly Bindable<FileInfo?> popoverSelection = new Bindable<FileInfo?>();
 
         public IEnumerable<string> HandledExtensions => handledExtensions;
 
@@ -82,13 +83,17 @@ namespace osu.Game.Graphics.UserInterfaceV2
         [Resolved]
         private OsuGameBase game { get; set; } = null!;
 
+        private ISystemFileSelector? systemFileSelector;
+
+        protected virtual bool IsPopoverVisible => popoverState.Value == Visibility.Visible;
+
         public FormFileSelector(params string[] handledExtensions)
         {
             this.handledExtensions = handledExtensions;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(GameHost host)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -157,63 +162,83 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     },
                 },
             };
+
+            systemFileSelector = host.CreateSystemFileSelector(handledExtensions);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            popoverState.BindValueChanged(_ => updateState());
-            current.BindDisabledChanged(_ => updateState());
+            popoverState.BindValueChanged(_ => UpdateState());
+            current.BindDisabledChanged(_ => UpdateState());
             current.BindValueChanged(_ =>
             {
-                updateState();
-                onFileSelected();
+                UpdateState();
+                onCurrentChanged();
             }, true);
+
+            popoverSelection.BindValueChanged(f =>
+            {
+                this.HidePopover();
+                OnFileSelected(f.NewValue!);
+            });
+
+            if (systemFileSelector != null)
+                systemFileSelector.Selected += f => Schedule(OnFileSelected, f);
+
             FinishTransforms(true);
             game.RegisterImportHandler(this);
         }
 
-        private void onFileSelected()
+        private void onCurrentChanged()
         {
-            if (Current.Value != null)
-                this.HidePopover();
-
             initialChooserPath = Current.Value?.DirectoryName;
             placeholderText.Alpha = Current.Value == null ? 1 : 0;
             filenameText.Text = Current.Value?.Name ?? string.Empty;
             background.FlashColour(ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark2), 800, Easing.OutQuint);
         }
 
+        /// <summary>
+        /// Triggered when a file is selected from a file selector. By default, this directly propagates the selection to <see cref="Current"/>,
+        /// but extra dialogs can be included before propagating selection to <see cref="Current"/> by overriding this method.
+        /// </summary>
+        /// <param name="file">The file selected by the file selector.</param>
+        protected virtual void OnFileSelected(FileInfo file) => Current.Value = file;
+
         protected override bool OnClick(ClickEvent e)
         {
-            this.ShowPopover();
+            if (systemFileSelector != null)
+                systemFileSelector.Present();
+            else
+                this.ShowPopover();
+
             return true;
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            updateState();
+            UpdateState();
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            updateState();
+            UpdateState();
         }
 
-        private void updateState()
+        public void UpdateState()
         {
             caption.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
             filenameText.Colour = Current.Disabled || Current.Value == null ? colourProvider.Foreground1 : colourProvider.Content1;
 
             if (!Current.Disabled)
             {
-                BorderThickness = IsHovered || popoverState.Value == Visibility.Visible ? 2 : 0;
-                BorderColour = popoverState.Value == Visibility.Visible ? colourProvider.Highlight1 : colourProvider.Light4;
+                BorderThickness = IsHovered || IsPopoverVisible ? 2 : 0;
+                BorderColour = IsPopoverVisible ? colourProvider.Highlight1 : colourProvider.Light4;
 
-                if (popoverState.Value == Visibility.Visible)
+                if (IsPopoverVisible)
                     background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
                 else if (IsHovered)
                     background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
@@ -236,30 +261,24 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         Task ICanAcceptFiles.Import(params string[] paths)
         {
-            Schedule(() => Current.Value = new FileInfo(paths.First()));
+            Schedule(() => OnFileSelected(new FileInfo(paths.First())));
             return Task.CompletedTask;
         }
 
         Task ICanAcceptFiles.Import(ImportTask[] tasks, ImportParameters parameters) => throw new NotImplementedException();
 
-        protected virtual FileChooserPopover CreatePopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath) => new FileChooserPopover(handledExtensions, current, chooserPath);
-
         public Popover GetPopover()
         {
-            var popover = CreatePopover(handledExtensions, Current, initialChooserPath);
+            var popover = new FileChooserPopover(handledExtensions, popoverSelection, initialChooserPath);
             popoverState.UnbindBindings();
             popoverState.BindTo(popover.State);
             return popover;
         }
 
-        protected partial class FileChooserPopover : OsuPopover
+        private partial class FileChooserPopover : OsuPopover
         {
             protected override string PopInSampleName => "UI/overlay-big-pop-in";
             protected override string PopOutSampleName => "UI/overlay-big-pop-out";
-
-            private readonly Bindable<FileInfo?> current = new Bindable<FileInfo?>();
-
-            protected OsuFileSelector FileSelector;
 
             public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath)
                 : base(false)
@@ -270,48 +289,20 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     // simplest solution to avoid underlying text to bleed through the bottom border
                     // https://github.com/ppy/osu/pull/30005#issuecomment-2378884430
                     Padding = new MarginPadding { Bottom = 1 },
-                    Child = FileSelector = new OsuFileSelector(chooserPath, handledExtensions)
+                    Child = new OsuFileSelector(chooserPath, handledExtensions)
                     {
                         RelativeSizeAxes = Axes.Both,
-                    },
+                        CurrentFile = { BindTarget = current },
+                    }
                 };
-
-                this.current.BindTo(current);
             }
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
-                Add(new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    BorderThickness = 2,
-                    CornerRadius = 10,
-                    BorderColour = colourProvider.Highlight1,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            Colour = Color4.Transparent,
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                    }
-                });
+                Body.BorderColour = colourProvider.Highlight1;
+                Body.BorderThickness = 2;
             }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                FileSelector.CurrentFile.ValueChanged += f =>
-                {
-                    if (f.NewValue != null)
-                        OnFileSelected(f.NewValue);
-                };
-            }
-
-            protected virtual void OnFileSelected(FileInfo file) => current.Value = file;
         }
     }
 }
