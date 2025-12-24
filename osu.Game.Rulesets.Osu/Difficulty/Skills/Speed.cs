@@ -65,12 +65,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             int index = 0;
 
-            // Difficulty is the weighted sum of the highest notes.
-            // We're sorting from highest to lowest note.
             foreach (double note in notes.OrderDescending())
             {
-                // Use a harmonic sum which effectively buffs maps with more notes, especially if note difficulties are consistent.
-                // Constants are arbitrary and give good values.
+                // Use a harmonic sum that considers each note of the map according to a predefined weight using arbitrary balancing constants.
                 // https://www.desmos.com/calculator/hfdpztcazs
                 double weight = (1.0 + (20.0 / (1 + index))) / (Math.Pow(index, 0.85) + 1.0 + (20.0 / (1.0 + index)));
 
