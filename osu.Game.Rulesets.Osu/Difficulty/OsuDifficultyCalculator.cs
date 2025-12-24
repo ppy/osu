@@ -50,8 +50,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods };
 
-            var aim = skills.OfType<Aim>().Single(a => a.IncludeSliders);
-            var aimWithoutSliders = skills.OfType<Aim>().Single(a => !a.IncludeSliders);
+            var aim = skills.OfType<CombinedAim>().Single(a => a.IncludeSliders);
+            var aimWithoutSliders = skills.OfType<CombinedAim>().Single(a => !a.IncludeSliders);
             var speed = skills.OfType<Speed>().Single();
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
 
@@ -83,13 +83,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             int totalHits = beatmap.HitObjects.Count;
 
-            double mechanicalDifficultyRating = calculateMechanicalDifficultyRating(aimDifficultyValue, speedDifficultyValue);
+            double snapAimDifficultyValue = skills.OfType<SnapAim>().Single().DifficultyValue();
+            double flowAimDifficultyValue = skills.OfType<FlowAim>().Single().DifficultyValue();
+
+            double mechanicalDifficultyRating = calculateMechanicalDifficultyRating(aimDifficultyValue, snapAimDifficultyValue, flowAimDifficultyValue, speedDifficultyValue);
             double sliderFactor = aimDifficultyValue > 0 ? OsuRatingCalculator.CalculateDifficultyRating(aimNoSlidersDifficultyValue) / OsuRatingCalculator.CalculateDifficultyRating(aimDifficultyValue) : 1;
 
             var osuRatingCalculator = new OsuRatingCalculator(mods, totalHits, approachRate, overallDifficulty, mechanicalDifficultyRating, sliderFactor);
 
-            double aimRating = osuRatingCalculator.ComputeAimRating(aimDifficultyValue);
+            double aimRating = osuRatingCalculator.ComputeCombinedAimRating(aimDifficultyValue, snapAimDifficultyValue, flowAimDifficultyValue);
+            double aimRatingNoSliders = osuRatingCalculator.ComputeCombinedAimRating(aimNoSlidersDifficultyValue, snapAimDifficultyValue, flowAimDifficultyValue);
             double speedRating = osuRatingCalculator.ComputeSpeedRating(speedDifficultyValue);
+
+            double snapAimRating = osuRatingCalculator.ComputeSnapAimRating(snapAimDifficultyValue);
+            double flowAimRating = osuRatingCalculator.ComputeFlowAimRating(flowAimDifficultyValue);
 
             double flashlightRating = 0.0;
 
@@ -106,8 +113,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double baseSpeedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
             double baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
 
-            double basePerformance = DifficultyCalculationUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, baseAimPerformance, baseSpeedPerformance, baseFlashlightPerformance);
-
+            double basePerformance = DifficultyCalculationUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, SumMechanicalDifficulty(baseAimPerformance, baseSpeedPerformance), baseFlashlightPerformance);
             double starRating = calculateStarRating(basePerformance);
 
             OsuDifficultyAttributes attributes = new OsuDifficultyAttributes
@@ -130,15 +136,52 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SpinnerCount = spinnerCount,
                 NestedScorePerObject = sliderNestedScorePerObject,
                 LegacyScoreBaseMultiplier = legacyScoreBaseMultiplier,
-                MaximumLegacyComboScore = scoreAttributes.ComboScore
+                MaximumLegacyComboScore = scoreAttributes.ComboScore,
+                SnapAimDifficulty = snapAimRating,
+                FlowAimDifficulty = flowAimRating
             };
 
             return attributes;
         }
 
-        private double calculateMechanicalDifficultyRating(double aimDifficultyValue, double speedDifficultyValue)
+        // Summation for aim and speed, reducing reward for mixed maps
+        public static double SumMechanicalDifficulty(double aim, double speed)
         {
-            double aimValue = OsuStrainSkill.DifficultyToPerformance(OsuRatingCalculator.CalculateDifficultyRating(aimDifficultyValue));
+            // Decrease this to nerf maps that mix aim and speed
+            const double addition_portion = 0.59;
+
+            // We take this min to max ratio as a basepoint to be not changed when addition_portion is changed
+            const double balance_base_point = 0.2;
+
+            // Base power for the summation
+            const double power = 7.7;
+
+            // This is automatically-computed multiplier to avoid manual multiplier balancing when addition_portion is changed
+            double multiplier = Math.Pow(1 + Math.Pow(balance_base_point, power), 1.0 / power) /
+                Math.Pow(
+                    Math.Pow(1 + balance_base_point * addition_portion, power) +
+                    Math.Pow(balance_base_point + addition_portion, power), 1.0 / power
+                );
+
+            // This is the actual summation formula. Add aim and speed is added with weight to decrease the reward for mixed maps
+            double difficulty =
+                Math.Pow(
+                    Math.Pow(aim + addition_portion * speed, power) +
+                    Math.Pow(speed + addition_portion * aim, power), 1.0 / power
+                );
+
+            return difficulty * multiplier;
+        }
+
+        private double calculateMechanicalDifficultyRating(double aimDifficultyValue, double snapAimDifficultyValue, double flowAimDifficultyValue, double speedDifficultyValue)
+        {
+            double totalAimRating = OsuRatingCalculator.SumTotalAimRating(
+                OsuRatingCalculator.CalculateDifficultyRating(aimDifficultyValue),
+                OsuRatingCalculator.CalculateDifficultyRating(snapAimDifficultyValue),
+                OsuRatingCalculator.CalculateDifficultyRating(flowAimDifficultyValue)
+                );
+
+            double aimValue = OsuStrainSkill.DifficultyToPerformance(totalAimRating);
             double speedValue = OsuStrainSkill.DifficultyToPerformance(OsuRatingCalculator.CalculateDifficultyRating(speedDifficultyValue));
 
             double totalValue = DifficultyCalculationUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, aimValue, speedValue);
@@ -169,9 +212,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             var skills = new List<Skill>
             {
-                new Aim(mods, true),
-                new Aim(mods, false),
-                new Speed(mods)
+                new CombinedAim(mods, true),
+                new CombinedAim(mods, false),
+                new Speed(mods),
+                new SnapAim(mods),
+                new FlowAim(mods),
             };
 
             if (mods.Any(h => h is OsuModFlashlight))
