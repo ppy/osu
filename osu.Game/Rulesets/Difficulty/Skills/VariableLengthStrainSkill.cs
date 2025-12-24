@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 return ObjectStrains.Count;
 
             // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-9.45179584121 * (s / consistentTopStrain - 0.93104))));
+            return ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
         }
 
         /// <summary>
