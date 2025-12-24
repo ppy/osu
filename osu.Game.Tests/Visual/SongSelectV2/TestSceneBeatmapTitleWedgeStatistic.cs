@@ -20,11 +20,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         private BeatmapTitleWedge.Statistic statistic3 = null!;
         private BeatmapTitleWedge.Statistic statistic4 = null!;
 
-        public TestSceneBeatmapTitleWedgeStatistic()
-            : base(false)
-        {
-        }
-
         [Test]
         public void TestLoading()
         {

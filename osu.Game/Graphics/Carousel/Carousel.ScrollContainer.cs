@@ -231,11 +231,11 @@ namespace osu.Game.Graphics.Carousel
                 }
 
                 [BackgroundDependencyLoader(true)]
-                private void load(OverlayColourProvider? colourProvider, OsuColour colours)
+                private void load(OverlayColourProvider colourProvider, OsuColour colours)
                 {
                     Colour = defaultColour = colours.Gray8;
                     hoverColour = colours.GrayF;
-                    highlightColour = colourProvider?.Highlight1 ?? colours.Green;
+                    highlightColour = colourProvider.Highlight1;
                 }
 
                 public override void ResizeTo(float val, int duration = 0, Easing easing = Easing.None)

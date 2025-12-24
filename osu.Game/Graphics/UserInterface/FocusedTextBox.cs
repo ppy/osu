@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
@@ -50,11 +49,11 @@ namespace osu.Game.Graphics.UserInterface
         [Resolved]
         private GameHost? host { get; set; }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider? colourProvider)
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
         {
-            BackgroundUnfocused = colourProvider?.Background5 ?? new Color4(10, 10, 10, 255);
-            BackgroundFocused = colourProvider?.Background5 ?? new Color4(10, 10, 10, 255);
+            BackgroundUnfocused = colourProvider.Background5;
+            BackgroundFocused = colourProvider.Background5;
         }
 
         // We may not be focused yet, but we need to handle keyboard input to be able to request focus

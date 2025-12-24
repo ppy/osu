@@ -57,9 +57,9 @@ namespace osu.Game.Overlays.BeatmapSet
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, OverlayColourProvider? colourProvider)
+        private void load(OverlayColourProvider colourProvider)
         {
-            background.Colour = colourProvider?.Background5 ?? colours.Gray2;
+            background.Colour = colourProvider.Background5;
         }
     }
 }

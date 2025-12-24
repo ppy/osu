@@ -19,10 +19,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
             Spacing = 20;
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider? overlayColourProvider, OsuColour osuColour)
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider overlayColourProvider)
         {
-            Background.Colour = overlayColourProvider?.Dark6 ?? osuColour.GreySeaFoamDarker;
+            Background.Colour = overlayColourProvider.Dark6;
         }
 
         protected override TextBox CreateHexCodeTextBox() => new OsuTextBox();

@@ -83,7 +83,7 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider? colourProvider, OsuColour colours)
+            private void load(OverlayColourProvider colourProvider, OsuColour colours)
             {
                 AutoSizeAxes = Axes.Both;
                 Masking = true;
@@ -94,14 +94,14 @@ namespace osu.Game.Graphics.UserInterface
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider?.Background6 ?? Colour4.Black.Opacity(0.7f),
+                        Colour = colourProvider.Background6,
                     },
                     new OsuSpriteText
                     {
                         Margin = new MarginPadding { Horizontal = 5, Bottom = 1, },
                         Text = hotkey.ToUpperInvariant(),
                         Font = OsuFont.Default.With(size: 12, weight: FontWeight.Bold),
-                        Colour = colourProvider?.Light1 ?? colours.GrayA,
+                        Colour = colourProvider.Light1,
                     }
                 };
             }

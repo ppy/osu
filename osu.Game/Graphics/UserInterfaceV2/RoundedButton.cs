@@ -37,11 +37,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider? overlayColourProvider, OsuColour colours)
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider overlayColourProvider)
         {
             // Many buttons have local colours, but this provides a sane default for all other cases.
-            DefaultBackgroundColour = overlayColourProvider?.Colour3 ?? colours.Blue3;
+            DefaultBackgroundColour = overlayColourProvider.Colour3;
             triangleGradientSecondColour ??= DefaultBackgroundColour.Lighten(0.2f);
         }
 

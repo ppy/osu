@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -150,9 +149,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider? colourProvider, OsuColour osuColour)
+        private void load(OverlayColourProvider colourProvider, OsuColour osuColour)
         {
-            background.Colour = colourProvider?.Background4 ?? Color4Extensions.FromHex(@"1c2125");
+            background.Colour = colourProvider.Background4;
             descriptionText.Colour = osuColour.Yellow;
         }
 

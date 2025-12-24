@@ -115,11 +115,11 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider? colourProvider, OsuColour colours)
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
         {
-            AccentColour = colourProvider?.Highlight1 ?? colours.Pink;
-            BackgroundColour = colourProvider?.Background5 ?? colours.PinkDarker.Darken(1);
+            AccentColour = colourProvider.Highlight1;
+            BackgroundColour = colourProvider.Background5;
         }
 
         protected override void Update()

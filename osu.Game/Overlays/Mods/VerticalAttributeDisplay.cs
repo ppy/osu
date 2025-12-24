@@ -38,6 +38,9 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
+
         public VerticalAttributeDisplay()
         {
             AutoSizeAxes = Axes.X;
@@ -142,7 +145,7 @@ namespace osu.Game.Overlays.Mods
             };
         }
 
-        public ITooltip<RulesetBeatmapAttribute?> GetCustomTooltip() => new BeatmapAttributeTooltip();
+        public ITooltip<RulesetBeatmapAttribute?> GetCustomTooltip() => new BeatmapAttributeTooltip(colourProvider);
         public RulesetBeatmapAttribute? TooltipContent { get; set; }
     }
 }

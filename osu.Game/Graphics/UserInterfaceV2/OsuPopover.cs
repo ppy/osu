@@ -46,10 +46,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
             };
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider? colourProvider, OsuColour colours, AudioManager audio)
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider, AudioManager audio)
         {
-            Background.Colour = Arrow.Colour = colourProvider?.Background4 ?? colours.GreySeaFoamDarker;
+            Background.Colour = Arrow.Colour = colourProvider.Background4;
             samplePopIn = audio.Samples.Get(PopInSampleName);
             samplePopOut = audio.Samples.Get(PopOutSampleName);
         }

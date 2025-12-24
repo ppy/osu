@@ -9,9 +9,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Chat;
 using osuTK.Graphics;
 
@@ -35,9 +35,9 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            linkColour = colours.Blue;
+            linkColour = new OverlayColourProvider(ColourScheme).Light2;
 
             var chatManager = new ChannelManager(API);
             BindableList<Channel> availableChannels = (BindableList<Channel>)chatManager.AvailableChannels;

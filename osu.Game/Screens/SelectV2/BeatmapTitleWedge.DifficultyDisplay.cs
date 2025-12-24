@@ -315,10 +315,10 @@ namespace osu.Game.Screens.SelectV2
             private partial class MapperLinkContainer : OsuHoverContainer
             {
                 [BackgroundDependencyLoader]
-                private void load(OverlayColourProvider? overlayColourProvider, OsuColour colours)
+                private void load(OverlayColourProvider overlayColourProvider)
                 {
                     TooltipText = ContextMenuStrings.ViewProfile;
-                    IdleColour = overlayColourProvider?.Light2 ?? colours.Blue;
+                    IdleColour = overlayColourProvider.Light2;
                 }
             }
         }

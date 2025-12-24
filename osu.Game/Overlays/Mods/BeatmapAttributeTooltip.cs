@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Mods
 {
     public partial class BeatmapAttributeTooltip : VisibilityContainer, ITooltip<RulesetBeatmapAttribute?>
     {
-        private readonly OverlayColourProvider? colourProvider;
+        private readonly OverlayColourProvider colourProvider;
 
         private Container content = null!;
 
@@ -27,10 +27,7 @@ namespace osu.Game.Overlays.Mods
         private OsuTextFlowContainer descriptionText = null!;
         private GridContainer metricsGrid = null!;
 
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
-
-        public BeatmapAttributeTooltip(OverlayColourProvider? colourProvider = null)
+        public BeatmapAttributeTooltip(OverlayColourProvider colourProvider)
         {
             this.colourProvider = colourProvider;
         }
@@ -53,7 +50,7 @@ namespace osu.Game.Overlays.Mods
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = colourProvider?.Background4 ?? colours.Gray3,
+                            Colour = colourProvider.Background4,
                         },
                         new FillFlowContainer
                         {
@@ -106,7 +103,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
                         Text = metric.Name,
-                        Colour = metric.Colour ?? colourProvider?.Content2 ?? Colour4.White,
+                        Colour = metric.Colour ?? colourProvider.Content2,
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                     },
@@ -115,7 +112,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         Font = OsuFont.Style.Caption1,
                         Text = metric.Value,
-                        Colour = Interpolation.ValueAt<Colour4>(0.85f, colourProvider?.Content1 ?? Colour4.White, metric.Colour ?? colourProvider?.Content1 ?? Colour4.White, 0, 1),
+                        Colour = Interpolation.ValueAt<Colour4>(0.85f, colourProvider.Content1, metric.Colour ?? colourProvider.Content1, 0, 1),
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                     }

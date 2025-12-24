@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, OsuColour colours, OverlayColourProvider? colourProvider)
+        private void load(TextureStore textures, OsuColour colours, OverlayColourProvider colourProvider)
         {
             FillFlowContainer contentFlow;
             ModSwitchTiny tinySwitch;
@@ -88,10 +88,10 @@ namespace osu.Game.Rulesets.UI
 
             var modTypeColour = colours.ForModType(mod.Type);
 
-            inactiveForegroundColour = colourProvider?.Background5 ?? colours.Gray3;
+            inactiveForegroundColour = colourProvider.Background5;
             activeForegroundColour = modTypeColour;
 
-            inactiveBackgroundColour = colourProvider?.Background2 ?? colours.Gray5;
+            inactiveBackgroundColour = colourProvider.Background2;
             activeBackgroundColour = Interpolation.ValueAt<Colour4>(0.1f, Colour4.Black, modTypeColour, 0, 1);
         }
 

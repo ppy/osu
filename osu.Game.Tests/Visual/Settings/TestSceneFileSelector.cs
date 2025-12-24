@@ -13,11 +13,6 @@ namespace osu.Game.Tests.Visual.Settings
 {
     public partial class TestSceneFileSelector : ThemeComparisonTestScene
     {
-        public TestSceneFileSelector()
-            : base(false)
-        {
-        }
-
         [Test]
         public void TestJpgFilesOnly()
         {

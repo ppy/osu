@@ -273,11 +273,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 private partial class DropdownSearchTextBox : OsuTextBox
                 {
                     [BackgroundDependencyLoader]
-                    private void load(OverlayColourProvider? colourProvider)
+                    private void load(OverlayColourProvider colourProvider)
                     {
                         TextContainer.Shear = -OsuGame.SHEAR;
-                        BackgroundUnfocused = colourProvider?.Background5 ?? new Color4(10, 10, 10, 255);
-                        BackgroundFocused = colourProvider?.Background5 ?? new Color4(10, 10, 10, 255);
+                        BackgroundUnfocused = colourProvider.Background5;
+                        BackgroundFocused = colourProvider.Background5;
                     }
 
                     protected override void OnFocus(FocusEvent e)

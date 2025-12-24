@@ -19,11 +19,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 {
     public partial class TestScenePanelGroup : ThemeComparisonTestScene
     {
-        public TestScenePanelGroup()
-            : base(false)
-        {
-        }
-
         [Test]
         public void TestGeneral()
         {

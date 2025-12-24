@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -105,9 +104,9 @@ namespace osu.Game.Overlays.SkinEditor
             }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider? overlayColourProvider, OsuColour colours)
+            private void load(OverlayColourProvider overlayColourProvider)
             {
-                BackgroundColour = overlayColourProvider?.Background3 ?? colours.Blue3;
+                BackgroundColour = overlayColourProvider.Background3;
                 Content.CornerRadius = 5;
             }
         }

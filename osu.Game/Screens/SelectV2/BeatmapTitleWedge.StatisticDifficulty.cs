@@ -57,6 +57,9 @@ namespace osu.Game.Screens.SelectV2
             [Resolved]
             private OsuColour colours { get; set; } = null!;
 
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
             public StatisticDifficulty()
             {
                 AutoSizeAxes = Axes.Y;
@@ -202,7 +205,7 @@ namespace osu.Game.Screens.SelectV2
                 }
             }
 
-            public ITooltip<RulesetBeatmapAttribute?> GetCustomTooltip() => new BeatmapAttributeTooltip();
+            public ITooltip<RulesetBeatmapAttribute?> GetCustomTooltip() => new BeatmapAttributeTooltip(colourProvider);
             public RulesetBeatmapAttribute? TooltipContent => value.BeatmapAttribute;
         }
     }

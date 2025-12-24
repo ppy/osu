@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Lists;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -28,7 +27,7 @@ namespace osu.Game.Online.Chat
         public readonly SlimReadOnlyListWrapper<Drawable> Parts;
 
         [Resolved]
-        private OverlayColourProvider? overlayColourProvider { get; set; }
+        private OverlayColourProvider overlayColourProvider { get; set; } = null!;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
@@ -54,9 +53,9 @@ namespace osu.Game.Online.Chat
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            IdleColour ??= overlayColourProvider?.Light2 ?? colours.Blue;
+            IdleColour ??= overlayColourProvider.Light2;
         }
 
         protected override IEnumerable<Drawable> EffectTargets => Parts;

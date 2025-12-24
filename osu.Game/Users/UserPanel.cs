@@ -69,7 +69,7 @@ namespace osu.Game.Users
         private IDialogOverlay? dialogOverlay { get; set; }
 
         [Resolved]
-        protected OverlayColourProvider? ColourProvider { get; private set; }
+        protected OverlayColourProvider ColourProvider { get; private set; } = null!;
 
         [Resolved]
         private IPerformFromScreenRunner? performer { get; set; }
@@ -91,7 +91,7 @@ namespace osu.Game.Users
             Add(new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = ColourProvider?.Background5 ?? Colours.Gray1
+                Colour = ColourProvider.Background5
             });
 
             var background = CreateBackground();
