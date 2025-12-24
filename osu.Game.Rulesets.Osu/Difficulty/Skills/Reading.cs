@@ -64,7 +64,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             List<double> notes = peaks.ToList();
 
-            double reducedDuration = objectList[0].StartTime / clockRate + 60 * 1000.0; // Start time at first object
+            int idx = 0;
+
+            HitObject firstDifficultyObject = objectList[idx];
+
+            while (noteDifficulties[idx] == 0)
+            {
+                idx++;
+                firstDifficultyObject = objectList[idx];
+            }
+
+            double reducedDuration = firstDifficultyObject.StartTime / clockRate + 60 * 1000.0; // Start time at first object with difficulty
 
             const double reduced_base_line = 0.0; // Assume the first seconds are completely memorised
 
@@ -87,12 +97,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             int index = 0;
 
-            // Difficulty is the weighted sum of the highest notes.
-            // We're sorting from highest to lowest note.
             foreach (double note in notes.OrderDescending())
             {
-                // Use a harmonic sum for note which effectively buffs maps with more notes, especially if note difficulties are consistent.
-                // Constants are arbitrary and give good values.
+                // Use a harmonic sum that considers each note of the map according to a predefined weight using arbitrary balancing constants.
                 // https://www.desmos.com/calculator/5eb60faf4c
                 double weight = (1.0 + (1.0 / (1 + index))) / (Math.Pow(index, 0.9) + 1.0 + (1.0 / (1.0 + index)));
 
