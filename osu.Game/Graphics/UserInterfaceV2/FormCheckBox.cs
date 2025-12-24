@@ -88,7 +88,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                         },
-                        new FormSwitchButton
+                        new SwitchButton
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
@@ -173,12 +173,5 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public void SetDefault() => Current.SetDefault();
 
         public bool IsDisabled => Current.Disabled;
-
-        private partial class FormSwitchButton : SwitchButton
-        {
-            // it doesn't make sense for this to show hover state or respond to input.
-            // FormCheckBox already handles all of that.
-            public override bool PropagatePositionalInputSubTree => false;
-        }
     }
 }
