@@ -23,8 +23,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double ReducedStrainBaseline => 0.727;
 
-        protected override double DifficultyMultiplier => 1.058;
-
         protected OsuVariableLengthStrainSkill(Mod[] mods)
             : base(mods)
         {
@@ -81,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 time += strain.SectionLength / MaxSectionLength;
             }
 
-            return difficulty * DifficultyMultiplier;
+            return difficulty;
         }
 
         public static double DifficultyToPerformance(double difficulty) => 4.0 * Math.Pow(difficulty, 3.0);

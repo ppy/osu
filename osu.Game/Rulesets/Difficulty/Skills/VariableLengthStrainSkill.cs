@@ -17,11 +17,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     public abstract class VariableLengthStrainSkill : Skill
     {
         /// <summary>
-        /// Multiplier applied to <see cref="DifficultyValue"/>
-        /// </summary>
-        protected virtual double DifficultyMultiplier => 1;
-
-        /// <summary>
         /// The weight by which each strain value decays.
         /// </summary>
         protected virtual double DecayWeight => 0.9;
@@ -168,7 +163,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 return ObjectStrains.Count;
 
             // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
+            return ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-9.45179584121 * (s / consistentTopStrain - 0.93104))));
         }
 
         /// <summary>
@@ -243,7 +238,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 time += strains[i].SectionLength / MaxSectionLength;
             }
 
-            return difficulty * DifficultyMultiplier;
+            return difficulty;
         }
 
         /// <summary>
