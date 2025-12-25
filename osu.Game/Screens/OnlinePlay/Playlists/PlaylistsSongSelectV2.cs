@@ -149,7 +149,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             freeModSelect.IsValidMod = isValidAllowedMod;
         }
 
-        protected override void OnStart() => AddNewItem();
+        protected override void OnStart()
+        {
+            addToPlaylistFooterButton.TriggerClick();
+        }
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
