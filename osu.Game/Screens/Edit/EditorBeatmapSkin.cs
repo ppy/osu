@@ -71,6 +71,14 @@ namespace osu.Game.Screens.Edit
             }
 
             public override string ToString() => Name;
+
+            public HashSet<string> Filenames = [];
+
+            public string? FindSampleIfExists(string sampleName, string bankName)
+                => Filenames.SingleOrDefault(f => f.StartsWith($@"{bankName}-{sampleName}{(SampleSetIndex > 1 ? SampleSetIndex : null)}", StringComparison.Ordinal));
+
+            public virtual bool Equals(SampleSet? other) => SampleSetIndex == other?.SampleSetIndex;
+            public override int GetHashCode() => SampleSetIndex;
         }
 
         public IEnumerable<SampleSet> GetAvailableSampleSets()
