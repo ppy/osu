@@ -131,11 +131,11 @@ namespace osu.Game.Database
 
                     realmAccess.Write(r =>
                     {
-                        foreach (var b in r.All<BeatmapInfo>())
+                        foreach (var beatmap in r.All<BeatmapInfo>())
                         {
-                            if (b.Ruleset.ShortName == ruleset.ShortName)
+                            if (beatmap.Ruleset.ShortName == ruleset.ShortName)
                             {
-                                b.StarRating = -1;
+                                beatmap.StarRating = -1;
                                 countReset++;
                             }
                         }
@@ -185,6 +185,9 @@ namespace osu.Game.Database
                 return ruleset;
             }
 
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             foreach (Guid id in beatmapIds)
             {
                 if (notification?.State == ProgressNotificationState.Cancelled)
@@ -225,6 +228,8 @@ namespace osu.Game.Database
             }
 
             completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
+
+            Logger.Log($"Populating {processedCount} of {beatmapIds.Count} missing star ratings completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void processOnlineBeatmapSetsWithNoUpdate()
@@ -258,6 +263,9 @@ namespace osu.Game.Database
             int processedCount = 0;
             int failedCount = 0;
 
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             foreach (var id in beatmapSetIds)
             {
                 if (notification?.State == ProgressNotificationState.Cancelled)
@@ -288,6 +296,8 @@ namespace osu.Game.Database
             }
 
             completeNotification(notification, processedCount, beatmapSetIds.Count, failedCount);
+
+            Logger.Log($"Processing {processedCount} of {beatmapSetIds.Count} online beatmapsets completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void processBeatmapsWithMissingObjectCounts()
@@ -311,6 +321,9 @@ namespace osu.Game.Database
 
             int processedCount = 0;
             int failedCount = 0;
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
 
             foreach (var id in beatmapIds)
             {
@@ -342,6 +355,8 @@ namespace osu.Game.Database
             }
 
             completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
+
+            Logger.Log($"Processing {processedCount} of {beatmapIds.Count} beatmaps object counts completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void processScoresWithMissingStatistics()
@@ -372,6 +387,9 @@ namespace osu.Game.Database
 
             int processedCount = 0;
             int failedCount = 0;
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
 
             foreach (var id in scoreIds)
             {
@@ -413,6 +431,8 @@ namespace osu.Game.Database
             }
 
             completeNotification(notification, processedCount, scoreIds.Count, failedCount);
+
+            Logger.Log($"Processing {processedCount} of {scoreIds.Count} missing scores statistics completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void upgradeModMultipliers()
@@ -507,6 +527,9 @@ namespace osu.Game.Database
             int processedCount = 0;
             int failedCount = 0;
 
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             foreach (var id in scoreIds)
             {
                 if (notification?.State == ProgressNotificationState.Cancelled)
@@ -542,6 +565,8 @@ namespace osu.Game.Database
             }
 
             completeNotification(notification, processedCount, scoreIds.Count, failedCount);
+
+            Logger.Log($"Converting totalScore {processedCount} of {scoreIds.Count} scores completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void upgradeScoreRanks()
@@ -566,6 +591,9 @@ namespace osu.Game.Database
 
             int processedCount = 0;
             int failedCount = 0;
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
 
             foreach (var id in scoreIds)
             {
@@ -602,6 +630,8 @@ namespace osu.Game.Database
             }
 
             completeNotification(notification, processedCount, scoreIds.Count, failedCount);
+
+            Logger.Log($"Upgrading {processedCount} of {scoreIds.Count} score ranks completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void backpopulateMissingSubmissionAndRankDates()
@@ -649,6 +679,9 @@ namespace osu.Game.Database
 
             int processedCount = 0;
             int failedCount = 0;
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
 
             foreach (var id in beatmapSetIds)
             {
@@ -700,6 +733,8 @@ namespace osu.Game.Database
             }
 
             completeNotification(notification, processedCount, beatmapSetIds.Count, failedCount);
+
+            Logger.Log($"Populating {processedCount} of {beatmapSetIds.Count} missing submission and rank dates completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void backpopulateUserTags()
@@ -751,6 +786,9 @@ namespace osu.Game.Database
             int processedCount = 0;
             int updatedCount = 0;
             int failedCount = 0;
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
 
             foreach (var id in beatmapIds)
             {
@@ -812,6 +850,8 @@ namespace osu.Game.Database
             completeNotification(notification, updatedCount, updatedCount, failedCount);
 
             config.SetValue(OsuSetting.LastOnlineTagsPopulation, metadataSourceFetchDate);
+
+            Logger.Log($"Populating {processedCount} of {beatmapIds.Count} beatmap user tags completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void updateNotificationProgress(ProgressNotification? notification, int processedCount, int totalCount)
