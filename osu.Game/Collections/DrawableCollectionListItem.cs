@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -12,6 +13,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -127,6 +129,12 @@ namespace osu.Game.Collections
 
         private partial class ItemTextBox : OsuTextBox
         {
+            [Resolved]
+            private BeatmapManager beatmapManager { get; set; } = null!;
+
+            [Resolved]
+            private RealmAccess realmAccess { get; set; } = null!;
+
             protected override float LeftRightPadding => item_height / 2;
 
             private const float count_text_size = 12;
@@ -134,6 +142,8 @@ namespace osu.Game.Collections
             private readonly Live<BeatmapCollection> collection;
 
             private OsuSpriteText countText = null!;
+
+            private IDisposable? subscription;
 
             public ItemTextBox(Live<BeatmapCollection> collection)
             {
@@ -169,18 +179,40 @@ namespace osu.Game.Collections
                     // but that subscription does not only cover *changes to the set of collections* (i.e. addition/removal/rearrangement of collections),
                     // but also covers *changes to the properties of collections*, which `BeatmapMD5Hashes` is one.
                     // when a collection item changes due to `BeatmapMD5Hashes` changing, the list item is deleted and re-inserted, thus guaranteeing this to work correctly.
-                    int count = collection.PerformRead(c => c.BeatmapMD5Hashes.Count);
+                    updateCountText();
 
-                    countText.Text = count == 1
-                        // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
-                        // but also in this case we want support for formatting a number within a string).
-                        ? $"{count:#,0} item"
-                        : $"{count:#,0} items";
+                    // subscribe to all BeatmapInfo changes
+                    subscription = realmAccess.RegisterForNotifications(
+                        realm => realm.All<BeatmapInfo>(),
+                        (_, __) => Schedule(updateCountText)
+                    );
                 }
                 else
                 {
                     PlaceholderText = CollectionsStrings.CreateNew;
                 }
+            }
+
+            private void updateCountText()
+            {
+                List<string> beatmapHashes = collection.PerformRead(c => c.BeatmapMD5Hashes.ToList());
+                int total = beatmapHashes.Count;
+                int missing = beatmapHashes.Count(hash => beatmapManager.QueryBeatmap(b => b.MD5Hash == hash) == null);
+
+                string itemLabel = total == 1 ? "item" : "items";
+                countText.Text = missing > 0
+                    // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
+                    // but also in this case we want support for formatting a number within a string).
+                    ? $"{total:#,0} {itemLabel} ({missing:#,0} missing)"
+                    : $"{total:#,0} {itemLabel}";
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                if (isDisposing)
+                    subscription?.Dispose();
+
+                base.Dispose(isDisposing);
             }
         }
 
