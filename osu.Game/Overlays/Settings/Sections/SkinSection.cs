@@ -10,24 +10,29 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Screens.Select;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 using Realms;
 using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
+using HtmlAgilityPack;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
@@ -153,6 +158,182 @@ namespace osu.Game.Overlays.Settings.Sections
 
             private partial class SkinDropdownControl : DropdownControl
             {
+                protected override DropdownMenu CreateMenu() => new SkinDropdownMenu();
+
+                private partial class SkinDropdownMenu : OsuDropdownMenu
+                {
+                    [BackgroundDependencyLoader(true)]
+                    private void load(OverlayColourProvider? colourProvider, OsuColour colours)
+                    {
+                        BackgroundColour = colourProvider?.Background5 ?? Color4.Black;
+                        HoverColour = colourProvider?.Light4 ?? colours.PinkDarker;
+                        SelectionColour = colourProvider?.Background3 ?? colours.PinkDarker.Opacity(0.5f);
+
+                        MaxHeight = 200;
+                    }
+
+                    protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableSkinDropdownMenuItem(item)
+                    {
+                        BackgroundColourHover = HoverColour,
+                        BackgroundColourSelected = SelectionColour
+                    };
+
+                    public partial class DrawableSkinDropdownMenuItem : DrawableOsuDropdownMenuItem
+                    {
+
+                        public DrawableSkinDropdownMenuItem(MenuItem item)
+                            : base(item)
+                        {
+                            Foreground.Padding = new MarginPadding(2);
+                            Foreground.AutoSizeAxes = Axes.Y;
+                            Foreground.RelativeSizeAxes = Axes.X;
+
+                            Masking = true;
+
+                            // This was "corner_radius", but now it's hard-coded here due to the private const in the parent class
+                            CornerRadius = 5;
+                        }
+
+                        [BackgroundDependencyLoader]
+                        private void load()
+                        {
+                            AddInternal(new HoverSounds());
+                        }
+
+                        protected override void UpdateForegroundColour()
+                        {
+                            base.UpdateForegroundColour();
+
+                            if (Foreground.Children.FirstOrDefault() is Content content)
+                                content.Hovering = IsHovered;
+                        }
+
+                        public partial class StarButton : SpriteIcon
+                        {
+                            private OverlayColourProvider? colourProvider;
+
+                            [BackgroundDependencyLoader(true)]
+                            private void load(OverlayColourProvider? colourProvider)
+                            {
+                                this.colourProvider = colourProvider;
+                            }
+                            public bool IsFavourite = false;
+
+                            // todo:
+                            //      Add hover to star for both hovered and unhovered states
+                            //      Make favourite status persistent
+                            //      Move fav skins to the top od the list
+                            //      Fix warnings
+                            //      Fetch value from config
+                            //      Touchscreen/mobile support
+                            //          Slide to reveal instead of permanently visible star?
+                            //      Fix hitbox?
+                            public override bool ChangeFocusOnClick => false;
+
+                            protected override bool OnClick(ClickEvent e)
+                            {
+                                if (!IsFavourite)
+                                {
+                                    this.FadeColour(Colour4.Gold, 250, Easing.OutQuint);
+                                    this.DelayUntilTransformsFinished().Schedule(() =>
+                                    {
+                                        Alpha = 1;
+                                    });
+                                }
+                                else
+                                {
+                                    Colour4 NewColor = colourProvider?.Background5 ?? Color4.Black;
+                                    this.FadeColour(NewColor, 250, Easing.OutQuint);
+                                    this.DelayUntilTransformsFinished().Schedule(() =>
+                                    {
+                                        Alpha = 0;
+                                    });
+                                }
+                                IsFavourite = !IsFavourite;
+                                Console.WriteLine(this);
+                                return true;
+                            }
+                        }
+
+                        protected override Drawable CreateContent() => new Content();
+
+                        protected new partial class Content : CompositeDrawable, IHasText
+                        {
+                            public LocalisableString Text
+                            {
+                                get => Label.Text;
+                                set => Label.Text = value;
+                            }
+
+                            public readonly OsuSpriteText Label;
+                            public readonly StarButton Star;
+
+                            private const float star_offset = -3;
+
+                            public Content()
+                            {
+                                RelativeSizeAxes = Axes.X;
+                                AutoSizeAxes = Axes.Y;
+                                // Height = 16;
+
+                                InternalChildren = new Drawable[]
+                                {
+                                    Star = new StarButton
+                                    {
+                                        Icon = FontAwesome.Solid.Star,
+                                        Size = new Vector2(10),
+                                        BypassAutoSizeAxes = Axes.Y,
+                                        Alpha = 0,
+                                        X = star_offset,
+                                        Y = 1,
+                                        Margin = new MarginPadding { Horizontal = 2 },
+                                        Origin = Anchor.CentreLeft,
+                                        Anchor = Anchor.CentreLeft,
+                                    },
+                                    Label = new TruncatingSpriteText
+                                    {
+                                        Padding = new MarginPadding { Left = 16 },
+                                        Origin = Anchor.CentreLeft,
+                                        Anchor = Anchor.CentreLeft,
+                                        RelativeSizeAxes = Axes.X,
+                                    },
+                                };
+                            }
+
+                            [BackgroundDependencyLoader(true)]
+                            private void load(OverlayColourProvider? colourProvider)
+                            {
+                                Star.Colour = colourProvider?.Background5 ?? Color4.Black;
+                            }
+
+                            private bool hovering;
+
+                            public bool Hovering
+                            {
+                                get => hovering;
+                                set
+                                {
+                                    if (value == hovering)
+                                        return;
+
+                                    hovering = value;
+
+                                    if (hovering)
+                                    {
+                                        Star.FadeIn(400, Easing.OutQuint);
+                                        Star.MoveToX(0, 400, Easing.OutQuint);
+                                    }
+                                    else if (!hovering && !Star.IsFavourite)
+                                    {
+                                        Star.FadeOut(200);
+                                        Star.MoveToX(star_offset, 200, Easing.In);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 protected override LocalisableString GenerateItemText(Live<SkinInfo> item) => item.ToString();
             }
         }
