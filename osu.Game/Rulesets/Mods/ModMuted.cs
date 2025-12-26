@@ -100,6 +100,11 @@ namespace osu.Game.Rulesets.Mods
 
     public partial class MuteComboSlider : RoundedSliderBar<int>
     {
+        public MuteComboSlider()
+        {
+            KeyboardStep = 1;
+        }
+
         public override LocalisableString TooltipText => Current.Value == 0 ? "always muted" : base.TooltipText;
     }
 }
