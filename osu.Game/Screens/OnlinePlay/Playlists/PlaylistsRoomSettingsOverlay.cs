@@ -241,7 +241,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                         {
                                                                             RelativeSizeAxes = Axes.X,
                                                                             Height = 40,
-                                                                            Text = "Edit playlist",
+                                                                            Text = "+ Add more beatmaps",
                                                                             Action = () => EditPlaylist?.Invoke()
                                                                         }
                                                                     }
