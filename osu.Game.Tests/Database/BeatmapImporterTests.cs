@@ -778,19 +778,7 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealmAsync(async (realm, storage) =>
             {
-                var importer = new BeatmapImporter(storage, realm)
-                {
-                    ProcessBeatmap = (set, _) =>
-                    {
-                        set.OnlineID = 1234;
-                        // note: this is only intended to be a quick-and-easy approximation of proper operation
-                        // the more proper way to do this would be to assign IDs based on content hash or something, but it largely doesn't matter here
-                        // so long as the beatmaps in the set get assigned an ID by the process flow
-                        for (int i = 0; i < set.Beatmaps.Count; ++i)
-                            set.Beatmaps[i].OnlineID = 5678 + i;
-                    }
-                };
-
+                var importer = new BeatmapImporter(storage, realm);
                 using var store = new RealmRulesetStore(realm, storage);
 
                 string? pathOriginal = TestResources.GetTestBeatmapForImport();
