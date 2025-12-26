@@ -13,6 +13,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
@@ -125,6 +126,40 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("dispose playback control", () => Clear(disposeChildren: true));
             AddAssert("track has 1x tempo", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(1));
+        }
+
+        [Test]
+        public void TestIncreaseDecreasePlaybackSpeed()
+        {
+            AddStep("set 0.25x speed directly", () => this.ChildrenOfType<OsuTabControl<double>>().First().Current.Value = 0.25);
+
+            AddStep("hold control", () => InputManager.PressKey(Key.LControl));
+
+            AddStep("press up", () => InputManager.Key(Key.Up));
+            AddAssert("track has 0.5x tempo", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(0.5));
+
+            AddStep("press up", () => InputManager.Key(Key.Up));
+            AddAssert("track has 0.75x tempo", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(0.75));
+
+            AddStep("press up", () => InputManager.Key(Key.Up));
+            AddAssert("track has 1x tempo", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(1));
+
+            AddStep("press up", () => InputManager.Key(Key.Up));
+            AddAssert("track still has 1x tempo", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(1));
+
+            AddStep("press down", () => InputManager.Key(Key.Down));
+            AddAssert("track has 0.75x tempo", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(0.75));
+
+            AddStep("press down", () => InputManager.Key(Key.Down));
+            AddAssert("track has 0.5x tempo", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(0.5));
+
+            AddStep("press down", () => InputManager.Key(Key.Down));
+            AddAssert("track has 0.25x tempo", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(0.25));
+
+            AddStep("press down", () => InputManager.Key(Key.Down));
+            AddAssert("track still has 0.25x tempo", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(0.25));
+
+            AddStep("release control", () => InputManager.ReleaseKey(Key.LControl));
         }
 
         protected override void Dispose(bool isDisposing)
