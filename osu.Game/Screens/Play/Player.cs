@@ -302,18 +302,18 @@ namespace osu.Game.Screens.Play
             if (cancellationToken.IsCancellationRequested)
                 return;
 
+            failAnimationContainer = DrawableRuleset.CreateFailAnimationContainer();
+            failAnimationContainer.OnComplete = onFailComplete;
+            failAnimationContainer.Children = new[]
+            {
+                // underlay and gameplay should have access to the skinning sources.
+                createUnderlayComponents(Beatmap.Value),
+                createGameplayComponents(Beatmap.Value)
+            };
+
             rulesetSkinProvider.AddRange(new Drawable[]
             {
-                failAnimationContainer = new FailAnimationContainer(DrawableRuleset)
-                {
-                    OnComplete = onFailComplete,
-                    Children = new[]
-                    {
-                        // underlay and gameplay should have access to the skinning sources.
-                        createUnderlayComponents(Beatmap.Value),
-                        createGameplayComponents(Beatmap.Value)
-                    }
-                },
+                failAnimationContainer,
                 FailOverlay = new FailOverlay
                 {
                     SaveReplay = Configuration.AllowUserInteraction ? async () => await prepareAndImportScoreAsync(true).ConfigureAwait(false) : null,
