@@ -5,13 +5,16 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Logging;
 using osu.Game.Database;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
@@ -499,6 +502,8 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.RoomStateChanged(MultiplayerRoomState state)
         {
+            logEvent([state]);
+
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
@@ -531,6 +536,8 @@ namespace osu.Game.Online.Multiplayer
 
         async Task IMultiplayerClient.UserJoined(MultiplayerRoomUser user)
         {
+            logEvent([user.UserID]);
+
             await PopulateUsers([user]).ConfigureAwait(false);
 
             handleRoomRequest(() =>
@@ -552,12 +559,16 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.UserLeft(MultiplayerRoomUser user)
         {
+            logEvent([user.UserID]);
+
             handleRoomRequest(() => handleUserLeft(user, UserLeft));
             return Task.CompletedTask;
         }
 
         Task IMultiplayerClient.UserKicked(MultiplayerRoomUser user)
         {
+            logEvent([user.UserID]);
+
             handleRoomRequest(() =>
             {
                 if (LocalUser == null)
@@ -590,6 +601,8 @@ namespace osu.Game.Online.Multiplayer
 
         async Task IMultiplayerClient.Invited(int invitedBy, long roomID, string password)
         {
+            logEvent([invitedBy, roomID]);
+
             APIUser? apiUser = await userLookupCache.GetUserAsync(invitedBy).ConfigureAwait(false);
             Room? apiRoom = await getRoomAsync(roomID).ConfigureAwait(false);
 
@@ -632,6 +645,8 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.HostChanged(int userId)
         {
+            logEvent([userId]);
+
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
@@ -651,12 +666,16 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.SettingsChanged(MultiplayerRoomSettings newSettings)
         {
+            logEvent();
+
             handleRoomRequest(() => updateLocalRoomSettings(newSettings));
             return Task.CompletedTask;
         }
 
         Task IMultiplayerClient.UserStateChanged(int userId, MultiplayerUserState state)
         {
+            logEvent([userId, state]);
+
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
@@ -679,6 +698,8 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.MatchUserStateChanged(int userId, MatchUserState state)
         {
+            logEvent([userId]);
+
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
@@ -698,6 +719,8 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.MatchRoomStateChanged(MatchRoomState state)
         {
+            logEvent();
+
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
@@ -712,6 +735,8 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.MatchEvent(MatchServerEvent e)
         {
+            logEvent([e.GetType().ReadableName()]);
+
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
@@ -762,6 +787,8 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.UserBeatmapAvailabilityChanged(int userId, BeatmapAvailability beatmapAvailability)
         {
+            logEvent([userId, beatmapAvailability.State]);
+
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
@@ -783,6 +810,8 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.UserStyleChanged(int userId, int? beatmapId, int? rulesetId)
         {
+            logEvent([userId, beatmapId, rulesetId]);
+
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
@@ -805,6 +834,8 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.UserModsChanged(int userId, IEnumerable<APIMod> mods)
         {
+            logEvent([userId]);
+
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
@@ -826,6 +857,8 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.LoadRequested()
         {
+            logEvent();
+
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
@@ -837,6 +870,8 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.GameplayAborted(GameplayAbortReason reason)
         {
+            logEvent();
+
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
@@ -848,6 +883,8 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.GameplayStarted()
         {
+            logEvent();
+
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
@@ -859,6 +896,8 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.ResultsReady()
         {
+            logEvent();
+
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
@@ -870,6 +909,8 @@ namespace osu.Game.Online.Multiplayer
 
         public Task PlaylistItemAdded(MultiplayerPlaylistItem item)
         {
+            logEvent([item.ID]);
+
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
@@ -887,6 +928,8 @@ namespace osu.Game.Online.Multiplayer
 
         public Task PlaylistItemRemoved(long playlistItemId)
         {
+            logEvent([playlistItemId]);
+
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
@@ -906,6 +949,8 @@ namespace osu.Game.Online.Multiplayer
 
         public Task PlaylistItemChanged(MultiplayerPlaylistItem item)
         {
+            logEvent([item.ID]);
+
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
@@ -923,6 +968,8 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.UserVotedToSkipIntro(int userId, bool voted)
         {
+            logEvent([userId, voted]);
+
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
@@ -942,6 +989,8 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.VoteToSkipIntroPassed()
         {
+            logEvent();
+
             handleRoomRequest(() =>
             {
                 Debug.Assert(Room != null);
@@ -1061,8 +1110,16 @@ namespace osu.Game.Online.Multiplayer
             });
         }
 
+        private void logEvent([CallerMemberName] string? callerMemberName = null)
+            => logEvent([], callerMemberName);
+
+        private void logEvent(object?[] args, [CallerMemberName] string? callerMemberName = null)
+            => Logger.Log($"[Multiplayer]: {callerMemberName}({string.Join(", ", args)})");
+
         Task IStatefulUserHubClient.DisconnectRequested()
         {
+            logEvent();
+
             Schedule(() =>
             {
                 Disconnecting?.Invoke();
@@ -1073,42 +1130,56 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMatchmakingClient.MatchmakingQueueJoined()
         {
+            logEvent();
+
             Scheduler.Add(() => MatchmakingQueueJoined?.Invoke());
             return Task.CompletedTask;
         }
 
         Task IMatchmakingClient.MatchmakingQueueLeft()
         {
+            logEvent();
+
             Scheduler.Add(() => MatchmakingQueueLeft?.Invoke());
             return Task.CompletedTask;
         }
 
         Task IMatchmakingClient.MatchmakingRoomInvited()
         {
+            logEvent();
+
             Scheduler.Add(() => MatchmakingRoomInvited?.Invoke());
             return Task.CompletedTask;
         }
 
         Task IMatchmakingClient.MatchmakingRoomReady(long roomId, string password)
         {
+            logEvent([roomId]);
+
             Scheduler.Add(() => MatchmakingRoomReady?.Invoke(roomId, password));
             return Task.CompletedTask;
         }
 
         Task IMatchmakingClient.MatchmakingLobbyStatusChanged(MatchmakingLobbyStatus status)
         {
+            logEvent();
+
             Scheduler.Add(() => MatchmakingLobbyStatusChanged?.Invoke(status));
             return Task.CompletedTask;
         }
 
         Task IMatchmakingClient.MatchmakingQueueStatusChanged(MatchmakingQueueStatus status)
         {
+            logEvent([status.GetType().ReadableName()]);
+
             Scheduler.Add(() => MatchmakingQueueStatusChanged?.Invoke(status));
             return Task.CompletedTask;
         }
 
         Task IMatchmakingClient.MatchmakingItemSelected(int userId, long playlistItemId)
         {
+            logEvent([userId, playlistItemId]);
+
             handleRoomRequest(() =>
             {
                 MatchmakingItemSelected?.Invoke(userId, playlistItemId);
@@ -1120,6 +1191,8 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMatchmakingClient.MatchmakingItemDeselected(int userId, long playlistItemId)
         {
+            logEvent([userId, playlistItemId]);
+
             handleRoomRequest(() =>
             {
                 MatchmakingItemDeselected?.Invoke(userId, playlistItemId);
