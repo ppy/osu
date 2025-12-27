@@ -32,7 +32,6 @@ using osuTK;
 using osuTK.Graphics;
 using Realms;
 using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
-using HtmlAgilityPack;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
@@ -140,7 +139,9 @@ namespace osu.Game.Overlays.Settings.Sections
             dropdownItems.Add(random_skin_info);
 
             foreach (var skin in sender.Where(s => !s.Protected))
+            {
                 dropdownItems.Add(skin.ToLive(realm));
+            }
 
             Schedule(() => skinDropdown.Items = dropdownItems);
         }
@@ -180,7 +181,6 @@ namespace osu.Game.Overlays.Settings.Sections
 
                     public partial class DrawableSkinDropdownMenuItem : DrawableOsuDropdownMenuItem
                     {
-
                         public DrawableSkinDropdownMenuItem(MenuItem item)
                             : base(item)
                         {
@@ -192,6 +192,15 @@ namespace osu.Game.Overlays.Settings.Sections
 
                             // This was "corner_radius", but now it's hard-coded here due to the private const in the parent class
                             CornerRadius = 5;
+
+                            if (item is DropdownMenuItem<Live<SkinInfo>> skinItem)
+                            {
+                                skinItem.Value.PerformRead(skin =>
+                                {
+                                    if (Foreground.Children.FirstOrDefault() is Content content)
+                                        content.Star.SkinData = skin;
+                                });
+                            }
                         }
 
                         [BackgroundDependencyLoader]
@@ -210,29 +219,30 @@ namespace osu.Game.Overlays.Settings.Sections
 
                         public partial class StarButton : SpriteIcon
                         {
+                            public bool IsFavourite;
+                            public SkinInfo? SkinData;
                             private OverlayColourProvider? colourProvider;
 
+                            [Resolved]
+                            private RealmAccess realm { get; set; } = null!;
+
                             [BackgroundDependencyLoader(true)]
-                            private void load(OverlayColourProvider? colourProvider)
+                            private void load(OverlayColourProvider? colourProvider, RealmAccess realm)
                             {
                                 this.colourProvider = colourProvider;
+
+                                var skin = realm.Run(r => r.All<SkinInfo>().FirstOrDefault(s => s.ID == SkinData.ID));
+                                Console.WriteLine($@"---- {skin} - {SkinData.ID} - IsFavourite: {SkinData.IsFavourite} ----");
+                                if (skin != null)
+                                {
+                                    IsFavourite = skin.IsFavourite;
+                                    changeStarButtonState(IsFavourite);
+                                }
                             }
-                            public bool IsFavourite = false;
 
-                            // todo:
-                            //      Add hover to star for both hovered and unhovered states
-                            //      Make favourite status persistent
-                            //      Move fav skins to the top od the list
-                            //      Fix warnings
-                            //      Fetch value from config
-                            //      Touchscreen/mobile support
-                            //          Slide to reveal instead of permanently visible star?
-                            //      Fix hitbox?
-                            public override bool ChangeFocusOnClick => false;
-
-                            protected override bool OnClick(ClickEvent e)
+                            private void changeStarButtonState(bool currentState)
                             {
-                                if (!IsFavourite)
+                                if (currentState)
                                 {
                                     this.FadeColour(Colour4.Gold, 250, Easing.OutQuint);
                                     this.DelayUntilTransformsFinished().Schedule(() =>
@@ -249,8 +259,33 @@ namespace osu.Game.Overlays.Settings.Sections
                                         Alpha = 0;
                                     });
                                 }
+                            }
+
+                            // todo:
+                            //      Add hover to star for both hovered and unhovered states
+                            //      Move fav skins to the top od the list
+                            //      Fix warnings
+                            //      Touchscreen/mobile support
+                            //          Slide to reveal instead of permanently visible star?
+                            //      Fix hitbox?
+                            //      Favorited skin -> remove -> star fades out
+                            //      Adjust X offset and alpha to reflect the value
+
+                            public override bool ChangeFocusOnClick => false;
+
+                            protected override bool OnClick(ClickEvent e)
+                            {
                                 IsFavourite = !IsFavourite;
-                                Console.WriteLine(this);
+                                changeStarButtonState(IsFavourite);
+
+                                realm.Write(r =>
+                                {
+                                    var skin = r.All<SkinInfo>().FirstOrDefault(s => s.ID == SkinData.ID);
+                                    Console.WriteLine($@"---- {skin} - {SkinData.ID} - IsFavourite: {IsFavourite} ----");
+                                    if (skin != null)
+                                        skin.IsFavourite = IsFavourite;
+                                });
+
                                 return true;
                             }
                         }
@@ -274,11 +309,10 @@ namespace osu.Game.Overlays.Settings.Sections
                             {
                                 RelativeSizeAxes = Axes.X;
                                 AutoSizeAxes = Axes.Y;
-                                // Height = 16;
 
                                 InternalChildren = new Drawable[]
                                 {
-                                    Star = new StarButton
+                                    Star = new StarButton()
                                     {
                                         Icon = FontAwesome.Solid.Star,
                                         Size = new Vector2(10),

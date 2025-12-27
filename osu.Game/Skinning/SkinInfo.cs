@@ -38,6 +38,8 @@ namespace osu.Game.Skinning
 
         public string Hash { get; set; } = string.Empty;
 
+        public bool IsFavourite { get; set; } = false;
+
         public bool Protected { get; set; }
 
         public virtual Skin CreateInstance(IStorageResourceProvider resources)

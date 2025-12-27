@@ -410,6 +410,7 @@ namespace osu.Game.Configuration
         ShowFirstRunSetup,
         ShowConvertedBeatmaps,
         Skin,
+        FavouriteSkins,
         ScreenshotFormat,
         ScreenshotCaptureMenuCursor,
         BeatmapSkins,
