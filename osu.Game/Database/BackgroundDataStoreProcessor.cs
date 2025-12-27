@@ -185,11 +185,11 @@ namespace osu.Game.Database
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            int chunkSize = 500;
+            const int chunk_size = 500;
             var chunks = beatmapIds
-                .Select((item, index) => new { item, index })
-                .GroupBy(x => x.index / chunkSize)
-                .Select(g => g.Select(x => x.item).ToList());
+             .Select((item, index) => new { item, index })
+             .GroupBy(x => x.index / chunk_size)
+             .Select(g => g.Select(x => x.item).ToList());
 
             foreach (var chunk in chunks)
             {
@@ -346,11 +346,11 @@ namespace osu.Game.Database
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            int chunkSize = 500;
+            const int chunk_size = 500;
             var chunks = beatmapIds
-                .Select((item, index) => new { item, index })
-                .GroupBy(x => x.index / chunkSize)
-                .Select(g => g.Select(x => x.item).ToList());
+             .Select((item, index) => new { item, index })
+             .GroupBy(x => x.index / chunk_size)
+             .Select(g => g.Select(x => x.item).ToList());
 
             foreach (var chunk in chunks)
             {
@@ -450,11 +450,11 @@ namespace osu.Game.Database
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            int chunkSize = 1000;
+            const int chunk_size = 1000;
             var chunks = scoreIds
-                .Select((item, index) => new { item, index })
-                .GroupBy(x => x.index / chunkSize)
-                .Select(g => g.Select(x => x.item).ToList());
+             .Select((item, index) => new { item, index })
+             .GroupBy(x => x.index / chunk_size)
+             .Select(g => g.Select(x => x.item).ToList());
 
             foreach (var chunk in chunks)
             {
@@ -548,11 +548,11 @@ namespace osu.Game.Database
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            int chunkSize = 500;
+            const int chunk_size = 500;
             var chunks = scoreIds
-                .Select((item, index) => new { item, index })
-                .GroupBy(x => x.index / chunkSize)
-                .Select(g => g.Select(x => x.item).ToList());
+             .Select((item, index) => new { item, index })
+             .GroupBy(x => x.index / chunk_size)
+             .Select(g => g.Select(x => x.item).ToList());
 
             foreach (var chunk in chunks)
             {
@@ -648,11 +648,11 @@ namespace osu.Game.Database
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            int chunkSize = 3000;
+            const int chunk_size = 3000;
             var chunks = scoreIds
-                .Select((item, index) => new { item, index })
-                .GroupBy(x => x.index / chunkSize)
-                .Select(g => g.Select(x => x.item).ToList());
+             .Select((item, index) => new { item, index })
+             .GroupBy(x => x.index / chunk_size)
+             .Select(g => g.Select(x => x.item).ToList());
 
             foreach (var chunk in chunks)
             {
@@ -766,11 +766,11 @@ namespace osu.Game.Database
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            int chunkSize = 1000;
+            const int chunk_size = 1000;
             var chunks = beatmapSetIds
-                .Select((item, index) => new { item, index })
-                .GroupBy(x => x.index / chunkSize)
-                .Select(g => g.Select(x => x.item).ToList());
+             .Select((item, index) => new { item, index })
+             .GroupBy(x => x.index / chunk_size)
+             .Select(g => g.Select(x => x.item).ToList());
 
             foreach (var chunk in chunks)
             {
@@ -898,11 +898,11 @@ namespace osu.Game.Database
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            int chunkSize = 2000;
+            const int chunk_size = 2000;
             var chunks = beatmapIds
-                .Select((item, index) => new { item, index })
-                .GroupBy(x => x.index / chunkSize)
-                .Select(g => g.Select(x => x.item).ToList());
+             .Select((item, index) => new { item, index })
+             .GroupBy(x => x.index / chunk_size)
+             .Select(g => g.Select(x => x.item).ToList());
 
             foreach (var chunk in chunks)
             {
