@@ -226,6 +226,7 @@ namespace osu.Game.Overlays.Settings.Sections
                         {
                             public bool IsFavourite;
                             public SkinInfo? SkinData;
+                            private bool isStarHovered;
                             private OverlayColourProvider? colourProvider;
 
                             [Resolved]
@@ -237,12 +238,11 @@ namespace osu.Game.Overlays.Settings.Sections
                                 this.colourProvider = colourProvider;
 
                                 var skin = realm.Run(r => r.All<SkinInfo>().FirstOrDefault(s => s.ID == SkinData.ID));
-                                Console.WriteLine($@"---- {skin} - {SkinData.ID} - IsFavourite: {SkinData.IsFavourite} ----");
                                 if (skin != null)
                                 {
                                     IsFavourite = skin.IsFavourite;
                                     Alpha = IsFavourite ? 1 : 0;
-                                    X = 0;
+                                    X = Content.StarOffset;
                                     changeStarButtonState(IsFavourite);
                                 }
                             }
@@ -269,13 +269,10 @@ namespace osu.Game.Overlays.Settings.Sections
                             }
 
                             // todo:
-                            //      Add hover to star for both hovered and unhovered states
-                            //      Move fav skins to the top od the list
                             //      Touchscreen/mobile support
                             //          Slide to reveal instead of permanently visible star?
-                            //      Something is causing a re-render when clicking the star button
+                            //      Realm changes are causing a re-render. This instantly refreshes the list, which at this point I don't even know whether is a good or bad UX. Instant change -> good, but scrolls to the top so kinda bad too.
                             //      Fix warnings
-                            //      Fix hitbox?
 
                             public override bool ChangeFocusOnClick => false;
 
@@ -287,13 +284,44 @@ namespace osu.Game.Overlays.Settings.Sections
                                 realm.Write(r =>
                                 {
                                     var skin = r.All<SkinInfo>().FirstOrDefault(s => s.ID == SkinData.ID);
-                                    Console.WriteLine($@"---- {skin} - {SkinData.ID} - IsFavourite: {IsFavourite} ----");
                                     if (skin != null)
                                         skin.IsFavourite = IsFavourite;
                                 });
 
                                 return true;
                             }
+
+                            protected override bool OnHover(HoverEvent e)
+                            {
+                                isStarHovered = true;
+
+                                if (IsFavourite)
+                                {
+                                    this.FadeColour(Colour4.Gold.Lighten(0.3f), 250, Easing.OutQuint);
+                                    this.ScaleTo(1.25f, 250, Easing.OutQuint);
+                                }
+                                else
+                                {
+                                    this.FadeColour(Colour4.Gold, 250, Easing.In);
+                                    this.ScaleTo(1.15f, 250, Easing.In);
+                                }
+                                return true;
+                            }
+
+                            protected override void OnHoverLost(HoverLostEvent e)
+                            {
+                                isStarHovered = false;
+
+                                if (IsFavourite)
+                                    this.FadeColour(Colour4.Gold, 250, Easing.OutQuint);
+                                else
+                                {
+                                    this.FadeColour(colourProvider?.Background5 ?? Color4.Black, 550, Easing.OutQuint);
+                                }
+                                this.ScaleTo(1.0f, 350, Easing.OutQuint);
+                            }
+
+                            public bool IsStarHovered => isStarHovered;
                         }
 
                         protected override Drawable CreateContent() => new Content();
@@ -309,7 +337,7 @@ namespace osu.Game.Overlays.Settings.Sections
                             public readonly OsuSpriteText Label;
                             public readonly StarButton Star;
 
-                            private const float star_offset = -3;
+                            public static float StarOffset = 6;
 
                             public Content()
                             {
@@ -324,10 +352,10 @@ namespace osu.Game.Overlays.Settings.Sections
                                         Size = new Vector2(10),
                                         BypassAutoSizeAxes = Axes.Y,
                                         Alpha = 0,
-                                        X = star_offset,
+                                        X = 3,
                                         Y = 1,
                                         Margin = new MarginPadding { Horizontal = 2 },
-                                        Origin = Anchor.CentreLeft,
+                                        Origin = Anchor.Centre,
                                         Anchor = Anchor.CentreLeft,
                                     },
                                     Label = new TruncatingSpriteText
@@ -361,12 +389,12 @@ namespace osu.Game.Overlays.Settings.Sections
                                     if (hovering || Star.IsFavourite)
                                     {
                                         Star.FadeIn(400, Easing.OutQuint);
-                                        Star.MoveToX(0, 400, Easing.OutQuint);
+                                        Star.MoveToX(StarOffset, 200, Easing.In);
                                     }
-                                    else if (!hovering && !Star.IsFavourite)
+                                    else if (!hovering && !Star.IsFavourite && !Star.IsStarHovered)
                                     {
                                         Star.FadeOut(200);
-                                        Star.MoveToX(star_offset, 200, Easing.In);
+                                        Star.MoveToX(3, 400, Easing.OutQuint);
                                     }
                                 }
                             }
