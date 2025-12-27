@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Runtime.Versioning;
 using osu.Desktop.LegacyIpc;
+using osu.Desktop.LowLatency;
 using osu.Desktop.Windows;
 using osu.Framework;
 using osu.Framework.Development;
@@ -138,6 +139,10 @@ namespace osu.Desktop
                     host.Run(new TournamentGame());
                 else
                 {
+                    // Attempt to use the NVAPI Low Latency Provider. This should only succeed on systems with NVIDIA GPUs and the proper drivers installed.
+                    if (NVAPI.Available)
+                        host.SetLowLatencyProvider(new NVAPIDirect3D11LowLatencyProvider());
+
                     host.Run(new OsuGameDesktop(args)
                     {
                         IsFirstRun = isFirstRun
