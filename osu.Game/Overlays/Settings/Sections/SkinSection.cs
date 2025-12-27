@@ -226,7 +226,7 @@ namespace osu.Game.Overlays.Settings.Sections
                         {
                             public bool IsFavourite;
                             public SkinInfo? SkinData;
-                            private bool isStarHovered;
+                            private bool isStarHovered { get; set; }
                             private OverlayColourProvider? colourProvider;
 
                             [Resolved]
@@ -289,6 +289,18 @@ namespace osu.Game.Overlays.Settings.Sections
                                 });
 
                                 return true;
+                            }
+
+                            protected override bool OnMouseDown(MouseDownEvent e)
+                            {
+                                this.ScaleTo(1.35f, 250, Easing.OutQuint);
+                                return true;
+                            }
+
+                            protected override void OnMouseUp(MouseUpEvent e)
+                            {
+                                this.ScaleTo(1.0f, 250, Easing.OutQuint);
+                                base.OnMouseUp(e);
                             }
 
                             protected override bool OnHover(HoverEvent e)
