@@ -236,6 +236,8 @@ namespace osu.Game.Overlays.Settings.Sections
                                 if (skin != null)
                                 {
                                     IsFavourite = skin.IsFavourite;
+                                    Alpha = IsFavourite ? 1 : 0;
+                                    X = 0;
                                     changeStarButtonState(IsFavourite);
                                 }
                             }
@@ -264,12 +266,11 @@ namespace osu.Game.Overlays.Settings.Sections
                             // todo:
                             //      Add hover to star for both hovered and unhovered states
                             //      Move fav skins to the top od the list
-                            //      Fix warnings
                             //      Touchscreen/mobile support
                             //          Slide to reveal instead of permanently visible star?
+                            //      Something is causing a re-render when clicking the star button
+                            //      Fix warnings
                             //      Fix hitbox?
-                            //      Favorited skin -> remove -> star fades out
-                            //      Adjust X offset and alpha to reflect the value
 
                             public override bool ChangeFocusOnClick => false;
 
@@ -352,7 +353,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
                                     hovering = value;
 
-                                    if (hovering)
+                                    if (hovering || Star.IsFavourite)
                                     {
                                         Star.FadeIn(400, Easing.OutQuint);
                                         Star.MoveToX(0, 400, Easing.OutQuint);
