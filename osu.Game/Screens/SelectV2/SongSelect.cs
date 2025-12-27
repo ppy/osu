@@ -121,6 +121,9 @@ namespace osu.Game.Screens.SelectV2
 
         private NoResultsPlaceholder noResultsPlaceholder = null!;
 
+        private bool rulesetChanged = true;
+        private RulesetInfo? oldRuleset;
+
         public override bool? ApplyModTrackAdjustments => true;
 
         public override bool ShowFooter => true;
@@ -375,6 +378,10 @@ namespace osu.Game.Screens.SelectV2
                 if (!this.IsCurrentScreen())
                     return;
 
+                // If we directly change the beatmap, we consider the ruleset haven't changed yet
+                // or the ruleset had been changed and caused a beatmap change.
+                // so that set `rulesetChanged` to false.
+                rulesetChanged = false;
                 ensureGlobalBeatmapValid();
 
                 ensurePlayingSelected();
@@ -382,6 +389,17 @@ namespace osu.Game.Screens.SelectV2
                 updateWedgeVisibility();
                 fetchOnlineInfo();
             });
+
+            Ruleset.BindValueChanged(ruleset =>
+            {
+                var newRuleset = ruleset.NewValue;
+                rulesetChanged = oldRuleset?.Equals(newRuleset) == false;
+
+                if (newRuleset != null)
+                {
+                    oldRuleset = newRuleset;
+                }
+            }, true);
         }
 
         protected override void Update()
@@ -584,6 +602,7 @@ namespace osu.Game.Screens.SelectV2
             // Refetch to be confident that the current selection is still valid. It may have been deleted or hidden.
             var currentBeatmap = beatmaps.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo, true);
             bool validSelection = checkBeatmapValidForSelection(currentBeatmap.BeatmapInfo);
+            bool validBeatmap = checkBeatmapValid(currentBeatmap.BeatmapInfo);
 
             if (validSelection)
             {
@@ -616,6 +635,22 @@ namespace osu.Game.Screens.SelectV2
                 }
             }
 
+            // If no difficulties from the same set are valid, try to switch ruleset to the beatmap's ruleset.
+            // `rulesetChanged` being true here indicates the user has explicitly changed rulesets, so we shouldn't override their choice.
+            if (!validSelection && validBeatmap && !rulesetChanged)
+            {
+                Ruleset.Value = Beatmap.Value.BeatmapInfo.Ruleset;
+
+                // Refresh the carousel to the new ruleset
+                // TODO: `criteriaChanged` will be called via the ruleset bindable callback, so it will replace the loading animation of here.
+                filterDebounce?.Cancel();
+                carousel.Filter(filterControl.CreateCriteria(), true);
+
+                carousel.CurrentBeatmap = currentBeatmap.BeatmapInfo;
+                debounceQueueSelection(currentBeatmap.BeatmapInfo);
+                return true;
+            }
+
             // If all else fails, use the default beatmap.
             Beatmap.SetDefault();
             performDebounceSelection();
@@ -623,11 +658,8 @@ namespace osu.Game.Screens.SelectV2
             return validSelection;
         }
 
-        private bool checkBeatmapValidForSelection(BeatmapInfo beatmap)
+        private bool checkBeatmapValid(BeatmapInfo beatmap)
         {
-            if (!beatmap.AllowGameplayWithRuleset(Ruleset.Value, showConvertedBeatmaps.Value))
-                return false;
-
             if (beatmap.Hidden)
                 return false;
 
@@ -638,6 +670,11 @@ namespace osu.Game.Screens.SelectV2
                 return false;
 
             return true;
+        }
+
+        private bool checkBeatmapValidForSelection(BeatmapInfo beatmap)
+        {
+            return beatmap.AllowGameplayWithRuleset(Ruleset.Value, showConvertedBeatmaps.Value) && checkBeatmapValid(beatmap);
         }
 
         #endregion
