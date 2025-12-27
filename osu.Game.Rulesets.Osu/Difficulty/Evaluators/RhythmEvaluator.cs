@@ -26,8 +26,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (current.BaseObject is Spinner)
                 return 0;
 
-            var currentOsuObject = (OsuDifficultyHitObject)current;
-
             double rhythmComplexitySum = 0;
 
             double deltaDifferenceEpsilon = ((OsuDifficultyHitObject)current).HitWindowGreat * 0.3;
