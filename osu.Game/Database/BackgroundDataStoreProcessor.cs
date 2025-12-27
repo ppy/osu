@@ -22,6 +22,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Performance;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Play;
@@ -184,45 +185,68 @@ namespace osu.Game.Database
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            realmAccess.Write(r =>
+            int chunkSize = 500;
+            var chunks = beatmapIds
+                .Select((item, index) => new { item, index })
+                .GroupBy(x => x.index / chunkSize)
+                .Select(g => g.Select(x => x.item).ToList());
+
+            foreach (var chunk in chunks)
             {
-                foreach (Guid id in beatmapIds)
+                Dictionary<Guid, double> cache = new Dictionary<Guid, double>();
+
+                realmAccess.Run(r =>
                 {
-                    if (notification?.State == ProgressNotificationState.Cancelled)
-                        break;
-
-                    updateNotificationProgress(notification, processedCount, beatmapIds.Count);
-
-                    sleepIfRequired();
-
-                    var beatmap = r.Find<BeatmapInfo>(id);
-                    if (beatmap == null)
+                    foreach (Guid id in chunk)
                     {
-                        ++processedCount;
-                        continue;
+                        if (notification?.State == ProgressNotificationState.Cancelled)
+                            break;
+
+                        updateNotificationProgress(notification, processedCount, beatmapIds.Count);
+
+                        sleepIfRequired();
+
+                        var beatmap = r.Find<BeatmapInfo>(id);
+
+                        if (beatmap == null)
+                        {
+                            ++processedCount;
+                            continue;
+                        }
+
+                        try
+                        {
+                            var working = beatmapManager.GetWorkingBeatmap(beatmap);
+                            var ruleset = getRuleset(working.BeatmapInfo.Ruleset);
+
+                            Debug.Assert(ruleset != null);
+
+                            var calculator = ruleset.CreateDifficultyCalculator(working);
+
+                            cache.Add(id, calculator.Calculate().StarRating);
+                            ++processedCount;
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Log($"Background processing failed on {beatmap}: {e}");
+                            ++failedCount;
+                        }
                     }
+                });
 
-                    try
+                realmAccess.Write(r =>
+                {
+                    foreach (var item in cache)
                     {
-                        var working = beatmapManager.GetWorkingBeatmap(beatmap);
-                        var ruleset = getRuleset(working.BeatmapInfo.Ruleset);
+                        var beatmap = r.Find<BeatmapInfo>(item.Key)!;
 
-                        Debug.Assert(ruleset != null);
-
-                        var calculator = ruleset.CreateDifficultyCalculator(working);
-
-                        double starRating = calculator.Calculate().StarRating;
-                        beatmap.StarRating = starRating;
+                        beatmap.StarRating = item.Value;
                         ((IWorkingBeatmapCache)beatmapManager).Invalidate(beatmap);
-                        ++processedCount;
                     }
-                    catch (Exception e)
-                    {
-                        Logger.Log($"Background processing failed on {beatmap}: {e}");
-                        ++failedCount;
-                    }
-                }
-            });
+                });
+
+                cache.Clear();
+            }
 
             completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
 
@@ -322,33 +346,72 @@ namespace osu.Game.Database
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            realmAccess.Run(r =>
+            int chunkSize = 500;
+            var chunks = beatmapIds
+                .Select((item, index) => new { item, index })
+                .GroupBy(x => x.index / chunkSize)
+                .Select(g => g.Select(x => x.item).ToList());
+
+            foreach (var chunk in chunks)
             {
-                foreach (var id in beatmapIds)
+                Dictionary<Guid, (int EndTimeObjectCount, int TotalObjectCount)> cache = [];
+
+                realmAccess.Run(r =>
                 {
-                    if (notification?.State == ProgressNotificationState.Cancelled)
-                        break;
-
-                    updateNotificationProgress(notification, processedCount, beatmapIds.Count);
-
-                    sleepIfRequired();
-
-                    var beatmap = r.Find<BeatmapInfo>(id);
-                    if (beatmap == null)
-                        continue;
-
-                    try
+                    foreach (Guid id in chunk)
                     {
-                        beatmapUpdater.ProcessObjectCounts(beatmap);
-                        ++processedCount;
+                        if (notification?.State == ProgressNotificationState.Cancelled)
+                            break;
+
+                        updateNotificationProgress(notification, processedCount, beatmapIds.Count);
+
+                        sleepIfRequired();
+
+                        var beatmap = r.Find<BeatmapInfo>(id);
+
+                        if (beatmap == null)
+                        {
+                            ++processedCount;
+                            continue;
+                        }
+
+                        try
+                        {
+                            var workingBeatmapCache = (IWorkingBeatmapCache)beatmapManager;
+                            workingBeatmapCache.Invalidate(beatmap);
+
+                            var working = workingBeatmapCache.GetWorkingBeatmap(beatmap);
+                            var workingBeatmap = working.Beatmap;
+
+                            cache.Add(id, (
+                                workingBeatmap.HitObjects.Count(h => h is IHasDuration),
+                                workingBeatmap.HitObjects.Count
+                            ));
+                            ++processedCount;
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Log($"Background processing failed on {beatmap}: {e}");
+                            ++failedCount;
+                        }
                     }
-                    catch (Exception e)
+                });
+
+                realmAccess.Write(r =>
+                {
+                    foreach (var item in cache)
                     {
-                        Logger.Log($"Background processing failed on {beatmap}: {e}");
-                        ++failedCount;
+                        var beatmap = r.Find<BeatmapInfo>(item.Key)!;
+
+                        beatmap.TotalObjectCount = item.Value.TotalObjectCount;
+                        beatmap.EndTimeObjectCount = item.Value.EndTimeObjectCount;
+
+                        ((IWorkingBeatmapCache)beatmapManager).Invalidate(beatmap);
                     }
-                }
-            });
+                });
+
+                cache.Clear();
+            }
 
             completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
 
@@ -387,46 +450,69 @@ namespace osu.Game.Database
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            // Can't use async overload because we're not on the update thread.
-            // ReSharper disable once MethodHasAsyncOverload
-            realmAccess.Write(r =>
+            int chunkSize = 1000;
+            var chunks = scoreIds
+                .Select((item, index) => new { item, index })
+                .GroupBy(x => x.index / chunkSize)
+                .Select(g => g.Select(x => x.item).ToList());
+
+            foreach (var chunk in chunks)
             {
-                foreach (var id in scoreIds)
+                Dictionary<Guid, string> cache = new Dictionary<Guid, string>();
+
+                // Can't use async overload because we're not on the update thread.
+                // ReSharper disable once MethodHasAsyncOverload
+                realmAccess.Run(r =>
                 {
-                    if (notification?.State == ProgressNotificationState.Cancelled)
-                        break;
-
-                    updateNotificationProgress(notification, processedCount, scoreIds.Count);
-
-                    sleepIfRequired();
-
-                    var score = r.Find<ScoreInfo>(id);
-                    if (score == null)
+                    foreach (Guid id in chunk)
                     {
-                        ++processedCount;
-                        continue;
-                    }
+                        if (notification?.State == ProgressNotificationState.Cancelled)
+                            break;
 
-                    try
-                    {
-                        scoreManager.PopulateMaximumStatistics(score);
+                        updateNotificationProgress(notification, processedCount, scoreIds.Count);
 
-                        score.MaximumStatisticsJson = JsonConvert.SerializeObject(score.MaximumStatistics);
-                        ++processedCount;
-                    }
-                    catch (ObjectDisposedException)
-                    {
-                        throw;
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Log(@$"Failed to populate maximum statistics for {id}: {e}");
+                        sleepIfRequired();
 
-                        score.BackgroundReprocessingFailed = true;
-                        ++failedCount;
+                        var score = r.Find<ScoreInfo>(id);
+
+                        if (score == null)
+                        {
+                            ++processedCount;
+                            continue;
+                        }
+
+                        try
+                        {
+                            scoreManager.PopulateMaximumStatistics(score);
+
+                            cache.Add(id, JsonConvert.SerializeObject(score.MaximumStatistics));
+                            ++processedCount;
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                            throw;
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Log(@$"Failed to populate maximum statistics for {id}: {e}");
+
+                            score.BackgroundReprocessingFailed = true;
+                            ++failedCount;
+                        }
                     }
-                }
-            });
+                });
+
+                realmAccess.Write(r =>
+                {
+                    foreach (var item in cache)
+                    {
+                        var score = r.Find<ScoreInfo>(item.Key)!;
+                        score.MaximumStatisticsJson = item.Value;
+                    }
+                });
+
+                cache.Clear();
+            }
 
             completeNotification(notification, processedCount, scoreIds.Count, failedCount);
 
@@ -462,46 +548,74 @@ namespace osu.Game.Database
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            // Can't use async overload because we're not on the update thread.
-            // ReSharper disable once MethodHasAsyncOverload
-            realmAccess.Write(r =>
+            int chunkSize = 500;
+            var chunks = scoreIds
+                .Select((item, index) => new { item, index })
+                .GroupBy(x => x.index / chunkSize)
+                .Select(g => g.Select(x => x.item).ToList());
+
+            foreach (var chunk in chunks)
             {
-                foreach (var id in scoreIds)
+                Dictionary<Guid, (double Accuracy, ScoreRank Rank, long TotalScore, long TotalScoreWithoutMods)> cache = [];
+
+                // Can't use async overload because we're not on the update thread.
+                // ReSharper disable once MethodHasAsyncOverload
+                realmAccess.Run(r =>
                 {
-                    if (notification?.State == ProgressNotificationState.Cancelled)
-                        break;
-
-                    updateNotificationProgress(notification, processedCount, scoreIds.Count);
-
-                    sleepIfRequired();
-
-                    var score = r.Find<ScoreInfo>(id);
-                    if (score == null)
+                    foreach (Guid id in chunk)
                     {
-                        processedCount++;
-                        continue;
+                        if (notification?.State == ProgressNotificationState.Cancelled)
+                            break;
+
+                        updateNotificationProgress(notification, processedCount, scoreIds.Count);
+
+                        sleepIfRequired();
+
+                        var score = r.Find<ScoreInfo>(id);
+
+                        if (score == null)
+                        {
+                            processedCount++;
+                            continue;
+                        }
+
+                        try
+                        {
+                            StandardisedScoreMigrationTools.UpdateFromLegacy(score, beatmapManager.GetWorkingBeatmap(score.BeatmapInfo));
+
+                            cache.Add(id, (score.Accuracy, score.Rank, score.TotalScore, score.TotalScoreWithoutMods));
+                            ++processedCount;
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                            throw;
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Log($"Failed to convert total score for {id}: {e}");
+
+                            score.BackgroundReprocessingFailed = true;
+                            ++failedCount;
+                        }
                     }
+                });
 
-                    try
+                realmAccess.Write(r =>
+                {
+                    foreach (var item in cache)
                     {
-                        StandardisedScoreMigrationTools.UpdateFromLegacy(score, beatmapManager.GetWorkingBeatmap(score.BeatmapInfo));
+                        var score = r.Find<ScoreInfo>(item.Key)!;
+
+                        score.Accuracy = item.Value.Accuracy;
+                        score.Rank = item.Value.Rank;
+                        score.TotalScore = item.Value.TotalScore;
+                        score.TotalScoreWithoutMods = item.Value.TotalScoreWithoutMods;
                         score.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+                    }
+                });
 
-                        ++processedCount;
-                    }
-                    catch (ObjectDisposedException)
-                    {
-                        throw;
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Log($"Failed to convert total score for {id}: {e}");
-
-                        score.BackgroundReprocessingFailed = true;
-                        ++failedCount;
-                    }
-                }
-            });
+                cache.Clear();
+            }
 
             completeNotification(notification, processedCount, scoreIds.Count, failedCount);
 
@@ -534,46 +648,69 @@ namespace osu.Game.Database
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            // Can't use async overload because we're not on the update thread.
-            // ReSharper disable once MethodHasAsyncOverload
-            realmAccess.Write(r =>
+            int chunkSize = 3000;
+            var chunks = scoreIds
+                .Select((item, index) => new { item, index })
+                .GroupBy(x => x.index / chunkSize)
+                .Select(g => g.Select(x => x.item).ToList());
+
+            foreach (var chunk in chunks)
             {
-                foreach (var id in scoreIds)
+                Dictionary<Guid, ScoreRank> cache = [];
+
+                // Can't use async overload because we're not on the update thread.
+                // ReSharper disable once MethodHasAsyncOverload
+                realmAccess.Run(r =>
                 {
-                    if (notification?.State == ProgressNotificationState.Cancelled)
-                        break;
-
-                    updateNotificationProgress(notification, processedCount, scoreIds.Count);
-
-                    sleepIfRequired();
-
-                    var score = r.Find<ScoreInfo>(id);
-                    if (score == null)
+                    foreach (Guid id in chunk)
                     {
-                        processedCount++;
-                        continue;
+                        if (notification?.State == ProgressNotificationState.Cancelled)
+                            break;
+
+                        updateNotificationProgress(notification, processedCount, scoreIds.Count);
+
+                        sleepIfRequired();
+
+                        var score = r.Find<ScoreInfo>(id);
+
+                        if (score == null)
+                        {
+                            processedCount++;
+                            continue;
+                        }
+
+                        try
+                        {
+                            cache.Add(id, StandardisedScoreMigrationTools.ComputeRank(score));
+                            ++processedCount;
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                            throw;
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Log($"Failed to update rank score {id}: {e}");
+
+                            score.BackgroundReprocessingFailed = true;
+                            ++failedCount;
+                        }
                     }
+                });
 
-                    try
+                realmAccess.Write(r =>
+                {
+                    foreach (var item in cache)
                     {
-                        score.Rank = StandardisedScoreMigrationTools.ComputeRank(score);
+                        var score = r.Find<ScoreInfo>(item.Key)!;
+
+                        score.Rank = item.Value;
                         score.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+                    }
+                });
 
-                        ++processedCount;
-                    }
-                    catch (ObjectDisposedException)
-                    {
-                        throw;
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Log($"Failed to update rank score {id}: {e}");
-
-                        score.BackgroundReprocessingFailed = true;
-                        ++failedCount;
-                    }
-                }
-            });
+                cache.Clear();
+            }
 
             completeNotification(notification, processedCount, scoreIds.Count, failedCount);
 
@@ -629,57 +766,81 @@ namespace osu.Game.Database
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            // Can't use async overload because we're not on the update thread.
-            // ReSharper disable once MethodHasAsyncOverload
-            realmAccess.Write(r =>
+            int chunkSize = 1000;
+            var chunks = beatmapSetIds
+                .Select((item, index) => new { item, index })
+                .GroupBy(x => x.index / chunkSize)
+                .Select(g => g.Select(x => x.item).ToList());
+
+            foreach (var chunk in chunks)
             {
-                foreach (var id in beatmapSetIds)
+                Dictionary<Guid, (DateTimeOffset? DateRanked, DateTimeOffset? DateSubmitted)> cache = [];
+
+                // Can't use async overload because we're not on the update thread.
+                // ReSharper disable once MethodHasAsyncOverload
+                realmAccess.Run(r =>
                 {
-                    if (notification?.State == ProgressNotificationState.Cancelled)
-                        break;
-
-                    updateNotificationProgress(notification, processedCount, beatmapSetIds.Count);
-
-                    sleepIfRequired();
-
-                    try
+                    foreach (var id in chunk)
                     {
-                        var beatmapSet = r.Find<BeatmapSetInfo>(id);
-                        if (beatmapSet == null)
+                        if (notification?.State == ProgressNotificationState.Cancelled)
+                            break;
+
+                        updateNotificationProgress(notification, processedCount, beatmapSetIds.Count);
+
+                        sleepIfRequired();
+
+                        try
                         {
-                            processedCount++;
-                            continue;
+                            var beatmapSet = r.Find<BeatmapSetInfo>(id);
+
+                            if (beatmapSet == null)
+                            {
+                                processedCount++;
+                                continue;
+                            }
+
+                            var beatmap = beatmapSet.Beatmaps.First(b => b.Status >= BeatmapOnlineStatus.Ranked);
+
+                            bool lookupSucceeded = localMetadataSource.TryLookup(beatmap, out var result);
+
+                            if (!lookupSucceeded)
+                            {
+                                Logger.Log($"Could not find {beatmapSet.GetDisplayString()} in local cache while backpopulating missing submission/rank date");
+                                ++failedCount;
+
+                                continue;
+                            }
+
+                            Debug.Assert(result != null);
+
+                            cache.Add(id, (result.DateRanked, result.DateSubmitted));
+                            ++processedCount;
                         }
-
-                        var beatmap = beatmapSet.Beatmaps.First(b => b.Status >= BeatmapOnlineStatus.Ranked);
-
-                        bool lookupSucceeded = localMetadataSource.TryLookup(beatmap, out var result);
-                        if (!lookupSucceeded)
+                        catch (ObjectDisposedException)
                         {
-                            Logger.Log($"Could not find {beatmapSet.GetDisplayString()} in local cache while backpopulating missing submission/rank date");
+                            throw;
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Log($"Failed to update ranked/submitted dates for beatmap set {id}: {e}");
                             ++failedCount;
-
-                            continue;
                         }
-
-                        Debug.Assert(result != null);
-
-                        beatmapSet.DateRanked = result.DateRanked;
-                        beatmapSet.DateSubmitted = result.DateSubmitted;
-
-                        ++processedCount;
                     }
-                    catch (ObjectDisposedException)
+                });
+
+                realmAccess.Write(r =>
+                {
+                    foreach (var item in cache)
                     {
-                        throw;
+                        var beatmapSet = r.Find<BeatmapSetInfo>(item.Key)!;
+
+                        beatmapSet.DateRanked = item.Value.DateRanked;
+                        beatmapSet.DateSubmitted = item.Value.DateSubmitted;
                     }
-                    catch (Exception e)
-                    {
-                        Logger.Log($"Failed to update ranked/submitted dates for beatmap set {id}: {e}");
-                        ++failedCount;
-                    }
-                }
-            });
+                });
+
+                cache.Clear();
+            }
 
             completeNotification(notification, processedCount, beatmapSetIds.Count, failedCount);
 
@@ -737,64 +898,87 @@ namespace osu.Game.Database
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            // Can't use async overload because we're not on the update thread.
-            // ReSharper disable once MethodHasAsyncOverload
-            realmAccess.Write(r =>
+            int chunkSize = 2000;
+            var chunks = beatmapIds
+                .Select((item, index) => new { item, index })
+                .GroupBy(x => x.index / chunkSize)
+                .Select(g => g.Select(x => x.item).ToList());
+
+            foreach (var chunk in chunks)
             {
-                foreach (var id in beatmapIds)
+                Dictionary<Guid, HashSet<string>> cache = [];
+
+                // Can't use async overload because we're not on the update thread.
+                // ReSharper disable once MethodHasAsyncOverload
+                realmAccess.Run(r =>
                 {
-                    if (notification?.State == ProgressNotificationState.Cancelled)
-                        break;
-
-                    updateNotificationProgress(notification, processedCount, beatmapIds.Count);
-
-                    sleepIfRequired();
-
-                    try
+                    foreach (Guid id in chunk)
                     {
-                        var beatmap = r.Find<BeatmapInfo>(id);
-                        if (beatmap == null)
-                        {
-                            processedCount++;
-                            continue;
-                        }
+                        if (notification?.State == ProgressNotificationState.Cancelled)
+                            break;
 
-                        bool lookupSucceeded = localMetadataSource.TryLookup(beatmap, out var result);
+                        updateNotificationProgress(notification, processedCount, beatmapIds.Count);
 
-                        if (!lookupSucceeded)
+                        sleepIfRequired();
+
+                        try
                         {
-                            Logger.Log(@$"Could not find {beatmap.GetDisplayString()} in local cache while backpopulating missing user tags");
+                            var beatmap = r.Find<BeatmapInfo>(id);
+
+                            if (beatmap == null)
+                            {
+                                processedCount++;
+                                continue;
+                            }
+
+                            bool lookupSucceeded = localMetadataSource.TryLookup(beatmap, out var result);
+
+                            if (!lookupSucceeded)
+                            {
+                                Logger.Log(@$"Could not find {beatmap.GetDisplayString()} in local cache while backpopulating missing user tags");
+                                ++processedCount;
+
+                                continue;
+                            }
+
+                            Debug.Assert(result != null);
+
+                            var userTags = result.UserTags.ToHashSet();
+
+                            if (userTags.SetEquals(beatmap.Metadata.UserTags))
+                            {
+                                ++processedCount;
+                                continue;
+                            }
+
+                            cache.Add(id, userTags);
                             ++processedCount;
-
-                            continue;
                         }
-
-                        Debug.Assert(result != null);
-
-                        var userTags = result.UserTags.ToHashSet();
-
-                        if (userTags.SetEquals(beatmap.Metadata.UserTags))
+                        catch (ObjectDisposedException)
                         {
-                            ++processedCount;
-                            continue;
+                            throw;
                         }
+                        catch (Exception e)
+                        {
+                            Logger.Log(@$"Failed to update user tags for beatmap {id}: {e}");
+                            ++failedCount;
+                        }
+                    }
+                });
+
+                realmAccess.Write(r =>
+                {
+                    foreach (var item in cache)
+                    {
+                        var beatmap = r.Find<BeatmapInfo>(item.Key)!;
 
                         beatmap.Metadata.UserTags.Clear();
-                        beatmap.Metadata.UserTags.AddRange(userTags);
+                        beatmap.Metadata.UserTags.AddRange(item.Value);
+                    }
+                });
 
-                        ++processedCount;
-                    }
-                    catch (ObjectDisposedException)
-                    {
-                        throw;
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Log(@$"Failed to update user tags for beatmap {id}: {e}");
-                        ++failedCount;
-                    }
-                }
-            });
+                cache.Clear();
+            }
 
             completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
             config.SetValue(OsuSetting.LastOnlineTagsPopulation, metadataSourceFetchDate);
