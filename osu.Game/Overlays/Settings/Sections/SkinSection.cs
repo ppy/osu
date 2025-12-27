@@ -138,7 +138,12 @@ namespace osu.Game.Overlays.Settings.Sections
 
             dropdownItems.Add(random_skin_info);
 
-            foreach (var skin in sender.Where(s => !s.Protected))
+            foreach (var skin in sender.Where(s => !s.Protected && s.IsFavourite))
+            {
+                dropdownItems.Add(skin.ToLive(realm));
+            }
+
+            foreach (var skin in sender.Where(s => !s.Protected && !s.IsFavourite))
             {
                 dropdownItems.Add(skin.ToLive(realm));
             }
