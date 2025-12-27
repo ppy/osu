@@ -50,6 +50,26 @@ namespace osu.Game.Localisation
         public static LocalisableString BackgroundBlur => new TranslatableString(getKey(@"blur"), @"Background blur");
 
         /// <summary>
+        /// "Background fill mode"
+        /// </summary>
+        public static LocalisableString BackgroundFillMode => new TranslatableString(getKey(@"fill_mode"), @"Background fill mode");
+
+        /// <summary>
+        /// "Stretch to fill"
+        /// </summary>
+        public static LocalisableString StretchToFill => new TranslatableString(getKey(@"stretch_to_fill"), @"Stretch to fill");
+
+        /// <summary>
+        /// "Scale to fill"
+        /// </summary>
+        public static LocalisableString ScaleToFill => new TranslatableString(getKey(@"scale_to_fill"), @"Scale to fill");
+
+        /// <summary>
+        /// "Scale to fit"
+        /// </summary>
+        public static LocalisableString ScaleToFit => new TranslatableString(getKey(@"scale_to_fit"), @"Scale to fit");
+
+        /// <summary>
         /// "Lighten playfield during breaks"
         /// </summary>
         public static LocalisableString LightenDuringBreaks => new TranslatableString(getKey(@"lighten_during_breaks"), @"Lighten playfield during breaks");
