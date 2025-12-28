@@ -30,15 +30,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             var currObj = (OsuDifficultyHitObject)current;
             var nextObj = (OsuDifficultyHitObject)current.Next(0);
-            double constantAngleNerfFactor = getConstantAngleNerfFactor(currObj);
-            double velocity = Math.Max(1, currObj.LazyJumpDistance / currObj.AdjustedDeltaTime); // Only allow velocity to buff
-            double currentVisibleObjectDensity = retrieveCurrentVisibleObjectDensity(totalObjects, currObj, preempt);
 
+            double velocity = Math.Max(1, currObj.LazyJumpDistance / currObj.AdjustedDeltaTime); // Only allow velocity to buff
+
+            double currentVisibleObjectDensity = retrieveCurrentVisibleObjectDensity(totalObjects, currObj, preempt);
             double pastObjectDifficultyInfluence = getPastObjectDifficultyInfluence(currObj, preempt);
+
+            double constantAngleNerfFactor = getConstantAngleNerfFactor(currObj);
 
             double noteDensityDifficulty = calculateDensityDifficulty(nextObj, velocity, constantAngleNerfFactor, pastObjectDifficultyInfluence, currentVisibleObjectDensity);
 
-            double hiddenDifficulty = hidden ? calculateHiddenDifficulty(currObj, pastObjectDifficultyInfluence, currentVisibleObjectDensity, preempt, velocity, clockRate, constantAngleNerfFactor) : 0;
+            double hiddenDifficulty = hidden
+                ? calculateHiddenDifficulty(currObj, pastObjectDifficultyInfluence, currentVisibleObjectDensity, preempt, velocity, clockRate, constantAngleNerfFactor)
+                : 0;
 
             double preemptDifficulty = calculatePreemptDifficulty(velocity, constantAngleNerfFactor, preempt);
 
