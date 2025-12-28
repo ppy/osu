@@ -186,10 +186,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             }
 
             List<double> hitObjectStrainPeaks = combinePeaks(
-                rhythm.ObjectDifficulties,
-                reading.ObjectDifficulties,
-                colour.ObjectDifficulties,
-                stamina.ObjectDifficulties
+                rhythm.GetObjectDifficulties(),
+                reading.GetObjectDifficulties(),
+                colour.GetObjectDifficulties(),
+                stamina.GetObjectDifficulties()
             );
 
             if (hitObjectStrainPeaks.Count == 0)

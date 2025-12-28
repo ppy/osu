@@ -15,15 +15,17 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     /// </remarks>
     public abstract class Skill
     {
-        public IReadOnlyList<double> ObjectDifficulties => objectDifficulties;
-
         /// <summary>
         /// Mods for use in skill calculations.
         /// </summary>
         protected IReadOnlyList<Mod> Mods => mods;
 
+        /// <summary>
+        /// List of calculated per-object difficulties, populated by Process
+        /// </summary>
+        protected readonly List<double> ObjectDifficulties = new List<double>();
+
         private readonly Mod[] mods;
-        private readonly List<double> objectDifficulties = new List<double>();
 
         protected Skill(Mod[] mods)
         {
@@ -37,7 +39,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         public void Process(DifficultyHitObject current)
         {
             double difficultyValue = ProcessInternal(current);
-            objectDifficulties.Add(difficultyValue);
+            ObjectDifficulties.Add(difficultyValue);
         }
 
         protected abstract double ProcessInternal(DifficultyHitObject current);
@@ -46,5 +48,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.
         /// </summary>
         public abstract double DifficultyValue();
+
+        public IReadOnlyList<double> GetObjectDifficulties() => ObjectDifficulties;
     }
 }
