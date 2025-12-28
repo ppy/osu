@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected abstract double ObjectDifficultyOf(DifficultyHitObject current);
 
-        protected override double ProcessInternal(DifficultyHitObject current)
+        protected sealed override double ProcessInternal(DifficultyHitObject current)
             => ObjectDifficultyOf(current);
 
         /// <summary>
