@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Difficulty.Utils;
@@ -38,7 +39,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double strainDecaySpeed(double ms) => Math.Pow(0.3, ms / 1000);
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) =>
-            PowerMean(meanExponent, currentAimStrain * strainDecayAim(time - current.Previous(0).StartTime), currentSpeedStrain * strainDecaySpeed(time - current.Previous(0).StartTime));
+            DifficultyCalculationUtils.Norm(meanExponent,
+                currentAimStrain * strainDecayAim(time - current.Previous(0).StartTime),
+                currentSpeedStrain * strainDecaySpeed(time - current.Previous(0).StartTime));
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
@@ -48,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentSpeedStrain *= strainDecaySpeed(current.DeltaTime);
             currentSpeedStrain += SpeedAimEvaluator.EvaluateDifficultyOf(current, Mods) * skillMultiplierSpeed;
 
-            double totalStrain = PowerMean(meanExponent, currentAimStrain, currentSpeedStrain);
+            double totalStrain = DifficultyCalculationUtils.Norm(meanExponent, currentAimStrain, currentSpeedStrain);
 
             if (current.BaseObject is Slider)
                 sliderStrains.Add(totalStrain);
@@ -67,10 +70,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0;
 
             return sliderStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxSliderStrain * 12.0 - 6.0))));
-        }
-        public static double PowerMean(double exponent, params double[] values)
-        {
-            return Math.Pow(values.Select(x => Math.Pow(x, exponent)).Sum(), 1.0 / exponent);
         }
 
         public double CountTopWeightedSliders(double difficultyValue)
