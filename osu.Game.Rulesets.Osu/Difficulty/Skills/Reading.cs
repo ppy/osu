@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             int idx = 0;
 
-            while (noteDifficulties[idx] == 0)
+            while (noteDifficulties[idx] == 0 && idx < noteDifficulties.Count)
             {
                 idx++;
                 firstDifficultyObject = objectList[idx];
