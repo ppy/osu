@@ -4,13 +4,12 @@
 using System;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 
-namespace osu.Game.Rulesets.Osu.Difficulty.Skills
+namespace osu.Game.Rulesets.Difficulty.Skills
 {
-    public abstract class OsuHarmonicSkill : Skill
+    public abstract class HarmonicSkill : Skill
     {
         /// <summary>
         /// The sum of note weights, calculated during summation.
@@ -30,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double DecayExponent => 0.9;
 
-        protected OsuHarmonicSkill(Mod[] mods)
+        protected HarmonicSkill(Mod[] mods)
             : base(mods)
         {
         }
