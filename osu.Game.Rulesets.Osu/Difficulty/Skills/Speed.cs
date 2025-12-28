@@ -9,19 +9,19 @@ using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 using System.Linq;
+using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
-using osu.Game.Rulesets.Osu.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     /// <summary>
     /// Represents the skill required to press keys with regards to keeping up with the speed at which objects need to be hit.
     /// </summary>
-    public class Speed : OsuStrainSkill
+    public class Speed : HarmonicSkill
     {
-        private double totalMultiplier => 1.0;
+        private double totalMultiplier => 0.91;
         private double burstMultiplier => 1.92;
-        private double streamMultiplier => 0.165;
+        private double streamMultiplier => 0.2;
         private double staminaMultiplier => 0.045;
         private double meanExponent => 1.25;
 
@@ -39,6 +39,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             WithoutStamina = withoutStamina;
         }
 
+        protected override double HarmonicScale => 5;
+        protected override double DecayExponent => 0.9;
+
         private double strainDecayBurst(double ms) => Math.Pow(0.14, ms / 1000);
         private double strainDecayStream(double ms) => Math.Pow(0.01, Math.Pow(ms / 1000, 1.6));
 
@@ -48,18 +51,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return Math.Pow(0.05, Math.Pow(ms * changeFactor / 1000, 3.5));
         }
 
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current)
-        {
-            if (WithoutStamina)
-                return currentBurstStrain * currentRhythm * strainDecayBurst(time - current.Previous(0).StartTime);
-
-            return DifficultyCalculationUtils.PowerMean(meanExponent,
-                currentBurstStrain * currentRhythm * strainDecayBurst(time - current.Previous(0).StartTime),
-                currentStreamStrain * strainDecayStream(time - current.Previous(0).StartTime),
-                currentStaminaStrain * strainDecayStamina(time - current.Previous(0).StartTime, StaminaEvaluator.EvaluateDifficultyOf(current) * staminaMultiplier));
-        }
-
-        protected override double StrainValueAt(DifficultyHitObject current)
+        protected override double ObjectDifficultyOf(DifficultyHitObject current)
         {
             currentBurstStrain *= strainDecayBurst(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
@@ -83,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStaminaStrain *= strainDecayStamina(((OsuDifficultyHitObject)current).AdjustedDeltaTime, staminaValue * staminaMultiplier);
             currentStaminaStrain += staminaValue * staminaMultiplier;
 
-            double totalValue = DifficultyCalculationUtils.PowerMean(meanExponent,
+            double totalValue = DifficultyCalculationUtils.Norm(meanExponent,
                 currentBurstStrain * currentRhythm,
                 currentStreamStrain,
                 currentStaminaStrain);
@@ -107,6 +99,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         public double CountTopWeightedSliders(double difficultyValue)
-            => OsuStrainUtils.CountTopWeightedSliders(sliderStrains, difficultyValue);
+        {
+            if (sliderStrains.Count == 0)
+                return 0;
+
+            if (NoteWeightSum == 0)
+                return 0.0;
+
+            double consistentTopNote = difficultyValue / NoteWeightSum; // What would the top note be if all note values were identical
+
+            if (consistentTopNote == 0)
+                return 0;
+
+            // Use a weighted sum of all notes. Constants are arbitrary and give nice values
+            return sliderStrains.Sum(s => DifficultyCalculationUtils.Logistic(s / consistentTopNote, 0.88, 10, 1.1));
+        }
     }
 }

@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedNotes = speed.RelevantNoteCount();
 
             double aimDifficultStrainCount = aim.CountTopWeightedStrains(aimDifficultyValue);
-            double speedDifficultStrainCount = speed.CountTopWeightedStrains(speedDifficultyValue);
+            double speedDifficultStrainCount = speed.CountTopWeightedObjectDifficulties(speedDifficultyValue);
 
             double aimNoSlidersTopWeightedSliderCount = aimWithoutSliders.CountTopWeightedSliders(aimNoSlidersDifficultyValue);
             double aimNoSlidersDifficultStrainCount = aimWithoutSliders.CountTopWeightedStrains(aimNoSlidersDifficultyValue);
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimRating = osuRatingCalculator.ComputeAimRating(aimDifficultyValue);
             double speedRating = osuRatingCalculator.ComputeSpeedRating(speedDifficultyValue);
 
-            double staminaFactor = speedRating > 0 ? osuRatingCalculator.ComputeSpeedRating(speedNoStaminaDifficultyValue) / speedRating : 1;
+            double staminaFactor = speedRating > 0 ? Math.Min(1, osuRatingCalculator.ComputeSpeedRating(speedNoStaminaDifficultyValue) / speedRating) : 1;
 
             double flashlightRating = 0.0;
 
