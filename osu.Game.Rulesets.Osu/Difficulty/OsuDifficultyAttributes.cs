@@ -91,11 +91,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double MaximumLegacyComboScore { get; set; }
 
         /// <summary>
-        /// The beatmap's drain rate. This doesn't scale with rate-adjusting mods.
-        /// </summary>
-        public double DrainRate { get; set; }
-
-        /// <summary>
         /// The number of hitcircles in the beatmap.
         /// </summary>
         public int HitCircleCount { get; set; }
@@ -155,7 +150,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             LegacyScoreBaseMultiplier = values[ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER];
             MaximumLegacyComboScore = values[ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE];
             StaminaFactor = values[ATTRIB_ID_STAMINA_FACTOR];
-            DrainRate = onlineInfo.DrainRate;
             HitCircleCount = onlineInfo.CircleCount;
             SliderCount = onlineInfo.SliderCount;
             SpinnerCount = onlineInfo.SpinnerCount;
