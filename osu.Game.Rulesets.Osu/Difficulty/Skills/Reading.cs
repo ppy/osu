@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             const double reduced_difficulty_duration = 60 * 1000;
 
-            if (objectList.Count == 0)
+            if (objectList.Count < 2)
                 return 0;
 
             // We take the 2nd note to match `CreateDifficultyHitObjects`
