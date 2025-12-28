@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     /// Used to processes strain values of <see cref="DifficultyHitObject"/>s, keep track of strain levels caused by the processed objects
     /// and to calculate a final difficulty value representing the difficulty of hitting all the processed objects.
     /// </summary>
-    public abstract class StrainSkill : Skill<double>
+    public abstract class StrainSkill : Skill
     {
         /// <summary>
         /// The weight by which each strain value decays.
