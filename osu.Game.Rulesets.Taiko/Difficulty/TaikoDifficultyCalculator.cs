@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
+        protected override ISkill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
             HitWindows hitWindows = new TaikoHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             isConvert = beatmap.BeatmapInfo.Ruleset.OnlineID == 0;
             isRelax = mods.Any(h => h is TaikoModRelax);
 
-            return new Skill[]
+            return new ISkill[]
             {
                 new Rhythm(mods, hitWindows.WindowFor(HitResult.Great) / clockRate),
                 new Reading(mods),
@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return difficultyHitObjects;
         }
 
-        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, ISkill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
                 return new TaikoDifficultyAttributes { Mods = mods };
@@ -186,10 +186,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             }
 
             List<double> hitObjectStrainPeaks = combinePeaks(
-                rhythm.GetObjectStrains().ToList(),
-                reading.GetObjectStrains().ToList(),
-                colour.GetObjectStrains().ToList(),
-                stamina.GetObjectStrains().ToList()
+                rhythm.ObjectDifficulties,
+                reading.ObjectDifficulties,
+                colour.ObjectDifficulties,
+                stamina.ObjectDifficulties
             );
 
             if (hitObjectStrainPeaks.Count == 0)
@@ -211,7 +211,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// <summary>
         /// Combines lists of peak strains from multiple skills into a list of single peak strains for each section.
         /// </summary>
-        private List<double> combinePeaks(List<double> rhythmPeaks, List<double> readingPeaks, List<double> colourPeaks, List<double> staminaPeaks)
+        private List<double> combinePeaks(IReadOnlyList<double> rhythmPeaks, IReadOnlyList<double> readingPeaks, IReadOnlyList<double> colourPeaks, IReadOnlyList<double> staminaPeaks)
         {
             var combinedPeaks = new List<double>();
 
