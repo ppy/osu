@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double minimum_angle_relevancy_time = 2000; // 2 seconds
         private const double maximum_angle_relevancy_time = 200;
 
-        public static double EvaluateDifficultyOf(int totalObjects, DifficultyHitObject current, double clockRate, double preempt, bool hidden)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current, int totalObjects, double clockRate, double preempt, bool hidden)
         {
             if (current.BaseObject is Spinner || current.Index == 0)
                 return 0;

@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             currentDifficulty *= strainDecay(current.DeltaTime);
 
-            currentDifficulty += ReadingEvaluator.EvaluateDifficultyOf(objectList.Count, current, clockRate, preempt, hasHiddenMod) * skillMultiplier;
+            currentDifficulty += ReadingEvaluator.EvaluateDifficultyOf(current, objectList.Count, clockRate, preempt, hasHiddenMod) * skillMultiplier;
 
             return currentDifficulty;
         }
