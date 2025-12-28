@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -332,7 +333,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeReadingValue(OsuDifficultyAttributes attributes)
         {
-            double readingValue = OsuStrainSkill.DifficultyToPerformance(attributes.ReadingDifficulty);
+            double readingValue = HarmonicSkill.DifficultyToPerformance(attributes.ReadingDifficulty);
 
             if (effectiveMissCount > 0)
                 readingValue *= calculateMissPenalty(effectiveMissCount + aimEstimatedSliderBreaks, attributes.ReadingDifficultNoteCount);

@@ -8,6 +8,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
@@ -16,9 +17,8 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
-    public class Reading : Skill
+    public class Reading : HarmonicSkill
     {
-        private readonly List<double> noteDifficulties = new List<double>();
         private readonly IReadOnlyList<HitObject> objectList;
 
         private readonly double clockRate;
@@ -35,53 +35,50 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         private double currentDifficulty;
-        private double noteWeightSum;
 
         private double skillMultiplier => 2.5;
         private double strainDecayBase => 0.8;
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 
-        public override void Process(DifficultyHitObject current)
+        protected override double ObjectDifficultyOf(DifficultyHitObject current)
         {
             currentDifficulty *= strainDecay(current.DeltaTime);
 
             currentDifficulty += ReadingEvaluator.EvaluateDifficultyOf(objectList.Count, current, clockRate, preempt, hasHiddenMod) * skillMultiplier;
 
-            noteDifficulties.Add(currentDifficulty);
+            return currentDifficulty;
         }
 
-        public override double DifficultyValue()
+        protected override void ApplyDifficultyTransformation(double[] difficulties)
         {
+            const double reduced_difficulty_base_line = 0.0; // Assume the first seconds are completely memorised
+
+            if (difficulties.Length == 0)
+                return;
+
+            int reducedNoteCount = calculateReducedNoteCount();
+
+            for (int i = 0; i < Math.Min(difficulties.Length, reducedNoteCount); i++)
+            {
+                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((double)i / reducedNoteCount, 0, 1)));
+                difficulties[i] *= Interpolation.Lerp(reduced_difficulty_base_line, 1.0, scale);
+            }
+        }
+
+        private int calculateReducedNoteCount()
+        {
+            const double reduced_difficulty_duration = 60 * 1000;
+
             if (objectList.Count == 0)
                 return 0;
 
-            if (noteDifficulties.Count == 0)
-                return 0;
+            // We take the 2nd note to match `CreateDifficultyHitObjects`
+            HitObject firstDifficultyObject = objectList[1];
 
-            double difficulty = 0;
+            double reducedDuration = (firstDifficultyObject.StartTime / clockRate) + reduced_difficulty_duration;
 
-            // Notes with 0 difficulty are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
-            // These notes will not contribute to the difficulty.
-            var peaks = noteDifficulties.Where(p => p > 0);
-
-            List<double> notes = peaks.ToList();
-
-            HitObject firstDifficultyObject = objectList[0];
-
-            int idx = 0;
-
-            while (noteDifficulties[idx] == 0 && idx < noteDifficulties.Count)
-            {
-                idx++;
-                firstDifficultyObject = objectList[idx];
-            }
-
-            double reducedDuration = firstDifficultyObject.StartTime / clockRate + 60 * 1000.0; // Start time at first object with difficulty
-
-            const double reduced_base_line = 0.0; // Assume the first seconds are completely memorised
-
-            double reducedNoteCount = 0;
+            int reducedNoteCount = 0;
 
             foreach (var hitObject in objectList)
             {
@@ -91,48 +88,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 reducedNoteCount++;
             }
 
-            for (int i = 0; i < Math.Min(notes.Count, reducedNoteCount); i++)
-            {
-                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp(i / reducedNoteCount, 0, 1)));
-                double mult = Interpolation.Lerp(reduced_base_line, 1.0, scale);
-                notes[i] *= mult;
-            }
-
-            int index = 0;
-
-            foreach (double note in notes.OrderDescending())
-            {
-                // Use a harmonic sum that considers each note of the map according to a predefined weight using arbitrary balancing constants.
-                // https://www.desmos.com/calculator/5eb60faf4c
-                double weight = (1.0 + (1.0 / (1 + index))) / (Math.Pow(index, 0.9) + 1.0 + (1.0 / (1.0 + index)));
-
-                noteWeightSum += weight;
-
-                difficulty += note * weight;
-                index += 1;
-            }
-
-            return difficulty;
+            return reducedNoteCount;
         }
 
-        /// <summary>
-        /// Returns the number of relevant objects weighted against the top note.
-        /// </summary>
-        public double CountTopWeightedNotes(double difficultyValue)
+        public override double CountTopWeightedObjectDifficulties(double difficultyValue)
         {
-            if (noteDifficulties.Count == 0)
+            if (ObjectDifficulties.Count == 0)
                 return 0.0;
 
-            if (noteWeightSum == 0)
+            if (NoteWeightSum == 0)
                 return 0.0;
 
-            double consistentTopNote = difficultyValue / noteWeightSum; // What would the top note be if all note values were identical
+            double consistentTopNote = difficultyValue / NoteWeightSum; // What would the top difficulty be if all object difficulties were identical
 
             if (consistentTopNote == 0)
                 return 0;
 
-            // Use a weighted sum of all notes. Constants are arbitrary and give nice values
-            return noteDifficulties.Sum(s => 1.1 / (1 + Math.Exp(-5 * (s / consistentTopNote - 1.15))));
+            return ObjectDifficulties.Sum(d => DifficultyCalculationUtils.Logistic(d / consistentTopNote, 1.15, 5, 1.1));
         }
     }
 }
