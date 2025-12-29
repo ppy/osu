@@ -195,19 +195,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (osuPrevObj == null || osuNextObj == null)
                 return 0;
 
-            double currDeltaTime = Math.Max(1, DeltaTime);
-            double nextDeltaTime = Math.Max(1, nextObj.DeltaTime);
-
-            double deltaDifference = Math.Abs(nextDeltaTime - currDeltaTime);
-
-            double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
-            double windowRatio = DiffUtils.Pow(Math.Min(1, currDeltaTime / HitWindowGreat), 5);
+            // It's easier to gallop if you have more time between doubles
+            // Get max between next and prev ratio to avoid nerfing triples
+            double speedRatio = Math.Max(getSpeedRatio(osuPrevObj), getSpeedRatio(osuNextObj));
 
             // Can't doubletap if circles don't intersect
-            double distanceFactor = DiffUtils.Pow(DiffUtils.ReverseLerp(LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS), 2);
+            double distanceFactor = Math.Pow(DifficultyCalculationUtils.ReverseLerp(LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS), 2);
 
             // Use HitWindowGreat * 2, because even if you can't get 300 with doubletapping - you still can gallop
-            double windowRatio = Math.Min(1, currDeltaTime / (HitWindowGreat * 2));
+            double windowRatio = Math.Min(1, DeltaTime / (HitWindowGreat * 2));
 
             // Nerf even more if you don't need to gallop anymore
             windowRatio *= Math.Min(windowRatio, 0.5) * 2;
