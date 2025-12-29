@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
@@ -169,7 +168,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private double getSpeedRatio(OsuDifficultyHitObject? other)
         {
-            if (other.IsNull())
+            if (other == null)
                 return 0;
 
             double currDeltaTime = Math.Max(1, DeltaTime);
