@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -10,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
@@ -26,6 +28,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
@@ -44,6 +47,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             [Resolved]
             private BeatmapSetOverlay? beatmapSetOverlay { get; set; }
 
+            [Resolved]
+            private RulesetStore rulesets { get; set; } = null!;
+
             private readonly IBindable<DownloadState> downloadState = new Bindable<DownloadState>();
             private readonly IBindableNumber<double> downloadProgress = new BindableDouble();
             private readonly Bindable<BeatmapSetFavouriteState> favouriteState = new Bindable<BeatmapSetFavouriteState>();
@@ -56,6 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             private FillFlowContainer idleBottomContent = null!;
             private BeatmapCardDownloadProgressBar downloadProgressBar = null!;
             private AvatarOverlay selectionOverlay = null!;
+            private OsuTextFlowContainer beatmapAttributesText = null!;
 
             public CardContentBeatmap(APIBeatmap beatmap, Mod[] mods)
             {
@@ -181,6 +188,28 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                                     }),
                                 }
                             },
+                            new FillFlowContainer
+                            {
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(2),
+                                Children = new Drawable[]
+                                {
+                                    new TopTagPill(beatmap)
+                                    {
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                    },
+                                    beatmapAttributesText = new OsuTextFlowContainer
+                                    {
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        AutoSizeAxes = Axes.Both,
+                                    }
+                                }
+                            },
                             new Container
                             {
                                 Name = @"Bottom content",
@@ -255,13 +284,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                                                                 },
                                                             }
                                                         },
-                                                        new ModFlowDisplay
+                                                        new Container
                                                         {
                                                             AutoSizeAxes = Axes.Both,
-                                                            Scale = new Vector2(0.5f),
-                                                            Margin = new MarginPadding { Left = 5 },
-                                                            Current = { Value = mods }
-                                                        },
+                                                            Alpha = mods.Length > 0 ? 1 : 0,
+                                                            Child = new ModFlowDisplay
+                                                            {
+                                                                AutoSizeAxes = Axes.Both,
+                                                                Scale = new Vector2(0.5f),
+                                                                Margin = new MarginPadding { Left = 5 },
+                                                                Current = { Value = mods },
+                                                            }
+                                                        }
                                                     },
                                                 }
                                             },
@@ -322,6 +356,62 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                         Margin = new MarginPadding { Left = 4 }
                     };
                 }
+
+                bool firstAttribute = true;
+
+                foreach (var attribute in getBeatmapAttributes())
+                {
+                    if (!firstAttribute)
+                    {
+                        beatmapAttributesText.AddText(@" / ", s =>
+                        {
+                            font(s, false);
+                            s.Spacing = new Vector2(-2, 0);
+                        });
+                    }
+
+                    beatmapAttributesText.AddText(attribute.heading, s => font(s, false));
+                    beatmapAttributesText.AddText(@" ", s => font(s, false));
+                    beatmapAttributesText.AddText(attribute.content, s => font(s, true));
+
+                    firstAttribute = false;
+
+                    static void font(SpriteText s, bool bold)
+                        => s.Font = OsuFont.Style.Caption2.With(weight: bold ? FontWeight.Bold : FontWeight.Regular);
+                }
+            }
+
+            private (string heading, string content)[] getBeatmapAttributes()
+            {
+                BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(beatmap.Difficulty);
+                foreach (var mod in mods.OfType<IApplicableToDifficulty>())
+                    mod.ApplyToDifficulty(adjustedDifficulty);
+
+                switch (beatmap.Ruleset.OnlineID)
+                {
+                    default:
+                        return new (string heading, string content)[]
+                        {
+                            ("CS", $"{adjustedDifficulty.CircleSize:0.#}"),
+                            ("AR", $"{adjustedDifficulty.ApproachRate:0.#}"),
+                            ("OD", $"{adjustedDifficulty.OverallDifficulty:0.#}"),
+                        };
+
+                    case 1:
+                    case 3:
+                        return new (string heading, string content)[]
+                        {
+                            ("OD", $"{adjustedDifficulty.OverallDifficulty:0.#}"),
+                            ("HP", $"{adjustedDifficulty.DrainRate:0.#}")
+                        };
+
+                    case 2:
+                        return new (string heading, string content)[]
+                        {
+                            ("CS", $"{adjustedDifficulty.CircleSize:0.#}"),
+                            ("AR", $"{adjustedDifficulty.ApproachRate:0.#}"),
+                        };
+                }
             }
 
             protected override void LoadComplete()
@@ -375,6 +465,45 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
 
                     return items.ToArray();
                 }
+            }
+
+            private partial class TopTagPill : CompositeDrawable, IHasTooltip
+            {
+                private readonly APIBeatmap beatmap;
+
+                public TopTagPill(APIBeatmap beatmap)
+                {
+                    this.beatmap = beatmap;
+
+                    AutoSizeAxes = Axes.Both;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OverlayColourProvider colourProvider)
+                {
+                    InternalChild = new CircularContainer
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Masking = true,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = colourProvider.Background1
+                            },
+                            new OsuSpriteText
+                            {
+                                Padding = new MarginPadding { Vertical = 2, Horizontal = 8 },
+                                Text = beatmap.GetTopUserTags().FirstOrDefault()?.Name ?? string.Empty,
+                                Colour = colourProvider.Content2,
+                                Font = OsuFont.Style.Caption2
+                            }
+                        }
+                    };
+                }
+
+                public LocalisableString TooltipText => string.Join('\n', beatmap.GetTopUserTags().Select(t => t.Name));
             }
         }
     }
