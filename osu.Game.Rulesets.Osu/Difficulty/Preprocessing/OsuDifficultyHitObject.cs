@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -187,19 +188,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (osuPrevObj == null || osuNextObj == null)
                 return 0;
 
-            // Nerf gallopable or doubletappable doubles.
-            double currDeltaTime = Math.Max(1, DeltaTime);
-
             // It's easier to gallop if you have more time between doubles
             // Get max between next and prev ratio to avoid nerfing triples
             double speedRatio = Math.Max(getSpeedRatio(osuPrevObj), getSpeedRatio(osuNextObj));
 
             // Can't doubletap if circles don't intersect
-            double normalizedDistance = Math.Min(1, LazyJumpDistance / (NORMALISED_RADIUS * 2));
-            double distanceFactor = normalizedDistance < 0.5 ? 1.0 : 1 - Math.Pow((normalizedDistance - 0.5) / 0.5, 0.5);
+            double distanceFactor = Math.Pow(DifficultyCalculationUtils.ReverseLerp(LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS), 2);
 
             // Use HitWindowGreat * 2, because even if you can't get 300 with doubletapping - you still can gallop
-            double windowRatio = Math.Min(1, currDeltaTime / (HitWindowGreat * 2));
+            double windowRatio = Math.Min(1, DeltaTime / (HitWindowGreat * 2));
 
             // Nerf even more if you don't need to gallop anymore
             windowRatio *= Math.Min(windowRatio, 0.5) * 2;
