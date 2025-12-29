@@ -224,21 +224,27 @@ namespace osu.Game.Overlays
             };
         }
 
-        private double? lastSeekTime;
+        private double? lastSeekGameTime;
+        private double? lastSeekAudioTargetTime;
 
         private void onSeek(double progress)
         {
-            if (!musicController.IsPlaying || lastSeekTime == null || Time.Current - lastSeekTime > TRACK_DRAG_SEEK_DEBOUNCE)
+            if (!musicController.IsPlaying || lastSeekGameTime == null || Time.Current - lastSeekGameTime > TRACK_DRAG_SEEK_DEBOUNCE)
             {
                 musicController.SeekTo(progress);
-                lastSeekTime = Time.Current;
+                lastSeekGameTime = Time.Current;
+                lastSeekAudioTargetTime = progress;
             }
         }
 
         private void onCommit(double progress)
         {
-            musicController.SeekTo(progress);
-            lastSeekTime = null;
+            // Avoid a second seek to the same location, which could occur when using keyboard navigation from `OnSeek` and subsequent `OnCommit` calls.
+            if (progress != lastSeekAudioTargetTime)
+                musicController.SeekTo(progress);
+
+            lastSeekGameTime = null;
+            lastSeekAudioTargetTime = null;
         }
 
         private void togglePlaylist()
@@ -518,6 +524,8 @@ namespace osu.Game.Overlays
 
         private partial class HoverableProgressBar : ProgressBar
         {
+            public override bool HandleNonPositionalInput => IsHovered;
+
             public HoverableProgressBar()
                 : base(true)
             {
