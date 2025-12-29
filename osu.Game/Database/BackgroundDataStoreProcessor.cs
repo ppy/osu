@@ -377,6 +377,7 @@ namespace osu.Game.Database
 
                         try
                         {
+                            // Moved from BeatmapUpdater.ProcessObjectCounts to reduce writes to disk
                             var workingBeatmapCache = (IWorkingBeatmapCache)beatmapManager;
                             workingBeatmapCache.Invalidate(beatmap);
 
@@ -473,7 +474,7 @@ namespace osu.Game.Database
 
                         sleepIfRequired();
 
-                        var score = r.Find<ScoreInfo>(id);
+                        var score = r.Find<ScoreInfo>(id)?.Detach();
 
                         if (score == null)
                         {
@@ -571,7 +572,7 @@ namespace osu.Game.Database
 
                         sleepIfRequired();
 
-                        var score = r.Find<ScoreInfo>(id);
+                        var score = r.Find<ScoreInfo>(id)?.Detach();
 
                         if (score == null)
                         {
