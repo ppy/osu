@@ -199,15 +199,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double distanceFactor = normalizedDistance < 0.5 ? 1.0 : 1 - Math.Pow((normalizedDistance - 0.5) / 0.5, 0.5);
 
             // Use HitWindowGreat * 2, because even if you can't get 300 with doubletapping - you still can gallop
-            const double power = 2;
-            double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / (HitWindowGreat * 2)), power);
+            double windowRatio = Math.Min(1, currDeltaTime / (HitWindowGreat * 2));
 
             // Nerf even more if you don't need to gallop anymore
-            double halfPoint = Math.Pow(0.5, power);
-            if (windowRatio < halfPoint)
-                windowRatio *= windowRatio / halfPoint;
+            windowRatio *= Math.Min(windowRatio, 0.5) * 2;
 
-            return 1 - Math.Pow(speedRatio, distanceFactor * (1 - windowRatio));
+            return 1 - Math.Pow(speedRatio, distanceFactor * (1 - Math.Pow(windowRatio, 2)));
         }
 
         private void setDistances(double clockRate)
