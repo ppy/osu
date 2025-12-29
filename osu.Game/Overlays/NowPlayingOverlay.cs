@@ -29,7 +29,7 @@ namespace osu.Game.Overlays
 {
     public partial class NowPlayingOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
-        public const double TRACK_DRAG_SEEK_DEBOUNCE = 200;
+        public const double TRACK_DRAG_SEEK_DEBOUNCE = 40;
 
         public IconUsage Icon => OsuIcon.Music;
         public LocalisableString Title => NowPlayingStrings.HeaderTitle;
