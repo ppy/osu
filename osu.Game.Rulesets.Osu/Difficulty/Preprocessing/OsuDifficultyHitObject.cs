@@ -178,7 +178,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double getSpeedRatio(OsuDifficultyHitObject other)
             {
                 double deltaDifference = Math.Abs(DeltaTime - other.DeltaTime);
-                return DeltaTime / Math.Max(deltaDifference, 1);
+                return DeltaTime / Math.Max(Math.Max(DeltaTime, deltaDifference), 1);
             }
 
             // It's easier to gallop if you have more time between doubles
