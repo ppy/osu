@@ -55,14 +55,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public double RelevantNoteCount()
         {
-            if (ObjectStrains.Count == 0)
+            if (ObjectDifficulties.Count == 0)
                 return 0;
 
-            double maxStrain = ObjectStrains.Max();
+            double maxStrain = ObjectDifficulties.Max();
             if (maxStrain == 0)
                 return 0;
 
-            return ObjectStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxStrain * 12.0 - 6.0))));
+            return ObjectDifficulties.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxStrain * 12.0 - 6.0))));
         }
 
         public double CountTopWeightedSliders(double difficultyValue)
