@@ -61,21 +61,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                     {
                         new Container
                         {
+                            RelativeSizeAxes = Axes.Both,
                             Masking = true,
                             CornerRadius = BeatmapCard.CORNER_RADIUS,
                             CornerExponent = 10,
-                            RelativeSizeAxes = Axes.Both,
-                            Children = new[]
+                            Child = lighting = new Box
                             {
-                                Content,
-                                lighting = new Box
-                                {
-                                    Blending = BlendingParameters.Additive,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Alpha = 0,
-                                },
+                                Blending = BlendingParameters.Additive,
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0,
                             }
                         },
+                        Content,
                         border = new Container
                         {
                             Alpha = 0,

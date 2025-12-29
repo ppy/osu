@@ -51,7 +51,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
             AddInternal(new Container
             {
-                Padding = new MarginPadding(2),
+                Padding = new MarginPadding(isOwnUser ? 2 : 0),
                 RelativeSizeAxes = Axes.Both,
                 Child = new CircularContainer
                 {

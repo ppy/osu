@@ -3,9 +3,11 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -29,37 +31,44 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             [BackgroundDependencyLoader]
             private void load()
             {
-                InternalChildren = new Drawable[]
+                InternalChild = new Container
                 {
-                    new Box
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    CornerRadius = BeatmapCard.CORNER_RADIUS,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Dark5,
-                    },
-                    new TrianglesV2
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0.1f,
-                    },
-                    Label = new OsuSpriteText
-                    {
-                        Y = 20,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Text = "Random"
-                    },
-                    Dice = new SpriteIcon
-                    {
-                        Y = -10,
-                        Size = new Vector2(28),
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Icon = randomDiceIcon(),
-                    },
-                    selectionOverlay = new AvatarOverlay
-                    {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colourProvider.Dark5,
+                        },
+                        new TrianglesV2
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0.1f,
+                        },
+                        Label = new OsuSpriteText
+                        {
+                            Y = 20,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Text = "Random"
+                        },
+                        Dice = new SpriteIcon
+                        {
+                            Y = -10,
+                            Size = new Vector2(28),
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Icon = randomDiceIcon(),
+                        },
+                        selectionOverlay = new AvatarOverlay
+                        {
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            Margin = new MarginPadding { Right = 5 }
+                        }
                     }
                 };
 
