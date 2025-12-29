@@ -6,7 +6,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Configuration
 {
-    public enum BackgroundFillMode
+    public enum BackgroundScaleMode
     {
         [LocalisableDescription(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.ScaleToFill))]
         ScaleToFill,

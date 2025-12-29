@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         private readonly string fallbackTextureName;
 
-        private Bindable<BackgroundFillMode> fillMode { get; set; }
+        private Bindable<BackgroundScaleMode> scaleMode { get; set; }
 
         public BeatmapBackground(WorkingBeatmap beatmap, string fallbackTextureName = @"Backgrounds/bg1")
         {
@@ -30,7 +30,7 @@ namespace osu.Game.Graphics.Backgrounds
         [BackgroundDependencyLoader]
         private void load(LargeTextureStore textures, OsuConfigManager config)
         {
-            fillMode = config.GetBindable<BackgroundFillMode>(OsuSetting.BackgroundFillMode);
+            scaleMode = config.GetBindable<BackgroundScaleMode>(OsuSetting.BackgroundScaleMode);
 
             Sprite.Texture = Beatmap?.GetBackground() ?? textures.Get(fallbackTextureName);
         }
@@ -39,23 +39,23 @@ namespace osu.Game.Graphics.Backgrounds
         {
             base.LoadComplete();
 
-            fillMode.BindValueChanged(_ => updateBackgroundFillMode(), true);
+            scaleMode.BindValueChanged(_ => updateBackgroundScaleMode(), true);
         }
 
-        private void updateBackgroundFillMode()
+        private void updateBackgroundScaleMode()
         {
-            switch (fillMode.Value)
+            switch (scaleMode.Value)
             {
-                case BackgroundFillMode.ScaleToFill:
+                case BackgroundScaleMode.ScaleToFill:
                     Sprite.FillMode = FillMode.Fill;
                     break;
 
-                case BackgroundFillMode.ScaleToFit:
+                case BackgroundScaleMode.ScaleToFit:
                     Sprite.FillMode = FillMode.Fit;
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(fillMode), fillMode, null);
+                    throw new ArgumentOutOfRangeException(nameof(scaleMode), scaleMode, null);
             }
 
             BufferedContainer?.ForceRedraw();

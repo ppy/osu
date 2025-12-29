@@ -32,11 +32,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },
-                new SettingsEnumDropdown<BackgroundFillMode>
+                new SettingsEnumDropdown<BackgroundScaleMode>
                 {
-                    ClassicDefault = BackgroundFillMode.ScaleToFit,
+                    ClassicDefault = BackgroundScaleMode.ScaleToFit,
                     LabelText = GameplaySettingsStrings.BackgroundScaleMode,
-                    Current = config.GetBindable<BackgroundFillMode>(OsuSetting.BackgroundFillMode),
+                    Current = config.GetBindable<BackgroundScaleMode>(OsuSetting.BackgroundScaleMode),
                 },
                 new SettingsCheckbox
                 {
