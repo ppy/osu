@@ -63,6 +63,8 @@ namespace osu.Game.Graphics.Backgrounds
                 default:
                     throw new ArgumentOutOfRangeException(nameof(fillMode), fillMode, null);
             }
+
+            BufferedContainer?.ForceRedraw();
         }
 
         public override bool Equals(Background other)
