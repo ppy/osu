@@ -179,14 +179,23 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [Test]
         public void TestApplyBPMQueries()
         {
+            const string query = "bpm=200";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(filterCriteria.BPM.Min, 199.5d);
+            Assert.AreEqual(filterCriteria.BPM.Max, 200.5d);
+        }
+
+        [Test]
+        public void TestApplyBPMRangeQueries()
+        {
             const string query = "bpm>:200 gotta go fast";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("gotta go fast", filterCriteria.SearchText.Trim());
             Assert.AreEqual(3, filterCriteria.SearchTerms.Length);
             Assert.IsNotNull(filterCriteria.BPM.Min);
-            Assert.Greater(filterCriteria.BPM.Min, 199.99d);
-            Assert.Less(filterCriteria.BPM.Min, 200.00d);
+            Assert.AreEqual(filterCriteria.BPM.Min, 199.5d);
             Assert.IsNull(filterCriteria.BPM.Max);
         }
 

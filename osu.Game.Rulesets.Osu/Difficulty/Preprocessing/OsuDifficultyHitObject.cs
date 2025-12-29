@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
@@ -164,6 +165,50 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             return Math.Clamp((time - fadeInStartTime) / fadeInDuration, 0.0, 1.0);
+        }
+
+        private double getSpeedRatio(OsuDifficultyHitObject? other)
+        {
+            if (other.IsNull())
+                return 0;
+
+            double currDeltaTime = Math.Max(1, DeltaTime);
+            double otherDeltaTime = Math.Max(1, other.DeltaTime);
+
+            double deltaDifference = Math.Abs(currDeltaTime - otherDeltaTime);
+
+            return currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
+        }
+
+        /// <summary>
+        /// Returns how possible is it to doubletap this object together with the next one and get perfect judgement in range from 0 to 1
+        /// </summary>
+        public double GetDoubletapness(OsuDifficultyHitObject? osuPrevObj, OsuDifficultyHitObject? osuNextObj)
+        {
+            if (osuNextObj == null)
+                return 0;
+
+            // Nerf gallopable or doubletappable doubles.
+            double currDeltaTime = Math.Max(1, DeltaTime);
+
+            // It's easier to gallop if you have more time between doubles
+            // Get max between next and prev ratio to avoid nerfing triples
+            double speedRatio = Math.Max(getSpeedRatio(osuPrevObj), getSpeedRatio(osuNextObj));
+
+            // Can't doubletap if circles don't intersect
+            double normalizedDistance = Math.Min(1, LazyJumpDistance / (NORMALISED_RADIUS * 2));
+            double distanceFactor = normalizedDistance < 0.5 ? 1.0 : 1 - Math.Pow((normalizedDistance - 0.5) / 0.5, 0.5);
+
+            // Use HitWindowGreat * 2, because even if you can't get 300 with doubletapping - you still can gallop
+            const double power = 2;
+            double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / (HitWindowGreat * 2)), power);
+
+            // Nerf even more if you don't need to gallop anymore
+            double halfPoint = Math.Pow(0.5, power);
+            if (windowRatio < halfPoint)
+                windowRatio *= windowRatio / halfPoint;
+
+            return Math.Pow(speedRatio, distanceFactor * (1 - windowRatio));
         }
 
         private void setDistances(double clockRate)
