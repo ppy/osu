@@ -174,6 +174,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             return Math.Clamp((time - fadeInStartTime) / fadeInDuration, 0.0, 1.0);
         }
 
+        private double getSpeedRatio(OsuDifficultyHitObject? other)
+        {
+            if (other == null)
+                return 0;
+
+            double currDeltaTime = Math.Max(1, DeltaTime);
+            double otherDeltaTime = Math.Max(1, other.DeltaTime);
+
+            double deltaDifference = Math.Abs(currDeltaTime - otherDeltaTime);
+
+            return currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
+        }
+
         /// <summary>
         /// Returns how possible is it to doubletap this object together with the next one and get perfect judgement in range from 0 to 1
         /// </summary>
