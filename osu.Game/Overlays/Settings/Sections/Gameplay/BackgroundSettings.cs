@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 new SettingsEnumDropdown<BackgroundFillMode>
                 {
                     ClassicDefault = BackgroundFillMode.ScaleToFit,
-                    LabelText = GameplaySettingsStrings.BackgroundFillMode,
+                    LabelText = GameplaySettingsStrings.BackgroundScaleMode,
                     Current = config.GetBindable<BackgroundFillMode>(OsuSetting.BackgroundFillMode),
                 },
                 new SettingsCheckbox
