@@ -192,7 +192,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double CalculateDoubleTapFeasibility(OsuDifficultyHitObject? nextObj)
         {
-            if (nextObj == null) return 0;
+            if (osuPrevObj == null || osuNextObj == null)
+                return 0;
 
             double currDeltaTime = Math.Max(1, DeltaTime);
             double nextDeltaTime = Math.Max(1, nextObj.DeltaTime);
