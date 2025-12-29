@@ -184,7 +184,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double GetDoubletapness(OsuDifficultyHitObject? osuPrevObj, OsuDifficultyHitObject? osuNextObj)
         {
-            if (osuNextObj == null)
+            if (osuPrevObj == null || osuNextObj == null)
                 return 0;
 
             // Nerf gallopable or doubletappable doubles.
