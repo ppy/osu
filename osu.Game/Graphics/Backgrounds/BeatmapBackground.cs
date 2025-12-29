@@ -32,8 +32,6 @@ namespace osu.Game.Graphics.Backgrounds
         {
             fillMode = config.GetBindable<BackgroundFillMode>(OsuSetting.BackgroundFillMode);
 
-            updateBackgroundFillMode();
-
             Sprite.Texture = Beatmap?.GetBackground() ?? textures.Get(fallbackTextureName);
         }
 
@@ -41,7 +39,7 @@ namespace osu.Game.Graphics.Backgrounds
         {
             base.LoadComplete();
 
-            fillMode.ValueChanged += _ => updateBackgroundFillMode();
+            fillMode.BindValueChanged(_ => updateBackgroundFillMode(), true);
         }
 
         private void updateBackgroundFillMode()
