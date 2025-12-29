@@ -75,7 +75,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 FillFlowContainer leftIconArea;
                 Container explicitBadgeArea;
 
-                InternalChildren = new Drawable[]
+                InternalChildren = new[]
                 {
                     new Container
                     {
