@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void updateUserTags()
         {
-            userTags.Metadata = Beatmap.Value.GetTopUserTags().Select(t => t.Tag.Name).ToArray();
+            userTags.Metadata = Beatmap.Value?.GetTopUserTags().Select(t => t.Tag.Name).ToArray();
         }
 
         [BackgroundDependencyLoader]
