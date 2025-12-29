@@ -24,7 +24,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         private readonly string textureName;
 
-        protected BufferedContainer BufferedContainer;
+        protected BufferedContainer BufferedContainer { get; private set; }
 
         public Background(string textureName = @"")
         {
