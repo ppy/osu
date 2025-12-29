@@ -55,6 +55,11 @@ namespace osu.Game.Tests.Visual.Matchmaking
                     new APIBeatmapTag { TagId = 23, VoteCount = 5 },
                 ];
 
+                beatmap.BeatmapSet!.HasExplicitContent = true;
+                beatmap.BeatmapSet!.HasVideo = true;
+                beatmap.BeatmapSet!.HasStoryboard = true;
+                beatmap.BeatmapSet.FeaturedInSpotlight = true;
+                beatmap.BeatmapSet.TrackId = 1;
                 beatmap.BeatmapSet!.RelatedTags =
                 [
                     new APITag
@@ -127,6 +132,12 @@ namespace osu.Game.Tests.Visual.Matchmaking
                     }
                 };
             });
+
+            AddStep("add peppy", () => panel!.AddUser(new APIUser
+            {
+                Id = 2,
+                Username = "peppy",
+            }));
 
             AddToggleStep("allow selection", value => panel!.AllowSelection = value);
 
