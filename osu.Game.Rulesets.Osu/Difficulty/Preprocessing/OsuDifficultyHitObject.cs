@@ -208,7 +208,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (windowRatio < halfPoint)
                 windowRatio *= windowRatio / halfPoint;
 
-            return Math.Pow(speedRatio, distanceFactor * (1 - windowRatio));
+            return 1 - Math.Pow(speedRatio, distanceFactor * (1 - windowRatio));
         }
 
         private void setDistances(double clockRate)

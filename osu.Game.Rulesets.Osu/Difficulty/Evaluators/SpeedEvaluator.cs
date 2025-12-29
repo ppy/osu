@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var osuNextObj = (OsuDifficultyHitObject?)osuCurrObj.Next(0);
 
             double strainTime = osuCurrObj.AdjustedDeltaTime;
-            double doubletapness = osuCurrObj.GetDoubletapness(osuPrevObj, osuNextObj);
+            double doubletapness = 1 - osuCurrObj.GetDoubletapness(osuPrevObj, osuNextObj);
 
             // Cap deltatime to the OD 300 hitwindow.
             // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
