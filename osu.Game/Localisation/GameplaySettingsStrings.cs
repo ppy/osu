@@ -65,9 +65,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ScaleToFill => new TranslatableString(getKey(@"scale_to_fill"), @"Scale to fill");
 
         /// <summary>
-        /// "Scale to fit"
+        /// "Scale to fit (letterbox)"
         /// </summary>
-        public static LocalisableString ScaleToFit => new TranslatableString(getKey(@"scale_to_fit"), @"Scale to fit");
+        public static LocalisableString ScaleToFit => new TranslatableString(getKey(@"scale_to_fit"), @"Scale to fit (letterbox)");
 
         /// <summary>
         /// "Lighten playfield during breaks"

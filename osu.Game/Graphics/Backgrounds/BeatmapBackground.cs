@@ -48,10 +48,6 @@ namespace osu.Game.Graphics.Backgrounds
         {
             switch (fillMode.Value)
             {
-                case BackgroundFillMode.StretchToFill:
-                    Sprite.FillMode = FillMode.Stretch;
-                    break;
-
                 case BackgroundFillMode.ScaleToFill:
                     Sprite.FillMode = FillMode.Fill;
                     break;

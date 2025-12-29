@@ -8,9 +8,6 @@ namespace osu.Game.Configuration
 {
     public enum BackgroundFillMode
     {
-        [LocalisableDescription(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.StretchToFill))]
-        StretchToFill,
-
         [LocalisableDescription(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.ScaleToFill))]
         ScaleToFill,
 
