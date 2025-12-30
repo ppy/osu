@@ -189,12 +189,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double distanceFactor = Math.Pow(DifficultyCalculationUtils.ReverseLerp(LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS), 2);
 
             // Use HitWindowGreat * 2, because even if you can't get 300 with doubletapping - you still can gallop
-            double windowRatio = Math.Min(1, DeltaTime / (HitWindowGreat * 2));
+            double windowRatio = Math.Min(DeltaTime / (HitWindowGreat * 2), 1);
 
-            // Nerf even more if you don't need to gallop anymore
-            windowRatio *= Math.Min(windowRatio, 0.5) * 2;
+            // Nerf even more if you can straight up doubletap
+            windowRatio *= Math.Min(Math.Pow(DeltaTime / HitWindowGreat, 2), 1);
 
-            return 1 - Math.Pow(speedRatio, distanceFactor * (1 - Math.Pow(windowRatio, 2)));
+            return 1 - Math.Pow(speedRatio, distanceFactor * (1 - windowRatio));
         }
 
         private void setDistances(double clockRate)
