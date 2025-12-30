@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -24,6 +25,8 @@ namespace osu.Game.Screens.SelectV2
         public partial class SpreadDisplay : OsuAnimatedButton
         {
             public Bindable<BeatmapSetInfo?> BeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
+            public Bindable<HashSet<BeatmapInfo>?> VisibleBeatmaps { get; } = new Bindable<HashSet<BeatmapInfo>?>();
+
             public BindableBool Expanded { get; } = new BindableBool();
 
             private readonly Bindable<BeatmapSetInfo?> scopedBeatmapSet = new Bindable<BeatmapSetInfo?>();
@@ -67,7 +70,7 @@ namespace osu.Game.Screens.SelectV2
                             AutoSizeAxes = Axes.X,
                             RelativeSizeAxes = Axes.Y,
                             Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(2),
+                            Spacing = new Vector2(1),
                         },
                         countText = new OsuSpriteText
                         {
@@ -97,6 +100,7 @@ namespace osu.Game.Screens.SelectV2
                 base.LoadComplete();
 
                 BeatmapSet.BindValueChanged(_ => updateBeatmapSet());
+                VisibleBeatmaps.BindValueChanged(_ => updateBeatmapSet());
                 showConvertedBeatmaps.BindValueChanged(_ => updateBeatmapSet(), true);
                 Expanded.BindValueChanged(_ => updateEnabled());
                 scopedBeatmapSet.BindValueChanged(_ => updateEnabled(), true);
@@ -114,30 +118,31 @@ namespace osu.Game.Screens.SelectV2
 
                 flow.Clear();
 
-                var starDifficulties = BeatmapSet.Value.Beatmaps
-                                                 .Where(b => b.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value))
-                                                 .OrderBy(b => b.Ruleset.OnlineID)
-                                                 .ThenBy(b => b.StarRating)
-                                                 .Select(b => b.StarRating)
-                                                 .ToList();
-                this.FadeTo(starDifficulties.Count > 0 ? 1 : 0, transition_duration, Easing.OutQuint);
+                var beatmaps = BeatmapSet.Value.Beatmaps
+                                         .Where(b => b.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value))
+                                         .OrderBy(b => b.Ruleset.OnlineID)
+                                         .ThenBy(b => b.StarRating)
+                                         .ToList();
+                this.FadeTo(beatmaps.Count > 0 ? 1 : 0, transition_duration, Easing.OutQuint);
 
-                if (starDifficulties.Count == 0)
+                if (beatmaps.Count == 0)
                     return;
 
                 // TODO: figure overflow later
 
-                foreach (double starDifficulty in starDifficulties)
+                foreach (var beatmap in beatmaps)
                 {
+                    bool visible = VisibleBeatmaps.Value?.Contains(beatmap) != false;
+
                     var circle = new Circle
                     {
-                        Size = new Vector2(5, 10),
+                        Size = visible ? new Vector2(7, 12) : new Vector2(5, 10),
+                        Alpha = visible ? 1 : 0.5f,
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Colour = colours.ForStarDifficulty(starDifficulty)
+                        Colour = colours.ForStarDifficulty(beatmap.StarRating)
                     };
                     flow.Add(circle);
-                    flow.SetLayoutPosition(circle, (float)starDifficulty);
                 }
 
                 Action = () => scopedBeatmapSet.Value = BeatmapSet.Value;
