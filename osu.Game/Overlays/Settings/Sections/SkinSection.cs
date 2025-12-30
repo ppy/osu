@@ -165,7 +165,32 @@ namespace osu.Game.Overlays.Settings.Sections
 
             private partial class SkinDropdownControl : DropdownControl
             {
-                protected override DropdownMenu CreateMenu() => new SkinDropdownMenu();
+
+                private SkinDropdownMenu? skinMenu;
+
+                protected override void LoadComplete()
+                {
+                    base.LoadComplete();
+
+                    if (skinMenu != null)
+                        skinMenu.StateChanged += onMenuStateChanged;
+                }
+
+                protected override void Dispose(bool isDisposing)
+                {
+                    if (skinMenu != null)
+                        skinMenu.StateChanged -= onMenuStateChanged;
+
+                    base.Dispose(isDisposing);
+                }
+
+                private void onMenuStateChanged(MenuState state)
+                {
+                    if (state == MenuState.Closed)
+                        skinMenu?.CommitFavouriteChanges();
+                }
+
+                protected override DropdownMenu CreateMenu() => skinMenu = new SkinDropdownMenu();
 
                 private partial class SkinDropdownMenu : OsuDropdownMenu
                 {
@@ -177,6 +202,31 @@ namespace osu.Game.Overlays.Settings.Sections
                         SelectionColour = colourProvider?.Background3 ?? colours.PinkDarker.Opacity(0.5f);
 
                         MaxHeight = 200;
+                    }
+
+                    [Resolved]
+                    private RealmAccess realm { get; set; } = null!;
+                    private readonly Dictionary<Guid, bool> pendingFavouriteChanges = new();
+
+
+                    public void TrackFavouriteChange(Guid skinID, bool isFavourite)
+                    {
+                        pendingFavouriteChanges[skinID] = isFavourite;
+                    }
+
+                    public void CommitFavouriteChanges()
+                    {
+                        realm.Write(r =>
+                        {
+                            foreach (var (skinID, isFavourite) in pendingFavouriteChanges)
+                            {
+                                var skin = r.All<SkinInfo>().FirstOrDefault(s => s.ID == skinID);
+                                if (skin != null)
+                                    skin.IsFavourite = isFavourite;
+                            }
+                        });
+
+                        pendingFavouriteChanges.Clear();
                     }
 
                     protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableSkinDropdownMenuItem(item)
@@ -193,10 +243,7 @@ namespace osu.Game.Overlays.Settings.Sections
                             Foreground.Padding = new MarginPadding(2);
                             Foreground.AutoSizeAxes = Axes.Y;
                             Foreground.RelativeSizeAxes = Axes.X;
-
                             Masking = true;
-
-                            // This was "corner_radius", but now it's hard-coded here due to the private const in the parent class
                             CornerRadius = 5;
 
                             if (item is DropdownMenuItem<Live<SkinInfo>> skinItem)
@@ -225,13 +272,15 @@ namespace osu.Game.Overlays.Settings.Sections
 
                         public partial class StarButton : SpriteIcon
                         {
+                            // todo:
+                            //  Touchscreen/mobile support
+                            //      Slide to reveal instead of permanently visible star?
+
                             public bool IsFavourite;
                             public SkinInfo? SkinData;
+                            private SkinDropdownMenu? menu;
                             private bool isStarHovered { get; set; }
                             private OverlayColourProvider? colourProvider;
-
-                            [Resolved]
-                            private RealmAccess realm { get; set; } = null!;
 
                             [BackgroundDependencyLoader(true)]
                             private void load(OverlayColourProvider? colourProvider, RealmAccess realm)
@@ -248,6 +297,12 @@ namespace osu.Game.Overlays.Settings.Sections
                                     X = Content.StarOffset;
                                     changeStarButtonState(IsFavourite);
                                 }
+                            }
+
+                            protected override void LoadComplete()
+                            {
+                                menu = this.FindClosestParent<SkinDropdownMenu>();
+                                base.LoadComplete();
                             }
 
                             private void changeStarButtonState(bool currentState)
@@ -271,26 +326,16 @@ namespace osu.Game.Overlays.Settings.Sections
                                 }
                             }
 
-                            // todo:
-                            //      Touchscreen/mobile support
-                            //          Slide to reveal instead of permanently visible star?
-                            //      Realm changes are causing a re-render. This instantly refreshes the list, which at this point I don't even know whether is a good or bad UX. Instant change -> good, but scrolls to the top so kinda bad too.
-                            //      Fix warnings
-
                             public override bool ChangeFocusOnClick => false;
 
                             protected override bool OnClick(ClickEvent e)
                             {
                                 IsFavourite = !IsFavourite;
                                 changeStarButtonState(IsFavourite);
-
-                                realm.Write(r =>
+                                if (SkinData != null)
                                 {
-                                    if (SkinData == null) return;
-                                    var skin = r.All<SkinInfo>().FirstOrDefault(s => s.ID == SkinData.ID);
-                                    if (skin != null)
-                                        skin.IsFavourite = IsFavourite;
-                                });
+                                    menu?.TrackFavouriteChange(SkinData.ID, IsFavourite);
+                                }
 
                                 return true;
                             }
