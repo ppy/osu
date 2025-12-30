@@ -12,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
@@ -116,7 +117,7 @@ namespace osu.Game.Overlays.Settings
 
             public MenuItem[] ContextMenuItems => new MenuItem[]
             {
-                new OsuMenuItem("Copy version", MenuItemType.Standard, () => game?.CopyToClipboard(version))
+                new OsuMenuItem(SettingsStrings.CopyVersion, MenuItemType.Standard, () => game?.CopyToClipboard(version))
             };
         }
     }
