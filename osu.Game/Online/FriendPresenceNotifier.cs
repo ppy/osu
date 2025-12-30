@@ -158,13 +158,10 @@ namespace osu.Game.Online
                 return;
             }
 
-            var users = onlineAlertQueue.ToArray();
-
-            notifications.Post(users.Length switch
-            {
-                1 => new SingleFriendOnlineNotification(users.Single()),
-                _ => new MultipleFriendsOnlineNotification(users),
-            });
+            if (onlineAlertQueue.Count == 1)
+                notifications.Post(new SingleFriendOnlineNotification(onlineAlertQueue.Single()));
+            else
+                notifications.Post(new MultipleFriendsOnlineNotification(onlineAlertQueue.ToArray()));
 
             onlineAlertQueue.Clear();
             lastOnlineAlertTime = null;
@@ -184,13 +181,10 @@ namespace osu.Game.Online
                 return;
             }
 
-            var users = offlineAlertQueue.ToArray();
-
-            notifications.Post(users.Length switch
-            {
-                1 => new SingleFriendOfflineNotification(users.Single()),
-                _ => new MultipleFriendsOfflineNotification(users),
-            });
+            if (offlineAlertQueue.Count == 1)
+                notifications.Post(new SingleFriendOfflineNotification(offlineAlertQueue.Single()));
+            else
+                notifications.Post(new MultipleFriendsOfflineNotification(offlineAlertQueue.ToArray()));
 
             offlineAlertQueue.Clear();
             lastOfflineAlertTime = null;
