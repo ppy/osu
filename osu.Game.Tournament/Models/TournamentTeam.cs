@@ -49,7 +49,25 @@ namespace osu.Game.Tournament.Models
 
         public Bindable<string> Seed = new Bindable<string>(string.Empty);
 
+        [JsonIgnore]
         public Bindable<string> LastYearPlacing = new Bindable<string>("N/A");
+
+        /// <summary>
+        /// Previously, a value of 0 was meant to indicate "no placement last year".
+        /// This will convert the number 0 from an old bracket.json file back to the "N/A" string (new default).
+        /// </summary>
+        [JsonProperty("LastYearPlacing")]
+        private object lastYearPlacing
+        {
+            get => LastYearPlacing.Value;
+            set
+            {
+                if (value is long oldValue && oldValue == 0)
+                    LastYearPlacing.Value = LastYearPlacing.Default;
+                else
+                    LastYearPlacing.Value = value.ToString() ?? LastYearPlacing.Default;
+            }
+        }
 
         [JsonProperty]
         public BindableList<TournamentUser> Players { get; } = new BindableList<TournamentUser>();
