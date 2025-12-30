@@ -20,7 +20,7 @@ namespace osu.Game.Screens.SelectV2
 {
     public partial class FilterControl
     {
-        public partial class ScopedBeatmapSetDisplay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+        public partial class ScopedBeatmapSetDisplay : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
         {
             public Bindable<BeatmapSetInfo?> ScopedBeatmapSet
             {
@@ -29,20 +29,27 @@ namespace osu.Game.Screens.SelectV2
             }
 
             private readonly BindableWithCurrent<BeatmapSetInfo?> scopedBeatmapSet = new BindableWithCurrent<BeatmapSetInfo?>();
+            private Box flashLayer = null!;
             private Container content = null!;
             private OsuTextFlowContainer text = null!;
-            private ShearedButton goBackButton = null!;
+
+            private const float transition_duration = 300;
+
+            public ScopedBeatmapSetDisplay()
+            {
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+                CornerRadius = 8f;
+                Masking = true;
+            }
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-                AutoSizeEasing = Easing.OutQuint;
-                AutoSizeDuration = 200;
-                CornerRadius = 8f;
-                Masking = true;
-                InternalChildren = new Drawable[]
+                Content.AutoSizeEasing = Easing.OutQuint;
+                Content.AutoSizeDuration = transition_duration;
+
+                AddRange(new Drawable[]
                 {
                     new Box
                     {
@@ -71,18 +78,26 @@ namespace osu.Game.Screens.SelectV2
                                 Colour = colourProvider.Background6,
                                 Padding = new MarginPadding { Right = 80, Vertical = 5 }
                             },
-                            goBackButton = new ShearedButton(80)
+                            new ShearedButton(80)
                             {
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
                                 Text = CommonStrings.Back,
                                 RelativeSizeAxes = Axes.Y,
                                 Height = 1,
-                                Action = () => scopedBeatmapSet.Value = null,
+                                Action = () => Action?.Invoke(),
                             }
                         }
-                    }
-                };
+                    },
+                    flashLayer = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Colour4.White,
+                        Blending = BlendingParameters.Additive,
+                        Alpha = 0,
+                    },
+                });
+                Action = () => scopedBeatmapSet.Value = null;
             }
 
             protected override void LoadComplete()
@@ -94,14 +109,18 @@ namespace osu.Game.Screens.SelectV2
 
             private void updateState()
             {
-                content.BypassAutoSizeAxes = scopedBeatmapSet.Value != null ? Axes.None : Axes.Y;
-
                 if (scopedBeatmapSet.Value != null)
                 {
+                    content.BypassAutoSizeAxes = Axes.None;
                     text.Clear();
                     text.AddText(SongSelectStrings.TemporarilyShowingAllBeatmapsIn);
                     text.AddText(@" ");
                     text.AddText(scopedBeatmapSet.Value.Metadata.GetDisplayTitleRomanisable(), t => t.Font = OsuFont.Style.Body.With(weight: FontWeight.Bold));
+                }
+                else
+                {
+                    flashLayer.FadeOutFromOne(transition_duration, Easing.OutQuint);
+                    content.BypassAutoSizeAxes = Axes.Y;
                 }
             }
 
@@ -109,7 +128,7 @@ namespace osu.Game.Screens.SelectV2
             {
                 if (scopedBeatmapSet.Value != null && e.Action == GlobalAction.Back && !e.Repeat)
                 {
-                    goBackButton.TriggerClick();
+                    TriggerClick();
                     return true;
                 }
 
