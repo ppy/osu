@@ -38,6 +38,8 @@ namespace osu.Game.Screens.SelectV2
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT * 1.6f;
 
+        public Bindable<HashSet<BeatmapInfo>?> VisibleBeatmaps { get; } = new Bindable<HashSet<BeatmapInfo>?>();
+
         private Box chevronBackground = null!;
         private PanelSetBackground setBackground = null!;
         private ScheduledDelegate? scheduledBackgroundRetrieval;
@@ -155,7 +157,8 @@ namespace osu.Game.Screens.SelectV2
                                 {
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
-                                    Expanded = { BindTarget = Expanded }
+                                    Expanded = { BindTarget = Expanded },
+                                    VisibleBeatmaps = { BindTarget = VisibleBeatmaps },
                                 },
                             },
                         }
