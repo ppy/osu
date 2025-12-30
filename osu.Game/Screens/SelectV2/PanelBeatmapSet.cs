@@ -47,7 +47,7 @@ namespace osu.Game.Screens.SelectV2
         private Drawable chevronIcon = null!;
         private PanelUpdateBeatmapButton updateButton = null!;
         private BeatmapSetOnlineStatusPill statusPill = null!;
-        private DifficultySpectrumDisplay difficultiesDisplay = null!;
+        private SpreadDisplay spreadDisplay = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -151,10 +151,11 @@ namespace osu.Game.Screens.SelectV2
                                     Origin = Anchor.CentreLeft,
                                     Margin = new MarginPadding { Right = 5f, Top = -2f },
                                 },
-                                difficultiesDisplay = new DifficultySpectrumDisplay
+                                spreadDisplay = new SpreadDisplay
                                 {
-                                    Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
+                                    Anchor = Anchor.CentreLeft,
+                                    Expanded = { BindTarget = Expanded }
                                 },
                             },
                         }
@@ -200,7 +201,7 @@ namespace osu.Game.Screens.SelectV2
             artistText.Text = new RomanisableString(beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist);
             updateButton.BeatmapSet = beatmapSet;
             statusPill.Status = beatmapSet.Status;
-            difficultiesDisplay.BeatmapSet = beatmapSet;
+            spreadDisplay.BeatmapSet.Value = beatmapSet;
         }
 
         protected override void FreeAfterUse()
@@ -211,7 +212,7 @@ namespace osu.Game.Screens.SelectV2
             scheduledBackgroundRetrieval = null;
             setBackground.Beatmap = null;
             updateButton.BeatmapSet = null;
-            difficultiesDisplay.BeatmapSet = null;
+            spreadDisplay.BeatmapSet.Value = null;
         }
 
         [Resolved]
