@@ -274,7 +274,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             new TeamDisplay(team) { Margin = new MarginPadding { Bottom = 30 } },
                             new RowDisplay("Average Rank:", $"#{team.AverageRank:#,0}"),
                             new RowDisplay("Seed:", team.Seed.Value),
-                            new RowDisplay("Last year's placing:", team.LastYearPlacing.Value > 0 ? $"#{team.LastYearPlacing:#,0}" : "N/A"),
+                            new RowDisplay("Last year's placing:", team.LastYearPlacing.Value),
                             new Container { Margin = new MarginPadding { Bottom = 30 } },
                         }
                     },

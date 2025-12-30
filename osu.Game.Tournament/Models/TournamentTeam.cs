@@ -49,11 +49,7 @@ namespace osu.Game.Tournament.Models
 
         public Bindable<string> Seed = new Bindable<string>(string.Empty);
 
-        public Bindable<int> LastYearPlacing = new BindableInt
-        {
-            MinValue = 0,
-            MaxValue = 256
-        };
+        public Bindable<string> LastYearPlacing = new Bindable<string>("N/A");
 
         [JsonProperty]
         public BindableList<TournamentUser> Players { get; } = new BindableList<TournamentUser>();
