@@ -160,6 +160,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private partial class SkinSettingsDropdown : SettingsDropdown<Live<SkinInfo>>
         {
+#nullable enable
             protected override OsuDropdown<Live<SkinInfo>> CreateDropdown() => new SkinDropdownControl();
 
             private partial class SkinDropdownControl : DropdownControl
@@ -237,6 +238,8 @@ namespace osu.Game.Overlays.Settings.Sections
                             {
                                 this.colourProvider = colourProvider;
 
+                                if (SkinData == null) return;
+
                                 var skin = realm.Run(r => r.All<SkinInfo>().FirstOrDefault(s => s.ID == SkinData.ID));
                                 if (skin != null)
                                 {
@@ -283,6 +286,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
                                 realm.Write(r =>
                                 {
+                                    if (SkinData == null) return;
                                     var skin = r.All<SkinInfo>().FirstOrDefault(s => s.ID == SkinData.ID);
                                     if (skin != null)
                                         skin.IsFavourite = IsFavourite;
@@ -413,7 +417,7 @@ namespace osu.Game.Overlays.Settings.Sections
                         }
                     }
                 }
-
+#nullable disable
                 protected override LocalisableString GenerateItemText(Live<SkinInfo> item) => item.ToString();
             }
         }
