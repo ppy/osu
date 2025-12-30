@@ -5,11 +5,13 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -40,8 +42,10 @@ namespace osu.Game.Screens.SelectV2
             [Resolved]
             private OsuColour colours { get; set; } = null!;
 
+            [Resolved]
+            private RulesetStore rulesets { get; set; } = null!;
+
             private FillFlowContainer flow = null!;
-            private OsuSpriteText countText = null!; // TODO
             private SpriteIcon icon = null!;
 
             public SpreadDisplay()
@@ -71,12 +75,6 @@ namespace osu.Game.Screens.SelectV2
                             RelativeSizeAxes = Axes.Y,
                             Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(1),
-                        },
-                        countText = new OsuSpriteText
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Font = OsuFont.Style.Caption2,
                         },
                         icon = new SpriteIcon
                         {
@@ -118,31 +116,86 @@ namespace osu.Game.Screens.SelectV2
 
                 flow.Clear();
 
+                const int max_difficulties_before_collapsing = 12;
+
                 var beatmaps = BeatmapSet.Value.Beatmaps
                                          .Where(b => b.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value))
-                                         .OrderBy(b => b.Ruleset.OnlineID)
-                                         .ThenBy(b => b.StarRating)
                                          .ToList();
                 this.FadeTo(beatmaps.Count > 0 ? 1 : 0, transition_duration, Easing.OutQuint);
 
                 if (beatmaps.Count == 0)
                     return;
 
-                // TODO: figure overflow later
+                bool showVisible = VisibleBeatmaps.Value == null || VisibleBeatmaps.Value?.Count <= max_difficulties_before_collapsing;
+                bool showHidden = beatmaps.Count <= max_difficulties_before_collapsing;
 
-                foreach (var beatmap in beatmaps)
+                var beatmapsByRuleset = beatmaps.GroupBy(beatmap => beatmap.Ruleset.OnlineID).OrderBy(group => group.Key);
+
+                foreach (var rulesetGrouping in beatmapsByRuleset)
                 {
-                    bool visible = VisibleBeatmaps.Value?.Contains(beatmap) != false;
-
-                    var circle = new Circle
+                    int rulesetId = rulesetGrouping.Key;
+                    var rulesetIcon = rulesets.GetRuleset(rulesetId)?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle };
+                    flow.Add(rulesetIcon.With(i =>
                     {
-                        Size = visible ? new Vector2(7, 12) : new Vector2(5, 10),
-                        Alpha = visible ? 1 : 0.5f,
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Colour = colours.ForStarDifficulty(beatmap.StarRating)
-                    };
-                    flow.Add(circle);
+                        i.Size = new Vector2(14);
+                        i.Anchor = i.Origin = Anchor.CentreLeft;
+                        i.Margin = new MarginPadding { Left = flow.Count > 0 ? 9 : 0 };
+                    }));
+
+                    int overflowVisible = 0;
+                    int overflowHidden = 0;
+                    bool? lastBeatmapVisible = null;
+
+                    foreach (var beatmap in rulesetGrouping.OrderBy(beatmap => beatmap.StarRating))
+                    {
+                        bool visible = VisibleBeatmaps.Value?.Contains(beatmap) != false;
+
+                        if ((visible && showVisible) || (!visible && showHidden))
+                        {
+                            var circle = new Circle
+                            {
+                                Size = visible ? new Vector2(7, 12) : new Vector2(5, 10),
+                                Alpha = visible ? 1 : 0.5f,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Colour = colours.ForStarDifficulty(beatmap.StarRating),
+                                Margin = new MarginPadding { Left = lastBeatmapVisible != null && lastBeatmapVisible != visible ? 1 : 0 }
+                            };
+                            flow.Add(circle);
+
+                            lastBeatmapVisible = visible;
+                        }
+                        else
+                        {
+                            if (visible)
+                                overflowVisible++;
+                            else
+                                overflowHidden++;
+                        }
+                    }
+
+                    if (overflowVisible > 0)
+                    {
+                        flow.Add(new OsuSpriteText
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Font = OsuFont.Style.Caption2,
+                            Text = overflowVisible.ToLocalisableString(),
+                        });
+                    }
+
+                    if (overflowHidden > 0)
+                    {
+                        flow.Add(new OsuSpriteText
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Font = OsuFont.Style.Caption2,
+                            Text = LocalisableString.Interpolate($@"+{overflowHidden}"),
+                            Alpha = 0.7f,
+                        });
+                    }
                 }
 
                 Action = () => scopedBeatmapSet.Value = BeatmapSet.Value;
