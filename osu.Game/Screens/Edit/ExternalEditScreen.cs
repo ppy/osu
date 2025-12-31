@@ -191,6 +191,7 @@ namespace osu.Game.Screens.Edit
 
         private async Task finish()
         {
+            BackButtonVisibility.Value = false;
             string originalDifficulty = editor.Beatmap.Value.Beatmap.BeatmapInfo.DifficultyName;
 
             showSpinner("Cleaning up...");
