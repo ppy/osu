@@ -116,14 +116,6 @@ namespace osu.Game.Tournament.Components
                                 }
                             },
                         },
-
-                        flash = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Gray,
-                            Blending = BlendingParameters.Additive,
-                            Alpha = 0,
-                        },
                         modIconContainer = new FillFlowContainer
                         {
                             Anchor = Anchor.CentreRight,
@@ -139,7 +131,14 @@ namespace osu.Game.Tournament.Components
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Alpha = 1,
-                    Margin = new MarginPadding { Top = 14, Right = 14 },
+                    Margin = new MarginPadding(12),
+                },
+                flash = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Gray,
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0,
                 },
             });
 
