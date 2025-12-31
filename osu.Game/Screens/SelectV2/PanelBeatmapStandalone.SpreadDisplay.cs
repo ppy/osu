@@ -27,6 +27,8 @@ namespace osu.Game.Screens.SelectV2
             public Bindable<BeatmapInfo?> Beatmap { get; } = new Bindable<BeatmapInfo?>();
             public Bindable<StarDifficulty> StarDifficulty { get; } = new Bindable<StarDifficulty>();
 
+            protected override Colour4 DimColour => Colour4.White;
+
             private readonly Bindable<BeatmapSetInfo?> scopedBeatmapSet = new Bindable<BeatmapSetInfo?>();
             private readonly Bindable<bool> showConvertedBeatmaps = new Bindable<bool>();
 
