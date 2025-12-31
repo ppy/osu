@@ -266,7 +266,11 @@ namespace osu.Game.Tests.Visual.Background
 
             FadeAccessibleResults results = null;
 
-            AddStep("Transition to Results", () => player.Push(results = new FadeAccessibleResults(TestResources.CreateTestScoreInfo())));
+            AddStep("Transition to Results", () =>
+            {
+                player.ValidForResume = false;
+                player.Push(results = new FadeAccessibleResults(TestResources.CreateTestScoreInfo()));
+            });
 
             AddUntilStep("Wait for results is current", () => results.IsCurrentScreen());
 

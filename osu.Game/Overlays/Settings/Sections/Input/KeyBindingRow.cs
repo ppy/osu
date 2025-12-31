@@ -191,8 +191,18 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                     Spacing = new Vector2(5),
                                     Children = new Drawable[]
                                     {
-                                        new CancelButton { Action = () => finalise(false) },
-                                        new ClearButton { Action = clear },
+                                        new RoundedButton
+                                        {
+                                            Text = CommonStrings.ButtonsCancel,
+                                            Size = new Vector2(80, 20),
+                                            Action = () => finalise(false)
+                                        },
+                                        new DangerousRoundedButton
+                                        {
+                                            Text = CommonStrings.ButtonsClear,
+                                            Size = new Vector2(80, 20),
+                                            Action = clear
+                                        },
                                     },
                                 },
                                 new HoverClickSounds()
@@ -537,24 +547,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private void updateIsDefaultValue()
         {
             isDefault.Value = KeyBindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
-        }
-
-        private partial class CancelButton : RoundedButton
-        {
-            public CancelButton()
-            {
-                Text = CommonStrings.ButtonsCancel;
-                Size = new Vector2(80, 20);
-            }
-        }
-
-        public partial class ClearButton : DangerousRoundedButton
-        {
-            public ClearButton()
-            {
-                Text = CommonStrings.ButtonsClear;
-                Size = new Vector2(80, 20);
-            }
         }
     }
 }

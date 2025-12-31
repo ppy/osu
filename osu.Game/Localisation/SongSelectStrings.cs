@@ -110,6 +110,11 @@ namespace osu.Game.Localisation
         public static LocalisableString UseTheseMods => new TranslatableString(getKey(@"use_these_mods"), @"Use these mods");
 
         /// <summary>
+        /// "Watch replay"
+        /// </summary>
+        public static LocalisableString WatchReplay => new TranslatableString(getKey(@"watch_replay"), @"Watch replay");
+
+        /// <summary>
         /// "For all difficulties"
         /// </summary>
         public static LocalisableString ForAllDifficulties => new TranslatableString(getKey(@"for_all_difficulties"), @"For all difficulties");
@@ -130,14 +135,14 @@ namespace osu.Game.Localisation
         public static LocalisableString MarkAsPlayed => new TranslatableString(getKey(@"mark_as_played"), @"Mark as played");
 
         /// <summary>
+        /// "Remove from played"
+        /// </summary>
+        public static LocalisableString RemoveFromPlayed => new TranslatableString(getKey(@"remove_from_played"), @"Remove from played");
+
+        /// <summary>
         /// "Clear all local scores"
         /// </summary>
         public static LocalisableString ClearAllLocalScores => new TranslatableString(getKey(@"clear_all_local_scores"), @"Clear all local scores");
-
-        /// <summary>
-        /// "Delete beatmap"
-        /// </summary>
-        public static LocalisableString DeleteBeatmap => new TranslatableString(getKey(@"delete_beatmap"), @"Delete beatmap");
 
         /// <summary>
         /// "Restore all hidden"
@@ -253,6 +258,11 @@ namespace osu.Game.Localisation
         /// "No beatmaps match your filter criteria!"
         /// </summary>
         public static LocalisableString NoMatchingBeatmapsDescription => new TranslatableString(getKey(@"no_matching_beatmaps_description"), @"No beatmaps match your filter criteria!");
+
+        /// <summary>
+        /// "Temporarily showing all beatmaps in"
+        /// </summary>
+        public static LocalisableString TemporarilyShowingAllBeatmapsIn => new TranslatableString(getKey(@"temporarily_showing_all_beatmaps_in"), @"Temporarily showing all beatmaps in");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

@@ -252,7 +252,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             return popover;
         }
 
-        protected partial class FileChooserPopover : OsuPopover
+        public partial class FileChooserPopover : OsuPopover
         {
             protected override string PopInSampleName => "UI/overlay-big-pop-in";
             protected override string PopOutSampleName => "UI/overlay-big-pop-out";

@@ -71,9 +71,9 @@ namespace osu.Game.Tests.Visual.Ranking
                             var beatmapSet = CreateAPIBeatmapSet(Beatmap.Value.BeatmapInfo);
                             beatmapSet.Beatmaps.Single().TopTags =
                             [
-                                new APIBeatmapTag { TagId = 3, VoteCount = 9 },
-                                new APIBeatmapTag { TagId = 2, VoteCount = 8 },
-                                new APIBeatmapTag { TagId = 0, VoteCount = 7 },
+                                new APIBeatmapTag { TagId = 3, VoteCount = 4 },
+                                new APIBeatmapTag { TagId = 2, VoteCount = 3 },
+                                new APIBeatmapTag { TagId = 0, VoteCount = 2 },
                             ];
                             Scheduler.AddDelayed(() => getBeatmapSetRequest.TriggerSuccess(beatmapSet), 500);
                             return true;
@@ -155,14 +155,14 @@ namespace osu.Game.Tests.Visual.Ranking
                 InputManager.MoveMouseTo(getDrawableTagById(2));
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("tag 2 voted for", () => getDrawableTagById(2).UserTag.VoteCount.Value, () => Is.EqualTo(9));
+            AddUntilStep("tag 2 voted for", () => getDrawableTagById(2).UserTag.VoteCount.Value, () => Is.EqualTo(4));
 
             AddStep("remove vote for tag 2", () =>
             {
                 InputManager.MoveMouseTo(getDrawableTagById(2));
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("tag 2 not voted for", () => getDrawableTagById(2).UserTag.VoteCount.Value, () => Is.EqualTo(8));
+            AddUntilStep("tag 2 not voted for", () => getDrawableTagById(2).UserTag.VoteCount.Value, () => Is.EqualTo(3));
             AddAssert("tag 2 is still second", () => getTagFlow().GetLayoutPosition(getDrawableTagById(2)), () => Is.EqualTo(1));
 
             AddStep("vote for tag 2", () =>
@@ -170,7 +170,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 InputManager.MoveMouseTo(getDrawableTagById(2));
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("tag 2 voted for", () => getDrawableTagById(2).UserTag.VoteCount.Value, () => Is.EqualTo(9));
+            AddUntilStep("tag 2 voted for", () => getDrawableTagById(2).UserTag.VoteCount.Value, () => Is.EqualTo(4));
             AddStep("move mouse away", () => InputManager.MoveMouseTo(Vector2.Zero));
             AddAssert("tag 2 reordered to first", () => getTagFlow().GetLayoutPosition(getDrawableTagById(2)), () => Is.EqualTo(0));
 

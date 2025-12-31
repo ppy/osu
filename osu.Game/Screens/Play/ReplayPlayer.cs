@@ -18,6 +18,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Skinning;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
@@ -100,15 +101,18 @@ namespace osu.Game.Screens.Play
                 playbackSettings.UserPlaybackRate.BindTo(master.UserPlaybackRate);
 
             HUDOverlay.PlayerSettingsOverlay.AddAtStart(playbackSettings);
-            AddInternal(failIndicator = new ReplayFailIndicator(GameplayClockContainer)
+            AddInternal(new RulesetSkinProvidingContainer(GameplayState.Ruleset, GameplayState.Beatmap, Beatmap.Value.Skin)
             {
-                GoToResults = () =>
+                Child = failIndicator = new ReplayFailIndicator(GameplayClockContainer)
                 {
-                    if (!this.IsCurrentScreen())
-                        return;
+                    GoToResults = () =>
+                    {
+                        if (!this.IsCurrentScreen())
+                            return;
 
-                    ValidForResume = false;
-                    this.Push(new SoloResultsScreen(Score.ScoreInfo));
+                        ValidForResume = false;
+                        this.Push(new SoloResultsScreen(Score.ScoreInfo));
+                    }
                 }
             });
         }

@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -72,7 +71,9 @@ namespace osu.Game.Collections
                 var createdItem = flow.Children.SingleOrDefault(item => item.Model.Value.ID == lastCreated);
 
                 if (createdItem != null)
-                    scroll.ScrollTo(createdItem);
+                {
+                    ScheduleAfterChildren(() => scroll.ScrollIntoView(createdItem));
+                }
 
                 lastCreated = null;
             }
@@ -104,13 +105,8 @@ namespace osu.Game.Collections
             }
         }
 
-        protected override OsuRearrangeableListItem<Live<BeatmapCollection>> CreateOsuDrawable(Live<BeatmapCollection> item)
-        {
-            if (item.ID == scroll.PlaceholderItem.Model.ID)
-                return scroll.ReplacePlaceholder();
-
-            return new DrawableCollectionListItem(item, true);
-        }
+        protected override OsuRearrangeableListItem<Live<BeatmapCollection>> CreateOsuDrawable(Live<BeatmapCollection> item) =>
+            new DrawableCollectionListItem(item, true);
 
         protected override void Dispose(bool isDisposing)
         {
@@ -122,91 +118,22 @@ namespace osu.Game.Collections
         /// The scroll container for this <see cref="DrawableCollectionList"/>.
         /// Contains the main flow of <see cref="DrawableCollectionListItem"/> and attaches a placeholder item to the end of the list.
         /// </summary>
-        /// <remarks>
-        /// Use <see cref="ReplacePlaceholder"/> to transfer the placeholder into the main list.
-        /// </remarks>
         private partial class Scroll : OsuScrollContainer
         {
-            /// <summary>
-            /// The currently-displayed placeholder item.
-            /// </summary>
-            public DrawableCollectionListItem PlaceholderItem { get; private set; } = null!;
-
             protected override Container<Drawable> Content => content;
-            private readonly Container content;
-
-            private readonly Container<DrawableCollectionListItem> placeholderContainer;
+            private readonly FillFlowContainer content;
 
             public Scroll()
             {
                 ScrollbarOverlapsContent = false;
 
-                base.Content.Add(new FillFlowContainer
+                base.Content.Add(content = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     LayoutDuration = 200,
                     LayoutEasing = Easing.OutQuint,
-                    Children = new Drawable[]
-                    {
-                        content = new Container { RelativeSizeAxes = Axes.X },
-                        placeholderContainer = new Container<DrawableCollectionListItem>
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y
-                        }
-                    }
                 });
-
-                ReplacePlaceholder();
-                Debug.Assert(PlaceholderItem != null);
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-
-                // AutoSizeAxes cannot be used as the height should represent the post-layout-transform height at all times, so that the placeholder doesn't bounce around.
-                content.Height = ((Flow)Child).Children.Sum(c => c.IsPresent ? c.DrawHeight + 5 : 0);
-            }
-
-            /// <summary>
-            /// Replaces the current <see cref="PlaceholderItem"/> with a new one, and returns the previous.
-            /// </summary>
-            /// <returns>The current <see cref="PlaceholderItem"/>.</returns>
-            public DrawableCollectionListItem ReplacePlaceholder()
-            {
-                var previous = PlaceholderItem;
-
-                placeholderContainer.Clear(false);
-                placeholderContainer.Add(PlaceholderItem = new NewCollectionEntryItem());
-
-                return previous;
-            }
-        }
-
-        private partial class NewCollectionEntryItem : DrawableCollectionListItem
-        {
-            [Resolved]
-            private RealmAccess realm { get; set; } = null!;
-
-            public NewCollectionEntryItem()
-                : base(new BeatmapCollection().ToLiveUnmanaged(), false)
-            {
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                TextBox.OnCommit += (sender, newText) =>
-                {
-                    if (string.IsNullOrEmpty(TextBox.Text))
-                        return;
-
-                    realm.Write(r => r.Add(new BeatmapCollection(TextBox.Text)));
-                    TextBox.Text = string.Empty;
-                };
             }
         }
 

@@ -151,5 +151,13 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 },
             });
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesetStore.IsNotNull())
+                rulesetStore.Dispose();
+        }
     }
 }

@@ -52,7 +52,7 @@ namespace osu.Game.Overlays
 
             ruleset.BindValueChanged(_ =>
             {
-                if (Header.Current.Value == RankingsScope.Spotlights)
+                if (Header.Current.Value == RankingsScope.Playlists)
                     return;
 
                 Scheduler.AddOnce(triggerTabChanged);
@@ -99,7 +99,7 @@ namespace osu.Game.Overlays
         {
             lastRequest?.Cancel();
 
-            if (Header.Current.Value == RankingsScope.Spotlights)
+            if (Header.Current.Value == RankingsScope.Playlists)
             {
                 LoadDisplay(new SpotlightsLayout
                 {

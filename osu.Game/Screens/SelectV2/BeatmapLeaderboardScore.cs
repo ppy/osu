@@ -16,7 +16,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
@@ -77,7 +76,7 @@ namespace osu.Game.Screens.SelectV2
         private OsuConfigManager config { get; set; } = null!;
 
         [Resolved]
-        private Clipboard? clipboard { get; set; }
+        private OsuGame? game { get; set; }
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -392,9 +391,9 @@ namespace osu.Game.Screens.SelectV2
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
                                         Spacing = new Vector2(-2),
-                                        Colour = DrawableRank.GetRankNameColour(Score.Rank),
+                                        Colour = DrawableRank.GetRankLetterColour(Score.Rank),
                                         Font = OsuFont.Numeric.With(size: 14),
-                                        Text = DrawableRank.GetRankName(Score.Rank),
+                                        Text = DrawableRank.GetRankLetter(Score.Rank),
                                         ShadowColour = Color4.Black.Opacity(0.3f),
                                         ShadowOffset = new Vector2(0, 0.08f),
                                         Shadow = true,
@@ -625,10 +624,12 @@ namespace osu.Game.Screens.SelectV2
                     items.Add(new OsuMenuItem(SongSelectStrings.UseTheseMods, MenuItemType.Highlighted, () => SelectedMods.Value = copyableMods));
 
                 if (Score.OnlineID > 0)
-                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.Endpoints.WebsiteUrl}/scores/{Score.OnlineID}")));
+                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyToClipboard($@"{api.Endpoints.WebsiteUrl}/scores/{Score.OnlineID}")));
 
                 if (Score.Files.Count <= 0) return items.ToArray();
 
+                items.Add(new OsuMenuItemSpacer());
+                items.Add(new OsuMenuItem(SongSelectStrings.WatchReplay, MenuItemType.Standard, () => game?.PresentScore(Score, ScorePresentType.Gameplay)));
                 items.Add(new OsuMenuItem(CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(Score)));
                 items.Add(new OsuMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
 
@@ -652,7 +653,7 @@ namespace osu.Game.Screens.SelectV2
                 Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold);
             }
 
-            protected override string Format() => Date.ToShortRelativeTime(TimeSpan.FromSeconds(30));
+            protected override LocalisableString Format() => Date.ToShortRelativeTime(TimeSpan.FromSeconds(30));
         }
 
         private partial class ScoreComponentLabel : Container

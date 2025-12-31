@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mods
         };
 
         [SettingSource("Accuracy", "Override a beatmap's set OD.", LAST_SETTING_ORDER, SettingControlType = typeof(DifficultyAdjustSettingsControl))]
-        public DifficultyBindable OverallDifficulty { get; } = new DifficultyBindable
+        public virtual DifficultyBindable OverallDifficulty { get; } = new DifficultyBindable
         {
             Precision = 0.1f,
             MinValue = 0,

@@ -12,6 +12,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -219,8 +220,15 @@ namespace osu.Game.Tests.Visual.Ranking
                                 Tags =
                                 [
                                     new APITag { Id = 1, Name = "song representation/simple", Description = "Accessible and straightforward map design.", },
-                                    new APITag { Id = 2, Name = "style/clean", Description = "Visually uncluttered and organised patterns, often involving few overlaps and equal visual spacing between objects.", },
-                                    new APITag { Id = 3, Name = "aim/aim control", Description = "Patterns with velocity or direction changes which strongly go against a player's natural movement pattern.", },
+                                    new APITag
+                                    {
+                                        Id = 2, Name = "style/clean",
+                                        Description = "Visually uncluttered and organised patterns, often involving few overlaps and equal visual spacing between objects.",
+                                    },
+                                    new APITag
+                                    {
+                                        Id = 3, Name = "aim/aim control", Description = "Patterns with velocity or direction changes which strongly go against a player's natural movement pattern.",
+                                    },
                                     new APITag { Id = 4, Name = "tap/bursts", Description = "Patterns requiring continuous movement and alternating, typically 9 notes or less.", },
                                 ]
                             }), 500);
@@ -401,6 +409,14 @@ namespace osu.Game.Tests.Visual.Ranking
             }
 
             return hitEvents;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesetStore.IsNotNull())
+                rulesetStore?.Dispose();
         }
 
         private class TestRuleset : Ruleset
