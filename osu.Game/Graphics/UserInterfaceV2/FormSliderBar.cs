@@ -108,7 +108,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// <summary>
         /// Whether sound effects should play when adjusting this slider.
         /// </summary>
-        public bool PlaySamplesOnAdjust { get; init; }
+        public bool PlaySamplesOnAdjust { get; init; } = true;
 
         /// <summary>
         /// The string formatting function to use for the value label.
