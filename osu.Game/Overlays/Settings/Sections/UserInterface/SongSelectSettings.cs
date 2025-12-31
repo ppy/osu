@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Mods.Input;
 
@@ -12,6 +13,9 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
     public partial class SongSelectSettings : SettingsSubsection
     {
+        private FormEnumDropdown<ModSelectHotkeyStyle> modSelectHotkeyStyle = null!;
+        private FormCheckBox modSelectTextSearchStartsActive = null!;
+
         protected override LocalisableString Header => UserInterfaceStrings.SongSelectHeader;
 
         [BackgroundDependencyLoader]
@@ -19,35 +23,43 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
         {
             Children = new Drawable[]
             {
-                new SettingsCheckbox
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = UserInterfaceStrings.ShowConvertedBeatmaps,
+                    Caption = UserInterfaceStrings.ShowConvertedBeatmaps,
                     Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
+                })
+                {
                     Keywords = new[] { "converts", "converted" }
                 },
-                new SettingsEnumDropdown<RandomSelectAlgorithm>
+                new SettingsItemV2(new FormEnumDropdown<RandomSelectAlgorithm>
                 {
-                    LabelText = UserInterfaceStrings.RandomSelectionAlgorithm,
+                    Caption = UserInterfaceStrings.RandomSelectionAlgorithm,
                     Current = config.GetBindable<RandomSelectAlgorithm>(OsuSetting.RandomSelectAlgorithm),
-                },
-                new SettingsEnumDropdown<ModSelectHotkeyStyle>
+                }),
+                new SettingsItemV2(modSelectHotkeyStyle = new FormEnumDropdown<ModSelectHotkeyStyle>
                 {
-                    LabelText = UserInterfaceStrings.ModSelectHotkeyStyle,
+                    Caption = UserInterfaceStrings.ModSelectHotkeyStyle,
                     Current = config.GetBindable<ModSelectHotkeyStyle>(OsuSetting.ModSelectHotkeyStyle),
-                    ClassicDefault = ModSelectHotkeyStyle.Classic
-                },
-                new SettingsCheckbox
+                })
                 {
-                    LabelText = UserInterfaceStrings.ModSelectTextSearchStartsActive,
+                    ApplyClassicDefault = () => modSelectHotkeyStyle.Current.Value = ModSelectHotkeyStyle.Classic,
+                },
+                new SettingsItemV2(modSelectTextSearchStartsActive = new FormCheckBox
+                {
+                    Caption = UserInterfaceStrings.ModSelectTextSearchStartsActive,
                     Current = config.GetBindable<bool>(OsuSetting.ModSelectTextSearchStartsActive),
-                    ClassicDefault = false
-                },
-                new SettingsCheckbox
+                })
                 {
-                    LabelText = GameplaySettingsStrings.BackgroundBlur,
+                    ApplyClassicDefault = () => modSelectTextSearchStartsActive.Current.Value = false,
+                },
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = GameplaySettingsStrings.BackgroundBlur,
                     Current = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur),
-                    ClassicDefault = false,
-                }
+                })
+                {
+                    ApplyClassicDefault = () => backgroundBlurCheckbox.Current.Value = false,
+                },
             };
         }
     }

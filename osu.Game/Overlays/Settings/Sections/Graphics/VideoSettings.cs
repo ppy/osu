@@ -9,6 +9,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Video;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
@@ -18,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         protected override LocalisableString Header => GraphicsSettingsStrings.VideoHeader;
 
         private Bindable<HardwareVideoDecoder> hardwareVideoDecoder;
-        private SettingsCheckbox hwAccelCheckbox;
+        private FormCheckBox hwAccelCheckbox;
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager config)
@@ -27,10 +28,10 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             Children = new Drawable[]
             {
-                hwAccelCheckbox = new SettingsCheckbox
+                new SettingsItemV2(hwAccelCheckbox = new FormCheckBox
                 {
-                    LabelText = GraphicsSettingsStrings.UseHardwareAcceleration,
-                },
+                    Caption = GraphicsSettingsStrings.UseHardwareAcceleration,
+                }),
             };
 
             hwAccelCheckbox.Current.Default = hardwareVideoDecoder.Default != HardwareVideoDecoder.None;
