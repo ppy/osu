@@ -56,10 +56,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 {
                     Caption = GameplaySettingsStrings.BackgroundBlur,
                     Current = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur),
-                })
-                {
-                    ApplyClassicDefault = () => backgroundBlurCheckbox.Current.Value = false,
-                },
+                }),
             };
         }
     }
