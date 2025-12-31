@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             this.handler = handler;
 
-            Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS };
+            Padding = SettingsPanel.ContentPaddingV2;
         }
 
         [BackgroundDependencyLoader]

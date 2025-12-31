@@ -18,6 +18,8 @@ namespace osu.Game.Overlays.Settings
 
         protected readonly FillFlowContainer FlowContent;
 
+        protected Container HeaderContainer { get; private set; } = null!;
+
         protected abstract LocalisableString Header { get; }
 
         public virtual IEnumerable<LocalisableString> FilterTerms => new[] { Header };
@@ -53,11 +55,20 @@ namespace osu.Game.Overlays.Settings
         {
             AddRangeInternal(new Drawable[]
             {
-                new OsuSpriteText
+                HeaderContainer = new Container
                 {
-                    Text = Header,
-                    Margin = new MarginPadding { Vertical = (header_height - header_font_size) * 0.5f, Horizontal = SettingsPanel.CONTENT_MARGINS },
-                    Font = OsuFont.GetFont(size: header_font_size),
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = SettingsPanel.ContentPaddingV2,
+                    Children = new[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Text = Header,
+                            Font = OsuFont.GetFont(size: header_font_size),
+                            Margin = new MarginPadding { Vertical = (header_height - header_font_size) * 0.5f },
+                        },
+                    },
                 },
                 FlowContent
             });
