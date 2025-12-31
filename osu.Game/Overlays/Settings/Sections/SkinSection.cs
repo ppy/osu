@@ -290,7 +290,7 @@ namespace osu.Game.Overlays.Settings.Sections
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
                             MatchingFilter = true,
-                            Text = "Save",
+                            Text = WebCommonStrings.ButtonsSave,
                         }
                     }
                 };

@@ -10,9 +10,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Localisation;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Models;
@@ -111,42 +109,42 @@ namespace osu.Game.Tournament.Screens.Editors
                             new SettingsTextBox
                             {
                                 LabelText = "Name",
-                                Width = 0.2f,
+                                Width = 0.33f,
                                 Current = Model.FullName
                             },
                             acronymTextBox = new SettingsTextBox
                             {
                                 LabelText = "Acronym",
-                                Width = 0.2f,
+                                Width = 0.25f,
                                 Current = Model.Acronym
                             },
                             new SettingsTextBox
                             {
                                 LabelText = "Flag",
-                                Width = 0.2f,
+                                Width = 0.25f,
                                 Current = Model.FlagName
-                            },
-                            new SettingsTextBox
-                            {
-                                LabelText = "Seed",
-                                Width = 0.2f,
-                                Current = Model.Seed
-                            },
-                            new SettingsSlider<int, LastYearPlacementSlider>
-                            {
-                                LabelText = "Last Year Placement",
-                                Width = 0.33f,
-                                Current = Model.LastYearPlacing
                             },
                             new SettingsButton
                             {
-                                Width = 0.2f,
-                                Margin = new MarginPadding(10),
+                                Width = 0.33f,
+                                Margin = new MarginPadding { Top = 20 },
                                 Text = "Edit seeding results",
                                 Action = () =>
                                 {
                                     sceneManager?.SetScreen(new SeedingEditorScreen(team, parent));
                                 }
+                            },
+                            new SettingsTextBox
+                            {
+                                LabelText = "Seed",
+                                Width = 0.25f,
+                                Current = Model.Seed
+                            },
+                            new SettingsTextBox
+                            {
+                                LabelText = "Last Year Placement",
+                                Width = 0.25f,
+                                Current = Model.LastYearPlacing
                             },
                             playerEditor,
                             new SettingsButton
@@ -198,11 +196,6 @@ namespace osu.Game.Tournament.Screens.Editors
                     else
                         acronymTextBox.ClearNoticeText();
                 }, true);
-            }
-
-            private partial class LastYearPlacementSlider : RoundedSliderBar<int>
-            {
-                public override LocalisableString TooltipText => Current.Value == 0 ? "N/A" : base.TooltipText;
             }
 
             public partial class PlayerEditor : CompositeDrawable

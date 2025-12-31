@@ -379,6 +379,25 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             checkMatchedBeatmaps(6);
         }
 
+        [Test]
+        public void TestScopeToBeatmapWhenDifficultiesGroupedBySet()
+        {
+            ImportBeatmapForRuleset(0);
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+            SortBy(SortMode.Artist);
+            checkMatchedBeatmaps(6);
+
+            AddStep("click spread indicator", () => this.ChildrenOfType<PanelBeatmapSet.SpreadDisplay>().Single(d => d.Enabled.Value).TriggerClick());
+            WaitForFiltering();
+            checkMatchedBeatmaps(3);
+
+            AddStep("press Escape", () => InputManager.Key(Key.Escape));
+            WaitForFiltering();
+            checkMatchedBeatmaps(6);
+        }
+
         private NoResultsPlaceholder? getPlaceholder() => SongSelect.ChildrenOfType<NoResultsPlaceholder>().FirstOrDefault();
 
         private void checkMatchedBeatmaps(int expected) => AddUntilStep($"{expected} matching shown", () => Carousel.MatchedBeatmapsCount, () => Is.EqualTo(expected));

@@ -60,6 +60,11 @@ namespace osu.Game.Localisation
         public static LocalisableString IntroSequence => new TranslatableString(getKey(@"intro_sequence"), @"Intro sequence");
 
         /// <summary>
+        /// "Random"
+        /// </summary>
+        public static LocalisableString IntroRandom => new TranslatableString(getKey(@"intro_random"), @"Random");
+
+        /// <summary>
         /// "Background source"
         /// </summary>
         public static LocalisableString BackgroundSource => new TranslatableString(getKey(@"background_source"), @"Background source");
