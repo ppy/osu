@@ -7,9 +7,10 @@ using osu.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Localisation;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
@@ -21,30 +22,37 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         [Resolved]
         private AudioManager audio { get; set; } = null!;
 
-        private SettingsDropdown<string> dropdown = null!;
+        private AudioDeviceDropdown dropdown = null!;
 
-        private SettingsCheckbox? wasapiExperimental;
+        private FormCheckBox? wasapiExperimental;
+
+        private readonly Bindable<SettingsNote.Data?> wasapiExperimentalNote = new Bindable<SettingsNote.Data?>();
 
         [BackgroundDependencyLoader]
         private void load()
         {
             Children = new Drawable[]
             {
-                dropdown = new AudioDeviceSettingsDropdown
+                new SettingsItemV2(dropdown = new AudioDeviceDropdown
                 {
-                    LabelText = AudioSettingsStrings.OutputDevice,
+                    Caption = AudioSettingsStrings.OutputDevice,
+                })
+                {
                     Keywords = new[] { "speaker", "headphone", "output" }
                 },
             };
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
             {
-                Add(wasapiExperimental = new SettingsCheckbox
+                Add(new SettingsItemV2(wasapiExperimental = new FormCheckBox
                 {
-                    LabelText = AudioSettingsStrings.WasapiLabel,
-                    TooltipText = AudioSettingsStrings.WasapiTooltip,
+                    Caption = AudioSettingsStrings.WasapiLabel,
+                    HintText = AudioSettingsStrings.WasapiTooltip,
                     Current = audio.UseExperimentalWasapi,
-                    Keywords = new[] { "wasapi", "latency", "exclusive" }
+                })
+                {
+                    Keywords = new[] { "wasapi", "latency", "exclusive" },
+                    Note = { BindTarget = wasapiExperimentalNote },
                 });
 
                 wasapiExperimental.Current.ValueChanged += _ => onDeviceChanged(string.Empty);
@@ -64,9 +72,9 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             if (wasapiExperimental != null)
             {
                 if (wasapiExperimental.Current.Value)
-                    wasapiExperimental.SetNoticeText(AudioSettingsStrings.WasapiNotice, true);
+                    wasapiExperimentalNote.Value = new SettingsNote.Data(AudioSettingsStrings.WasapiNotice, SettingsNote.Type.Warning);
                 else
-                    wasapiExperimental.ClearNoticeText();
+                    wasapiExperimentalNote.Value = null;
             }
         }
 
@@ -103,15 +111,10 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             }
         }
 
-        private partial class AudioDeviceSettingsDropdown : SettingsDropdown<string>
+        private partial class AudioDeviceDropdown : FormDropdown<string>
         {
-            protected override OsuDropdown<string> CreateDropdown() => new AudioDeviceDropdownControl();
-
-            private partial class AudioDeviceDropdownControl : DropdownControl
-            {
-                protected override LocalisableString GenerateItemText(string item)
-                    => string.IsNullOrEmpty(item) ? CommonStrings.Default : base.GenerateItemText(item);
-            }
+            protected override LocalisableString GenerateItemText(string item)
+                => string.IsNullOrEmpty(item) ? CommonStrings.Default : base.GenerateItemText(item);
         }
     }
 }

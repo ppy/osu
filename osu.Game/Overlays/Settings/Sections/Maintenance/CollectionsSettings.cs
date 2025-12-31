@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         [BackgroundDependencyLoader]
         private void load(IDialogOverlay? dialogOverlay)
         {
-            Add(new DangerousSettingsButton
+            Add(new DangerousSettingsButtonV2
             {
                 Text = MaintenanceSettingsStrings.DeleteAllCollections,
                 Action = () =>

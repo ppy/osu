@@ -396,7 +396,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private LocalisableString defaultLabelFormat(T value) => currentNumberInstantaneous.Value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS, DisplayAsPercentage);
 
-        private partial class InnerSlider : OsuSliderBar<T>
+        public partial class InnerSlider : OsuSliderBar<T>
         {
             public BindableBool Focused { get; } = new BindableBool();
 

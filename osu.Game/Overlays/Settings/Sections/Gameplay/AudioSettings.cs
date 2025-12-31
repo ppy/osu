@@ -5,12 +5,15 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
     public partial class AudioSettings : SettingsSubsection
     {
+        private FormCheckBox alwaysPlayFirstComboBreak = null!;
+
         protected override LocalisableString Header => GameplaySettingsStrings.AudioHeader;
 
         [BackgroundDependencyLoader]
@@ -18,19 +21,23 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         {
             Children = new Drawable[]
             {
-                new SettingsSlider<float>
+                new SettingsItemV2(new FormSliderBar<float>
                 {
-                    LabelText = AudioSettingsStrings.PositionalLevel,
-                    Keywords = new[] { @"positional", @"balance" },
+                    Caption = AudioSettingsStrings.PositionalLevel,
                     Current = osuConfig.GetBindable<float>(OsuSetting.PositionalHitsoundsLevel),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
-                },
-                new SettingsCheckbox
+                })
                 {
-                    ClassicDefault = false,
-                    LabelText = GameplaySettingsStrings.AlwaysPlayFirstComboBreak,
+                    Keywords = new[] { @"positional", @"balance" },
+                },
+                new SettingsItemV2(alwaysPlayFirstComboBreak = new FormCheckBox
+                {
+                    Caption = GameplaySettingsStrings.AlwaysPlayFirstComboBreak,
                     Current = config.GetBindable<bool>(OsuSetting.AlwaysPlayFirstComboBreak)
+                })
+                {
+                    ApplyClassicDefault = () => alwaysPlayFirstComboBreak.Current.Value = false,
                 }
             };
         }
