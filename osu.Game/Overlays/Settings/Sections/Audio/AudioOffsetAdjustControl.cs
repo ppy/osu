@@ -13,12 +13,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Screens.Play.PlayerSettings;
-using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
 {
@@ -36,9 +33,12 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
         public readonly Bindable<double?> SuggestedOffset = new Bindable<double?>();
 
-        private Container<Box> notchContainer = null!;
-        private TextFlowContainer hintText = null!;
+        private Container<Circle> notchContainer = null!;
+        private SettingsNote hintNote = null!;
         private RoundedButton applySuggestion = null!;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(SessionAverageHitErrorTracker hitErrorTracker)
@@ -51,7 +51,6 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(7),
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
@@ -67,16 +66,18 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     new Container
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 10,
+                        AutoSizeAxes = Axes.Y,
                         Padding = new MarginPadding
                         {
                             Left = SettingsPanel.ContentPaddingV2.Left + 9,
                             Right = SettingsPanel.ContentPaddingV2.Right + 5
                         },
-                        Child = notchContainer = new Container<Box>
+                        Child = notchContainer = new Container<Circle>
                         {
-                            RelativeSizeAxes = Axes.Both,
+                            RelativeSizeAxes = Axes.X,
                             Width = 0.5f,
+                            Height = 10,
+                            Margin = new MarginPadding { Top = 2 },
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             Padding = new MarginPadding
@@ -85,11 +86,11 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                             },
                         },
                     },
-                    hintText = new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 16))
+                    hintNote = new SettingsNote
                     {
                         RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
                         Padding = SettingsPanel.ContentPaddingV2,
+                        TextAnchor = Anchor.TopCentre,
                     },
                     applySuggestion = new RoundedButton
                     {
@@ -124,13 +125,14 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     foreach (SessionAverageHitErrorTracker.DataPoint dataPoint in e.NewItems!)
                     {
                         notchContainer.ForEach(n => n.Alpha *= 0.95f);
-                        notchContainer.Add(new Box
+                        notchContainer.Add(new Circle
                         {
                             RelativeSizeAxes = Axes.Y,
                             Width = 2,
                             RelativePositionAxes = Axes.X,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            Colour = colourProvider.Light1,
                             X = getXPositionForOffset(dataPoint.SuggestedGlobalAudioOffset)
                         });
                     }
@@ -162,17 +164,20 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             if (SuggestedOffset.Value == null)
             {
                 applySuggestion.Enabled.Value = false;
-                hintText.Text = AudioSettingsStrings.SuggestedOffsetNote;
+                notchContainer.Hide();
+                hintNote.Current.Value = new SettingsNote.Data(AudioSettingsStrings.SuggestedOffsetNote, SettingsNote.Type.Informational);
             }
             else if (Math.Abs(SuggestedOffset.Value.Value - current.Value) < 1)
             {
                 applySuggestion.Enabled.Value = false;
-                hintText.Text = AudioSettingsStrings.SuggestedOffsetCorrect(averageHitErrorHistory.Count);
+                notchContainer.Show();
+                hintNote.Current.Value = new SettingsNote.Data(AudioSettingsStrings.SuggestedOffsetCorrect(averageHitErrorHistory.Count), SettingsNote.Type.Informational);
             }
             else
             {
                 applySuggestion.Enabled.Value = true;
-                hintText.Text = AudioSettingsStrings.SuggestedOffsetValueReceived(averageHitErrorHistory.Count, SuggestedOffset.Value.Value.ToStandardFormattedString(0));
+                notchContainer.Show();
+                hintNote.Current.Value = new SettingsNote.Data(AudioSettingsStrings.SuggestedOffsetValueReceived(averageHitErrorHistory.Count, SuggestedOffset.Value.Value.ToStandardFormattedString(0)), SettingsNote.Type.Informational);
             }
         }
     }
