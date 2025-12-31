@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -110,6 +112,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double SmallCircleBonus { get; private set; }
 
+        /// <summary>
+        /// Selective bonus for sliderjumps being more difficult to process, effectively increasing aiming difficulty.
+        /// This is kept in mechanical skills until better balancing option is discovered.
+        /// </summary>
+        public double SliderJumpBonus { get; private set; }
+
         private readonly OsuDifficultyHitObject? lastLastDifficultyObject;
         private readonly OsuDifficultyHitObject? lastDifficultyObject;
 
@@ -135,6 +143,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             computeSliderCursorPosition();
             setDistances(clockRate);
+            SliderJumpBonus = calculateSliderJumpBonus();
         }
 
         public double OpacityAt(double time, bool hidden)
@@ -185,6 +194,37 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             return 0;
+        }
+
+        private double calculateSliderJumpBonus()
+        {
+            if (lastDifficultyObject == null || lastLastDifficultyObject == null) return 0.0;
+
+            Slider? sliderCurr = lastDifficultyObject.BaseObject as Slider;
+            Slider? sliderLast = lastLastDifficultyObject.BaseObject as Slider;
+
+            // Any of 2 previous objects should be a slider to buff alternating sliderjump-jump-sliderjump-jump case as much as normal sliderjumps
+            if (sliderCurr == null && sliderLast == null)
+                return 0.0;
+
+            double sliderJumpBonus = 1.0;
+
+            // Punish the cases where 1/2 slider going into 1/2 note
+            sliderJumpBonus *= DifficultyCalculationUtils.ReverseLerp(lastDifficultyObject.AdjustedDeltaTime, AdjustedDeltaTime * 0.55, AdjustedDeltaTime * 0.75);
+
+            // Punish the cases where 1/2 slider going into two 1/2 notes
+            if (sliderCurr == null)
+                sliderJumpBonus *= DifficultyCalculationUtils.ReverseLerp(AdjustedDeltaTime, lastDifficultyObject.AdjustedDeltaTime * 0.55, lastDifficultyObject.AdjustedDeltaTime * 0.75);
+
+            // Punish too short sliders to prevent cheesing
+            static double length(Slider? slider) => slider.IsNotNull() ? slider.Velocity * slider.SpanDuration : 0;
+            double sliderLength = Math.Max(length(sliderCurr), length(sliderLast));
+
+            double threshold = BaseObject.Radius / 2;
+            if (sliderLength < threshold)
+                sliderJumpBonus *= sliderLength / threshold;
+
+            return sliderJumpBonus;
         }
 
         private void setDistances(double clockRate)
