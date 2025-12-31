@@ -21,6 +21,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
+using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK;
 
@@ -32,7 +33,8 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float tile_spacing = 2;
 
         private readonly LinkFlowContainer infoContainer;
-        private readonly Statistic plays, favourites;
+        private readonly Statistic plays;
+        private readonly RecentlyFavouriters recentlyFavouriters;
 
         public readonly DifficultiesContainer Difficulties;
 
@@ -105,10 +107,10 @@ namespace osu.Game.Overlays.BeatmapSet
                             AutoSizeAxes = Axes.Y,
                             Spacing = new Vector2(10f),
                             Margin = new MarginPadding { Top = 5 },
-                            Children = new[]
+                            Children = new Drawable[]
                             {
                                 plays = new Statistic(FontAwesome.Solid.PlayCircle),
-                                favourites = new Statistic(FontAwesome.Solid.Heart),
+                                recentlyFavouriters = new RecentlyFavouriters()
                             },
                         },
                     },
@@ -177,7 +179,10 @@ namespace osu.Game.Overlays.BeatmapSet
             Beatmap.Value ??= Difficulties.FirstOrDefault()?.Beatmap;
 
             plays.Value = BeatmapSet?.PlayCount ?? 0;
-            favourites.Value = BeatmapSet?.FavouriteCount ?? 0;
+            recentlyFavouriters.SetData(
+                BeatmapSet?.RecentFavourites ?? Array.Empty<APIUser>(),
+                BeatmapSet?.FavouriteCount ?? 0
+            );
 
             updateDifficultyButtons();
         }
