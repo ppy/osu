@@ -102,10 +102,7 @@ namespace osu.Game.Screens.Edit
             this.beatmapInfo = beatmapInfo ?? playableBeatmap.BeatmapInfo;
 
             if (beatmapSkin is LegacyBeatmapSkin skin)
-            {
-                BeatmapSkin = new EditorBeatmapSkin(playableBeatmap.BeatmapInfo!.BeatmapSet!, skin);
-                BeatmapSkin.BeatmapSkinChanged += SaveState;
-            }
+                BeatmapSkin = new EditorBeatmapSkin(this, skin);
 
             beatmapProcessor = new EditorBeatmapProcessor(this, playableBeatmap.BeatmapInfo.Ruleset.CreateInstance());
 
