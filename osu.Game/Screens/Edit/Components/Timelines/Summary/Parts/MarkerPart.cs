@@ -63,16 +63,24 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         /// <param name="instant">Whether the seek should be instant (drag end, mouse button press) or debounced (drag in progress).</param>
         private void seekToPosition(Vector2 screenPosition, bool instant)
         {
-            float markerPos = Math.Clamp(ToLocalSpace(screenPosition).X, 0, DrawWidth);
-            double seekDestination = markerPos / DrawWidth * editorClock.TrackLength;
-            marker.X = (float)seekDestination;
+            // Debounce seeks to ensure we only run one per update frame at most.
+            //
+            // Without this, we could end up seeking 1000+ times per second, leading to
+            // unexpected performance overheads as the editor tries to prepare for displaying
+            // each of the destinations.
+            Scheduler.AddOnce(data =>
+            {
+                float markerPos = Math.Clamp(ToLocalSpace(data.screenPosition).X, 0, DrawWidth);
+                double seekDestination = markerPos / DrawWidth * editorClock.TrackLength;
+                marker.X = (float)seekDestination;
 
-            if (editorClock.IsRunning && !instant && lastSeekTime != null && Time.Current - lastSeekTime < NowPlayingOverlay.TRACK_DRAG_SEEK_DEBOUNCE)
-                return;
+                if (editorClock.IsRunning && !data.instant && lastSeekTime != null && Time.Current - lastSeekTime < NowPlayingOverlay.TRACK_DRAG_SEEK_DEBOUNCE)
+                    return;
 
-            editorClock.SeekSmoothlyTo(seekDestination);
+                editorClock.Seek(seekDestination);
 
-            lastSeekTime = instant ? null : Time.Current;
+                lastSeekTime = data.instant ? null : Time.Current;
+            }, (screenPosition, instant));
         }
 
         protected override void Update()
