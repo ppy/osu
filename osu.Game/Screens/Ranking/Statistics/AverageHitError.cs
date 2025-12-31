@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Localisation;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
@@ -17,11 +19,19 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// </summary>
         /// <param name="hitEvents">Sequence of <see cref="HitEvent"/>s to calculate the unstable rate based on.</param>
         public AverageHitError(IEnumerable<HitEvent> hitEvents)
-            : base("Average Hit Error")
+            : base(RankingStatisticsStrings.AverageHitErrorTitle)
         {
             Value = hitEvents.CalculateAverageHitError();
         }
 
-        protected override string DisplayValue(double? value) => value == null ? "(not available)" : $"{Math.Abs(value.Value):N2} ms {(value.Value < 0 ? "early" : "late")}";
+        protected override LocalisableString DisplayValue(double? value)
+        {
+            return value == null ? RankingStatisticsStrings.NotAvailable : getEarlyLateText(value.Value);
+
+            LocalisableString getEarlyLateText(double offset) =>
+                offset < 0
+                    ? RankingStatisticsStrings.Early(Math.Abs(offset))
+                    : RankingStatisticsStrings.Late(Math.Abs(offset));
+        }
     }
 }
