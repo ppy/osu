@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
@@ -49,25 +50,9 @@ namespace osu.Game.Tournament.Models
 
         public Bindable<string> Seed = new Bindable<string>(string.Empty);
 
-        [JsonIgnore]
-        public Bindable<string> LastYearPlacing = new Bindable<string>("N/A");
-
-        /// <summary>
-        /// Previously, a value of 0 was meant to indicate "no placement last year".
-        /// This will convert the number 0 from an old bracket.json file back to the "N/A" string (new default).
-        /// </summary>
-        [JsonProperty("LastYearPlacing")]
-        private object lastYearPlacing
-        {
-            get => LastYearPlacing.Value;
-            set
-            {
-                if (value is long oldValue && oldValue == 0)
-                    LastYearPlacing.Value = LastYearPlacing.Default;
-                else
-                    LastYearPlacing.Value = value.ToString() ?? LastYearPlacing.Default;
-            }
-        }
+        [JsonProperty]
+        [JsonConverter(typeof(LastYearPlacingConverter))]
+        public Bindable<string> LastYearPlacing = new Bindable<string>(@"N/A");
 
         [JsonProperty]
         public BindableList<TournamentUser> Players { get; } = new BindableList<TournamentUser>();
@@ -90,5 +75,37 @@ namespace osu.Game.Tournament.Models
         }
 
         public override string ToString() => FullName.Value ?? Acronym.Value;
+
+        public class LastYearPlacingConverter : JsonConverter
+        {
+            public override bool CanConvert(Type objectType) => objectType == typeof(Bindable<string>);
+
+            public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+                => serializer.Serialize(writer, ((Bindable<string>)value!).Value);
+
+            public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+            {
+                var lastYearPlacing = existingValue as Bindable<string>;
+                Debug.Assert(lastYearPlacing != null);
+
+                switch (reader.TokenType)
+                {
+                    case JsonToken.String:
+                        lastYearPlacing.Value = (string?)reader.Value ?? lastYearPlacing.Default;
+                        break;
+
+                    case JsonToken.Integer:
+                        long value = (long)reader.Value!;
+                        lastYearPlacing.Value = value > 0 ? $@"#{value}" : lastYearPlacing.Default;
+                        break;
+
+                    default:
+                        reader.Read();
+                        break;
+                }
+
+                return lastYearPlacing;
+            }
+        }
     }
 }
