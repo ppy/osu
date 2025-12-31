@@ -37,9 +37,9 @@ namespace osu.Game.Overlays.Settings
 
             FlowContent = new FillFlowContainer
             {
-                Margin = new MarginPadding { Top = SettingsSection.ITEM_SPACING },
+                Margin = new MarginPadding { Top = SettingsSection.ITEM_SPACING_V2 },
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, SettingsSection.ITEM_SPACING),
+                Spacing = new Vector2(0, SettingsSection.ITEM_SPACING_V2),
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
             };
