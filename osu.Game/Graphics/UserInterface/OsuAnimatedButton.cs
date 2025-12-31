@@ -92,11 +92,12 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            Colour = dimColour;
-            Enabled.BindValueChanged(_ => this.FadeColour(dimColour, 200, Easing.OutQuint));
+            Colour = Enabled.Value ? Colour4.White : DimColour;
+            Enabled.BindValueChanged(_ => this.FadeColour(DimColour, 200, Easing.OutQuint), true);
+            FinishTransforms(true);
         }
 
-        private Color4 dimColour => Enabled.Value ? Color4.White : colours.Gray9;
+        protected virtual Colour4 DimColour => colours.Gray9;
 
         protected override bool OnHover(HoverEvent e)
         {
