@@ -31,6 +31,8 @@ namespace osu.Game.Screens.SelectV2
 
             public BindableBool Expanded { get; } = new BindableBool();
 
+            protected override Colour4 DimColour => Colour4.White;
+
             private readonly Bindable<BeatmapSetInfo?> scopedBeatmapSet = new Bindable<BeatmapSetInfo?>();
             private readonly Bindable<bool> showConvertedBeatmaps = new Bindable<bool>();
 
