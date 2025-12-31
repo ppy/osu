@@ -342,6 +342,7 @@ namespace osu.Game.Skinning
 
             Textures?.Dispose();
             Samples?.Dispose();
+            FallbackStore?.Dispose();
 
             store.Dispose();
         }
