@@ -50,6 +50,8 @@ namespace osu.Game.Screens.Edit
 
         public ExternalEditOperation<BeatmapSetInfo>? EditOperation { get; private set; }
 
+        private Task? finishOperation;
+
         private FillFlowContainer flow = null!;
 
         [BackgroundDependencyLoader]
@@ -98,11 +100,15 @@ namespace osu.Game.Screens.Edit
             if (fileMountOperation?.IsCompleted == false)
                 return true;
 
+            // Similarly do not allow interrupting an ongoing finish.
+            if (finishOperation?.IsCompleted == false)
+                return true;
+
             // If the operation completed successfully, ensure that we finish the operation before exiting.
             // The finish() call will subsequently call Exit() when done.
-            if (EditOperation != null)
+            if (EditOperation != null && finishOperation == null)
             {
-                finish().FireAndForget();
+                (finishOperation = finish()).FireAndForget();
                 return true;
             }
 
@@ -161,7 +167,7 @@ namespace osu.Game.Screens.Edit
                     Width = 350,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Action = () => finish().FireAndForget(),
+                    Action = () => (finishOperation = finish()).FireAndForget(),
                     Enabled = { Value = false }
                 }
             };
