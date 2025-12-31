@@ -141,6 +141,7 @@ namespace osu.Game.Screens.Edit
         {
             if (Skin.BeatmapSetResources != null)
                 Skin.BeatmapSetResources.CacheInvalidated -= InvokeSkinChanged;
+            Skin.Dispose();
         }
 
         #region Delegated ISkin implementation
