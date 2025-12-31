@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit
 
         private Task? fileMountOperation;
 
-        public ExternalEditOperation<BeatmapSetInfo>? EditOperation;
+        public ExternalEditOperation<BeatmapSetInfo>? EditOperation { get; private set; }
 
         private FillFlowContainer flow = null!;
 
