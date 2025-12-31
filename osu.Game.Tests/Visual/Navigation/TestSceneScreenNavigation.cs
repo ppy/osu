@@ -99,12 +99,13 @@ namespace osu.Game.Tests.Visual.Navigation
                 AddUntilStep("wait for selection", () => !Game.Beatmap.IsDefault);
 
                 AddStep("add item", () => InputManager.Key(Key.Enter));
+                AddStep("exit screen", () => InputManager.Key(Key.Escape));
 
                 AddUntilStep("wait for return to playlist screen", () => playlistScreen.CurrentSubScreen is PlaylistsRoomSubScreen);
 
                 AddStep("go back to song select", () =>
                 {
-                    InputManager.MoveMouseTo(playlistScreen.ChildrenOfType<PurpleRoundedButton>().Single(b => b.Text == "Edit playlist"));
+                    InputManager.MoveMouseTo(playlistScreen.ChildrenOfType<PurpleRoundedButton>().Single(b => b.Text == "+ Add more beatmaps"));
                     InputManager.Click(MouseButton.Left);
                 });
 
