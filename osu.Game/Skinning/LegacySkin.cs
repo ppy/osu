@@ -145,8 +145,10 @@ namespace osu.Game.Skinning
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.ColumnIndex.Value]));
 
                 case LegacyManiaSkinConfigurationLookups.WidthForNoteHeightScale:
-                    Debug.Assert(maniaLookup.ColumnIndex != null);
-                    return SkinUtils.As<TValue>(new Bindable<float>(existing.WidthForNoteHeightScale));
+                    float width = existing.WidthForNoteHeightScale;
+                    if (width <= 0)
+                        width = existing.MinimumColumnWidth;
+                    return SkinUtils.As<TValue>(new Bindable<float>(width));
 
                 case LegacyManiaSkinConfigurationLookups.HitPosition:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.HitPosition));
@@ -410,6 +412,9 @@ namespace osu.Game.Skinning
                                         leaderboard.Origin = Anchor.CentreLeft;
                                         leaderboard.X = 10;
                                     }
+
+                                    foreach (var d in container.OfType<ISerialisableDrawable>())
+                                        d.UsesFixedAnchor = true;
                                 })
                                 {
                                     new LegacyDefaultComboCounter(),
@@ -446,6 +451,9 @@ namespace osu.Game.Skinning
                                     hitError.Origin = Anchor.CentreLeft;
                                     hitError.Rotation = -90;
                                 }
+
+                                foreach (var d in container.OfType<ISerialisableDrawable>())
+                                    d.UsesFixedAnchor = true;
                             })
                             {
                                 Children = new Drawable[]
@@ -537,6 +545,10 @@ namespace osu.Game.Skinning
             {
                 case "Menu/fountain-star":
                     componentName = "star2";
+                    break;
+
+                case @"Intro/Welcome/welcome_text":
+                    componentName = @"welcome_text";
                     break;
             }
 

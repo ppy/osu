@@ -7,6 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -1056,6 +1057,14 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private ModPanel getPanelForMod(Type modType)
             => modSelectOverlay.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.GetType() == modType);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesetStore.IsNotNull())
+                rulesetStore.Dispose();
+        }
 
         private partial class TestModSelectOverlay : UserModSelectOverlay
         {

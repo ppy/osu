@@ -27,5 +27,14 @@ namespace osu.Game.Screens.Play
 
             AbortConfirm();
         }
+
+        protected override void Confirm()
+        {
+            base.Confirm();
+
+            // Not removing immediately can lead to delays due to async disposal.
+            // This is done here rather than in `Player` because it's simpler to handle.
+            RemoveAudioAdjustments();
+        }
     }
 }

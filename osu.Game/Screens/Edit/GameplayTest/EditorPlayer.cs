@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
@@ -55,12 +56,25 @@ namespace osu.Game.Screens.Edit.GameplayTest
             return masterGameplayClockContainer;
         }
 
+        protected override void LoadAsyncComplete()
+        {
+            base.LoadAsyncComplete();
+
+            if (!LoadedBeatmapSuccessfully)
+                return;
+
+            // This hack needs to be called to install its hooks before drawable hit objects get the chance to run update logic,
+            // because it will not work otherwise due to being too late (various effects of the objects getting missed will have already taken place).
+            preventMissOnPreviousHitObjects();
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
+            // this will notify components such as the skin's combo counter, which needs to happen on the update thread
+            // and therefore can't happen alongside `preventMissOnPreviousHitObjects()` in `LoadAsyncComplete()`
             markPreviousObjectsHit();
-            markVisibleDrawableObjectsHit();
 
             ScoreProcessor.HasCompleted.BindValueChanged(completed =>
             {
@@ -111,38 +125,45 @@ namespace osu.Game.Screens.Edit.GameplayTest
             }
         }
 
-        private void markVisibleDrawableObjectsHit()
+        private void preventMissOnPreviousHitObjects()
         {
-            if (!DrawableRuleset.Playfield.IsLoaded)
+            void preventMiss(HitObject hitObject)
             {
-                Schedule(markVisibleDrawableObjectsHit);
-                return;
+                var drawableObject = DrawableRuleset.Playfield.HitObjectContainer
+                                                    .AliveObjects
+                                                    .SingleOrDefault(it => it.HitObject == hitObject);
+
+                if (drawableObject != null)
+                    preventMissOnDrawable(drawableObject);
             }
 
-            foreach (var drawableObject in enumerateDrawableObjects(DrawableRuleset.Playfield.AllHitObjects, editorState.Time))
+            void preventMissOnDrawable(DrawableHitObject drawableObject)
             {
-                if (drawableObject.Entry == null)
-                    continue;
+                foreach (var nested in drawableObject.NestedHitObjects)
+                    preventMissOnDrawable(nested);
 
-                var result = drawableObject.CreateResult(drawableObject.HitObject.Judgement);
-                result.Type = result.Judgement.MaxResult;
-                drawableObject.Entry.Result = result;
-            }
-
-            static IEnumerable<DrawableHitObject> enumerateDrawableObjects(IEnumerable<DrawableHitObject> drawableObjects, double cutoffTime)
-            {
-                foreach (var drawableObject in drawableObjects)
+                if (drawableObject.Entry != null && drawableObject.HitObject.GetEndTime() < editorState.Time)
                 {
-                    foreach (var nested in enumerateDrawableObjects(drawableObject.NestedHitObjects, cutoffTime))
-                    {
-                        if (nested.HitObject.GetEndTime() < cutoffTime)
-                            yield return nested;
-                    }
-
-                    if (drawableObject.HitObject.GetEndTime() < cutoffTime)
-                        yield return drawableObject;
+                    var result = drawableObject.CreateResult(drawableObject.HitObject.Judgement);
+                    result.Type = result.Judgement.MaxResult;
+                    drawableObject.Entry.Result = result;
                 }
             }
+
+            void removeListener()
+            {
+                if (!DrawableRuleset.Playfield.IsLoaded)
+                {
+                    Schedule(removeListener);
+                    return;
+                }
+
+                DrawableRuleset.Playfield.HitObjectUsageBegan -= preventMiss;
+            }
+
+            DrawableRuleset.Playfield.HitObjectUsageBegan += preventMiss;
+
+            Schedule(removeListener);
         }
 
         protected override void PrepareReplay()
@@ -160,10 +181,16 @@ namespace osu.Game.Screens.Edit.GameplayTest
             switch (e.Action)
             {
                 case GlobalAction.EditorTestPlayToggleAutoplay:
+                    if (PauseOverlay?.State.Value == Visibility.Visible || DrawableRuleset.ResumeOverlay?.State.Value == Visibility.Visible)
+                        return true;
+
                     toggleAutoplay();
                     return true;
 
                 case GlobalAction.EditorTestPlayToggleQuickPause:
+                    if (PauseOverlay?.State.Value == Visibility.Visible || DrawableRuleset.ResumeOverlay?.State.Value == Visibility.Visible)
+                        return true;
+
                     toggleQuickPause();
                     return true;
 

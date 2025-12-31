@@ -56,7 +56,8 @@ namespace osu.Game.Graphics.UserInterface
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-                CornerRadius = 5,
+                CornerRadius = 10,
+                CornerExponent = 2.5f,
                 Masking = true,
                 EdgeEffect = new EdgeEffectParameters
                 {

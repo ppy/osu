@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -176,7 +177,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("mods selected", () => SelectedMods.Value, () => Has.Count.EqualTo(1));
             AddStep("right click mod button", () =>
             {
-                InputManager.MoveMouseTo(Footer.ChildrenOfType<FooterButtonMods>().Single());
+                InputManager.MoveMouseTo(ScreenFooter.ChildrenOfType<FooterButtonMods>().Single());
                 InputManager.Click(MouseButton.Right);
             });
             AddAssert("not mods selected", () => SelectedMods.Value, () => Has.Count.EqualTo(0));
@@ -310,7 +311,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [Test]
         public void TestFilteringRunsAfterReturningFromGameplay()
         {
-            AddStep("import actual beatmap", () => Beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()));
+            AddStep("import actual beatmap", () => Beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely());
+
             LoadSongSelect();
 
             AddUntilStep("wait for filtered", () => SongSelect.ChildrenOfType<BeatmapCarousel>().Single().FilterCount, () => Is.EqualTo(1));
@@ -320,9 +322,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
             AddUntilStep("wait for fail", () => ((Player)Stack.CurrentScreen).GameplayState.HasFailed);
 
-            AddStep("exit gameplay", () => InputManager.Key(Key.Escape));
-            AddStep("exit gameplay", () => InputManager.Key(Key.Escape));
+            AddStep("exit gameplay", () => Stack.CurrentScreen.Exit());
 
+            AddUntilStep("wait for song select", () => Stack.CurrentScreen is Screens.SelectV2.SongSelect);
             AddUntilStep("wait for filtered", () => SongSelect.ChildrenOfType<BeatmapCarousel>().Single().FilterCount, () => Is.EqualTo(2));
         }
 
@@ -582,7 +584,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("previous random invoked", () => previousRandomCalled && !nextRandomCalled);
         }
 
-        private FooterButtonRandom randomButton => Footer.ChildrenOfType<FooterButtonRandom>().Single();
+        private FooterButtonRandom randomButton => ScreenFooter.ChildrenOfType<FooterButtonRandom>().Single();
 
         [Test]
         public void TestFooterOptions()
@@ -590,7 +592,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             LoadSongSelect();
 
             ImportBeatmapForRuleset(0);
-            AddAssert("options enabled", () => this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+            AddUntilStep("options enabled", () => this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
 
             AddStep("click", () => this.ChildrenOfType<FooterButtonOptions>().Single().TriggerClick());
             AddUntilStep("popover displayed", () => this.ChildrenOfType<FooterButtonOptions.Popover>().Any(p => p.IsPresent));
@@ -647,7 +649,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             ImportBeatmapForRuleset(0);
 
-            AddAssert("options enabled", () => this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+            AddUntilStep("options enabled", () => this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
             AddStep("delete all beatmaps", () => Beatmaps.Delete());
 
             AddAssert("beatmap selected", () => !Beatmap.IsDefault);

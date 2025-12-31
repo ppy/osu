@@ -106,6 +106,8 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
+            base.OnEntering(e);
+
             this.FadeIn();
             waves.Show();
 
@@ -119,6 +121,8 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
+            base.OnResuming(e);
+
             this.FadeIn(250);
             this.ScaleTo(1, 250, Easing.OutSine);
 
@@ -129,12 +133,12 @@ namespace osu.Game.Screens.OnlinePlay
             // to work around this, do not proxy resume to screens that haven't loaded yet.
             if ((screenStack.CurrentScreen as Drawable)?.IsLoaded == true)
                 screenStack.CurrentScreen.OnResuming(e);
-
-            base.OnResuming(e);
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
+            base.OnSuspending(e);
+
             this.ScaleTo(1.1f, 250, Easing.InSine);
             this.FadeOut(250);
 
@@ -152,18 +156,19 @@ namespace osu.Game.Screens.OnlinePlay
             while (screenStack.CurrentScreen != null && screenStack.CurrentScreen is not LoungeSubScreen)
             {
                 var subScreen = (Screen)screenStack.CurrentScreen;
-                if (subScreen.IsLoaded && subScreen.OnExiting(e))
-                    return true;
 
                 subScreen.Exit();
+
+                // If it's still current after calling Exit(), it must have blocked OnExiting().
+                if (subScreen.IsCurrentScreen())
+                    return true;
             }
 
             waves.Hide();
 
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
 
-            base.OnExiting(e);
-            return false;
+            return base.OnExiting(e);
         }
 
         public override bool OnBackButton()

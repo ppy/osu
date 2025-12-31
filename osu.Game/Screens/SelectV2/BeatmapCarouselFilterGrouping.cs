@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using osu.Framework.Extensions;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics.Carousel;
@@ -26,6 +26,8 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         public int BeatmapItemsCount { get; private set; }
 
+        public IDictionary<object, (CarouselItem item, int index)> ItemMap => itemMap;
+
         /// <summary>
         /// Beatmap sets contain difficulties as related panels. This dictionary holds the relationships between set-difficulties to allow expanding them on selection.
         /// </summary>
@@ -36,30 +38,25 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         public IDictionary<GroupDefinition, HashSet<CarouselItem>> GroupItems => groupMap;
 
+        private Dictionary<object, (CarouselItem, int)> itemMap = new Dictionary<object, (CarouselItem, int)>();
         private Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>> setMap = new Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>>();
         private Dictionary<GroupDefinition, HashSet<CarouselItem>> groupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>();
 
-        private readonly Func<FilterCriteria> getCriteria;
-        private readonly Func<List<BeatmapCollection>> getCollections;
-        private readonly Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> getLocalUserTopRanks;
-
-        public BeatmapCarouselFilterGrouping(Func<FilterCriteria> getCriteria, Func<List<BeatmapCollection>> getCollections,
-                                             Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> getLocalUserTopRanks)
-        {
-            this.getCriteria = getCriteria;
-            this.getCollections = getCollections;
-            this.getLocalUserTopRanks = getLocalUserTopRanks;
-        }
+        public required Func<FilterCriteria> GetCriteria { get; init; }
+        public required Func<List<BeatmapCollection>> GetCollections { get; init; }
+        public required Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> GetLocalUserTopRanks { get; init; }
+        public required Func<HashSet<int>> GetFavouriteBeatmapSets { get; init; }
 
         public async Task<List<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken)
         {
             return await Task.Run(() =>
             {
                 // preallocate space for the new mappings using last known estimates
+                var newItemMap = new Dictionary<object, (CarouselItem, int)>(itemMap.Count);
                 var newSetMap = new Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>>(setMap.Count);
                 var newGroupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>(groupMap.Count);
 
-                var criteria = getCriteria();
+                var criteria = GetCriteria();
                 var newItems = new List<CarouselItem>();
 
                 BeatmapSetsGroupedTogether = ShouldGroupBeatmapsTogether(criteria);
@@ -120,11 +117,12 @@ namespace osu.Game.Screens.SelectV2
                         {
                             if (groupItem != null)
                                 groupItem.NestedItemCount++;
-
-                            item.DrawHeight = PanelBeatmapStandalone.HEIGHT;
                         }
 
-                        addItem(item);
+                        addItem(new CarouselItem(new GroupedBeatmap(group, beatmap))
+                        {
+                            DrawHeight = BeatmapSetsGroupedTogether ? PanelBeatmap.HEIGHT : PanelBeatmapStandalone.HEIGHT,
+                        });
                         lastBeatmap = beatmap;
                         displayedBeatmapsCount++;
                     }
@@ -133,6 +131,7 @@ namespace osu.Game.Screens.SelectV2
                     {
                         newItems.Add(i);
 
+                        newItemMap[i.Model] = (i, newItems.Count - 1);
                         currentGroupItems?.Add(i);
                         currentSetItems?.Add(i);
 
@@ -142,6 +141,7 @@ namespace osu.Game.Screens.SelectV2
 
                 cancellationToken.ThrowIfCancellationRequested();
 
+                Interlocked.Exchange(ref itemMap, newItemMap);
                 Interlocked.Exchange(ref setMap, newSetMap);
                 Interlocked.Exchange(ref groupMap, newGroupMap);
                 BeatmapItemsCount = displayedBeatmapsCount;
@@ -191,8 +191,8 @@ namespace osu.Game.Screens.SelectV2
                     {
                         var date = b.LastPlayed;
 
-                        if (date == null || date == DateTimeOffset.MinValue)
-                            return new GroupDefinition(int.MaxValue, "Never");
+                        if (date == null)
+                            return new GroupDefinition(int.MaxValue, "Never").Yield();
 
                         return defineGroupByDate(date.Value);
                     }, items);
@@ -214,8 +214,8 @@ namespace osu.Game.Screens.SelectV2
 
                 case GroupMode.Collections:
                 {
-                    var collections = getCollections();
-                    return getGroupsBy(b => defineGroupByCollection(b, collections), items);
+                    var collections = GetCollections();
+                    return defineGroupsByCollection(items, collections);
                 }
 
                 case GroupMode.MyMaps:
@@ -223,197 +223,262 @@ namespace osu.Game.Screens.SelectV2
 
                 case GroupMode.RankAchieved:
                 {
-                    var topRankMapping = getLocalUserTopRanks(criteria);
+                    var topRankMapping = GetLocalUserTopRanks(criteria);
                     return getGroupsBy(b => defineGroupByRankAchieved(b, topRankMapping), items);
                 }
 
-                // TODO: need implementation
-                // case GroupMode.Favourites:
-                //     goto case GroupMode.None;
+                case GroupMode.Favourites:
+                {
+                    var favouriteBeatmapSets = GetFavouriteBeatmapSets();
+                    return getGroupsBy(b => defineGroupByFavourites(b, favouriteBeatmapSets), items);
+                }
 
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        private List<GroupMapping> getGroupsBy(Func<BeatmapInfo, GroupDefinition?> getGroup, List<CarouselItem> items)
+        private List<GroupMapping> getGroupsBy(Func<BeatmapInfo, IEnumerable<GroupDefinition>> defineGroups, List<CarouselItem> items)
         {
-            return items.GroupBy(i => getGroup((BeatmapInfo)i.Model))
-                        .Where(g => g.Key != null)
-                        .OrderBy(g => g.Key!.Order)
-                        .ThenBy(g => g.Key!.Title)
-                        .Select(g => new GroupMapping(g.Key, g.ToList()))
-                        .ToList();
+            var groups = new Dictionary<GroupDefinition, GroupMapping>();
+
+            foreach (var item in items)
+            {
+                foreach (var groupDefinition in defineGroups((BeatmapInfo)item.Model))
+                {
+                    if (!groups.TryGetValue(groupDefinition, out var group))
+                        group = groups[groupDefinition] = new GroupMapping(groupDefinition, []);
+
+                    group.ItemsInGroup.Add(item);
+                }
+            }
+
+            return groups.Values
+                         .OrderBy(g => g.Group!.Order)
+                         .ThenBy(g => g.Group!.Title.ToString())
+                         .ToList();
         }
 
-        private GroupDefinition defineGroupAlphabetically(string name)
+        private IEnumerable<GroupDefinition> defineGroupAlphabetically(string name)
         {
             char firstChar = name.FirstOrDefault();
 
             if (char.IsAsciiDigit(firstChar))
-                return new GroupDefinition(int.MinValue, "0-9");
+                return new GroupDefinition(int.MinValue, "0-9").Yield();
 
             if (char.IsAsciiLetter(firstChar))
-                return new GroupDefinition(char.ToUpperInvariant(firstChar) - 'A', char.ToUpperInvariant(firstChar).ToString());
+                return new GroupDefinition(char.ToUpperInvariant(firstChar) - 'A', char.ToUpperInvariant(firstChar).ToString()).Yield();
 
-            return new GroupDefinition(int.MaxValue, "Other");
+            return new GroupDefinition(int.MaxValue, "Other").Yield();
         }
 
-        private GroupDefinition defineGroupByDate(DateTimeOffset date)
+        private IEnumerable<GroupDefinition> defineGroupByDate(DateTimeOffset date)
         {
             var now = DateTimeOffset.Now;
             var elapsed = now - date;
 
             if (elapsed.TotalDays < 1)
-                return new GroupDefinition(0, "Today");
+                return new GroupDefinition(0, "Today").Yield();
 
             if (elapsed.TotalDays < 2)
-                return new GroupDefinition(1, "Yesterday");
+                return new GroupDefinition(1, "Yesterday").Yield();
 
             if (elapsed.TotalDays < 7)
-                return new GroupDefinition(2, "Last week");
+                return new GroupDefinition(2, "Last week").Yield();
 
             if (elapsed.TotalDays < 30)
-                return new GroupDefinition(3, "Last month");
+                return new GroupDefinition(3, "Last month").Yield();
 
             if (elapsed.TotalDays < 60)
-                return new GroupDefinition(4, "1 month ago");
+                return new GroupDefinition(4, "1 month ago").Yield();
 
             for (int i = 90; i <= 150; i += 30)
             {
                 if (elapsed.TotalDays < i)
-                    return new GroupDefinition(i, $"{i / 30 - 1} months ago");
+                    return new GroupDefinition(i, $"{i / 30 - 1} months ago").Yield();
             }
 
-            return new GroupDefinition(151, "Over 5 months ago");
+            return new GroupDefinition(151, "Over 5 months ago").Yield();
         }
 
-        private GroupDefinition defineGroupByRankedDate(DateTimeOffset? date)
+        private IEnumerable<GroupDefinition> defineGroupByRankedDate(DateTimeOffset? date)
         {
             if (date == null)
-                return new GroupDefinition(0, "Unranked");
+                return new GroupDefinition(0, "Unranked").Yield();
 
-            return new GroupDefinition(-date.Value.Year, $"{date.Value.Year}");
+            return new GroupDefinition(-date.Value.Year, $"{date.Value.Year}").Yield();
         }
 
-        private GroupDefinition defineGroupByStatus(BeatmapOnlineStatus status)
+        private IEnumerable<GroupDefinition> defineGroupByStatus(BeatmapOnlineStatus status)
         {
             switch (status)
             {
                 case BeatmapOnlineStatus.Ranked:
                 case BeatmapOnlineStatus.Approved:
-                    return new GroupDefinition(0, BeatmapOnlineStatus.Ranked.GetDescription());
+                    return new RankedStatusGroupDefinition(0, BeatmapOnlineStatus.Ranked).Yield();
 
                 case BeatmapOnlineStatus.Qualified:
-                    return new GroupDefinition(1, status.GetDescription());
+                    return new RankedStatusGroupDefinition(1, status).Yield();
 
                 case BeatmapOnlineStatus.WIP:
-                    return new GroupDefinition(2, status.GetDescription());
+                    return new RankedStatusGroupDefinition(2, status).Yield();
 
                 case BeatmapOnlineStatus.Pending:
-                    return new GroupDefinition(3, status.GetDescription());
+                    return new RankedStatusGroupDefinition(3, status).Yield();
 
                 case BeatmapOnlineStatus.Graveyard:
-                    return new GroupDefinition(4, status.GetDescription());
+                    return new RankedStatusGroupDefinition(4, status).Yield();
 
                 case BeatmapOnlineStatus.LocallyModified:
-                    return new GroupDefinition(5, status.GetDescription());
+                    return new RankedStatusGroupDefinition(5, status).Yield();
 
                 case BeatmapOnlineStatus.None:
-                    return new GroupDefinition(6, status.GetDescription());
+                    return new RankedStatusGroupDefinition(6, status).Yield();
 
                 case BeatmapOnlineStatus.Loved:
-                    return new GroupDefinition(7, status.GetDescription());
+                    return new RankedStatusGroupDefinition(7, status).Yield();
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(status), status, null);
             }
         }
 
-        private GroupDefinition defineGroupByBPM(double bpm)
+        private IEnumerable<GroupDefinition> defineGroupByBPM(double bpm)
         {
             if (bpm < 60)
-                return new GroupDefinition(60, "Under 60 BPM");
+                return new GroupDefinition(60, "Under 60 BPM").Yield();
 
             for (int i = 70; i <= 300; i += 10)
             {
                 if (bpm < i)
-                    return new GroupDefinition(i, $"{i - 10} - {i} BPM");
+                    return new GroupDefinition(i, $"{i - 10} - {i} BPM").Yield();
             }
 
-            return new GroupDefinition(301, "Over 300 BPM");
+            return new GroupDefinition(301, "Over 300 BPM").Yield();
         }
 
-        private GroupDefinition defineGroupByStars(double stars)
+        private IEnumerable<GroupDefinition> defineGroupByStars(double stars)
         {
             // truncation is intentional - compare `FormatUtils.FormatStarRating()`
             int starInt = (int)stars;
             var starDifficulty = new StarDifficulty(starInt, 0);
 
             if (starInt == 0)
-                return new StarDifficultyGroupDefinition(0, "Below 1 Star", starDifficulty);
+                return new StarDifficultyGroupDefinition(0, "Below 1 Star", starDifficulty).Yield();
 
             if (starInt == 1)
-                return new StarDifficultyGroupDefinition(1, "1 Star", starDifficulty);
+                return new StarDifficultyGroupDefinition(1, "1 Star", starDifficulty).Yield();
 
-            return new StarDifficultyGroupDefinition(starInt, $"{starInt} Stars", starDifficulty);
+            if (starInt < 15)
+                return new StarDifficultyGroupDefinition(starInt, $"{starInt} Stars", starDifficulty).Yield();
+
+            return new StarDifficultyGroupDefinition(15, "Over 15 Stars", new StarDifficulty(15, 0)).Yield();
         }
 
-        private GroupDefinition defineGroupByLength(double length)
+        private IEnumerable<GroupDefinition> defineGroupByLength(double length)
         {
             for (int i = 1; i < 6; i++)
             {
                 if (length <= i * 60_000)
                 {
                     if (i == 1)
-                        return new GroupDefinition(1, "1 minute or less");
+                        return new GroupDefinition(1, "1 minute or less").Yield();
 
-                    return new GroupDefinition(i, $"{i} minutes or less");
+                    return new GroupDefinition(i, $"{i} minutes or less").Yield();
                 }
             }
 
             if (length <= 10 * 60_000)
-                return new GroupDefinition(10, "10 minutes or less");
+                return new GroupDefinition(10, "10 minutes or less").Yield();
 
-            return new GroupDefinition(11, "Over 10 minutes");
+            return new GroupDefinition(11, "Over 10 minutes").Yield();
         }
 
-        private GroupDefinition defineGroupBySource(string source)
+        private IEnumerable<GroupDefinition> defineGroupBySource(string source)
         {
             if (string.IsNullOrEmpty(source))
-                return new GroupDefinition(1, "Unsourced");
+                return new GroupDefinition(1, "Unsourced").Yield();
 
-            return new GroupDefinition(0, source);
+            return new GroupDefinition(0, source).Yield();
         }
 
-        private GroupDefinition defineGroupByCollection(BeatmapInfo beatmap, IEnumerable<BeatmapCollection> collections)
+        private List<GroupMapping> defineGroupsByCollection(List<CarouselItem> carouselItems, List<BeatmapCollection> allCollections)
         {
-            foreach (var collection in collections)
+            Dictionary<GroupDefinition, GroupMapping> groupMappings = new Dictionary<GroupDefinition, GroupMapping>();
+            // this is a pre-built mapping of MD5s to a list of collections in which this MD5 is found in.
+            // the reason to pre-build this is that `BeatmapCollection.BeatmapMD5Hashes` is a list and therefore a naive implementation would be slow,
+            // particularly in edge cases where most beatmaps are in more than one collection.
+            Dictionary<string, List<GroupDefinition>> md5ToCollectionsMap = new Dictionary<string, List<GroupDefinition>>();
+
+            for (int i = 0; i < allCollections.Count; i++)
             {
-                if (collection.BeatmapMD5Hashes.Contains(beatmap.MD5Hash))
-                    return new GroupDefinition(0, collection.Name);
+                var collection = allCollections[i];
+                // NOTE: the ordering of the incoming collection list is significant and needs to be preserved.
+                // the fallback to ordering by name cannot be relied on.
+                // see xmldoc of `BeatmapCarousel.GetAllCollections()`.
+                var groupDefinition = new GroupDefinition(i, collection.Name);
+                groupMappings[groupDefinition] = new GroupMapping(groupDefinition, []);
+
+                foreach (string md5 in collection.BeatmapMD5Hashes)
+                {
+                    if (!md5ToCollectionsMap.TryGetValue(md5, out var collections))
+                        md5ToCollectionsMap[md5] = collections = new List<GroupDefinition>();
+
+                    collections.Add(groupDefinition);
+                }
             }
 
-            return new GroupDefinition(1, "Not in collection");
+            var notInCollection = new GroupDefinition(int.MaxValue, "Not in collection");
+            groupMappings[notInCollection] = new GroupMapping(notInCollection, []);
+
+            foreach (var item in carouselItems)
+            {
+                var beatmap = (BeatmapInfo)item.Model;
+
+                // as a side note, even reading the `MD5Hash` off a realm model is slow if done enough times,
+                // so it definitely helps that thanks to the mapping it needs to only be retrieved once
+                if (md5ToCollectionsMap.TryGetValue(beatmap.MD5Hash, out var collections))
+                {
+                    foreach (var collection in collections)
+                        groupMappings[collection].ItemsInGroup.Add(item);
+                }
+                else
+                    groupMappings[notInCollection].ItemsInGroup.Add(item);
+            }
+
+            return groupMappings.Values
+                                // safety against potentially empty eagerly-initialised groups
+                                // (could happen if user has a collection with MD5s of maps that aren't locally available)
+                                .Where(mapping => mapping.ItemsInGroup.Count > 0)
+                                .OrderBy(mapping => mapping.Group!.Order)
+                                .ToList();
         }
 
-        private GroupDefinition? defineGroupByOwnMaps(BeatmapInfo beatmap, int? localUserId, string? localUserUsername)
+        private IEnumerable<GroupDefinition> defineGroupByOwnMaps(BeatmapInfo beatmap, int? localUserId, string? localUserUsername)
         {
             var author = beatmap.BeatmapSet!.Metadata.Author;
 
             if (author.OnlineID == localUserId || (author.OnlineID <= 1 && author.Username == localUserUsername))
-                return new GroupDefinition(0, "My maps");
+                return new GroupDefinition(0, "My maps").Yield();
 
             // discard beatmaps not owned by the user.
-            return null;
+            return [];
         }
 
-        private GroupDefinition defineGroupByRankAchieved(BeatmapInfo beatmap, IReadOnlyDictionary<Guid, ScoreRank> topRankMapping)
+        private IEnumerable<GroupDefinition> defineGroupByRankAchieved(BeatmapInfo beatmap, IReadOnlyDictionary<Guid, ScoreRank> topRankMapping)
         {
             if (topRankMapping.TryGetValue(beatmap.ID, out var rank))
-                return new GroupDefinition(-(int)rank, rank.GetDescription());
+                return new RankDisplayGroupDefinition(rank).Yield();
 
-            return new GroupDefinition(int.MaxValue, "Unplayed");
+            return new GroupDefinition(int.MaxValue, "Unplayed").Yield();
+        }
+
+        private IEnumerable<GroupDefinition> defineGroupByFavourites(BeatmapInfo beatmap, HashSet<int> favouriteBeatmapSets)
+        {
+            if (beatmap.BeatmapSet?.OnlineID > 0 && favouriteBeatmapSets.Contains(beatmap.BeatmapSet.OnlineID))
+                return new GroupDefinition(0, "Favourites").Yield();
+
+            return [];
         }
 
         private record GroupMapping(GroupDefinition? Group, List<CarouselItem> ItemsInGroup);

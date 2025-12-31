@@ -17,6 +17,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.SelectV2;
+using osuTK.Input;
 using FilterControl = osu.Game.Screens.SelectV2.FilterControl;
 using NoResultsPlaceholder = osu.Game.Screens.SelectV2.NoResultsPlaceholder;
 
@@ -86,6 +87,33 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddUntilStep("wait for filter", () => !Carousel.IsFiltering);
 
             AddAssert("selection unchanged", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(Beatmaps.GetAllUsableBeatmapSets().First().Beatmaps.Last()));
+        }
+
+        [Test]
+        public void TestFilterSingleResult_ReselectedAfterRulesetSwitches()
+        {
+            LoadSongSelect();
+
+            ImportBeatmapForRuleset(0);
+            ImportBeatmapForRuleset(0);
+
+            AddStep("disable converts", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
+            AddStep("set filter text", () => filterTextBox.Current.Value = $"\"{Beatmaps.GetAllUsableBeatmapSets().Last().Metadata.Title}\"");
+
+            AddWaitStep("wait for debounce", 5);
+            AddUntilStep("wait for filter", () => !Carousel.IsFiltering);
+            AddUntilStep("selection is second beatmap set", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(Beatmaps.GetAllUsableBeatmapSets().Last().Beatmaps.First()));
+
+            AddStep("select last difficulty", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmap.Value.BeatmapSetInfo.Beatmaps.Last()));
+            AddUntilStep("selection is last difficulty of second beatmap set", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(Beatmaps.GetAllUsableBeatmapSets().Last().Beatmaps.Last()));
+
+            ChangeRuleset(1);
+            AddUntilStep("wait for filter", () => !Carousel.IsFiltering);
+            AddUntilStep("selection is default", () => Beatmap.IsDefault);
+
+            ChangeRuleset(0);
+            AddUntilStep("wait for filter", () => !Carousel.IsFiltering);
+            AddUntilStep("selection is last difficulty of second beatmap set", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(Beatmaps.GetAllUsableBeatmapSets().Last().Beatmaps.Last()));
         }
 
         [Test]
@@ -302,7 +330,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             checkMatchedBeatmaps(2);
 
-            AddAssert("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.Not.EqualTo(hiddenBeatmap));
+            AddUntilStep("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.Not.EqualTo(hiddenBeatmap));
 
             AddStep("restore", () => Beatmaps.Restore(hiddenBeatmap!));
 
@@ -325,6 +353,30 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddAssert("hide fails", () => Beatmaps.Hide(Beatmap.Value.BeatmapInfo), () => Is.False);
             checkMatchedBeatmaps(1);
+        }
+
+        [Test]
+        public void TestScopeToBeatmapWhenDifficultiesSplitApart()
+        {
+            ImportBeatmapForRuleset(0);
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+            SortBy(SortMode.Difficulty);
+            checkMatchedBeatmaps(6);
+
+            AddUntilStep("wait for spread indicator", () => this.ChildrenOfType<PanelBeatmapStandalone.SpreadDisplay>().Any(d => d.Enabled.Value));
+            AddStep("click spread indicator", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<PanelBeatmapStandalone.SpreadDisplay>().Single(d => d.Enabled.Value));
+                InputManager.Click(MouseButton.Left);
+            });
+            WaitForFiltering();
+            checkMatchedBeatmaps(3);
+
+            AddStep("press Escape", () => InputManager.Key(Key.Escape));
+            WaitForFiltering();
+            checkMatchedBeatmaps(6);
         }
 
         private NoResultsPlaceholder? getPlaceholder() => SongSelect.ChildrenOfType<NoResultsPlaceholder>().FirstOrDefault();

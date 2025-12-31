@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -30,7 +31,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             RemoveAllBeatmaps();
             CreateCarousel();
             WaitForFiltering();
-            AddBeatmaps(1, 3);
+            AddStep("add beatmap", () =>
+            {
+                var beatmap = CreateTestBeatmapSetInfo(3, false);
+                Realm.Write(r => r.Add(beatmap, update: true));
+                BeatmapSets.Add(beatmap.Detach());
+            });
             WaitForFiltering();
             AddStep("generate and add test beatmap", () =>
             {
@@ -44,7 +50,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                 foreach (var b in baseTestBeatmap.Beatmaps)
                     b.Metadata = metadata;
-                BeatmapSets.Add(baseTestBeatmap);
+
+                Realm.Write(r => r.Add(baseTestBeatmap, update: true));
+                BeatmapSets.Add(baseTestBeatmap.Detach());
             });
             WaitForFiltering();
 
@@ -68,12 +76,19 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("drawables unchanged", () => Carousel.ChildrenOfType<Panel>(), () => Is.EqualTo(originalDrawables));
         }
 
-        [Test]
-        public void TestScrollPositionMaintainedWhenSetUpdated()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestScrollPositionMaintainedWhenSetUpdated(bool difficultySort)
         {
-            PanelBeatmapSet panel = null!;
+            if (difficultySort)
+            {
+                SortAndGroupBy(SortMode.Difficulty, GroupMode.Difficulty);
+                assertDidFilter(1);
+            }
 
-            AddStep("find panel", () => panel = Carousel.ChildrenOfType<PanelBeatmapSet>().Single(p => p.ChildrenOfType<OsuSpriteText>().Any(t => t.Text.ToString() == "beatmap")));
+            Panel panel = null!;
+
+            AddStep("find panel", () => panel = Carousel.ChildrenOfType<Panel>().First(p => p.Item != null && p.ChildrenOfType<OsuSpriteText>().Any(t => t.Text.ToString() == "beatmap")));
 
             AddStep("select panel", () => panel.TriggerClick());
 
@@ -97,7 +112,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 };
             });
 
-            assertDidFilter();
+            assertDidFilter(difficultySort ? 2 : 1);
             WaitForFiltering();
 
             AddAssert("scroll is still at end", () => Carousel.ChildrenOfType<UserTrackingScrollContainer>().Single().IsScrolledToEnd());
@@ -172,15 +187,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             assertDidNotFilter();
         }
 
-        [TestCase(false)]
-        [TestCase(true)]
-        public void TestSelectionHeld(bool hashChanged)
+        [TestCase(false, false)]
+        [TestCase(false, true)]
+        [TestCase(true, false)]
+        [TestCase(true, true)]
+        public void TestSelectionHeld(bool difficultySort, bool hashChanged)
         {
             SelectNextSet();
 
+            if (difficultySort)
+            {
+                SortAndGroupBy(SortMode.Difficulty, GroupMode.Difficulty);
+                assertDidFilter(1);
+            }
+
             WaitForSetSelection(1, 0);
-            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
-            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentBeatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => (GetSelectedPanel()?.Item?.Model as GroupedBeatmap)?.Beatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
             updateBeatmap(b =>
             {
@@ -188,15 +211,17 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     b.Hash = "new hash";
             });
 
+            int baseFilterCount = difficultySort ? 1 : 0;
+
             if (hashChanged)
-                assertDidFilter();
+                assertDidFilter(baseFilterCount + 1);
             else
-                assertDidNotFilter();
+                assertDidFilter(baseFilterCount);
 
             WaitForFiltering();
 
-            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
-            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentBeatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => (GetSelectedPanel()?.Item?.Model as GroupedBeatmap)?.Beatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
         }
 
         [Test] // Checks that we keep selection based on online ID where possible.
@@ -205,15 +230,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             SelectNextSet();
 
             WaitForSetSelection(1, 0);
-            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
-            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentBeatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => (GetSelectedPanel()?.Item?.Model as GroupedBeatmap)?.Beatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
             updateBeatmap(b => b.DifficultyName = "new name");
             assertDidFilter();
             WaitForFiltering();
 
-            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
-            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentBeatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => (GetSelectedPanel()?.Item?.Model as GroupedBeatmap)?.Beatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
         }
 
         [Test] // Checks that we fallback to keeping selection based on difficulty name.
@@ -222,15 +247,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             SelectNextSet();
 
             WaitForSetSelection(1, 0);
-            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
-            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentBeatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => (GetSelectedPanel()?.Item?.Model as GroupedBeatmap)?.Beatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
             updateBeatmap(b => b.OnlineID = b.OnlineID + 1);
             assertDidFilter();
             WaitForFiltering();
 
-            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
-            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentBeatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => (GetSelectedPanel()?.Item?.Model as GroupedBeatmap)?.Beatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
         }
 
         [Test] // Checks that we don't crash if there exists a difficulty with the same online ID as the selected difficulty.
@@ -239,8 +264,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             SelectNextSet();
 
             WaitForSetSelection(1, 0);
-            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
-            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentBeatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => (GetSelectedPanel()?.Item?.Model as GroupedBeatmap)?.Beatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
             // Add another difficulty with same online ID.
             updateBeatmap(null, bs =>
@@ -252,8 +277,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             WaitForFiltering();
 
-            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
-            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentBeatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => (GetSelectedPanel()?.Item?.Model as GroupedBeatmap)?.Beatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
         }
 
         [Test] // Checks that we don't crash if there exists a difficulty with the same name as the selected difficulty.
@@ -262,21 +287,24 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             SelectNextSet();
 
             WaitForSetSelection(1, 0);
-            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
-            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentBeatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("visible panel is updateable beatmap", () => (GetSelectedPanel()?.Item?.Model as GroupedBeatmap)?.Beatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
 
             // Remove original selected difficulty, and add two difficulties with same name as selection.
             updateBeatmap(null, bs =>
             {
                 string selectedName = bs.Beatmaps[0].DifficultyName;
+                Realm.Write(r => r.Remove(r.Find<BeatmapInfo>(bs.Beatmaps[0].ID)!));
                 bs.Beatmaps.RemoveAt(0);
 
                 var newBeatmap = createBeatmap(bs);
+                newBeatmap.ID = Guid.NewGuid();
                 newBeatmap.DifficultyName = selectedName;
                 newBeatmap.OnlineID = -1;
                 bs.Beatmaps.Add(newBeatmap);
 
                 newBeatmap = createBeatmap(bs);
+                newBeatmap.ID = Guid.NewGuid();
                 newBeatmap.DifficultyName = selectedName;
                 newBeatmap.OnlineID = -1;
                 bs.Beatmaps.Add(newBeatmap);
@@ -284,8 +312,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             WaitForFiltering();
 
-            AddAssert("selection is updateable beatmap", () => Carousel.CurrentSelection, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
-            AddAssert("visible panel is updateable beatmap", () => GetSelectedPanel()?.Item?.Model, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
+            AddAssert("selection is updateable beatmap", () => Carousel.CurrentBeatmap, () => Is.EqualTo(BeatmapSets[1].Beatmaps[2]));
+            AddAssert("visible panel is updateable beatmap", () => (GetSelectedPanel()?.Item?.Model as GroupedBeatmap)?.Beatmap, () => Is.EqualTo(BeatmapSets[1].Beatmaps[2]));
         }
 
         /// <summary>
@@ -402,7 +430,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
         }
 
-        private void assertDidFilter() => AddAssert("did filter", () => Carousel.FilterCount, () => Is.EqualTo(initial_filter_count + 1));
+        private void assertDidFilter(int count = 1) => AddAssert("did filter", () => Carousel.FilterCount, () => Is.EqualTo(initial_filter_count + count));
 
         private void assertDidNotFilter() => AddAssert("did not filter", () => Carousel.FilterCount, () => Is.EqualTo(initial_filter_count));
 
@@ -439,7 +467,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                 int originalIndex = BeatmapSets.IndexOf(baseTestBeatmap);
 
-                BeatmapSets.ReplaceRange(originalIndex, 1, [updatedSet]);
+                Realm.Write(r => r.Add(updatedSet, update: true));
+                BeatmapSets.ReplaceRange(originalIndex, 1, [updatedSet.Detach()]);
             });
         }
 

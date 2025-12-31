@@ -103,6 +103,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                                     leaderboard.Origin = Anchor.BottomLeft;
                                     leaderboard.Position = pos;
                                 }
+
+                                foreach (var d in container.OfType<ISerialisableDrawable>())
+                                    d.UsesFixedAnchor = true;
                             })
                             {
                                 Children = new Drawable[]

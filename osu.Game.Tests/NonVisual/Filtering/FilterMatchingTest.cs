@@ -299,6 +299,23 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual(filtered, carouselItem.Filtered.Value);
         }
 
+        [Test]
+        [TestCase("artist")]
+        [TestCase("unicode")]
+        public void TestCriteriaNotMatchingArtist(string excludedTerm)
+        {
+            var beatmap = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                Artist = new FilterCriteria.OptionalTextFilter { SearchTerm = excludedTerm, ExcludeTerm = true }
+            };
+
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            Assert.True(carouselItem.Filtered.Value);
+        }
+
         [TestCase("simple", false)]
         [TestCase("\"style/clean\"", false)]
         [TestCase("\"style/clean\"!", false)]
@@ -342,6 +359,41 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 [
                     new FilterCriteria.OptionalTextFilter { SearchTerm = "\"song representation/simple\"!" },
                     new FilterCriteria.OptionalTextFilter { SearchTerm = "\"style/dirty\"!" }
+                ]
+            };
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            Assert.AreEqual(true, carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        public void TestCriteriaMatchingTagExcluded()
+        {
+            var beatmap = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                UserTags =
+                [
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"song representation/simple\"!", ExcludeTerm = true },
+                ]
+            };
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            Assert.AreEqual(true, carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        public void TestCriteriaOneTagIncludedAndOneTagExcluded()
+        {
+            var beatmap = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                UserTags =
+                [
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"song representation/simple\"!" },
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"style/clean\"!", ExcludeTerm = true }
                 ]
             };
             var carouselItem = new CarouselBeatmap(beatmap);

@@ -43,6 +43,8 @@ namespace osu.Game.Screens.SelectV2
             var request = new GetBeatmapSetRequest(id);
             var tcs = new TaskCompletionSource<APIBeatmapSet?>();
 
+            token.Register(() => request.Cancel());
+
             // async request success callback is a bit of a dangerous game, but there's some reasoning for it.
             // - don't really want to use `IAPIAccess.PerformAsync()` because we still want to respect request queueing & online status checks
             // - we want the realm write here to be async because it is known to be slow for some users with large beatmap collections
@@ -80,7 +82,9 @@ namespace osu.Game.Screens.SelectV2
                 // unfortunately in terms of subscriptions realm treats *every* write to any realm object as a modification,
                 // even if the write was redundant and had no observable effect.
 
-                if (dbBeatmapSet.Status != onlineBeatmapSet.Status)
+                // notably, `LocallyModified` status is preserved on the set until the user performs an explicit action to get rid of it
+                // (be it updating the set or deciding to discard their changes, removing the set and re-downloading it, etc.)
+                if (dbBeatmapSet.Status != onlineBeatmapSet.Status && dbBeatmapSet.Status != BeatmapOnlineStatus.LocallyModified)
                     dbBeatmapSet.Status = onlineBeatmapSet.Status;
 
                 foreach (var dbBeatmap in dbBeatmapSet.Beatmaps)
