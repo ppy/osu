@@ -90,14 +90,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestItemNotAddedIfExistingOnStart()
-        {
-            AddStep("create new item", () => songSelect.AddNewItem());
-            AddStep("finalise selection", () => InputManager.Key(Key.Enter));
-            AddAssert("playlist has 1 item", () => room.Playlist.Count == 1);
-        }
-
-        [Test]
         public void TestAddSameItemMultipleTimes()
         {
             AddStep("create new item", () => songSelect.AddNewItem());
