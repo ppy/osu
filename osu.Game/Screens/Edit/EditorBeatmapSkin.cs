@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
-using osu.Game.Beatmaps;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -34,10 +33,13 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public BindableList<Colour4> ComboColours { get; }
 
-        public EditorBeatmapSkin(BeatmapSetInfo beatmapSet, LegacyBeatmapSkin skin)
-        {
-            Skin = skin;
+        private readonly EditorBeatmap editorBeatmap;
 
+        public EditorBeatmapSkin(EditorBeatmap editorBeatmap, LegacyBeatmapSkin skin)
+        {
+            this.editorBeatmap = editorBeatmap;
+
+            Skin = skin;
             ComboColours = new BindableList<Colour4>();
 
             if (Skin.Configuration.ComboColours is IReadOnlyList<Color4> comboColours)
@@ -67,6 +69,7 @@ namespace osu.Game.Screens.Edit
             for (int i = 0; i < ComboColours.Count; ++i)
                 Skin.Configuration.CustomComboColours.Add(ComboColours[(ComboColours.Count + i - 1) % ComboColours.Count]);
             InvokeSkinChanged();
+            editorBeatmap.SaveState();
         }
 
         #endregion
