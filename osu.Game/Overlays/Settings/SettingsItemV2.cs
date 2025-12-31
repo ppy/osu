@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Settings
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS_RIGHT },
+                Padding = SettingsPanel.ContentPaddingV2,
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
