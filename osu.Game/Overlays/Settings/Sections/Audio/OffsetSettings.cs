@@ -26,6 +26,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 new AudioOffsetAdjustControl
                 {
                     Current = config.GetBindable<double>(OsuSetting.AudioOffset),
+                    Margin = new MarginPadding { Bottom = 5 },
                 },
                 new SettingsItemV2(new FormCheckBox
                 {
