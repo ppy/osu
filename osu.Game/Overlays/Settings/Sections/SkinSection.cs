@@ -206,8 +206,8 @@ namespace osu.Game.Overlays.Settings.Sections
 
                     [Resolved]
                     private RealmAccess realm { get; set; } = null!;
-                    private readonly Dictionary<Guid, bool> pendingFavouriteChanges = new();
 
+                    private readonly Dictionary<Guid, bool> pendingFavouriteChanges = new();
 
                     public void TrackFavouriteChange(Guid skinID, bool isFavourite)
                     {
@@ -243,6 +243,7 @@ namespace osu.Game.Overlays.Settings.Sections
                             Foreground.Padding = new MarginPadding(2);
                             Foreground.AutoSizeAxes = Axes.Y;
                             Foreground.RelativeSizeAxes = Axes.X;
+
                             Masking = true;
                             CornerRadius = 5;
 
@@ -254,12 +255,6 @@ namespace osu.Game.Overlays.Settings.Sections
                                         content.Star.SkinData = skin;
                                 });
                             }
-                        }
-
-                        [BackgroundDependencyLoader]
-                        private void load()
-                        {
-                            AddInternal(new HoverSounds());
                         }
 
                         protected override void UpdateForegroundColour()
@@ -277,10 +272,18 @@ namespace osu.Game.Overlays.Settings.Sections
                             //      Slide to reveal instead of permanently visible star?
 
                             public bool IsFavourite;
+
                             public SkinInfo? SkinData;
+
                             private SkinDropdownMenu? menu;
+
                             private bool isStarHovered { get; set; }
+
+                            public bool IsStarHovered => isStarHovered;
+
                             private OverlayColourProvider? colourProvider;
+
+                            public override bool ChangeFocusOnClick => false;
 
                             [BackgroundDependencyLoader(true)]
                             private void load(OverlayColourProvider? colourProvider, RealmAccess realm)
@@ -295,6 +298,7 @@ namespace osu.Game.Overlays.Settings.Sections
                                     IsFavourite = skin.IsFavourite;
                                     Alpha = IsFavourite ? 1 : 0;
                                     X = Content.StarOffset;
+
                                     changeStarButtonState(IsFavourite);
                                 }
                             }
@@ -302,6 +306,7 @@ namespace osu.Game.Overlays.Settings.Sections
                             protected override void LoadComplete()
                             {
                                 menu = this.FindClosestParent<SkinDropdownMenu>();
+
                                 base.LoadComplete();
                             }
 
@@ -310,23 +315,16 @@ namespace osu.Game.Overlays.Settings.Sections
                                 if (currentState)
                                 {
                                     this.FadeColour(Colour4.Gold, 250, Easing.OutQuint);
-                                    this.DelayUntilTransformsFinished().Schedule(() =>
-                                    {
-                                        Alpha = 1;
-                                    });
+                                    this.DelayUntilTransformsFinished().Schedule(() => { Alpha = 1; });
                                 }
                                 else
                                 {
                                     Colour4 NewColor = colourProvider?.Background5 ?? Color4.Black;
+
                                     this.FadeColour(NewColor, 250, Easing.OutQuint);
-                                    this.DelayUntilTransformsFinished().Schedule(() =>
-                                    {
-                                        Alpha = 0;
-                                    });
+                                    this.DelayUntilTransformsFinished().Schedule(() => { Alpha = 0; });
                                 }
                             }
-
-                            public override bool ChangeFocusOnClick => false;
 
                             protected override bool OnClick(ClickEvent e)
                             {
@@ -379,16 +377,21 @@ namespace osu.Game.Overlays.Settings.Sections
                                 {
                                     this.FadeColour(colourProvider?.Background5 ?? Color4.Black, 550, Easing.OutQuint);
                                 }
+
                                 this.ScaleTo(1.0f, 350, Easing.OutQuint);
                             }
-
-                            public bool IsStarHovered => isStarHovered;
                         }
 
                         protected override Drawable CreateContent() => new Content();
 
                         protected new partial class Content : CompositeDrawable, IHasText
                         {
+                            [BackgroundDependencyLoader(true)]
+                            private void load(OverlayColourProvider? colourProvider)
+                            {
+                                Star.Colour = colourProvider?.Background5 ?? Color4.Black;
+                            }
+
                             public LocalisableString Text
                             {
                                 get => Label.Text;
@@ -396,9 +399,35 @@ namespace osu.Game.Overlays.Settings.Sections
                             }
 
                             public readonly OsuSpriteText Label;
+
                             public readonly StarButton Star;
 
                             public static float StarOffset = 6;
+
+                            private bool hovering;
+
+                            public bool Hovering
+                            {
+                                get => hovering;
+                                set
+                                {
+                                    if (value == hovering)
+                                        return;
+
+                                    hovering = value;
+
+                                    if (hovering || Star.IsFavourite)
+                                    {
+                                        Star.FadeIn(400, Easing.OutQuint);
+                                        Star.MoveToX(StarOffset, 200, Easing.In);
+                                    }
+                                    else if (!hovering && !Star.IsFavourite && !Star.IsStarHovered)
+                                    {
+                                        Star.FadeOut(200);
+                                        Star.MoveToX(3, 400, Easing.OutQuint);
+                                    }
+                                }
+                            }
 
                             public Content()
                             {
@@ -427,37 +456,6 @@ namespace osu.Game.Overlays.Settings.Sections
                                         RelativeSizeAxes = Axes.X,
                                     },
                                 };
-                            }
-
-                            [BackgroundDependencyLoader(true)]
-                            private void load(OverlayColourProvider? colourProvider)
-                            {
-                                Star.Colour = colourProvider?.Background5 ?? Color4.Black;
-                            }
-
-                            private bool hovering;
-
-                            public bool Hovering
-                            {
-                                get => hovering;
-                                set
-                                {
-                                    if (value == hovering)
-                                        return;
-
-                                    hovering = value;
-
-                                    if (hovering || Star.IsFavourite)
-                                    {
-                                        Star.FadeIn(400, Easing.OutQuint);
-                                        Star.MoveToX(StarOffset, 200, Easing.In);
-                                    }
-                                    else if (!hovering && !Star.IsFavourite && !Star.IsStarHovered)
-                                    {
-                                        Star.FadeOut(200);
-                                        Star.MoveToX(3, 400, Easing.OutQuint);
-                                    }
-                                }
                             }
                         }
                     }
