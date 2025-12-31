@@ -15,6 +15,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
 {
     public partial class FormFieldCaption : CompositeDrawable, IHasTooltip
     {
+        private OsuSpriteText captionText = null!;
+        private SpriteIcon questionIcon = null!;
+
         private LocalisableString caption;
 
         public LocalisableString Caption
@@ -29,9 +32,19 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
-        private OsuSpriteText captionText = null!;
+        private LocalisableString tooltipText;
 
-        public LocalisableString TooltipText { get; set; }
+        public LocalisableString TooltipText
+        {
+            get => tooltipText;
+            set
+            {
+                tooltipText = value;
+
+                if (questionIcon.IsNotNull())
+                    questionIcon.Alpha = value == default ? 0 : 1;
+            }
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -52,14 +65,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                     },
-                    new SpriteIcon
+                    questionIcon = new SpriteIcon
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Alpha = TooltipText == default ? 0 : 1,
                         Size = new Vector2(10),
                         Icon = FontAwesome.Solid.QuestionCircle,
-                        Margin = new MarginPadding { Top = 1, },
+                        Margin = new MarginPadding { Top = 1 },
                     }
                 },
             };
