@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             Children = new Drawable[]
             {
-                new SettingsButton
+                new SettingsButtonV2
                 {
                     Text = BindingSettingsStrings.Configure,
                     TooltipText = BindingSettingsStrings.ChangeBindingsButton,

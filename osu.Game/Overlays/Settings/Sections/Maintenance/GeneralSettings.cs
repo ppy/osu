@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             AddRange(new Drawable[]
             {
-                new SettingsButton
+                new SettingsButtonV2
                 {
                     Text = DebugSettingsStrings.ImportFiles,
                     Action = () =>
@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                             performer?.PerformFromScreen(menu => menu.Push(new FileImportScreen()));
                     },
                 },
-                new SettingsButton
+                new SettingsButtonV2
                 {
                     Text = DebugSettingsStrings.RunLatencyCertifier,
                     Action = () => performer?.PerformFromScreen(menu => menu.Push(new LatencyCertifierScreen()))

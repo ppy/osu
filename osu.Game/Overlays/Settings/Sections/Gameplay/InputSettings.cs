@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
@@ -19,32 +20,35 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         {
             Children = new Drawable[]
             {
-                new SettingsSlider<float, SizeSlider<float>>
+                new SettingsItemV2(new FormSliderBar<float>
                 {
-                    LabelText = SkinSettingsStrings.GameplayCursorSize,
+                    Caption = SkinSettingsStrings.GameplayCursorSize,
                     Current = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
-                    KeyboardStep = 0.01f
-                },
-                new SettingsCheckbox
+                    KeyboardStep = 0.01f,
+                    LabelFormat = v => $"{v:0.##}x"
+                }),
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = SkinSettingsStrings.AutoCursorSize,
+                    Caption = SkinSettingsStrings.AutoCursorSize,
                     Current = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
-                },
-                new SettingsCheckbox
+                }),
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = SkinSettingsStrings.GameplayCursorDuringTouch,
-                    Keywords = new[] { @"touchscreen" },
+                    Caption = SkinSettingsStrings.GameplayCursorDuringTouch,
                     Current = config.GetBindable<bool>(OsuSetting.GameplayCursorDuringTouch)
+                })
+                {
+                    Keywords = new[] { @"touchscreen" },
                 },
             };
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
             {
-                Add(new SettingsCheckbox
+                Add(new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = GameplaySettingsStrings.DisableWinKey,
+                    Caption = GameplaySettingsStrings.DisableWinKey,
                     Current = config.GetBindable<bool>(OsuSetting.GameplayDisableWinKey)
-                });
+                }));
             }
         }
     }

@@ -13,6 +13,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
+using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 {
@@ -23,10 +24,10 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
         [BackgroundDependencyLoader]
         private void load(GameHost host, RealmAccess realm)
         {
-            SettingsButton blockAction;
-            SettingsButton unblockAction;
+            SettingsButtonV2 blockAction;
+            SettingsButtonV2 unblockAction;
 
-            Add(new SettingsButton
+            Add(new SettingsButtonV2
             {
                 Text = @"Clear all caches",
                 Action = () =>
@@ -38,11 +39,11 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                 }
             });
 
-            SettingsEnumDropdown<GCLatencyMode> latencyModeDropdown;
-            Add(latencyModeDropdown = new SettingsEnumDropdown<GCLatencyMode>
+            FormEnumDropdown<GCLatencyMode> latencyModeDropdown;
+            Add(new SettingsItemV2(latencyModeDropdown = new FormEnumDropdown<GCLatencyMode>
             {
-                LabelText = "GC mode",
-            });
+                Caption = "GC mode",
+            }));
 
             latencyModeDropdown.Current.BindValueChanged(mode =>
             {
@@ -65,7 +66,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
             {
                 AddRange(new Drawable[]
                 {
-                    new SettingsButton
+                    new SettingsButtonV2
                     {
                         Text = @"Compact realm",
                         Action = () =>
@@ -76,11 +77,11 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                             }
                         }
                     },
-                    blockAction = new SettingsButton
+                    blockAction = new SettingsButtonV2
                     {
                         Text = @"Block realm",
                     },
-                    unblockAction = new SettingsButton
+                    unblockAction = new SettingsButtonV2
                     {
                         Text = @"Unblock realm",
                     }
