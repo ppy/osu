@@ -171,17 +171,27 @@ namespace osu.Game.Tournament.Screens.MapPool
                 return;
 
             int totalBansRequired = CurrentMatch.Value.Round.Value.BanCount.Value * 2;
+            int totalProtectsRequired = CurrentMatch.Value.Round.Value.ProtectCount.Value * 2;
 
             TeamColour lastPickColour = CurrentMatch.Value.PicksBans.LastOrDefault()?.Team ?? TeamColour.Red;
 
             TeamColour nextColour;
-
+            bool hasAllProtects = CurrentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Protect) >= totalProtectsRequired;
             bool hasAllBans = CurrentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) >= totalBansRequired;
 
-            if (!hasAllBans)
+            ChoiceType nextMode = ChoiceType.Pick;
+
+            if (!hasAllProtects)
+            {
+                // Protect phase: switch teams every protect.
+                nextMode = ChoiceType.Protect;
+                nextColour = getOppositeTeamColour(lastPickColour);
+            }
+            else if (!hasAllBans)
             {
                 // Ban phase: switch teams every second ban.
-                nextColour = CurrentMatch.Value.PicksBans.Count % 2 == 1
+                nextMode = ChoiceType.Ban;
+                nextColour = CurrentMatch.Value.PicksBans.Count(pb => pb.Type == ChoiceType.Ban) % 2 == 1
                     ? getOppositeTeamColour(lastPickColour)
                     : lastPickColour;
             }
@@ -193,7 +203,7 @@ namespace osu.Game.Tournament.Screens.MapPool
                     : lastPickColour;
             }
 
-            setMode(nextColour, hasAllBans ? ChoiceType.Pick : ChoiceType.Ban);
+            setMode(nextColour, nextMode);
 
             TeamColour getOppositeTeamColour(TeamColour colour) => colour == TeamColour.Red ? TeamColour.Blue : TeamColour.Red;
         }

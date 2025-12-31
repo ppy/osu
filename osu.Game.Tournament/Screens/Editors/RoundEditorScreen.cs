@@ -89,14 +89,20 @@ namespace osu.Game.Tournament.Screens.Editors
                             },
                             new SettingsSlider<int>
                             {
+                                LabelText = "# of Protects",
+                                Width = 0.33f,
+                                Current = Model.ProtectCount
+                            },
+                            new SettingsSlider<int>
+                            {
                                 LabelText = "Best of",
                                 Width = 0.33f,
                                 Current = Model.BestOf
                             },
                             new SettingsButton
                             {
-                                Width = 0.2f,
-                                Margin = new MarginPadding(10),
+                                Width = 1.0f,
+                                Margin = new MarginPadding { Vertical = 10 },
                                 Text = "Add beatmap",
                                 Action = () => beatmapEditor.CreateNew()
                             },
