@@ -3,7 +3,6 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Tournament.Components;
@@ -18,16 +17,14 @@ namespace osu.Game.Tournament.Tests.Screens
     {
         private MapPoolScreen screen = null!;
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Add(screen = new TestMapPoolScreen { Width = 0.7f });
-        }
-
         [SetUpSteps]
         public override void SetUpSteps()
         {
-            AddStep("reset state", resetState);
+            AddStep("reset state", () =>
+            {
+                base.Content.Child = screen = new TestMapPoolScreen { Width = 0.95f };
+                resetState();
+            });
         }
 
         private void resetState()
@@ -47,18 +44,9 @@ namespace osu.Game.Tournament.Tests.Screens
         [Test]
         public void TestFewMaps()
         {
-            AddStep("load few maps", () =>
-            {
-                Ladder.CurrentMatch.Value!.Round.Value!.Beatmaps.Clear();
+            loadMaps(8);
 
-                for (int i = 0; i < 8; i++)
-                    addBeatmap();
-            });
-
-            AddStep("reset match", () =>
-            {
-                Ladder.CurrentMatch.Value = new TournamentMatch();
-            });
+            AddStep("reset state", resetState);
 
             assertTwoWide();
         }
@@ -66,13 +54,7 @@ namespace osu.Game.Tournament.Tests.Screens
         [Test]
         public void TestJustEnoughMaps()
         {
-            AddStep("load just enough maps", () =>
-            {
-                Ladder.CurrentMatch.Value!.Round.Value!.Beatmaps.Clear();
-
-                for (int i = 0; i < 18; i++)
-                    addBeatmap();
-            });
+            loadMaps(18);
 
             AddStep("reset state", resetState);
 
@@ -82,13 +64,7 @@ namespace osu.Game.Tournament.Tests.Screens
         [Test]
         public void TestManyMaps()
         {
-            AddStep("load many maps", () =>
-            {
-                Ladder.CurrentMatch.Value!.Round.Value!.Beatmaps.Clear();
-
-                for (int i = 0; i < 19; i++)
-                    addBeatmap();
-            });
+            loadMaps(19);
 
             AddStep("reset state", resetState);
 
@@ -154,13 +130,7 @@ namespace osu.Game.Tournament.Tests.Screens
         {
             AddStep("set ban count", () => Ladder.CurrentMatch.Value!.Round.Value!.BanCount.Value = 2);
 
-            AddStep("load some maps", () =>
-            {
-                Ladder.CurrentMatch.Value!.Round.Value!.Beatmaps.Clear();
-
-                for (int i = 0; i < 5; i++)
-                    addBeatmap();
-            });
+            loadMaps(5);
 
             AddStep("update displayed maps", () => Ladder.SplitMapPoolByMods.Value = false);
 
@@ -192,13 +162,7 @@ namespace osu.Game.Tournament.Tests.Screens
         {
             AddStep("set ban count", () => Ladder.CurrentMatch.Value!.Round.Value!.BanCount.Value = 1);
 
-            AddStep("load some maps", () =>
-            {
-                Ladder.CurrentMatch.Value!.Round.Value!.Beatmaps.Clear();
-
-                for (int i = 0; i < 5; i++)
-                    addBeatmap();
-            });
+            loadMaps(5);
 
             AddStep("update displayed maps", () => Ladder.SplitMapPoolByMods.Value = false);
 
@@ -237,13 +201,7 @@ namespace osu.Game.Tournament.Tests.Screens
         {
             AddStep("set ban count", () => Ladder.CurrentMatch.Value!.Round.Value!.BanCount.Value = 3);
 
-            AddStep("load some maps", () =>
-            {
-                Ladder.CurrentMatch.Value!.Round.Value!.Beatmaps.Clear();
-
-                for (int i = 0; i < 12; i++)
-                    addBeatmap();
-            });
+            loadMaps(12);
 
             AddStep("update displayed maps", () => Ladder.SplitMapPoolByMods.Value = false);
 
@@ -343,6 +301,17 @@ namespace osu.Game.Tournament.Tests.Screens
         {
             InputManager.MoveMouseTo(screen.ChildrenOfType<TournamentBeatmapPanel>().ElementAt(index));
             InputManager.Click(MouseButton.Left);
+        }
+
+        private void loadMaps(int count)
+        {
+            AddStep($"load {count} map(s)", () =>
+            {
+                Ladder.CurrentMatch.Value!.Round.Value!.Beatmaps.Clear();
+
+                for (int i = 0; i < count; i++)
+                    addBeatmap();
+            });
         }
 
         private partial class TestMapPoolScreen : MapPoolScreen
