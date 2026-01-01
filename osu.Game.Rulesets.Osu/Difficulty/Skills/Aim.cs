@@ -19,6 +19,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         public readonly bool IncludeSliders;
 
+        public override bool IsRelevant => IncludeSliders;
+
         public Aim(Mod[] mods, bool includeSliders)
             : base(mods)
         {

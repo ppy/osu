@@ -37,5 +37,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.
         /// </summary>
         public abstract double DifficultyValue();
+
+        /// <summary>
+        /// Returns true if this Skill is relevant to star rating calculation.
+        /// </summary>
+        public virtual bool IsRelevant => true;
     }
 }
