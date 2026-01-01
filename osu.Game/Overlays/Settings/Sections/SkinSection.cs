@@ -257,6 +257,19 @@ namespace osu.Game.Overlays.Settings.Sections
                             }
                         }
 
+                        public override bool ChangeFocusOnClick => false;
+
+                        protected override bool OnClick(ClickEvent e)
+                        {
+                            if (e.AltPressed && Foreground.Children.FirstOrDefault() is Content content)
+                            {
+                                content.Star.TriggerFavouriteChange();
+                                return true;
+                            }
+
+                            return base.OnClick(e);
+                        }
+
                         protected override void UpdateForegroundColour()
                         {
                             base.UpdateForegroundColour();
@@ -267,9 +280,6 @@ namespace osu.Game.Overlays.Settings.Sections
 
                         public partial class StarButton : SpriteIcon
                         {
-                            // todo:
-                            //  Touchscreen/mobile support
-                            //      Slide to reveal instead of permanently visible star?
 
                             public bool IsFavourite;
 
@@ -328,13 +338,10 @@ namespace osu.Game.Overlays.Settings.Sections
 
                             protected override bool OnClick(ClickEvent e)
                             {
-                                IsFavourite = !IsFavourite;
-                                changeStarButtonState(IsFavourite);
-                                if (SkinData != null)
-                                {
-                                    menu?.TrackFavouriteChange(SkinData.ID, IsFavourite);
-                                }
+                                if (!e.AltPressed && !isStarHovered)
+                                    return false;
 
+                                TriggerFavouriteChange();
                                 return true;
                             }
 
@@ -379,6 +386,17 @@ namespace osu.Game.Overlays.Settings.Sections
                                 }
 
                                 this.ScaleTo(1.0f, 350, Easing.OutQuint);
+                            }
+
+                            public bool TriggerFavouriteChange()
+                            {
+                                IsFavourite = !IsFavourite;
+                                changeStarButtonState(IsFavourite);
+                                if (SkinData != null)
+                                {
+                                    menu?.TrackFavouriteChange(SkinData.ID, IsFavourite);
+                                }
+                                return true;
                             }
                         }
 
