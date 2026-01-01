@@ -181,15 +181,16 @@ namespace osu.Game.Overlays.Settings
                             if (currentState)
                             {
                                 this.FadeColour(Colour4.Gold, 250, Easing.OutQuint);
-                                this.DelayUntilTransformsFinished().Schedule(() => { Alpha = 1; });
                             }
                             else
                             {
                                 Colour4 NewColor = colourProvider?.Background5 ?? Color4.Black;
 
                                 this.FadeColour(NewColor, 250, Easing.OutQuint);
-                                this.DelayUntilTransformsFinished().Schedule(() => { Alpha = 0; });
                             }
+
+                            this.ScaleTo(1.35f, 250, Easing.OutQuint);
+                            this.DelayUntilTransformsFinished().ScaleTo(1.0f, 250, Easing.OutQuint);
                         }
 
                         protected override bool OnClick(ClickEvent e)
@@ -199,18 +200,6 @@ namespace osu.Game.Overlays.Settings
 
                             TriggerFavouriteChange();
                             return true;
-                        }
-
-                        protected override bool OnMouseDown(MouseDownEvent e)
-                        {
-                            this.ScaleTo(1.35f, 250, Easing.OutQuint);
-                            return true;
-                        }
-
-                        protected override void OnMouseUp(MouseUpEvent e)
-                        {
-                            this.ScaleTo(1.0f, 250, Easing.OutQuint);
-                            base.OnMouseUp(e);
                         }
 
                         protected override bool OnHover(HoverEvent e)
