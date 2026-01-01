@@ -165,9 +165,9 @@ namespace osu.Game.Localisation
         public static LocalisableString NeverRepeat => new TranslatableString(getKey(@"never_repeat_random"), @"Never repeat");
 
         /// <summary>
-        /// "True Random"
+        /// "True random"
         /// </summary>
-        public static LocalisableString TrueRandom => new TranslatableString(getKey(@"true_random"), @"True Random");
+        public static LocalisableString TrueRandom => new TranslatableString(getKey(@"true_random"), @"True random");
 
         /// <summary>
         /// "Selected Mods"
