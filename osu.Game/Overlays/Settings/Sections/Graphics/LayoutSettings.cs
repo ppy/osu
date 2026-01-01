@@ -401,7 +401,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         break;
 
                     case FullscreenCapability.Incapable:
-                        windowModeDropdownNote.Value = new SettingsNote.Data(LayoutSettingsStrings.UnableToRunExclusiveFullscreen, SettingsNote.Type.Critical);
+                        windowModeDropdownNote.Value = new SettingsNote.Data(LayoutSettingsStrings.UnableToRunExclusiveFullscreen, SettingsNote.Type.Warning);
                         break;
                 }
             }
