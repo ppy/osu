@@ -121,9 +121,6 @@ namespace osu.Game.Screens.SelectV2
 
         private NoResultsPlaceholder noResultsPlaceholder = null!;
 
-        private bool rulesetChanged = true;
-        private RulesetInfo? oldRuleset;
-
         public override bool? ApplyModTrackAdjustments => true;
 
         public override bool ShowFooter => true;
@@ -378,10 +375,6 @@ namespace osu.Game.Screens.SelectV2
                 if (!this.IsCurrentScreen())
                     return;
 
-                // If we directly change the beatmap, we consider the ruleset haven't changed yet
-                // or the ruleset had been changed and caused a beatmap change.
-                // so that set `rulesetChanged` to false.
-                rulesetChanged = false;
                 ensureGlobalBeatmapValid();
 
                 ensurePlayingSelected();
@@ -389,17 +382,6 @@ namespace osu.Game.Screens.SelectV2
                 updateWedgeVisibility();
                 fetchOnlineInfo();
             });
-
-            Ruleset.BindValueChanged(ruleset =>
-            {
-                var newRuleset = ruleset.NewValue;
-                rulesetChanged = oldRuleset?.Equals(newRuleset) == false;
-
-                if (newRuleset != null)
-                {
-                    oldRuleset = newRuleset;
-                }
-            }, true);
         }
 
         protected override void Update()
@@ -587,7 +569,7 @@ namespace osu.Game.Screens.SelectV2
             debounceQueueSelection(groupedBeatmap.Beatmap);
         }
 
-        private bool ensureGlobalBeatmapValid()
+        private bool ensureGlobalBeatmapValid(bool triggeredByCarousel = false)
         {
             if (!this.IsCurrentScreen())
                 return false;
@@ -634,7 +616,9 @@ namespace osu.Game.Screens.SelectV2
                 }
 
                 // If no difficulties whose ruleset is valid, try to switch ruleset to a valid beatmap's ruleset.
-                if (!rulesetChanged)
+                // `triggeredByCarousel` being true means that the change is triggered by `newItemsPresented` and we shouldn't to modify the ruleset.
+                // These code should only run at `Beatmap` bindable callback.
+                if (!triggeredByCarousel)
                 {
                     validBeatmaps = activeSet.Beatmaps.Where(checkBeatmapValid).ToArray();
 
@@ -906,7 +890,7 @@ namespace osu.Game.Screens.SelectV2
             //
             // `ensureGlobalBeatmapValid` is run post-selection which will resolve any pending incompatibilities (see `Beatmap` bindable callback).
             if (debounceQueuedSelection == null)
-                ensureGlobalBeatmapValid();
+                ensureGlobalBeatmapValid(true);
 
             updateWedgeVisibility();
         }
