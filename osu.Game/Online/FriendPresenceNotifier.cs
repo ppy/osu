@@ -158,7 +158,10 @@ namespace osu.Game.Online
                 return;
             }
 
-            notifications.Post(new FriendOnlineNotification(onlineAlertQueue.ToArray()));
+            if (onlineAlertQueue.Count == 1)
+                notifications.Post(new SingleFriendOnlineNotification(onlineAlertQueue.Single()));
+            else
+                notifications.Post(new MultipleFriendsOnlineNotification(onlineAlertQueue.ToArray()));
 
             onlineAlertQueue.Clear();
             lastOnlineAlertTime = null;
@@ -178,60 +181,81 @@ namespace osu.Game.Online
                 return;
             }
 
-            notifications.Post(new FriendOfflineNotification(offlineAlertQueue.ToArray()));
+            if (offlineAlertQueue.Count == 1)
+                notifications.Post(new SingleFriendOfflineNotification(offlineAlertQueue.Single()));
+            else
+                notifications.Post(new MultipleFriendsOfflineNotification(offlineAlertQueue.ToArray()));
 
             offlineAlertQueue.Clear();
             lastOfflineAlertTime = null;
         }
 
-        public partial class FriendOnlineNotification : UserAvatarNotification
+        public partial class SingleFriendOnlineNotification : UserAvatarNotification
         {
-            private readonly ICollection<APIUser> users;
-
-            public FriendOnlineNotification(ICollection<APIUser> users)
-                : base(users.Count == 1 ? users.Single() : null)
+            public SingleFriendOnlineNotification(APIUser user)
+                : base(user)
             {
-                this.users = users;
-
                 Transient = true;
                 IsImportant = false;
-                Text = $"Online: {string.Join(@", ", users.Select(u => u.Username))}";
+                Text = $"Online: {User.Username}";
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, ChannelManager channelManager, ChatOverlay chatOverlay)
+            private void load(ChannelManager channelManager, ChatOverlay chatOverlay)
             {
-                if (users.Count > 1)
+                Activated = () =>
                 {
-                    Icon = FontAwesome.Solid.User;
-                    IconColour = colours.GrayD;
-                }
-                else
-                {
-                    Activated = () =>
-                    {
-                        channelManager.OpenPrivateChannel(users.Single());
-                        chatOverlay.Show();
+                    channelManager.OpenPrivateChannel(User);
+                    chatOverlay.Show();
 
-                        return true;
-                    };
-                }
+                    return true;
+                };
             }
 
             public override string PopInSampleName => "UI/notification-friend-online";
         }
 
-        public partial class FriendOfflineNotification : UserAvatarNotification
+        public partial class MultipleFriendsOnlineNotification : SimpleNotification
         {
-            private readonly ICollection<APIUser> users;
-
-            public FriendOfflineNotification(ICollection<APIUser> users)
-                : base(users.Count == 1 ? users.Single() : null)
+            public MultipleFriendsOnlineNotification(ICollection<APIUser> users)
             {
-                this.users = users;
+                Text = $"Online: {string.Join(@", ", users.Select(u => u.Username))}";
+            }
 
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Icon = FontAwesome.Solid.User;
+                IconColour = colours.Green;
+            }
+
+            public override string PopInSampleName => "UI/notification-friend-online";
+        }
+
+        public partial class SingleFriendOfflineNotification : UserAvatarNotification
+        {
+            public SingleFriendOfflineNotification(APIUser user)
+                : base(user)
+            {
                 Transient = true;
                 IsImportant = false;
+                Text = $"Offline: {User.Username}";
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Icon = FontAwesome.Solid.UserSlash;
+                Avatar.Colour = Color4.White.Opacity(0.25f);
+            }
+
+            public override string PopInSampleName => "UI/notification-friend-offline";
+        }
+
+        public partial class MultipleFriendsOfflineNotification : SimpleNotification
+        {
+            public MultipleFriendsOfflineNotification(ICollection<APIUser> users)
+            {
                 Text = $"Offline: {string.Join(@", ", users.Select(u => u.Username))}";
             }
 
@@ -239,11 +263,7 @@ namespace osu.Game.Online
             private void load(OsuColour colours)
             {
                 Icon = FontAwesome.Solid.UserSlash;
-
-                if (users.Count == 1)
-                    Avatar.Colour = Color4.White.Opacity(0.25f);
-                else
-                    IconColour = colours.Gray3;
+                IconColour = colours.Red;
             }
 
             public override string PopInSampleName => "UI/notification-friend-offline";
