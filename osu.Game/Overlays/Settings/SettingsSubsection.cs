@@ -19,7 +19,6 @@ namespace osu.Game.Overlays.Settings
         protected readonly FillFlowContainer FlowContent;
 
         protected Container HeaderContainer { get; private set; } = null!;
-        protected OsuSpriteText HeaderText { get; private set; } = null!;
 
         protected abstract LocalisableString Header { get; }
 
@@ -63,7 +62,7 @@ namespace osu.Game.Overlays.Settings
                     Padding = SettingsPanel.ContentPaddingV2,
                     Children = new[]
                     {
-                        HeaderText = new OsuSpriteText
+                        new OsuSpriteText
                         {
                             Text = Header,
                             Font = OsuFont.GetFont(size: header_font_size),

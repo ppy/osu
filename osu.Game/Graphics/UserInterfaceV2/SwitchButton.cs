@@ -110,7 +110,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
         protected override void OnUserChange(bool value)
         {
             base.OnUserChange(value);
+            PlaySample(value);
+        }
 
+        public void PlaySample(bool value)
+        {
             if (value)
                 sampleChecked?.Play();
             else

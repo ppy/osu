@@ -4,8 +4,13 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.Handlers;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
 
@@ -15,8 +20,6 @@ namespace osu.Game.Overlays.Settings.Sections
     {
         private readonly InputHandler handler;
 
-        private SwitchButton switchButton = null!;
-
         protected override LocalisableString Header => handler.Description;
 
         /// <summary>
@@ -25,9 +28,6 @@ namespace osu.Game.Overlays.Settings.Sections
         protected virtual bool IsToggleable => true;
 
         private readonly BindableBool handlerEnabled = new BindableBool();
-
-        [Resolved]
-        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public InputSubsection(InputHandler handler)
         {
@@ -39,40 +39,22 @@ namespace osu.Game.Overlays.Settings.Sections
         [BackgroundDependencyLoader]
         private void load()
         {
-            HeaderContainer.Add(switchButton = new SwitchButton
+            HeaderContainer.Child = new ToggleableHeader(Header, IsToggleable)
             {
-                Anchor = Anchor.TopLeft,
-                Origin = Anchor.TopLeft,
-                Scale = new Vector2(0.6f),
-                Position = new Vector2(12, 8),
-                Rotation = 90,
-            });
-
-            HeaderText.X = 20;
+                Current = { BindTarget = handlerEnabled },
+            };
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            switchButton.Current.ValueChanged += v => handlerEnabled.Value = v.NewValue;
-
             handlerEnabled.BindTo(handler.Enabled);
-            handlerEnabled.BindValueChanged(v =>
-            {
-                switchButton.Current.Disabled = false;
-                switchButton.Current.Value = v.NewValue;
-                switchButton.Current.Disabled = !IsToggleable;
-
-                updateEnabledState();
-            }, true);
+            handlerEnabled.BindValueChanged(v => updateEnabledState(), true);
         }
 
         private void updateEnabledState()
         {
-            HeaderText.Colour = handlerEnabled.Value ? colourProvider.Content1 : colourProvider.Foreground1;
-            HeaderText.Text = handlerEnabled.Value ? Header : $@"{Header} (disabled)";
-
             bool negativeBottomMargin = !handlerEnabled.Value || FlowContent.Count == 0;
             HeaderContainer.TransformTo(nameof(Margin), new MarginPadding { Bottom = negativeBottomMargin ? -15 : 0 }, 300, Easing.OutQuint);
 
@@ -93,6 +75,100 @@ namespace osu.Game.Overlays.Settings.Sections
                 ScheduleAfterChildren(() => FlowContent.AutoSizeDuration = 0);
 
                 FlowContent.FadeIn(300, Easing.OutQuint);
+            }
+        }
+
+        private partial class ToggleableHeader : CompositeDrawable
+        {
+            private readonly LocalisableString header;
+            private readonly bool toggleable;
+
+            public readonly BindableBool Current = new BindableBool(true);
+
+            public ToggleableHeader(LocalisableString header, bool toggleable)
+            {
+                this.header = header;
+                this.toggleable = toggleable;
+            }
+
+            private SwitchButton switchButton = null!;
+            private OsuSpriteText headerText = null!;
+
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                AutoSizeAxes = Axes.Both;
+
+                InternalChildren = new Drawable[]
+                {
+                    switchButton = new SwitchButton
+                    {
+                        Anchor = Anchor.TopLeft,
+                        Origin = Anchor.TopLeft,
+                        Scale = new Vector2(0.6f),
+                        Position = new Vector2(12, 8),
+                        Rotation = 90,
+                    },
+                    headerText = new OsuSpriteText
+                    {
+                        Text = header,
+                        Font = OsuFont.GetFont(size: 20),
+                        Margin = new MarginPadding { Vertical = 12 },
+                        X = 20,
+                    },
+                    new HoverSounds(),
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                switchButton.Current.ValueChanged += v => Current.Value = v.NewValue;
+
+                Current.BindValueChanged(v =>
+                {
+                    switchButton.Current.Disabled = false;
+                    switchButton.Current.Value = v.NewValue;
+                    switchButton.Current.Disabled = !toggleable;
+
+                    updateDisplay();
+                }, true);
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                updateDisplay();
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                updateDisplay();
+                base.OnHoverLost(e);
+            }
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                if (toggleable)
+                {
+                    Current.Toggle();
+                    switchButton.PlaySample(Current.Value);
+                }
+
+                updateDisplay();
+                return true;
+            }
+
+            private void updateDisplay()
+            {
+                if (toggleable && IsHovered)
+                    headerText.FadeColour(colourProvider.Light1, 300, Easing.OutQuint);
+                else
+                    headerText.FadeColour(Current.Value ? colourProvider.Content1 : colourProvider.Foreground1, 300, Easing.OutQuint);
             }
         }
     }
