@@ -532,6 +532,9 @@ namespace osu.Game.Screens.SelectV2
             // If a group was selected that is not the one containing the selection, attempt to reselect it.
             if (groupForReselection != null && grouping.GroupItems.TryGetValue(groupForReselection, out _))
                 setExpandedGroup(groupForReselection);
+
+            foreach (var item in Scroll.Panels.OfType<PanelBeatmapSet>().Where(p => p.Item != null))
+                updateVisibleBeatmaps((GroupedBeatmapSet)item.Item!.Model, item);
         }
 
         private void selectRecommendedDifficultyForBeatmapSet(GroupedBeatmapSet set)
@@ -959,11 +962,22 @@ namespace osu.Game.Screens.SelectV2
 
                     return beatmapPanelPool.Get();
 
-                case GroupedBeatmapSet:
-                    return setPanelPool.Get();
+                case GroupedBeatmapSet groupedBeatmapSet:
+                    var setPanel = setPanelPool.Get();
+                    updateVisibleBeatmaps(groupedBeatmapSet, setPanel);
+                    return setPanel;
             }
 
             throw new InvalidOperationException();
+        }
+
+        private void updateVisibleBeatmaps(GroupedBeatmapSet groupedBeatmapSet, PanelBeatmapSet setPanel)
+        {
+            HashSet<BeatmapInfo> visibleBeatmaps = [];
+            if (grouping.SetItems.TryGetValue(groupedBeatmapSet, out var visibleItems))
+                visibleBeatmaps = visibleItems.Where(i => i.Model is GroupedBeatmap).Select(i => ((GroupedBeatmap)i.Model).Beatmap).ToHashSet();
+
+            setPanel.VisibleBeatmaps.Value = visibleBeatmaps;
         }
 
         #endregion

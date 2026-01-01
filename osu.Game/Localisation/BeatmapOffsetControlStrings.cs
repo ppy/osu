@@ -39,6 +39,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString HitObjectsAppearEarlier => new TranslatableString(getKey(@"hit_objects_appear_earlier"), @"(hit objects appear earlier)");
 
+        /// <summary>
+        /// "Beatmap offset was adjusted to {0} ms."
+        /// </summary>
+        public static LocalisableString BeatmapOffsetWasAdjustedTo(string offset) => new TranslatableString(getKey(@"beatmap_offset_was_adjusted_to"), @"Beatmap offset was adjusted to {0} ms.", offset);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
