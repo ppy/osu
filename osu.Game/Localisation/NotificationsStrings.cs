@@ -135,6 +135,16 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString Mention => new TranslatableString(getKey(@"mention"), @"Mention");
 
+        /// <summary>
+        /// "Online: {0}"
+        /// </summary>
+        public static LocalisableString FriendOnline(string info) => new TranslatableString(getKey(@"friend_online"), @"Online: {0}", info);
+
+        /// <summary>
+        /// "Offline: {0}"
+        /// </summary>
+        public static LocalisableString FriendOffline(string info) => new TranslatableString(getKey(@"friend_offline"), @"Offline: {0}", info);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
