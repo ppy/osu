@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
@@ -197,7 +198,7 @@ namespace osu.Game.Online
             {
                 Transient = true;
                 IsImportant = false;
-                Text = $"Online: {User.Username}";
+                Text = NotificationsStrings.FriendOnline(User.Username);
             }
 
             [BackgroundDependencyLoader]
@@ -219,7 +220,7 @@ namespace osu.Game.Online
         {
             public MultipleFriendsOnlineNotification(ICollection<APIUser> users)
             {
-                Text = $"Online: {string.Join(@", ", users.Select(u => u.Username))}";
+                Text = NotificationsStrings.FriendOnline(string.Join(@", ", users.Select(u => u.Username)));
             }
 
             [BackgroundDependencyLoader]
@@ -239,7 +240,7 @@ namespace osu.Game.Online
             {
                 Transient = true;
                 IsImportant = false;
-                Text = $"Offline: {User.Username}";
+                Text = NotificationsStrings.FriendOffline(User.Username);
             }
 
             [BackgroundDependencyLoader]
@@ -256,7 +257,7 @@ namespace osu.Game.Online
         {
             public MultipleFriendsOfflineNotification(ICollection<APIUser> users)
             {
-                Text = $"Offline: {string.Join(@", ", users.Select(u => u.Username))}";
+                Text = NotificationsStrings.FriendOffline(string.Join(@", ", users.Select(u => u.Username)));
             }
 
             [BackgroundDependencyLoader]
