@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
             user.BindValueChanged(u =>
             {
                 if (u.NewValue?.IsSupporter != true)
-                    backgroundSourceNote.Value = new SettingsNote.Data(UserInterfaceStrings.NotSupporterNote, SettingsNote.Type.Warning);
+                    backgroundSourceNote.Value = new SettingsNote.Data(UserInterfaceStrings.NotSupporterNote, SettingsNote.Type.Informational);
                 else
                     backgroundSourceNote.Value = null;
             }, true);
