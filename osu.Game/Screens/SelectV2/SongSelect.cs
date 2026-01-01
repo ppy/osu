@@ -602,7 +602,6 @@ namespace osu.Game.Screens.SelectV2
             // Refetch to be confident that the current selection is still valid. It may have been deleted or hidden.
             var currentBeatmap = beatmaps.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo, true);
             bool validSelection = checkBeatmapValidForSelection(currentBeatmap.BeatmapInfo);
-            bool validBeatmap = checkBeatmapValid(currentBeatmap.BeatmapInfo);
 
             if (validSelection)
             {
@@ -633,22 +632,26 @@ namespace osu.Game.Screens.SelectV2
                     debounceQueueSelection(beatmap);
                     return true;
                 }
-            }
 
-            // If no difficulties from the same set are valid, try to switch ruleset to the beatmap's ruleset.
-            // `rulesetChanged` being true here indicates the user has explicitly changed rulesets, so we shouldn't override their choice.
-            if (!validSelection && validBeatmap && !rulesetChanged)
-            {
-                Ruleset.Value = Beatmap.Value.BeatmapInfo.Ruleset;
+                // If no difficulties whose ruleset is valid, try to switch ruleset to a valid beatmap's ruleset.
+                if (!rulesetChanged)
+                {
+                    validBeatmaps = activeSet.Beatmaps.Where(checkBeatmapValid).ToArray();
 
-                // Refresh the carousel to the new ruleset
-                // TODO: `criteriaChanged` will be called via the ruleset bindable callback, so it will replace the loading animation of here.
-                filterDebounce?.Cancel();
-                carousel.Filter(filterControl.CreateCriteria(), true);
+                    if (validBeatmaps.Any())
+                    {
+                        Ruleset.Value = Beatmap.Value.BeatmapInfo.Ruleset;
 
-                carousel.CurrentBeatmap = currentBeatmap.BeatmapInfo;
-                debounceQueueSelection(currentBeatmap.BeatmapInfo);
-                return true;
+                        // Refresh the carousel to the new ruleset
+                        // TODO: `criteriaChanged` will be called via the ruleset bindable callback, so it will replace the loading animation of here.
+                        filterDebounce?.Cancel();
+                        carousel.Filter(filterControl.CreateCriteria(), true);
+
+                        carousel.CurrentBeatmap = currentBeatmap.BeatmapInfo;
+                        debounceQueueSelection(currentBeatmap.BeatmapInfo);
+                        return true;
+                    }
+                }
             }
 
             // If all else fails, use the default beatmap.
