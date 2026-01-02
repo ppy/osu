@@ -57,6 +57,8 @@ namespace osu.Game.Online
             (typeof(MatchmakingStageCountdown), typeof(MultiplayerCountdown)),
             (typeof(MatchmakingAvatarActionRequest), typeof(MatchUserRequest)),
             (typeof(MatchmakingAvatarActionEvent), typeof(MatchServerEvent)),
+            (typeof(MatchmakingCursorPositionRequest), typeof(MatchUserRequest)),
+            (typeof(MatchmakingCursorPositionEvent), typeof(MatchServerEvent)),
         };
     }
 }
