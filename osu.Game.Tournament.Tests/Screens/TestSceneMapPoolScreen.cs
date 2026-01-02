@@ -36,6 +36,7 @@ namespace osu.Game.Tournament.Tests.Screens
             Ladder.CurrentMatch.Value.PicksBans.Clear();
             Ladder.CurrentMatch.Value.Round.Value!.BanCount.Value = 2;
             Ladder.CurrentMatch.Value.Round.Value!.ProtectCount.Value = 0;
+            Ladder.CurrentMatch.Value!.Round.Value!.AllowPickOpponentProtect.Value = true;
         }
 
         [SetUp]
@@ -324,9 +325,10 @@ namespace osu.Game.Tournament.Tests.Screens
         }
 
         [Test]
-        public void TestAllowPickOfProtectedMap()
+        public void TestDisallowPickOpponentProtect()
         {
             AddStep("set protect count to 1", () => Ladder.CurrentMatch.Value!.Round.Value!.ProtectCount.Value = 1);
+            AddStep("opponent protect pick = false", () => Ladder.CurrentMatch.Value!.Round.Value!.AllowPickOpponentProtect.Value = false);
             loadMaps(5);
 
             AddStep("update displayed maps", () => Ladder.SplitMapPoolByMods.Value = false);
@@ -374,6 +376,62 @@ namespace osu.Game.Tournament.Tests.Screens
             AddAssert("red protect was picked",
                 () => Ladder.CurrentMatch.Value!.PicksBans.Count(pb => pb.Type == ChoiceType.Pick && pb.Team == TeamColour.Red),
                 () => Is.EqualTo(1));
+        }
+
+        [Test]
+        public void TestAllowPickOpponentProtect()
+        {
+            AddStep("set protect count to 1", () => Ladder.CurrentMatch.Value!.Round.Value!.ProtectCount.Value = 2);
+            AddStep("opponent protect pick = true", () => Ladder.CurrentMatch.Value!.Round.Value!.AllowPickOpponentProtect.Value = true);
+            loadMaps(5);
+
+            AddStep("update displayed maps", () => Ladder.SplitMapPoolByMods.Value = false);
+
+            AddStep("add protects", () =>
+            {
+                screen.ChildrenOfType<TourneyButton>().First(btn => btn.Text == "Blue Protect").TriggerClick();
+                clickBeatmapPanel(0);
+                clickBeatmapPanel(1);
+                clickBeatmapPanel(2);
+                clickBeatmapPanel(3);
+            });
+
+            AddStep("red picks blue protect", () =>
+            {
+                screen.ChildrenOfType<TourneyButton>().First(btn => btn.Text == "Red Pick").TriggerClick();
+                clickBeatmapPanel(0);
+            });
+            AddAssert("blue protect was picked",
+                () => Ladder.CurrentMatch.Value!.PicksBans.Count(pb => pb.Type == ChoiceType.Pick && pb.Team == TeamColour.Red),
+                () => Is.EqualTo(1));
+
+            AddStep("blue picks red protect", () =>
+            {
+                screen.ChildrenOfType<TourneyButton>().First(btn => btn.Text == "Blue Pick").TriggerClick();
+                clickBeatmapPanel(1);
+            });
+
+            AddAssert("red protect was picked",
+                () => Ladder.CurrentMatch.Value!.PicksBans.Count(pb => pb.Type == ChoiceType.Pick && pb.Team == TeamColour.Red),
+                () => Is.EqualTo(1));
+
+            AddStep("blue picks blue protect", () =>
+            {
+                screen.ChildrenOfType<TourneyButton>().First(btn => btn.Text == "Blue Pick").TriggerClick();
+                clickBeatmapPanel(2);
+            });
+            AddAssert("blue protect was picked",
+                () => Ladder.CurrentMatch.Value!.PicksBans.Count(pb => pb.Type == ChoiceType.Pick && pb.Team == TeamColour.Blue),
+                () => Is.EqualTo(2));
+
+            AddStep("red picks red protect", () =>
+            {
+                screen.ChildrenOfType<TourneyButton>().First(btn => btn.Text == "Red Pick").TriggerClick();
+                clickBeatmapPanel(3);
+            });
+            AddAssert("red protect was picked",
+                () => Ladder.CurrentMatch.Value!.PicksBans.Count(pb => pb.Type == ChoiceType.Pick && pb.Team == TeamColour.Red),
+                () => Is.EqualTo(2));
         }
 
         private void checkTotalPickBans(int expected) => AddAssert($"total pickbans is {expected}", () => Ladder.CurrentMatch.Value!.PicksBans, () => Has.Count.EqualTo(expected));

@@ -267,9 +267,12 @@ namespace osu.Game.Tournament.Screens.MapPool
                 // only allow a protected map to be re-added as a pick
                 bool allowPick = existingPickBan.Type == ChoiceType.Protect;
 
-                // only allow if map is being **picked** and being picked by the **same team** that protected the map
-                if (pickType != ChoiceType.Pick || pickColour != existingPickBan.Team)
-                    allowPick = false;
+                if (!CurrentMatch.Value.Round.Value.AllowPickOpponentProtect.Value)
+                {
+                    // only allow if map is being **picked** and being picked by the **same team** that protected the map
+                    if (pickType != ChoiceType.Pick || pickColour != existingPickBan.Team)
+                        allowPick = false;
+                }
 
                 // don't allow picking again if already picked after protect
                 if (CurrentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId && p.Type == ChoiceType.Pick))
