@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -17,7 +18,7 @@ namespace osu.Game.Tournament.Components
         private SpriteIcon protectIcon = null!;
         private Box background = null!;
 
-        private Color4 backgroundColour;
+        private ColourInfo backgroundColour;
 
         private TeamColour? teamColour;
 
@@ -30,14 +31,16 @@ namespace osu.Game.Tournament.Components
                     return;
 
                 teamColour = value;
-                updateColour();
+
+                if (IsLoaded)
+                    updateColour();
             }
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Children = new Drawable[]
+            InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.CentreRight,
@@ -78,20 +81,15 @@ namespace osu.Game.Tournament.Components
 
         private void updateColour()
         {
-            if (!IsLoaded)
-                return;
-
             if (TeamColour == null)
             {
                 Alpha = 0;
-                protectIcon.Colour = Color4.Transparent;
-                background.Colour = Color4.Transparent;
                 return;
             }
 
-            backgroundColour = TournamentGame.GetTeamColour((TeamColour)TeamColour);
+            backgroundColour = TournamentGame.GetTeamColour(TeamColour.Value);
 
-            protectIcon.Colour = Interpolation.ValueAt<Colour4>(0.1f, Colour4.Black, backgroundColour, 0, 1);
+            protectIcon.Colour = Interpolation.ValueAt<Color4>(0.1f, Color4.Black, backgroundColour, 0, 1);
             background.Colour = backgroundColour;
             Alpha = 1;
         }
