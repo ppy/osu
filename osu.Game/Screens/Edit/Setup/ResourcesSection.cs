@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Models;
 using osu.Game.Overlays;
@@ -22,6 +23,8 @@ namespace osu.Game.Screens.Edit.Setup
     {
         private FormBeatmapFileSelector audioTrackChooser = null!;
         private FormBeatmapFileSelector backgroundChooser = null!;
+        private FormBeatmapFileSelector videoChooser = null!;
+        private FormSliderBar<int> offsetSlider { get; set; } = null!;
 
         public override LocalisableString Title => EditorSetupStrings.ResourcesHeader;
 
@@ -65,7 +68,29 @@ namespace osu.Game.Screens.Edit.Setup
                     Caption = EditorSetupStrings.AudioTrack,
                     PlaceholderText = EditorSetupStrings.ClickToSelectTrack,
                 },
+                videoChooser = new FormBeatmapFileSelector(beatmapHasMultipleDifficulties, SupportedExtensions.VIDEO_EXTENSIONS)
+                {
+                    Caption = GameplaySettingsStrings.VideoHeader,
+                    PlaceholderText = EditorSetupStrings.ClickToSelectVideo,
+                },
+                offsetSlider = new FormSliderBar<int>
+                {
+                    Caption = EditorSetupStrings.VideoOffset,
+                    HintText = EditorSetupStrings.VideoOffsetDescription,
+                    KeyboardStep = 1,
+                    Current = new BindableInt()
+                    {
+                        Default = 0,
+                        MinValue = -3000,
+                        MaxValue = 3000,
+                        Precision = 1,
+                    },
+                    TransferValueOnCommit = true,
+                    TabbableContentContainer = this,
+                },
             };
+            //TODO: Show offset slider only if the video has been added
+            // offsetSlider.Hide();
 
             backgroundChooser.PreviewContainer.Add(headerBackground);
 
