@@ -49,8 +49,6 @@ namespace osu.Game.Tournament.Tests.Screens
         {
             loadMaps(8);
 
-            AddStep("reset state", resetState);
-
             assertTwoWide();
         }
 
@@ -59,8 +57,6 @@ namespace osu.Game.Tournament.Tests.Screens
         {
             loadMaps(18);
 
-            AddStep("reset state", resetState);
-
             assertTwoWide();
         }
 
@@ -68,8 +64,6 @@ namespace osu.Game.Tournament.Tests.Screens
         public void TestManyMaps()
         {
             loadMaps(19);
-
-            AddStep("reset state", resetState);
 
             assertThreeWide();
         }
@@ -135,8 +129,6 @@ namespace osu.Game.Tournament.Tests.Screens
 
             loadMaps(5);
 
-            AddStep("update displayed maps", () => Ladder.SplitMapPoolByMods.Value = false);
-
             AddStep("start bans from blue team", () => screen.ChildrenOfType<TourneyButton>().First(btn => btn.Text == "Blue Ban").TriggerClick());
 
             AddStep("ban map", () => clickBeatmapPanel(0));
@@ -166,8 +158,6 @@ namespace osu.Game.Tournament.Tests.Screens
             AddStep("set ban count", () => Ladder.CurrentMatch.Value!.Round.Value!.BanCount.Value = 1);
 
             loadMaps(5);
-
-            AddStep("update displayed maps", () => Ladder.SplitMapPoolByMods.Value = false);
 
             AddStep("start bans from blue team", () => screen.ChildrenOfType<TourneyButton>().First(btn => btn.Text == "Blue Ban").TriggerClick());
 
@@ -205,8 +195,6 @@ namespace osu.Game.Tournament.Tests.Screens
             AddStep("set ban count", () => Ladder.CurrentMatch.Value!.Round.Value!.BanCount.Value = 3);
 
             loadMaps(12);
-
-            AddStep("update displayed maps", () => Ladder.SplitMapPoolByMods.Value = false);
 
             AddStep("start bans with red team", () => screen.ChildrenOfType<TourneyButton>().First(btn => btn.Text == "Red Ban").TriggerClick());
 
@@ -292,8 +280,6 @@ namespace osu.Game.Tournament.Tests.Screens
 
             loadMaps(12);
 
-            AddStep("update displayed maps", () => Ladder.SplitMapPoolByMods.Value = false);
-
             AddStep("start blue team protect", () => screen.ChildrenOfType<TourneyButton>().First(btn => btn.Text == "Blue Protect").TriggerClick());
 
             AddStep("click first map", () => clickBeatmapPanel(0));
@@ -330,8 +316,6 @@ namespace osu.Game.Tournament.Tests.Screens
             AddStep("set protect count to 1", () => Ladder.CurrentMatch.Value!.Round.Value!.ProtectCount.Value = 1);
             AddStep("opponent protect pick = false", () => Ladder.CurrentMatch.Value!.Round.Value!.AllowPickOpponentProtect.Value = false);
             loadMaps(5);
-
-            AddStep("update displayed maps", () => Ladder.SplitMapPoolByMods.Value = false);
 
             AddStep("add protects", () =>
             {
@@ -385,8 +369,6 @@ namespace osu.Game.Tournament.Tests.Screens
             AddStep("opponent protect pick = true", () => Ladder.CurrentMatch.Value!.Round.Value!.AllowPickOpponentProtect.Value = true);
             loadMaps(5);
 
-            AddStep("update displayed maps", () => Ladder.SplitMapPoolByMods.Value = false);
-
             AddStep("add protects", () =>
             {
                 screen.ChildrenOfType<TourneyButton>().First(btn => btn.Text == "Blue Protect").TriggerClick();
@@ -434,6 +416,47 @@ namespace osu.Game.Tournament.Tests.Screens
                 () => Is.EqualTo(2));
         }
 
+        [Test]
+        public void TestRemoveProtect()
+        {
+            loadMaps(1);
+
+            AddStep("protect a map", () =>
+            {
+                screen.ChildrenOfType<TourneyButton>().First(btn => btn.Text == "Red Protect").TriggerClick();
+                clickBeatmapPanel(0);
+            });
+
+            AddAssert("map was protected",
+                () => Ladder.CurrentMatch.Value!.PicksBans.Count(pb => pb.Type == ChoiceType.Protect),
+                () => Is.EqualTo(1));
+
+            AddStep("pick a map", () =>
+            {
+                screen.ChildrenOfType<TourneyButton>().First(btn => btn.Text == "Red Pick").TriggerClick();
+                clickBeatmapPanel(0);
+            });
+
+            AddAssert("map was picked",
+                () => Ladder.CurrentMatch.Value!.PicksBans.Count(pb => pb.Type == ChoiceType.Pick),
+                () => Is.EqualTo(1));
+
+            AddStep("remove pick", () => clickBeatmapPanel(0, MouseButton.Right));
+
+            AddAssert("pick was removed",
+                () => Ladder.CurrentMatch.Value!.PicksBans.Count(pb => pb.Type == ChoiceType.Pick),
+                () => Is.EqualTo(0));
+            AddAssert("protect remains",
+                () => Ladder.CurrentMatch.Value!.PicksBans.Count(pb => pb.Type == ChoiceType.Protect),
+                () => Is.EqualTo(1));
+
+            AddStep("remove protect", () => clickBeatmapPanel(0, MouseButton.Right));
+
+            AddAssert("protect was removed",
+                () => Ladder.CurrentMatch.Value!.PicksBans.Count(pb => pb.Type == ChoiceType.Protect),
+                () => Is.EqualTo(0));
+        }
+
         private void checkTotalPickBans(int expected) => AddAssert($"total pickbans is {expected}", () => Ladder.CurrentMatch.Value!.PicksBans, () => Has.Count.EqualTo(expected));
 
         private void checkLastPick(ChoiceType expectedChoice, TeamColour expectedColour) =>
@@ -450,10 +473,10 @@ namespace osu.Game.Tournament.Tests.Screens
             });
         }
 
-        private void clickBeatmapPanel(int index)
+        private void clickBeatmapPanel(int index, MouseButton button = MouseButton.Left)
         {
             InputManager.MoveMouseTo(screen.ChildrenOfType<TournamentBeatmapPanel>().ElementAt(index));
-            InputManager.Click(MouseButton.Left);
+            InputManager.Click(button);
         }
 
         private void loadMaps(int count)
@@ -464,6 +487,10 @@ namespace osu.Game.Tournament.Tests.Screens
 
                 for (int i = 0; i < count; i++)
                     addBeatmap();
+
+                // to force mappool screen display update
+                Ladder.CurrentMatch.Value = new TournamentMatch();
+                Ladder.CurrentMatch.Value = Ladder.Matches.First();
             });
         }
 
