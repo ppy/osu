@@ -60,6 +60,7 @@ namespace osu.Game.Beatmaps
 
         public string AudioFile { get; set; } = string.Empty;
         public string BackgroundFile { get; set; } = string.Empty;
+        public string VideoFile { get; set; } = string.Empty;
 
         public BeatmapMetadata(RealmUser? user = null)
         {
