@@ -659,6 +659,51 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("options disabled", () => !this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
         }
 
+        /// <summary>
+        /// tests that clicking the osu! logo immediately after selecting a different difficulty
+        /// (before the selection debounce completes) starts the correct beatmap.
+        /// this tests the fix for https://github.com/ppy/osu/issues/36074
+        /// </summary>
+        [Test]
+        public void TestPlayCorrectBeatmapWhenSelectionNotFullyLoaded()
+        {
+            // import a beatmap set with multiple difficulties
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+
+            // wait for initial beatmap to be selected
+            AddUntilStep("wait for first beatmap selected", () => !Beatmap.IsDefault);
+
+            BeatmapInfo? firstBeatmap = null;
+            AddStep("store first difficulty", () => firstBeatmap = Beatmap.Value.BeatmapInfo);
+
+            // start loading the first difficulty
+            AddStep("click logo to start loading", () => this.ChildrenOfType<OsuLogo>().Single().TriggerClick());
+            AddUntilStep("wait for player loader", () => Stack.CurrentScreen is PlayerLoader);
+
+            // return to song select
+            AddStep("press escape to return", () => InputManager.Key(Key.Escape));
+            AddUntilStep("wait for return to song select", () => SongSelect.IsCurrentScreen());
+
+            // press down and schedule logo click to happen shortly after (but before 150ms debounce)
+            // this reproduces the race condition where Beatmap.Value hasn't updated yet
+            AddStep("select next difficulty and click logo immediately", () =>
+            {
+                InputManager.Key(Key.Down);
+                Schedule(() => this.ChildrenOfType<OsuLogo>().Single().TriggerClick());
+            });
+
+            AddUntilStep("wait for player loader", () => Stack.CurrentScreen is PlayerLoader);
+
+            // verify we're loading the second difficulty, not the first
+            // without the fix, this would fail because Beatmap.Value still has the old value
+            AddAssert("player is loading second difficulty", () =>
+                Beatmap.Value.BeatmapInfo.ID != firstBeatmap!.ID);
+
+            AddUntilStep("wait for return to song select", () => SongSelect.IsCurrentScreen());
+        }
+
         #endregion
     }
 }
