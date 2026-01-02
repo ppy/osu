@@ -5,6 +5,7 @@ using System;
 using System.Globalization;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
@@ -27,6 +28,8 @@ namespace osu.Game.Screens.Edit.Setup
         private FormCheckBox epilepsyWarning = null!;
         private FormCheckBox letterboxDuringBreaks = null!;
         private FormCheckBox samplesMatchPlaybackRate = null!;
+
+        private FormSliderBar<int> offsetSlider { get; set; } = null!;
 
         public override LocalisableString Title => EditorSetupStrings.DesignHeader;
 
@@ -87,7 +90,22 @@ namespace osu.Game.Screens.Edit.Setup
                     Caption = EditorSetupStrings.SamplesMatchPlaybackRate,
                     HintText = EditorSetupStrings.SamplesMatchPlaybackRateDescription,
                     Current = { Value = Beatmap.SamplesMatchPlaybackRate }
-                }
+                },
+                offsetSlider = new FormSliderBar<int>
+                {
+                    Caption = EditorSetupStrings.VideoOffset,
+                    HintText = EditorSetupStrings.VideoOffsetDescription,
+                    KeyboardStep = 1,
+                    Current = new BindableInt()
+                    {
+                        Default = 0,
+                        MinValue = -3000,
+                        MaxValue = 3000,
+                        Precision = 1,
+                    },
+                    TransferValueOnCommit = true,
+                    TabbableContentContainer = this,
+                },
             };
         }
 
