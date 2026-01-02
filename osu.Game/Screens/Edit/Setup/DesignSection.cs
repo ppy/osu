@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Edit.Setup
         private FormCheckBox letterboxDuringBreaks = null!;
         private FormCheckBox samplesMatchPlaybackRate = null!;
 
-        private FormSliderBar<int> offsetSlider { get; set; } = null!;
+        private FormSliderBar<int> videoOffsetSlider { get; set; } = null!;
 
         public override LocalisableString Title => EditorSetupStrings.DesignHeader;
 
@@ -91,12 +91,12 @@ namespace osu.Game.Screens.Edit.Setup
                     HintText = EditorSetupStrings.SamplesMatchPlaybackRateDescription,
                     Current = { Value = Beatmap.SamplesMatchPlaybackRate }
                 },
-                offsetSlider = new FormSliderBar<int>
+                videoOffsetSlider = new FormSliderBar<int>
                 {
                     Caption = EditorSetupStrings.VideoOffset,
                     HintText = EditorSetupStrings.VideoOffsetDescription,
                     KeyboardStep = 1,
-                    Current = new BindableInt()
+                    Current = new BindableInt(Beatmap.Metadata.VideoOffset)
                     {
                         Default = 0,
                         MinValue = -3000,
