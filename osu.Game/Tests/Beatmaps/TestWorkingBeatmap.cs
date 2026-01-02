@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Beatmaps
 
         public override Texture? GetBackground() => null;
 
-        public override Video GetBeatmapVideo() => null;
+        public override Video? GetBeatmapVideo() => null;
 
         protected override Track? GetBeatmapTrack() => null;
     }
