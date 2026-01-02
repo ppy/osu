@@ -86,7 +86,8 @@ namespace osu.Game.Beatmaps
             Tags = Tags,
             PreviewTime = PreviewTime,
             AudioFile = AudioFile,
-            BackgroundFile = BackgroundFile
+            BackgroundFile = BackgroundFile,
+            VideoFile = VideoFile
         };
     }
 }

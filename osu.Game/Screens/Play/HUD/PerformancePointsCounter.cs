@@ -14,6 +14,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Video;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
@@ -150,6 +151,8 @@ namespace osu.Game.Screens.Play.HUD
             public override Texture GetBackground() => throw new NotImplementedException();
 
             protected override Track GetBeatmapTrack() => throw new NotImplementedException();
+
+            public override Video GetBeatmapVideo() => throw new NotImplementedException();
 
             protected internal override ISkin GetSkin() => throw new NotImplementedException();
 

@@ -13,6 +13,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Rendering.Dummy;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Video;
 using osu.Framework.IO.Stores;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
@@ -35,6 +36,8 @@ namespace osu.Game.Beatmaps
         /// Beatmap files may specify this filename to denote that they don't have an audio track.
         /// </summary>
         private const string virtual_track_filename = @"virtual";
+
+        private const string virtual_video_filename = @"virtual";
 
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
@@ -235,6 +238,12 @@ namespace osu.Game.Beatmaps
                     Logger.Error(e, "Track failed to load");
                     return null;
                 }
+            }
+
+            public override Video GetBeatmapVideo()
+            {
+                //TODO: Implement actual video getter
+                return null;
             }
 
             protected override Waveform GetWaveform()

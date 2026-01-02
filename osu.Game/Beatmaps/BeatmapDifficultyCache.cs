@@ -13,6 +13,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Video;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
@@ -384,6 +385,7 @@ namespace osu.Game.Beatmaps
             IBeatmap IWorkingBeatmap.Beatmap => working.Beatmap;
             Texture IWorkingBeatmap.GetBackground() => working.GetBackground();
             Texture IWorkingBeatmap.GetPanelBackground() => working.GetPanelBackground();
+            Video IWorkingBeatmap.GetBeatmapVideo() => working.GetBeatmapVideo();
             Waveform IWorkingBeatmap.Waveform => working.Waveform;
             Storyboard IWorkingBeatmap.Storyboard => working.Storyboard;
             ISkin IWorkingBeatmap.Skin => working.Skin;

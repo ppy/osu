@@ -15,6 +15,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Video;
 using osu.Framework.Logging;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -73,6 +74,7 @@ namespace osu.Game.Beatmaps
         public abstract Texture GetBackground();
         public virtual Texture GetPanelBackground() => GetBackground();
         protected abstract Track GetBeatmapTrack();
+        public abstract Video GetBeatmapVideo();
 
         /// <summary>
         /// Creates a new skin instance for this beatmap.

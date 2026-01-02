@@ -8,6 +8,7 @@ using System.IO;
 using System.Threading;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Video;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -73,6 +74,11 @@ namespace osu.Game.Beatmaps
         /// Retrieves the <see cref="Track"/> which this <see cref="IWorkingBeatmap"/> has loaded.
         /// </summary>
         Track Track { get; }
+
+        /// <summary>
+        /// Retrieves the Video which for this <see cref="IWorkingBeatmap"/>.
+        /// </summary>
+        Video GetBeatmapVideo();
 
         /// <summary>
         /// Constructs a playable <see cref="IBeatmap"/> from <see cref="Beatmap"/> using the applicable converters for a specific <see cref="RulesetInfo"/>.
