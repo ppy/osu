@@ -81,6 +81,9 @@ namespace osu.Game.Screens.Edit.Setup
             if (!string.IsNullOrEmpty(working.Value.Metadata.AudioFile))
                 audioTrackChooser.Current.Value = new FileInfo(working.Value.Metadata.AudioFile);
 
+            if (!string.IsNullOrEmpty(working.Value.Metadata.VideoFile))
+                videoChooser.Current.Value = new FileInfo(working.Value.Metadata.VideoFile);
+
             backgroundChooser.Current.BindValueChanged(backgroundChanged);
             audioTrackChooser.Current.BindValueChanged(audioTrackChanged);
         }
