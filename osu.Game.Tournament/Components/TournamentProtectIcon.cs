@@ -6,10 +6,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
 using osu.Game.Tournament.Models;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
@@ -17,7 +15,7 @@ namespace osu.Game.Tournament.Components
     public partial class TournamentProtectIcon : Container
     {
         private SpriteIcon protectIcon = null!;
-        private Circle background = null!;
+        private Box background = null!;
 
         private Color4 backgroundColour;
 
@@ -37,35 +35,37 @@ namespace osu.Game.Tournament.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load()
         {
             Children = new Drawable[]
             {
-                new Container
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
+                Name = "main content",
+                Masking = true,
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Name = "main content",
-                    Size = new Vector2(22),
-                    Children = new Drawable[]
+                    background = new Box
                     {
-                        background = new Circle
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            FillMode = FillMode.Fit,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        protectIcon = new SpriteIcon
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre,
-                            Scale = new Vector2(0.6f),
-                            Icon = FontAwesome.Solid.ShieldAlt,
-                        },
-                    }
-                },
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.Centre,
+                        Rotation = 45,
+                    },
+                    protectIcon = new SpriteIcon
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        RelativePositionAxes = Axes.Both,
+                        Origin = Anchor.BottomLeft,
+                        Anchor = Anchor.Centre,
+                        Width = 0.3f,
+                        Height = 0.3f,
+                        X = 0.14f,
+                        Y = -0.14f,
+                        Icon = FontAwesome.Solid.ShieldAlt,
+                    },
+                }
             };
         }
 

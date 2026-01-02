@@ -116,22 +116,24 @@ namespace osu.Game.Tournament.Components
                                 }
                             },
                         },
-                        modIconContainer = new FillFlowContainer
-                        {
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreRight,
-                            Padding = new MarginPadding { Vertical = 10 },
-                            RelativeSizeAxes = Axes.Y,
-                            Direction = FillDirection.Horizontal,
-                        },
                     }
+                },
+                modIconContainer = new FillFlowContainer
+                {
+                    Name = "Mod icon container",
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    Padding = new MarginPadding { Vertical = 10, Right = 20 },
+                    RelativeSizeAxes = Axes.Y,
+                    Direction = FillDirection.Horizontal,
                 },
                 protectIcon = new TournamentProtectIcon
                 {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
                     Alpha = 1,
-                    Margin = new MarginPadding(12),
+                    Width = Height,
+                    Height = Height,
                 },
                 flash = new Box
                 {
@@ -148,8 +150,6 @@ namespace osu.Game.Tournament.Components
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Width = 60,
-                    RelativeSizeAxes = Axes.Y,
                 });
             }
         }
