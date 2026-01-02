@@ -14,18 +14,20 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Components
 {
-    public partial class PlaybackControl : BottomBarContainer
+    public partial class PlaybackControl : BottomBarContainer, IKeyBindingHandler<GlobalAction>
     {
         private IconButton playButton = null!;
         private PlaybackSpeedControl playbackSpeedControl = null!;
@@ -34,7 +36,13 @@ namespace osu.Game.Screens.Edit.Components
         private EditorClock editorClock { get; set; } = null!;
 
         private readonly Bindable<EditorScreenMode> currentScreenMode = new Bindable<EditorScreenMode>();
-        private readonly BindableNumber<double> tempoAdjustment = new BindableDouble(1);
+
+        private readonly BindableNumber<double> tempoAdjustment = new BindableDouble(1)
+        {
+            Default = 1,
+            MinValue = 0.25,
+            MaxValue = 1,
+        };
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, Editor? editor)
@@ -133,6 +141,26 @@ namespace osu.Game.Screens.Edit.Components
                 editorClock.Stop();
             else
                 editorClock.Start();
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                case GlobalAction.EditorIncreasePlaybackSpeed:
+                    tempoAdjustment.Add(0.25);
+                    return true;
+
+                case GlobalAction.EditorDecreasePlaybackSpeed:
+                    tempoAdjustment.Add(-0.25);
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
         }
 
         private static readonly IconUsage play_icon = FontAwesome.Regular.PlayCircle;
