@@ -61,6 +61,7 @@ namespace osu.Game.Beatmaps
         public string AudioFile { get; set; } = string.Empty;
         public string BackgroundFile { get; set; } = string.Empty;
         public string VideoFile { get; set; } = string.Empty;
+        public int VideoOffset { get; set; }
 
         public BeatmapMetadata(RealmUser? user = null)
         {
@@ -86,7 +87,9 @@ namespace osu.Game.Beatmaps
             Tags = Tags,
             PreviewTime = PreviewTime,
             AudioFile = AudioFile,
-            BackgroundFile = BackgroundFile
+            BackgroundFile = BackgroundFile,
+            VideoFile = VideoFile,
+            VideoOffset = VideoOffset
         };
     }
 }
