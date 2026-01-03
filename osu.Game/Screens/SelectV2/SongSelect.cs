@@ -94,13 +94,9 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         protected bool ControlGlobalMusic { get; init; } = true;
 
-        // Colour scheme for mod overlay is left as default (green) to match mods button.
-        // Not sure about this, but we'll iterate based on feedback.
-        private readonly ModSelectOverlay modSelectOverlay = new UserModSelectOverlay
-        {
-            ShowPresets = true,
-        };
+        protected MarginPadding LeftPadding { get; init; }
 
+        private ModSelectOverlay modSelectOverlay = null!;
         private ModSpeedHotkeyHandler modSpeedHotkeyHandler = null!;
 
         // Blue is the most neutral choice, so I'm using that for now.
@@ -224,6 +220,7 @@ namespace osu.Game.Screens.SelectV2
                                                         RelativeSizeAxes = Axes.Both,
                                                         Spacing = new Vector2(0f, 4f),
                                                         Direction = FillDirection.Vertical,
+                                                        Padding = LeftPadding,
                                                         Children = new Drawable[]
                                                         {
                                                             new ShearAligningWrapper(titleWedge = new BeatmapTitleWedge()),
@@ -293,7 +290,7 @@ namespace osu.Game.Screens.SelectV2
                     RelativeSizeAxes = Axes.Both,
                 },
                 modSpeedHotkeyHandler = new ModSpeedHotkeyHandler(),
-                modSelectOverlay,
+                modSelectOverlay = CreateModSelectOverlay(),
             });
 
             configBackgroundBlur = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur);
@@ -307,6 +304,13 @@ namespace osu.Game.Screens.SelectV2
 
             showConvertedBeatmaps = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
         }
+
+        // Colour scheme for mod overlay is left as default (green) to match mods button.
+        // Not sure about this, but we'll iterate based on feedback.
+        protected virtual ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay
+        {
+            ShowPresets = true,
+        };
 
         private void requestRecommendedSelection(IEnumerable<GroupedBeatmap> groupedBeatmaps)
         {
@@ -348,7 +352,7 @@ namespace osu.Game.Screens.SelectV2
                         errorSample?.Play();
                 }
             },
-            new FooterButtonOptions
+            new FooterButtonOptions(this)
             {
                 Hotkey = GlobalAction.ToggleBeatmapOptions,
             }
@@ -388,7 +392,7 @@ namespace osu.Game.Screens.SelectV2
         {
             base.Update();
 
-            detailsArea.Height = wedgesContainer.DrawHeight - titleWedge.LayoutSize.Y - 4;
+            detailsArea.Height = wedgesContainer.ChildSize.Y - titleWedge.LayoutSize.Y - 4;
 
             float widescreenBonusWidth = Math.Max(0, DrawWidth / DrawHeight - 2f);
 

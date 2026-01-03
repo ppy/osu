@@ -94,21 +94,22 @@ namespace osu.Game.Tests.Visual.Navigation
 
                 AddStep("edit playlist", () => InputManager.Key(Key.Enter));
 
-                AddUntilStep("wait for song select", () => (playlistScreen.CurrentSubScreen as PlaylistsSongSelect)?.BeatmapSetsLoaded == true);
+                AddUntilStep("wait for song select", () => playlistScreen.CurrentSubScreen is PlaylistsSongSelectV2 songSelect && songSelect.IsLoaded && !songSelect.IsFiltering);
 
                 AddUntilStep("wait for selection", () => !Game.Beatmap.IsDefault);
 
                 AddStep("add item", () => InputManager.Key(Key.Enter));
+                AddStep("exit screen", () => InputManager.Key(Key.Escape));
 
                 AddUntilStep("wait for return to playlist screen", () => playlistScreen.CurrentSubScreen is PlaylistsRoomSubScreen);
 
                 AddStep("go back to song select", () =>
                 {
-                    InputManager.MoveMouseTo(playlistScreen.ChildrenOfType<PurpleRoundedButton>().Single(b => b.Text == "Edit playlist"));
+                    InputManager.MoveMouseTo(playlistScreen.ChildrenOfType<PurpleRoundedButton>().Single(b => b.Text == "+ Add more beatmaps"));
                     InputManager.Click(MouseButton.Left);
                 });
 
-                AddUntilStep("wait for song select", () => (playlistScreen.CurrentSubScreen as PlaylistsSongSelect)?.BeatmapSetsLoaded == true);
+                AddUntilStep("wait for song select", () => playlistScreen.CurrentSubScreen is PlaylistsSongSelectV2 songSelect && songSelect.IsLoaded && !songSelect.IsFiltering);
 
                 AddStep("press home button", () =>
                 {
