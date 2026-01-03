@@ -28,6 +28,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private const float assumed_slider_radius = NORMALISED_RADIUS * 1.8f;
 
         private readonly IReadOnlyList<OsuDifficultyHitObject> mainDifficultyHitObjects;
+        private readonly OsuHitObject lastMainObject;
 
         protected new OsuHitObject BaseObject => (OsuHitObject)base.BaseObject;
         protected new OsuHitObject LastObject => (OsuHitObject)base.LastObject;
@@ -38,7 +39,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public int IndexMain;
 
         /// <summary>
-        /// <see cref="DifficultyHitObject.DeltaTime"/> capped to a minimum of <see cref="MIN_DELTA_TIME"/>ms.
+        /// <see cref="DifficultyHitObject.DeltaTime"/> between tappable objects.
+        /// </summary>
+        public readonly double DeltaTimeMain;
+
+        /// <summary>
+        /// <see cref="DifficultyHitObject.DeltaTime"/> between tappable objects capped to a minimum of <see cref="MIN_DELTA_TIME"/>ms.
         /// </summary>
         public readonly double AdjustedDeltaTime;
 
@@ -120,17 +126,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private readonly OsuDifficultyHitObject? lastLastDifficultyObject;
         private readonly OsuDifficultyHitObject? lastDifficultyObject;
 
-        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index, List<OsuDifficultyHitObject> mainObjects, int mainIndex)
+        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, HitObject lastMainObject, double clockRate, List<DifficultyHitObject> objects, int index, List<OsuDifficultyHitObject> mainObjects, int mainIndex)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
+            this.lastMainObject = (OsuHitObject)lastMainObject;
             mainDifficultyHitObjects = mainObjects;
             IndexMain = mainIndex;
 
             lastLastDifficultyObject = index > 1 ? mainObjects[mainIndex - 2] : null;
             lastDifficultyObject = index > 0 ? mainObjects[mainIndex - 1] : null;
 
+            DeltaTimeMain = (hitObject.StartTime - lastMainObject.StartTime) / clockRate;
+
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
-            AdjustedDeltaTime = Math.Max(DeltaTime, MIN_DELTA_TIME);
+            AdjustedDeltaTime = Math.Max(DeltaTimeMain, MIN_DELTA_TIME);
 
             SmallCircleBonus = Math.Max(1.0, 1.0 + (30 - BaseObject.Radius) / 40);
 
@@ -218,20 +227,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 TravelTime = Math.Max(LazyTravelTime / clockRate, MIN_DELTA_TIME);
             }
 
-            // We don't need to calculate either angle or distance when one of the last->curr objects is a spinner
-            if (BaseObject is Spinner || LastObject is Spinner)
-                return;
-
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
             float scalingFactor = NORMALISED_RADIUS / (float)BaseObject.Radius;
 
-            Vector2 lastCursorPosition = lastDifficultyObject != null ? getEndCursorPosition(lastDifficultyObject) : LastObject.StackedPosition;
+            Vector2 lastCursorPosition = lastDifficultyObject != null ? getEndCursorPosition(lastDifficultyObject) : lastMainObject.StackedPosition;
 
             LazyJumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
             MinimumJumpTime = AdjustedDeltaTime;
             MinimumJumpDistance = LazyJumpDistance;
 
-            if (LastObject is Slider lastSlider && lastDifficultyObject != null)
+            if (lastMainObject is Slider lastSlider && lastDifficultyObject != null)
             {
                 double lastTravelTime = Math.Max(lastDifficultyObject.LazyTravelTime / clockRate, MIN_DELTA_TIME);
                 MinimumJumpTime = Math.Max(AdjustedDeltaTime - lastTravelTime, MIN_DELTA_TIME);
@@ -266,7 +271,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             {
                 Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastDifficultyObject);
 
-                Vector2 v1 = lastLastCursorPosition - LastObject.StackedPosition;
+                Vector2 v1 = lastLastCursorPosition - lastMainObject.StackedPosition;
                 Vector2 v2 = BaseObject.StackedPosition - lastCursorPosition;
 
                 float dot = Vector2.Dot(v1, v2);

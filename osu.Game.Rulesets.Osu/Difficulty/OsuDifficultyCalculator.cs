@@ -157,7 +157,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
             List<OsuDifficultyHitObject> mainObjects = new List<OsuDifficultyHitObject>();
 
-            HitObject lastObj = beatmap.HitObjects.First();
+            HitObject lastMainObj = beatmap.HitObjects.First();
 
             // The first jump is formed by the first two hitobjects of the map.
             // If the map has less than two OsuHitObjects, the enumerator will not return anything.
@@ -167,16 +167,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 if (currObj is Spinner)
                 {
-                    objects.Add(new OsuSpinnerDifficultyHitObject(currObj, lastObj, clockRate, objects, objects.Count));
+                    objects.Add(new OsuSpinnerDifficultyHitObject(currObj, beatmap.HitObjects[i - 1], clockRate, objects, objects.Count));
                 }
                 else
                 {
-                    var difficultyObject = new OsuDifficultyHitObject(currObj, lastObj, clockRate, objects, objects.Count, mainObjects, mainObjects.Count);
+                    var difficultyObject = new OsuDifficultyHitObject(currObj, beatmap.HitObjects[i - 1], lastMainObj, clockRate, objects, objects.Count, mainObjects, mainObjects.Count);
 
                     objects.Add(difficultyObject);
                     mainObjects.Add(difficultyObject);
 
-                    lastObj = currObj;
+                    lastMainObj = currObj;
                 }
             }
 
