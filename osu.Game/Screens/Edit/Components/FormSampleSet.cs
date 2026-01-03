@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Edit.Components
             set => current.Current = value;
         }
 
-        public Func<FileInfo, string>? SampleAddRequested { get; init; }
+        public Func<FileInfo, string, string>? SampleAddRequested { get; init; }
         public Action<string>? SampleRemoveRequested { get; init; }
 
         private readonly BindableWithCurrent<EditorBeatmapSkin.SampleSet?> current = new BindableWithCurrent<EditorBeatmapSkin.SampleSet?>();
@@ -194,7 +194,7 @@ namespace osu.Game.Screens.Edit.Components
             /// <summary>
             /// Invoked when a new sample is selected via this button.
             /// </summary>
-            public Func<FileInfo, string>? SampleAddRequested { get; init; }
+            public Func<FileInfo, string, string>? SampleAddRequested { get; init; }
 
             /// <summary>
             /// Invoked when a sample removal is selected via this button.
@@ -294,7 +294,18 @@ namespace osu.Game.Screens.Edit.Components
 
                 AddInternal(hoverSounds = (ActualFilename.Value == null ? new HoverClickSounds(HoverSampleSet.Button) : new HoverSounds(HoverSampleSet.Button)));
 
-                sample = ActualFilename.Value == null ? null : editorBeatmap?.BeatmapSkin?.Skin.Samples?.Get(ActualFilename.Value);
+                if (ActualFilename.Value != null)
+                {
+                    // to cover all bases, invalidate the extensionless filename (which gameplay is most likely to use)
+                    // as well as the filename with extension (which we are using here).
+                    editorBeatmap?.BeatmapSkin?.Skin.Samples?.Invalidate(ExpectedFilename.Value);
+                    editorBeatmap?.BeatmapSkin?.Skin.Samples?.Invalidate(ActualFilename.Value);
+                    sample = editorBeatmap?.BeatmapSkin?.Skin.Samples?.Get(ActualFilename.Value);
+                }
+                else
+                {
+                    sample = null;
+                }
             }
 
             protected override bool OnHover(HoverEvent e)
@@ -317,7 +328,7 @@ namespace osu.Game.Screens.Edit.Components
                     return;
 
                 this.HidePopover();
-                ActualFilename.Value = SampleAddRequested?.Invoke(selectedFile.Value) ?? selectedFile.Value.ToString();
+                ActualFilename.Value = SampleAddRequested?.Invoke(selectedFile.Value, ExpectedFilename.Value) ?? selectedFile.Value.ToString();
             }
 
             private void deleteSample()
