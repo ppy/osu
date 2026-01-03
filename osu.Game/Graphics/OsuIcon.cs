@@ -660,15 +660,15 @@ namespace osu.Game.Graphics
                 this.textures = textures;
             }
 
-            public ITexturedCharacterGlyph? Get(string? fontName, char character)
+            public ITexturedCharacterGlyph? Get(string? fontName, Grapheme character)
             {
                 if (fontName == FONT_NAME)
-                    return new Glyph(textures.Get($@"{fontName}/{((OsuIconMapping)character).GetDescription()}"));
+                    return new Glyph(textures.Get($@"{fontName}/{((OsuIconMapping)character.CharValue).GetDescription()}"));
 
                 return null;
             }
 
-            public Task<ITexturedCharacterGlyph?> GetAsync(string fontName, char character) => Task.Run(() => Get(fontName, character));
+            public Task<ITexturedCharacterGlyph?> GetAsync(string fontName, Grapheme character) => Task.Run(() => Get(fontName, character));
 
             public Texture? Get(string name, WrapMode wrapModeS, WrapMode wrapModeT) => null;
 
@@ -688,13 +688,14 @@ namespace osu.Game.Graphics
                 public float YOffset => default;
                 public float XAdvance => default;
                 public float Baseline => default;
-                public char Character => default;
+                public Grapheme Character => default;
 
                 public float GetKerning<T>(T lastGlyph) where T : ICharacterGlyph => throw new NotImplementedException();
 
                 public Texture Texture { get; }
                 public float Width => Texture.Width;
                 public float Height => Texture.Height;
+                public bool Coloured => false;
 
                 public Glyph(Texture texture)
                 {
