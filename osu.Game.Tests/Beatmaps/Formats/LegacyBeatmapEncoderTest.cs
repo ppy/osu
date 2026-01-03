@@ -10,7 +10,6 @@ using System.Text;
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Video;
 using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -357,8 +356,6 @@ namespace osu.Game.Tests.Beatmaps.Formats
             public override Texture GetBackground() => throw new NotImplementedException();
 
             protected override Track GetBeatmapTrack() => throw new NotImplementedException();
-
-            public override Video GetBeatmapVideo() => throw new NotImplementedException();
 
             protected internal override ISkin GetSkin() => throw new NotImplementedException();
 

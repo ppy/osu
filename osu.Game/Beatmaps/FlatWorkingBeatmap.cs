@@ -5,7 +5,6 @@ using System;
 using System.IO;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Video;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Skinning;
@@ -45,7 +44,6 @@ namespace osu.Game.Beatmaps
         protected override IBeatmap GetBeatmap() => beatmap;
         public override Texture GetBackground() => throw new NotImplementedException();
         protected override Track GetBeatmapTrack() => throw new NotImplementedException();
-        public override Video GetBeatmapVideo() => throw new NotImplementedException();
         protected internal override ISkin GetSkin() => throw new NotImplementedException();
         public override Stream GetStream(string storagePath) => throw new NotImplementedException();
     }

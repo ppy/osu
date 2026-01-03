@@ -15,7 +15,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Video;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -365,7 +364,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             public override Texture? GetBackground() => null;
             public override Stream? GetStream(string storagePath) => null;
             protected override Track? GetBeatmapTrack() => null;
-            public override Video? GetBeatmapVideo() => null;
             protected internal override ISkin? GetSkin() => null;
         }
     }
