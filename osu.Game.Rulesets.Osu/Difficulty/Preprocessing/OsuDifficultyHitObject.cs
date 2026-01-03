@@ -27,8 +27,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private const float maximum_slider_radius = NORMALISED_RADIUS * 2.4f;
         private const float assumed_slider_radius = NORMALISED_RADIUS * 1.8f;
 
+        private readonly IReadOnlyList<OsuDifficultyHitObject> mainDifficultyHitObjects;
+
         protected new OsuHitObject BaseObject => (OsuHitObject)base.BaseObject;
         protected new OsuHitObject LastObject => (OsuHitObject)base.LastObject;
+
+        /// <summary>
+        /// The index of this <see cref="OsuDifficultyHitObject"/> in the list of main <see cref="OsuDifficultyHitObject"/>s.
+        /// </summary>
+        public int IndexMain;
 
         /// <summary>
         /// <see cref="DifficultyHitObject.DeltaTime"/> capped to a minimum of <see cref="MIN_DELTA_TIME"/>ms.
@@ -113,11 +120,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private readonly OsuDifficultyHitObject? lastLastDifficultyObject;
         private readonly OsuDifficultyHitObject? lastDifficultyObject;
 
-        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index)
+        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index, List<OsuDifficultyHitObject> mainObjects, int mainIndex)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
-            lastLastDifficultyObject = index > 1 ? (OsuDifficultyHitObject)objects[index - 2] : null;
-            lastDifficultyObject = index > 0 ? (OsuDifficultyHitObject)objects[index - 1] : null;
+            mainDifficultyHitObjects = mainObjects;
+            IndexMain = mainIndex;
+
+            lastLastDifficultyObject = index > 1 ? mainObjects[mainIndex - 2] : null;
+            lastDifficultyObject = index > 0 ? mainObjects[mainIndex - 1] : null;
 
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
             AdjustedDeltaTime = Math.Max(DeltaTime, MIN_DELTA_TIME);
@@ -135,6 +145,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             computeSliderCursorPosition();
             setDistances(clockRate);
+        }
+
+        public OsuDifficultyHitObject? PreviousMain(int backwardsIndex)
+        {
+            int index = IndexMain - (backwardsIndex + 1);
+            return index >= 0 && index < mainDifficultyHitObjects.Count ? mainDifficultyHitObjects[index] : default;
+        }
+
+        public OsuDifficultyHitObject? NextMain(int forwardsIndex)
+        {
+            int index = IndexMain + (forwardsIndex + 1);
+            return index >= 0 && index < mainDifficultyHitObjects.Count ? mainDifficultyHitObjects[index] : default;
         }
 
         public double OpacityAt(double time, bool hidden)

@@ -30,15 +30,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current, IReadOnlyList<Mod> mods)
         {
-            if (current.BaseObject is Spinner)
+            if (current is not OsuDifficultyHitObject osuCurrObj)
                 return 0;
 
             // derive strainTime for calculation
-            var osuCurrObj = (OsuDifficultyHitObject)current;
-            var osuPrevObj = current.Index > 0 ? (OsuDifficultyHitObject)current.Previous(0) : null;
+            var osuPrevObj = osuCurrObj.IndexMain > 0 ? osuCurrObj.PreviousMain(0) : null;
 
             double strainTime = osuCurrObj.AdjustedDeltaTime;
-            double doubletapness = 1.0 - osuCurrObj.GetDoubletapness((OsuDifficultyHitObject?)osuCurrObj.Next(0));
+            double doubletapness = 1.0 - osuCurrObj.GetDoubletapness(osuCurrObj.NextMain(0));
 
             // Cap deltatime to the OD 300 hitwindow.
             // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.

@@ -39,7 +39,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            currentStrain *= strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
+            // Use adjusted only if object is tappable
+            double deltaTime = current is OsuDifficultyHitObject osuCurrObj ? osuCurrObj.AdjustedDeltaTime : current.DeltaTime;
+
+            currentStrain *= strainDecay(deltaTime);
             currentStrain += SpeedEvaluator.EvaluateDifficultyOf(current, Mods) * skillMultiplier;
 
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
