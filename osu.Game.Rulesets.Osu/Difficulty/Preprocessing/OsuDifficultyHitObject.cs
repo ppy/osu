@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -109,6 +110,35 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// Selective bonus for maps with higher circle size.
         /// </summary>
         public double SmallCircleBonus { get; private set; }
+
+        private double normalWeight;
+
+        private double? stackAngle1;
+        private double stackWeight1;
+
+        private double? stackAngle2;
+        private double stackWeight2;
+
+        /// <summary>
+        /// This is a simple version of stack adjusted angle, that just lerps between normal angle and stacked angles based on their weights.
+        /// Use if the function to be applied is linear, or close to linear.
+        /// Use with caution if function is non-linear, but the resulting value is strictly growing or strictly decreasing with angle.
+        /// Never use it if the function changes growth direction with angle on the range [0, PI].
+        /// </summary>
+        public double? StackAdjustedAngle => Angle != null ? Angle * normalWeight + stackAngle1 * stackWeight1 + stackAngle2 * stackWeight2 : null;
+
+        /// <summary>
+        /// More complex version of stack adjusted angle calculation, that applies a function to each angle before lerping them based on their weights.
+        /// Works for any function, as it runs it three times and then weights the results.
+        /// </summary>
+        /// <param name="func">Function that takes angle as a parameter</param>
+        /// <param name="defaultValue">Value that would be returned if angle is null, defaults to 0</param>
+        /// <returns></returns>
+        public double CalcAngleFunctionStackAdjusted(Func<double, double> func, double defaultValue = 0)
+        {
+            if (Angle == null) return defaultValue;
+            return func(Angle!.Value) * normalWeight + func(stackAngle1!.Value) * stackWeight1 + func(stackAngle2!.Value) * stackWeight2;
+        }
 
         private readonly OsuDifficultyHitObject? lastLastDifficultyObject;
         private readonly OsuDifficultyHitObject? lastDifficultyObject;
@@ -240,17 +270,60 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 MinimumJumpDistance = Math.Max(0, Math.Min(LazyJumpDistance - (maximum_slider_radius - assumed_slider_radius), tailJumpDistance - maximum_slider_radius));
             }
 
-            if (lastLastDifficultyObject != null && lastLastDifficultyObject.BaseObject is not Spinner)
+            if (lastDifficultyObject != null && lastLastDifficultyObject != null && lastLastDifficultyObject.BaseObject is not Spinner)
             {
                 Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastDifficultyObject);
+                Angle = Math.Abs(calculateAngle(lastLastCursorPosition - LastObject.StackedPosition, BaseObject.StackedPosition - lastCursorPosition));
 
-                Vector2 v1 = lastLastCursorPosition - LastObject.StackedPosition;
-                Vector2 v2 = BaseObject.StackedPosition - lastCursorPosition;
+                stackAngle1 = Angle;
+                stackAngle2 = Angle;
 
-                float dot = Vector2.Dot(v1, v2);
-                float det = v1.X * v2.Y - v1.Y * v2.X;
+                // We have two cases: either the current object is a stack, so we need to angle between last 3 objects before this
+                // one, or the last object is a stack, so we need to angle between last 2 objects before this one and this one.
 
-                Angle = Math.Abs(Math.Atan2(det, dot));
+                // If current distance is larger then the last one, then the only possible case is that last object is stacked
+                // We have strict if else check because in case of both distances being similar - stack weight would be 0 in any of the branches
+                if (LazyJumpDistance > lastDifficultyObject.LazyJumpDistance)
+                {
+                    OsuDifficultyHitObject? last2DifficultyObject = (OsuDifficultyHitObject?)Previous(2);
+
+                    // If there's no objects before last last or it's a spinner - we cannot compute an angle
+                    // In this case stack weight would be 0, and normal angle would be used
+                    if (last2DifficultyObject != null && last2DifficultyObject.BaseObject is not Spinner)
+                    {
+                        Vector2 last2CursorPosition = getEndCursorPosition(last2DifficultyObject);
+                        stackAngle1 = Math.Abs(calculateAngle(last2CursorPosition - lastDifficultyObject.LastObject.StackedPosition, BaseObject.StackedPosition - lastCursorPosition));
+
+                        stackWeight1 = DifficultyCalculationUtils.ReverseLerp(lastDifficultyObject.LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS)
+                            * DifficultyCalculationUtils.ReverseLerp(LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_DIAMETER * 2);
+                    }
+                }
+                // In other case , if last distance is larger, then current object may be stacked
+                else
+                {
+                    stackAngle1 = lastDifficultyObject.Angle ?? Angle;
+
+                    stackWeight1 = DifficultyCalculationUtils.ReverseLerp(LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS)
+                        * DifficultyCalculationUtils.ReverseLerp(lastDifficultyObject.LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_DIAMETER * 2);
+
+                    // Here we also need to handle cases where last last object is also stacked
+                    OsuDifficultyHitObject? last3DifficultyObject = (OsuDifficultyHitObject?)Previous(3);
+
+                    if (last3DifficultyObject != null && last3DifficultyObject.BaseObject is not Spinner)
+                    {
+                        Vector2 last3CursorPosition = getEndCursorPosition(last3DifficultyObject);
+                        stackAngle2 = Math.Abs(calculateAngle(last3CursorPosition - lastLastDifficultyObject.LastObject.StackedPosition, LastObject.StackedPosition - lastLastCursorPosition));
+
+                        stackWeight2 = DifficultyCalculationUtils.ReverseLerp(lastLastDifficultyObject.LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS)
+                            * DifficultyCalculationUtils.ReverseLerp(lastDifficultyObject.LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_DIAMETER * 2);
+
+                        // Rescale stack weights
+                        stackWeight2 *= stackWeight1;
+                        stackWeight1 -= stackWeight2;
+                    }
+                }
+
+                normalWeight = 1 - (stackWeight1 + stackWeight2);
             }
         }
 
@@ -365,6 +438,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private Vector2 getEndCursorPosition(OsuDifficultyHitObject difficultyHitObject)
         {
             return difficultyHitObject.LazyEndPosition ?? difficultyHitObject.BaseObject.StackedPosition;
+        }
+
+        private double calculateAngle(Vector2 v1, Vector2 v2)
+        {
+            float dot = Vector2.Dot(v1, v2);
+            float det = v1.X * v2.Y - v1.Y * v2.X;
+            return Math.Atan2(det, dot);
         }
     }
 }
