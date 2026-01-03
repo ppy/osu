@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
-        public const double PERFORMANCE_BASE_MULTIPLIER = 1.12; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
+        public const double PERFORMANCE_BASE_MULTIPLIER = 1.13; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
         public const double PERFORMANCE_NORM_EXPONENT = 1.1;
 
         private bool usingClassicSliderAccuracy;
@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
 
-            double totalValue = DifficultyCalculationUtils.Norm(PERFORMANCE_NORM_EXPONENT, aimValue, speedValue, accuracyValue, flashlightValue) * multiplier;
+            double totalValue = DifficultyCalculationUtils.Norm(PERFORMANCE_NORM_EXPONENT, OsuDifficultyCalculator.SumMechanicalDifficulty(aimValue, speedValue), accuracyValue, flashlightValue) * multiplier;
 
             return new OsuPerformanceAttributes
             {
@@ -169,7 +169,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModAutopilot))
                 return 0.0;
 
-            double aimDifficulty = attributes.AimDifficulty;
+            double flowAimHighDeviationMultiplier = calculateFlowAimHighDeviationNerf(attributes);
+            double aimDifficulty = double.Lerp(attributes.SnapAimDifficulty, attributes.AimDifficulty, flowAimHighDeviationMultiplier);
 
             if (attributes.SliderCount > 0 && attributes.AimDifficultSliderCount > 0)
             {
@@ -489,6 +490,38 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             adjustedSpeedValue = double.Lerp(adjustedSpeedValue, speedValue, lerp);
 
             return adjustedSpeedValue / speedValue;
+        }
+
+        private double calculateFlowAimHighDeviationNerf(OsuDifficultyAttributes attributes)
+        {
+            if (speedDeviation == null)
+                return 0;
+
+            double speedValue = OsuStrainSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
+            double flowAimValue = OsuStrainSkill.DifficultyToPerformance(attributes.FlowAimDifficulty);
+
+            double speedFlowValue = Math.Pow(Math.Pow(speedValue, 1.1) + Math.Pow(flowAimValue, 1.1), 1 / 1.1);
+
+            // Decides a point where the PP value achieved compared to the speed deviation is assumed to be tapped improperly. Any PP above this point is considered "excess" speed difficulty.
+            // This is used to cause PP above the cutoff to scale logarithmically towards the original speed value thus nerfing the value.
+            double excessSpeedFlowDifficultyCutoff = 100 + 220 * Math.Pow(22 / speedDeviation.Value, 6.5);
+
+            if (speedFlowValue <= excessSpeedFlowDifficultyCutoff)
+                return 1.0;
+
+            const double scale = 50;
+            double adjustedSpeedFlowValue = scale * (Math.Log((speedFlowValue - excessSpeedFlowDifficultyCutoff) / scale + 1) + excessSpeedFlowDifficultyCutoff / scale);
+
+            // 200 UR and less are considered tapped correctly to ensure that normal scores will be punished as little as possible
+            // For flow aim we would have harsher UR requirement, because high UR scores are more likely to be raked when it comes to more flowy maps
+            double lerp = 1 - DifficultyCalculationUtils.ReverseLerp(speedDeviation.Value, 20.0, 25.0);
+            adjustedSpeedFlowValue = double.Lerp(adjustedSpeedFlowValue, speedFlowValue, lerp);
+
+            // Punish flow less if most difficulty is speed
+            double nerf = adjustedSpeedFlowValue / speedFlowValue;
+            nerf = double.Lerp(1, nerf, flowAimValue / speedFlowValue);
+
+            return nerf;
         }
 
         // Miss penalty assumes that a player will miss on the hardest parts of a map,
