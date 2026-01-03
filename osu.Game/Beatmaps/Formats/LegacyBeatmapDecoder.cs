@@ -451,14 +451,14 @@ namespace osu.Game.Beatmaps.Formats
                         break;
 
                     case LegacyEventType.Video:
-                        string filename = CleanFilename(split[2]);
+                        beatmap.BeatmapInfo.Metadata.VideoFile = CleanFilename(split[2]);
 
                         // Some very old beatmaps had incorrect type specifications for their backgrounds (ie. using 1 for VIDEO
                         // instead of 0 for BACKGROUND). To handle this gracefully, check the file extension against known supported
                         // video extensions and handle similar to a background if it doesn't match.
-                        if (!SupportedExtensions.VIDEO_EXTENSIONS.Contains(Path.GetExtension(filename).ToLowerInvariant()))
+                        if (!SupportedExtensions.VIDEO_EXTENSIONS.Contains(Path.GetExtension(beatmap.BeatmapInfo.Metadata.VideoFile).ToLowerInvariant()))
                         {
-                            beatmap.BeatmapInfo.Metadata.BackgroundFile = filename;
+                            beatmap.BeatmapInfo.Metadata.BackgroundFile = beatmap.BeatmapInfo.Metadata.VideoFile;
                             lineSupportedByEncoder = true;
                         }
 

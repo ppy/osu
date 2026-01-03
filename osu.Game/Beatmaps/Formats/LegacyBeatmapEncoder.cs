@@ -154,6 +154,10 @@ namespace osu.Game.Beatmaps.Formats
             if (!string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
                 writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Background},0,\"{beatmap.BeatmapInfo.Metadata.BackgroundFile}\",0,0"));
 
+            //TODO: This thing should replace Video event with new values and not add a new line every time
+            if (!string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
+                writer.WriteLine(FormattableString.Invariant($"{LegacyEventType.Video},{beatmap.BeatmapInfo.Metadata.VideoOffset},\"{beatmap.BeatmapInfo.Metadata.VideoFile}\""));
+
             foreach (var b in beatmap.Breaks)
                 writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Break},{b.StartTime},{b.EndTime}"));
 
