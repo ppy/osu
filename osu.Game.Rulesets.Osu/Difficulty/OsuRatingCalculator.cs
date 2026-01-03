@@ -35,18 +35,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModAutopilot))
                 return 0;
 
-            double aimRating = CalculateDifficultyRating(aimDifficultyValue);
-
             if (mods.Any(m => m is OsuModTouchDevice))
-                aimRating = Math.Pow(aimRating, 0.8);
+                aimDifficultyValue = Math.Pow(aimDifficultyValue, 0.8) * 1.3;
 
             if (mods.Any(m => m is OsuModRelax))
-                aimRating *= 0.9;
+                aimDifficultyValue *= 0.7;
 
             if (mods.Any(m => m is OsuModMagnetised))
             {
                 float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
-                aimRating *= 1.0 - magnetisedStrength;
+                aimDifficultyValue *= 1.0 - magnetisedStrength;
             }
 
             double ratingMultiplier = 1.0;
@@ -74,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // It is important to consider accuracy difficulty when scaling with accuracy.
             ratingMultiplier *= 0.98 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 2500;
 
-            return aimRating * Math.Cbrt(ratingMultiplier);
+            return aimDifficultyValue * ratingMultiplier;
         }
 
         public double ComputeSpeedRating(double speedDifficultyValue)
@@ -82,16 +80,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModRelax))
                 return 0;
 
-            double speedRating = CalculateDifficultyRating(speedDifficultyValue);
-
             if (mods.Any(m => m is OsuModAutopilot))
-                speedRating *= 0.5;
+                speedDifficultyValue *= 0.125;
 
             if (mods.Any(m => m is OsuModMagnetised))
             {
                 // reduce speed rating because of the speed distance scaling, with maximum reduction being 0.7x
                 float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
-                speedRating *= 1.0 - magnetisedStrength * 0.3;
+                speedDifficultyValue *= 1.0 - magnetisedStrength * 0.3;
             }
 
             double ratingMultiplier = 1.0;
@@ -116,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             ratingMultiplier *= 0.95 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 750;
 
-            return speedRating * Math.Cbrt(ratingMultiplier);
+            return speedDifficultyValue * ratingMultiplier;
         }
 
         public double ComputeFlashlightRating(double flashlightDifficultyValue)
@@ -124,26 +120,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (!mods.Any(m => m is OsuModFlashlight))
                 return 0;
 
-            double flashlightRating = CalculateDifficultyRating(flashlightDifficultyValue);
-
             if (mods.Any(m => m is OsuModTouchDevice))
-                flashlightRating = Math.Pow(flashlightRating, 0.8);
+                flashlightDifficultyValue = Math.Pow(flashlightDifficultyValue, 0.8) * 1.9;
 
             if (mods.Any(m => m is OsuModRelax))
-                flashlightRating *= 0.7;
+                flashlightDifficultyValue *= 0.5;
             else if (mods.Any(m => m is OsuModAutopilot))
-                flashlightRating *= 0.4;
+                flashlightDifficultyValue *= 0.15;
 
             if (mods.Any(m => m is OsuModMagnetised))
             {
                 float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
-                flashlightRating *= 1.0 - magnetisedStrength;
+                flashlightDifficultyValue *= 1.0 - magnetisedStrength;
             }
 
             if (mods.Any(m => m is OsuModDeflate))
             {
                 float deflateInitialScale = mods.OfType<OsuModDeflate>().First().StartScale.Value;
-                flashlightRating *= Math.Clamp(DifficultyCalculationUtils.ReverseLerp(deflateInitialScale, 11, 1), 0.1, 1);
+                flashlightDifficultyValue *= Math.Clamp(DifficultyCalculationUtils.ReverseLerp(deflateInitialScale, 11, 1), 0.1, 1);
             }
 
             double ratingMultiplier = 1.0;
@@ -155,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // It is important to consider accuracy difficulty when scaling with accuracy.
             ratingMultiplier *= 0.98 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 2500;
 
-            return flashlightRating * Math.Sqrt(ratingMultiplier);
+            return flashlightDifficultyValue * ratingMultiplier;
         }
 
         private double calculateAimVisibilityFactor(double approachRate)
