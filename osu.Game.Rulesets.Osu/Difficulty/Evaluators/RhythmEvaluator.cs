@@ -23,12 +23,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
-            if (current is not OsuDifficultyHitObject osuCurrObj)
+            if (current is not OsuDifficultyHitObject osuCurrent)
                 return 1.0;
 
             double rhythmComplexitySum = 0;
 
-            double deltaDifferenceEpsilon = osuCurrObj.HitWindowGreat * 0.3;
+            double deltaDifferenceEpsilon = osuCurrent.HitWindowGreat * 0.3;
 
             var island = new Island(deltaDifferenceEpsilon);
             var previousIsland = new Island(deltaDifferenceEpsilon);
@@ -41,20 +41,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             bool firstDeltaSwitch = false;
 
-            int historicalNoteCount = Math.Min(osuCurrObj.IndexMain, history_objects_max);
+            int historicalNoteCount = Math.Min(osuCurrent.IndexMain, history_objects_max);
 
             int rhythmStart = 0;
 
-            while (rhythmStart < historicalNoteCount - 2 && current.StartTime - osuCurrObj.PreviousMain(rhythmStart)!.StartTime < history_time_max)
+            while (rhythmStart < historicalNoteCount - 2 && current.StartTime - osuCurrent.PreviousMain(rhythmStart)!.StartTime < history_time_max)
                 rhythmStart++;
 
-            OsuDifficultyHitObject prevObj = osuCurrObj.PreviousMain(rhythmStart)!;
-            OsuDifficultyHitObject lastObj = osuCurrObj.PreviousMain(rhythmStart + 1)!;
+            OsuDifficultyHitObject prevObj = osuCurrent.PreviousMain(rhythmStart)!;
+            OsuDifficultyHitObject lastObj = osuCurrent.PreviousMain(rhythmStart + 1)!;
 
             // we go from the furthest object back to the current one
             for (int i = rhythmStart; i > 0; i--)
             {
-                OsuDifficultyHitObject currObj = osuCurrObj.PreviousMain(i - 1)!;
+                OsuDifficultyHitObject currObj = osuCurrent.PreviousMain(i - 1)!;
 
                 // scales note 0 to 1 from history to now
                 double timeDecay = (history_time_max - (current.StartTime - currObj.StartTime)) / history_time_max;
