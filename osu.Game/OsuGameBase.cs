@@ -625,7 +625,7 @@ namespace osu.Game
                     return new TouchSettings(th);
 
                 case MidiHandler:
-                    return new InputSection.HandlerSection(handler);
+                    return new InputSubsection(handler);
 
                 // return null for handlers that shouldn't have settings.
                 default:
