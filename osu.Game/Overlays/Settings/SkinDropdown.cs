@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -142,6 +143,9 @@ namespace osu.Game.Overlays.Settings
 
                     private int favouriteDragEndThreshold = 50;
 
+                    [Resolved]
+                    private GameHost host { get; set; } = null!;
+
                     private bool favouriteStarButtonVisible = false;
 
                     private ClickableContainer starContainer = null!;
@@ -248,7 +252,7 @@ namespace osu.Game.Overlays.Settings
 
                     protected override bool OnMouseMove(MouseMoveEvent e)
                     {
-                        if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
+                        if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch || !host.IsActive.Value)
                             return base.OnMouseMove(e);
 
                         if (e.MousePosition.X < hoverSlideThreshold && !favouriteStarButtonVisible)
