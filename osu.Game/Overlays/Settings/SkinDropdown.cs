@@ -163,18 +163,7 @@ namespace osu.Game.Overlays.Settings
                             Alpha = 0,
                             Action = () =>
                             {
-                                starBackground
-                                    .FadeColour(Colour4.Gold, 150, Easing.OutQuint)
-                                    .Then()
-                                    .FadeColour(Colour4.FromHex(@"#edae00"), 250, Easing.OutQuint);
-
-                                starIcon
-                                    .FadeColour(Colour4.White, 150, Easing.OutQuint)
-                                    .ScaleTo(0.8f, 150, Easing.OutQuint)
-                                    .Then()
-                                    .FadeColour(Colour4.White.Opacity(0.7f), 250, Easing.OutQuint)
-                                    .ScaleTo(1.0f, 250, Easing.OutQuint);
-
+                                starButtonFlash();
                                 TriggerFavouriteChange();
                             },
                             Children = [
@@ -224,11 +213,19 @@ namespace osu.Game.Overlays.Settings
                         return base.OnDragStart(e);
                     }
 
+                    private bool stateChanged = false;
+
                     protected override void OnDrag(DragEvent e)
                     {
                         dragDelta += e.Delta.X / 2;
 
                         if (Math.Abs(dragDelta) < 0.01) return;
+
+                        if (dragDelta >= favouriteDragEndThreshold && !stateChanged)
+                        {
+                            stateChanged = true;
+                            TriggerFavouriteChange();
+                        }
 
                         dragDelta = Math.Clamp(dragDelta, 0, 100);
                         Background.MoveToX(dragDelta, 100, Easing.OutQuint);
@@ -241,9 +238,7 @@ namespace osu.Game.Overlays.Settings
                     protected override void OnDragEnd(DragEndEvent e)
                     {
                         starButtonAnimateOut();
-
-                        if (dragDelta >= favouriteDragEndThreshold)
-                            TriggerFavouriteChange();
+                        stateChanged = false;
 
                         dragDelta = 0;
 
@@ -285,6 +280,7 @@ namespace osu.Game.Overlays.Settings
                         if (SkinData != null)
                         {
                             menu?.TrackFavouriteChange(SkinData.ID, IsFavourite);
+                            starButtonFlash();
                         }
                         return true;
                     }
@@ -305,6 +301,21 @@ namespace osu.Game.Overlays.Settings
                         Foreground.MoveToX(offset, 250, Easing.OutQuint);
                         starContainer.FadeTo(0, 250, Easing.OutQuint).ResizeWidthTo(offset, 250, Easing.OutQuint);
                         favouriteStarButtonVisible = false;
+                    }
+
+                    private void starButtonFlash()
+                    {
+                        starBackground
+                            .FadeColour(Colour4.Gold, 150, Easing.OutQuint)
+                            .Then()
+                            .FadeColour(Colour4.FromHex(@"#edae00"), 250, Easing.OutQuint);
+
+                        starIcon
+                            .FadeColour(Colour4.White, 150, Easing.OutQuint)
+                            .ScaleTo(0.8f, 150, Easing.OutQuint)
+                            .Then()
+                            .FadeColour(Colour4.White.Opacity(0.7f), 250, Easing.OutQuint)
+                            .ScaleTo(1.0f, 250, Easing.OutQuint);
                     }
 
                     public partial class FavouriteIndicator : SpriteIcon
