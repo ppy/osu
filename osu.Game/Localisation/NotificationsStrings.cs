@@ -145,6 +145,26 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString FriendOffline(string info) => new TranslatableString(getKey(@"friend_offline"), @"Offline: {0}", info);
 
+        /// <summary>
+        /// "Connection to API was lost. Can't continue with online play."
+        /// </summary>
+        public static LocalisableString APIDisconnect => new TranslatableString(getKey(@"api_disconnect"), @"Connection to API was lost. Can't continue with online play.");
+
+        /// <summary>
+        /// "Connection to the multiplayer server was lost. Exiting multiplayer."
+        /// </summary>
+        public static LocalisableString MultiplayerDisconnect => new TranslatableString(getKey(@"multiplayer_disconnect"), @"Connection to the multiplayer server was lost. Exiting multiplayer.");
+
+        /// <summary>
+        /// "You have been logged out on this device due to a login to your account on another device."
+        /// </summary>
+        public static LocalisableString AnotherDeviceDisconnect => new TranslatableString(getKey(@"another_device_disconnect"), @"You have been logged out on this device due to a login to your account on another device.");
+
+        /// <summary>
+        /// "You have been logged out due to a change to your account. Please log in again."
+        /// </summary>
+        public static LocalisableString AccountChangeDisconnect => new TranslatableString(getKey(@"account_change_disconnect"), @"You have been logged out due to a change to your account. Please log in again.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
