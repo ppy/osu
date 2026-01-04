@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -133,6 +135,10 @@ namespace osu.Game.Overlays.Settings
 
                     public SkinInfo? SkinData;
 
+                    private Sample? sampleShow;
+
+                    private Sample? sampleHide;
+
                     private SkinDropdownMenu? menu;
 
                     private Box starBackground = null!;
@@ -197,6 +203,13 @@ namespace osu.Game.Overlays.Settings
                                     SkinData = skin;
                             });
                         }
+                    }
+
+                    [BackgroundDependencyLoader(true)]
+                    private void load(AudioManager audio)
+                    {
+                        sampleShow = audio.Samples.Get(@"UI/check-on");
+                        sampleHide = audio.Samples.Get(@"UI/check-off");
                     }
 
                     protected override bool OnDragStart(DragStartEvent e)
@@ -281,6 +294,7 @@ namespace osu.Game.Overlays.Settings
 
                     public bool TriggerFavouriteChange()
                     {
+                        playStarSound();
                         IsFavourite = !IsFavourite;
                         content?.FavouriteIndicator.ChangeFavouriteIndicatorState(IsFavourite);
                         if (SkinData != null)
@@ -322,6 +336,14 @@ namespace osu.Game.Overlays.Settings
                             .Then()
                             .FadeColour(Colour4.White.Opacity(0.7f), 250, Easing.OutQuint)
                             .ScaleTo(1.0f, 250, Easing.OutQuint);
+                    }
+
+                    private void playStarSound()
+                    {
+                        if (IsFavourite)
+                            sampleHide?.Play();
+                        else
+                            sampleShow?.Play();
                     }
 
                     public partial class FavouriteIndicator : SpriteIcon
