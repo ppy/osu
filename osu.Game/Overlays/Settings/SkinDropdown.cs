@@ -21,6 +21,7 @@ using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Input.StateChanges;
+using Newtonsoft.Json;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -101,12 +102,6 @@ namespace osu.Game.Overlays.Settings
 
                 public partial class DrawableSkinDropdownMenuItem : DrawableOsuDropdownMenuItem
                 {
-                    [BackgroundDependencyLoader(true)]
-                    private void load(OverlayColourProvider? colourProvider)
-                    {
-                        this.colourProvider = colourProvider;
-                    }
-
                     private float dragDelta;
 
                     public bool IsFavourite;
@@ -124,8 +119,6 @@ namespace osu.Game.Overlays.Settings
                     private int hoverSlideThreshold = 25;
 
                     private int favouriteDragEndThreshold = 50;
-
-                    private OverlayColourProvider? colourProvider;
 
                     private bool favouriteStarButtonVisible = false;
 
@@ -231,36 +224,6 @@ namespace osu.Game.Overlays.Settings
                         base.OnDragEnd(e);
                     }
 
-                    private void starButtonAnimateIn()
-                    {
-                        int offset = 20;
-                        Background.MoveToX(offset, 100, Easing.OutQuint);
-                        Foreground.MoveToX(offset, 100, Easing.OutQuint);
-                        starContainer.FadeTo(1, 100, Easing.OutQuint).ResizeWidthTo(offset, 100, Easing.OutQuint);
-                        favouriteStarButtonVisible = true;
-                    }
-
-                    private void starButtonAnimateOut()
-                    {
-                        int offset = 0;
-                        Background.MoveToX(offset, 250, Easing.OutQuint);
-                        Foreground.MoveToX(offset, 250, Easing.OutQuint);
-                        starContainer.FadeTo(0, 250, Easing.OutQuint).ResizeWidthTo(offset, 250, Easing.OutQuint);
-                        favouriteStarButtonVisible = false;
-                    }
-
-                    private void slideToggleStarButton(bool newValue)
-                    {
-                        if (!newValue && !favouriteStarButtonVisible)
-                            return;
-                        else if (!newValue)
-                            starButtonAnimateIn();
-                        else
-                            starButtonAnimateOut();
-
-                        favouriteStarButtonVisible = newValue;
-                    }
-
                     protected override bool OnMouseMove(MouseMoveEvent e)
                     {
                         if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
@@ -300,6 +263,24 @@ namespace osu.Game.Overlays.Settings
                         return true;
                     }
 
+                    private void starButtonAnimateIn()
+                    {
+                        int offset = 20;
+                        Background.MoveToX(offset, 100, Easing.OutQuint);
+                        Foreground.MoveToX(offset, 100, Easing.OutQuint);
+                        starContainer.FadeTo(1, 100, Easing.OutQuint).ResizeWidthTo(offset, 100, Easing.OutQuint);
+                        favouriteStarButtonVisible = true;
+                    }
+
+                    private void starButtonAnimateOut()
+                    {
+                        int offset = 0;
+                        Background.MoveToX(offset, 250, Easing.OutQuint);
+                        Foreground.MoveToX(offset, 250, Easing.OutQuint);
+                        starContainer.FadeTo(0, 250, Easing.OutQuint).ResizeWidthTo(offset, 250, Easing.OutQuint);
+                        favouriteStarButtonVisible = false;
+                    }
+
                     public partial class FavouriteIndicator : SpriteIcon
                     {
                         private bool isStarHovered { get; set; }
@@ -315,12 +296,9 @@ namespace osu.Game.Overlays.Settings
 
                         public override bool ChangeFocusOnClick => false;
 
-                        private OverlayColourProvider? colourProvider;
-
                         [BackgroundDependencyLoader(true)]
-                        private void load(OverlayColourProvider? colourProvider, RealmAccess realm)
+                        private void load(RealmAccess realm)
                         {
-                            this.colourProvider = colourProvider;
                             if (skinItem.SkinData == null) return;
                             Alpha = skinItem.IsFavourite ? 1 : 0;
 
@@ -330,6 +308,12 @@ namespace osu.Game.Overlays.Settings
                                 skinItem.IsFavourite = skin.IsFavourite;
                                 changeFavouriteIndicatorState(skinItem.IsFavourite);
                             }
+                        }
+
+                        protected override void LoadComplete()
+                        {
+                            skinItem.menu = this.FindClosestParent<SkinDropdownMenu>();
+                            base.LoadComplete();
                         }
 
                         public void ChangeFavouriteIndicatorState(bool currentState)
@@ -345,17 +329,11 @@ namespace osu.Game.Overlays.Settings
                             else
                                 this.Delay(250).FadeOutFromOne(250, Easing.OutQuint);
                         }
-
-                        protected override void LoadComplete()
-                        {
-                            skinItem.menu = this.FindClosestParent<SkinDropdownMenu>();
-                            base.LoadComplete();
-                        }
                     }
 
                     protected override Drawable CreateContent()
                     {
-                        content = new Content(this, colourProvider);
+                        content = new Content(this);
                         return content;
                     }
 
@@ -374,7 +352,7 @@ namespace osu.Game.Overlays.Settings
 
                         public readonly FavouriteIndicator FavouriteIndicator;
 
-                        public Content(DrawableSkinDropdownMenuItem skinItem, OverlayColourProvider? colourProvider)
+                        public Content(DrawableSkinDropdownMenuItem skinItem)
                         {
                             this.skinItem = skinItem;
 
@@ -383,25 +361,25 @@ namespace osu.Game.Overlays.Settings
 
                             InternalChildren = new Drawable[]
                             {
-                        FavouriteIndicator = new FavouriteIndicator(skinItem)
-                        {
-                            Icon = FontAwesome.Solid.Star,
-                            Colour = Colour4.Gold,
-                            Size = new Vector2(10),
-                            BypassAutoSizeAxes = Axes.Y,
-                            X = 6,
-                            Y = 0,
-                            Margin = new MarginPadding { Horizontal = 2 },
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.CentreLeft,
-                        },
-                        Label = new TruncatingSpriteText
-                        {
-                            Padding = new MarginPadding { Left = 16 },
-                            Origin = Anchor.CentreLeft,
-                            Anchor = Anchor.CentreLeft,
-                            RelativeSizeAxes = Axes.X,
-                        },
+                                FavouriteIndicator = new FavouriteIndicator(skinItem)
+                                {
+                                    Icon = FontAwesome.Solid.Star,
+                                    Colour = Colour4.Gold,
+                                    Size = new Vector2(10),
+                                    BypassAutoSizeAxes = Axes.Y,
+                                    X = 6,
+                                    Y = 0,
+                                    Margin = new MarginPadding { Horizontal = 2 },
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.CentreLeft,
+                                },
+                                Label = new TruncatingSpriteText
+                                {
+                                    Padding = new MarginPadding { Left = 16 },
+                                    Origin = Anchor.CentreLeft,
+                                    Anchor = Anchor.CentreLeft,
+                                    RelativeSizeAxes = Axes.X,
+                                },
                             };
                         }
                     }
