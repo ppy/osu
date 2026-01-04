@@ -219,7 +219,11 @@ namespace osu.Game.Overlays.Settings
                             bool mostlyHorizontal = Math.Abs(e.Delta.X) > Math.Abs(e.Delta.Y);
 
                             if (mostlyHorizontal)
+                            {
                                 starContainer.FadeTo(1, 100, Easing.OutQuint);
+                                favouriteIndicatorAnimateOut();
+                                favouriteStarButtonVisible = true;
+                            }
 
                             return mostlyHorizontal;
                         }
@@ -252,8 +256,8 @@ namespace osu.Game.Overlays.Settings
                     protected override void OnDragEnd(DragEndEvent e)
                     {
                         starButtonAnimateOut();
-                        stateChanged = false;
 
+                        stateChanged = false;
                         dragDelta = 0;
 
                         base.OnDragEnd(e);
@@ -296,7 +300,6 @@ namespace osu.Game.Overlays.Settings
                     {
                         playStarSound();
                         IsFavourite = !IsFavourite;
-                        content?.FavouriteIndicator.ChangeFavouriteIndicatorState(IsFavourite);
                         if (SkinData != null)
                         {
                             menu?.TrackFavouriteChange(SkinData.ID, IsFavourite);
@@ -311,6 +314,7 @@ namespace osu.Game.Overlays.Settings
                         Background.MoveToX(offset, 100, Easing.OutQuint);
                         Foreground.MoveToX(offset, 100, Easing.OutQuint);
                         starContainer.FadeTo(1, 100, Easing.OutQuint).ResizeWidthTo(offset, 100, Easing.OutQuint);
+                        favouriteIndicatorAnimateOut();
                         favouriteStarButtonVisible = true;
                     }
 
@@ -320,6 +324,7 @@ namespace osu.Game.Overlays.Settings
                         Background.MoveToX(offset, 250, Easing.OutQuint);
                         Foreground.MoveToX(offset, 250, Easing.OutQuint);
                         starContainer.FadeTo(0, 250, Easing.OutQuint).ResizeWidthTo(offset, 250, Easing.OutQuint);
+                        favouriteIndicatorAnimateIn();
                         favouriteStarButtonVisible = false;
                     }
 
@@ -336,6 +341,18 @@ namespace osu.Game.Overlays.Settings
                             .Then()
                             .FadeColour(Colour4.White.Opacity(0.7f), 250, Easing.OutQuint)
                             .ScaleTo(1.0f, 250, Easing.OutQuint);
+                    }
+
+                    private void favouriteIndicatorAnimateIn()
+                    {
+                        if (IsFavourite && favouriteStarButtonVisible)
+                            content?.FavouriteIndicator.ShowFavouriteIndicator(true);
+                    }
+
+                    private void favouriteIndicatorAnimateOut()
+                    {
+                        if (IsFavourite && !favouriteStarButtonVisible)
+                            content?.FavouriteIndicator.ShowFavouriteIndicator(false, 0, 100);
                     }
 
                     private void playStarSound()
@@ -371,7 +388,7 @@ namespace osu.Game.Overlays.Settings
                             if (skin != null)
                             {
                                 skinItem.IsFavourite = skin.IsFavourite;
-                                changeFavouriteIndicatorState(skinItem.IsFavourite);
+                                ShowFavouriteIndicator(skinItem.IsFavourite);
                             }
                         }
 
@@ -381,18 +398,13 @@ namespace osu.Game.Overlays.Settings
                             base.LoadComplete();
                         }
 
-                        public void ChangeFavouriteIndicatorState(bool currentState)
-                        {
-                            changeFavouriteIndicatorState(currentState);
-                        }
-
-                        private void changeFavouriteIndicatorState(bool currentState)
+                        public void ShowFavouriteIndicator(bool show, int delay = 250, int duration = 250)
                         {
                             this.ScaleTo(1.35f, 250, Easing.OutQuint).Then().ScaleTo(1.0f, 250, Easing.OutQuint);
-                            if (currentState)
-                                this.FadeInFromZero(250, Easing.OutQuint);
+                            if (show)
+                                this.FadeInFromZero(duration, Easing.OutQuint);
                             else
-                                this.Delay(250).FadeOutFromOne(250, Easing.OutQuint);
+                                this.Delay(delay).FadeOutFromOne(duration, Easing.OutQuint);
                         }
                     }
 
