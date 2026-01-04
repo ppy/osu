@@ -21,7 +21,6 @@ using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Input.StateChanges;
-using Newtonsoft.Json;
 
 namespace osu.Game.Overlays.Settings
 {
