@@ -107,23 +107,31 @@ namespace osu.Game.Overlays.Settings
                         this.colourProvider = colourProvider;
                     }
 
-                    private Content? content;
+                    private float dragDelta;
 
                     public bool IsFavourite;
+
+                    private Content? content;
 
                     public SkinInfo? SkinData;
 
                     private SkinDropdownMenu? menu;
 
-                    private bool favouriteStarVisible = false; // Rename to favouriteStarButtonVisible. favouriteStar relates more to the indicator
-
-                    private OverlayColourProvider? colourProvider;
-
-                    private ClickableContainer starContainer = null!;
+                    private Box starBackground = null!;
 
                     private SpriteIcon starIcon = null!;
 
-                    private Box starBackground = null!;
+                    private int hoverSlideThreshold = 25;
+
+                    private int favouriteDragEndThreshold = 50;
+
+                    private OverlayColourProvider? colourProvider;
+
+                    private bool favouriteStarButtonVisible = false;
+
+                    private ClickableContainer starContainer = null!;
+
+                    public override bool ChangeFocusOnClick => false;
 
                     public DrawableSkinDropdownMenuItem(MenuItem item)
                         : base(item)
@@ -152,19 +160,18 @@ namespace osu.Game.Overlays.Settings
                             },
                             Children = [
                                 starBackground = new Box(){
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Colour4.FromHex(@"#edae00"),
-                                    Depth = 2
-                                },
-                                starIcon = new SpriteIcon(){
-                                    Icon = FontAwesome.Solid.Star,
-                                    Size = new Vector2(10),
-                                    BypassAutoSizeAxes = Axes.Y,
-                                    Origin = Anchor.Centre,
-                                    Anchor = Anchor.Centre,
-                                    Colour = Colour4.White.Opacity(0.7f),
-                                    Depth = 1,
-                                }
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Colour4.FromHex(@"#edae00"),
+                            Depth = 1
+                        },
+                        starIcon = new SpriteIcon(){
+                            Icon = FontAwesome.Solid.Star,
+                            Size = new Vector2(10),
+                            BypassAutoSizeAxes = Axes.Y,
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Colour = Colour4.White.Opacity(0.7f),
+                        }
                             ]
                         });
                         Foreground.Padding = new MarginPadding(2);
@@ -184,16 +191,12 @@ namespace osu.Game.Overlays.Settings
                         }
                     }
 
-                    private partial class NoFocusChangeClickableContainer : ClickableContainer
-                    {
-                        public override bool ChangeFocusOnClick => false;
-                    }
-
                     protected override bool OnDragStart(DragStartEvent e)
                     {
                         if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
                         {
-                            toggleSlideStar(true, 0);
+                            starContainer.FadeTo(1, 100, Easing.OutQuint);
+
                             bool mostlyHorizontal = Math.Abs(e.Delta.X) > Math.Abs(e.Delta.Y);
 
                             return mostlyHorizontal;
@@ -204,16 +207,7 @@ namespace osu.Game.Overlays.Settings
 
                     protected override void OnDrag(DragEvent e)
                     {
-                        adjustOnDrag(e.Delta);
-
-                        base.OnDrag(e);
-                    }
-
-                    private float dragDelta;
-
-                    private void adjustOnDrag(Vector2 delta)
-                    {
-                        dragDelta += delta.X / 2;
+                        dragDelta += e.Delta.X / 2;
 
                         if (Math.Abs(dragDelta) < 0.01) return;
 
@@ -221,84 +215,76 @@ namespace osu.Game.Overlays.Settings
                         Background.MoveToX(dragDelta, 100, Easing.OutQuint);
                         Foreground.MoveToX(dragDelta, 100, Easing.OutQuint);
                         starContainer.ResizeWidthTo(dragDelta, 100, Easing.OutQuint);
+
+                        base.OnDrag(e);
                     }
 
-                    private void toggleSlideStar(bool newValue, int itemOffset = 20) // Rename to something better (toggleStarButton? )
-                    {
-                        if (!newValue && !favouriteStarVisible)
-                        {
-                            return;
-                        }
-                        else if (!newValue)
-                        {
-                            itemOffset = 0;
-                            Background.MoveToX(itemOffset, 250, Easing.OutQuint);
-                            Foreground.MoveToX(itemOffset, 250, Easing.OutQuint);
-                            starContainer.FadeOutFromOne(250, Easing.OutQuint);
-                            starContainer.ResizeWidthTo(itemOffset - 3, 250, Easing.OutQuint).Then().ResizeWidthTo(itemOffset, 250, Easing.OutQuint);
-                        }
-                        else
-                        {
-                            starContainer.FadeInFromZero(100, Easing.OutQuint);
-                            Background.MoveToX(itemOffset, 100, Easing.OutQuint);
-                            Foreground.MoveToX(itemOffset, 100, Easing.OutQuint);
-                            starContainer.ResizeWidthTo(dragDelta, 100, Easing.OutQuint);
-                        }
-                        favouriteStarVisible = newValue;
-                    }
-
-                    private int itemOffset = 0;
                     protected override void OnDragEnd(DragEndEvent e)
                     {
-                        toggleSlideStar(!favouriteStarVisible);
+                        starButtonAnimateOut();
 
-                        if (dragDelta >= 50)
+                        if (dragDelta >= favouriteDragEndThreshold)
                             TriggerFavouriteChange();
 
                         dragDelta = 0;
-                        itemOffset = 0;
 
                         base.OnDragEnd(e);
                     }
 
-                    private int hoverSlideThreshold = 25;
+                    private void starButtonAnimateIn()
+                    {
+                        int offset = 20;
+                        Background.MoveToX(offset, 100, Easing.OutQuint);
+                        Foreground.MoveToX(offset, 100, Easing.OutQuint);
+                        starContainer.FadeTo(1, 100, Easing.OutQuint).ResizeWidthTo(offset, 100, Easing.OutQuint);
+                        favouriteStarButtonVisible = true;
+                    }
+
+                    private void starButtonAnimateOut()
+                    {
+                        int offset = 0;
+                        Background.MoveToX(offset, 250, Easing.OutQuint);
+                        Foreground.MoveToX(offset, 250, Easing.OutQuint);
+                        starContainer.FadeTo(0, 250, Easing.OutQuint).ResizeWidthTo(offset, 250, Easing.OutQuint);
+                        favouriteStarButtonVisible = false;
+                    }
+
+                    private void slideToggleStarButton(bool newValue)
+                    {
+                        if (!newValue && !favouriteStarButtonVisible)
+                            return;
+                        else if (!newValue)
+                            starButtonAnimateIn();
+                        else
+                            starButtonAnimateOut();
+
+                        favouriteStarButtonVisible = newValue;
+                    }
 
                     protected override bool OnMouseMove(MouseMoveEvent e)
                     {
                         if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
                             return base.OnMouseMove(e);
 
-                        if (e.MousePosition.X < hoverSlideThreshold && !favouriteStarVisible)
-                        {
-                            adjustOnDrag(new Vector2(40, 0));
-                            toggleSlideStar(true);
-                        }
-                        else if (e.MousePosition.X >= hoverSlideThreshold && favouriteStarVisible)
-                        {
-                            adjustOnDrag(new Vector2(-40, 0));
-                            toggleSlideStar(false);
-                        }
+                        if (e.MousePosition.X < hoverSlideThreshold && !favouriteStarButtonVisible)
+                            starButtonAnimateIn();
+                        else if (e.MousePosition.X >= hoverSlideThreshold && favouriteStarButtonVisible)
+                            starButtonAnimateOut();
 
                         return base.OnMouseMove(e);
                     }
 
                     protected override void OnHoverLost(HoverLostEvent e)
                     {
-                        adjustOnDrag(new Vector2(-40, 0));
-                        toggleSlideStar(false);
+                        starButtonAnimateOut();
 
                         base.OnHoverLost(e);
                     }
 
-                    public override bool ChangeFocusOnClick => false;
-
                     protected override bool OnClick(ClickEvent e)
                     {
                         if (e.AltPressed)
-                        {
-                            TriggerFavouriteChange();
-                            return true;
-                        }
+                            return TriggerFavouriteChange();
 
                         return base.OnClick(e);
                     }
@@ -397,30 +383,35 @@ namespace osu.Game.Overlays.Settings
 
                             InternalChildren = new Drawable[]
                             {
-                                FavouriteIndicator = new FavouriteIndicator(skinItem)
-                                {
-                                    Icon = FontAwesome.Solid.Star,
-                                    Colour = Colour4.Gold,
-                                    Size = new Vector2(10),
-                                    BypassAutoSizeAxes = Axes.Y,
-                                    X = 6,
-                                    Y = 0,
-                                    Margin = new MarginPadding { Horizontal = 2 },
-                                    Origin = Anchor.Centre,
-                                    Anchor = Anchor.CentreLeft,
-                                },
-                                Label = new TruncatingSpriteText
-                                {
-                                    Padding = new MarginPadding { Left = 16 },
-                                    Origin = Anchor.CentreLeft,
-                                    Anchor = Anchor.CentreLeft,
-                                    RelativeSizeAxes = Axes.X,
-                                },
+                        FavouriteIndicator = new FavouriteIndicator(skinItem)
+                        {
+                            Icon = FontAwesome.Solid.Star,
+                            Colour = Colour4.Gold,
+                            Size = new Vector2(10),
+                            BypassAutoSizeAxes = Axes.Y,
+                            X = 6,
+                            Y = 0,
+                            Margin = new MarginPadding { Horizontal = 2 },
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.CentreLeft,
+                        },
+                        Label = new TruncatingSpriteText
+                        {
+                            Padding = new MarginPadding { Left = 16 },
+                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.CentreLeft,
+                            RelativeSizeAxes = Axes.X,
+                        },
                             };
                         }
                     }
                 }
             }
         }
+    }
+
+    public partial class NoFocusChangeClickableContainer : ClickableContainer
+    {
+        public override bool ChangeFocusOnClick => false;
     }
 }
