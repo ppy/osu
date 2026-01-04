@@ -145,6 +145,11 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString FriendOffline(string info) => new TranslatableString(getKey(@"friend_offline"), @"Offline: {0}", info);
 
+        /// <summary>
+        /// "Downloading {0}"
+        /// </summary>
+        public static LocalisableString Downloading(string info) => new TranslatableString(getKey(@"downloading"), @"Downloading {0}", info);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
