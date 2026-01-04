@@ -93,11 +93,34 @@ namespace osu.Game.Overlays.Settings
                     pendingFavouriteChanges.Clear();
                 }
 
-                protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableSkinDropdownMenuItem(item)
+                protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item)
                 {
-                    BackgroundColourHover = HoverColour,
-                    BackgroundColourSelected = SelectionColour
-                };
+                    if (item is DropdownMenuItem<Live<SkinInfo>> skinItem)
+                    {
+                        bool isProtected = false;
+                        bool isRandomSkin = false;
+                        skinItem.Value.PerformRead(skin =>
+                        {
+                            isProtected = skin.Protected;
+                            isRandomSkin = skin.ID == new Guid("D39DFEFB-477C-4372-B1EA-2BCEA5FB8908");
+                        });
+
+                        if (isProtected || isRandomSkin)
+                        {
+                            return new DrawableOsuDropdownMenuItem(item)
+                            {
+                                BackgroundColourHover = HoverColour,
+                                BackgroundColourSelected = SelectionColour
+                            };
+                        }
+                    }
+
+                    return new DrawableSkinDropdownMenuItem(item)
+                    {
+                        BackgroundColourHover = HoverColour,
+                        BackgroundColourSelected = SelectionColour
+                    };
+                }
 
                 public partial class DrawableSkinDropdownMenuItem : DrawableOsuDropdownMenuItem
                 {
