@@ -8,6 +8,7 @@ using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transforms;
@@ -20,6 +21,7 @@ namespace osu.Game.Graphics.Backgrounds
     /// </summary>
     public partial class Background : CompositeDrawable, IEquatable<Background>
     {
+        public readonly Box Letterbox;
         public readonly Sprite Sprite;
 
         private readonly string textureName;
@@ -30,6 +32,15 @@ namespace osu.Game.Graphics.Backgrounds
         {
             this.textureName = textureName;
             RelativeSizeAxes = Axes.Both;
+
+            AddInternal(Letterbox = new Box
+            {
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                FillMode = FillMode.Fill,
+                Colour = Colour4.Black,
+            });
 
             AddInternal(Sprite = new Sprite
             {
