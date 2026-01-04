@@ -203,9 +203,10 @@ namespace osu.Game.Overlays.Settings
                     {
                         if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
                         {
-                            starContainer.FadeTo(1, 100, Easing.OutQuint);
-
                             bool mostlyHorizontal = Math.Abs(e.Delta.X) > Math.Abs(e.Delta.Y);
+
+                            if (mostlyHorizontal)
+                                starContainer.FadeTo(1, 100, Easing.OutQuint);
 
                             return mostlyHorizontal;
                         }
@@ -260,7 +261,12 @@ namespace osu.Game.Overlays.Settings
 
                     protected override void OnHoverLost(HoverLostEvent e)
                     {
-                        starButtonAnimateOut();
+                        if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
+                        {
+                            // Do nothing
+                        }
+                        else
+                            starButtonAnimateOut();
 
                         base.OnHoverLost(e);
                     }
