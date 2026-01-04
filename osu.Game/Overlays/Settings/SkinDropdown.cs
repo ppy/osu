@@ -353,7 +353,7 @@ namespace osu.Game.Overlays.Settings
                     private void favouriteIndicatorAnimateOut()
                     {
                         if (IsFavourite && !favouriteStarButtonVisible)
-                            content?.FavouriteIndicator.ShowFavouriteIndicator(false, 0, 100);
+                            content?.FavouriteIndicator.ShowFavouriteIndicator(false, 100, 350);
                     }
 
                     private void playStarSound()
@@ -401,11 +401,16 @@ namespace osu.Game.Overlays.Settings
 
                         public void ShowFavouriteIndicator(bool show, int delay = 250, int duration = 250)
                         {
-                            this.ScaleTo(1.35f, 250, Easing.OutQuint).Then().ScaleTo(1.0f, 250, Easing.OutQuint);
                             if (show)
+                            {
+                                this.ScaleTo(1.35f, duration, Easing.OutQuint).Then().ScaleTo(1.0f, duration, Easing.OutQuint);
                                 this.FadeInFromZero(duration, Easing.OutQuint);
+                            }
                             else
+                            {
+                                this.Delay(delay).ScaleTo(0.8f, duration, Easing.OutQuint);
                                 this.Delay(delay).FadeOutFromOne(duration, Easing.OutQuint);
+                            }
                         }
                     }
 
