@@ -179,7 +179,6 @@ namespace osu.Game.Overlays.Settings
                             Depth = 1
                         },
                         starIcon = new SpriteIcon(){
-                            Icon = FontAwesome.Solid.Star,
                             Size = new Vector2(10),
                             BypassAutoSizeAxes = Axes.Y,
                             Origin = Anchor.Centre,
@@ -208,6 +207,7 @@ namespace osu.Game.Overlays.Settings
                     [BackgroundDependencyLoader(true)]
                     private void load(AudioManager audio)
                     {
+                        starIcon.Icon = IsFavourite ? FontAwesome.Solid.Star : FontAwesome.Regular.Star;
                         sampleShow = audio.Samples.Get(@"UI/check-on");
                         sampleHide = audio.Samples.Get(@"UI/check-off");
                     }
@@ -300,6 +300,7 @@ namespace osu.Game.Overlays.Settings
                     {
                         playStarSound();
                         IsFavourite = !IsFavourite;
+                        starIcon.Icon = IsFavourite ? FontAwesome.Solid.Star : FontAwesome.Regular.Star;
                         if (SkinData != null)
                         {
                             menu?.TrackFavouriteChange(SkinData.ID, IsFavourite);
