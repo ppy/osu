@@ -8,6 +8,7 @@ using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
@@ -91,6 +92,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             modSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(freeModSelect);
 
+            modSelect.State.BindValueChanged(onModSelectStateChanged, true);
+            freeModSelect.State.BindValueChanged(onModSelectStateChanged, true);
+
             Mods.BindValueChanged(onGlobalModsChanged);
             Ruleset.BindValueChanged(onRulesetChanged);
             Freestyle.BindValueChanged(onFreestyleChanged);
@@ -103,6 +107,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         public void AddNewItem()
         {
             room.Playlist = room.Playlist.Append(createItem()).ToArray();
+        }
+
+        private void onModSelectStateChanged(ValueChangedEvent<Visibility> state)
+        {
+            if (state.NewValue == Visibility.Visible)
+                addToPlaylistFooterButton.Disappear();
+            else
+                addToPlaylistFooterButton.Appear();
         }
 
         private void onGlobalModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
