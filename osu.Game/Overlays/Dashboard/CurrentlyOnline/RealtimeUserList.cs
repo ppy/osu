@@ -74,6 +74,28 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
         {
             switch (e.Action)
             {
+                case NotifyDictionaryChangedAction.Replace:
+                    foreach ((int userId, var presence) in e.NewItems!)
+                    {
+                        if (userPanels.TryGetValue(userId, out var userPanel))
+                        {
+                            switch (presence.Activity)
+                            {
+                                default:
+                                    userPanel.CanSpectate.Value = false;
+                                    break;
+
+                                case UserActivity.InSoloGame:
+                                case UserActivity.InMultiplayerGame:
+                                case UserActivity.InPlaylistGame:
+                                    userPanel.CanSpectate.Value = true;
+                                    break;
+                            }
+                        }
+                    }
+
+                    break;
+
                 case NotifyDictionaryChangedAction.Add:
                     searchContainer.LayoutDuration = e.NewItems!.Count < 10 ? 500 : 0;
 

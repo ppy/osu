@@ -12,7 +12,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
-using osu.Game.Users;
 
 namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
 {
@@ -20,8 +19,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
     {
         public readonly APIUser User;
 
-        public IBindable<bool> CanSpectate => canSpectate;
-        private readonly Bindable<bool> canSpectate = new Bindable<bool>();
+        public readonly Bindable<bool> CanSpectate = new Bindable<bool>();
 
         [Resolved]
         private IPerformFromScreenRunner? performer { get; set; }
@@ -35,27 +33,6 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
             FilterTerms = new LocalisableString[] { User.Username };
 
             Alpha = 0;
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // TODO: we probably don't want to do this every frame.
-            var activity = metadataClient?.GetPresence(User.Id)?.Activity;
-
-            switch (activity)
-            {
-                default:
-                    canSpectate.Value = false;
-                    break;
-
-                case UserActivity.InSoloGame:
-                case UserActivity.InMultiplayerGame:
-                case UserActivity.InPlaylistGame:
-                    canSpectate.Value = true;
-                    break;
-            }
         }
 
         protected void BeginSpectating()
