@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 new FooterButtonMods(modOverlay) { Current = SelectedMods },
                 new FooterButtonRandom(),
-                new FooterButtonOptions(null),
+                new FooterButtonOptions(),
             });
         });
 

@@ -24,12 +24,8 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private IBindable<WorkingBeatmap> workingBeatmap { get; set; } = null!;
 
-        private readonly ISongSelect? songSelect;
-
-        public FooterButtonOptions(ISongSelect? songSelect)
-        {
-            this.songSelect = songSelect;
-        }
+        [Resolved]
+        private ISongSelect? songSelect { get; set; }
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
