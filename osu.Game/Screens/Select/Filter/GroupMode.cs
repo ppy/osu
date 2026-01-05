@@ -32,8 +32,8 @@ namespace osu.Game.Screens.Select.Filter
         [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Difficulty))]
         Difficulty,
 
-        // [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Favourites))]
-        // Favourites,
+        [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Favourites))]
+        Favourites,
 
         [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.LastPlayed))]
         LastPlayed,

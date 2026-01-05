@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Select
                     return TryUpdateCriteriaRange(ref criteria.OverallDifficulty, op, value);
 
                 case "bpm":
-                    return TryUpdateCriteriaRange(ref criteria.BPM, op, value, 0.01d / 2);
+                    return TryUpdateCriteriaRange(ref criteria.BPM, op, value, 0.5f);
 
                 case "length":
                     return tryUpdateLengthRange(criteria, op, value);
@@ -68,6 +68,7 @@ namespace osu.Game.Screens.Select
                 case "ranked":
                     return tryUpdateRankedDateRange(ref criteria.DateRanked, op, value);
 
+                case "created":
                 case "submitted":
                     return tryUpdateRankedDateRange(ref criteria.DateSubmitted, op, value);
 

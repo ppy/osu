@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             InternalChild = info = new ProfileValueDisplay(minimumWidth: 140)
             {
                 Title = UsersStrings.ShowStatsPlayTime,
-                ContentTooltipText = "0 hours",
+                Content = { TooltipText = "0 hours", }
             };
 
             User.BindValueChanged(updateTime, true);
@@ -35,8 +35,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private void updateTime(ValueChangedEvent<UserProfileData?> user)
         {
             int? playTime = user.NewValue?.User.Statistics?.PlayTime;
-            info.ContentTooltipText = (playTime ?? 0) / 3600 + " hours";
-            info.Content = formatTime(playTime);
+            info.Content.TooltipText = (playTime ?? 0) / 3600 + " hours";
+            info.Content.Text = formatTime(playTime);
         }
 
         private string formatTime(int? secondsNull)

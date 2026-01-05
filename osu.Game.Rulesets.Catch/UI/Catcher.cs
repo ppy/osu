@@ -224,7 +224,20 @@ namespace osu.Game.Rulesets.Catch.UI
                     addLighting(result, drawableObject.AccentColour.Value, positionInStack.X);
             }
 
-            // droplet doesn't affect the catcher state
+            if (result.IsHit)
+                CurrentState = hitObject.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle;
+            else if (hitObject is not Banana)
+                CurrentState = CatcherAnimationState.Fail;
+
+            if (palpableObject.HitObject.LastInCombo)
+            {
+                if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
+                    Explode();
+                else
+                    Drop();
+            }
+
+            // droplet doesn't affect hyperdash state
             if (hitObject is TinyDroplet) return;
 
             // if a hyper fruit was already handled this frame, just go where it says to go.
@@ -243,19 +256,6 @@ namespace osu.Game.Rulesets.Catch.UI
                 }
                 else
                     SetHyperDashState();
-            }
-
-            if (result.IsHit)
-                CurrentState = hitObject.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle;
-            else if (!(hitObject is Banana))
-                CurrentState = CatcherAnimationState.Fail;
-
-            if (palpableObject.HitObject.LastInCombo)
-            {
-                if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
-                    Explode();
-                else
-                    Drop();
             }
         }
 

@@ -37,7 +37,21 @@ namespace osu.Game.Screens.SelectV2
             get => working;
             set
             {
-                if (value == working)
+                if (working == null && value == null)
+                    return;
+
+                // this guard papers over excessive refreshes of the background asset which occur if `working == value` type guards are used.
+                // the root cause of why `working == value` type guards fail here is that `SongSelect` will invalidate working beatmaps very often
+                // (via https://github.com/ppy/osu/blob/d3ae20dd882381e109c20ca00ee5237e4dd1750d/osu.Game/Screens/SelectV2/SongSelect.cs#L506-L507),
+                // due to a variety of causes, ranging from "someone typed a letter in the search box" (which triggers a refilter -> presentation of new items -> `ensureGlobalBeatmapValid()`),
+                // to "someone just went into the editor and replaced every single file in the set, including the background".
+                // the following guard approximates the most appropriate debounce criterion, which is the contents of the actual asset that is supposed to be displayed in the background,
+                // i.e. if the hash of the new background file matches the old, then we do not bother updating the working beatmap here.
+                //
+                // note that this is basically a reimplementation of the caching scheme in `WorkingBeatmapCache.getBackgroundFromStore()`,
+                // which cannot be used directly by retrieving the texture and checking texture reference equality,
+                // because missing the cache would incur a synchronous texture load on the update thread.
+                if (getBackgroundFileHash(working) == getBackgroundFileHash(value))
                     return;
 
                 working = value;
@@ -51,6 +65,9 @@ namespace osu.Game.Screens.SelectV2
                 timeSinceUnpool = 0;
             }
         }
+
+        private static string? getBackgroundFileHash(WorkingBeatmap? working)
+            => working?.BeatmapSetInfo.GetFile(working.Metadata.BackgroundFile)?.File.Hash;
 
         public PanelSetBackground()
         {
@@ -132,7 +149,7 @@ namespace osu.Game.Screens.SelectV2
                 // - By using a slightly customised formula to decide when to start the load, we can coerce the loading of backgrounds into an order that
                 //   prioritises panels which are closest to the centre of the screen. Basically, we want to load backgrounds "outwards" from the visual
                 //   centre to give the user the best experience possible.
-                float timeUpdatingBeforeLoad = 50 + Math.Abs(containingSsdq.Centre.Y - ScreenSpaceDrawQuad.Centre.Y) / containingSsdq.Height * 100;
+                float timeUpdatingBeforeLoad = Math.Abs(containingSsdq.Centre.Y - ScreenSpaceDrawQuad.Centre.Y) / containingSsdq.Height * 100;
 
                 timeSinceUnpool += Time.Elapsed;
 

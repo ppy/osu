@@ -87,7 +87,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Debug.Assert(client.LocalUser != null);
 
             if (client.LocalUser.State == MultiplayerUserState.Results)
-                client.ChangeState(MultiplayerUserState.Idle);
+                client.ChangeState(MultiplayerUserState.Idle).FireAndForget();
+        }
+
+        public override bool OnExiting(ScreenExitEvent e)
+        {
+            if (base.OnExiting(e))
+                return true;
+
+            client.LeaveRoom().FireAndForget();
+            return false;
         }
 
         protected override string ScreenTitle => "Multiplayer";

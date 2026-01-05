@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -47,6 +48,8 @@ namespace osu.Game.Rulesets.Edit
 
         private HitObject? getPreviousHitObject() => beatmap.HitObjects.TakeWhile(h => h.StartTime <= startTimeBindable.Value).LastOrDefault();
 
+        protected override bool IsValidForPlacement => HitObject.StartTime >= beatmap.ControlPointInfo.TimingPoints[0].Time;
+
         [Resolved]
         private IPlacementHandler placementHandler { get; set; } = null!;
 
@@ -87,6 +90,13 @@ namespace osu.Game.Rulesets.Edit
                 placementHandler.HidePlacement();
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            Colour = IsValidForPlacement ? Colour4.White : Colour4.Red;
+        }
+
         /// <summary>
         /// Updates the time and position of this <see cref="PlacementBlueprint"/>.
         /// </summary>
@@ -119,8 +129,11 @@ namespace osu.Game.Rulesets.Edit
                     // Inherit the bank from the previous hit object
                     HitObject.Samples = HitObject.Samples.Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: lastHitNormal.Bank) : s).ToList();
 
-                // Inherit the volume from the previous hit object
-                HitObject.Samples = HitObject.Samples.Select(s => s.With(newVolume: lastHitNormal.Volume)).ToList();
+                // Inherit the volume and sample set info from the previous hit object
+                HitObject.Samples = HitObject.Samples.Select(s => s.With(
+                    newVolume: lastHitNormal.Volume,
+                    newSuffix: lastHitNormal.Suffix,
+                    newUseBeatmapSamples: lastHitNormal.UseBeatmapSamples)).ToList();
             }
 
             if (HitObject is IHasRepeats hasRepeats)

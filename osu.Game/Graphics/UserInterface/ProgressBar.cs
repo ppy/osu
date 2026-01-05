@@ -13,7 +13,10 @@ namespace osu.Game.Graphics.UserInterface
 {
     public partial class ProgressBar : SliderBar<double>
     {
+        public bool Seeking { get; private set; }
+
         public Action<double> OnSeek;
+        public Action<double> OnCommit;
 
         private readonly Box fill;
         private readonly Box background;
@@ -75,6 +78,18 @@ namespace osu.Game.Graphics.UserInterface
             fill.Width = value * UsableWidth;
         }
 
-        protected override void OnUserChange(double value) => OnSeek?.Invoke(value);
+        protected override void OnUserChange(double value)
+        {
+            Seeking = true;
+            OnSeek?.Invoke(value);
+            base.OnUserChange(value);
+        }
+
+        protected override bool Commit()
+        {
+            Seeking = false;
+            OnCommit?.Invoke(CurrentNumber.Value);
+            return base.Commit();
+        }
     }
 }

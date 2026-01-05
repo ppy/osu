@@ -20,6 +20,8 @@ namespace osu.Game.Online.API.Requests
         public const int DEFAULT_SCORES_PER_REQUEST = 50;
         public const int MAX_SCORES_PER_REQUEST = 100;
 
+        public int ScoresRequested { get; }
+
         private readonly IBeatmapInfo beatmapInfo;
         private readonly BeatmapLeaderboardScope scope;
         private readonly IRulesetInfo ruleset;
@@ -37,6 +39,8 @@ namespace osu.Game.Online.API.Requests
             this.scope = scope;
             this.ruleset = ruleset ?? throw new ArgumentNullException(nameof(ruleset));
             this.mods = mods ?? Array.Empty<IMod>();
+
+            ScoresRequested = this.scope.RequiresSupporter(this.mods.Any()) ? MAX_SCORES_PER_REQUEST : DEFAULT_SCORES_PER_REQUEST;
         }
 
         protected override string Target => $@"beatmaps/{beatmapInfo.OnlineID}/scores";
@@ -51,7 +55,7 @@ namespace osu.Game.Online.API.Requests
             foreach (var mod in mods)
                 req.AddParameter(@"mods[]", mod.Acronym);
 
-            req.AddParameter(@"limit", (scope.RequiresSupporter(mods.Any()) ? MAX_SCORES_PER_REQUEST : DEFAULT_SCORES_PER_REQUEST).ToString(CultureInfo.InvariantCulture));
+            req.AddParameter(@"limit", ScoresRequested.ToString(CultureInfo.InvariantCulture));
             return req;
         }
 

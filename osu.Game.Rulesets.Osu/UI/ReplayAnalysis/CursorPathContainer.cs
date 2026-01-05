@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Graphics;
@@ -12,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
 {
-    public partial class CursorPathContainer : Path
+    public partial class CursorPathContainer : SmoothPath
     {
         private readonly LifetimeEntryManager lifetimeManager = new LifetimeEntryManager();
         private readonly SortedSet<AnalysisFrameEntry> aliveEntries = new SortedSet<AnalysisFrameEntry>(new AimLinePointComparator());
@@ -22,14 +21,13 @@ namespace osu.Game.Rulesets.Osu.UI.ReplayAnalysis
             lifetimeManager.EntryBecameAlive += entryBecameAlive;
             lifetimeManager.EntryBecameDead += entryBecameDead;
 
-            PathRadius = 0.5f;
+            PathRadius = 1f;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             Colour = colours.Pink2;
-            BackgroundColour = colours.Pink2.Opacity(0);
         }
 
         protected override void Update()
