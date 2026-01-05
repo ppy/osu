@@ -4,13 +4,10 @@
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
@@ -31,27 +28,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         public MultiplayerPlayerLoader(Func<Player> createPlayer)
             : base(createPlayer)
         {
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            PlayerSettings.Add(new Container
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Child = new HoldForMenuButton(true)
-                {
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
-                    Margin = new MarginPadding(10),
-                    Action = () =>
-                    {
-                        if (this.IsCurrentScreen())
-                            this.Exit();
-                    }
-                }
-            });
         }
 
         protected override bool ReadyForGameplay =>
