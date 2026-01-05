@@ -10,6 +10,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
 using osu.Game.Overlays.Dashboard.Friends;
@@ -33,7 +34,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
         private MetadataClient metadataClient { get; set; } = null!;
 
         [Resolved]
-        private UserLookupCache users { get; set; } = null!;
+        private UserLookupCache userCache { get; set; } = null!;
 
         public RealtimeUserList(OverlayPanelDisplayStyle style)
         {
@@ -48,7 +49,6 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
         {
             InternalChild = searchContainer = new OnlineUserSearchContainer
             {
-                LayoutEasing = Easing.OutQuart,
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(style == OverlayPanelDisplayStyle.Card ? 10 : 3),
@@ -64,6 +64,8 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
             onlineUserPresences.BindCollectionChanged(onUserPresenceUpdated, true);
 
             SearchText.BindValueChanged(onSearchTextChanged, true);
+
+            Scheduler.AddDelayed(updateUsers, 2000, true);
         }
 
         private void onSearchTextChanged(ValueChangedEvent<string> search)
@@ -71,7 +73,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
             searchContainer.SearchTerm = search.NewValue;
         }
 
-        private void onUserPresenceUpdated(object? sender, NotifyDictionaryChangedEventArgs<int, UserPresence> e) => Schedule(() =>
+        private void onUserPresenceUpdated(object? sender, NotifyDictionaryChangedEventArgs<int, UserPresence> e)
         {
             switch (e.Action)
             {
@@ -79,50 +81,13 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                     foreach ((int userId, var presence) in e.NewItems!)
                     {
                         if (userPanels.TryGetValue(userId, out var userPanel))
-                        {
-                            switch (presence.Activity)
-                            {
-                                default:
-                                    userPanel.CanSpectate.Value = false;
-                                    break;
-
-                                case UserActivity.InSoloGame:
-                                case UserActivity.InMultiplayerGame:
-                                case UserActivity.InPlaylistGame:
-                                    userPanel.CanSpectate.Value = true;
-                                    break;
-                            }
-                        }
+                            updateUserSpectateState(presence, userPanel);
                     }
 
                     break;
 
                 case NotifyDictionaryChangedAction.Add:
-                    searchContainer.LayoutDuration = e.NewItems!.Count < 10 ? 500 : 0;
-
-                    foreach ((int userId, _) in e.NewItems!)
-                    {
-                        if (userPanels.ContainsKey(userId))
-                            continue;
-
-                        users.GetUserAsync(userId).ContinueWith(task =>
-                        {
-                            if (task.GetResultSafely() is APIUser user)
-                            {
-                                // This is quite dodgy – it affects the global `UserLookupCache`.
-                                //
-                                // but it's the best we can do for now.
-                                // this should probaly be returned by server-spectator not osu-web.
-                                user.LastVisit = DateTimeOffset.Now;
-
-                                Schedule(() =>
-                                {
-                                    var panel = createUserPanel(user);
-                                    searchContainer.Add(userPanels[userId] = panel);
-                                });
-                            }
-                        });
-                    }
+                    pendingUsers.AddRange(e.NewItems!.Select(i => i.Key));
 
                     break;
 
@@ -131,11 +96,83 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                     {
                         if (userPanels.Remove(userId, out var userPanel))
                             userPanel.Expire();
+
+                        pendingUsers.Remove(userId);
                     }
 
                     break;
             }
-        });
+        }
+
+        private readonly HashSet<int> pendingUsers = new HashSet<int>();
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // ReSharper disable once InconsistentlySynchronizedField
+            if (pendingUsers.Count > 100)
+                updateUsers();
+        }
+
+        private void updateUsers()
+        {
+            // partitioning here is just to break up the requests.
+            // without this, the intitial request will take seconds to minutes.
+            const int partition_size = 50;
+
+            for (int i = 0; i <= pendingUsers.Count / partition_size; i++)
+            {
+                int[] partitionedUsers = pendingUsers.Skip(i * partition_size).Take(partition_size).ToArray();
+
+                userCache.GetUsersAsync(partitionedUsers).ContinueWith(task => Schedule(() =>
+                {
+                    var users = task.GetResultSafely();
+
+                    foreach (APIUser? user in users)
+                    {
+                        if (user == null)
+                            continue;
+
+                        var presence = metadataClient.GetPresence(user.Id);
+
+                        if (presence == null)
+                            continue;
+
+                        if (userPanels.TryGetValue(user.Id, out _))
+                            return;
+
+                        // This is quite dodgy – it affects the global `UserLookupCache`.
+                        //
+                        // but it's the best we can do for now.
+                        // this should probaly be returned by server-spectator not osu-web.
+                        user.LastVisit = DateTimeOffset.Now;
+
+                        var panel = createUserPanel(user);
+                        updateUserSpectateState(presence.Value, panel);
+                        searchContainer.Add(userPanels[user.Id] = panel);
+                    }
+                }));
+            }
+
+            pendingUsers.Clear();
+        }
+
+        private static void updateUserSpectateState(UserPresence presence, OnlineUserPanel userPanel)
+        {
+            switch (presence.Activity)
+            {
+                default:
+                    userPanel.CanSpectate.Value = false;
+                    break;
+
+                case UserActivity.InSoloGame:
+                case UserActivity.InMultiplayerGame:
+                case UserActivity.InPlaylistGame:
+                    userPanel.CanSpectate.Value = true;
+                    break;
+            }
+        }
 
         private OnlineUserPanel createUserPanel(APIUser user)
         {
@@ -175,7 +212,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                         default:
                         case UserSortCriteria.LastVisit:
                             // Todo: Last visit time is not currently updated according to realtime user presence.
-                            return panels.OrderByDescending(panel => panel.User.LastVisit);
+                            return panels.OrderByDescending(panel => panel.User.LastVisit).ThenBy(panel => panel.User.Id);
 
                         case UserSortCriteria.Rank:
                             // Todo: Statistics are not currently updated according to realtime user statistics, but it's also not currently displayed in the panels.
