@@ -19,6 +19,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 {
     public partial class SwitchButton : Checkbox
     {
+        public const float WIDTH = 45;
+
         private const float border_thickness = 4.5f;
         private const float padding = 1.25f;
 
@@ -35,7 +37,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public SwitchButton()
         {
-            Size = new Vector2(45, 20);
+            Size = new Vector2(WIDTH, 20);
 
             InternalChild = content = new CircularContainer
             {
