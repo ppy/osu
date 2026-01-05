@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Metadata;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
 
@@ -23,9 +22,6 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
 
         [Resolved]
         private IPerformFromScreenRunner? performer { get; set; }
-
-        [Resolved]
-        private MetadataClient? metadataClient { get; set; }
 
         protected OnlineUserPanel(APIUser user)
         {

@@ -16,13 +16,13 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
             : base(user)
         {
             RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
+            Height = 40;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = new DelayedLoadWrapper(() => new GridContainer
+            InternalChild = new DelayedLoadUnloadWrapper(() => new GridContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -51,11 +51,9 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                         }
                     }
                 }
-            }, 0)
+            }, 40, 5000)
             {
-                // These are approximate metrics - DLW will adopt the content's sizing mode after load.
-                RelativeSizeAxes = Axes.X,
-                Height = 40
+                RelativeSizeAxes = Axes.Both,
             };
         }
     }

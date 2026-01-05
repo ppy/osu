@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = new DelayedLoadWrapper(() => new FillFlowContainer
+            InternalChild = new DelayedLoadUnloadWrapper(() => new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                         Action = BeginSpectating
                     }
                 }
-            }, 0)
+            }, 40, 5000)
             {
                 RelativeSizeAxes = Axes.Both,
             };
