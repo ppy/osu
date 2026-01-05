@@ -16,8 +16,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
         public OnlineUserGridPanel(APIUser user)
             : base(user)
         {
-            AutoSizeAxes = Axes.Y;
-            Width = 290;
+            Size = new Vector2(290, 162);
         }
 
         [BackgroundDependencyLoader]
@@ -49,9 +48,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                 }
             }, 0)
             {
-                // These are approximate metrics - DLW will adopt the content's sizing mode after load.
-                RelativeSizeAxes = Axes.X,
-                Height = 160
+                RelativeSizeAxes = Axes.Both,
             };
         }
     }

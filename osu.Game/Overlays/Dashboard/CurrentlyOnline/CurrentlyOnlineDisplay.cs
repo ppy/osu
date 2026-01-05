@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
     {
         private Box background = null!;
         private UserListToolbar userListToolbar = null!;
-        private Container<CurrentlyOnlineList> listContainer = null!;
+        private Container<RealtimeUserList> listContainer = null!;
         private LoadingLayer loading = null!;
         private BasicSearchTextBox searchTextBox = null!;
 
@@ -94,7 +94,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                             AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
-                                listContainer = new Container<CurrentlyOnlineList>
+                                listContainer = new Container<RealtimeUserList>
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
@@ -122,8 +122,8 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
             listLoadCancellation?.Cancel();
             var cancellationSource = listLoadCancellation = new CancellationTokenSource();
 
-            CurrentlyOnlineList? currentList = listContainer.SingleOrDefault();
-            CurrentlyOnlineList newList = new CurrentlyOnlineList(userListToolbar.DisplayStyle.Value)
+            RealtimeUserList? currentList = listContainer.SingleOrDefault();
+            RealtimeUserList newList = new RealtimeUserList(userListToolbar.DisplayStyle.Value)
             {
                 SortCriteria = { BindTarget = userListToolbar.SortCriteria },
                 SearchText = { BindTarget = searchTextBox.Current }
@@ -132,18 +132,18 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
             loading.Show();
             LoadComponentAsync(newList, finishLoad, cancellationSource.Token);
 
-            void finishLoad(CurrentlyOnlineList list)
+            void finishLoad(RealtimeUserList list)
             {
                 loading.Hide();
 
                 if (currentList != null)
                 {
-                    currentList.FadeOut(100, Easing.OutQuint).Expire();
+                    currentList.FadeOut(250, Easing.OutQuint).Expire();
                     currentList.Delay(25).Schedule(() => currentList.BypassAutoSizeAxes = Axes.Y);
                 }
 
                 listContainer.Add(newList);
-                newList.FadeIn(200, Easing.OutQuint);
+                newList.FadeInFromZero(1000, Easing.OutQuint);
             }
         }
 

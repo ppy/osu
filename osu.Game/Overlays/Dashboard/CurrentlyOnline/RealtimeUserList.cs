@@ -17,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
 {
-    internal partial class CurrentlyOnlineList : CompositeDrawable
+    internal partial class RealtimeUserList : CompositeDrawable
     {
         public readonly IBindable<UserSortCriteria> SortCriteria = new Bindable<UserSortCriteria>();
         public readonly IBindable<string> SearchText = new Bindable<string>();
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
         [Resolved]
         private UserLookupCache users { get; set; } = null!;
 
-        public CurrentlyOnlineList(OverlayPanelDisplayStyle style)
+        public RealtimeUserList(OverlayPanelDisplayStyle style)
         {
             this.style = style;
 
@@ -47,9 +47,10 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
         {
             InternalChild = searchContainer = new OnlineUserSearchContainer
             {
+                LayoutEasing = Easing.OutQuart,
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(style == OverlayPanelDisplayStyle.Card ? 10 : 2),
+                Spacing = new Vector2(style == OverlayPanelDisplayStyle.Card ? 10 : 3),
                 SortCriteria = { BindTarget = SortCriteria },
             };
         }
@@ -74,6 +75,8 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
             switch (e.Action)
             {
                 case NotifyDictionaryChangedAction.Add:
+                    searchContainer.LayoutDuration = e.NewItems!.Count < 10 ? 500 : 0;
+
                     foreach ((int userId, _) in e.NewItems!)
                     {
                         if (userPanels.ContainsKey(userId))
@@ -82,7 +85,13 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                         users.GetUserAsync(userId).ContinueWith(task =>
                         {
                             if (task.GetResultSafely() is APIUser user)
-                                Schedule(() => searchContainer.Add(userPanels[userId] = createUserPanel(user)));
+                            {
+                                Schedule(() =>
+                                {
+                                    var panel = createUserPanel(user);
+                                    searchContainer.Add(userPanels[userId] = panel);
+                                });
+                            }
                         });
                     }
 
