@@ -165,6 +165,31 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString AccountChangeDisconnect => new TranslatableString(getKey(@"account_change_disconnect"), @"You have been logged out due to a change to your account. Please log in again.");
 
+        /// <summary>
+        /// "Downloading {0}"
+        /// </summary>
+        public static LocalisableString Downloading(string info) => new TranslatableString(getKey(@"downloading"), @"Downloading {0}", info);
+
+        /// <summary>
+        /// "Collections import is initialising..."
+        /// </summary>
+        public static LocalisableString CollectionsImportInitialising => new TranslatableString(getKey(@"collections_import_initialising"), @"Collections import is initialising...");
+
+        /// <summary>
+        /// "Reading collections..."
+        /// </summary>
+        public static LocalisableString ReadingCollections => new TranslatableString(getKey(@"reading_collections"), @"Reading collections...");
+
+        /// <summary>
+        /// "Imported {0} collections"
+        /// </summary>
+        public static LocalisableString CollectionsImportProgress(int count) => new TranslatableString(getKey(@"collections_import_progress"), @"Imported {0} collections", count);
+
+        /// <summary>
+        /// "Imported {0} of {1} collections"
+        /// </summary>
+        public static LocalisableString CollectionsImportProgressTotal(int count, int totalCount) => new TranslatableString(getKey(@"collections_import_progress_total"), @"Imported {0} of {1} collections", count, totalCount);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
