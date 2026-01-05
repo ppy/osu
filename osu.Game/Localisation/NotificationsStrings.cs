@@ -146,6 +146,11 @@ Click to see what's new!", version);
         public static LocalisableString FriendOffline(string info) => new TranslatableString(getKey(@"friend_offline"), @"Offline: {0}", info);
 
         /// <summary>
+        /// "Downloading {0}"
+        /// </summary>
+        public static LocalisableString Downloading(string info) => new TranslatableString(getKey(@"downloading"), @"Downloading {0}", info);
+
+        /// <summary>
         /// "Collections import is initialising..."
         /// </summary>
         public static LocalisableString CollectionsImportInitialising => new TranslatableString(getKey(@"collections_import_initialising"), @"Collections import is initialising...");
