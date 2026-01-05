@@ -117,34 +117,46 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 50,
+                    AutoSizeAxes = Axes.Y,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Padding = new MarginPadding(9),
                     Children = new Drawable[]
                     {
-                        caption = new FormFieldCaption
+                        new FillFlowContainer
                         {
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopLeft,
-                            Caption = Caption,
-                            TooltipText = HintText,
-                        },
-                        placeholderText = new OsuSpriteText
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
                             RelativeSizeAxes = Axes.X,
-                            Width = 1,
-                            Text = PlaceholderText,
-                            Colour = colourProvider.Foreground1,
-                        },
-                        filenameText = new OsuSpriteText
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.X,
-                            Width = 1,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0f, 4f),
+                            Children = new Drawable[]
+                            {
+                                caption = new FormFieldCaption
+                                {
+                                    Caption = Caption,
+                                    TooltipText = HintText,
+                                },
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Children = new[]
+                                    {
+                                        placeholderText = new OsuSpriteText
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Width = 1,
+                                            Text = PlaceholderText,
+                                            Colour = colourProvider.Foreground1,
+                                        },
+                                        filenameText = new OsuSpriteText
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Width = 1,
+                                        },
+                                    }
+                                }
+                            },
                         },
                         new SpriteIcon
                         {
@@ -242,7 +254,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         Task ICanAcceptFiles.Import(ImportTask[] tasks, ImportParameters parameters) => throw new NotImplementedException();
 
-        protected virtual FileChooserPopover CreatePopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath) => new FileChooserPopover(handledExtensions, current, chooserPath);
+        protected virtual FileChooserPopover CreatePopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath) =>
+            new FileChooserPopover(handledExtensions, current, chooserPath);
 
         public Popover GetPopover()
         {
