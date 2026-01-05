@@ -120,15 +120,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double timeSpentInvisible = currObj.DurationSpentInvisible() / clockRate;
 
             // Value time spent invisible exponentially
-            double timeSpentInvisibleFactor = Math.Pow(timeSpentInvisible, 2.25) * 0.0065;
+            double timeSpentInvisibleFactor = Math.Pow(timeSpentInvisible, 2.2) * 0.022;
 
             // Account for both past and current densities
-            double densityFactor = Math.Pow(currentVisibleObjectDensity + pastObjectDifficultyInfluence, 3.3) * 4;
+            double densityFactor = Math.Pow(currentVisibleObjectDensity + pastObjectDifficultyInfluence, 3.3) * 3;
 
             double hiddenDifficulty = (timeSpentInvisibleFactor + densityFactor) * constantAngleNerfFactor * velocity * 0.01;
 
             // Apply a soft cap to general HD reading to account for partial memorization
-            hiddenDifficulty = Math.Pow(hiddenDifficulty, 0.45) * hidden_multiplier;
+            hiddenDifficulty = Math.Pow(hiddenDifficulty, 0.4) * hidden_multiplier;
 
             var previousObj = currObj.Previous(0);
 
