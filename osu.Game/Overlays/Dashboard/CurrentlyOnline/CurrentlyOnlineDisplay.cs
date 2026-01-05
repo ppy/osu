@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                 }
 
                 listContainer.Add(newList);
-                newList.FadeInFromZero(1000, Easing.OutQuint);
+                newList.FadeInFromZero(250, Easing.OutQuint);
             }
         }
 

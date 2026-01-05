@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
@@ -27,8 +26,6 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
         {
             User = user;
             FilterTerms = new LocalisableString[] { User.Username };
-
-            Alpha = 0;
         }
 
         protected void BeginSpectating()
@@ -45,7 +42,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
             set
             {
                 if (value)
-                    this.FadeIn(500, Easing.OutQuint);
+                    Show();
                 else
                     Hide();
             }

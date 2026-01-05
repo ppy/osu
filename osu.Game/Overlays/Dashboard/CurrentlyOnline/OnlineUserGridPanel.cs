@@ -22,30 +22,37 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = new DelayedLoadUnloadWrapper(() => new FillFlowContainer
+            InternalChild = new DelayedLoadUnloadWrapper(() =>
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(2),
-                Children = new Drawable[]
+                var content = new FillFlowContainer
                 {
-                    new UserGridPanel(User)
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(2),
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre
-                    },
-                    new PurpleRoundedButton
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Text = "Spectate",
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Enabled = { BindTarget = CanSpectate },
-                        Action = BeginSpectating
+                        new UserGridPanel(User)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre
+                        },
+                        new PurpleRoundedButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Text = "Spectate",
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Action = BeginSpectating,
+                            Enabled = { BindTarget = CanSpectate },
+                        }
                     }
-                }
+                };
+
+                content.OnLoadComplete += _ => content.FadeInFromZero(800, Easing.OutQuint);
+
+                return content;
             }, 40, 5000)
             {
                 RelativeSizeAxes = Axes.Both,
