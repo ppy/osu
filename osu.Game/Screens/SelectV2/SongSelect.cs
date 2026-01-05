@@ -63,7 +63,6 @@ namespace osu.Game.Screens.SelectV2
     /// This screen is intended to house all components introduced in the new song select design to add transitions and examine the overall look.
     /// This will be gradually built upon and ultimately replace <see cref="Select.SongSelect"/> once everything is in place.
     /// </summary>
-    [Cached(typeof(ISongSelect))]
     public abstract partial class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, ISongSelect, IHandlePresentBeatmap
     {
         /// <summary>
@@ -352,7 +351,7 @@ namespace osu.Game.Screens.SelectV2
                         errorSample?.Play();
                 }
             },
-            new FooterButtonOptions(this)
+            new FooterButtonOptions
             {
                 Hotkey = GlobalAction.ToggleBeatmapOptions,
             }
