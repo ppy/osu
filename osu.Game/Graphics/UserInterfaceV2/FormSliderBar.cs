@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
 using osu.Framework.Allocation;
@@ -16,13 +17,15 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Extensions;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public partial class FormSliderBar<T> : CompositeDrawable, IHasCurrentValue<T>
+    public partial class FormSliderBar<T> : CompositeDrawable, IHasCurrentValue<T>, IFormControl
         where T : struct, INumber<T>, IMinMaxValue<T>
     {
         public Bindable<T> Current
@@ -96,9 +99,31 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
+        /// <summary>
+        /// Whether to format the tooltip as a percentage or the actual value.
+        /// </summary>
+        public bool DisplayAsPercentage { get; init; }
+
+        /// <summary>
+        /// Whether sound effects should play when adjusting this slider.
+        /// </summary>
+        public bool PlaySamplesOnAdjust { get; init; }
+
+        /// <summary>
+        /// The string formatting function to use for the value label.
+        /// </summary>
+        public Func<T, LocalisableString> LabelFormat { get; init; }
+
+        /// <summary>
+        /// The string formatting function to use for the slider's tooltip text.
+        /// If not provided, <see cref="LabelFormat"/> is used.
+        /// </summary>
+        public Func<T, LocalisableString> TooltipFormat { get; init; }
+
         private Box background = null!;
         private Box flashLayer = null!;
         private FormTextBox.InnerTextBox textBox = null!;
+        private OsuSpriteText valueLabel = null!;
         private InnerSlider slider = null!;
         private FormFieldCaption captionText = null!;
         private IFocusManager focusManager = null!;
@@ -107,6 +132,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
         private readonly Bindable<Language> currentLanguage = new Bindable<Language>();
+
+        public FormSliderBar()
+        {
+            LabelFormat ??= defaultLabelFormat;
+            TooltipFormat ??= v => LabelFormat(v);
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, OsuGame? game)
@@ -152,6 +183,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             Origin = Anchor.BottomLeft,
                             RelativeSizeAxes = Axes.X,
                             Width = 0.5f,
+                            // the textbox is hidden when the control is unfocused,
+                            // but clicking on the label should reach the textbox,
+                            // therefore make it always present.
+                            AlwaysPresent = true,
                             CommitOnFocusLost = true,
                             SelectAllOnFocus = true,
                             OnInputError = () =>
@@ -161,6 +196,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             },
                             TabbableContentContainer = tabbableContentContainer,
                         },
+                        valueLabel = new TruncatingSpriteText
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            RelativeSizeAxes = Axes.X,
+                            Width = 0.5f,
+                            Padding = new MarginPadding { Right = 5 },
+                        },
                         slider = new InnerSlider
                         {
                             Anchor = Anchor.CentreRight,
@@ -169,6 +212,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             Width = 0.5f,
                             Current = currentNumberInstantaneous,
                             OnCommit = () => current.Value = currentNumberInstantaneous.Value,
+                            TooltipFormat = TooltipFormat,
+                            DisplayAsPercentage = DisplayAsPercentage,
+                            PlaySamplesOnAdjust = PlaySamplesOnAdjust,
                         }
                     },
                 },
@@ -194,7 +240,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
             slider.IsDragging.BindValueChanged(_ => updateState());
             slider.Focused.BindValueChanged(_ => updateState());
 
-            current.ValueChanged += e => currentNumberInstantaneous.Value = e.NewValue;
+            current.ValueChanged += e =>
+            {
+                currentNumberInstantaneous.Value = e.NewValue;
+                ValueChanged?.Invoke();
+            };
+
             current.MinValueChanged += v => currentNumberInstantaneous.MinValue = v;
             current.MaxValueChanged += v => currentNumberInstantaneous.MaxValue = v;
             current.PrecisionChanged += v => currentNumberInstantaneous.Precision = v;
@@ -207,10 +258,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 }
 
                 currentNumberInstantaneous.Disabled = disabled;
+                updateState();
             };
 
             current.CopyTo(currentNumberInstantaneous);
             currentLanguage.BindValueChanged(_ => Schedule(updateValueDisplay));
+            currentNumberInstantaneous.BindDisabledChanged(_ => updateState());
             currentNumberInstantaneous.BindValueChanged(e =>
             {
                 if (!TransferValueOnCommit)
@@ -283,7 +336,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected override bool OnClick(ClickEvent e)
         {
-            focusManager.ChangeFocus(textBox);
+            if (!Current.Disabled)
+                focusManager.ChangeFocus(textBox);
             return true;
         }
 
@@ -291,14 +345,20 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             bool childHasFocus = slider.Focused.Value || textBox.Focused.Value;
 
-            textBox.Alpha = 1;
+            textBox.ReadOnly = currentNumberInstantaneous.Disabled;
+            textBox.Alpha = textBox.Focused.Value ? 1 : 0;
+            valueLabel.Alpha = textBox.Focused.Value ? 0 : 1;
 
-            background.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background4 : colourProvider.Background5;
-            captionText.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
-            textBox.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
+            captionText.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background1 : colourProvider.Content2;
+            textBox.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background1 : colourProvider.Content1;
+            valueLabel.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background1 : colourProvider.Content1;
 
             BorderThickness = childHasFocus || IsHovered || slider.IsDragging.Value ? 2 : 0;
-            BorderColour = childHasFocus ? colourProvider.Highlight1 : colourProvider.Light4;
+
+            if (Current.Disabled)
+                BorderColour = colourProvider.Dark1;
+            else
+                BorderColour = childHasFocus ? colourProvider.Highlight1 : colourProvider.Light4;
 
             if (childHasFocus)
                 background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
@@ -312,19 +372,28 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             if (updatingFromTextBox) return;
 
-            textBox.Text = slider.GetDisplayableValue(currentNumberInstantaneous.Value).ToString();
+            textBox.Text = currentNumberInstantaneous.Value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS);
+            valueLabel.Text = LabelFormat(currentNumberInstantaneous.Value);
         }
+
+        private LocalisableString defaultLabelFormat(T value) => currentNumberInstantaneous.Value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS, DisplayAsPercentage);
 
         private partial class InnerSlider : OsuSliderBar<T>
         {
             public BindableBool Focused { get; } = new BindableBool();
 
             public BindableBool IsDragging { get; set; } = new BindableBool();
+
             public Action? OnCommit { get; set; }
+
+            public sealed override LocalisableString TooltipText => base.TooltipText;
+
+            public required Func<T, LocalisableString> TooltipFormat { get; init; }
 
             private Box leftBox = null!;
             private Box rightBox = null!;
             private InnerSliderNub nub = null!;
+            private HoverClickSounds sounds = null!;
             public const float NUB_WIDTH = 10;
 
             [Resolved]
@@ -373,14 +442,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             }
                         }
                     },
-                    new HoverClickSounds()
+                    sounds = new HoverClickSounds()
                 };
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                updateState();
+                Current.BindDisabledChanged(_ => updateState(), true);
             }
 
             protected override void UpdateAfterChildren()
@@ -433,9 +502,19 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             private void updateState()
             {
+                sounds.Enabled.Value = !Current.Disabled;
                 rightBox.Colour = colourProvider.Background6;
-                leftBox.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Dark2;
-                nub.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1 : colourProvider.Light4;
+
+                if (Current.Disabled)
+                {
+                    leftBox.Colour = colourProvider.Dark3;
+                    nub.Colour = colourProvider.Dark1;
+                }
+                else
+                {
+                    leftBox.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Highlight1.Opacity(0.3f);
+                    nub.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1 : colourProvider.Light4;
+                }
             }
 
             protected override void UpdateValue(float value)
@@ -452,6 +531,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                 return result;
             }
+
+            protected sealed override LocalisableString GetTooltipText(T value) => TooltipFormat(value);
         }
 
         private partial class InnerSliderNub : Circle
@@ -475,5 +556,15 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 return true;
             }
         }
+
+        public IEnumerable<LocalisableString> FilterTerms => new[] { Caption, HintText };
+
+        public event Action? ValueChanged;
+
+        public bool IsDefault => Current.IsDefault;
+
+        public void SetDefault() => Current.SetDefault();
+
+        public bool IsDisabled => Current.Disabled;
     }
 }

@@ -79,6 +79,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                                     spectatorList.Origin = Anchor.TopLeft;
                                     spectatorList.Position = pos;
                                 }
+
+                                foreach (var d in container.OfType<ISerialisableDrawable>())
+                                    d.UsesFixedAnchor = true;
                             })
                             {
                                 new LegacyDefaultComboCounter(),

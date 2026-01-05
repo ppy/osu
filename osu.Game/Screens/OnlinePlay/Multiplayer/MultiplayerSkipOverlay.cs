@@ -42,10 +42,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
         }
 
-        protected override OsuClickableContainer CreateButton() => skipButton = new Button
+        protected override OsuClickableContainer CreateButton(IBindable<bool> inSkipPeriod) => skipButton = new Button
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
+            InSkipPeriod = { BindTarget = inSkipPeriod },
         };
 
         protected override void LoadComplete()
@@ -68,7 +69,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onUserStateChanged(MultiplayerRoomUser user, MultiplayerUserState state) => Schedule(updateCount);
 
-        private void onUserVotedToSkipIntro(int userId) => Schedule(() =>
+        private void onUserVotedToSkipIntro(int userId, bool voted) => Schedule(() =>
         {
             FadingContent.TriggerShow();
             updateCount();
@@ -119,6 +120,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             public readonly BindableInt SkippedCount = new BindableInt();
             public readonly BindableInt RequiredCount = new BindableInt();
+            public readonly BindableBool InSkipPeriod = new BindableBool();
+
+            private readonly BindableBool clicked = new BindableBool();
 
             [Resolved]
             private OsuColour colours { get; set; } = null!;
@@ -201,10 +205,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
                 SkippedCount.BindValueChanged(_ => updateCount());
                 RequiredCount.BindValueChanged(_ => updateCount(), true);
+
+                InSkipPeriod.BindValueChanged(_ => updateEnabledState());
+                clicked.BindValueChanged(_ => updateEnabledState(), true);
+
                 Enabled.BindValueChanged(_ => updateColours(), true);
 
                 FinishTransforms(true);
             }
+
+            private void updateEnabledState() => Enabled.Value = InSkipPeriod.Value && !clicked.Value;
 
             private void updateChevronsSpacing()
             {
@@ -300,7 +310,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
                 base.OnClick(e);
 
-                Enabled.Value = false;
+                clicked.Value = true;
                 return true;
             }
 

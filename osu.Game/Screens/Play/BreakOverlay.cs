@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -10,10 +9,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Beatmaps.ControlPoints;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.Break;
@@ -21,7 +19,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Screens.Play
 {
-    public partial class BreakOverlay : BeatSyncedContainer
+    public partial class BreakOverlay : Container
     {
         /// <summary>
         /// The duration of the break overlay fading.
@@ -50,12 +48,6 @@ namespace osu.Game.Screens.Play
         {
             this.scoreProcessor = scoreProcessor;
             RelativeSizeAxes = Axes.Both;
-
-            MinimumBeatLength = 200;
-
-            // Doesn't play well with pause/unpause.
-            // This might mean that some beats don't animate if the user is running <60fps, but we'll deal with that if anyone notices.
-            AllowMistimedEventFiring = false;
 
             Child = fadeContainer = new Container
             {
@@ -142,25 +134,8 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
+            remainingTimeBox.Width = (float)Interpolation.DampContinuously(remainingTimeBox.Width, remainingTimeForCurrentPeriod, 40, Math.Abs(Time.Elapsed));
             remainingTimeBox.Height = Math.Min(8, remainingTimeBox.DrawWidth);
-
-            // Keep things simple by resetting beat synced transforms on a rewind.
-            if (Clock.ElapsedFrameTime < 0)
-            {
-                remainingTimeBox.ClearTransforms(targetMember: nameof(Width));
-                remainingTimeBox.Width = remainingTimeForCurrentPeriod;
-            }
-        }
-
-        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
-        {
-            base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
-
-            if (currentPeriod.Value == null)
-                return;
-
-            float timeBoxTargetWidth = (float)Math.Max(0, remainingTimeForCurrentPeriod - timingPoint.BeatLength / currentPeriod.Value.Value.Duration);
-            remainingTimeBox.ResizeWidthTo(timeBoxTargetWidth, timingPoint.BeatLength * 3.5, Easing.OutQuint);
         }
 
         private void updateDisplay(ValueChangedEvent<Period?> period)
@@ -181,8 +156,6 @@ namespace osu.Game.Screens.Play
                     .ResizeWidthTo(remaining_time_container_max_size, BREAK_FADE_DURATION, Easing.OutQuint)
                     .Delay(b.Duration)
                     .ResizeWidthTo(0);
-
-                remainingTimeBox.ResizeWidthTo(remainingTimeForCurrentPeriod);
 
                 remainingTimeCounter.CountTo(b.Duration + BREAK_FADE_DURATION).CountTo(0, b.Duration + BREAK_FADE_DURATION);
 

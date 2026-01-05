@@ -756,6 +756,7 @@ namespace osu.Game.Screens.SelectV2
 
             logo.Action = () =>
             {
+                ensureGlobalBeatmapValid();
                 SelectAndRun(Beatmap.Value.BeatmapInfo, OnStart);
                 return false;
             };
@@ -999,6 +1000,7 @@ namespace osu.Game.Screens.SelectV2
                     // one of which is filtering out all visible beatmaps and attempting to start gameplay.
                     // in that case, users still expect a `Select` press to advance to gameplay anyway, using the ambient selected beatmap if there is one,
                     // which matches the behaviour resulting from clicking the osu! cookie in that scenario.
+                    ensureGlobalBeatmapValid();
                     SelectAndRun(Beatmap.Value.BeatmapInfo, OnStart);
                     return true;
 
@@ -1203,6 +1205,8 @@ namespace osu.Game.Screens.SelectV2
             foreach (var b in beatmapSet.Beatmaps)
                 beatmaps.Restore(b);
         }
+
+        public Bindable<BeatmapSetInfo?> ScopedBeatmapSet => filterControl.ScopedBeatmapSet;
 
         #endregion
     }
