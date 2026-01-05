@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -140,30 +141,30 @@ namespace osu.Game.Graphics.UserInterfaceV2
             [BackgroundDependencyLoader]
             private void load()
             {
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.None;
-                Height = 50;
-
                 Masking = true;
                 CornerRadius = 5;
 
-                Foreground.AutoSizeAxes = Axes.None;
-                Foreground.RelativeSizeAxes = Axes.Both;
                 Foreground.Padding = new MarginPadding(9);
                 Foreground.Children = new Drawable[]
                 {
-                    caption = new FormFieldCaption
-                    {
-                        Anchor = Anchor.TopLeft,
-                        Origin = Anchor.TopLeft,
-                        Caption = Caption,
-                        TooltipText = HintText,
-                    },
-                    label = new OsuSpriteText
+                    new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 4),
+                        Children = new Drawable[]
+                        {
+                            caption = new FormFieldCaption
+                            {
+                                Caption = Caption,
+                                TooltipText = HintText,
+                            },
+                            label = new OsuSpriteText
+                            {
+                                RelativeSizeAxes = Axes.X,
+                            },
+                        }
                     },
                     chevron = new SpriteIcon
                     {

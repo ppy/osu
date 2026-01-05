@@ -19,6 +19,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -89,7 +90,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private void load(OsuColour colours)
         {
             RelativeSizeAxes = Axes.X;
-            Height = 50;
+            AutoSizeAxes = Axes.Y;
 
             Masking = true;
             CornerRadius = 5;
@@ -107,10 +108,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     RelativeSizeAxes = Axes.Both,
                     Colour = Colour4.Transparent,
                 },
-                new Container
+                new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding(9),
+                    Spacing = new Vector2(0, 4),
                     Children = new Drawable[]
                     {
                         caption = new FormFieldCaption
@@ -122,8 +125,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         },
                         textBox = CreateTextBox().With(t =>
                         {
-                            t.Anchor = Anchor.BottomRight;
-                            t.Origin = Anchor.BottomRight;
                             t.RelativeSizeAxes = Axes.X;
                             t.Width = 1;
                             t.PlaceholderText = PlaceholderText;

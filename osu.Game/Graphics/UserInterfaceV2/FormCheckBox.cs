@@ -18,6 +18,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -56,7 +57,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private void load(AudioManager audio)
         {
             RelativeSizeAxes = Axes.X;
-            Height = 50;
+            AutoSizeAxes = Axes.Y;
 
             Masking = true;
             CornerRadius = 5;
@@ -71,22 +72,30 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 },
                 new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding(9),
                     Children = new Drawable[]
                     {
-                        caption = new FormFieldCaption
-                        {
-                            Caption = Caption,
-                            TooltipText = HintText,
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopLeft,
-                        },
-                        text = new OsuSpriteText
+                        new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Padding = new MarginPadding { Right = SwitchButton.WIDTH + 5 },
+                            Spacing = new Vector2(0f, 4f),
+                            Children = new Drawable[]
+                            {
+                                caption = new FormFieldCaption
+                                {
+                                    Caption = Caption,
+                                    TooltipText = HintText,
+                                },
+                                text = new OsuSpriteText
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                },
+                            },
                         },
                         new SwitchButton
                         {
@@ -97,7 +106,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     },
                 },
             };
-
             sampleChecked = audio.Samples.Get(@"UI/check-on");
             sampleUnchecked = audio.Samples.Get(@"UI/check-off");
             sampleDisabled = audio.Samples.Get(@"UI/default-select-disabled");
