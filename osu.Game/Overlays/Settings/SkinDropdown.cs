@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -145,14 +144,7 @@ namespace osu.Game.Overlays.Settings
 
                     private SpriteIcon starIcon = null!;
 
-                    private int hoverSlideThreshold = 25;
-
                     private int favouriteDragEndThreshold = 50;
-
-                    [Resolved]
-                    private GameHost host { get; set; } = null!;
-
-                    private bool favouriteStarButtonVisible = false;
 
                     private ClickableContainer starContainer = null!;
 
@@ -221,8 +213,8 @@ namespace osu.Game.Overlays.Settings
                             if (mostlyHorizontal)
                             {
                                 starContainer.FadeTo(1, 100, Easing.OutQuint);
-                                favouriteIndicatorAnimateOut();
-                                favouriteStarButtonVisible = true;
+                                if (IsFavourite)
+                                    favouriteIndicatorAnimateOut();
                             }
 
                             return mostlyHorizontal;
@@ -255,7 +247,15 @@ namespace osu.Game.Overlays.Settings
 
                     protected override void OnDragEnd(DragEndEvent e)
                     {
-                        starButtonAnimateOut();
+                        int offset = 0;
+                        int duration = 250;
+                        Easing easing = Easing.OutQuint;
+
+                        Background.MoveToX(offset, duration, easing);
+                        Foreground.MoveToX(offset, duration, easing);
+                        starContainer.FadeTo(0, duration, easing).ResizeWidthTo(offset, duration, easing);
+                        if (IsFavourite)
+                            favouriteIndicatorAnimateIn();
 
                         stateChanged = false;
                         dragDelta = 0;
@@ -263,17 +263,12 @@ namespace osu.Game.Overlays.Settings
                         base.OnDragEnd(e);
                     }
 
-                    protected override bool OnMouseMove(MouseMoveEvent e)
+                    protected override bool OnHover(HoverEvent e)
                     {
-                        if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch || !host.IsActive.Value)
-                            return base.OnMouseMove(e);
+                        if (!IsFavourite && e.CurrentState.Mouse.LastSource is not ISourcedFromTouch)
+                            favouriteIndicatorAnimateIn();
 
-                        if (e.MousePosition.X < hoverSlideThreshold && !favouriteStarButtonVisible)
-                            starButtonAnimateIn();
-                        else if (e.MousePosition.X >= hoverSlideThreshold && favouriteStarButtonVisible)
-                            starButtonAnimateOut();
-
-                        return base.OnMouseMove(e);
+                        return base.OnHover(e);
                     }
 
                     protected override void OnHoverLost(HoverLostEvent e)
@@ -282,8 +277,9 @@ namespace osu.Game.Overlays.Settings
                         {
                             // Do nothing
                         }
-                        else
-                            starButtonAnimateOut();
+                        else if (!IsFavourite)
+                            favouriteIndicatorAnimateOut();
+
 
                         base.OnHoverLost(e);
                     }
@@ -298,35 +294,22 @@ namespace osu.Game.Overlays.Settings
 
                     public bool TriggerFavouriteChange()
                     {
-                        playStarSound();
+                        if (IsFavourite)
+                            sampleHide?.Play();
+                        else
+                            sampleShow?.Play();
+
                         IsFavourite = !IsFavourite;
                         starIcon.Icon = IsFavourite ? FontAwesome.Solid.Star : FontAwesome.Regular.Star;
+
+                        content?.FavouriteIndicator.ChangeFavouriteIndicatorState();
+                        starButtonFlash();
+
                         if (SkinData != null)
                         {
                             menu?.TrackFavouriteChange(SkinData.ID, IsFavourite);
-                            starButtonFlash();
                         }
                         return true;
-                    }
-
-                    private void starButtonAnimateIn()
-                    {
-                        int offset = 20;
-                        Background.MoveToX(offset, 100, Easing.OutQuint);
-                        Foreground.MoveToX(offset, 100, Easing.OutQuint);
-                        starContainer.FadeTo(1, 100, Easing.OutQuint).ResizeWidthTo(offset, 100, Easing.OutQuint);
-                        favouriteIndicatorAnimateOut();
-                        favouriteStarButtonVisible = true;
-                    }
-
-                    private void starButtonAnimateOut()
-                    {
-                        int offset = 0;
-                        Background.MoveToX(offset, 250, Easing.OutQuint);
-                        Foreground.MoveToX(offset, 250, Easing.OutQuint);
-                        starContainer.FadeTo(0, 250, Easing.OutQuint).ResizeWidthTo(offset, 250, Easing.OutQuint);
-                        favouriteIndicatorAnimateIn();
-                        favouriteStarButtonVisible = false;
                     }
 
                     private void starButtonFlash()
@@ -346,31 +329,21 @@ namespace osu.Game.Overlays.Settings
 
                     private void favouriteIndicatorAnimateIn()
                     {
-                        if (IsFavourite && favouriteStarButtonVisible)
-                            content?.FavouriteIndicator.ShowFavouriteIndicator(true);
+                        content?.FavouriteIndicator.ShowFavouriteIndicator(true);
                     }
 
                     private void favouriteIndicatorAnimateOut()
                     {
-                        if (IsFavourite && !favouriteStarButtonVisible)
-                            content?.FavouriteIndicator.ShowFavouriteIndicator(false, 100, 350);
-                    }
-
-                    private void playStarSound()
-                    {
-                        if (IsFavourite)
-                            sampleHide?.Play();
-                        else
-                            sampleShow?.Play();
+                        content?.FavouriteIndicator.ShowFavouriteIndicator(false, 100, 350);
                     }
 
                     public partial class FavouriteIndicator : SpriteIcon
                     {
-                        private bool isStarHovered { get; set; }
-
-                        public bool IsStarHovered => isStarHovered;
-
                         private DrawableSkinDropdownMenuItem skinItem;
+
+                        public Colour4 ActiveColour = Colour4.Gold;
+
+                        private Colour4 inactiveColour = Colour4.Black.Opacity(0.4f);
 
                         public FavouriteIndicator(DrawableSkinDropdownMenuItem skinItemInstance)
                         {
@@ -399,11 +372,23 @@ namespace osu.Game.Overlays.Settings
                             base.LoadComplete();
                         }
 
+                        protected override bool OnClick(ClickEvent e)
+                        {
+                            if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
+                                return true;
+
+                            ChangeFavouriteIndicatorState();
+                            skinItem.TriggerFavouriteChange();
+
+                            return true;
+                        }
+
                         public void ShowFavouriteIndicator(bool show, int delay = 250, int duration = 250)
                         {
+                            Colour = skinItem.IsFavourite ? ActiveColour : inactiveColour;
                             if (show)
                             {
-                                this.ScaleTo(1.35f, duration, Easing.OutQuint).Then().ScaleTo(1.0f, duration, Easing.OutQuint);
+                                this.ScaleTo(1.25f, duration, Easing.OutQuint).Then().ScaleTo(1.0f, duration, Easing.OutQuint);
                                 this.FadeInFromZero(duration, Easing.OutQuint);
                             }
                             else
@@ -411,6 +396,15 @@ namespace osu.Game.Overlays.Settings
                                 this.Delay(delay).ScaleTo(0.8f, duration, Easing.OutQuint);
                                 this.Delay(delay).FadeOutFromOne(duration, Easing.OutQuint);
                             }
+                        }
+
+                        public void ChangeFavouriteIndicatorState()
+                        {
+                            this.ScaleTo(1.35f, 250, Easing.OutQuint).Then().ScaleTo(1.0f, 250, Easing.OutQuint);
+                            if (skinItem.IsFavourite)
+                                this.FadeColour(ActiveColour, 250, Easing.OutQuint);
+                            else
+                                this.FadeColour(inactiveColour, 250, Easing.OutQuint);
                         }
                     }
 
@@ -447,7 +441,6 @@ namespace osu.Game.Overlays.Settings
                                 FavouriteIndicator = new FavouriteIndicator(skinItem)
                                 {
                                     Icon = FontAwesome.Solid.Star,
-                                    Colour = Colour4.Gold,
                                     Size = new Vector2(10),
                                     BypassAutoSizeAxes = Axes.Y,
                                     X = 6,
