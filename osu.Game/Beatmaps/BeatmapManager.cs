@@ -329,6 +329,14 @@ namespace osu.Game.Beatmaps
              .FirstOrDefault()?.Detach());
 
         /// <summary>
+        /// Perform a lookup query on available <see cref="BeatmapInfo"/>s for a specific online ID.
+        /// </summary>
+        /// <returns>A matching local beatmap info if existing and in a valid state.</returns>
+        public BeatmapInfo? QueryOnlineBeatmapId(int id) => Realm.Run(r =>
+            r.All<BeatmapInfo>()
+             .ForOnlineId(id).SingleOrDefault()?.Detach());
+
+        /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
         /// </summary>
         public IWorkingBeatmap DefaultBeatmap => workingBeatmapCache.DefaultBeatmap;
@@ -476,9 +484,11 @@ namespace osu.Game.Beatmaps
         public Task<ExternalEditOperation<BeatmapSetInfo>> BeginExternalEditing(BeatmapSetInfo model) =>
             beatmapImporter.BeginExternalEditing(model);
 
-        public Task Export(BeatmapSetInfo beatmap) => beatmapExporter.ExportAsync(beatmap.ToLive(Realm));
+        public Task Export(BeatmapSetInfo beatmapSet) => beatmapExporter.ExportAsync(beatmapSet.ToLive(Realm));
 
-        public Task ExportLegacy(BeatmapSetInfo beatmap) => legacyBeatmapExporter.ExportAsync(beatmap.ToLive(Realm));
+        public Task ExportLegacy(BeatmapSetInfo beatmapSet) => legacyBeatmapExporter.ExportAsync(beatmapSet.ToLive(Realm));
+
+        public Task ExportLegacy(BeatmapInfo beatmap) => legacyBeatmapExporter.ExportAsync(beatmap.ToLive(Realm));
 
         private void updateHashAndMarkDirty(BeatmapSetInfo setInfo)
         {

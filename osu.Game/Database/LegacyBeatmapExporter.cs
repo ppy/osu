@@ -2,17 +2,22 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Extensions;
 using osu.Game.IO;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Database
@@ -175,5 +180,54 @@ namespace osu.Game.Database
         }
 
         protected override string FileExtension => @".osz";
+
+        public Task ExportAsync(Live<BeatmapInfo> beatmap) => Task.Run(() =>
+        {
+            string itemFilename = Path.GetFileNameWithoutExtension(beatmap.PerformRead(s => s.File!.Filename.GetValidFilename()));
+            const string osu_extension = @".osu";
+
+            if (itemFilename.Length > MAX_FILENAME_LENGTH - osu_extension.Length)
+                itemFilename = itemFilename.Remove(MAX_FILENAME_LENGTH - osu_extension.Length);
+
+            IEnumerable<string> existingExports = ExportStorage
+                                                  .GetFiles(string.Empty, $"{itemFilename}*{osu_extension}")
+                                                  .Concat(ExportStorage.GetDirectories(string.Empty));
+
+            string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{osu_extension}");
+
+            ProgressNotification notification = new ProgressNotification
+            {
+                State = ProgressNotificationState.Active,
+                Text = $"Exporting {itemFilename}...",
+            };
+
+            PostNotification?.Invoke(notification);
+
+            try
+            {
+                beatmap.PerformRead(b =>
+                {
+                    using var exportStream = ExportStorage.CreateFileSafely(filename);
+                    using var inputFile = GetFileContents(b.BeatmapSet!, b.File!);
+
+                    if (inputFile == null)
+                        throw new InvalidOperationException($"Beatmap file {b.File!.Filename} could not be opened!");
+
+                    inputFile.CopyTo(exportStream);
+                });
+            }
+            catch
+            {
+                notification.State = ProgressNotificationState.Cancelled;
+
+                // cleanup if export is failed or canceled.
+                ExportStorage.Delete(filename);
+                throw;
+            }
+
+            notification.CompletionText = $"Exported {itemFilename}! Click to view.";
+            notification.CompletionClickAction = () => ExportStorage.PresentFileExternally(filename);
+            notification.State = ProgressNotificationState.Completed;
+        });
     }
 }

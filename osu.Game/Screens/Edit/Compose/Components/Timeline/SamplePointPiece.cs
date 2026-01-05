@@ -20,10 +20,11 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Timing;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -127,7 +128,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void updateText()
         {
-            Label.Text = $"{abbreviateBank(GetBankValue(GetSamples()))} {GetVolumeValue(GetSamples())}";
+            Label.Text = $"{abbreviateBank(GetBankValue(GetSamples()))}{GetSuffix(GetSamples())} {GetVolumeValue(GetSamples())}";
 
             if (!contracted.Value)
                 LabelContainer.ResizeWidthTo(Label.Width, 200, Easing.OutQuint);
@@ -147,6 +148,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public static string? GetBankValue(IEnumerable<HitSampleInfo> samples)
         {
             return samples.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL)?.Bank;
+        }
+
+        public static string GetSuffix(IEnumerable<HitSampleInfo> samples)
+        {
+            var suffixes = samples.Select(o => o.Suffix).Distinct().ToList();
+
+            // having multiple values should never happen, but just for safety...
+            if (suffixes.Count != 1 || suffixes.Single() is not string commonSuffix)
+                return string.Empty;
+
+            return $@":{commonSuffix}";
         }
 
         public static string? GetAdditionBankValue(IEnumerable<HitSampleInfo> samples)
@@ -176,9 +188,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             private readonly HitObject hitObject;
 
-            private LabelledTextBox bank = null!;
-            private LabelledTextBox additionBank = null!;
+            private LabelledDropdown<string> bank = null!;
+            private LabelledDropdown<string> additionBank = null!;
+            private FillFlowContainer<SampleSetTernaryButton>? sampleSetsFlow;
+            private LabelledDropdown<EditorBeatmapSkin.SampleSet>? sampleSetDropdown;
             private IndeterminateSliderWithTextBoxInput<int> volume = null!;
+            private SkinnableSound demoSample = null!;
 
             private FillFlowContainer togglesCollection = null!;
 
@@ -229,11 +244,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     flow = new FillFlowContainer
                     {
-                        Width = 200,
+                        Width = 220,
                         Direction = FillDirection.Vertical,
                         AutoSizeAxes = Axes.Y,
                         Spacing = new Vector2(0, 10),
-                        Children = new Drawable[]
+                        Children = new[]
                         {
                             togglesCollection = new FillFlowContainer
                             {
@@ -242,27 +257,30 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 Direction = FillDirection.Horizontal,
                                 Spacing = new Vector2(5, 5),
                             },
-                            bank = new LabelledTextBox
+                            bank = new LabelledDropdown<string>(padded: false)
                             {
-                                Label = "Bank Name",
-                                SelectAllOnFocus = true,
+                                Label = "Normal Bank",
+                                Items = HitSampleInfo.ALL_BANKS,
                             },
-                            additionBank = new LabelledTextBox
+                            additionBank = new LabelledDropdown<string>(padded: false)
                             {
                                 Label = "Addition Bank",
-                                SelectAllOnFocus = true,
+                                Items = HitSampleInfo.ALL_BANKS,
                             },
+                            createSampleSetContent(),
                             volume = new IndeterminateSliderWithTextBoxInput<int>("Volume", new BindableInt(100)
                             {
                                 MinValue = DrawableHitObject.MINIMUM_SAMPLE_VOLUME,
                                 MaxValue = 100,
                             })
                         }
+                    },
+                    new EditorSkinProvidingContainer(beatmap)
+                    {
+                        Child = demoSample = new SkinnableSound()
                     }
                 };
 
-                bank.TabbableContentContainer = flow;
-                additionBank.TabbableContentContainer = flow;
                 volume.TabbableContentContainer = flow;
 
                 // if the piece belongs to a currently selected object, assume that the user wants to change all selected objects.
@@ -283,10 +301,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                     setBank(val.NewValue);
                     updatePrimaryBankState();
+                    playDemoSample();
                 });
-                // on commit, ensure that the value is correct by sourcing it from the objects' samples again.
-                // this ensures that committing empty text causes a revert to the previous value.
-                bank.OnCommit += (_, _) => updatePrimaryBankState();
 
                 updateAdditionBankState();
                 additionBank.Current.BindValueChanged(val =>
@@ -296,8 +312,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                     setAdditionBank(val.NewValue);
                     updateAdditionBankState();
+                    playDemoSample();
                 });
-                additionBank.OnCommit += (_, _) => updateAdditionBankState();
+
+                updateSampleSetState();
 
                 volume.Current.BindValueChanged(val =>
                 {
@@ -308,6 +326,58 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 createStateBindables();
                 updateTernaryStates();
                 togglesCollection.AddRange(createTernaryButtons());
+            }
+
+            private Drawable createSampleSetContent()
+            {
+                if (beatmap.BeatmapSkin == null)
+                    return Empty();
+
+                var sampleSets = beatmap.BeatmapSkin.GetAvailableSampleSets().ToList();
+
+                if (sampleSets.Count == 0)
+                    return Empty();
+
+                sampleSets.Insert(0, new EditorBeatmapSkin.SampleSet(0, "User skin"));
+
+                if (sampleSets.Count < 20)
+                {
+                    sampleSetsFlow = new FillFlowContainer<SampleSetTernaryButton>
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Spacing = new Vector2(5),
+                        ChildrenEnumerable = sampleSets.Select(set => new SampleSetTernaryButton(set) { Description = set.Name }),
+                    };
+
+                    foreach (var ternary in sampleSetsFlow)
+                    {
+                        ternary.Current.BindValueChanged(val =>
+                        {
+                            if (val.NewValue == TernaryState.True)
+                                setSampleSet(ternary.SampleSet);
+
+                            updateSampleSetState();
+                            playDemoSample();
+                        });
+                    }
+
+                    return sampleSetsFlow;
+                }
+
+                sampleSetDropdown = new LabelledDropdown<EditorBeatmapSkin.SampleSet>(padded: false)
+                {
+                    Label = "Sample Set",
+                    Items = sampleSets,
+                };
+                sampleSetDropdown.Current.BindValueChanged(val =>
+                {
+                    setSampleSet(val.NewValue);
+                    updateSampleSetState();
+                    playDemoSample();
+                });
+
+                return sampleSetDropdown;
             }
 
             private string? getCommonBank() => allRelevantSamples.Select(h => GetBankValue(h.samples)).Distinct().Count() == 1
@@ -327,15 +397,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private void updatePrimaryBankState()
             {
                 string? commonBank = getCommonBank();
-                bank.Current.Value = commonBank;
-                bank.PlaceholderText = string.IsNullOrEmpty(commonBank) ? "(multiple)" : string.Empty;
+                bank.Current.Value = !string.IsNullOrEmpty(commonBank) ? commonBank : "(multiple)";
             }
 
             private void updateAdditionBankState()
             {
                 string? commonAdditionBank = getCommonAdditionBank();
-                additionBank.PlaceholderText = string.IsNullOrEmpty(commonAdditionBank) ? "(multiple)" : string.Empty;
-                additionBank.Current.Value = commonAdditionBank;
+                additionBank.Current.Value = !string.IsNullOrEmpty(commonAdditionBank) ? commonAdditionBank : "(multiple)";
 
                 bool anyAdditions = allRelevantSamples.Any(o => o.samples.Any(s => s.Name != HitSampleInfo.HIT_NORMAL));
                 if (anyAdditions)
@@ -343,6 +411,40 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 else
                     additionBank.Hide();
             }
+
+            private void updateSampleSetState()
+            {
+                HashSet<int> activeSets = new HashSet<int>();
+
+                foreach (var sample in allRelevantSamples.SelectMany(h => h.samples))
+                {
+                    if (sample.Suffix == null)
+                        activeSets.Add(sample.UseBeatmapSamples ? 1 : 0);
+                    else if (int.TryParse(sample.Suffix, out int suffix))
+                        activeSets.Add(suffix);
+                }
+
+                if (sampleSetsFlow != null)
+                {
+                    var onState = activeSets.Count > 1 ? TernaryState.Indeterminate : TernaryState.True;
+
+                    foreach (var ternary in sampleSetsFlow)
+                        ternary.Current.Value = activeSets.Contains(ternary.SampleSet.SampleSetIndex) ? onState : TernaryState.False;
+                }
+
+                if (sampleSetDropdown != null)
+                {
+                    sampleSetDropdown.Current.Value = activeSets.Count == 1
+                        ? sampleSetDropdown.Items.Single(i => i.SampleSetIndex == activeSets.Single())
+                        : new EditorBeatmapSkin.SampleSet(-1, "(multiple)");
+                }
+            }
+
+            private void playDemoSample() => Scheduler.AddOnce(() =>
+            {
+                demoSample.Samples = allRelevantSamples.First().samples.Cast<ISampleInfo>().ToArray();
+                demoSample.Play();
+            });
 
             /// <summary>
             /// Applies the given update action on all samples of <see cref="allRelevantSamples"/>
@@ -397,6 +499,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 });
             }
 
+            private void setSampleSet(EditorBeatmapSkin.SampleSet newSampleSet)
+            {
+                updateAllRelevantSamples((_, relevantSamples) =>
+                {
+                    for (int i = 0; i < relevantSamples.Count; i++)
+                    {
+                        relevantSamples[i] = relevantSamples[i].With(
+                            newSuffix: newSampleSet.SampleSetIndex >= 2 ? newSampleSet.SampleSetIndex.ToString() : null,
+                            newUseBeatmapSamples: newSampleSet.SampleSetIndex >= 1);
+                    }
+                });
+            }
+
             private void setVolume(int newVolume)
             {
                 updateAllRelevantSamples((_, relevantSamples) =>
@@ -435,6 +550,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 addHitSample(sampleName);
                                 break;
                         }
+
+                        playDemoSample();
                     };
 
                     selectionSampleStates[sampleName] = bindable;
@@ -455,7 +572,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 foreach ((string sampleName, var bindable) in selectionSampleStates)
                 {
-                    yield return new DrawableTernaryButton
+                    yield return new DrawableTernaryButton(null)
                     {
                         Current = bindable,
                         Description = string.Empty,

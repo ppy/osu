@@ -520,6 +520,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
         private void onBeatmapAvailabilityChanged(MultiplayerRoomUser user, BeatmapAvailability availability) => Scheduler.Add(() =>
         {
+            if (!user.Equals(RoomUser))
+                return;
+
             if (availability.State == DownloadState.Downloading)
                 downloadProgressBar.FadeIn(200, Easing.OutPow10);
             else
