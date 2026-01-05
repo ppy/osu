@@ -8,6 +8,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
@@ -88,7 +89,7 @@ namespace osu.Game.Online
                     notificationOverlay?.Post(new SimpleErrorNotification
                     {
                         Icon = FontAwesome.Solid.ExclamationCircle,
-                        Text = "Connection to API was lost. Can't continue with online play."
+                        Text = NotificationsStrings.APIDisconnect,
                     });
                 }
             });
@@ -109,7 +110,7 @@ namespace osu.Game.Online
                     notificationOverlay?.Post(new SimpleErrorNotification
                     {
                         Icon = FontAwesome.Solid.ExclamationCircle,
-                        Text = "Connection to the multiplayer server was lost. Exiting multiplayer."
+                        Text = NotificationsStrings.MultiplayerDisconnect,
                     });
                 }
             }));
@@ -128,7 +129,7 @@ namespace osu.Game.Online
             notificationOverlay?.Post(new SimpleErrorNotification
             {
                 Icon = FontAwesome.Solid.ExclamationCircle,
-                Text = "You have been logged out on this device due to a login to your account on another device."
+                Text = NotificationsStrings.AnotherDeviceDisconnect,
             });
         }
 
@@ -142,7 +143,7 @@ namespace osu.Game.Online
             notificationOverlay?.Post(new SimpleErrorNotification
             {
                 Icon = FontAwesome.Solid.ExclamationCircle,
-                Text = "You have been logged out due to a change to your account. Please log in again."
+                Text = NotificationsStrings.AccountChangeDisconnect,
             });
         }
 
