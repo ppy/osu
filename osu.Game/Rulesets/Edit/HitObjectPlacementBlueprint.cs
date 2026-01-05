@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Edit
 
         private HitObject? getPreviousHitObject() => beatmap.HitObjects.TakeWhile(h => h.StartTime <= startTimeBindable.Value).LastOrDefault();
 
-        protected override bool IsValidForPlacement => HitObject.StartTime >= beatmap.ControlPointInfo.TimingPoints[0].Time;
+        protected override bool IsValidForPlacement => HitObject.StartTime >= beatmap.ControlPointInfo.TimingPoints.FirstOrDefault()?.Time;
 
         [Resolved]
         private IPlacementHandler placementHandler { get; set; } = null!;
