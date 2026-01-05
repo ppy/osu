@@ -383,6 +383,22 @@ namespace osu.Game.Overlays.Settings
                             return true;
                         }
 
+                        protected override bool OnHover(HoverEvent e)
+                        {
+                            if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
+                                return base.OnHover(e);
+
+                            this.ScaleTo(1.25f, 250, Easing.OutQuint);
+
+                            return base.OnHover(e);
+                        }
+
+                        protected override void OnHoverLost(HoverLostEvent e)
+                        {
+                            if (e.CurrentState.Mouse.LastSource is not ISourcedFromTouch)
+                                this.ScaleTo(1.0f, 250, Easing.OutQuint);
+                        }
+
                         public void ShowFavouriteIndicator(bool show, int delay = 250, int duration = 250)
                         {
                             Colour = skinItem.IsFavourite ? ActiveColour : inactiveColour;
