@@ -41,6 +41,7 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        private Drawable modsWedge = null!;
         private ModDisplay modDisplay = null!;
         private Container modContainer = null!;
         private ModCountText overflowModCountDisplay = null!;
@@ -57,62 +58,60 @@ namespace osu.Game.Screens.OnlinePlay
             Icon = FontAwesome.Solid.ExchangeAlt;
             AccentColour = colours.Lime1;
 
-            AddRange(new[]
+            Add(modsWedge = new Container
             {
-                new Container
+                Y = -5f,
+                Depth = float.MaxValue,
+                Origin = Anchor.BottomLeft,
+                Shear = OsuGame.SHEAR,
+                CornerRadius = CORNER_RADIUS,
+                Size = new Vector2(BUTTON_WIDTH, bar_height),
+                Masking = true,
+                EdgeEffect = new EdgeEffectParameters
                 {
-                    Y = -5f,
-                    Depth = float.MaxValue,
-                    Origin = Anchor.BottomLeft,
-                    Shear = OsuGame.SHEAR,
-                    CornerRadius = CORNER_RADIUS,
-                    Size = new Vector2(BUTTON_WIDTH, bar_height),
-                    Masking = true,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Radius = 4,
-                        // Figma says 50% opacity, but it does not match up visually if taken at face value, and looks bad.
-                        Colour = Colour4.Black.Opacity(0.25f),
-                        Offset = new Vector2(0, 2),
-                    },
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            Colour = colourProvider.Background4,
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        modContainer = new Container
-                        {
-                            CornerRadius = CORNER_RADIUS,
-                            RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    Colour = colourProvider.Background3,
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                modDisplay = new ModDisplay(showExtendedInformation: true)
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Shear = -OsuGame.SHEAR,
-                                    Scale = new Vector2(0.5f),
-                                    Current = { BindTarget = FreeMods },
-                                    ExpansionMode = ExpansionMode.AlwaysContracted,
-                                },
-                                overflowModCountDisplay = new ModCountText
-                                {
-                                    Mods = { BindTarget = FreeMods },
-                                    Freestyle = { BindTarget = Freestyle }
-                                },
-                            }
-                        },
-                    }
+                    Type = EdgeEffectType.Shadow,
+                    Radius = 4,
+                    // Figma says 50% opacity, but it does not match up visually if taken at face value, and looks bad.
+                    Colour = Colour4.Black.Opacity(0.25f),
+                    Offset = new Vector2(0, 2),
                 },
+                Alpha = 0,
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        Colour = colourProvider.Background4,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    modContainer = new Container
+                    {
+                        CornerRadius = CORNER_RADIUS,
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                Colour = colourProvider.Background3,
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                            modDisplay = new ModDisplay(showExtendedInformation: true)
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Shear = -OsuGame.SHEAR,
+                                Scale = new Vector2(0.5f),
+                                Current = { BindTarget = FreeMods },
+                                ExpansionMode = ExpansionMode.AlwaysContracted,
+                            },
+                            overflowModCountDisplay = new ModCountText
+                            {
+                                Mods = { BindTarget = FreeMods },
+                                Freestyle = { BindTarget = Freestyle }
+                            },
+                        }
+                    },
+                }
             });
         }
 
@@ -121,14 +120,18 @@ namespace osu.Game.Screens.OnlinePlay
             base.LoadComplete();
 
             Freestyle.BindValueChanged(f => Enabled.Value = !f.NewValue, true);
+            FreeMods.BindValueChanged(m =>
+            {
+                if (m.NewValue.Count == 0)
+                    modsWedge.FadeOut(200);
+                else
+                    modsWedge.FadeIn(200);
+            }, true);
         }
 
         protected override void Update()
         {
             base.Update();
-
-            if (FreeMods.Value.Count == 0)
-                return;
 
             if (modDisplay.DrawWidth * modDisplay.Scale.X > modContainer.DrawWidth)
                 overflowModCountDisplay.Show();
