@@ -245,7 +245,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             double timeDifference = ApplyModsToTimeDelta(lastFrame.Time, h.StartTime);
             OsuReplayFrame? lastLastFrame = Frames.Count >= 2 ? (OsuReplayFrame)Frames[^2] : null;
 
-            if (timeDifference > 0)
+            if (timeDifference >= 0)
             {
                 // If the last frame is a key-up frame and there has been no wait period, adjust the last frame's position such that it begins eased movement instantaneously.
                 if (lastLastFrame != null && lastFrame is OsuKeyUpReplayFrame && !hasWaited)
