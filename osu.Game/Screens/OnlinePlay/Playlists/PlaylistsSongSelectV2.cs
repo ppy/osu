@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
@@ -31,11 +32,16 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         protected readonly Bindable<bool> Freestyle = new Bindable<bool>(true);
         private readonly Bindable<IReadOnlyList<Mod>> freeMods = new Bindable<IReadOnlyList<Mod>>([]);
 
+        [Resolved]
+        private IOverlayManager? overlayManager { get; set; }
+
         private readonly AddToPlaylistFooterButton addToPlaylistFooterButton;
 
         private readonly Room room;
         private ModSelectOverlay modSelect = null!;
         private FreeModSelectOverlay freeModSelect = null!;
+
+        private IDisposable? modSelectOverlayRegistration;
 
         public PlaylistsSongSelectV2(Room room)
         {
@@ -61,29 +67,29 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddRangeInternal(new Drawable[]
+            AddInternal(new PlaylistTray(room)
             {
-                freeModSelect = new FreeModSelectOverlay
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
+                Margin = new MarginPadding
                 {
-                    SelectedMods = { BindTarget = freeMods },
-                    IsValidMod = isValidAllowedMod,
-                },
-                new PlaylistTray(room)
-                {
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
-                    Margin = new MarginPadding
-                    {
-                        Bottom = ScreenFooterButton.HEIGHT,
-                        Right = OsuGame.SCREEN_EDGE_MARGIN
-                    }
+                    Bottom = ScreenFooterButton.HEIGHT,
+                    Right = OsuGame.SCREEN_EDGE_MARGIN
                 }
+            });
+
+            LoadComponent(freeModSelect = new FreeModSelectOverlay
+            {
+                SelectedMods = { BindTarget = freeMods },
+                IsValidMod = isValidAllowedMod,
             });
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            modSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(freeModSelect);
 
             Mods.BindValueChanged(onGlobalModsChanged);
             Ruleset.BindValueChanged(onRulesetChanged);
@@ -250,5 +256,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                    && Mods.Value.All(m => m.Acronym != mod.Acronym)
                                                    // Mod must be compatible with all the required mods.
                                                    && ModUtils.CheckCompatibleSet(Mods.Value.Append(mod).ToArray());
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            modSelectOverlayRegistration?.Dispose();
+        }
     }
 }
