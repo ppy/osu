@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Osu.Replays
 {
     public class OsuAutoGenerator : OsuAutoGeneratorBase
     {
+        public const double MIN_FRAME_SEPARATION_FOR_ALTERNATING = 266;
+
         public new OsuBeatmap Beatmap => (OsuBeatmap)base.Beatmap;
 
         #region Parameters
@@ -266,7 +268,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
 
             // Start alternating once the time separation is too small (faster than ~225BPM).
-            if (timeDifference >= 0 && timeDifference < 266)
+            if (timeDifference >= 0 && timeDifference < MIN_FRAME_SEPARATION_FOR_ALTERNATING)
                 buttonIndex++;
             else
                 buttonIndex = 0;
