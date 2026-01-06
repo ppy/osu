@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Edit.Timing
     {
         private LabelledSwitchButton kiai = null!;
 
-        private SliderWithTextBoxInput<double> scrollSpeedSlider = null!;
+        private FormSliderBar<double> scrollSpeedSlider { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -21,11 +21,14 @@ namespace osu.Game.Screens.Edit.Timing
             Flow.AddRange(new Drawable[]
             {
                 kiai = new LabelledSwitchButton { Label = "Kiai Time" },
-                scrollSpeedSlider = new SliderWithTextBoxInput<double>("Scroll Speed")
+                scrollSpeedSlider = new FormSliderBar<double>
                 {
+                    Caption = "Scroll Speed",
                     Current = new EffectControlPoint().ScrollSpeedBindable,
-                    KeyboardStep = 0.1f
-                }
+                    KeyboardStep = 0.1f,
+                    TransferValueOnCommit = true,
+                    TabbableContentContainer = this,
+                },
             });
         }
 
