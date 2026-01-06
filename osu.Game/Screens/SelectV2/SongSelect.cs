@@ -152,6 +152,7 @@ namespace osu.Game.Screens.SelectV2
         private IDialogOverlay? dialogOverlay { get; set; }
 
         private InputManager inputManager = null!;
+        private MenuCursorContainer? menuCursor;
 
         private readonly RealmPopulatingOnlineLookupSource onlineLookupSource = new RealmPopulatingOnlineLookupSource();
 
@@ -359,7 +360,7 @@ namespace osu.Game.Screens.SelectV2
             base.LoadComplete();
 
             inputManager = GetContainingInputManager()!;
-
+            menuCursor = findMenuCursor();
             filterControl.CriteriaChanged += criteriaChanged;
 
             modSelectOverlay.State.BindValueChanged(v =>
@@ -911,6 +912,9 @@ namespace osu.Game.Screens.SelectV2
         #region Input
 
         private ScheduledDelegate? revealingBackground;
+        private ScheduledDelegate? cursorFadeOutAfterMovement;
+        private Vector2 lastMousePosition;
+        private bool isBackgroundRevealed;
 
         private GridContainer mainGridContainer = null!;
 
@@ -937,6 +941,9 @@ namespace osu.Game.Screens.SelectV2
                         return;
                     }
 
+                    isBackgroundRevealed = true;
+                    lastMousePosition = e.MousePosition;
+
                     mainContent.ResizeWidthTo(1.2f, 600, Easing.OutQuint);
                     mainContent.ScaleTo(1.2f, 600, Easing.OutQuint);
                     mainContent.FadeOut(200, Easing.OutQuint);
@@ -948,6 +955,9 @@ namespace osu.Game.Screens.SelectV2
                     updateBackgroundDim();
 
                     Footer?.Hide();
+
+                    if (menuCursor != null)
+                        menuCursor.FadeCursorTo(0f, 200, Easing.OutQuint);
                 }, 200);
             }
 
@@ -965,6 +975,8 @@ namespace osu.Game.Screens.SelectV2
             if (revealingBackground == null)
                 return;
 
+            isBackgroundRevealed = false;
+
             if (revealingBackground.State == ScheduledDelegate.RunState.Complete)
             {
                 mainContent.ResizeWidthTo(1f, 500, Easing.OutQuint);
@@ -981,7 +993,51 @@ namespace osu.Game.Screens.SelectV2
             revealingBackground.Cancel();
             revealingBackground = null;
 
+            if (menuCursor != null)
+                menuCursor.FadeCursorTo(1f);
+
+            cursorFadeOutAfterMovement?.Cancel();
+            cursorFadeOutAfterMovement = null;
+
             updateBackgroundDim();
+        }
+
+        private void onMouseMovedDuringReveal()
+        {
+            if (!isBackgroundRevealed || menuCursor == null)
+                return;
+
+            menuCursor.FadeCursorTo(1f);
+            cursorFadeOutAfterMovement?.Cancel();
+
+            cursorFadeOutAfterMovement = Scheduler.AddDelayed(() =>
+            {
+                if (isBackgroundRevealed && menuCursor != null)
+                    menuCursor.FadeCursorTo(0f);
+            }, 1000);
+        }
+
+        private MenuCursorContainer? findMenuCursor()
+        {
+            Drawable? current = this;
+            while (current != null)
+            {
+                if (current is GlobalCursorDisplay globalCursor)
+                    return globalCursor.MenuCursor;
+                current = current.Parent;
+            }
+            return null;
+        }
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            if (isBackgroundRevealed && Vector2.Distance(e.MousePosition, lastMousePosition) > 0.1f)
+            {
+                lastMousePosition = e.MousePosition;
+                onMouseMovedDuringReveal();
+            }
+
+            return base.OnMouseMove(e);
         }
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)

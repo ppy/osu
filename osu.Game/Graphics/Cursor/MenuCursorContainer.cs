@@ -53,6 +53,12 @@ namespace osu.Game.Graphics.Cursor
 
         private bool visible;
 
+        public void FadeCursorTo(float alpha, double duration = 200, Easing easing = Easing.OutQuint)
+        {
+            if (visible && State.Value == Visibility.Visible && activeCursor != null)
+                activeCursor.FadeTo(alpha, duration, easing);
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, ScreenshotManager? screenshotManager, AudioManager audio)
         {
