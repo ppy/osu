@@ -57,8 +57,8 @@ namespace osu.Game.Screens.Play.HUD
             AlwaysPresent = true;
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(Player player, OsuConfigManager config)
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
             Children = new Drawable[]
             {
@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
                 },
-                button = new HoldButton(isDangerousAction || player?.Configuration.AllowRestart == false)
+                button = new HoldButton(isDangerousAction)
                 {
                     HoverGained = () => text.FadeIn(500, Easing.OutQuint),
                     HoverLost = () => text.FadeOut(500, Easing.OutQuint),
