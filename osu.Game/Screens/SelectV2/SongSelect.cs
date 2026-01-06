@@ -64,7 +64,7 @@ namespace osu.Game.Screens.SelectV2
     /// This will be gradually built upon and ultimately replace <see cref="Select.SongSelect"/> once everything is in place.
     /// </summary>
     [Cached(typeof(ISongSelect))]
-    public abstract partial class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, ISongSelect, IHandlePresentBeatmap
+    public abstract partial class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, ISongSelect, IHandlePresentBeatmap, IProvideCursor
     {
         /// <summary>
         /// A debounce that governs how long after a panel is selected before the rest of song select (and the game at large)
@@ -911,6 +911,23 @@ namespace osu.Game.Screens.SelectV2
         #region Input
 
         private ScheduledDelegate? revealingBackground;
+        private bool isRevealingBackground;
+        private double? lastCursorMoveTimeDuringReveal;
+
+        private bool cursorRecentlyMoved => lastCursorMoveTimeDuringReveal.HasValue &&
+                                            Clock.CurrentTime - lastCursorMoveTimeDuringReveal.Value < 1000;
+
+        public CursorContainer? Cursor => null;
+        public bool ProvidingUserCursor => isRevealingBackground && !cursorRecentlyMoved;
+
+        protected override bool OnHover(HoverEvent e) => true;
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            if (isRevealingBackground)
+                lastCursorMoveTimeDuringReveal = Clock.CurrentTime;
+            return base.OnMouseMove(e);
+        }
 
         private GridContainer mainGridContainer = null!;
 
@@ -948,6 +965,9 @@ namespace osu.Game.Screens.SelectV2
                     updateBackgroundDim();
 
                     Footer?.Hide();
+
+                    isRevealingBackground = true;
+                    lastCursorMoveTimeDuringReveal = null;
                 }, 200);
             }
 
@@ -980,6 +1000,9 @@ namespace osu.Game.Screens.SelectV2
 
             revealingBackground.Cancel();
             revealingBackground = null;
+
+            isRevealingBackground = false;
+            lastCursorMoveTimeDuringReveal = null;
 
             updateBackgroundDim();
         }
