@@ -145,10 +145,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimValue = computeAimValue(score, osuAttributes);
             double speedValue = computeSpeedValue(score, osuAttributes);
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
-            double flashlightValue = computeFlashlightValue(score, osuAttributes);
-            double readingValue = computeReadingValue(osuAttributes);
 
-            double totalValue = DifficultyCalculationUtils.Norm(PERFORMANCE_NORM_EXPONENT, aimValue, speedValue, accuracyValue, readingValue, flashlightValue) * multiplier;
+            double readingValue = computeReadingValue(osuAttributes);
+            double flashlightValue = computeFlashlightValue(score, osuAttributes);
+            double cognitionValue = DifficultyCalculationUtils.Norm(2, readingValue, flashlightValue);
+
+            double totalValue = DifficultyCalculationUtils.Norm(PERFORMANCE_NORM_EXPONENT, aimValue, speedValue, accuracyValue, cognitionValue) * multiplier;
 
             return new OsuPerformanceAttributes
             {
