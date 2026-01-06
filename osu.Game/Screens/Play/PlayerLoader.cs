@@ -237,8 +237,7 @@ namespace osu.Game.Screens.Play
                     Width = SettingsToolboxGroup.CONTAINER_WIDTH + padding * 2,
                     Padding = new MarginPadding
                     {
-                        Top = padding,
-                        Bottom = ScreenFooter.HEIGHT + padding
+                        Bottom = ScreenFooter.HEIGHT
                     },
                     RowDimensions =
                     [
@@ -252,13 +251,16 @@ namespace osu.Game.Screens.Play
                             settingsScroll = new OsuScrollContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Masking = holdForMenuExitButton,
                                 Child = PlayerSettings = new FillFlowContainer<PlayerSettingsGroup>
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Vertical,
                                     Spacing = new Vector2(0, 20),
-                                    Padding = new MarginPadding { Horizontal = padding },
+                                    Padding = new MarginPadding
+                                    {
+                                        Horizontal = padding,
+                                        Vertical = padding,
+                                    },
                                     Children = new PlayerSettingsGroup[]
                                     {
                                         VisualSettings = new VisualSettings(),
@@ -282,6 +284,7 @@ namespace osu.Game.Screens.Play
                                     {
                                         Top = 20,
                                         Horizontal = padding,
+                                        Bottom = padding,
                                     },
                                     Action = () =>
                                     {
