@@ -220,16 +220,18 @@ namespace osu.Game.Graphics.Cursor
         {
             activeCursor.FadeTo(1, 250, Easing.OutQuint);
             activeCursor.ScaleTo(1, 400, Easing.OutQuint);
-            activeCursor.RotateTo(0, 400, Easing.OutQuint);
-            dragRotationState = DragRotationState.NotDragging;
+
+            if (dragRotationState == DragRotationState.NotDragging)
+                activeCursor.RotateTo(0, 400, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
             activeCursor.FadeTo(0, 250, Easing.OutQuint);
             activeCursor.ScaleTo(0.6f, 250, Easing.In);
-            activeCursor.RotateTo(0, 400, Easing.OutQuint);
-            dragRotationState = DragRotationState.NotDragging;
+
+            if (dragRotationState == DragRotationState.NotDragging)
+                activeCursor.RotateTo(0, 400, Easing.OutQuint);
         }
 
         private void playTapSample(double baseFrequency = 1f)
