@@ -29,6 +29,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             private FillFlowContainer flow = null!;
             private OsuSpriteText text = null!;
 
+            private const float item_width = 250;
+
             public PlaylistTray(Room room)
             {
                 this.room = room;
@@ -107,6 +109,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                 {
                                                     RelativeSizeAxes = Axes.Y,
                                                     AutoSizeAxes = Axes.X,
+                                                    Padding = new MarginPadding { Left = item_width },
                                                     Spacing = new Vector2(5),
                                                     Direction = FillDirection.Horizontal
                                                 }
@@ -150,7 +153,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     var newItem = new DrawableRoomPlaylistItem(room.Playlist[^1], loadImmediately: true)
                     {
                         RelativeSizeAxes = Axes.None,
-                        Width = 250,
+                        Width = item_width,
                         AllowReordering = false,
                     };
 
@@ -159,7 +162,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                     flow.Add(newItem);
 
-                    scroll.ScrollToStart(animated: false);
+                    if (scroll.IsLoaded)
+                        scroll.ScrollToStart(animated: false);
                     ScheduleAfterChildren(() => scroll.ScrollToEnd());
 
                     Scheduler.AddDelayed(() => text.Text = $"{room.Playlist.Count} item(s)", 100);
