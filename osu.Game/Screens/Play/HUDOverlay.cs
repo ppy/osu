@@ -175,7 +175,10 @@ namespace osu.Game.Screens.Play
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        PlayerSettingsOverlay = new PlayerSettingsOverlay(),
+                        PlayerSettingsOverlay = new PlayerSettingsOverlay
+                        {
+                            Alpha = 0,
+                        }
                     }
                 },
                 TopLeftElements = new FillFlowContainer
@@ -346,6 +349,11 @@ namespace osu.Game.Screens.Play
 
         private void updateVisibility()
         {
+            if (configSettingsOverlay.Value && replayLoaded.Value)
+                PlayerSettingsOverlay.Show();
+            else
+                PlayerSettingsOverlay.Hide();
+
             if (ShowHud.Disabled)
                 return;
 
@@ -354,11 +362,6 @@ namespace osu.Game.Screens.Play
                 ShowHud.Value = true;
                 return;
             }
-
-            if (configSettingsOverlay.Value && replayLoaded.Value)
-                PlayerSettingsOverlay.Show();
-            else
-                PlayerSettingsOverlay.Hide();
 
             switch (configVisibilityMode.Value)
             {
