@@ -73,6 +73,7 @@ namespace osu.Game.Screens.Play
         private readonly DrawableRuleset drawableRuleset;
 
         private readonly IReadOnlyList<Mod> mods;
+        private readonly PlayerConfiguration configuration;
 
         /// <summary>
         /// Whether the elements that can optionally be hidden should be visible.
@@ -113,12 +114,13 @@ namespace osu.Game.Screens.Play
         /// </summary>
         internal readonly Drawable PlayfieldSkinLayer;
 
-        public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
+        public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, PlayerConfiguration configuration)
         {
             Container rightSettings;
 
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
+            this.configuration = configuration;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -391,7 +393,7 @@ namespace osu.Game.Screens.Play
             ShowHealth = { BindTarget = ShowHealthBar }
         };
 
-        protected HoldForMenuButton CreateHoldForMenuButton() => new HoldForMenuButton
+        protected HoldForMenuButton CreateHoldForMenuButton() => new HoldForMenuButton(!configuration.AllowRestart)
         {
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
