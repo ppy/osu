@@ -15,7 +15,7 @@ using osu.Game.Users;
 namespace osu.Game.Online.API.Requests.Responses
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public class APIUser : IEquatable<APIUser>, IUser
+    public class APIUser : IEquatable<APIUser>, IUser, IHasCover
     {
         /// <summary>
         /// A user ID which can be used to represent any system user which is not attached to a user profile.
@@ -68,6 +68,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public string AvatarUrl;
 
         [JsonProperty(@"cover_url")]
+        [CanBeNull]
         public string CoverUrl
         {
             get => Cover?.Url;
@@ -75,14 +76,17 @@ namespace osu.Game.Online.API.Requests.Responses
         }
 
         [JsonProperty(@"cover")]
+        [CanBeNull]
         public UserCover Cover;
 
         public class UserCover
         {
             [JsonProperty(@"custom_url")]
+            [CanBeNull]
             public string CustomUrl;
 
             [JsonProperty(@"url")]
+            [CanBeNull]
             public string Url;
 
             [JsonProperty(@"id")]

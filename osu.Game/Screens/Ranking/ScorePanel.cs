@@ -172,10 +172,10 @@ namespace osu.Game.Screens.Ranking
                                 Children = new[]
                                 {
                                     middleLayerBackground = new Box { RelativeSizeAxes = Axes.Both },
-                                    new UserCoverBackground
+                                    new CoverBackground
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        User = Score.User,
+                                        Item = Score.User,
                                         Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0))
                                     }
                                 }

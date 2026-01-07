@@ -164,13 +164,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                         RelativeSizeAxes = Axes.Both,
                         Colour = colourProvider?.Background5 ?? colours.Gray1
                     },
-                    background = new UserCoverBackground
+                    background = new CoverBackground
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Colour = colours.Gray7,
-                        User = User
+                        Item = User
                     },
                     new Container
                     {
