@@ -34,6 +34,8 @@ namespace osu.Game.Overlays.Settings
         {
             private SkinDropdownMenu? skinMenu;
 
+            protected override LocalisableString GenerateItemText(Live<SkinInfo> item) => item.ToString() ?? string.Empty;
+
             protected override void LoadComplete()
             {
                 base.LoadComplete();
@@ -73,7 +75,7 @@ namespace osu.Game.Overlays.Settings
                 [Resolved]
                 private RealmAccess realm { get; set; } = null!;
 
-                private readonly Dictionary<Guid, bool> pendingFavouriteChanges = new();
+                private readonly Dictionary<Guid, bool> pendingFavouriteChanges = new Dictionary<Guid, bool>();
 
                 public void TrackFavouriteChange(Guid skinID, bool isFavourite)
                 {
@@ -140,13 +142,13 @@ namespace osu.Game.Overlays.Settings
 
                     private SkinDropdownMenu? menu;
 
-                    private Box starBackground = null!;
+                    private readonly Box starBackground;
 
-                    private SpriteIcon starIcon = null!;
+                    private readonly SpriteIcon starIcon;
 
-                    private int favouriteDragEndThreshold = 50;
+                    private const int favourite_drag_end_threshold = 50;
 
-                    private ClickableContainer starContainer = null!;
+                    private readonly ClickableContainer starContainer;
 
                     public override bool ChangeFocusOnClick => false;
 
@@ -164,19 +166,22 @@ namespace osu.Game.Overlays.Settings
                                 starButtonFlash();
                                 TriggerFavouriteChange();
                             },
-                            Children = [
-                                starBackground = new Box(){
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Colour4.FromHex(@"#edae00"),
-                            Depth = 1
-                        },
-                        starIcon = new SpriteIcon(){
-                            Size = new Vector2(10),
-                            BypassAutoSizeAxes = Axes.Y,
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre,
-                            Colour = Colour4.White.Opacity(0.7f),
-                        }
+                            Children =
+                            [
+                                starBackground = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Colour4.FromHex(@"#edae00"),
+                                    Depth = 1
+                                },
+                                starIcon = new SpriteIcon
+                                {
+                                    Size = new Vector2(10),
+                                    BypassAutoSizeAxes = Axes.Y,
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.Centre,
+                                    Colour = Colour4.White.Opacity(0.7f),
+                                }
                             ]
                         });
                         Foreground.Padding = new MarginPadding(2);
@@ -190,7 +195,7 @@ namespace osu.Game.Overlays.Settings
                         {
                             skinItem.Value.PerformRead(skin =>
                             {
-                                if (Foreground.Children.FirstOrDefault() is Content content)
+                                if (Foreground.Children.FirstOrDefault() is Content)
                                     SkinData = skin;
                             });
                         }
@@ -223,7 +228,7 @@ namespace osu.Game.Overlays.Settings
                         return base.OnDragStart(e);
                     }
 
-                    private bool stateChanged = false;
+                    private bool stateChanged;
 
                     protected override void OnDrag(DragEvent e)
                     {
@@ -231,7 +236,7 @@ namespace osu.Game.Overlays.Settings
 
                         if (Math.Abs(dragDelta) < 0.01) return;
 
-                        if (dragDelta >= favouriteDragEndThreshold && !stateChanged)
+                        if (dragDelta >= favourite_drag_end_threshold && !stateChanged)
                         {
                             stateChanged = true;
                             TriggerFavouriteChange();
@@ -247,9 +252,9 @@ namespace osu.Game.Overlays.Settings
 
                     protected override void OnDragEnd(DragEndEvent e)
                     {
-                        int offset = 0;
-                        int duration = 250;
-                        Easing easing = Easing.OutQuint;
+                        const int offset = 0;
+                        const int duration = 250;
+                        const Easing easing = Easing.OutQuint;
 
                         Background.MoveToX(offset, duration, easing);
                         Foreground.MoveToX(offset, duration, easing);
@@ -280,7 +285,6 @@ namespace osu.Game.Overlays.Settings
                         else if (!IsFavourite)
                             favouriteIndicatorAnimateOut();
 
-
                         base.OnHoverLost(e);
                     }
 
@@ -309,6 +313,7 @@ namespace osu.Game.Overlays.Settings
                         {
                             menu?.TrackFavouriteChange(SkinData.ID, IsFavourite);
                         }
+
                         return true;
                     }
 
@@ -339,11 +344,11 @@ namespace osu.Game.Overlays.Settings
 
                     public partial class FavouriteIndicator : SpriteIcon
                     {
-                        private DrawableSkinDropdownMenuItem skinItem;
+                        private readonly DrawableSkinDropdownMenuItem skinItem;
 
-                        public Colour4 ActiveColour = Colour4.Gold;
+                        public readonly Colour4 ActiveColour = Colour4.Gold;
 
-                        private Colour4 inactiveColour = Colour4.Black.Opacity(0.4f);
+                        private readonly Colour4 inactiveColour = Colour4.Black.Opacity(0.4f);
 
                         public FavouriteIndicator(DrawableSkinDropdownMenuItem skinItemInstance)
                         {
@@ -356,9 +361,11 @@ namespace osu.Game.Overlays.Settings
                         private void load(RealmAccess realm)
                         {
                             if (skinItem.SkinData == null) return;
+
                             Alpha = skinItem.IsFavourite ? 1 : 0;
 
                             var skin = realm.Run(r => r.All<SkinInfo>().FirstOrDefault(s => s.ID == skinItem.SkinData.ID));
+
                             if (skin != null)
                             {
                                 skinItem.IsFavourite = skin.IsFavourite;
@@ -402,6 +409,7 @@ namespace osu.Game.Overlays.Settings
                         public void ShowFavouriteIndicator(bool show, int delay = 250, int duration = 250)
                         {
                             Colour = skinItem.IsFavourite ? ActiveColour : inactiveColour;
+
                             if (show)
                             {
                                 this.ScaleTo(1.25f, duration, Easing.OutQuint).Then().ScaleTo(1.0f, duration, Easing.OutQuint);
@@ -432,7 +440,6 @@ namespace osu.Game.Overlays.Settings
 
                     protected new partial class Content : CompositeDrawable, IHasText
                     {
-
                         public LocalisableString Text
                         {
                             get => Label.Text;
@@ -441,14 +448,10 @@ namespace osu.Game.Overlays.Settings
 
                         public readonly OsuSpriteText Label;
 
-                        private readonly DrawableSkinDropdownMenuItem skinItem;
-
                         public readonly FavouriteIndicator FavouriteIndicator;
 
                         public Content(DrawableSkinDropdownMenuItem skinItem)
                         {
-                            this.skinItem = skinItem;
-
                             RelativeSizeAxes = Axes.X;
                             AutoSizeAxes = Axes.Y;
 

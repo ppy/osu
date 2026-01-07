@@ -81,7 +81,8 @@ namespace osu.Game.Tests.Visual.Settings
                         Padding = new MarginPadding { Left = 300, Right = 300 },
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Children = [
+                        Children =
+                        [
                             skinDropdown = new SkinDropdown
                             {
                                 AlwaysShowSearchBar = true,
@@ -93,41 +94,44 @@ namespace osu.Game.Tests.Visual.Settings
                 );
             });
 
-            AddStep("load skins", () => loadSkins());
+            AddStep("load skins", loadSkins);
         }
 
         [Test]
         public void TestToggleFavourite()
         {
             IHasText label = null;
-            bool? IsFavourite = null;
+            bool? isFavourite = null;
 
             AddStep("open dropdown", () =>
             {
                 var menu = skinDropdown.ChildrenOfType<Menu>().FirstOrDefault();
 
-                if (menu?.State == MenuState.Closed)
-                {
-                    InputManager.MoveMouseTo(skinDropdown);
-                    InputManager.Click(MouseButton.Left);
-                }
+                if (menu?.State != MenuState.Closed) return;
+
+                InputManager.MoveMouseTo(skinDropdown);
+                InputManager.Click(MouseButton.Left);
             });
-            AddAssert("dropdown opened", () => skinDropdown.ChildrenOfType<Menu>().FirstOrDefault().State == MenuState.Open);
+            AddAssert("dropdown opened", () =>
+            {
+                var menu = skinDropdown.ChildrenOfType<Menu>().FirstOrDefault();
+                return menu != null && menu.State == MenuState.Open;
+            });
             AddStep("move over imported skin 4", () =>
             {
-                label = skinDropdown.ChildrenOfType<IHasText>()
-                    .First(d => d.Text.ToString() == "Imported Skin 4");
+                label = skinDropdown.ChildrenOfType<IHasText>().First(d => d.Text.ToString() == "Imported Skin 4");
+                Assert.NotNull(label.Parent);
                 InputManager.MoveMouseTo(label.Parent);
             });
             AddStep("hover over star", () =>
             {
+                Assert.NotNull(label.Parent);
                 var menuItem = label.Parent.Parent;
 
                 var starIcon = menuItem.ChildrenOfType<SpriteIcon>()
-                    .First(icon => icon.Icon.Equals(FontAwesome.Solid.Star) ||
-                                icon.Icon.Equals(FontAwesome.Regular.Star));
+                                       .First(icon => icon.Icon.Equals(FontAwesome.Solid.Star) || icon.Icon.Equals(FontAwesome.Regular.Star));
 
-                IsFavourite = starIcon.Icon.Equals(FontAwesome.Solid.Star);
+                isFavourite = starIcon.Icon.Equals(FontAwesome.Solid.Star);
 
                 InputManager.MoveMouseTo(starIcon, new Vector2(20, 4));
             });
@@ -138,13 +142,13 @@ namespace osu.Game.Tests.Visual.Settings
             });
             AddAssert("favourite status changed", () =>
             {
+                Assert.NotNull(label.Parent);
                 var menuItem = label.Parent.Parent;
 
                 var starIcon = menuItem.ChildrenOfType<SpriteIcon>()
-                    .First(icon => icon.Icon.Equals(FontAwesome.Solid.Star) ||
-                                icon.Icon.Equals(FontAwesome.Regular.Star));
+                                       .First(icon => icon.Icon.Equals(FontAwesome.Solid.Star) || icon.Icon.Equals(FontAwesome.Regular.Star));
 
-                return starIcon.Icon.Equals(FontAwesome.Solid.Star) != IsFavourite;
+                return starIcon.Icon.Equals(FontAwesome.Solid.Star) != isFavourite;
             });
             AddStep("commit changes", () =>
             {
@@ -161,8 +165,7 @@ namespace osu.Game.Tests.Visual.Settings
         [Test]
         public void TestAltClickToggleFavourite()
         {
-            IHasText label = null;
-            bool? IsFavourite = null;
+            bool? isFavourite = null;
 
             AddStep("open dropdown", () =>
             {
@@ -174,29 +177,25 @@ namespace osu.Game.Tests.Visual.Settings
                     InputManager.Click(MouseButton.Left);
                 }
             });
-            AddAssert("dropdown opened", () => skinDropdown.ChildrenOfType<Menu>().FirstOrDefault().State == MenuState.Open);
+            AddAssert("dropdown opened", () =>
+            {
+                var menu = skinDropdown.ChildrenOfType<Menu>().FirstOrDefault();
+                return menu != null && menu.State == MenuState.Open;
+            });
             AddStep("move over imported skin 4", () =>
             {
-                label = skinDropdown.ChildrenOfType<IHasText>()
-                    .First(d => d.Text.ToString() == "Imported Skin 4");
+                var label = skinDropdown.ChildrenOfType<IHasText>().First(d => d.Text.ToString() == "Imported Skin 4");
+                Assert.NotNull(label.Parent);
                 InputManager.MoveMouseTo(label.Parent);
             });
             AddStep("toggle favourite status", () =>
             {
+                isFavourite = getStarIcon();
                 InputManager.PressKey(Key.LAlt);
                 InputManager.Click(MouseButton.Left);
                 InputManager.ReleaseKey(Key.LAlt);
             });
-            AddAssert("favourite status changed", () =>
-            {
-                var menuItem = label.Parent.Parent;
-
-                var starIcon = menuItem.ChildrenOfType<SpriteIcon>()
-                    .First(icon => icon.Icon.Equals(FontAwesome.Solid.Star) ||
-                                icon.Icon.Equals(FontAwesome.Regular.Star));
-
-                return starIcon.Icon.Equals(FontAwesome.Solid.Star) != IsFavourite;
-            });
+            AddAssert("favourite status changed", () => getStarIcon() != isFavourite);
             AddStep("commit changes", () =>
             {
                 InputManager.MoveMouseTo(skinDropdown, new Vector2(0, -100));
@@ -213,7 +212,7 @@ namespace osu.Game.Tests.Visual.Settings
         public void TestTouchToggleFavourite()
         {
             IHasText label = null;
-            bool? IsFavourite = null;
+            bool? isFavourite = null;
             int touchDragPosition = 100;
 
             AddStep("open dropdown", () =>
@@ -228,11 +227,18 @@ namespace osu.Game.Tests.Visual.Settings
                     InputManager.EndTouch(new Touch(TouchSource.Touch1, position));
                 }
             });
-            AddAssert("dropdown opened", () => skinDropdown.ChildrenOfType<Menu>().FirstOrDefault().State == MenuState.Open);
+            AddAssert("dropdown opened", () =>
+            {
+                var menu = skinDropdown.ChildrenOfType<Menu>().FirstOrDefault();
+                return menu != null && menu.State == MenuState.Open;
+            });
             AddStep("begin favourite drag", () =>
             {
+                isFavourite = getStarIcon();
                 label = skinDropdown.ChildrenOfType<IHasText>()
-                    .First(d => d.Text.ToString() == "Imported Skin 4");
+                                    .FirstOrDefault(d => d.Text.ToString() == "Imported Skin 4");
+                Assert.NotNull(label);
+                Assert.NotNull(label.Parent);
                 var startPos = label.Parent.ToScreenSpace(new Vector2(touchDragPosition, 10));
                 InputManager.BeginTouch(new Touch(TouchSource.Touch1, startPos));
             });
@@ -240,6 +246,8 @@ namespace osu.Game.Tests.Visual.Settings
             AddRepeatStep("drag right", () =>
             {
                 touchDragPosition += 5;
+
+                Assert.NotNull(label.Parent);
                 var position = label.Parent.ToScreenSpace(new Vector2(touchDragPosition, 10));
 
                 InputManager.MoveTouchTo(new Touch(TouchSource.Touch1, position));
@@ -247,19 +255,11 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddStep("end drag", () =>
             {
+                Assert.NotNull(label.Parent);
                 var endPosition = label.Parent.ToScreenSpace(new Vector2(touchDragPosition, 10));
                 InputManager.EndTouch(new Touch(TouchSource.Touch1, endPosition));
             });
-            AddAssert("favourite status changed", () =>
-            {
-                var menuItem = label.Parent.Parent;
-
-                var starIcon = menuItem.ChildrenOfType<SpriteIcon>()
-                    .First(icon => icon.Icon.Equals(FontAwesome.Solid.Star) ||
-                                icon.Icon.Equals(FontAwesome.Regular.Star));
-
-                return starIcon.Icon.Equals(FontAwesome.Solid.Star) != IsFavourite;
-            });
+            AddAssert("favourite status changed", () => getStarIcon() != isFavourite);
             AddStep("commit changes", () =>
             {
                 var position = skinDropdown.ToScreenSpace(new Vector2(0, -100));
@@ -310,6 +310,17 @@ namespace osu.Game.Tests.Visual.Settings
             }
 
             Schedule(() => skinDropdown.Items = dropdownItems);
+        }
+
+        private bool getStarIcon()
+        {
+            var label = skinDropdown.ChildrenOfType<IHasText>().FirstOrDefault(d => d.Text.ToString() == "Imported Skin 4");
+            Assert.NotNull(label);
+            Assert.NotNull(label.Parent);
+            var menuItem = label.Parent.Parent;
+            var starIcon = menuItem.ChildrenOfType<SpriteIcon>()
+                                   .First(icon => icon.Icon.Equals(FontAwesome.Solid.Star) || icon.Icon.Equals(FontAwesome.Regular.Star));
+            return starIcon.Icon.Equals(FontAwesome.Solid.Star);
         }
 
         protected override void Dispose(bool isDisposing)

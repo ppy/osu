@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Settings.Sections
 {
     public partial class SkinSection : SettingsSection
     {
-        private SkinSettingsDropdown skinDropdown;
+        private SkinDropdown skinDropdown;
 
         public override LocalisableString Header => SkinSettingsStrings.SkinSectionHeader;
 
@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             Children = new Drawable[]
             {
-                skinDropdown = new SkinSettingsDropdown
+                skinDropdown = new SkinDropdown
                 {
                     AlwaysShowSearchBar = true,
                     AllowNonContiguousMatching = true,
@@ -152,14 +152,6 @@ namespace osu.Game.Overlays.Settings.Sections
             base.Dispose(isDisposing);
 
             realmSubscription?.Dispose();
-        }
-
-        private partial class SkinSettingsDropdown : SkinDropdown
-        {
-            private partial class SkinDropdownControl : DropdownControl
-            {
-                protected override LocalisableString GenerateItemText(Live<SkinInfo> item) => item.ToString();
-            }
         }
 
         public partial class RenameSkinButton : SettingsButton, IHasPopover
