@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Play
         protected Task? DisposalTask { get; private set; }
 
         private FillFlowContainer disclaimers = null!;
-        private OsuScrollContainer settingsScroll = null!;
+        private GridContainer sideContent = null!;
 
         private Bindable<bool> showStoryboards = null!;
 
@@ -229,7 +229,7 @@ namespace osu.Game.Screens.Play
                     Padding = new MarginPadding(padding),
                     Spacing = new Vector2(20),
                 },
-                new GridContainer
+                sideContent = new GridContainer
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
@@ -248,7 +248,7 @@ namespace osu.Game.Screens.Play
                     {
                         new Drawable[]
                         {
-                            settingsScroll = new OsuScrollContainer
+                            new OsuScrollContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Child = PlayerSettings = new FillFlowContainer<PlayerSettingsGroup>
@@ -354,7 +354,7 @@ namespace osu.Game.Screens.Play
 
             // Start side content off-screen.
             disclaimers.MoveToX(-disclaimers.DrawWidth);
-            settingsScroll.MoveToX(settingsScroll.DrawWidth);
+            sideContent.MoveToX(sideContent.DrawWidth);
 
             content.ScaleTo(0.7f);
 
@@ -600,8 +600,8 @@ namespace osu.Game.Screens.Play
 
                 using (BeginDelayedSequence(delayBeforeSideDisplays))
                 {
-                    settingsScroll.FadeInFromZero(500, Easing.Out)
-                                  .MoveToX(0, 500, Easing.OutQuint);
+                    sideContent.FadeInFromZero(500, Easing.Out)
+                               .MoveToX(0, 500, Easing.OutQuint);
 
                     disclaimers.FadeInFromZero(500, Easing.Out)
                                .MoveToX(0, 500, Easing.OutQuint);
@@ -641,8 +641,8 @@ namespace osu.Game.Screens.Play
 
             disclaimers.FadeOut(CONTENT_OUT_DURATION, Easing.Out)
                        .MoveToX(-disclaimers.DrawWidth, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
-            settingsScroll.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint)
-                          .MoveToX(settingsScroll.DrawWidth, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
+            sideContent.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint)
+                       .MoveToX(sideContent.DrawWidth, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
 
             lowPassFilter?.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, CONTENT_OUT_DURATION);
             highPassFilter?.CutoffTo(0, CONTENT_OUT_DURATION);
