@@ -31,7 +31,9 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Volume;
 using osu.Game.Performance;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Skinning;
@@ -135,6 +137,8 @@ namespace osu.Game.Screens.Play
             // or if a child of a focused overlay is focused, like settings' search textbox.
             && inputManager.FocusedDrawable?.FindClosestParent<OsuFocusedOverlayContainer>() == null;
 
+        private bool holdForMenuExitButton => !AllowUserExit;
+
         private readonly Func<Player> createPlayer;
 
         /// <summary>
@@ -225,27 +229,72 @@ namespace osu.Game.Screens.Play
                     Padding = new MarginPadding(padding),
                     Spacing = new Vector2(20),
                 },
-                settingsScroll = new OsuScrollContainer
+                new GridContainer
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Y,
                     Width = SettingsToolboxGroup.CONTAINER_WIDTH + padding * 2,
-                    Padding = new MarginPadding { Vertical = padding },
-                    Masking = false,
-                    Child = PlayerSettings = new FillFlowContainer<PlayerSettingsGroup>
+                    Padding = new MarginPadding
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 20),
-                        Padding = new MarginPadding { Horizontal = padding },
-                        Children = new PlayerSettingsGroup[]
-                        {
-                            VisualSettings = new VisualSettings(),
-                            AudioSettings = new AudioSettings(),
-                            new InputSettings()
-                        }
+                        Bottom = ScreenFooter.HEIGHT
                     },
+                    RowDimensions =
+                    [
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize)
+                    ],
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            settingsScroll = new OsuScrollContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Child = PlayerSettings = new FillFlowContainer<PlayerSettingsGroup>
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(0, 20),
+                                    Padding = new MarginPadding
+                                    {
+                                        Horizontal = padding,
+                                        Vertical = padding,
+                                    },
+                                    Children = new PlayerSettingsGroup[]
+                                    {
+                                        VisualSettings = new VisualSettings(),
+                                        AudioSettings = new AudioSettings(),
+                                        new InputSettings()
+                                    }
+                                },
+                            }
+                        },
+                        new Drawable[]
+                        {
+                            new Container
+                            {
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                Alpha = holdForMenuExitButton ? 1 : 0,
+                                AutoSizeAxes = Axes.Both,
+                                Child = new HoldForMenuButton(true)
+                                {
+                                    Margin = new MarginPadding
+                                    {
+                                        Top = 20,
+                                        Horizontal = padding,
+                                        Bottom = padding,
+                                    },
+                                    Action = () =>
+                                    {
+                                        if (this.IsCurrentScreen())
+                                            this.Exit();
+                                    }
+                                }
+                            }
+                        }
+                    }
                 },
                 idleTracker = new IdleTracker(1500),
                 sampleRestart = new SkinnableSound(new SampleInfo(@"Gameplay/restart", @"pause-retry-click"))
