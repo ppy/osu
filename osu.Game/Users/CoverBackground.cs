@@ -10,20 +10,19 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Online.API.Requests.Responses;
 using osuTK.Graphics;
 
 namespace osu.Game.Users
 {
-    public partial class UserCoverBackground : ModelBackedDrawable<APIUser?>
+    public partial class CoverBackground : ModelBackedDrawable<IHasCover?>
     {
-        public APIUser? User
+        public IHasCover? Item
         {
             get => Model;
             set => Model = value;
         }
 
-        protected override Drawable CreateDrawable(APIUser? user) => new Cover(user);
+        protected override Drawable CreateDrawable(IHasCover? item) => new Cover(item);
 
         protected override double LoadDelay => 300;
 
@@ -41,11 +40,11 @@ namespace osu.Game.Users
         [LongRunningLoad]
         private partial class Cover : CompositeDrawable
         {
-            private readonly APIUser? user;
+            private readonly IHasCover? item;
 
-            public Cover(APIUser? user)
+            public Cover(IHasCover? item)
             {
-                this.user = user;
+                this.item = item;
 
                 RelativeSizeAxes = Axes.Both;
             }
@@ -53,7 +52,7 @@ namespace osu.Game.Users
             [BackgroundDependencyLoader]
             private void load(LargeTextureStore textures)
             {
-                if (user == null)
+                if (item == null)
                 {
                     InternalChild = new Box
                     {
@@ -66,7 +65,7 @@ namespace osu.Game.Users
                     InternalChild = new Sprite
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Texture = textures.Get(user.CoverUrl),
+                        Texture = textures.Get(item.CoverUrl),
                         FillMode = FillMode.Fill,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
