@@ -176,6 +176,7 @@ namespace osu.Game.Utils
                     scope.SetTag(@"beatmap", $"{beatmap.OnlineID}");
                     scope.SetTag(@"ruleset", ruleset.ShortName);
                     scope.SetTag(@"os", $"{RuntimeInfo.OS} ({Environment.OSVersion})");
+                    scope.SetTag(@"version hash", game.VersionHash);
                     scope.SetTag(@"processor count", Environment.ProcessorCount.ToString());
                 });
             }
