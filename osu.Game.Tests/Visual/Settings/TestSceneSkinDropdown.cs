@@ -100,6 +100,29 @@ namespace osu.Game.Tests.Visual.Settings
         [Test]
         public void TestToggleFavourite()
         {
+            toggleFavourite();
+            AddWaitStep("wait", 5);
+            toggleFavourite();
+        }
+
+        [Test]
+        public void TestAltClickToggleFavourite()
+        {
+            altClickToggleFavourite();
+            AddWaitStep("wait", 5);
+            altClickToggleFavourite();
+        }
+
+        [Test]
+        public void TestTouchToggleFavourite()
+        {
+            touchToggleFavourite();
+            AddWaitStep("wait", 5);
+            touchToggleFavourite();
+        }
+
+        private void toggleFavourite()
+        {
             IHasText label = null;
             bool? isFavourite = null;
 
@@ -158,8 +181,7 @@ namespace osu.Game.Tests.Visual.Settings
             });
         }
 
-        [Test]
-        public void TestAltClickToggleFavourite()
+        private void altClickToggleFavourite()
         {
             bool? isFavourite = null;
 
@@ -204,8 +226,7 @@ namespace osu.Game.Tests.Visual.Settings
             });
         }
 
-        [Test]
-        public void TestTouchToggleFavourite()
+        private void touchToggleFavourite()
         {
             IHasText label = null;
             bool? isFavourite = null;
@@ -241,13 +262,13 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddRepeatStep("drag right", () =>
             {
-                touchDragPosition += 5;
+                touchDragPosition += 10;
 
                 Assert.NotNull(label.Parent);
                 var position = label.Parent.ToScreenSpace(new Vector2(touchDragPosition, 10));
 
                 InputManager.MoveTouchTo(new Touch(TouchSource.Touch1, position));
-            }, 12);
+            }, 8);
 
             AddStep("end drag", () =>
             {
@@ -258,6 +279,7 @@ namespace osu.Game.Tests.Visual.Settings
             AddAssert("favourite status changed", () => getStarIcon() != isFavourite);
             AddStep("commit changes", () =>
             {
+                isFavourite = getStarIcon();
                 var position = skinDropdown.ToScreenSpace(new Vector2(0, -100));
 
                 InputManager.MoveTouchTo(new Touch(TouchSource.Touch1, position));
@@ -272,6 +294,7 @@ namespace osu.Game.Tests.Visual.Settings
                 InputManager.BeginTouch(new Touch(TouchSource.Touch1, position));
                 InputManager.EndTouch(new Touch(TouchSource.Touch1, position));
             });
+            AddAssert("check favourite status", () => getStarIcon() == isFavourite);
         }
 
         private void loadSkins()
