@@ -5,7 +5,6 @@ using System;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -30,6 +29,8 @@ namespace osu.Game.Overlays
 {
     public partial class NowPlayingOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
+        public const double TRACK_DRAG_SEEK_DEBOUNCE = 40;
+
         public IconUsage Icon => OsuIcon.Music;
         public LocalisableString Title => NowPlayingStrings.HeaderTitle;
         public LocalisableString Description => NowPlayingStrings.HeaderDescription;
@@ -50,7 +51,7 @@ namespace osu.Game.Overlays
         private MusicIconButton shuffleButton = null!;
         private IconButton playlistButton = null!;
 
-        private ScrollingTextContainer title = null!, artist = null!;
+        private MarqueeContainer title = null!, artist = null!;
 
         private PlaylistOverlay? playlist;
 
@@ -71,6 +72,9 @@ namespace osu.Game.Overlays
 
         private Bindable<bool> allowTrackControl = null!;
         private readonly BindableBool shuffle = new BindableBool(true);
+
+        private static readonly FontUsage title_font = OsuFont.GetFont(size: 25, italics: true);
+        private static readonly FontUsage artist_font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold, italics: true);
 
         public NowPlayingOverlay()
         {
@@ -105,23 +109,37 @@ namespace osu.Game.Overlays
                             Children = new[]
                             {
                                 background = Empty(),
-                                title = new ScrollingTextContainer
+                                title = new MarqueeContainer
                                 {
                                     Origin = Anchor.BottomCentre,
                                     Anchor = Anchor.TopCentre,
                                     Position = new Vector2(0, 40),
-                                    Font = OsuFont.GetFont(size: 25, italics: true),
                                     Colour = Color4.White,
-                                    Text = @"Nothing to play",
+                                    CreateContent = () => new OsuSpriteText
+                                    {
+                                        Font = title_font,
+                                        Text = @"Nothing to play",
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                    },
+                                    NonOverflowingContentAnchor = Anchor.Centre,
+                                    Padding = new MarginPadding { Horizontal = 15 },
                                 },
-                                artist = new ScrollingTextContainer
+                                artist = new MarqueeContainer
                                 {
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Position = new Vector2(0, 45),
-                                    Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold, italics: true),
                                     Colour = Color4.White,
-                                    Text = @"Nothing to play",
+                                    CreateContent = () => new OsuSpriteText
+                                    {
+                                        Font = artist_font,
+                                        Text = @"Nothing to play",
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                    },
+                                    NonOverflowingContentAnchor = Anchor.Centre,
+                                    Padding = new MarginPadding { Horizontal = 15 },
                                 },
                                 new Container
                                 {
@@ -191,7 +209,8 @@ namespace osu.Game.Overlays
                                     Height = progress_height / 2,
                                     FillColour = colours.Yellow,
                                     BackgroundColour = colours.YellowDarker.Opacity(0.5f),
-                                    OnSeek = musicController.SeekTo
+                                    OnSeek = onSeek,
+                                    OnCommit = onCommit,
                                 }
                             },
                         },
@@ -203,6 +222,29 @@ namespace osu.Game.Overlays
                     }
                 },
             };
+        }
+
+        private double? lastSeekGameTime;
+        private double? lastSeekAudioTargetTime;
+
+        private void onSeek(double progress)
+        {
+            if (!musicController.IsPlaying || lastSeekGameTime == null || Time.Current - lastSeekGameTime > TRACK_DRAG_SEEK_DEBOUNCE)
+            {
+                musicController.SeekTo(progress);
+                lastSeekGameTime = Time.Current;
+                lastSeekAudioTargetTime = progress;
+            }
+        }
+
+        private void onCommit(double progress)
+        {
+            // Avoid a second seek to the same location, which could occur when using keyboard navigation from `OnSeek` and subsequent `OnCommit` calls.
+            if (progress != lastSeekAudioTargetTime)
+                musicController.SeekTo(progress);
+
+            lastSeekGameTime = null;
+            lastSeekAudioTargetTime = null;
         }
 
         private void togglePlaylist()
@@ -288,18 +330,21 @@ namespace osu.Game.Overlays
 
             var track = musicController.CurrentTrack;
 
-            if (!track.IsDummyDevice)
+            if (!progressBar.Seeking)
             {
-                progressBar.EndTime = track.Length;
-                progressBar.CurrentTime = track.CurrentTime;
+                if (!track.IsDummyDevice)
+                {
+                    progressBar.EndTime = track.Length;
+                    progressBar.CurrentTime = track.CurrentTime;
 
-                playButton.Icon = track.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
-            }
-            else
-            {
-                progressBar.CurrentTime = 0;
-                progressBar.EndTime = 1;
-                playButton.Icon = FontAwesome.Regular.PlayCircle;
+                    playButton.Icon = track.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
+                }
+                else
+                {
+                    progressBar.CurrentTime = 0;
+                    progressBar.EndTime = 1;
+                    playButton.Icon = FontAwesome.Regular.PlayCircle;
+                }
             }
         }
 
@@ -318,8 +363,20 @@ namespace osu.Game.Overlays
             {
                 BeatmapMetadata metadata = beatmap.Metadata;
 
-                title.Text = new RomanisableString(metadata.TitleUnicode, metadata.Title);
-                artist.Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
+                title.CreateContent = () => new OsuSpriteText
+                {
+                    Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
+                    Font = title_font,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                };
+                artist.CreateContent = () => new OsuSpriteText
+                {
+                    Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist),
+                    Font = artist_font,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                };
 
                 backgroundLoadCancellation?.Cancel();
 
@@ -467,6 +524,8 @@ namespace osu.Game.Overlays
 
         private partial class HoverableProgressBar : ProgressBar
         {
+            public override bool HandleNonPositionalInput => IsHovered;
+
             public HoverableProgressBar()
                 : base(true)
             {
@@ -482,112 +541,6 @@ namespace osu.Game.Overlays
             {
                 this.ResizeHeightTo(progress_height / 2, 500, Easing.OutQuint);
                 base.OnHoverLost(e);
-            }
-        }
-
-        private partial class ScrollingTextContainer : CompositeDrawable
-        {
-            private const float initial_move_delay = 1000;
-            private const float pixels_per_second = 50;
-
-            private OsuSpriteText mainSpriteText = null!;
-            private OsuSpriteText fillerSpriteText = null!;
-
-            private Bindable<bool> showUnicode = null!;
-
-            [Resolved]
-            private FrameworkConfigManager frameworkConfig { get; set; } = null!;
-
-            private LocalisableString text;
-
-            public LocalisableString Text
-            {
-                get => text;
-                set
-                {
-                    text = value;
-
-                    if (IsLoaded)
-                        updateText();
-                }
-            }
-
-            private FontUsage font = OsuFont.Default;
-
-            public FontUsage Font
-            {
-                get => font;
-                set
-                {
-                    font = value;
-
-                    if (IsLoaded)
-                        updateFontAndText();
-                }
-            }
-
-            public ScrollingTextContainer()
-            {
-                AutoSizeAxes = Axes.Both;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                InternalChild = new FillFlowContainer<OsuSpriteText>
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
-                    Children = new[]
-                    {
-                        mainSpriteText = new OsuSpriteText { Padding = new MarginPadding { Horizontal = margin } },
-                        fillerSpriteText = new OsuSpriteText { Padding = new MarginPadding { Horizontal = margin }, Alpha = 0 },
-                    }
-                };
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                showUnicode = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowUnicode);
-                showUnicode.BindValueChanged(_ => updateText());
-
-                updateFontAndText();
-            }
-
-            private void updateFontAndText()
-            {
-                mainSpriteText.Font = font;
-                fillerSpriteText.Font = font;
-
-                updateText();
-            }
-
-            private void updateText()
-            {
-                mainSpriteText.Text = text;
-                fillerSpriteText.Alpha = 0;
-
-                ClearTransforms();
-                X = 0;
-
-                float textOverflowWidth = mainSpriteText.Width - player_width;
-
-                // apply half margin of tolerance on both sides before the text scrolls
-                if (textOverflowWidth > margin)
-                {
-                    fillerSpriteText.Alpha = 1;
-                    fillerSpriteText.Text = text;
-
-                    float initialX = (textOverflowWidth + mainSpriteText.Width) / 2;
-                    float targetX = (textOverflowWidth - mainSpriteText.Width) / 2;
-
-                    this.MoveToX(initialX)
-                        .Delay(initial_move_delay)
-                        .MoveToX(targetX, mainSpriteText.Width * 1000 / pixels_per_second)
-                        .Loop();
-                }
             }
         }
     }

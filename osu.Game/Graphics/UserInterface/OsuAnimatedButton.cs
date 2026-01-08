@@ -25,6 +25,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private Color4 hoverColour = Color4.White.Opacity(0.1f);
 
+        protected float ScaleOnMouseDown { get; init; } = 0.75f;
+
         /// <summary>
         /// The background colour of the <see cref="OsuAnimatedButton"/> while it is hovered.
         /// </summary>
@@ -54,7 +56,8 @@ namespace osu.Game.Graphics.UserInterface
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-                CornerRadius = 5,
+                CornerRadius = 10,
+                CornerExponent = 2.5f,
                 Masking = true,
                 EdgeEffect = new EdgeEffectParameters
                 {
@@ -89,11 +92,12 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            Colour = dimColour;
-            Enabled.BindValueChanged(_ => this.FadeColour(dimColour, 200, Easing.OutQuint));
+            Colour = DimColour;
+            Enabled.BindValueChanged(_ => this.FadeColour(DimColour, 200, Easing.OutQuint), true);
+            FinishTransforms(true);
         }
 
-        private Color4 dimColour => Enabled.Value ? Color4.White : colours.Gray9;
+        protected virtual Colour4 DimColour => Enabled.Value ? Color4.White : colours.Gray9;
 
         protected override bool OnHover(HoverEvent e)
         {
@@ -119,7 +123,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            Content.ScaleTo(0.75f, 2000, Easing.OutQuint);
+            Content.ScaleTo(ScaleOnMouseDown, 2000, Easing.OutQuint);
             return base.OnMouseDown(e);
         }
 

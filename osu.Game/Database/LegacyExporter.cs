@@ -41,13 +41,13 @@ namespace osu.Game.Database
         protected abstract string FileExtension { get; }
 
         protected readonly Storage UserFileStorage;
-        private readonly Storage exportStorage;
+        protected readonly Storage ExportStorage;
 
         public Action<Notification>? PostNotification { get; set; }
 
         protected LegacyExporter(Storage storage)
         {
-            exportStorage = (storage as OsuStorage)?.GetExportStorage() ?? storage.GetStorageForDirectory(@"exports");
+            ExportStorage = (storage as OsuStorage)?.GetExportStorage() ?? storage.GetStorageForDirectory(@"exports");
             UserFileStorage = storage.GetStorageForDirectory(@"files");
         }
 
@@ -74,9 +74,9 @@ namespace osu.Game.Database
             if (itemFilename.Length > MAX_FILENAME_LENGTH - FileExtension.Length)
                 itemFilename = itemFilename.Remove(MAX_FILENAME_LENGTH - FileExtension.Length);
 
-            IEnumerable<string> existingExports = exportStorage
+            IEnumerable<string> existingExports = ExportStorage
                                                   .GetFiles(string.Empty, $"{itemFilename}*{FileExtension}")
-                                                  .Concat(exportStorage.GetDirectories(string.Empty));
+                                                  .Concat(ExportStorage.GetDirectories(string.Empty));
 
             string filename = NamingUtils.GetNextBestFilename(existingExports, $"{itemFilename}{FileExtension}");
 
@@ -92,7 +92,7 @@ namespace osu.Game.Database
 
             try
             {
-                using (var stream = exportStorage.CreateFileSafely(filename))
+                using (var stream = ExportStorage.CreateFileSafely(filename))
                 {
                     await ExportToStreamAsync(model, stream, notification, linkedSource.Token).ConfigureAwait(false);
                 }
@@ -102,12 +102,12 @@ namespace osu.Game.Database
                 notification.State = ProgressNotificationState.Cancelled;
 
                 // cleanup if export is failed or canceled.
-                exportStorage.Delete(filename);
+                ExportStorage.Delete(filename);
                 throw;
             }
 
             notification.CompletionText = $"Exported {itemFilename}! Click to view.";
-            notification.CompletionClickAction = () => exportStorage.PresentFileExternally(filename);
+            notification.CompletionClickAction = () => ExportStorage.PresentFileExternally(filename);
             notification.State = ProgressNotificationState.Completed;
         }
 

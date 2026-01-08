@@ -5,7 +5,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -14,6 +13,7 @@ using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -35,17 +35,23 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private readonly Bindable<Vector2> areaOffset = new Bindable<Vector2>();
         private readonly Bindable<Vector2> areaSize = new Bindable<Vector2>();
+        private readonly Bindable<Vector2> outputAreaSize = new Bindable<Vector2>();
+        private readonly Bindable<Vector2> outputAreaOffset = new Bindable<Vector2>();
         private readonly IBindable<TabletInfo> tablet = new Bindable<TabletInfo>();
 
-        private readonly BindableNumber<float> offsetX = new BindableNumber<float> { MinValue = 0 };
-        private readonly BindableNumber<float> offsetY = new BindableNumber<float> { MinValue = 0 };
+        private readonly BindableNumber<float> offsetX = new BindableNumber<float> { MinValue = 0, Precision = 1 };
+        private readonly BindableNumber<float> offsetY = new BindableNumber<float> { MinValue = 0, Precision = 1 };
 
-        private readonly BindableNumber<float> sizeX = new BindableNumber<float> { MinValue = 10 };
-        private readonly BindableNumber<float> sizeY = new BindableNumber<float> { MinValue = 10 };
+        private readonly BindableNumber<float> sizeX = new BindableNumber<float> { MinValue = 10, Precision = 1 };
+        private readonly BindableNumber<float> sizeY = new BindableNumber<float> { MinValue = 10, Precision = 1 };
 
-        private readonly BindableNumber<float> rotation = new BindableNumber<float> { MinValue = 0, MaxValue = 360 };
+        private readonly BindableNumber<float> rotation = new BindableNumber<float> { MinValue = 0, MaxValue = 360, Precision = 1 };
 
         private readonly BindableNumber<float> pressureThreshold = new BindableNumber<float> { MinValue = 0.0f, MaxValue = 1.0f, Precision = 0.005f };
+
+        private Bindable<ScalingMode> scalingMode = null!;
+        private Bindable<float> scalingSizeX = null!;
+        private Bindable<float> scalingSizeY = null!;
 
         [Resolved]
         private GameHost host { get; set; }
@@ -78,8 +84,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationManager localisation)
+        private void load(OsuColour colours, LocalisationManager localisation, OsuConfigManager osuConfig)
         {
+            scalingMode = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
+            scalingSizeX = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX);
+            scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
+
             Children = new Drawable[]
             {
                 new SettingsCheckbox
@@ -113,15 +123,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             AutoSizeAxes = Axes.Y,
                         }.With(t =>
                         {
-                            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows || RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
-                            {
-                                t.NewLine();
-                                var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedString(TabletSettingsStrings.NoTabletDetectedDescription(
-                                    RuntimeInfo.OS == RuntimeInfo.Platform.Windows
-                                        ? @"https://opentabletdriver.net/Wiki/FAQ/Windows"
-                                        : @"https://opentabletdriver.net/Wiki/FAQ/Linux")));
-                                t.AddLinks(formattedSource.Text, formattedSource.Links);
-                            }
+                            t.NewLine();
+
+                            const string url = @"https://opentabletdriver.net/Wiki/FAQ/General";
+                            var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedString(TabletSettingsStrings.NoTabletDetectedDescription(url)));
+
+                            t.AddLinks(formattedSource.Text, formattedSource.Links);
                         }),
                     }
                 },
@@ -130,7 +137,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     Alpha = 0,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(0, 8),
+                    Spacing = new Vector2(0, SettingsSection.ITEM_SPACING),
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
@@ -156,7 +163,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             Text = TabletSettingsStrings.ConformToCurrentGameAspectRatio,
                             Action = () =>
                             {
-                                forceAspectRatio((float)host.Window.ClientSize.Width / host.Window.ClientSize.Height);
+                                float gameplayWidth = host.Window.ClientSize.Width;
+                                float gameplayHeight = host.Window.ClientSize.Height;
+
+                                if (scalingMode.Value == ScalingMode.Everything)
+                                {
+                                    gameplayWidth *= scalingSizeX.Value;
+                                    gameplayHeight *= scalingSizeY.Value;
+                                }
+
+                                forceAspectRatio(gameplayWidth / gameplayHeight);
                             },
                             CanBeShown = { BindTarget = enabled }
                         },
@@ -252,6 +268,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 sizeX.Value = val.NewValue.X;
                 sizeY.Value = val.NewValue.Y;
             }), true);
+
+            outputAreaSize.BindTo(tabletHandler.OutputAreaSize);
+            outputAreaOffset.BindTo(tabletHandler.OutputAreaOffset);
 
             sizeX.BindValueChanged(val =>
             {

@@ -17,6 +17,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
@@ -52,7 +53,11 @@ namespace osu.Game.Collections
             ShowDragHandle.Value = false;
 
             Masking = true;
-            CornerRadius = item_height / 2;
+
+            // This doesn't match the latest design spec (should be 5) but is an in-between that feels right to the eye
+            // until we move everything over to Form controls.
+            CornerRadius = 10;
+            CornerExponent = 2.5f;
         }
 
         protected override Drawable CreateContent() => content = new ItemContent(Model);
@@ -134,7 +139,8 @@ namespace osu.Game.Collections
             {
                 this.collection = collection;
 
-                CornerRadius = item_height / 2;
+                CornerRadius = 10;
+                CornerExponent = 2.5f;
             }
 
             [BackgroundDependencyLoader]
@@ -173,7 +179,7 @@ namespace osu.Game.Collections
                 }
                 else
                 {
-                    PlaceholderText = "Create a new collection";
+                    PlaceholderText = CollectionsStrings.CreateNew;
                 }
             }
         }

@@ -6,9 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -24,8 +26,10 @@ namespace osu.Game.Rulesets.Taiko.Mods
     {
         public override string Name => @"Single Tap";
         public override string Acronym => @"SG";
+        public override IconUsage? Icon => OsuIcon.ModSingleTap;
         public override LocalisableString Description => @"One key for dons, one key for kats.";
 
+        public override bool Ranked => true;
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(TaikoModCinema) };
         public override ModType Type => ModType.Conversion;
@@ -62,7 +66,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 foreach (BreakPeriod b in drawableRuleset.Beatmap.Breaks)
                     periods.Add(new Period(b.StartTime, getValidJudgementTime(ruleset.Objects.First(h => h.StartTime >= b.EndTime)) - 1));
 
-                static double getValidJudgementTime(HitObject hitObject) => hitObject.StartTime - hitObject.HitWindows.WindowFor(HitResult.Meh);
+                static double getValidJudgementTime(HitObject hitObject) => hitObject.StartTime - hitObject.HitWindows.WindowFor(HitResult.Ok);
             }
 
             nonGameplayPeriods = new PeriodTracker(periods);

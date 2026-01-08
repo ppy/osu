@@ -5,10 +5,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
@@ -64,14 +66,16 @@ namespace osu.Game.Online.Chat
         public IBindableList<Channel> AvailableChannels => availableChannels;
 
         private readonly IAPIProvider api;
-        private readonly IChatClient chatClient;
 
         [Resolved]
         private UserLookupCache users { get; set; }
 
+        private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+        private readonly IBindableList<APIRelation> localUserBlocks = new BindableList<APIRelation>();
         private ScheduledDelegate scheduledAck;
 
+        private IChatClient chatClient = null!;
         private long? lastSilenceMessageId;
         private uint? lastSilenceId;
 
@@ -79,22 +83,43 @@ namespace osu.Game.Online.Chat
         {
             this.api = api;
 
-            chatClient = api.GetChatClient();
-
             CurrentChannel.ValueChanged += currentChannelChanged;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            chatClient = api.GetChatClient();
             chatClient.ChannelJoined += ch => Schedule(() => joinChannel(ch));
             chatClient.ChannelParted += ch => Schedule(() => leaveChannel(getChannel(ch), false));
             chatClient.NewMessages += msgs => Schedule(() => addMessages(msgs));
             chatClient.PresenceReceived += () => Schedule(initializeChannels);
             chatClient.RequestPresence();
 
+            localUser.BindTo(api.LocalUser);
+            localUser.BindValueChanged(userChanged);
+
             apiState.BindTo(api.State);
             apiState.BindValueChanged(_ => SendAck(), true);
+
+            localUserBlocks.BindTo(api.LocalUserState.Blocks);
+            localUserBlocks.BindCollectionChanged((_, args) => Schedule(() => onBlocksChanged(args)));
+        }
+
+        private void userChanged(ValueChangedEvent<APIUser> userChange)
+        {
+            if (userChange.OldValue?.Equals(userChange.NewValue) == true)
+                return;
+
+            CurrentChannel.Value = null;
+
+            foreach (var joinedChannel in joinedChannels)
+                joinedChannel.Joined.Value = false;
+
+            joinedChannels.Clear();
+            // additionally clear the history of last joined channels so that the new user can't reopen the old user's channels
+            // (would likely fail web-side on perms anyway, but why even get that far)
+            closedChannels.Clear();
         }
 
         /// <summary>
@@ -282,8 +307,7 @@ namespace osu.Game.Online.Chat
 
                     // Check if the user has joined the requested channel already.
                     // This uses the channel name for comparison as the PM user's username is unavailable after a restart.
-                    var privateChannel = JoinedChannels.FirstOrDefault(
-                        c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Name.Equals(content, StringComparison.OrdinalIgnoreCase));
+                    var privateChannel = JoinedChannels.FirstOrDefault(c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Name.Equals(content, StringComparison.OrdinalIgnoreCase));
 
                     if (privateChannel != null)
                     {
@@ -312,8 +336,9 @@ namespace osu.Game.Online.Chat
         private void addMessages(List<Message> messages)
         {
             var channels = JoinedChannels.ToList();
+            var blockedUserIds = localUserBlocks.Select(b => b.TargetID).ToList();
 
-            foreach (var group in messages.GroupBy(m => m.ChannelId))
+            foreach (var group in messages.Where(m => !blockedUserIds.Contains(m.SenderId)).GroupBy(m => m.ChannelId))
                 channels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
 
             lastSilenceMessageId ??= messages.LastOrDefault()?.Id;
@@ -642,10 +667,24 @@ namespace osu.Game.Online.Chat
             api.Queue(req);
         }
 
+        private void onBlocksChanged(NotifyCollectionChangedEventArgs args)
+        {
+            if (args.Action != NotifyCollectionChangedAction.Add)
+                return;
+
+            foreach (APIRelation newBlock in args.NewItems!)
+            {
+                foreach (var channel in joinedChannels)
+                    channel.RemoveMessagesFromUser(newBlock.TargetID);
+            }
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            chatClient?.Dispose();
+
+            if (chatClient.IsNotNull())
+                chatClient.Dispose();
         }
     }
 

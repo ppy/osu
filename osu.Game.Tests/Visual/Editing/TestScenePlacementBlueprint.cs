@@ -7,6 +7,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
@@ -27,9 +28,50 @@ namespace osu.Game.Tests.Visual.Editing
     {
         protected override Ruleset CreateEditorRuleset() => new OsuRuleset();
 
-        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset, false);
+        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
+        {
+            var beatmap = new TestBeatmap(ruleset, false);
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint());
+            return beatmap;
+        }
 
         private GlobalActionContainer globalActionContainer => this.ChildrenOfType<GlobalActionContainer>().Single();
+
+        [Test]
+        public void TestPlaceThenUndo()
+        {
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to center of playfield", () => InputManager.MoveMouseTo(this.ChildrenOfType<Playfield>().Single()));
+            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("one circle added", () => EditorBeatmap.HitObjects, () => Has.One.Items);
+
+            AddStep("undo", () => Editor.Undo());
+
+            AddAssert("circle removed", () => EditorBeatmap.HitObjects, () => Is.Empty);
+        }
+
+        [Test]
+        public void TestTimingLost()
+        {
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to center of playfield", () => InputManager.MoveMouseTo(this.ChildrenOfType<Playfield>().Single()));
+
+            AddAssert("placement ready", () => this.ChildrenOfType<ComposeBlueprintContainer>().Single().CurrentPlacement, () => Is.Not.Null);
+
+            AddStep("nuke timing", () => EditorBeatmap.ControlPointInfo.Clear());
+
+            AddAssert("placement not available", () => this.ChildrenOfType<ComposeBlueprintContainer>().Single().CurrentPlacement, () => Is.Null);
+
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+
+            AddAssert("placement not available", () => this.ChildrenOfType<ComposeBlueprintContainer>().Single().CurrentPlacement, () => Is.Null);
+
+            AddStep("add back timing", () => EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+
+            AddAssert("placement ready", () => this.ChildrenOfType<ComposeBlueprintContainer>().Single().CurrentPlacement, () => Is.Not.Null);
+        }
 
         [Test]
         public void TestDeleteUsingMiddleMouse()

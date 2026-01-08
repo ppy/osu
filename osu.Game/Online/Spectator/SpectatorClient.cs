@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
@@ -95,7 +96,7 @@ namespace osu.Game.Online.Spectator
 
         private readonly Queue<FrameDataBundle> pendingFrameBundles = new Queue<FrameDataBundle>();
 
-        private readonly Queue<LegacyReplayFrame> pendingFrames = new Queue<LegacyReplayFrame>();
+        private readonly List<LegacyReplayFrame> pendingFrames = new List<LegacyReplayFrame>();
 
         private double lastPurgeTime;
 
@@ -203,7 +204,7 @@ namespace osu.Game.Online.Spectator
 
         Task IStatefulUserHubClient.DisconnectRequested()
         {
-            Schedule(() => DisconnectInternal());
+            Schedule(() => DisconnectInternal().FireAndForget());
             return Task.CompletedTask;
         }
 
@@ -244,7 +245,16 @@ namespace osu.Game.Online.Spectator
             if (frame is IConvertibleReplayFrame convertible)
             {
                 Debug.Assert(currentBeatmap != null);
-                pendingFrames.Enqueue(convertible.ToLegacy(currentBeatmap));
+
+                var convertedFrame = convertible.ToLegacy(currentBeatmap);
+
+                // this reduces redundancy of frames in the resulting replay.
+                // it is also done at `ReplayRecorder`, but needs to be done here as well
+                // due to the flow being handled differently.
+                if (pendingFrames.LastOrDefault()?.IsEquivalentTo(convertedFrame) == true)
+                    pendingFrames[^1] = convertedFrame;
+                else
+                    pendingFrames.Add(convertedFrame);
             }
 
             if (pendingFrames.Count > max_pending_frames)
@@ -281,7 +291,7 @@ namespace osu.Game.Online.Spectator
                 else
                     currentState.State = SpectatedUserState.Quit;
 
-                EndPlayingInternal(currentState);
+                EndPlayingInternal(currentState).FireAndForget();
             });
         }
 
@@ -295,7 +305,7 @@ namespace osu.Game.Online.Spectator
                 return;
             }
 
-            WatchUserInternal(userId);
+            WatchUserInternal(userId).FireAndForget();
         }
 
         public void StopWatchingUser(int userId)
@@ -312,7 +322,7 @@ namespace osu.Game.Online.Spectator
 
                 watchedUsersRefCounts.Remove(userId);
                 watchedUserStates.Remove(userId);
-                StopWatchingUserInternal(userId);
+                StopWatchingUserInternal(userId).FireAndForget();
             });
         }
 

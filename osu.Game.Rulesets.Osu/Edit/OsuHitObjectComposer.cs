@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
@@ -142,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 case PositionSnapGridType.Triangle:
                     var triangularPositionSnapGrid = new TriangularPositionSnapGrid();
 
-                    triangularPositionSnapGrid.Spacing.BindTo(OsuGridToolboxGroup.Spacing);
+                    triangularPositionSnapGrid.Spacing.BindTo(OsuGridToolboxGroup.GridLineSpacing);
                     triangularPositionSnapGrid.GridLineRotation.BindTo(OsuGridToolboxGroup.GridLinesRotation);
 
                     positionSnapGrid = triangularPositionSnapGrid;
@@ -151,7 +152,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 case PositionSnapGridType.Circle:
                     var circularPositionSnapGrid = new CircularPositionSnapGrid();
 
-                    circularPositionSnapGrid.Spacing.BindTo(OsuGridToolboxGroup.Spacing);
+                    circularPositionSnapGrid.Spacing.BindTo(OsuGridToolboxGroup.GridLineSpacing);
 
                     positionSnapGrid = circularPositionSnapGrid;
                     break;
@@ -171,7 +172,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             => new OsuBlueprintContainer(this);
 
         public override string ConvertSelectionToString()
-            => string.Join(',', selectedHitObjects.Cast<OsuHitObject>().OrderBy(h => h.StartTime).Select(h => (h.IndexInCurrentCombo + 1).ToString()));
+            => string.Join(',', selectedHitObjects.Cast<OsuHitObject>().OrderBy(h => h.StartTime)
+                                                  .Select(h => (h.IndexInCurrentCombo + 1).ToString(CultureInfo.InvariantCulture)));
 
         // 1,2,3,4 ...
         private static readonly Regex selection_regex = new Regex(@"^\d+(,\d+)*$", RegexOptions.Compiled);
@@ -254,11 +256,15 @@ namespace osu.Game.Rulesets.Osu.Edit
         [CanBeNull]
         public SnapResult TrySnapToDistanceGrid(Vector2 screenSpacePosition, double? fixedTime = null)
         {
-            if (DistanceSnapProvider.DistanceSnapToggle.Value != TernaryState.True || distanceSnapGrid == null)
+            if (DistanceSnapProvider.DistanceSnapToggle.Value != TernaryState.True || distanceSnapGrid?.IsLoaded != true)
                 return null;
 
             var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
             (Vector2 pos, double time) = distanceSnapGrid.GetSnappedPosition(distanceSnapGrid.ToLocalSpace(screenSpacePosition), fixedTime);
+
+            if (pos.X < 0 || pos.X > OsuPlayfield.BASE_SIZE.X || pos.Y < 0 || pos.Y > OsuPlayfield.BASE_SIZE.Y)
+                return null;
+
             return new SnapResult(distanceSnapGrid.ToScreenSpace(pos), time, playfield);
         }
 

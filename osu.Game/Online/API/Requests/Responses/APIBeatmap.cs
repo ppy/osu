@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
@@ -31,6 +33,9 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty(@"playcount")]
         public int PlayCount { get; set; }
+
+        [JsonProperty(@"current_user_playcount")]
+        public int UserPlayCount { get; set; }
 
         [JsonProperty(@"passcount")]
         public int PassCount { get; set; }
@@ -112,6 +117,23 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"owners")]
         public BeatmapOwner[] BeatmapOwners { get; set; } = Array.Empty<BeatmapOwner>();
 
+        public (APITag Tag, int VoteCount)[] GetTopUserTags()
+        {
+            if (TopTags == null || TopTags.Length == 0 || BeatmapSet?.RelatedTags == null)
+                return [];
+
+            var tagsById = BeatmapSet.RelatedTags.ToDictionary(t => t.Id);
+
+            return TopTags
+                   .Select(t => (topTag: t, relatedTag: tagsById.GetValueOrDefault(t.TagId)))
+                   .Where(t => t.relatedTag != null)
+                   // see https://github.com/ppy/osu-web/blob/bb3bd2e7c6f84f26066df5ea20a81c77ec9bb60a/resources/js/beatmapsets-show/controller.ts#L103-L106 for sort criteria
+                   .OrderByDescending(t => t.topTag.VoteCount)
+                   .ThenBy(t => t.relatedTag!.Name)
+                   .Select(t => (t.relatedTag!, t.topTag.VoteCount))
+                   .ToArray();
+        }
+
         #region Implementation of IBeatmapInfo
 
         public IBeatmapMetadataInfo Metadata => (BeatmapSet as IBeatmapSetInfo)?.Metadata ?? new BeatmapMetadata();
@@ -143,6 +165,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
             public string Name => $@"{nameof(APIRuleset)} (ID: {OnlineID})";
 
+            [JsonIgnore]
             public string ShortName
             {
                 get

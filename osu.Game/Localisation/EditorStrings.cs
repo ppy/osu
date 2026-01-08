@@ -55,6 +55,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ExportForCompatibility => new TranslatableString(getKey(@"export_for_compatibility"), @"For compatibility (.osz)");
 
         /// <summary>
+        /// "Guest difficulty (.osu)"
+        /// </summary>
+        public static LocalisableString ExportGuestDifficulty => new TranslatableString(getKey(@"export_guest_difficulty"), @"Guest difficulty (.osu)");
+
+        /// <summary>
         /// "Create new difficulty"
         /// </summary>
         public static LocalisableString CreateNewDifficulty => new TranslatableString(getKey(@"create_new_difficulty"), @"Create new difficulty");
@@ -155,6 +160,11 @@ namespace osu.Game.Localisation
         public static LocalisableString TimelineShowTimingChanges => new TranslatableString(getKey(@"timeline_show_timing_changes"), @"Show timing changes");
 
         /// <summary>
+        /// "Finish editing and import changes"
+        /// </summary>
+        public static LocalisableString FinishEditingExternally => new TranslatableString(getKey(@"Finish editing and import changes"), @"Finish editing and import changes");
+
+        /// <summary>
         /// "Show breaks"
         /// </summary>
         public static LocalisableString TimelineShowBreaks => new TranslatableString(getKey(@"timeline_show_breaks"), @"Show breaks");
@@ -203,6 +213,16 @@ namespace osu.Game.Localisation
         /// "Open beatmap discussion page"
         /// </summary>
         public static LocalisableString OpenDiscussionPage => new TranslatableString(getKey(@"open_discussion_page"), @"Open beatmap discussion page");
+
+        /// <summary>
+        /// "Current difficulty"
+        /// </summary>
+        public static LocalisableString CheckCurrentDifficulty => new TranslatableString(getKey(@"check_current_difficulty"), @"Current difficulty");
+
+        /// <summary>
+        /// "Entire beatmap set"
+        /// </summary>
+        public static LocalisableString CheckEntireBeatmapSet => new TranslatableString(getKey(@"check_entire_beatmap_set"), @"Entire beatmap set");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

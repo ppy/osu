@@ -48,6 +48,8 @@ namespace osu.Game.Overlays.SkinEditor
 
         public readonly BindableList<ISerialisableDrawable> SelectedComponents = new BindableList<ISerialisableDrawable>();
 
+        public bool ExternalEditInProgress => externalEditOperation != null && !externalEditOperation.IsCompleted;
+
         protected override bool StartHidden => true;
 
         private Drawable? targetScreen;
@@ -104,6 +106,11 @@ namespace osu.Game.Overlays.SkinEditor
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
+        [Resolved]
+        private ExternalEditOverlay? externalEditOverlay { get; set; }
+
+        private Task? externalEditOperation;
+
         public SkinEditor()
         {
         }
@@ -159,6 +166,7 @@ namespace osu.Game.Overlays.SkinEditor
                                                     {
                                                         new EditorMenuItem(Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()) { Hotkey = new Hotkey(PlatformAction.Save) },
                                                         new EditorMenuItem(CommonStrings.Export, MenuItemType.Standard, () => skins.ExportCurrentSkin()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
+                                                        new EditorMenuItem(EditorStrings.EditExternally, MenuItemType.Standard, () => _ = editExternally()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
                                                         new OsuMenuItemSpacer(),
                                                         new EditorMenuItem(CommonStrings.RevertToDefault, MenuItemType.Destructive, () => dialogOverlay?.Push(new RevertConfirmDialog(revert))),
                                                         new OsuMenuItemSpacer(),
@@ -276,6 +284,15 @@ namespace osu.Game.Overlays.SkinEditor
             selectedTarget.BindValueChanged(targetChanged, true);
         }
 
+        private async Task editExternally()
+        {
+            Save();
+
+            var skin = currentSkin.Value.SkinInfo.PerformRead(s => s.Detach());
+
+            externalEditOperation = await externalEditOverlay!.Begin(skin).ConfigureAwait(false);
+        }
+
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
             switch (e.Action)
@@ -374,10 +391,10 @@ namespace osu.Game.Overlays.SkinEditor
                 return;
             }
 
-            if (skinComponentsContainer.IsLoaded)
+            if (skinComponentsContainer.ComponentsLoaded)
                 bindChangeHandler(skinComponentsContainer);
             else
-                skinComponentsContainer.OnLoadComplete += d => Schedule(() => bindChangeHandler((SkinnableContainer)d));
+                skinComponentsContainer.OnComponentsLoaded += onComponentsLoaded;
 
             content.Child = new SkinBlueprintContainer(skinComponentsContainer);
 
@@ -411,6 +428,13 @@ namespace osu.Game.Overlays.SkinEditor
                 RequestPlacement = requestPlacement
             });
 
+            void onComponentsLoaded(Drawable d)
+            {
+                SkinnableContainer container = (SkinnableContainer)d;
+                container.OnComponentsLoaded -= onComponentsLoaded;
+                Schedule(() => bindChangeHandler(container));
+            }
+
             void requestPlacement(Type type)
             {
                 if (!(Activator.CreateInstance(type) is ISerialisableDrawable component))
@@ -436,8 +460,8 @@ namespace osu.Game.Overlays.SkinEditor
 
             headerText.Clear();
 
-            headerText.AddParagraph(SkinEditorStrings.SkinEditor, cp => cp.Font = OsuFont.Default.With(size: 16));
-            headerText.NewParagraph();
+            headerText.AddText(SkinEditorStrings.SkinEditor, cp => cp.Font = OsuFont.Default.With(size: 16));
+            headerText.NewLine();
             headerText.AddText(SkinEditorStrings.CurrentlyEditing, cp =>
             {
                 cp.Font = OsuFont.Default.With(size: 12);
@@ -505,7 +529,9 @@ namespace osu.Game.Overlays.SkinEditor
             }
 
             SelectedComponents.Add(component);
-            SkinSelectionHandler.ApplyClosestAnchorOrigin(drawableComponent);
+
+            if (!component.UsesFixedAnchor)
+                SkinSelectionHandler.ApplyClosestAnchorOrigin(drawableComponent);
             return true;
         }
 
@@ -760,11 +786,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         #region Delegation of IEditorChangeHandler
 
-        public event Action? OnStateChange
-        {
-            add => throw new NotImplementedException();
-            remove => throw new NotImplementedException();
-        }
+        public event Action? OnStateChange;
 
         private IEditorChangeHandler? beginChangeHandler;
 
@@ -773,6 +795,9 @@ namespace osu.Game.Overlays.SkinEditor
             // Change handler may change between begin and end, which can cause unbalanced operations.
             // Let's track the one that was used when beginning the change so we can call EndChange on it specifically.
             (beginChangeHandler = changeHandler)?.BeginChange();
+
+            if (beginChangeHandler != null)
+                beginChangeHandler.OnStateChange += OnStateChange;
         }
 
         public void EndChange() => beginChangeHandler?.EndChange();

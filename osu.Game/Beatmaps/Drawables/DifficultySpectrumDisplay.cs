@@ -141,7 +141,7 @@ namespace osu.Game.Beatmaps.Drawables
 
                 Add(countText = new OsuSpriteText
                 {
-                    Font = OsuFont.Default.With(size: 12),
+                    Font = OsuFont.Style.Caption1,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Padding = new MarginPadding { Bottom = 1 }

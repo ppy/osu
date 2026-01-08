@@ -5,6 +5,7 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -27,6 +28,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         private Box transferContainerBox;
         private Drawable logoFacade;
         private bool randomPositions;
+
+        [CanBeNull]
+        private IDisposable logoTracking;
 
         private const float visual_box_size = 72;
 
@@ -150,14 +154,15 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("Perform logo movements", () =>
             {
-                trackingContainer.StopTracking();
+                logoTracking?.Dispose();
+
                 logo.MoveTo(new Vector2(0.5f), 500, Easing.InOutExpo);
 
                 visualBox.Colour = Color4.White;
 
                 Scheduler.AddDelayed(() =>
                 {
-                    trackingContainer.StartTracking(logo, 1000, Easing.InOutExpo);
+                    logoTracking = trackingContainer.StartTracking(logo, 1000, Easing.InOutExpo);
                     visualBox.Colour = Color4.Tomato;
                 }, 700);
             });

@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realm, storage) =>
             {
-                var rulesets = new RealmRulesetStore(realm, storage);
+                using var rulesets = new RealmRulesetStore(realm, storage);
 
                 Assert.AreEqual(4, rulesets.AvailableRulesets.Count());
                 Assert.AreEqual(4, realm.Realm.All<RulesetInfo>().Count());
@@ -36,8 +36,8 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realm, storage) =>
             {
-                var rulesets = new RealmRulesetStore(realm, storage);
-                var rulesets2 = new RealmRulesetStore(realm, storage);
+                using var rulesets = new RealmRulesetStore(realm, storage);
+                using var rulesets2 = new RealmRulesetStore(realm, storage);
 
                 Assert.AreEqual(4, rulesets.AvailableRulesets.Count());
                 Assert.AreEqual(4, rulesets2.AvailableRulesets.Count());
@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realm, storage) =>
             {
-                var rulesets = new RealmRulesetStore(realm, storage);
+                using var rulesets = new RealmRulesetStore(realm, storage);
 
                 Assert.IsFalse(rulesets.AvailableRulesets.First().IsManaged);
                 Assert.IsFalse(rulesets.GetRuleset(0)?.IsManaged);
@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Database
                 Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName)!.Available), Is.True);
 
                 // Availability is updated on construction of a RealmRulesetStore
-                _ = new RealmRulesetStore(realm, storage);
+                using var _ = new RealmRulesetStore(realm, storage);
 
                 Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName)!.Available), Is.False);
             });
@@ -104,13 +104,13 @@ namespace osu.Game.Tests.Database
                 Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName)!.Available), Is.True);
 
                 // Availability is updated on construction of a RealmRulesetStore
-                _ = new RealmRulesetStore(realm, storage);
+                using var _ = new RealmRulesetStore(realm, storage);
 
                 Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName)!.Available), Is.False);
 
                 // Simulate the ruleset getting updated
                 LoadTestRuleset.Version = Ruleset.CURRENT_RULESET_API_VERSION;
-                _ = new RealmRulesetStore(realm, storage);
+                using var __ = new RealmRulesetStore(realm, storage);
 
                 Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName)!.Available), Is.True);
             });

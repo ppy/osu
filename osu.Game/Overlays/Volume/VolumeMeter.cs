@@ -321,6 +321,8 @@ namespace osu.Game.Overlays.Volume
 
         private float dragDelta;
 
+        protected override bool OnMouseDown(MouseDownEvent e) => true; // handle to prevent drawables behind from potentially receiving the mouse down
+
         protected override bool OnDragStart(DragStartEvent e)
         {
             dragDelta = 0;

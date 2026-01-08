@@ -6,8 +6,13 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -16,15 +21,18 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual.OnlinePlay;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestScenePlaylistsSongSelect : OnlinePlayTestScene
     {
+        private RulesetStore rulesets = null!;
         private BeatmapManager manager = null!;
         private TestPlaylistsSongSelect songSelect = null!;
         private Room room = null!;
@@ -34,7 +42,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             BeatmapStore beatmapStore;
 
-            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.CacheAs(beatmapStore = new RealmDetachedBeatmapStore());
             Dependencies.Cache(Realm);
@@ -49,6 +57,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public override void SetUpSteps()
         {
             base.SetUpSteps();
+
+            AddUntilStep("wait for mod select removed", () => this.ChildrenOfType<FreeModSelectOverlay>().Count(), () => Is.Zero);
 
             AddStep("reset", () =>
             {
@@ -153,9 +163,47 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
+        [Test]
+        public void TestFreeModSelectionDisable()
+        {
+            FooterButtonFreeMods freeMods = null!;
+
+            AddAssert("freestyle enabled", () => songSelect.Freestyle.Value, () => Is.True);
+            AddStep("click icon in free mods button", () =>
+            {
+                freeMods = this.ChildrenOfType<FooterButtonFreeMods>().Single();
+                InputManager.MoveMouseTo(freeMods.ChildrenOfType<SpriteIcon>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("mod select not visible", () => this.ChildrenOfType<FreeModSelectOverlay>().Single().State.Value, () => Is.EqualTo(Visibility.Hidden));
+
+            AddStep("toggle freestyle off", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonFreestyle>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("freestyle disabled", () => songSelect.Freestyle.Value, () => Is.False);
+            AddStep("click icon in free mods button", () =>
+            {
+                InputManager.MoveMouseTo(freeMods.ChildrenOfType<SpriteIcon>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("mod select visible", () => this.ChildrenOfType<FreeModSelectOverlay>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
+        }
+
         private partial class TestPlaylistsSongSelect : PlaylistsSongSelect
         {
             public new MatchBeatmapDetailArea BeatmapDetails => (MatchBeatmapDetailArea)base.BeatmapDetails;
+
+            public new IBindable<bool> Freestyle => base.Freestyle;
 
             public TestPlaylistsSongSelect(Room room)
                 : base(room)

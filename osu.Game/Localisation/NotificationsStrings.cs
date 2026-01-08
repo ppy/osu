@@ -84,16 +84,6 @@ Please try changing your audio device to a working setting.");
         public static LocalisableString LinkTypeNotSupported => new TranslatableString(getKey(@"unsupported_link_type"), @"This link type is not yet supported!");
 
         /// <summary>
-        /// "You received a private message from &#39;{0}&#39;. Click to read it!"
-        /// </summary>
-        public static LocalisableString PrivateMessageReceived(string username) => new TranslatableString(getKey(@"private_message_received"), @"You received a private message from '{0}'. Click to read it!", username);
-
-        /// <summary>
-        /// "Your name was mentioned in chat by &#39;{0}&#39;. Click to find out why!"
-        /// </summary>
-        public static LocalisableString YourNameWasMentioned(string username) => new TranslatableString(getKey(@"your_name_was_mentioned"), @"Your name was mentioned in chat by '{0}'. Click to find out why!", username);
-
-        /// <summary>
         /// "{0} invited you to the multiplayer match &quot;{1}&quot;! Click to join."
         /// </summary>
         public static LocalisableString InvitedYouToTheMultiplayer(string username, string roomName) => new TranslatableString(getKey(@"invited_you_to_the_multiplayer"), @"{0} invited you to the multiplayer match ""{1}""! Click to join.", username, roomName);
@@ -134,6 +124,71 @@ Click to see what's new!", version);
         /// "Downloading update..."
         /// </summary>
         public static LocalisableString DownloadingUpdate => new TranslatableString(getKey(@"downloading_update"), @"Downloading update...");
+
+        /// <summary>
+        /// "This multiplayer room has ended. Click to display room results."
+        /// </summary>
+        public static LocalisableString MultiplayerRoomEnded => new TranslatableString(getKey(@"multiplayer_room_ended"), @"This multiplayer room has ended. Click to display room results.");
+
+        /// <summary>
+        /// "Mention"
+        /// </summary>
+        public static LocalisableString Mention => new TranslatableString(getKey(@"mention"), @"Mention");
+
+        /// <summary>
+        /// "Online: {0}"
+        /// </summary>
+        public static LocalisableString FriendOnline(string info) => new TranslatableString(getKey(@"friend_online"), @"Online: {0}", info);
+
+        /// <summary>
+        /// "Offline: {0}"
+        /// </summary>
+        public static LocalisableString FriendOffline(string info) => new TranslatableString(getKey(@"friend_offline"), @"Offline: {0}", info);
+
+        /// <summary>
+        /// "Connection to API was lost. Can't continue with online play."
+        /// </summary>
+        public static LocalisableString APIDisconnect => new TranslatableString(getKey(@"api_disconnect"), @"Connection to API was lost. Can't continue with online play.");
+
+        /// <summary>
+        /// "Connection to the multiplayer server was lost. Exiting multiplayer."
+        /// </summary>
+        public static LocalisableString MultiplayerDisconnect => new TranslatableString(getKey(@"multiplayer_disconnect"), @"Connection to the multiplayer server was lost. Exiting multiplayer.");
+
+        /// <summary>
+        /// "You have been logged out on this device due to a login to your account on another device."
+        /// </summary>
+        public static LocalisableString AnotherDeviceDisconnect => new TranslatableString(getKey(@"another_device_disconnect"), @"You have been logged out on this device due to a login to your account on another device.");
+
+        /// <summary>
+        /// "You have been logged out due to a change to your account. Please log in again."
+        /// </summary>
+        public static LocalisableString AccountChangeDisconnect => new TranslatableString(getKey(@"account_change_disconnect"), @"You have been logged out due to a change to your account. Please log in again.");
+
+        /// <summary>
+        /// "Downloading {0}"
+        /// </summary>
+        public static LocalisableString Downloading(string info) => new TranslatableString(getKey(@"downloading"), @"Downloading {0}", info);
+
+        /// <summary>
+        /// "Collections import is initialising..."
+        /// </summary>
+        public static LocalisableString CollectionsImportInitialising => new TranslatableString(getKey(@"collections_import_initialising"), @"Collections import is initialising...");
+
+        /// <summary>
+        /// "Reading collections..."
+        /// </summary>
+        public static LocalisableString ReadingCollections => new TranslatableString(getKey(@"reading_collections"), @"Reading collections...");
+
+        /// <summary>
+        /// "Imported {0} collections"
+        /// </summary>
+        public static LocalisableString CollectionsImportProgress(int count) => new TranslatableString(getKey(@"collections_import_progress"), @"Imported {0} collections", count);
+
+        /// <summary>
+        /// "Imported {0} of {1} collections"
+        /// </summary>
+        public static LocalisableString CollectionsImportProgressTotal(int count, int totalCount) => new TranslatableString(getKey(@"collections_import_progress_total"), @"Imported {0} of {1} collections", count, totalCount);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

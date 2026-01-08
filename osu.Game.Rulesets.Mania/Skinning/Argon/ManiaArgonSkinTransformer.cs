@@ -40,8 +40,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                         case GlobalSkinnableContainers.MainHUDComponents:
                             return new DefaultSkinComponentsContainer(container =>
                             {
+                                var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
                                 var combo = container.ChildrenOfType<ArgonManiaComboCounter>().FirstOrDefault();
                                 var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
+
+                                if (leaderboard != null)
+                                    leaderboard.Position = new Vector2(36, 115);
 
                                 if (combo != null)
                                 {
@@ -53,8 +57,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                                 if (spectatorList != null)
                                     spectatorList.Position = new Vector2(36, -66);
+
+                                foreach (var d in container.OfType<ISerialisableDrawable>())
+                                    d.UsesFixedAnchor = true;
                             })
                             {
+                                new DrawableGameplayLeaderboard(),
                                 new ArgonManiaComboCounter(),
                                 new SpectatorList
                                 {
@@ -131,8 +139,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
                 switch (maniaLookup.Lookup)
                 {
-                    case LegacyManiaSkinConfigurationLookups.ColumnSpacing:
-                        return SkinUtils.As<TValue>(new Bindable<float>(2));
+                    case LegacyManiaSkinConfigurationLookups.LeftColumnSpacing:
+                    case LegacyManiaSkinConfigurationLookups.RightColumnSpacing:
+                        return SkinUtils.As<TValue>(new Bindable<float>(1));
 
                     case LegacyManiaSkinConfigurationLookups.StagePaddingBottom:
                     case LegacyManiaSkinConfigurationLookups.StagePaddingTop:
@@ -146,7 +155,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                         return SkinUtils.As<TValue>(new Bindable<float>(width));
 
                     case LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour:
-
                         var colour = getColourForLayout(columnIndex, stage);
 
                         return SkinUtils.As<TValue>(new Bindable<Color4>(colour));

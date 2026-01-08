@@ -8,17 +8,17 @@ namespace osu.Game.Overlays.Rankings
 {
     public enum RankingsScope
     {
-        [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypePerformance))]
+        [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.StatPerformance))]
         Performance,
 
-        [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypeScore))]
+        [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.StatRankedScore))]
         Score,
 
         [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypeCountry))]
         Country,
 
-        [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypeCharts))]
-        Spotlights,
+        [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypePlaylists))]
+        Playlists,
 
         [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypeKudosu))]
         Kudosu,

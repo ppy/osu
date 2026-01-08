@@ -15,7 +15,11 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 {
     public class OsuBeatmapProcessor : BeatmapProcessor
     {
-        private const int stack_distance = 3;
+        /// <summary>
+        /// The maximum distance between the end of one object and the start of another
+        /// which allows the objects to be stacked on top of another.
+        /// </summary>
+        public const int STACK_DISTANCE = 3;
 
         public OsuBeatmapProcessor(IBeatmap beatmap)
             : base(beatmap)
@@ -87,14 +91,14 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                             continue;
 
                         double endTime = stackBaseObject.GetEndTime();
-                        double stackThreshold = objectN.TimePreempt * beatmap.StackLeniency;
+                        float stackThreshold = calculateStackThreshold(beatmap, objectN);
 
                         if (objectN.StartTime - endTime > stackThreshold)
                             // We are no longer within stacking range of the next object.
                             break;
 
-                        if (Vector2Extensions.Distance(stackBaseObject.Position, objectN.Position) < stack_distance
-                            || (stackBaseObject is Slider && Vector2Extensions.Distance(stackBaseObject.EndPosition, objectN.Position) < stack_distance))
+                        if (Vector2Extensions.Distance(stackBaseObject.Position, objectN.Position) < STACK_DISTANCE
+                            || (stackBaseObject is Slider && Vector2Extensions.Distance(stackBaseObject.EndPosition, objectN.Position) < STACK_DISTANCE))
                         {
                             stackBaseIndex = n;
 
@@ -132,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 OsuHitObject objectI = hitObjects[i];
                 if (objectI.StackHeight != 0 || objectI is Spinner) continue;
 
-                double stackThreshold = objectI.TimePreempt * beatmap.StackLeniency;
+                float stackThreshold = calculateStackThreshold(beatmap, objectI);
 
                 /* If this object is a hitcircle, then we enter this "special" case.
                  * It either ends with a stack of hitcircles only, or a stack of hitcircles that are underneath a slider.
@@ -147,7 +151,10 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 
                         double endTime = objectN.GetEndTime();
 
-                        if (objectI.StartTime - endTime > stackThreshold)
+                        // truncation to integer is required to match stable
+                        // compare https://github.com/peppy/osu-stable-reference/blob/08e3dafd525934cf48880b08e91c24ce4ad8b761/osu!/GameplayElements/HitObjectManager.cs#L1725
+                        // - both quantities being subtracted there are integers
+                        if ((int)objectI.StartTime - (int)endTime > stackThreshold)
                             // We are no longer within stacking range of the previous object.
                             break;
 
@@ -163,7 +170,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                          *        o <- hitCircle has stack of -1
                          *         o <- hitCircle has stack of -2
                          */
-                        if (objectN is Slider && Vector2Extensions.Distance(objectN.EndPosition, objectI.Position) < stack_distance)
+                        if (objectN is Slider && Vector2Extensions.Distance(objectN.EndPosition, objectI.Position) < STACK_DISTANCE)
                         {
                             int offset = objectI.StackHeight - objectN.StackHeight + 1;
 
@@ -171,7 +178,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                             {
                                 // For each object which was declared under this slider, we will offset it to appear *below* the slider end (rather than above).
                                 OsuHitObject objectJ = hitObjects[j];
-                                if (Vector2Extensions.Distance(objectN.EndPosition, objectJ.Position) < stack_distance)
+                                if (Vector2Extensions.Distance(objectN.EndPosition, objectJ.Position) < STACK_DISTANCE)
                                     objectJ.StackHeight -= offset;
                             }
 
@@ -180,7 +187,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                             break;
                         }
 
-                        if (Vector2Extensions.Distance(objectN.Position, objectI.Position) < stack_distance)
+                        if (Vector2Extensions.Distance(objectN.Position, objectI.Position) < STACK_DISTANCE)
                         {
                             // Keep processing as if there are no sliders.  If we come across a slider, this gets cancelled out.
                             //NOTE: Sliders with start positions stacking are a special case that is also handled here.
@@ -204,7 +211,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                             // We are no longer within stacking range of the previous object.
                             break;
 
-                        if (Vector2Extensions.Distance(objectN.EndPosition, objectI.Position) < stack_distance)
+                        if (Vector2Extensions.Distance(objectN.EndPosition, objectI.Position) < STACK_DISTANCE)
                         {
                             objectN.StackHeight = objectI.StackHeight + 1;
                             objectI = objectN;
@@ -228,7 +235,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 
                 for (int j = i + 1; j < hitObjects.Count; j++)
                 {
-                    double stackThreshold = hitObjects[i].TimePreempt * beatmap.StackLeniency;
+                    float stackThreshold = calculateStackThreshold(beatmap, hitObjects[i]);
 
                     if (hitObjects[j].StartTime - stackThreshold > startTime)
                         break;
@@ -245,12 +252,12 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     // Effects of this can be seen on https://osu.ppy.sh/beatmapsets/243#osu/1146 at sliders around 86647 ms, where
                     // if we use `EndTime` here it would result in unexpected stacking.
 
-                    if (Vector2Extensions.Distance(hitObjects[j].Position, currHitObject.Position) < stack_distance)
+                    if (Vector2Extensions.Distance(hitObjects[j].Position, currHitObject.Position) < STACK_DISTANCE)
                     {
                         currHitObject.StackHeight++;
                         startTime = hitObjects[j].StartTime;
                     }
-                    else if (Vector2Extensions.Distance(hitObjects[j].Position, position2) < stack_distance)
+                    else if (Vector2Extensions.Distance(hitObjects[j].Position, position2) < STACK_DISTANCE)
                     {
                         // Case for sliders - bump notes down and right, rather than up and left.
                         sliderStack++;
@@ -260,5 +267,17 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 }
             }
         }
+
+        /// <remarks>
+        /// Truncation of <see cref="OsuHitObject.TimePreempt"/> to <see cref="int"/>, as well as keeping the result as <see cref="float"/>, are both done
+        /// <a href="https://github.com/peppy/osu-stable-reference/blob/08e3dafd525934cf48880b08e91c24ce4ad8b761/osu!/GameplayElements/HitObjectManager.cs#L1652">
+        /// for the purposes of stable compatibility
+        /// </a>.
+        /// Note that for top-level objects <see cref="OsuHitObject.TimePreempt"/> is supposed to be integral anyway;
+        /// see <see cref="OsuHitObject.ApplyDefaultsToSelf"/> using <see cref="IBeatmapDifficultyInfo.DifficultyRangeInt"/> when calculating it.
+        /// Slider ticks and end circles are the exception to that, but they do not matter for stacking.
+        /// </remarks>
+        private static float calculateStackThreshold(IBeatmap beatmap, OsuHitObject hitObject)
+            => (int)hitObject.TimePreempt * beatmap.StackLeniency;
     }
 }

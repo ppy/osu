@@ -14,7 +14,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.Countdown;
-using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osuTK;
@@ -23,22 +22,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public partial class MatchStartControl : CompositeDrawable
     {
-        public required Bindable<PlaylistItem?> SelectedItem
-        {
-            get => selectedItem;
-            set => selectedItem.Current = value;
-        }
-
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; } = null!;
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
-        private readonly BindableWithCurrent<PlaylistItem?> selectedItem = new BindableWithCurrent<PlaylistItem?>();
         private readonly MultiplayerReadyButton readyButton;
         private readonly MultiplayerCountdownButton countdownButton;
 
@@ -58,11 +50,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 ColumnDimensions = new[]
                 {
                     new Dimension(),
+                    new Dimension(GridSizeMode.Absolute, 5),
                     new Dimension(GridSizeMode.AutoSize)
                 },
                 Content = new[]
                 {
-                    new Drawable[]
+                    new Drawable?[]
                     {
                         readyButton = new MultiplayerReadyButton
                         {
@@ -70,6 +63,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                             Size = Vector2.One,
                             Action = onReadyButtonClick,
                         },
+                        null,
                         countdownButton = new MultiplayerCountdownButton
                         {
                             RelativeSizeAxes = Axes.Y,
@@ -98,9 +92,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             base.LoadComplete();
 
-            SelectedItem.BindValueChanged(_ => updateState());
             client.RoomUpdated += onRoomUpdated;
             client.LoadRequested += onLoadRequested;
+
             updateState();
         }
 
@@ -214,8 +208,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             readyButton.Enabled.Value = countdownButton.Enabled.Value =
                 client.Room.State != MultiplayerRoomState.Closed
-                && SelectedItem.Value?.ID == client.Room.Settings.PlaylistItemId
-                && !client.Room.Playlist.Single(i => i.ID == client.Room.Settings.PlaylistItemId).Expired
+                && !client.Room.CurrentPlaylistItem.Expired
                 && !operationInProgress.Value;
 
             // When the local user is the host and spectating the match, the ready button should be enabled only if any users are ready.
