@@ -68,7 +68,6 @@ namespace osu.Game.Online.API.Requests.Responses
         public string AvatarUrl;
 
         [JsonProperty(@"cover_url")]
-        [CanBeNull]
         public string CoverUrl
         {
             get => Cover?.Url;
