@@ -46,8 +46,8 @@ namespace osu.Game.Tests.Visual.Settings
         private static readonly SkinInfo protected_skin_1 = new SkinInfo { Protected = true, ID = SkinInfo.ARGON_SKIN, Name = "Protected skin 1", };
         private static readonly SkinInfo protected_skin_2 = new SkinInfo { Protected = true, ID = SkinInfo.ARGON_PRO_SKIN, Name = "Protected skin 2", };
 
-        [Test]
-        public void TestShowDropdown()
+        [SetUpSteps]
+        public void SetUpSteps()
         {
             AddStep("reset storage", () =>
             {
@@ -119,7 +119,9 @@ namespace osu.Game.Tests.Visual.Settings
             });
             AddStep("move over imported skin 4", () =>
             {
-                label = skinDropdown.ChildrenOfType<IHasText>().First(d => d.Text.ToString() == "Imported Skin 4");
+                isFavourite = getStarIcon();
+                label = skinDropdown.ChildrenOfType<IHasText>()
+                                    .FirstOrDefault(d => d.Text.ToString() == "Imported Skin 4");
                 Assert.NotNull(label.Parent);
                 InputManager.MoveMouseTo(label.Parent);
             });
@@ -130,26 +132,19 @@ namespace osu.Game.Tests.Visual.Settings
 
                 var starIcon = menuItem.ChildrenOfType<SpriteIcon>()
                                        .First(icon => icon.Icon.Equals(FontAwesome.Solid.Star) || icon.Icon.Equals(FontAwesome.Regular.Star));
-
-                isFavourite = starIcon.Icon.Equals(FontAwesome.Solid.Star);
-
-                InputManager.MoveMouseTo(starIcon, new Vector2(20, 4));
+                InputManager.MoveMouseTo(starIcon, new Vector2(10, 4));
             });
-            AddWaitStep("wait for star", 1);
             AddStep("toggle favourite status", () =>
             {
+                isFavourite = getStarIcon();
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("favourite status changed", () =>
+            AddAssert("dropdown opened", () =>
             {
-                Assert.NotNull(label.Parent);
-                var menuItem = label.Parent.Parent;
-
-                var starIcon = menuItem.ChildrenOfType<SpriteIcon>()
-                                       .First(icon => icon.Icon.Equals(FontAwesome.Solid.Star) || icon.Icon.Equals(FontAwesome.Regular.Star));
-
-                return starIcon.Icon.Equals(FontAwesome.Solid.Star) != isFavourite;
+                var menu = skinDropdown.ChildrenOfType<Menu>().FirstOrDefault();
+                return menu != null && menu.State == MenuState.Open;
             });
+            AddAssert("favourite status changed", () => getStarIcon() != isFavourite);
             AddStep("commit changes", () =>
             {
                 InputManager.MoveMouseTo(skinDropdown, new Vector2(0, -100));
