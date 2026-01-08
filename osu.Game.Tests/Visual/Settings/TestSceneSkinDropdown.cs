@@ -122,6 +122,7 @@ namespace osu.Game.Tests.Visual.Settings
                 isFavourite = getStarIcon();
                 label = skinDropdown.ChildrenOfType<IHasText>()
                                     .FirstOrDefault(d => d.Text.ToString() == "Imported Skin 4");
+                Assert.NotNull(label);
                 Assert.NotNull(label.Parent);
                 InputManager.MoveMouseTo(label.Parent);
             });
