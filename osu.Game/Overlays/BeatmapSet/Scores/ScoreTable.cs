@@ -170,6 +170,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         new UpdateableTeamFlag(score.User.Team)
                         {
                             Size = new Vector2(28, 14),
+                            CornerRadius = 1.75f,
                         },
                         username,
                     }
