@@ -93,7 +93,7 @@ namespace osu.Game.Graphics.UserInterface
             base.LoadComplete();
 
             Colour = DimColour;
-            Enabled.BindValueChanged(_ => this.FadeColour(DimColour, 200, Easing.OutQuint), true);
+            Enabled.BindValueChanged(_ => content.FadeColour(DimColour, 200, Easing.OutQuint), true);
             FinishTransforms(true);
         }
 
