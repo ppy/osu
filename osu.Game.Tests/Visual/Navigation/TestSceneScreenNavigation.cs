@@ -142,13 +142,12 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestExitSongSelectWithEscape()
         {
-            SoloSongSelect songSelect = null;
             ModSelectOverlay modSelect = null;
 
-            PushAndConfirm(() => songSelect = new SoloSongSelect());
+            PushAndConfirm(() => new SoloSongSelect());
             AddStep("Show mods overlay", () =>
             {
-                modSelect = songSelect!.ChildrenOfType<ModSelectOverlay>().Single();
+                modSelect = Game!.ChildrenOfType<ModSelectOverlay>().Single();
                 modSelect.Show();
             });
             AddAssert("Overlay was shown", () => modSelect.State.Value == Visibility.Visible);
@@ -310,11 +309,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestOpenModSelectOverlayUsingAction()
         {
-            SoloSongSelect songSelect = null;
-
-            PushAndConfirm(() => songSelect = new SoloSongSelect());
+            PushAndConfirm(() => new SoloSongSelect());
             AddStep("Show mods overlay", () => InputManager.Key(Key.F1));
-            AddAssert("Overlay was shown", () => songSelect!.ChildrenOfType<ModSelectOverlay>().Single().State.Value == Visibility.Visible);
+            AddAssert("Overlay was shown", () => Game!.ChildrenOfType<ModSelectOverlay>().Single().State.Value == Visibility.Visible);
         }
 
         [Test]
@@ -731,7 +728,7 @@ namespace osu.Game.Tests.Visual.Navigation
             PushAndConfirm(() => songSelect = new SoloSongSelect());
             AddStep("Show mods overlay", () =>
             {
-                modSelect = songSelect!.ChildrenOfType<ModSelectOverlay>().Single();
+                modSelect = Game!.ChildrenOfType<ModSelectOverlay>().Single();
                 modSelect.Show();
             });
             AddAssert("Overlay was shown", () => modSelect.State.Value == Visibility.Visible);
@@ -806,13 +803,12 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             AddUntilStep("Wait for toolbar to load", () => Game.Toolbar.IsLoaded);
 
-            SoloSongSelect songSelect = null;
             ModSelectOverlay modSelect = null;
 
-            PushAndConfirm(() => songSelect = new SoloSongSelect());
+            PushAndConfirm(() => new SoloSongSelect());
             AddStep("Show mods overlay", () =>
             {
-                modSelect = songSelect!.ChildrenOfType<ModSelectOverlay>().Single();
+                modSelect = Game!.ChildrenOfType<ModSelectOverlay>().Single();
                 modSelect.Show();
             });
             AddAssert("Overlay was shown", () => modSelect.State.Value == Visibility.Visible);
