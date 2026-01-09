@@ -13,6 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections.Input;
 using osu.Game.Rulesets.Taiko;
 using osuTK.Input;
@@ -202,16 +203,16 @@ namespace osu.Game.Tests.Visual.Settings
                 InputManager.ReleaseKey(Key.P);
             });
 
-            AddUntilStep("restore button shown", () => settingsKeyBindingRow.ChildrenOfType<RevertToDefaultButton<bool>>().First().Alpha > 0);
+            AddUntilStep("restore button shown", () => settingsKeyBindingRow.ChildrenOfType<SettingsRevertToDefaultButton>().First().Alpha > 0);
 
             AddStep("click reset button for bindings", () =>
             {
-                var resetButton = settingsKeyBindingRow.ChildrenOfType<RevertToDefaultButton<bool>>().First();
+                var resetButton = settingsKeyBindingRow.ChildrenOfType<SettingsRevertToDefaultButton>().First();
 
                 resetButton.TriggerClick();
             });
 
-            AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RevertToDefaultButton<bool>>().First().Alpha == 0);
+            AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<SettingsRevertToDefaultButton>().First().Alpha == 0);
 
             AddAssert("binding cleared",
                 () => settingsKeyBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.Value.KeyCombination.Equals(settingsKeyBindingRow.Defaults.ElementAt(0)));
@@ -232,7 +233,7 @@ namespace osu.Game.Tests.Visual.Settings
                 InputManager.ReleaseKey(Key.P);
             });
 
-            AddUntilStep("restore button shown", () => settingsKeyBindingRow.ChildrenOfType<RevertToDefaultButton<bool>>().First().Alpha > 0);
+            AddUntilStep("restore button shown", () => settingsKeyBindingRow.ChildrenOfType<SettingsRevertToDefaultButton>().First().Alpha > 0);
 
             AddStep("click reset button for bindings", () =>
             {
@@ -241,7 +242,7 @@ namespace osu.Game.Tests.Visual.Settings
                 resetButton.TriggerClick();
             });
 
-            AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RevertToDefaultButton<bool>>().First().Alpha == 0);
+            AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<SettingsRevertToDefaultButton>().First().Alpha == 0);
 
             AddAssert("binding cleared",
                 () => settingsKeyBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.Value.KeyCombination.Equals(settingsKeyBindingRow.Defaults.ElementAt(0)));
@@ -394,7 +395,7 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("reset Left (centre) to default", () =>
             {
                 var row = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == "Left (centre)"));
-                row.ChildrenOfType<RevertToDefaultButton<bool>>().Single().TriggerClick();
+                row.ChildrenOfType<SettingsRevertToDefaultButton>().Single().TriggerClick();
             });
 
             KeyBindingConflictPopover popover = null;
@@ -450,7 +451,7 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("revert row to default", () =>
             {
                 var row = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == "Left (centre)"));
-                InputManager.MoveMouseTo(row.ChildrenOfType<RevertToDefaultButton<bool>>().Single());
+                InputManager.MoveMouseTo(row.ChildrenOfType<SettingsRevertToDefaultButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
             AddWaitStep("wait a bit", 3);

@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Osu.Configuration;
@@ -13,6 +14,8 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public partial class OsuSettingsSubsection : RulesetSettingsSubsection
     {
+        private FormCheckBox snakingOutSliders = null!;
+
         protected override LocalisableString Header => "osu!";
 
         public OsuSettingsSubsection(Ruleset ruleset)
@@ -27,32 +30,34 @@ namespace osu.Game.Rulesets.Osu.UI
 
             Children = new Drawable[]
             {
-                new SettingsCheckbox
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = RulesetSettingsStrings.SnakingInSliders,
+                    Caption = RulesetSettingsStrings.SnakingInSliders,
                     Current = config.GetBindable<bool>(OsuRulesetSetting.SnakingInSliders)
-                },
-                new SettingsCheckbox
+                }),
+                new SettingsItemV2(snakingOutSliders = new FormCheckBox
                 {
-                    ClassicDefault = false,
-                    LabelText = RulesetSettingsStrings.SnakingOutSliders,
+                    Caption = RulesetSettingsStrings.SnakingOutSliders,
                     Current = config.GetBindable<bool>(OsuRulesetSetting.SnakingOutSliders)
-                },
-                new SettingsCheckbox
+                })
                 {
-                    LabelText = RulesetSettingsStrings.CursorTrail,
+                    ApplyClassicDefault = () => snakingOutSliders.Current.Value = false,
+                },
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = RulesetSettingsStrings.CursorTrail,
                     Current = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
-                },
-                new SettingsCheckbox
+                }),
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = RulesetSettingsStrings.CursorRipples,
+                    Caption = RulesetSettingsStrings.CursorRipples,
                     Current = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorRipples)
-                },
-                new SettingsEnumDropdown<PlayfieldBorderStyle>
+                }),
+                new SettingsItemV2(new FormEnumDropdown<PlayfieldBorderStyle>
                 {
-                    LabelText = RulesetSettingsStrings.PlayfieldBorderStyle,
+                    Caption = RulesetSettingsStrings.PlayfieldBorderStyle,
                     Current = config.GetBindable<PlayfieldBorderStyle>(OsuRulesetSetting.PlayfieldBorderStyle),
-                },
+                }),
             };
         }
     }
