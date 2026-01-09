@@ -45,6 +45,11 @@ namespace osu.Game.Localisation
         public static LocalisableString NoAutoplayMod => new TranslatableString(getKey(@"no_autoplay_mod"), @"The current ruleset doesn't have an autoplay mod available!");
 
         /// <summary>
+        /// "The current ruleset doesn&#39;t have a cinema mod available!"
+        /// </summary>
+        public static LocalisableString NoCinemaMod => new TranslatableString(getKey(@"no_cinema_mod"), @"The current ruleset doesn't have a cinema mod available!");
+
+        /// <summary>
         /// "osu! doesn&#39;t seem to be able to play audio correctly.
         ///
         /// Please try changing your audio device to a working setting."
