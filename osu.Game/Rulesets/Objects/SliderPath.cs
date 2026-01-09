@@ -137,6 +137,18 @@ namespace osu.Game.Rulesets.Objects
             }
         }
 
+        /// <summary>
+        /// Path vertices after lengthening/shortening to account for <see cref="ExpectedDistance"/>.
+        /// </summary>
+        public IReadOnlyList<Vector2> CalculatedPath
+        {
+            get
+            {
+                ensureValid();
+                return calculatedPath;
+            }
+        }
+
         private bool optimiseCatmull;
 
         /// <summary>

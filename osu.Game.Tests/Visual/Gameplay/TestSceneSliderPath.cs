@@ -39,12 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             base.Update();
 
             if (path != null)
-            {
-                List<Vector2> vertices = new List<Vector2>();
-                path.GetPathToProgress(vertices, 0, 1);
-
-                drawablePath.Vertices = vertices;
-            }
+                drawablePath.Vertices = path.CalculatedPath;
         }
 
         [Test]
