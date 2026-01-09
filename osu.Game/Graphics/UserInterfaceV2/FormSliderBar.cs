@@ -22,6 +22,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
+using Vector2 = osuTK.Vector2;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -143,7 +144,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private void load(OsuColour colours, OsuGame? game)
         {
             RelativeSizeAxes = Axes.X;
-            Height = 50;
+            AutoSizeAxes = Axes.Y;
 
             Masking = true;
             CornerRadius = 5;
@@ -162,47 +163,64 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 },
                 new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding
                     {
-                        Vertical = 9,
+                        Vertical = 5,
                         Left = 9,
                         Right = 5,
                     },
                     Children = new Drawable[]
                     {
-                        captionText = new FormFieldCaption
+                        new FillFlowContainer
                         {
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopLeft,
-                            TooltipText = HintText,
-                        },
-                        textBox = new FormNumberBox.InnerNumberBox(allowDecimals: true)
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
                             RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0f, 4f),
                             Width = 0.5f,
-                            // the textbox is hidden when the control is unfocused,
-                            // but clicking on the label should reach the textbox,
-                            // therefore make it always present.
-                            AlwaysPresent = true,
-                            CommitOnFocusLost = true,
-                            SelectAllOnFocus = true,
-                            OnInputError = () =>
+                            Padding = new MarginPadding
                             {
-                                flashLayer.Colour = ColourInfo.GradientVertical(colours.Red3.Opacity(0), colours.Red3);
-                                flashLayer.FadeOutFromOne(200, Easing.OutQuint);
+                                Right = 10,
+                                Vertical = 4,
                             },
-                            TabbableContentContainer = tabbableContentContainer,
-                        },
-                        valueLabel = new TruncatingSpriteText
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.X,
-                            Width = 0.5f,
-                            Padding = new MarginPadding { Right = 5 },
+                            Children = new Drawable[]
+                            {
+                                captionText = new FormFieldCaption
+                                {
+                                    TooltipText = HintText,
+                                },
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Children = new Drawable[]
+                                    {
+                                        textBox = new FormNumberBox.InnerNumberBox(allowDecimals: true)
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            // the textbox is hidden when the control is unfocused,
+                                            // but clicking on the label should reach the textbox,
+                                            // therefore make it always present.
+                                            AlwaysPresent = true,
+                                            CommitOnFocusLost = true,
+                                            SelectAllOnFocus = true,
+                                            OnInputError = () =>
+                                            {
+                                                flashLayer.Colour = ColourInfo.GradientVertical(colours.Red3.Opacity(0), colours.Red3);
+                                                flashLayer.FadeOutFromOne(200, Easing.OutQuint);
+                                            },
+                                            TabbableContentContainer = tabbableContentContainer,
+                                        },
+                                        valueLabel = new TruncatingSpriteText
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Padding = new MarginPadding { Right = 5 },
+                                        },
+                                    },
+                                },
+                            },
                         },
                         slider = new InnerSlider
                         {
