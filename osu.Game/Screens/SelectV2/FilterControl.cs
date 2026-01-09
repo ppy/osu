@@ -15,6 +15,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Input.Bindings;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
@@ -121,6 +122,7 @@ namespace osu.Game.Screens.SelectV2
                                 ApplyFilter = applyFilter,
                                 SaveFilter = saveFilter,
                                 Ruleset = ruleset,
+                                ScopedBeatmapSet = ScopedBeatmapSet,
                             },
                         },
                         new GridContainer
@@ -386,6 +388,14 @@ namespace osu.Game.Screens.SelectV2
             public Action<string>? SaveFilter { get; set; }
             public IBindable<RulesetInfo> Ruleset { get; set; } = null!;
 
+            public Bindable<BeatmapSetInfo?> ScopedBeatmapSet
+            {
+                get => scopedBeatmapSet.Current;
+                set => scopedBeatmapSet.Current = value;
+            }
+
+            private readonly BindableWithCurrent<BeatmapSetInfo?> scopedBeatmapSet = new BindableWithCurrent<BeatmapSetInfo?>();
+
             private readonly Box hoverBox;
 
             public SongSelectSearchTextBox()
@@ -439,11 +449,30 @@ namespace osu.Game.Screens.SelectV2
 
             private Popover createPopover() => new SavedFiltersPopover(f => ApplyFilter?.Invoke(f), n => SaveFilter?.Invoke(n), Ruleset.Value);
 
-            protected override InnerSearchTextBox CreateInnerTextBox() => new InnerTextBox();
+            protected override InnerSearchTextBox CreateInnerTextBox() => new InnerTextBox
+            {
+                ScopedBeatmapSet = ScopedBeatmapSet,
+            };
 
             private partial class InnerTextBox : InnerFilterTextBox
             {
+                public Bindable<BeatmapSetInfo?> ScopedBeatmapSet
+                {
+                    get => scopedBeatmapSet.Current;
+                    set => scopedBeatmapSet.Current = value;
+                }
+
+                private readonly BindableWithCurrent<BeatmapSetInfo?> scopedBeatmapSet = new BindableWithCurrent<BeatmapSetInfo?>();
+
                 public override bool HandleLeftRightArrows => false;
+
+                public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+                {
+                    if (e.Action == GlobalAction.Back && scopedBeatmapSet.Value != null)
+                        return false;
+
+                    return base.OnPressed(e);
+                }
 
                 public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
                 {

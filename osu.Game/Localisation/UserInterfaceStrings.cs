@@ -60,6 +60,11 @@ namespace osu.Game.Localisation
         public static LocalisableString IntroSequence => new TranslatableString(getKey(@"intro_sequence"), @"Intro sequence");
 
         /// <summary>
+        /// "Random"
+        /// </summary>
+        public static LocalisableString IntroRandom => new TranslatableString(getKey(@"intro_random"), @"Random");
+
+        /// <summary>
         /// "Background source"
         /// </summary>
         public static LocalisableString BackgroundSource => new TranslatableString(getKey(@"background_source"), @"Background source");
@@ -160,9 +165,9 @@ namespace osu.Game.Localisation
         public static LocalisableString NeverRepeat => new TranslatableString(getKey(@"never_repeat_random"), @"Never repeat");
 
         /// <summary>
-        /// "True Random"
+        /// "True random"
         /// </summary>
-        public static LocalisableString TrueRandom => new TranslatableString(getKey(@"true_random"), @"True Random");
+        public static LocalisableString TrueRandom => new TranslatableString(getKey(@"true_random"), @"True random");
 
         /// <summary>
         /// "Selected Mods"
