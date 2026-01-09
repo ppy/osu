@@ -66,7 +66,7 @@ namespace osu.Game.Overlays
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        private BindableNumber<double> sampleVolume = null!;
+        private IBindable<double> sampleVolume = null!;
 
         private readonly BindableDouble audioDuckVolume = new BindableDouble(1);
 
@@ -82,7 +82,7 @@ namespace osu.Game.Overlays
         {
             AddInternal(audioDuckFilter = new AudioFilter(audio.TrackMixer));
             audio.Tracks.AddAdjustment(AdjustableProperty.Volume, audioDuckVolume);
-            sampleVolume = audio.VolumeSample.GetBoundCopy();
+            sampleVolume = audio.Samples.AggregateVolume.GetBoundCopy();
 
             configManager.BindWith(OsuSetting.RandomSelectAlgorithm, randomSelectAlgorithm);
         }

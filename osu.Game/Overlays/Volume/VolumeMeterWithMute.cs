@@ -9,7 +9,14 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
-    public partial class MasterVolumeMeter : VolumeMeter
+    public enum MuteMode
+    {
+        Master,
+        Effects,
+        Music,
+    }
+
+    public partial class VolumeMeterWithMute : VolumeMeter
     {
         private MuteButton muteButton = null!;
 
@@ -17,12 +24,33 @@ namespace osu.Game.Overlays.Volume
 
         private readonly BindableDouble muteAdjustment = new BindableDouble();
 
+        private readonly MuteMode mode;
+
         [Resolved]
         private VolumeOverlay volumeOverlay { get; set; } = null!;
 
-        public MasterVolumeMeter(string name, float circleSize, Color4 meterColour)
+        public VolumeMeterWithMute(string name, float circleSize, Color4 meterColour, MuteMode muteMode)
             : base(name, circleSize, meterColour)
         {
+            mode = muteMode;
+        }
+
+        private IAdjustableAudioComponent getAudioComponent(AudioManager audio)
+        {
+            switch (mode)
+            {
+                case MuteMode.Master:
+                    return audio;
+
+                case MuteMode.Effects:
+                    return audio.Samples;
+
+                case MuteMode.Music:
+                    return audio.Tracks;
+
+                default:
+                    throw new System.Diagnostics.UnreachableException();
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -30,10 +58,11 @@ namespace osu.Game.Overlays.Volume
         {
             IsMuted.BindValueChanged(muted =>
             {
+                IAdjustableAudioComponent component = getAudioComponent(audio);
                 if (muted.NewValue)
-                    audio.AddAdjustment(AdjustableProperty.Volume, muteAdjustment);
+                    component.AddAdjustment(AdjustableProperty.Volume, muteAdjustment);
                 else
-                    audio.RemoveAdjustment(AdjustableProperty.Volume, muteAdjustment);
+                    component.RemoveAdjustment(AdjustableProperty.Volume, muteAdjustment);
             });
 
             Add(muteButton = new MuteButton
