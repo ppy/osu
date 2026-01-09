@@ -11,9 +11,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Database;
 using osu.Game.Extensions;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
 using osu.Game.Overlays.Dashboard.Friends;
+using osu.Game.Rulesets;
 using osu.Game.Users;
 using osuTK;
 
@@ -33,8 +35,8 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
         [Resolved]
         private MetadataClient metadataClient { get; set; } = null!;
 
-        [Resolved]
-        private UserLookupCache userCache { get; set; } = null!;
+        [Cached(typeof(UserLookupCache))] // not used at the moment.
+        private UserWithRankLookupCache userCache { get; set; } = new UserWithRankLookupCache();
 
         public RealtimeUserList(OverlayPanelDisplayStyle style)
         {
@@ -47,6 +49,8 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
         [BackgroundDependencyLoader]
         private void load()
         {
+            AddInternal(userCache);
+
             InternalChild = searchContainer = new OnlineUserSearchContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -117,6 +121,9 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
 
         private void updateUsers()
         {
+            if (pendingUsers.Count == 0)
+                return;
+
             // partitioning here is just to break up the requests.
             // without this, the intitial request will take seconds to minutes.
             const int partition_size = 50;
@@ -223,6 +230,29 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// This is implemented local to avoid invalidating the full cache on ruleset change at a global `UserLookupCache` level.
+        /// We should probably do better than this (server-spectator sending the rank data instead? something else?).
+        /// </summary>
+        private partial class UserWithRankLookupCache : UserLookupCache
+        {
+            [Resolved]
+            private IBindable<RulesetInfo> ruleset { get; set; } = null!;
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                ruleset.BindValueChanged(ruleset =>
+                {
+                    if (ruleset.OldValue?.OnlineID != ruleset.NewValue?.OnlineID)
+                        Clear();
+                });
+            }
+
+            protected override LookupUsersRequest CreateRequest(IEnumerable<int> ids) => new LookupUsersRequest(ids.ToArray(), ruleset.Value?.OnlineID >= 0 ? ruleset.Value.OnlineID : null);
         }
     }
 }
