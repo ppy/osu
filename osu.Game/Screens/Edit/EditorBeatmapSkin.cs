@@ -18,14 +18,14 @@ namespace osu.Game.Screens.Edit
     /// <summary>
     /// A beatmap skin which is being edited.
     /// </summary>
-    public class EditorBeatmapSkin : ISkin
+    public class EditorBeatmapSkin : ISkin, IDisposable
     {
         public event Action? BeatmapSkinChanged;
 
         /// <summary>
         /// The underlying beatmap skin.
         /// </summary>
-        protected internal readonly Skin Skin;
+        protected internal readonly LegacyBeatmapSkin Skin;
 
         /// <summary>
         /// The combo colours of this skin.
@@ -33,10 +33,13 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public BindableList<Colour4> ComboColours { get; }
 
-        public EditorBeatmapSkin(Skin skin)
-        {
-            Skin = skin;
+        private readonly EditorBeatmap editorBeatmap;
 
+        public EditorBeatmapSkin(EditorBeatmap editorBeatmap, LegacyBeatmapSkin skin)
+        {
+            this.editorBeatmap = editorBeatmap;
+
+            Skin = skin;
             ComboColours = new BindableList<Colour4>();
 
             if (Skin.Configuration.ComboColours is IReadOnlyList<Color4> comboColours)
@@ -50,9 +53,14 @@ namespace osu.Game.Screens.Edit
             }
 
             ComboColours.BindCollectionChanged((_, _) => updateColours());
+
+            if (skin.BeatmapSetResources != null)
+                skin.BeatmapSetResources.CacheInvalidated += InvokeSkinChanged;
         }
 
-        private void invokeSkinChanged() => BeatmapSkinChanged?.Invoke();
+        public void InvokeSkinChanged() => BeatmapSkinChanged?.Invoke();
+
+        #region Combo colours
 
         private void updateColours()
         {
@@ -60,8 +68,13 @@ namespace osu.Game.Screens.Edit
             Skin.Configuration.CustomComboColours.Clear();
             for (int i = 0; i < ComboColours.Count; ++i)
                 Skin.Configuration.CustomComboColours.Add(ComboColours[(ComboColours.Count + i - 1) % ComboColours.Count]);
-            invokeSkinChanged();
+            InvokeSkinChanged();
+            editorBeatmap.SaveState();
         }
+
+        #endregion
+
+        #region Sample sets
 
         public record SampleSet(int SampleSetIndex, string Name)
         {
@@ -88,7 +101,7 @@ namespace osu.Game.Screens.Edit
 
             string[] possiblePrefixes = possibleSounds.SelectMany(sound => possibleBanks.Select(bank => $@"{bank}-{sound}")).ToArray();
 
-            HashSet<int> indices = new HashSet<int>();
+            Dictionary<int, SampleSet> sampleSets = new Dictionary<int, SampleSet>();
 
             if (Skin.Samples != null)
             {
@@ -96,19 +109,39 @@ namespace osu.Game.Screens.Edit
                 {
                     foreach (string possiblePrefix in possiblePrefixes)
                     {
-                        if (!sample.StartsWith(possiblePrefix, StringComparison.InvariantCultureIgnoreCase))
+                        if (!sample.StartsWith(possiblePrefix, StringComparison.Ordinal))
                             continue;
 
                         string indexString = Path.GetFileNameWithoutExtension(sample)[possiblePrefix.Length..];
+                        int? index = null;
+
                         if (string.IsNullOrEmpty(indexString))
-                            indices.Add(1);
-                        if (int.TryParse(indexString, out int index))
-                            indices.Add(index);
+                            index = 1;
+                        if (int.TryParse(indexString, out int parsed))
+                            index = parsed;
+
+                        if (!index.HasValue)
+                            continue;
+
+                        SampleSet? sampleSet;
+                        if (!sampleSets.TryGetValue(index.Value, out sampleSet))
+                            sampleSet = sampleSets[index.Value] = new SampleSet(index.Value);
+
+                        sampleSet.Filenames.Add(sample);
                     }
                 }
             }
 
-            return indices.OrderBy(i => i).Select(i => new SampleSet(i));
+            return sampleSets.OrderBy(i => i.Key).Select(i => i.Value);
+        }
+
+        #endregion
+
+        public void Dispose()
+        {
+            if (Skin.BeatmapSetResources != null)
+                Skin.BeatmapSetResources.CacheInvalidated -= InvokeSkinChanged;
+            Skin.Dispose();
         }
 
         #region Delegated ISkin implementation
