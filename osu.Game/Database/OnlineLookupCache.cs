@@ -81,7 +81,7 @@ namespace osu.Game.Database
                 pendingTasks.Enqueue((id, tcs));
 
                 // Create a request task if there's not already one.
-                if (pendingRequestTask == null)
+                if (pendingRequestTask == null || pendingRequestTask.IsFaulted)
                     createNewTask();
 
                 return tcs.Task;
