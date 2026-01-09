@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class SpeedEvaluator
     {
-        private const double single_spacing_threshold = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25; // 1.25 circles distance between centers
+        private const double single_spacing_threshold = OsuTappableDifficultyHitObject.NORMALISED_DIAMETER * 1.25; // 1.25 circles distance between centers
         private const double min_speed_bonus = 200; // 200 BPM 1/4th
         private const double speed_balancing_factor = 40;
         private const double distance_multiplier = 0.8;
@@ -30,14 +30,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current, IReadOnlyList<Mod> mods)
         {
-            if (current is not OsuDifficultyHitObject osuCurrObj)
+            if (current is not OsuTappableDifficultyHitObject osuCurrObj)
                 return 0;
 
             // derive strainTime for calculation
-            var osuPrevObj = osuCurrObj.IndexMain > 0 ? osuCurrObj.PreviousMain(0) : null;
+            var osuPrevObj = osuCurrObj.IndexTappable > 0 ? osuCurrObj.PreviousTappable(0) : null;
 
             double strainTime = osuCurrObj.AdjustedDeltaTime;
-            double doubletapness = 1.0 - osuCurrObj.GetDoubletapness(osuCurrObj.NextMain(0));
+            double doubletapness = 1.0 - osuCurrObj.GetDoubletapness(osuCurrObj.NextTappable(0));
 
             // Cap deltatime to the OD 300 hitwindow.
             // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.

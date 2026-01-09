@@ -28,15 +28,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
-            if (current is not OsuDifficultyHitObject osuCurrObj || osuCurrObj.IndexMain <= 1)
+            if (current is not OsuTappableDifficultyHitObject osuCurrObj || osuCurrObj.IndexTappable <= 1)
                 return 0;
 
-            var osuLastObj = osuCurrObj.PreviousMain(0)!;
-            var osuLastLastObj = osuCurrObj.PreviousMain(1)!;
-            var osuLast2Obj = osuCurrObj.PreviousMain(2);
+            var osuLastObj = osuCurrObj.PreviousTappable(0)!;
+            var osuLastLastObj = osuCurrObj.PreviousTappable(1)!;
+            var osuLast2Obj = osuCurrObj.PreviousTappable(2);
 
-            const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
-            const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
+            const int radius = OsuTappableDifficultyHitObject.NORMALISED_RADIUS;
+            const int diameter = OsuTappableDifficultyHitObject.NORMALISED_DIAMETER;
 
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
             double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.AdjustedDeltaTime;

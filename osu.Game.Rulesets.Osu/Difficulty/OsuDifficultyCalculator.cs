@@ -155,9 +155,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
-            List<OsuDifficultyHitObject> mainObjects = new List<OsuDifficultyHitObject>();
+            List<OsuTappableDifficultyHitObject> tappbleObjects = new List<OsuTappableDifficultyHitObject>();
 
-            HitObject lastMainObj = beatmap.HitObjects.First();
+            HitObject lastTappableObj = beatmap.HitObjects.First();
 
             // The first jump is formed by the first two hitobjects of the map.
             // If the map has less than two OsuHitObjects, the enumerator will not return anything.
@@ -171,12 +171,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 }
                 else
                 {
-                    var difficultyObject = new OsuDifficultyHitObject(currObj, beatmap.HitObjects[i - 1], lastMainObj, clockRate, objects, objects.Count, mainObjects, mainObjects.Count);
+                    var difficultyObject = new OsuTappableDifficultyHitObject(currObj, beatmap.HitObjects[i - 1], lastTappableObj, clockRate, objects, objects.Count, tappbleObjects, tappbleObjects.Count);
 
                     objects.Add(difficultyObject);
-                    mainObjects.Add(difficultyObject);
+                    tappbleObjects.Add(difficultyObject);
 
-                    lastMainObj = currObj;
+                    lastTappableObj = currObj;
                 }
             }
 
