@@ -251,15 +251,19 @@ namespace osu.Game.Beatmaps
                 var ruleset = rulesetInfo.CreateInstance();
                 Debug.Assert(ruleset != null);
 
-                PlayableCachedWorkingBeatmap workingBeatmap = new PlayableCachedWorkingBeatmap(beatmapManager.GetWorkingBeatmap(key.BeatmapInfo));
-                IBeatmap playableBeatmap = workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, key.OrderedMods, cancellationToken);
+                WorkingBeatmap workingBeatmap = beatmapManager.GetWorkingBeatmap(key.BeatmapInfo);
+                PlayableCachedWorkingBeatmap playableCachedWorkingBeatmap = new PlayableCachedWorkingBeatmap(workingBeatmap);
+                IBeatmap playableBeatmap = playableCachedWorkingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, key.OrderedMods, cancellationToken);
 
-                var difficulty = ruleset.CreateDifficultyCalculator(workingBeatmap).Calculate(key.OrderedMods, cancellationToken);
+                var noModDifficulty = ruleset.CreateDifficultyCalculator(workingBeatmap).Calculate(key.OrderedMods.OfType<ModTouchDevice>(), cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var difficulty = ruleset.CreateDifficultyCalculator(playableCachedWorkingBeatmap).Calculate(key.OrderedMods, cancellationToken);
                 cancellationToken.ThrowIfCancellationRequested();
 
                 var performanceCalculator = ruleset.CreatePerformanceCalculator();
                 if (performanceCalculator == null)
-                    return new StarDifficulty(difficulty, new PerformanceAttributes());
+                    return new StarDifficulty(difficulty, new PerformanceAttributes(), noModDifficulty);
 
                 ScoreProcessor scoreProcessor = ruleset.CreateScoreProcessor();
                 scoreProcessor.Mods.Value = key.OrderedMods;
@@ -281,7 +285,7 @@ namespace osu.Game.Beatmaps
                 var performance = performanceCalculator.Calculate(perfectScore, difficulty);
                 cancellationToken.ThrowIfCancellationRequested();
 
-                return new StarDifficulty(difficulty, performance);
+                return new StarDifficulty(difficulty, performance, noModDifficulty);
             }
             catch (OperationCanceledException)
             {

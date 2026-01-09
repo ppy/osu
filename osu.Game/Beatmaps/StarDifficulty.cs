@@ -14,6 +14,11 @@ namespace osu.Game.Beatmaps
         public readonly double Stars;
 
         /// <summary>
+        /// The star difficulty rating for the given beatmap without any mods applied.
+        /// </summary>
+        public readonly double NoModStars;
+
+        /// <summary>
         /// The maximum combo achievable on the given beatmap.
         /// </summary>
         public readonly int MaxCombo;
@@ -33,9 +38,10 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Creates a <see cref="StarDifficulty"/> structure.
         /// </summary>
-        public StarDifficulty(DifficultyAttributes difficulty, PerformanceAttributes performance)
+        public StarDifficulty(DifficultyAttributes difficulty, PerformanceAttributes performance, DifficultyAttributes noModDifficulty)
         {
             Stars = double.IsFinite(difficulty.StarRating) ? difficulty.StarRating : 0;
+            NoModStars = double.IsFinite(noModDifficulty.StarRating) ? noModDifficulty.StarRating : 0;
             MaxCombo = difficulty.MaxCombo;
             DifficultyAttributes = difficulty;
             PerformanceAttributes = performance;
@@ -49,6 +55,7 @@ namespace osu.Game.Beatmaps
         public StarDifficulty(double starDifficulty, int maxCombo)
         {
             Stars = double.IsFinite(starDifficulty) ? starDifficulty : 0;
+            NoModStars = Stars;
             MaxCombo = maxCombo;
         }
 
