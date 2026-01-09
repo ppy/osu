@@ -13,6 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
@@ -169,10 +170,13 @@ namespace osu.Game.Overlays.Settings.Sections
 
             private void updateDisplay()
             {
-                if (toggleable && IsHovered)
-                    headerText.FadeColour(colourProvider.Light1, 300, Easing.OutQuint);
-                else
-                    headerText.FadeColour(Current.Value ? colourProvider.Content1 : colourProvider.Foreground1, 300, Easing.OutQuint);
+                // default, toggled on (or not toggleable)
+                Color4 col = colourProvider.Content1;
+
+                if (toggleable && !Current.Value)
+                    col = IsHovered ? colourProvider.Light1 : colourProvider.Foreground1;
+
+                headerText.FadeColour(col, 300, Easing.OutQuint);
             }
         }
     }
