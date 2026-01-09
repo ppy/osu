@@ -139,12 +139,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                                     Current = new BindableFloat
                                     {
                                         MinValue = 0,
-                                        MaxValue = 1,
-                                        Value = 0.2f,
-                                        Precision = 0.0001f,
+                                        MaxValue = 100,
+                                        Value = 20,
+                                        Precision = 0.01f,
                                     },
-                                    LabelFormat = v => $"{v * 100:0.00} funometer",
-                                    TooltipFormat = v => $"This setting has the value set to {v * 100:0.00} funometer.",
+                                    LabelFormat = v => $"{v:0.00} funometer",
+                                    TooltipFormat = v => $"This setting has the value set to {v:0.00} funometer.",
                                     TabbableContentContainer = this,
                                 },
                                 new FormSliderBar<float>
@@ -154,14 +154,14 @@ namespace osu.Game.Tests.Visual.UserInterface
                                     Current = new BindableFloat
                                     {
                                         MinValue = 0,
-                                        MaxValue = 1,
-                                        Value = 0.2f,
-                                        Precision = 0.0001f,
+                                        MaxValue = 100,
+                                        Value = 20,
+                                        Precision = 0.01f,
                                         Disabled = true,
                                     },
                                     TransferValueOnCommit = true,
-                                    LabelFormat = v => $"{v * 100:0.00} funometer",
-                                    TooltipFormat = v => $"This setting has the value set to {v * 100:0.00} funometer.",
+                                    LabelFormat = v => $"{v:0.00} funometer",
+                                    TooltipFormat = v => $"This setting has the value set to {v:0.00} funometer.",
                                     TabbableContentContainer = this,
                                 },
                                 new FormEnumDropdown<CountdownType>
