@@ -479,6 +479,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString EditorDiscardUnsavedChanges => new TranslatableString(getKey(@"editor_discard_unsaved_changes"), @"Discard unsaved changes");
 
+        /// <summary>
+        /// "Increase playback speed"
+        /// </summary>
+        public static LocalisableString EditorIncreasePlaybackSpeed => new TranslatableString(getKey(@"editor_increase_playback_speed"), @"Increase playback speed");
+
+        /// <summary>
+        /// "Decrease playback speed"
+        /// </summary>
+        public static LocalisableString EditorDecreasePlaybackSpeed => new TranslatableString(getKey(@"editor_decrease_playback_speed"), @"Decrease playback speed");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
