@@ -199,6 +199,7 @@ namespace osu.Game.Overlays.Profile.Header
                                                                 teamFlag = new UpdateableTeamFlag
                                                                 {
                                                                     Size = new Vector2(40, 20),
+                                                                    CornerRadius = 2.5f,
                                                                 },
                                                                 teamText = new OsuSpriteText
                                                                 {
