@@ -19,16 +19,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double rhythm_ratio_multiplier = 15.0;
 
         /// <summary>
-        /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
+        /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuTappableDifficultyHitObject"/>.
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
-            if (current.BaseObject is Spinner)
-                return 0;
+            if (current is not OsuTappableDifficultyHitObject osuCurrent)
+                return 1.0;
 
             double rhythmComplexitySum = 0;
 
-            double deltaDifferenceEpsilon = ((OsuDifficultyHitObject)current).HitWindowGreat * 0.3;
+            double deltaDifferenceEpsilon = osuCurrent.HitWindowGreat * 0.3;
 
             var island = new Island(deltaDifferenceEpsilon);
             var previousIsland = new Island(deltaDifferenceEpsilon);
@@ -41,20 +41,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             bool firstDeltaSwitch = false;
 
-            int historicalNoteCount = Math.Min(current.Index, history_objects_max);
+            int historicalNoteCount = Math.Min(osuCurrent.IndexTappable, history_objects_max);
 
             int rhythmStart = 0;
 
-            while (rhythmStart < historicalNoteCount - 2 && current.StartTime - current.Previous(rhythmStart).StartTime < history_time_max)
+            while (rhythmStart < historicalNoteCount - 2 && current.StartTime - osuCurrent.PreviousTappable(rhythmStart)!.StartTime < history_time_max)
                 rhythmStart++;
 
-            OsuDifficultyHitObject prevObj = (OsuDifficultyHitObject)current.Previous(rhythmStart);
-            OsuDifficultyHitObject lastObj = (OsuDifficultyHitObject)current.Previous(rhythmStart + 1);
+            OsuTappableDifficultyHitObject prevObj = osuCurrent.PreviousTappable(rhythmStart)!;
+            OsuTappableDifficultyHitObject lastObj = osuCurrent.PreviousTappable(rhythmStart + 1)!;
 
             // we go from the furthest object back to the current one
             for (int i = rhythmStart; i > 0; i--)
             {
-                OsuDifficultyHitObject currObj = (OsuDifficultyHitObject)current.Previous(i - 1);
+                OsuTappableDifficultyHitObject currObj = osuCurrent.PreviousTappable(i - 1)!;
 
                 // scales note 0 to 1 from history to now
                 double timeDecay = (history_time_max - (current.StartTime - currObj.StartTime)) / history_time_max;
@@ -63,9 +63,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double currHistoricalDecay = Math.Min(noteDecay, timeDecay); // either we're limited by time or limited by object count.
 
                 // Use custom cap value to ensure that that at this point delta time is actually zero
-                double currDelta = Math.Max(currObj.DeltaTime, 1e-7);
-                double prevDelta = Math.Max(prevObj.DeltaTime, 1e-7);
-                double lastDelta = Math.Max(lastObj.DeltaTime, 1e-7);
+                double currDelta = Math.Max(currObj.DeltaTimeTappable, 1e-7);
+                double prevDelta = Math.Max(prevObj.DeltaTimeTappable, 1e-7);
+                double lastDelta = Math.Max(lastObj.DeltaTimeTappable, 1e-7);
 
                 // calculate how much current delta difference deserves a rhythm bonus
                 // this function is meant to reduce rhythm bonus for deltas that are multiples of each other (i.e 100 and 200)
@@ -189,7 +189,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             public Island(int delta, double epsilon)
             {
                 deltaDifferenceEpsilon = epsilon;
-                Delta = Math.Max(delta, OsuDifficultyHitObject.MIN_DELTA_TIME);
+                Delta = Math.Max(delta, OsuTappableDifficultyHitObject.MIN_DELTA_TIME);
                 DeltaCount++;
             }
 
@@ -199,7 +199,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             public void AddDelta(int delta)
             {
                 if (Delta == int.MaxValue)
-                    Delta = Math.Max(delta, OsuDifficultyHitObject.MIN_DELTA_TIME);
+                    Delta = Math.Max(delta, OsuTappableDifficultyHitObject.MIN_DELTA_TIME);
 
                 DeltaCount++;
             }
