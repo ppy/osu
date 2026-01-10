@@ -130,6 +130,16 @@ namespace osu.Game.Localisation
         public static LocalisableString SelectNext => new TranslatableString(getKey(@"select_next"), @"Next selection");
 
         /// <summary>
+        /// "Previous page"
+        /// </summary>
+        public static LocalisableString SelectPreviousPage => new TranslatableString(getKey(@"select_previous_page"), @"Previous page");
+
+        /// <summary>
+        /// "Next page"
+        /// </summary>
+        public static LocalisableString SelectNextPage => new TranslatableString(getKey(@"select_next_page"), @"Next page");
+
+        /// <summary>
         /// "Activate previous set"
         /// </summary>
         public static LocalisableString ActivatePreviousSet => new TranslatableString(getKey(@"activate_previous_set"), @"Activate previous set");
