@@ -46,9 +46,6 @@ namespace osu.Game.Screens.SelectV2
         private BeatmapManager beatmaps { get; set; } = null!;
 
         [Resolved]
-        private OsuColour colours { get; set; } = null!;
-
-        [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
         private IBindable<StarDifficulty>? starDifficultyBindable;

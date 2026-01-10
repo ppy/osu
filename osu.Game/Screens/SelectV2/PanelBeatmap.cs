@@ -54,12 +54,6 @@ namespace osu.Game.Screens.SelectV2
         private IRulesetStore rulesets { get; set; } = null!;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; } = null!;
-
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
-
-        [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
         [Resolved]
