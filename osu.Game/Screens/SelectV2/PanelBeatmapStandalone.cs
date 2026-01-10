@@ -46,9 +46,6 @@ namespace osu.Game.Screens.SelectV2
         private BeatmapManager beatmaps { get; set; } = null!;
 
         [Resolved]
-        private OsuColour colours { get; set; } = null!;
-
-        [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
         private IBindable<StarDifficulty>? starDifficultyBindable;
@@ -293,7 +290,7 @@ namespace osu.Game.Screens.SelectV2
             spreadDisplay.Current.Colour = diffColour;
 
             backgroundBorder.Colour = diffColour;
-            difficultyIcon.Colour = starRatingDisplay.DisplayedStars.Value > OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider.Background5;
+            difficultyIcon.Colour = starRatingDisplay.DisplayedDifficultyTextColour;
         }
 
         private void updateKeyCount()
