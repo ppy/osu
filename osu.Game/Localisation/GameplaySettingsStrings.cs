@@ -25,6 +25,11 @@ namespace osu.Game.Localisation
         public static LocalisableString AudioHeader => new TranslatableString(getKey(@"audio"), @"Audio");
 
         /// <summary>
+        /// "Video"
+        /// </summary>
+        public static LocalisableString VideoHeader => new TranslatableString(getKey(@"video_header"), @"Video");
+
+        /// <summary>
         /// "HUD"
         /// </summary>
         public static LocalisableString HUDHeader => new TranslatableString(getKey(@"h_u_d"), @"HUD");

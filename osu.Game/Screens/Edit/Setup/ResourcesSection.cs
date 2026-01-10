@@ -22,6 +22,7 @@ namespace osu.Game.Screens.Edit.Setup
     {
         private FormBeatmapFileSelector audioTrackChooser = null!;
         private FormBeatmapFileSelector backgroundChooser = null!;
+        private FormBeatmapFileSelector videoChooser = null!;
 
         public override LocalisableString Title => EditorSetupStrings.ResourcesHeader;
 
@@ -65,6 +66,13 @@ namespace osu.Game.Screens.Edit.Setup
                     Caption = EditorSetupStrings.AudioTrack,
                     PlaceholderText = EditorSetupStrings.ClickToSelectTrack,
                 },
+                //Maybe it's important to have some warning if the video file exceeds allowed size.
+                //I was waiting for half of a minute to load 5GB ProRes .mov into it
+                videoChooser = new FormBeatmapFileSelector(beatmapHasMultipleDifficulties, SupportedExtensions.VIDEO_EXTENSIONS)
+                {
+                    Caption = GameplaySettingsStrings.VideoHeader,
+                    PlaceholderText = EditorSetupStrings.ClickToSelectVideo,
+                }
             };
 
             backgroundChooser.PreviewContainer.Add(headerBackground);
@@ -75,8 +83,12 @@ namespace osu.Game.Screens.Edit.Setup
             if (!string.IsNullOrEmpty(working.Value.Metadata.AudioFile))
                 audioTrackChooser.Current.Value = new FileInfo(working.Value.Metadata.AudioFile);
 
+            if (!string.IsNullOrEmpty(working.Value.Metadata.VideoFile))
+                videoChooser.Current.Value = new FileInfo(working.Value.Metadata.VideoFile);
+
             backgroundChooser.Current.BindValueChanged(backgroundChanged);
             audioTrackChooser.Current.BindValueChanged(audioTrackChanged);
+            videoChooser.Current.BindValueChanged(videoChanged);
         }
 
         public bool ChangeBackgroundImage(FileInfo source, bool applyToAllDifficulties)
@@ -90,6 +102,19 @@ namespace osu.Game.Screens.Edit.Setup
 
             headerBackground.UpdateBackground();
             editor?.ApplyToBackground(bg => ((EditorBackgroundScreen)bg).RefreshBackground());
+            return true;
+        }
+
+        public bool ChangeVideo(FileInfo source, bool applyToAllDifficulties)
+        {
+            if (!source.Exists)
+                return false;
+
+            changeResource(source, applyToAllDifficulties, @"video",
+                metadata => metadata.VideoFile,
+                (metadata, name) => metadata.VideoFile = name);
+
+            //Something should reload the video, but currently I have no clue what could it be
             return true;
         }
 
@@ -213,6 +238,7 @@ namespace osu.Game.Screens.Edit.Setup
         // (or at least cleaned them up properly themselves) if they return `false`.
         private bool rollingBackBackgroundChange;
         private bool rollingBackAudioChange;
+        private bool rollingBackVideoChange;
 
         private void backgroundChanged(ValueChangedEvent<FileInfo?> file)
         {
@@ -237,6 +263,19 @@ namespace osu.Game.Screens.Edit.Setup
                 rollingBackAudioChange = true;
                 audioTrackChooser.Current.Value = file.OldValue;
                 rollingBackAudioChange = false;
+            }
+        }
+
+        private void videoChanged(ValueChangedEvent<FileInfo?> file)
+        {
+            if (rollingBackVideoChange)
+                return;
+
+            if (file.NewValue == null || !ChangeVideo(file.NewValue, videoChooser.ApplyToAllDifficulties.Value))
+            {
+                rollingBackVideoChange = true;
+                videoChooser.Current.Value = file.OldValue;
+                rollingBackVideoChange = false;
             }
         }
     }

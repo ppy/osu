@@ -199,6 +199,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ClickToSelectBackground => new TranslatableString(getKey(@"click_to_select_background"), @"Click to select a background image");
 
         /// <summary>
+        /// "Click to select a background video"
+        /// </summary>
+        public static LocalisableString ClickToSelectVideo => new TranslatableString(getKey(@"click_to_select_video"), @"Click to select a background video");
+
+        /// <summary>
         /// "Apply this change to all difficulties?"
         /// </summary>
         public static LocalisableString ApplicationScopeSelectionTitle => new TranslatableString(getKey(@"application_scope_selection_title"), @"Apply this change to all difficulties?");
@@ -242,6 +247,16 @@ namespace osu.Game.Localisation
         /// "Drag image here to set beatmap background!"
         /// </summary>
         public static LocalisableString DragToSetBackground => new TranslatableString(getKey(@"drag_to_set_background"), @"Drag image here to set beatmap background!");
+
+        /// <summary>
+        /// "Video Offset"
+        /// </summary>
+        public static LocalisableString VideoOffset => new TranslatableString(getKey(@"video_offset"), @"Video Offset");
+
+        /// <summary>
+        /// "Determines how early or late should the video appear. Helps with synchronizing video with music"
+        /// </summary>
+        public static LocalisableString VideoOffsetDescription => new TranslatableString(getKey(@"video_offset_description"), @"Determines how early or late should the video appear. Helps with synchronizing video with music");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

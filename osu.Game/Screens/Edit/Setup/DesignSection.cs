@@ -5,6 +5,7 @@ using System;
 using System.Globalization;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
@@ -27,6 +28,8 @@ namespace osu.Game.Screens.Edit.Setup
         private FormCheckBox epilepsyWarning = null!;
         private FormCheckBox letterboxDuringBreaks = null!;
         private FormCheckBox samplesMatchPlaybackRate = null!;
+
+        private FormSliderBar<int> videoOffset { get; set; } = null!;
 
         public override LocalisableString Title => EditorSetupStrings.DesignHeader;
 
@@ -87,7 +90,21 @@ namespace osu.Game.Screens.Edit.Setup
                     Caption = EditorSetupStrings.SamplesMatchPlaybackRate,
                     HintText = EditorSetupStrings.SamplesMatchPlaybackRateDescription,
                     Current = { Value = Beatmap.SamplesMatchPlaybackRate }
-                }
+                },
+                videoOffset = new FormSliderBar<int>
+                {
+                    Caption = EditorSetupStrings.VideoOffset,
+                    HintText = EditorSetupStrings.VideoOffsetDescription,
+                    KeyboardStep = 1,
+                    Current = new BindableInt(Beatmap.Metadata.VideoOffset)
+                    {
+                        Default = 0,
+                        MinValue = -3000,
+                        MaxValue = 3000,
+                    },
+                    TransferValueOnCommit = true,
+                    TabbableContentContainer = this,
+                },
             };
         }
 
@@ -105,6 +122,8 @@ namespace osu.Game.Screens.Edit.Setup
             epilepsyWarning.Current.BindValueChanged(_ => updateBeatmap());
             letterboxDuringBreaks.Current.BindValueChanged(_ => updateBeatmap());
             samplesMatchPlaybackRate.Current.BindValueChanged(_ => updateBeatmap());
+
+            videoOffset.Current.BindValueChanged(_ => updateBeatmap());
         }
 
         private void updateCountdownSettingsVisibility() => CountdownSettings.FadeTo(EnableCountdown.Current.Value ? 1 : 0);
@@ -125,6 +144,7 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.EpilepsyWarning = epilepsyWarning.Current.Value;
             Beatmap.LetterboxInBreaks = letterboxDuringBreaks.Current.Value;
             Beatmap.SamplesMatchPlaybackRate = samplesMatchPlaybackRate.Current.Value;
+            Beatmap.Metadata.VideoOffset = videoOffset.Current.Value;
 
             Beatmap.SaveState();
         }
