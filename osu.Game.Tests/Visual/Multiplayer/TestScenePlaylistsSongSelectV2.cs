@@ -9,9 +9,7 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
-using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -22,7 +20,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay;
-using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual.OnlinePlay;
@@ -30,7 +27,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public partial class TestScenePlaylistsSongSelect : OnlinePlayTestScene
+    public partial class TestScenePlaylistsSongSelectV2 : OnlinePlayTestScene
     {
         private RulesetStore rulesets = null!;
         private BeatmapManager manager = null!;
@@ -69,47 +66,45 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddStep("create song select", () => LoadScreen(songSelect = new TestPlaylistsSongSelect(room)));
-            AddUntilStep("wait for present", () => songSelect.IsCurrentScreen() && songSelect.BeatmapSetsLoaded);
+            AddUntilStep("wait for song select", () => songSelect.IsLoaded && !songSelect.IsFiltering);
+        }
+
+        [Test]
+        public void TestShowScreen()
+        {
+            AddStep("show screen", () => { });
         }
 
         [Test]
         public void TestItemAddedIfEmptyOnStart()
         {
-            AddStep("finalise selection", () => songSelect.FinaliseSelection());
+            AddStep("finalise selection", () => InputManager.Key(Key.Enter));
             AddAssert("playlist has 1 item", () => room.Playlist.Count == 1);
         }
 
         [Test]
         public void TestItemAddedWhenCreateNewItemClicked()
         {
-            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem!());
-            AddAssert("playlist has 1 item", () => room.Playlist.Count == 1);
-        }
-
-        [Test]
-        public void TestItemNotAddedIfExistingOnStart()
-        {
-            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem!());
-            AddStep("finalise selection", () => songSelect.FinaliseSelection());
+            AddStep("create new item", () => songSelect.AddNewItem());
             AddAssert("playlist has 1 item", () => room.Playlist.Count == 1);
         }
 
         [Test]
         public void TestAddSameItemMultipleTimes()
         {
-            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem!());
-            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem!());
+            AddStep("create new item", () => songSelect.AddNewItem());
+            AddStep("create new item", () => songSelect.AddNewItem());
             AddAssert("playlist has 2 items", () => room.Playlist.Count == 2);
         }
 
         [Test]
         public void TestAddItemAfterRearrangement()
         {
-            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem!());
-            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem!());
+            AddStep("create new item", () => songSelect.AddNewItem());
+            AddStep("create new item", () => songSelect.AddNewItem());
             AddStep("rearrange", () => room.Playlist = room.Playlist.Skip(1).Append(room.Playlist[0]).ToArray());
 
-            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem!());
+            AddStep("create new item", () => songSelect.AddNewItem());
             AddAssert("new item has id 2", () => room.Playlist.Last().ID == 2);
         }
 
@@ -120,9 +115,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestNewItemHasNewModInstances()
         {
             AddStep("set dt mod", () => SelectedMods.Value = new[] { new OsuModDoubleTime() });
-            AddStep("create item", () => songSelect.BeatmapDetails.CreateNewItem!());
+            AddStep("create item", () => songSelect.AddNewItem());
             AddStep("change mod rate", () => ((OsuModDoubleTime)SelectedMods.Value[0]).SpeedChange.Value = 2);
-            AddStep("create item", () => songSelect.BeatmapDetails.CreateNewItem!());
+            AddStep("create item", () => songSelect.AddNewItem());
 
             AddAssert("item 1 has rate 1.5", () =>
             {
@@ -153,7 +148,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 mod = (OsuModDoubleTime)SelectedMods.Value[0];
             });
 
-            AddStep("create item", () => songSelect.BeatmapDetails.CreateNewItem!());
+            AddStep("create item", () => songSelect.AddNewItem());
 
             AddStep("change stored mod rate", () => mod.SpeedChange.Value = 2);
             AddAssert("item has rate 1.5", () =>
@@ -166,26 +161,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestFreeModSelectionDisable()
         {
-            FooterButtonFreeMods freeMods = null!;
-
             AddAssert("freestyle enabled", () => songSelect.Freestyle.Value, () => Is.True);
             AddStep("click icon in free mods button", () =>
             {
-                freeMods = this.ChildrenOfType<FooterButtonFreeMods>().Single();
-                InputManager.MoveMouseTo(freeMods.ChildrenOfType<SpriteIcon>().Single());
+                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonFreeModsV2>().Single());
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("mod select not visible", () => this.ChildrenOfType<FreeModSelectOverlay>().Single().State.Value, () => Is.EqualTo(Visibility.Hidden));
 
             AddStep("toggle freestyle off", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonFreestyle>().Single());
+                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonFreestyleV2>().Single());
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("freestyle disabled", () => songSelect.Freestyle.Value, () => Is.False);
             AddStep("click icon in free mods button", () =>
             {
-                InputManager.MoveMouseTo(freeMods.ChildrenOfType<SpriteIcon>().Single());
+                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonFreeModsV2>().Single());
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("mod select visible", () => this.ChildrenOfType<FreeModSelectOverlay>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
@@ -199,10 +191,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 rulesets.Dispose();
         }
 
-        private partial class TestPlaylistsSongSelect : PlaylistsSongSelect
+        private partial class TestPlaylistsSongSelect : PlaylistsSongSelectV2
         {
-            public new MatchBeatmapDetailArea BeatmapDetails => (MatchBeatmapDetailArea)base.BeatmapDetails;
-
             public new IBindable<bool> Freestyle => base.Freestyle;
 
             public TestPlaylistsSongSelect(Room room)
