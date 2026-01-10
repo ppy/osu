@@ -64,7 +64,7 @@ namespace osu.Game.Screens.SelectV2
     /// This will be gradually built upon and ultimately replace <see cref="Select.SongSelect"/> once everything is in place.
     /// </summary>
     [Cached(typeof(ISongSelect))]
-    public abstract partial class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, ISongSelect, IHandlePresentBeatmap
+    public abstract partial class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, ISongSelect, IHandlePresentBeatmap, IProvideCursor
     {
         /// <summary>
         /// A debounce that governs how long after a panel is selected before the rest of song select (and the game at large)
@@ -118,6 +118,8 @@ namespace osu.Game.Screens.SelectV2
         private Box rightGradientBackground = null!;
         private Container mainContent = null!;
         private SkinnableContainer skinnableContent = null!;
+
+        private GridContainer mainGridContainer = null!;
 
         private NoResultsPlaceholder noResultsPlaceholder = null!;
 
@@ -812,7 +814,7 @@ namespace osu.Game.Screens.SelectV2
             // Probably needs more thought because this needs to be in every `ApplyToBackground` currently to restore sane defaults.
             backgroundModeBeatmap.FadeColour(Color4.White, 250);
 
-            bool backgroundRevealActive = revealingBackground?.State == ScheduledDelegate.RunState.Running || revealingBackground?.State == ScheduledDelegate.RunState.Complete;
+            bool backgroundRevealActive = revealBackgroundDelegate?.State == ScheduledDelegate.RunState.Running || revealBackgroundDelegate?.State == ScheduledDelegate.RunState.Complete;
             backgroundModeBeatmap.BlurAmount.Value = configBackgroundBlur.Value && !backgroundRevealActive ? 20 : 0f;
         });
 
@@ -908,11 +910,14 @@ namespace osu.Game.Screens.SelectV2
 
         #endregion
 
-        #region Input
+        #region Background reveal
 
-        private ScheduledDelegate? revealingBackground;
+        private ScheduledDelegate? revealBackgroundDelegate;
 
-        private GridContainer mainGridContainer = null!;
+        public CursorContainer? Cursor => null;
+        bool IProvideCursor.ProvidingUserCursor => revealBackgroundDelegate?.Completed == true;
+
+        protected override bool OnHover(HoverEvent e) => true;
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
@@ -927,13 +932,13 @@ namespace osu.Game.Screens.SelectV2
             // For simplicity, disable this functionality on mobile.
             bool isTouchInput = e.CurrentState.Mouse.LastSource is ISourcedFromTouch;
 
-            if (!carousel.AbsoluteScrolling && !isTouchInput && mouseDownPriority && revealingBackground == null)
+            if (!carousel.AbsoluteScrolling && !isTouchInput && mouseDownPriority && revealBackgroundDelegate == null)
             {
-                revealingBackground = Scheduler.AddDelayed(() =>
+                revealBackgroundDelegate = Scheduler.AddDelayed(() =>
                 {
                     if (containingInputManager.DraggedDrawable != null)
                     {
-                        revealingBackground = null;
+                        revealBackgroundDelegate = null;
                         return;
                     }
 
@@ -962,10 +967,10 @@ namespace osu.Game.Screens.SelectV2
 
         private void restoreBackground()
         {
-            if (revealingBackground == null)
+            if (revealBackgroundDelegate == null)
                 return;
 
-            if (revealingBackground.State == ScheduledDelegate.RunState.Complete)
+            if (revealBackgroundDelegate.State == ScheduledDelegate.RunState.Complete)
             {
                 mainContent.ResizeWidthTo(1f, 500, Easing.OutQuint);
                 mainContent.ScaleTo(1, 500, Easing.OutQuint);
@@ -978,11 +983,15 @@ namespace osu.Game.Screens.SelectV2
                 Footer?.Show();
             }
 
-            revealingBackground.Cancel();
-            revealingBackground = null;
+            revealBackgroundDelegate.Cancel();
+            revealBackgroundDelegate = null;
 
             updateBackgroundDim();
         }
+
+        #endregion
+
+        #region Input
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
