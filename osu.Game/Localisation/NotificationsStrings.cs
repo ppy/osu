@@ -190,6 +190,11 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString CollectionsImportProgressTotal(int count, int totalCount) => new TranslatableString(getKey(@"collections_import_progress_total"), @"Imported {0} of {1} collections", count, totalCount);
 
+        /// <summary>
+        /// "An action was interrupted due to a dialog being displayed."
+        /// </summary>
+        public static LocalisableString ActionInterruptedByDialog => new TranslatableString(getKey(@"action_interrupted_by_dialog"), @"An action was interrupted due to a dialog being displayed.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
