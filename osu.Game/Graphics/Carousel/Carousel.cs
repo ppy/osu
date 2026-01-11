@@ -704,7 +704,7 @@ namespace osu.Game.Graphics.Carousel
 
             // If we couldn't find a visible item in the desired direction,
             // try stepping backward from where we stopped.
-            newIndex = newIndex - direction;
+            newIndex -= direction;
             while (newIndex >= 0 && newIndex < carouselItems.Count && newIndex != originalIndex)
             {
                 var item = carouselItems[newIndex];
