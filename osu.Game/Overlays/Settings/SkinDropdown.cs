@@ -21,6 +21,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Input;
 using osuTK.Graphics;
 using osu.Framework.Input.StateChanges;
 
@@ -288,12 +289,17 @@ namespace osu.Game.Overlays.Settings
                         base.OnHoverLost(e);
                     }
 
-                    protected override bool OnClick(ClickEvent e)
+                    protected override bool OnMouseDown(MouseDownEvent e)
                     {
-                        if (e.AltPressed)
+                        if (e.Button == MouseButton.Right && e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
+                        {
+                            favouriteIndicatorAnimateIn();
+                            return TriggerFavouriteChange();
+                        }
+                        else if (e.Button == MouseButton.Right)
                             return TriggerFavouriteChange();
 
-                        return base.OnClick(e);
+                        return base.OnMouseDown(e);
                     }
 
                     public bool TriggerFavouriteChange()

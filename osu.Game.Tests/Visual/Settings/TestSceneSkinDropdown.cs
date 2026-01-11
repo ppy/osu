@@ -37,8 +37,6 @@ namespace osu.Game.Tests.Visual.Settings
         [Resolved]
         private RealmAccess realm { get; set; }
 
-        protected bool AllowRightClickFromLongTouch => false;
-
         protected override bool UseFreshStoragePerRun => true;
 
         private readonly List<Live<SkinInfo>> dropdownItems = new List<Live<SkinInfo>>();
@@ -106,11 +104,11 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         [Test]
-        public void TestAltClickToggleFavourite()
+        public void TestRightClickToggleFavourite()
         {
-            altClickToggleFavourite();
+            rightClickToggleFavourite();
             AddWaitStep("wait", 5);
-            altClickToggleFavourite();
+            rightClickToggleFavourite();
         }
 
         [Test]
@@ -119,6 +117,14 @@ namespace osu.Game.Tests.Visual.Settings
             touchToggleFavourite();
             AddWaitStep("wait", 5);
             touchToggleFavourite();
+        }
+
+        [Test]
+        public void TestTouchHoldToggleFavourite()
+        {
+            touchHoldToggleFavourite();
+            AddWaitStep("wait", 5);
+            touchHoldToggleFavourite();
         }
 
         private void toggleFavourite()
@@ -163,14 +169,15 @@ namespace osu.Game.Tests.Visual.Settings
                 isFavourite = getStarIcon();
                 InputManager.Click(MouseButton.Left);
             });
+            AddAssert("check favourite status", () => getStarIcon() != isFavourite);
             AddAssert("dropdown opened", () =>
             {
                 var menu = skinDropdown.ChildrenOfType<Menu>().FirstOrDefault();
                 return menu != null && menu.State == MenuState.Open;
             });
-            AddAssert("favourite status changed", () => getStarIcon() != isFavourite);
             AddStep("commit changes", () =>
             {
+                isFavourite = getStarIcon();
                 InputManager.MoveMouseTo(skinDropdown, new Vector2(0, -100));
                 InputManager.Click(MouseButton.Left);
             });
@@ -179,9 +186,10 @@ namespace osu.Game.Tests.Visual.Settings
                 InputManager.MoveMouseTo(skinDropdown);
                 InputManager.Click(MouseButton.Left);
             });
+            AddAssert("check favourite status", () => getStarIcon() == isFavourite);
         }
 
-        private void altClickToggleFavourite()
+        private void rightClickToggleFavourite()
         {
             bool? isFavourite = null;
 
@@ -209,13 +217,12 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("toggle favourite status", () =>
             {
                 isFavourite = getStarIcon();
-                InputManager.PressKey(Key.LAlt);
-                InputManager.Click(MouseButton.Left);
-                InputManager.ReleaseKey(Key.LAlt);
+                InputManager.Click(MouseButton.Right);
             });
-            AddAssert("favourite status changed", () => getStarIcon() != isFavourite);
+            AddAssert("check favourite status", () => getStarIcon() != isFavourite);
             AddStep("commit changes", () =>
             {
+                isFavourite = getStarIcon();
                 InputManager.MoveMouseTo(skinDropdown, new Vector2(0, -100));
                 InputManager.Click(MouseButton.Left);
             });
@@ -224,6 +231,7 @@ namespace osu.Game.Tests.Visual.Settings
                 InputManager.MoveMouseTo(skinDropdown);
                 InputManager.Click(MouseButton.Left);
             });
+            AddAssert("check favourite status", () => getStarIcon() == isFavourite);
         }
 
         private void touchToggleFavourite()
@@ -260,7 +268,7 @@ namespace osu.Game.Tests.Visual.Settings
                 InputManager.BeginTouch(new Touch(TouchSource.Touch1, startPos));
             });
 
-            AddRepeatStep("drag right", () =>
+            AddUntilStep("drag right", () =>
             {
                 touchDragPosition += 10;
 
@@ -268,15 +276,63 @@ namespace osu.Game.Tests.Visual.Settings
                 var position = label.Parent.ToScreenSpace(new Vector2(touchDragPosition, 10));
 
                 InputManager.MoveTouchTo(new Touch(TouchSource.Touch1, position));
-            }, 8);
-
-            AddStep("end drag", () =>
-            {
-                Assert.NotNull(label.Parent);
-                var endPosition = label.Parent.ToScreenSpace(new Vector2(touchDragPosition, 10));
-                InputManager.EndTouch(new Touch(TouchSource.Touch1, endPosition));
+                return getStarIcon() != isFavourite;
             });
-            AddAssert("favourite status changed", () => getStarIcon() != isFavourite);
+            AddStep("end drag", () => InputManager.EndTouch(new Touch(TouchSource.Touch1, Vector2.Zero)));
+            AddStep("commit changes", () =>
+            {
+                isFavourite = getStarIcon();
+                var position = skinDropdown.ToScreenSpace(new Vector2(0, -100));
+
+                InputManager.MoveTouchTo(new Touch(TouchSource.Touch1, position));
+                InputManager.BeginTouch(new Touch(TouchSource.Touch1, position));
+                InputManager.EndTouch(new Touch(TouchSource.Touch1, position));
+            });
+            AddStep("preview changes", () =>
+            {
+                var position = skinDropdown.ToScreenSpace(new Vector2(200, 50));
+
+                InputManager.MoveTouchTo(new Touch(TouchSource.Touch1, position));
+                InputManager.BeginTouch(new Touch(TouchSource.Touch1, position));
+                InputManager.EndTouch(new Touch(TouchSource.Touch1, position));
+            });
+            AddAssert("check favourite status", () => getStarIcon() == isFavourite);
+        }
+
+        private void touchHoldToggleFavourite()
+        {
+            IHasText label;
+            bool? isFavourite = null;
+
+            AddStep("open dropdown", () =>
+            {
+                var menu = skinDropdown.ChildrenOfType<Menu>().FirstOrDefault();
+
+                if (menu?.State == MenuState.Closed)
+                {
+                    var position = skinDropdown.ToScreenSpace(new Vector2(200, 50));
+
+                    InputManager.BeginTouch(new Touch(TouchSource.Touch1, position));
+                    InputManager.EndTouch(new Touch(TouchSource.Touch1, position));
+                }
+            });
+            AddAssert("dropdown opened", () =>
+            {
+                var menu = skinDropdown.ChildrenOfType<Menu>().FirstOrDefault();
+                return menu != null && menu.State == MenuState.Open;
+            });
+            AddStep("begin favourite hold", () =>
+            {
+                isFavourite = getStarIcon();
+                label = skinDropdown.ChildrenOfType<IHasText>()
+                                    .FirstOrDefault(d => d.Text.ToString() == "Imported Skin 4");
+                Assert.NotNull(label);
+                Assert.NotNull(label.Parent);
+                var startPos = label.Parent.ToScreenSpace(new Vector2(100, 10));
+                InputManager.BeginTouch(new Touch(TouchSource.Touch1, startPos));
+            });
+            AddUntilStep("check favourite status", () => getStarIcon() != isFavourite);
+            AddStep("end hold", () => InputManager.EndTouch(new Touch(TouchSource.Touch1, Vector2.Zero)));
             AddStep("commit changes", () =>
             {
                 isFavourite = getStarIcon();
