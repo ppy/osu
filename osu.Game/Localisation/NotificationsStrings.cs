@@ -191,9 +191,19 @@ Click to see what's new!", version);
         public static LocalisableString CollectionsImportProgressTotal(int count, int totalCount) => new TranslatableString(getKey(@"collections_import_progress_total"), @"Imported {0} of {1} collections", count, totalCount);
 
         /// <summary>
-        /// "This error has been automatically reported to the devs."
+        /// "A newer release of osu! has been found ({0} → {1})."
         /// </summary>
-        public static LocalisableString ErrorAutomaticallyReported => new TranslatableString(getKey(@"error_automatically_reported"), @"This error has been automatically reported to the devs.");
+        public static LocalisableString UpdateAvailable(string version, string latestTagName) => new TranslatableString(getKey(@"update_available"), @"A newer release of osu! has been found ({0} → {1}).", version, latestTagName);
+
+        /// <summary>
+        /// "Click here to download the new version, which can be installed over the top of your existing installation"
+        /// </summary>
+        public static LocalisableString UpdateMobile => new TranslatableString(getKey(@"update_mobile"), @"Click here to download the new version, which can be installed over the top of your existing installation");
+
+        /// <summary>
+        /// "Check with your package manager / provider to bring osu! up-to-date!"
+        /// </summary>
+        public static LocalisableString UpdateNoAction => new TranslatableString(getKey(@"update_no_action"), @"Check with your package manager / provider to bring osu! up-to-date!");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
