@@ -190,6 +190,11 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString CollectionsImportProgressTotal(int count, int totalCount) => new TranslatableString(getKey(@"collections_import_progress_total"), @"Imported {0} of {1} collections", count, totalCount);
 
+        /// <summary>
+        /// "This error has been automatically reported to the devs."
+        /// </summary>
+        public static LocalisableString ErrorAutomaticallyReported => new TranslatableString(getKey(@"error_automatically_reported"), @"This error has been automatically reported to the devs.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
