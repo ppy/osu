@@ -57,6 +57,21 @@ namespace osu.Game.Screens.SelectV2
 
                 Current.BindValueChanged(_ => updateDisplay());
 
+                // Update the underlining for the active tab item when the text changes (e.g., due to language change).
+                foreach (var drawable in TabContainer.Children)
+                {
+                    if (drawable is not TabItem wedgeTab)
+                        continue;
+
+                    wedgeTab.Text.Current.BindValueChanged(_ =>
+                    {
+                        if (wedgeTab == SelectedTab)
+                        {
+                            ScheduleAfterChildren(updateDisplay);
+                        }
+                    });
+                }
+
                 ScheduleAfterChildren(() =>
                 {
                     updateDisplay();
