@@ -1383,7 +1383,7 @@ namespace osu.Game
                 Schedule(() => Notifications.Post(new SimpleErrorNotification
                 {
                     Icon = entry.Level == LogLevel.Important ? FontAwesome.Solid.ExclamationCircle : FontAwesome.Solid.Bomb,
-                    Text = entry.Message.Truncate(256) + (entry.Exception != null && IsDeployedBuild ? "\n\nThis error has been automatically reported to the devs." : string.Empty),
+                    Text = LocalisableString.Interpolate($"{entry.Message.Truncate(256)}{(entry.Exception != null && IsDeployedBuild ? LocalisableString.Interpolate($"\n\n{NotificationsStrings.ErrorAutomaticallyReported}") : string.Empty)}"),
                 }));
             }
             else if (generalLogRecentCount == short_term_display_limit)
