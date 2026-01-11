@@ -479,6 +479,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString EditorDiscardUnsavedChanges => new TranslatableString(getKey(@"editor_discard_unsaved_changes"), @"Discard unsaved changes");
 
+        /// <summary>
+        /// "Select page up"
+        /// </summary>
+        public static LocalisableString SelectPageUp => new TranslatableString(getKey(@"select_page_up"), @"Select page up");
+
+        /// <summary>
+        /// "Select page down"
+        /// </summary>
+        public static LocalisableString SelectPageDown => new TranslatableString(getKey(@"select_page_down"), @"Select page down");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

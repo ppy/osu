@@ -212,6 +212,9 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Up }, GlobalAction.IncreaseModSpeed),
             new KeyBinding(new[] { InputKey.Control, InputKey.Down }, GlobalAction.DecreaseModSpeed),
             new KeyBinding(InputKey.None, GlobalAction.AbsoluteScrollSongList),
+
+            new KeyBinding(InputKey.PageUp, GlobalAction.SelectPageUp),
+            new KeyBinding(InputKey.PageDown, GlobalAction.SelectPageDown),
         };
 
         private static IEnumerable<KeyBinding> audioControlKeyBindings => new[]
@@ -520,6 +523,12 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleCurrentGroup))]
         ToggleCurrentGroup,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectPageUp))]
+        SelectPageUp,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectPageDown))]
+        SelectPageDown,
     }
 
     public enum GlobalActionCategory

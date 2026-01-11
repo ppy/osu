@@ -503,6 +503,14 @@ namespace osu.Game.Graphics.Carousel
                     Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Group, -1));
                     return true;
 
+                case GlobalAction.SelectPageUp:
+                    Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Page, -1));
+                    return true;
+
+                case GlobalAction.SelectPageDown:
+                    Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Page, 1));
+                    return true;
+
                 case GlobalAction.ExpandNextGroup:
                     Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Group, 1));
                     return true;
@@ -555,13 +563,17 @@ namespace osu.Game.Graphics.Carousel
                         traverseGroupSelection(traversal.Direction);
                         break;
 
+                    case TraversalType.Page:
+                        traversePageSelection(traversal.Direction);
+                        break;
+
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
             }
         }
 
-        private enum TraversalType { Keyboard, Set, Group }
+        private enum TraversalType { Keyboard, Set, Group, Page }
 
         private record TraversalOperation(TraversalType Type, int Direction);
 
@@ -624,6 +636,95 @@ namespace osu.Game.Graphics.Carousel
         /// <param name="direction">Positive for downwards, negative for upwards.</param>
         /// <returns>Whether selection was possible.</returns>
         private void traverseGroupSelection(int direction) => traverseSelection(direction, CheckValidForGroupSelection);
+
+        /// <summary>
+        /// The number of items to skip when performing page-based keyboard selection traversal.
+        /// </summary>
+        protected virtual int PageSelectionDistance => 5;
+
+        /// <summary>
+        /// Move keyboard selection by a page worth of items.
+        /// This is generally for keyboard based traversal using Page Up/Page Down.
+        /// </summary>
+        /// <param name="direction">Positive for downwards (Page Down), negative for upwards (Page Up).</param>
+        private void traversePageSelection(int direction)
+        {
+            if (carouselItems == null || carouselItems.Count == 0) return;
+
+            int originalIndex;
+
+            if (currentKeyboardSelection.Index != null)
+                originalIndex = currentKeyboardSelection.Index.Value;
+            else if (direction > 0)
+                originalIndex = carouselItems.Count - 1;
+            else
+                originalIndex = 0;
+
+            int newIndex = originalIndex;
+            int itemsTraversed = 0;
+
+            // Move through multiple visible items to simulate page navigation.
+            while (itemsTraversed < PageSelectionDistance)
+            {
+                int nextIndex = newIndex + direction;
+
+                // Stop at boundaries without wrapping.
+                if (nextIndex < 0 || nextIndex >= carouselItems.Count)
+                    break;
+
+                newIndex = nextIndex;
+                var newItem = carouselItems[newIndex];
+
+                if (newItem.IsVisible)
+                    itemsTraversed++;
+            }
+
+            // Find the actual visible item at or near the target position.
+            // If we landed on a non-visible item, find the nearest visible one.
+            while (newIndex >= 0 && newIndex < carouselItems.Count)
+            {
+                var item = carouselItems[newIndex];
+
+                if (item.IsVisible)
+                {
+                    if (!CheckModelEquality(currentSelection.Model, item.Model) && ShouldActivateOnKeyboardSelection(item))
+                        Activate(item);
+                    else
+                    {
+                        playTraversalSound();
+                        setKeyboardSelection(item.Model);
+                    }
+
+                    return;
+                }
+
+                // If current item isn't visible, step in the traversal direction to find a visible one.
+                newIndex += direction;
+            }
+
+            // If we couldn't find a visible item in the desired direction,
+            // try stepping backward from where we stopped.
+            newIndex = newIndex - direction;
+            while (newIndex >= 0 && newIndex < carouselItems.Count && newIndex != originalIndex)
+            {
+                var item = carouselItems[newIndex];
+
+                if (item.IsVisible)
+                {
+                    if (!CheckModelEquality(currentSelection.Model, item.Model) && ShouldActivateOnKeyboardSelection(item))
+                        Activate(item);
+                    else
+                    {
+                        playTraversalSound();
+                        setKeyboardSelection(item.Model);
+                    }
+
+                    return;
+                }
+
+                newIndex -= direction;
+            }
+        }
 
         /// <summary>
         /// Select the next valid set selection relative to a current selection.
