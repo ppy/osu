@@ -210,6 +210,11 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString UpdateNoAction => new TranslatableString(getKey(@"update_no_action"), @"Check with your package manager / provider to bring osu! up-to-date!");
 
+        /// <summary>
+        /// "An action was interrupted due to a dialog being displayed."
+        /// </summary>
+        public static LocalisableString ActionInterruptedByDialog => new TranslatableString(getKey(@"action_interrupted_by_dialog"), @"An action was interrupted due to a dialog being displayed.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
