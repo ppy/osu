@@ -57,7 +57,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             void applyFadeInAdjustment(OsuHitObject osuObject)
             {
-                osuObject.TimePreempt += osuObject.StartTime - lastNewComboTime;
+                if (osuObject is not Spinner)
+                    osuObject.TimePreempt += osuObject.StartTime - lastNewComboTime;
 
                 foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
                 {
