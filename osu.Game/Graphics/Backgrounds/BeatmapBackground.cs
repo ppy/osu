@@ -44,7 +44,6 @@ namespace osu.Game.Graphics.Backgrounds
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         RelativeSizeAxes = Axes.Both,
-                        Width = 0f,
                         Colour = Color4.Black,
                     },
                     rightLetterbox = new Box
@@ -52,7 +51,6 @@ namespace osu.Game.Graphics.Backgrounds
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                         RelativeSizeAxes = Axes.Both,
-                        Width = 0f,
                         Colour = Color4.Black,
                     }
                 }
@@ -62,7 +60,7 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 leftLetterbox.ResizeWidthTo(margin.NewValue / 2f);
                 rightLetterbox.ResizeWidthTo(margin.NewValue / 2f);
-            });
+            }, true);
         }
 
         [BackgroundDependencyLoader]
