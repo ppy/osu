@@ -2,19 +2,20 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.Containers;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
     public partial class FormFieldCaption : CompositeDrawable, IHasTooltip
     {
+        private OsuTextFlowContainer textFlow = null!;
+
         private LocalisableString caption;
 
         public LocalisableString Caption
@@ -24,45 +25,60 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 caption = value;
 
-                if (captionText.IsNotNull())
-                    captionText.Text = value;
+                if (IsLoaded)
+                    updateDisplay();
             }
         }
 
-        private OsuSpriteText captionText = null!;
+        private LocalisableString tooltipText;
 
-        public LocalisableString TooltipText { get; set; }
+        public LocalisableString TooltipText
+        {
+            get => tooltipText;
+            set
+            {
+                tooltipText = value;
+
+                if (IsLoaded)
+                    updateDisplay();
+            }
+        }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            AutoSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
 
-            InternalChild = new FillFlowContainer
+            InternalChild = textFlow = new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 12, weight: FontWeight.SemiBold))
             {
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(5),
-                Children = new Drawable[]
-                {
-                    captionText = new OsuSpriteText
-                    {
-                        Text = caption,
-                        Font = OsuFont.Default.With(size: 12, weight: FontWeight.SemiBold),
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                    },
-                    new SpriteIcon
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Alpha = TooltipText == default ? 0 : 1,
-                        Size = new Vector2(10),
-                        Icon = FontAwesome.Solid.QuestionCircle,
-                        Margin = new MarginPadding { Top = 1, },
-                    }
-                },
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            updateDisplay();
+        }
+
+        private void updateDisplay()
+        {
+            textFlow.Text = caption;
+
+            if (TooltipText != default)
+            {
+                textFlow.AddArbitraryDrawable(new SpriteIcon
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Size = new Vector2(10),
+                    Icon = FontAwesome.Solid.QuestionCircle,
+                    Margin = new MarginPadding { Left = 5 },
+                    Y = 1f,
+                });
+            }
         }
     }
 }
