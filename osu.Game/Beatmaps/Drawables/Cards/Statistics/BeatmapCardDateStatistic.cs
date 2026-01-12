@@ -2,10 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Utils;
 
 namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
 {
@@ -18,7 +18,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
             this.dateTime = dateTime;
 
             Icon = FontAwesome.Regular.CheckCircle;
-            Text = dateTime.ToLocalisableString(@"d MMM yyyy");
+            Text = dateTime.ToLocalisedMediumDate();
         }
 
         public override object TooltipContent => dateTime;
