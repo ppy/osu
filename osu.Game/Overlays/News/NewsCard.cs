@@ -16,6 +16,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Utils;
 
 namespace osu.Game.Overlays.News
 {
@@ -143,7 +144,7 @@ namespace osu.Game.Overlays.News
                     },
                     new OsuSpriteText
                     {
-                        Text = date.ToLocalisableString(@"d MMM yyyy").ToUpper(),
+                        Text = date.ToLocalisedMediumDate().ToUpper(),
                         Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold),
                         Margin = new MarginPadding
                         {
