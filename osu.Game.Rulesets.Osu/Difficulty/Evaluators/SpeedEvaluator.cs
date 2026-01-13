@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double min_speed_bonus = 200; // 200 BPM 1/4th
         private const double speed_balancing_factor = 40;
         private const double distance_multiplier = 0.8;
+        private const double sliderstream_multiplier = 0.25;
 
         /// <summary>
         /// Evaluates the difficulty of tapping the current object, based on:
@@ -66,8 +67,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (mods.OfType<OsuModAutopilot>().Any())
                 distanceBonus = 0;
 
+            double sliderStreamBonus = 1 + osuCurrObj.SliderJumpBonus * sliderstream_multiplier;
+
             // Base difficulty with all bonuses
-            double difficulty = (1 + speedBonus + distanceBonus) * 1000 / strainTime;
+            double difficulty = (1 + speedBonus + distanceBonus) * sliderStreamBonus * 1000 / strainTime;
 
             // Apply penalty if there's doubletappable doubles
             return difficulty * doubletapness;
