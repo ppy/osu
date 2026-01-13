@@ -59,7 +59,7 @@ namespace osu.Game.Updater
                 {
                     Notifications.Post(new UpdateAvailableNotification(cancellationToken)
                     {
-                        Text = LocalisableString.Interpolate($"{NotificationsStrings.UpdateAvailable(version, latestTagName)}\n\n{NotificationsStrings.UpdateMobile}"),
+                        Text = LocalisableString.Interpolate($"{NotificationsStrings.UpdateAvailable(version, latestTagName)}\n\n{NotificationsStrings.UpdateAvailableManualInstall}"),
                         Icon = FontAwesome.Solid.Download,
                         Activated = () =>
                         {

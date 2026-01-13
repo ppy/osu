@@ -198,17 +198,17 @@ Click to see what's new!", version);
         /// <summary>
         /// "A newer release of osu! has been found ({0} → {1})."
         /// </summary>
-        public static LocalisableString UpdateAvailable(string version, string latestTagName) => new TranslatableString(getKey(@"update_available"), @"A newer release of osu! has been found ({0} → {1}).", version, latestTagName);
+        public static LocalisableString UpdateAvailable(string oldVersion, string newVersion) => new TranslatableString(getKey(@"update_available"), @"A newer release of osu! has been found ({0} → {1}).", oldVersion, newVersion);
 
         /// <summary>
-        /// "Click here to download the new version, which can be installed over the top of your existing installation"
+        /// "Click here to download the new version, which can be installed over the top of your existing installation."
         /// </summary>
-        public static LocalisableString UpdateMobile => new TranslatableString(getKey(@"update_mobile"), @"Click here to download the new version, which can be installed over the top of your existing installation");
+        public static LocalisableString UpdateAvailableManualInstall => new TranslatableString(getKey(@"update_available_manual_install"), @"Click here to download the new version, which can be installed over the top of your existing installation.");
 
         /// <summary>
         /// "Check with your package manager / provider to bring osu! up-to-date!"
         /// </summary>
-        public static LocalisableString UpdateNoAction => new TranslatableString(getKey(@"update_no_action"), @"Check with your package manager / provider to bring osu! up-to-date!");
+        public static LocalisableString UpdateAvailablePackageManaged => new TranslatableString(getKey(@"update_available_package_managed"), @"Check with your package manager / provider to bring osu! up-to-date!");
 
         /// <summary>
         /// "An action was interrupted due to a dialog being displayed."
