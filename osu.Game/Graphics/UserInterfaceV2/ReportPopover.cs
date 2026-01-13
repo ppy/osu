@@ -11,6 +11,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
@@ -23,11 +24,23 @@ namespace osu.Game.Graphics.UserInterfaceV2
     public abstract partial class ReportPopover<TReportReason> : OsuPopover
         where TReportReason : struct, Enum
     {
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
         /// <summary>
-        /// The action to run when the report is finalised.
-        /// The arguments to this action are: the reason for the report, and an optional additional comment.
+        /// The action to run when the report is submitted.
         /// </summary>
-        public Action<TReportReason, string>? Action;
+        public event Action? Submitted;
+
+        /// <summary>
+        /// The action to run when the report is submitted successfully.
+        /// </summary>
+        public event Action? Success;
+
+        /// <summary>
+        /// The action to run when the report failed to submit.
+        /// </summary>
+        public event Action? Failure;
 
         private OsuEnumDropdown<TReportReason> reasonDropdown = null!;
         private OsuTextBox commentsTextBox = null!;
@@ -105,12 +118,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         Text = UsersStrings.ReportActionsSend,
                         Action = () =>
                         {
-                            Action?.Invoke(reasonDropdown.Current.Value, commentsTextBox.Text);
+                            Submitted?.Invoke();
+                            performRequest();
+
                             this.HidePopover();
                         },
                         Margin = new MarginPadding { Bottom = 5, Top = 10 },
-                    }
-                }
+                    },
+                },
             };
 
             commentsTextBox.Current.BindValueChanged(_ => updateStatus());
@@ -124,6 +139,34 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             submitButton.Enabled.Value = !string.IsNullOrWhiteSpace(commentsTextBox.Current.Value) || !IsCommentRequired(reasonDropdown.Current.Value);
         }
+
+        private void performRequest()
+        {
+            var request = GetRequest(reasonDropdown.Current.Value, commentsTextBox.Text);
+
+            request.Success += handleSuccess;
+            request.Failure += handleFailure;
+
+            api.Queue(request);
+        }
+
+        private void handleSuccess()
+        {
+            Success?.Invoke();
+        }
+
+        private void handleFailure(Exception e)
+        {
+            Failure?.Invoke();
+        }
+
+        /// <summary>
+        /// Returns the API request responsible for submitting this report.
+        /// </summary>
+        /// <param name="reason">The reason for this report.</param>
+        /// <param name="comments">An optional comment explaining the report.</param>
+        /// <returns></returns>
+        protected abstract APIRequest GetRequest(TReportReason reason, string comments);
 
         /// <summary>
         /// Determines whether an additional comment is required for submitting the report with the supplied <paramref name="reason"/>.
