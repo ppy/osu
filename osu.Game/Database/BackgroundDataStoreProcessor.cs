@@ -698,7 +698,7 @@ namespace osu.Game.Database
             int processedCount = 0;
             int failedCount = 0;
 
-            List<(Guid, BeatmapInfo, HashSet<string>)> buffer = new List<(Guid, BeatmapInfo, HashSet<string>)>(); 
+            List<(Guid, BeatmapInfo, HashSet<string>)> buffer = new List<(Guid, BeatmapInfo, HashSet<string>)>();
 
             foreach (var id in beatmapIds)
             {
@@ -711,8 +711,6 @@ namespace osu.Game.Database
 
                 try
                 {
-                    // Can't use async overload because we're not on the update thread.
-                    // ReSharper disable once MethodHasAsyncOverload
                     var beatmap = realmAccess.Run(r => r.Find<BeatmapInfo>(id)?.Detach());
 
                     if (beatmap == null)
@@ -749,15 +747,30 @@ namespace osu.Game.Database
                 }
             }
 
-
+            // Can't use async overload because we're not on the update thread.
+            // ReSharper disable once MethodHasAsyncOverload
             realmAccess.Write(r =>
             {
                 foreach ((Guid id, BeatmapInfo beatmap, HashSet<string> userTags) in buffer)
                 {
-                    beatmap.Metadata.UserTags.Clear();
-                    beatmap.Metadata.UserTags.AddRange(userTags);
+                    try
+                    {
+                        beatmap.Metadata.UserTags.Clear();
+                        beatmap.Metadata.UserTags.AddRange(userTags);
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        throw;
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Log(@$"Failed to update user tags for beatmap {id}: {e}");
+                        --processedCount;
+                        ++failedCount;
+                    }
                 }
             });
+
             completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
             config.SetValue(OsuSetting.LastOnlineTagsPopulation, metadataSourceFetchDate);
         }
