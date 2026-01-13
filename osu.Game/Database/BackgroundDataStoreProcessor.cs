@@ -218,7 +218,6 @@ namespace osu.Game.Database
                 }
             }
 
-
             realmAccess.Write(r =>
             {
                 foreach ((Guid id, BeatmapInfo beatmap, double starRating) in buffer)
