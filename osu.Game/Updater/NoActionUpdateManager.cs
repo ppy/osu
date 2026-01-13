@@ -53,7 +53,7 @@ namespace osu.Game.Updater
                 {
                     Notifications.Post(new UpdateAvailableNotification(cancellationToken)
                     {
-                        Text = LocalisableString.Interpolate($"{NotificationsStrings.UpdateAvailable(version, latestTagName)}\n\n{NotificationsStrings.UpdateNoAction}"),
+                        Text = LocalisableString.Interpolate($"{NotificationsStrings.UpdateAvailable(version, latestTagName)}\n\n{NotificationsStrings.UpdateAvailablePackageManaged}"),
                     });
 
                     return true;
