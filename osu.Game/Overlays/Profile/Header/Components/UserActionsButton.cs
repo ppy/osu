@@ -180,7 +180,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             new OsuSpriteText
                             {
                                 Text = caption,
-                                Font = OsuFont.Style.Body,
+                                Font = OsuFont.Style.Caption1,
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 UseFullGlyphHeight = false,
