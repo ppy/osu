@@ -190,6 +190,31 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString CollectionsImportProgressTotal(int count, int totalCount) => new TranslatableString(getKey(@"collections_import_progress_total"), @"Imported {0} of {1} collections", count, totalCount);
 
+        /// <summary>
+        /// "This error has been automatically reported to the dev team."
+        /// </summary>
+        public static LocalisableString ErrorAutomaticallyReported => new TranslatableString(getKey(@"error_automatically_reported"), @"This error has been automatically reported to the dev team.");
+
+        /// <summary>
+        /// "A newer release of osu! has been found ({0} → {1})."
+        /// </summary>
+        public static LocalisableString UpdateAvailable(string oldVersion, string newVersion) => new TranslatableString(getKey(@"update_available"), @"A newer release of osu! has been found ({0} → {1}).", oldVersion, newVersion);
+
+        /// <summary>
+        /// "Click here to download the new version, which can be installed over the top of your existing installation."
+        /// </summary>
+        public static LocalisableString UpdateAvailableManualInstall => new TranslatableString(getKey(@"update_available_manual_install"), @"Click here to download the new version, which can be installed over the top of your existing installation.");
+
+        /// <summary>
+        /// "Check with your package manager / provider to bring osu! up-to-date!"
+        /// </summary>
+        public static LocalisableString UpdateAvailablePackageManaged => new TranslatableString(getKey(@"update_available_package_managed"), @"Check with your package manager / provider to bring osu! up-to-date!");
+
+        /// <summary>
+        /// "An action was interrupted due to a dialog being displayed."
+        /// </summary>
+        public static LocalisableString ActionInterruptedByDialog => new TranslatableString(getKey(@"action_interrupted_by_dialog"), @"An action was interrupted due to a dialog being displayed.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
