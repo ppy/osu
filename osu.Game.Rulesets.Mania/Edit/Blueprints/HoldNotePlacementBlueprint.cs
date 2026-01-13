@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; } = null!;
 
-        protected override bool IsValidForPlacement => Precision.DefinitelyBigger(HitObject.Duration, 0);
+        protected override bool IsValidForPlacement => base.IsValidForPlacement && (PlacementActive == PlacementState.Waiting || Precision.DefinitelyBigger(HitObject.Duration, 0));
 
         public HoldNotePlacementBlueprint()
             : base(new HoldNote())

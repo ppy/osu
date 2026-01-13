@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -17,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public partial class FormDropdown<T> : OsuDropdown<T>
+    public partial class FormDropdown<T> : OsuDropdown<T>, IFormControl
     {
         /// <summary>
         /// Caption describing this slider bar, displayed on top of the controls.
@@ -28,6 +30,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// Hint text containing an extended description of this slider bar, displayed in a tooltip when hovering the caption.
         /// </summary>
         public LocalisableString HintText { get; init; }
+
+        /// <summary>
+        /// The maximum height of the dropdown's menu.
+        /// By default, this is set to 200px high. Set to <see cref="float.PositiveInfinity"/> to remove such limit.
+        /// </summary>
+        public float MaxHeight { get; set; } = 200;
 
         private FormDropdownHeader header = null!;
 
@@ -40,12 +48,40 @@ namespace osu.Game.Graphics.UserInterfaceV2
             header.HintText = HintText;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Current.BindValueChanged(_ => ValueChanged?.Invoke());
+        }
+
+        public virtual IEnumerable<LocalisableString> FilterTerms
+        {
+            get
+            {
+                yield return Caption;
+
+                foreach (var item in MenuItems)
+                    yield return item.Text.Value;
+            }
+        }
+
+        public event Action? ValueChanged;
+
+        public bool IsDefault => Current.IsDefault;
+
+        public void SetDefault() => Current.SetDefault();
+
+        public bool IsDisabled => Current.Disabled;
+
         protected override DropdownHeader CreateHeader() => header = new FormDropdownHeader
         {
             Dropdown = this,
         };
 
-        protected override DropdownMenu CreateMenu() => new FormDropdownMenu();
+        protected override DropdownMenu CreateMenu() => new FormDropdownMenu
+        {
+            MaxHeight = MaxHeight,
+        };
 
         private partial class FormDropdownHeader : DropdownHeader
         {
@@ -105,30 +141,30 @@ namespace osu.Game.Graphics.UserInterfaceV2
             [BackgroundDependencyLoader]
             private void load()
             {
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.None;
-                Height = 50;
-
                 Masking = true;
                 CornerRadius = 5;
 
-                Foreground.AutoSizeAxes = Axes.None;
-                Foreground.RelativeSizeAxes = Axes.Both;
                 Foreground.Padding = new MarginPadding(9);
                 Foreground.Children = new Drawable[]
                 {
-                    caption = new FormFieldCaption
-                    {
-                        Anchor = Anchor.TopLeft,
-                        Origin = Anchor.TopLeft,
-                        Caption = Caption,
-                        TooltipText = HintText,
-                    },
-                    label = new OsuSpriteText
+                    new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 4),
+                        Children = new Drawable[]
+                        {
+                            caption = new FormFieldCaption
+                            {
+                                Caption = Caption,
+                                TooltipText = HintText,
+                            },
+                            label = new OsuSpriteText
+                            {
+                                RelativeSizeAxes = Axes.X,
+                            },
+                        }
                     },
                     chevron = new SpriteIcon
                     {
@@ -136,10 +172,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                         Size = new Vector2(16),
+                        Margin = new MarginPadding { Right = 5 },
                     },
                 };
 
-                AddInternal(new HoverClickSounds());
+                AddInternal(new HoverClickSounds
+                {
+                    Enabled = { BindTarget = Enabled },
+                });
             }
 
             protected override void LoadComplete()
@@ -175,29 +215,26 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 label.Alpha = string.IsNullOrEmpty(SearchBar.SearchTerm.Value) ? 1 : 0;
 
-                caption.Colour = Dropdown.Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
-                label.Colour = Dropdown.Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
-                chevron.Colour = Dropdown.Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
+                caption.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content2;
+                label.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content1;
+                chevron.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content1;
                 DisabledColour = Colour4.White;
 
                 bool dropdownOpen = Dropdown.Menu.State == MenuState.Open;
 
-                if (!Dropdown.Current.Disabled)
-                {
-                    BorderThickness = IsHovered || dropdownOpen ? 2 : 0;
+                BorderThickness = IsHovered || dropdownOpen ? 2 : 0;
+
+                if (Dropdown.Current.Disabled)
+                    BorderColour = colourProvider.Dark1;
+                else
                     BorderColour = dropdownOpen ? colourProvider.Highlight1 : colourProvider.Light4;
 
-                    if (dropdownOpen)
-                        Background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
-                    else if (IsHovered)
-                        Background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
-                    else
-                        Background.Colour = colourProvider.Background5;
-                }
+                if (dropdownOpen)
+                    Background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
+                else if (IsHovered)
+                    Background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
                 else
-                {
-                    Background.Colour = colourProvider.Background4;
-                }
+                    Background.Colour = colourProvider.Background5;
             }
 
             private void updateChevron()

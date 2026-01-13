@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -9,6 +10,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Scoring;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Visual.UserInterface;
 using osuTK;
@@ -75,6 +77,120 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                                     new PanelGroupStarDifficulty
                                     {
                                         Item = new CarouselItem(new StarDifficultyGroupDefinition(3, $"{star} Star(s)", new StarDifficulty(star, 0))),
+                                        Expanded = { Value = true },
+                                        KeyboardSelected = { Value = true },
+                                    },
+                                },
+                            }
+                        }
+                    };
+                });
+            }
+        }
+
+        [Test]
+        public void TestRanks()
+        {
+            for (int i = -1; i <= 7; i++)
+            {
+                ScoreRank rank = (ScoreRank)i;
+
+                AddStep($"display rank {rank}", () =>
+                {
+                    ContentContainer.Child = new DependencyProvidingContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        CachedDependencies = new (Type, object)[]
+                        {
+                            (typeof(OverlayColourProvider), new OverlayColourProvider(OverlayColourScheme.Aquamarine))
+                        },
+                        Child = new OsuContextMenuContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = new FillFlowContainer
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Width = 0.5f,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(0f, 5f),
+                                Children = new[]
+                                {
+                                    new PanelGroupRankDisplay
+                                    {
+                                        Item = new CarouselItem(new RankDisplayGroupDefinition(rank))
+                                    },
+                                    new PanelGroupRankDisplay
+                                    {
+                                        Item = new CarouselItem(new RankDisplayGroupDefinition(rank)),
+                                        KeyboardSelected = { Value = true },
+                                    },
+                                    new PanelGroupRankDisplay
+                                    {
+                                        Item = new CarouselItem(new RankDisplayGroupDefinition(rank)),
+                                        Expanded = { Value = true },
+                                    },
+                                    new PanelGroupRankDisplay
+                                    {
+                                        Item = new CarouselItem(new RankDisplayGroupDefinition(rank)),
+                                        Expanded = { Value = true },
+                                        KeyboardSelected = { Value = true },
+                                    },
+                                },
+                            }
+                        }
+                    };
+                });
+            }
+        }
+
+        [Test]
+        public void TestStatuses()
+        {
+            foreach (var status in Enum.GetValues<BeatmapOnlineStatus>().Where(s => s != BeatmapOnlineStatus.Approved))
+            {
+                AddStep($"display {status} status", () =>
+                {
+                    ContentContainer.Child = new DependencyProvidingContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        CachedDependencies = new (Type, object)[]
+                        {
+                            (typeof(OverlayColourProvider), new OverlayColourProvider(OverlayColourScheme.Aquamarine))
+                        },
+                        Child = new OsuContextMenuContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = new FillFlowContainer
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Width = 0.5f,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(0f, 5f),
+                                Children = new[]
+                                {
+                                    new PanelGroupRankedStatus
+                                    {
+                                        Item = new CarouselItem(new RankedStatusGroupDefinition(0, status))
+                                    },
+                                    new PanelGroupRankedStatus
+                                    {
+                                        Item = new CarouselItem(new RankedStatusGroupDefinition(1, status)),
+                                        KeyboardSelected = { Value = true },
+                                    },
+                                    new PanelGroupRankedStatus
+                                    {
+                                        Item = new CarouselItem(new RankedStatusGroupDefinition(2, status)),
+                                        Expanded = { Value = true },
+                                    },
+                                    new PanelGroupRankedStatus
+                                    {
+                                        Item = new CarouselItem(new RankedStatusGroupDefinition(3, status)),
                                         Expanded = { Value = true },
                                         KeyboardSelected = { Value = true },
                                     },

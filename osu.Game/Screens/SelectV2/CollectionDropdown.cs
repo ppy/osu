@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -18,6 +19,7 @@ using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osuTK;
 using Realms;
 
@@ -33,8 +35,6 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         protected virtual bool ShowManageCollectionsItem => true;
 
-        public Action? RequestFilter { private get; set; }
-
         private readonly BindableList<CollectionFilterMenuItem> filters = new BindableList<CollectionFilterMenuItem>();
 
         [Resolved]
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.SelectV2
         private readonly CollectionFilterMenuItem allBeatmapsItem = new AllBeatmapsCollectionFilterMenuItem();
 
         public CollectionDropdown()
-            : base("Collection")
+            : base(CollectionsStrings.Collection)
         {
             ItemSource = filters;
 
@@ -109,15 +109,11 @@ namespace osu.Game.Screens.SelectV2
                             Current.Value = filters.SingleOrDefault(f => f.Collection?.ID == selectedItem.Collection?.ID) ?? filters[0];
                         });
 
-                        // Trigger an external re-filter if the current item was in the change set.
-                        RequestFilter?.Invoke();
                         break;
                     }
                 }
             }
         }
-
-        private Live<BeatmapCollection>? lastFiltered;
 
         private void selectionChanged(ValueChangedEvent<CollectionFilterMenuItem> filter)
         {
@@ -131,17 +127,6 @@ namespace osu.Game.Screens.SelectV2
             {
                 Current.Value = filter.OldValue;
                 manageCollectionsDialog?.Show();
-                return;
-            }
-
-            var newCollection = filter.NewValue.Collection;
-
-            // This dropdown be weird.
-            // We only care about filtering if the actual collection has changed.
-            if (newCollection != lastFiltered)
-            {
-                RequestFilter?.Invoke();
-                lastFiltered = newCollection;
             }
         }
 
@@ -214,7 +199,7 @@ namespace osu.Game.Screens.SelectV2
 
                         addOrRemoveButton.Enabled.Value = !beatmap.IsDefault;
                         addOrRemoveButton.Icon = beatmapInCollection ? FontAwesome.Solid.MinusSquare : FontAwesome.Solid.PlusSquare;
-                        addOrRemoveButton.TooltipText = beatmapInCollection ? "Remove selected beatmap" : "Add selected beatmap";
+                        addOrRemoveButton.TooltipText = beatmapInCollection ? CollectionsStrings.RemoveSelectedBeatmap : CollectionsStrings.AddSelectedBeatmap;
 
                         updateButtonVisibility();
                     }, true);
@@ -253,11 +238,11 @@ namespace osu.Game.Screens.SelectV2
             {
                 Debug.Assert(collection != null);
 
-                collection.PerformWrite(c =>
+                Task.Run(() => collection.PerformWrite(c =>
                 {
                     if (!c.BeatmapMD5Hashes.Remove(beatmap.Value.BeatmapInfo.MD5Hash))
                         c.BeatmapMD5Hashes.Add(beatmap.Value.BeatmapInfo.MD5Hash);
-                });
+                }));
             }
 
             protected override Drawable CreateContent() => (Content)base.CreateContent();

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Collections.Generic;
 using Humanizer;
 using NUnit.Framework;
-using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Audio;
@@ -196,11 +195,6 @@ namespace osu.Game.Tests.Visual.Editing
             clickSamplePiece(1);
             samplePopoverHasSingleBank(HitSampleInfo.BANK_SOFT);
 
-            setBankViaPopover(string.Empty);
-            hitObjectHasSampleBank(0, HitSampleInfo.BANK_SOFT);
-            hitObjectHasSampleBank(1, HitSampleInfo.BANK_SOFT);
-            samplePopoverHasSingleBank(HitSampleInfo.BANK_SOFT);
-
             setBankViaPopover(HitSampleInfo.BANK_DRUM);
             hitObjectHasSampleBank(0, HitSampleInfo.BANK_DRUM);
             hitObjectHasSampleBank(1, HitSampleInfo.BANK_DRUM);
@@ -217,11 +211,6 @@ namespace osu.Game.Tests.Visual.Editing
             dismissPopover();
 
             clickSamplePiece(1);
-            samplePopoverHasIndeterminateBank();
-
-            setBankViaPopover(string.Empty);
-            hitObjectHasSampleBank(0, HitSampleInfo.BANK_NORMAL);
-            hitObjectHasSampleBank(1, HitSampleInfo.BANK_SOFT);
             samplePopoverHasIndeterminateBank();
 
             setBankViaPopover(HitSampleInfo.BANK_NORMAL);
@@ -878,17 +867,17 @@ namespace osu.Game.Tests.Visual.Editing
         private void samplePopoverHasSingleBank(string bank) => AddUntilStep($"sample popover has bank {bank}", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
-            var textBox = popover?.ChildrenOfType<OsuTextBox>().First();
+            var dropdown = popover?.ChildrenOfType<LabelledDropdown<string>>().First();
 
-            return textBox?.Current.Value == bank && string.IsNullOrEmpty(textBox.PlaceholderText.ToString());
+            return dropdown?.Current.Value == bank;
         });
 
         private void samplePopoverHasIndeterminateBank() => AddUntilStep("sample popover has indeterminate bank", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
-            var textBox = popover?.ChildrenOfType<OsuTextBox>().First();
+            var dropdown = popover?.ChildrenOfType<LabelledDropdown<string>>().First();
 
-            return textBox != null && string.IsNullOrEmpty(textBox.Current.Value) && !string.IsNullOrEmpty(textBox.PlaceholderText.ToString());
+            return dropdown?.Current.Value == "(multiple)";
         });
 
         private void dismissPopover()
@@ -920,23 +909,15 @@ namespace osu.Game.Tests.Visual.Editing
         private void setBankViaPopover(string bank) => AddStep($"set bank {bank} via popover", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().Single();
-            var textBox = popover.ChildrenOfType<LabelledTextBox>().First();
+            var textBox = popover.ChildrenOfType<LabelledDropdown<string>>().First();
             textBox.Current.Value = bank;
-            // force a commit via keyboard.
-            // this is needed when testing attempting to set empty bank - which should revert to the previous value, but only on commit.
-            ((IFocusManager)InputManager).ChangeFocus(textBox);
-            InputManager.Key(Key.Enter);
         });
 
         private void setAdditionBankViaPopover(string bank) => AddStep($"set addition bank {bank} via popover", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().Single();
-            var textBox = popover.ChildrenOfType<LabelledTextBox>().ToArray()[1];
+            var textBox = popover.ChildrenOfType<LabelledDropdown<string>>().ToArray()[1];
             textBox.Current.Value = bank;
-            // force a commit via keyboard.
-            // this is needed when testing attempting to set empty bank - which should revert to the previous value, but only on commit.
-            ((IFocusManager)InputManager).ChangeFocus(textBox);
-            InputManager.Key(Key.Enter);
         });
 
         private void toggleAdditionViaPopover(int index) => AddStep($"toggle addition {index} via popover", () =>

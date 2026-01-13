@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     LabelText = GraphicsSettingsStrings.FrameLimiter,
                     Current = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync),
-                    Keywords = new[] { @"fps" },
+                    Keywords = new[] { @"fps", @"framerate" },
                 },
                 new SettingsEnumDropdown<ExecutionMode>
                 {
@@ -54,7 +54,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 new SettingsCheckbox
                 {
                     LabelText = GraphicsSettingsStrings.ShowFPS,
-                    Current = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay)
+                    Current = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay),
+                    Keywords = new[] { @"framerate", @"counter" },
                 },
             };
 

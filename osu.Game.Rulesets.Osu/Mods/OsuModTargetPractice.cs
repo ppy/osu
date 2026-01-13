@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Name => "Target Practice";
         public override string Acronym => "TP";
         public override ModType Type => ModType.Conversion;
-        public override IconUsage? Icon => OsuIcon.ModTarget;
+        public override IconUsage? Icon => OsuIcon.ModTargetPractice;
         public override LocalisableString Description => @"Practice keeping up with the beat of the song.";
         public override double ScoreMultiplier => 0.1;
 
@@ -114,10 +114,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         #endregion
 
         #region Reduce AR (IApplicableToDifficulty)
-
-        public void ReadFromDifficulty(IBeatmapDifficultyInfo difficulty)
-        {
-        }
 
         public void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {

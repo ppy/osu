@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
@@ -24,7 +25,11 @@ namespace osu.Game.Online.Leaderboards
 {
     public partial class LeaderboardManager : Component
     {
+        /// <summary>
+        /// The latest leaderboard scores fetched by the criteria in <see cref="CurrentCriteria"/>.
+        /// </summary>
         public IBindable<LeaderboardScores?> Scores => scores;
+
         private readonly Bindable<LeaderboardScores?> scores = new Bindable<LeaderboardScores?>();
 
         public LeaderboardCriteria? CurrentCriteria { get; private set; }
@@ -47,6 +52,9 @@ namespace osu.Game.Online.Leaderboards
         /// </summary>
         public void FetchWithCriteria(LeaderboardCriteria newCriteria, bool forceRefresh = false)
         {
+            if (!ThreadSafety.IsUpdateThread)
+                throw new InvalidOperationException(@$"{nameof(FetchWithCriteria)} must be called from the update thread.");
+
             if (!forceRefresh && CurrentCriteria?.Equals(newCriteria) == true && scores.Value?.FailState == null)
                 return;
 
@@ -76,6 +84,9 @@ namespace osu.Game.Online.Leaderboards
 
                 default:
                 {
+                    if (newCriteria.Sorting != LeaderboardSortMode.Score)
+                        throw new NotSupportedException($@"Requesting online scores with a {nameof(LeaderboardSortMode)} other than {nameof(LeaderboardSortMode.Score)} is not supported");
+
                     if (!api.IsLoggedIn)
                     {
                         scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotLoggedIn);
@@ -133,7 +144,8 @@ namespace osu.Game.Online.Leaderboards
                                         return s;
                                     })
                                     .ToArray(),
-                            response.ScoresCount,
+                            scoresRequested: newRequest.ScoresRequested,
+                            totalScores: response.ScoresCount,
                             response.UserScore?.CreateScoreInfo(rulesets, newCriteria.Beatmap)
                         );
                         inFlightOnlineRequest = null;
@@ -180,10 +192,17 @@ namespace osu.Game.Online.Leaderboards
                 }
             }
 
-            newScores = newScores.Detach().OrderByTotalScore();
+            newScores = newScores.Detach().OrderByCriteria(CurrentCriteria.Sorting);
 
             var newScoresArray = newScores.ToArray();
-            scores.Value = LeaderboardScores.Success(newScoresArray, newScoresArray.Length, null);
+            scores.Value = LeaderboardScores.Success(newScoresArray, scoresRequested: newScoresArray.Length, totalScores: newScoresArray.Length, null);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            localScoreSubscription?.Dispose();
         }
     }
 
@@ -191,14 +210,39 @@ namespace osu.Game.Online.Leaderboards
         BeatmapInfo? Beatmap,
         RulesetInfo? Ruleset,
         BeatmapLeaderboardScope Scope,
-        Mod[]? ExactMods
+        Mod[]? ExactMods,
+        LeaderboardSortMode Sorting = LeaderboardSortMode.Score
     );
 
     public record LeaderboardScores
     {
+        /// <summary>
+        /// The collection of all scores received through the leaderboard lookup.
+        /// </summary>
         public ICollection<ScoreInfo> TopScores { get; }
+
+        /// <summary>
+        /// The number of scores which was requested.
+        /// Used to determine whether the returned leaderboard can be judged to be a partial or full leaderboard
+        /// (i.e. whether <see cref="TopScores"/> contains all scores that it could ever contain).
+        /// </summary>
+        public int ScoresRequested { get; }
+
+        /// <summary>
+        /// The number of all scores that exist on the leaderboard.
+        /// </summary>
         public int TotalScores { get; }
+
+        public bool IsPartial => ScoresRequested < TotalScores;
+
+        /// <summary>
+        /// The local user's best score.
+        /// </summary>
         public ScoreInfo? UserScore { get; }
+
+        /// <summary>
+        /// The failure state that occurred when attempting to retrieve the leaderboard.
+        /// </summary>
         public LeaderboardFailState? FailState { get; }
 
         public IEnumerable<ScoreInfo> AllScores
@@ -213,16 +257,20 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        private LeaderboardScores(ICollection<ScoreInfo> topScores, int totalScores, ScoreInfo? userScore, LeaderboardFailState? failState)
+        private LeaderboardScores(ICollection<ScoreInfo> topScores, int scoresRequested, int totalScores, ScoreInfo? userScore, LeaderboardFailState? failState)
         {
             TopScores = topScores;
+            ScoresRequested = scoresRequested;
             TotalScores = totalScores;
             UserScore = userScore;
             FailState = failState;
         }
 
-        public static LeaderboardScores Success(ICollection<ScoreInfo> topScores, int totalScores, ScoreInfo? userScore) => new LeaderboardScores(topScores, totalScores, userScore, null);
-        public static LeaderboardScores Failure(LeaderboardFailState failState) => new LeaderboardScores([], 0, null, failState);
+        public static LeaderboardScores Success(ICollection<ScoreInfo> topScores, int scoresRequested, int totalScores, ScoreInfo? userScore)
+            => new LeaderboardScores(topScores, scoresRequested, totalScores, userScore, null);
+
+        public static LeaderboardScores Failure(LeaderboardFailState failState)
+            => new LeaderboardScores([], scoresRequested: 0, totalScores: 0, null, failState);
     }
 
     public enum LeaderboardFailState

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -23,7 +24,9 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.SelectV2;
+using osu.Game.Tests.Resources;
 using osuTK.Input;
+using BeatmapCarousel = osu.Game.Screens.SelectV2.BeatmapCarousel;
 using FooterButtonMods = osu.Game.Screens.SelectV2.FooterButtonMods;
 using FooterButtonOptions = osu.Game.Screens.SelectV2.FooterButtonOptions;
 using FooterButtonRandom = osu.Game.Screens.SelectV2.FooterButtonRandom;
@@ -174,7 +177,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("mods selected", () => SelectedMods.Value, () => Has.Count.EqualTo(1));
             AddStep("right click mod button", () =>
             {
-                InputManager.MoveMouseTo(Footer.ChildrenOfType<FooterButtonMods>().Single());
+                InputManager.MoveMouseTo(ScreenFooter.ChildrenOfType<FooterButtonMods>().Single());
                 InputManager.Click(MouseButton.Right);
             });
             AddAssert("not mods selected", () => SelectedMods.Value, () => Has.Count.EqualTo(0));
@@ -300,6 +303,29 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 InputManager.Key(Key.Down);
                 InputManager.ReleaseKey(Key.ControlLeft);
             });
+        }
+
+        /// <summary>
+        /// Last played and rank achieved may have changed, so we want to make sure filtering runs on resume to song select.
+        /// </summary>
+        [Test]
+        public void TestFilteringRunsAfterReturningFromGameplay()
+        {
+            AddStep("import actual beatmap", () => Beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely());
+
+            LoadSongSelect();
+
+            AddUntilStep("wait for filtered", () => SongSelect.ChildrenOfType<BeatmapCarousel>().Single().FilterCount, () => Is.EqualTo(1));
+
+            AddStep("enter gameplay", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
+            AddUntilStep("wait for fail", () => ((Player)Stack.CurrentScreen).GameplayState.HasFailed);
+
+            AddStep("exit gameplay", () => Stack.CurrentScreen.Exit());
+
+            AddUntilStep("wait for song select", () => Stack.CurrentScreen is Screens.SelectV2.SongSelect);
+            AddUntilStep("wait for filtered", () => SongSelect.ChildrenOfType<BeatmapCarousel>().Single().FilterCount, () => Is.EqualTo(2));
         }
 
         [Test]
@@ -558,7 +584,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("previous random invoked", () => previousRandomCalled && !nextRandomCalled);
         }
 
-        private FooterButtonRandom randomButton => Footer.ChildrenOfType<FooterButtonRandom>().Single();
+        private FooterButtonRandom randomButton => ScreenFooter.ChildrenOfType<FooterButtonRandom>().Single();
 
         [Test]
         public void TestFooterOptions()
@@ -566,7 +592,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             LoadSongSelect();
 
             ImportBeatmapForRuleset(0);
-            AddAssert("options enabled", () => this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+            AddUntilStep("options enabled", () => this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
 
             AddStep("click", () => this.ChildrenOfType<FooterButtonOptions>().Single().TriggerClick());
             AddUntilStep("popover displayed", () => this.ChildrenOfType<FooterButtonOptions.Popover>().Any(p => p.IsPresent));
@@ -623,7 +649,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             ImportBeatmapForRuleset(0);
 
-            AddAssert("options enabled", () => this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+            AddUntilStep("options enabled", () => this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
             AddStep("delete all beatmaps", () => Beatmaps.Delete());
 
             AddAssert("beatmap selected", () => !Beatmap.IsDefault);
@@ -631,6 +657,51 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddUntilStep("wait for no beatmap", () => Beatmap.IsDefault);
             AddAssert("options disabled", () => !this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+        }
+
+        /// <summary>
+        /// tests that clicking the osu! logo immediately after selecting a different difficulty
+        /// (before the selection debounce completes) starts the correct beatmap.
+        /// this tests the fix for https://github.com/ppy/osu/issues/36074
+        /// </summary>
+        [Test]
+        public void TestPlayCorrectBeatmapWhenSelectionNotFullyLoaded()
+        {
+            // import a beatmap set with multiple difficulties
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+
+            // wait for initial beatmap to be selected
+            AddUntilStep("wait for first beatmap selected", () => !Beatmap.IsDefault);
+
+            BeatmapInfo? firstBeatmap = null;
+            AddStep("store first difficulty", () => firstBeatmap = Beatmap.Value.BeatmapInfo);
+
+            // start loading the first difficulty
+            AddStep("click logo to start loading", () => this.ChildrenOfType<OsuLogo>().Single().TriggerClick());
+            AddUntilStep("wait for player loader", () => Stack.CurrentScreen is PlayerLoader);
+
+            // return to song select
+            AddStep("press escape to return", () => InputManager.Key(Key.Escape));
+            AddUntilStep("wait for return to song select", () => SongSelect.IsCurrentScreen());
+
+            // press down and schedule logo click to happen shortly after (but before 150ms debounce)
+            // this reproduces the race condition where Beatmap.Value hasn't updated yet
+            AddStep("select next difficulty and click logo immediately", () =>
+            {
+                InputManager.Key(Key.Down);
+                Schedule(() => this.ChildrenOfType<OsuLogo>().Single().TriggerClick());
+            });
+
+            AddUntilStep("wait for player loader", () => Stack.CurrentScreen is PlayerLoader);
+
+            // verify we're loading the second difficulty, not the first
+            // without the fix, this would fail because Beatmap.Value still has the old value
+            AddAssert("player is loading second difficulty", () =>
+                Beatmap.Value.BeatmapInfo.ID != firstBeatmap!.ID);
+
+            AddUntilStep("wait for return to song select", () => SongSelect.IsCurrentScreen());
         }
 
         #endregion

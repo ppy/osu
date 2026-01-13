@@ -42,6 +42,8 @@ namespace osu.Game.Overlays.Settings.Sections
             Icon = OsuIcon.SkinB
         };
 
+        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "skins" });
+
         private static readonly Live<SkinInfo> random_skin_info = new SkinInfo
         {
             ID = SkinInfo.RANDOM_SKIN,
@@ -69,7 +71,6 @@ namespace osu.Game.Overlays.Settings.Sections
                     AllowNonContiguousMatching = true,
                     LabelText = SkinSettingsStrings.CurrentSkin,
                     Current = skins.CurrentSkinInfo,
-                    Keywords = new[] { @"skins" },
                 },
                 new FillFlowContainer
                 {
@@ -130,6 +131,7 @@ namespace osu.Game.Overlays.Settings.Sections
             dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.ARGON_PRO_SKIN).ToLive(realm));
             dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.TRIANGLES_SKIN).ToLive(realm));
             dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.CLASSIC_SKIN).ToLive(realm));
+            dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.RETRO_SKIN).ToLive(realm));
 
             dropdownItems.Add(random_skin_info);
 
@@ -175,8 +177,11 @@ namespace osu.Game.Overlays.Settings.Sections
                 base.LoadComplete();
 
                 currentSkin = skins.CurrentSkin.GetBoundCopy();
-                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.PerformRead(s => !s.Protected), true);
+                currentSkin.BindValueChanged(_ => updateState());
+                currentSkin.BindDisabledChanged(_ => updateState(), true);
             }
+
+            private void updateState() => Enabled.Value = !currentSkin.Disabled && currentSkin.Value.SkinInfo.PerformRead(s => !s.Protected);
 
             public Popover GetPopover()
             {
@@ -203,8 +208,11 @@ namespace osu.Game.Overlays.Settings.Sections
                 base.LoadComplete();
 
                 currentSkin = skins.CurrentSkin.GetBoundCopy();
-                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.PerformRead(s => !s.Protected), true);
+                currentSkin.BindValueChanged(_ => updateState());
+                currentSkin.BindDisabledChanged(_ => updateState(), true);
             }
+
+            private void updateState() => Enabled.Value = !currentSkin.Disabled && currentSkin.Value.SkinInfo.PerformRead(s => !s.Protected);
 
             private void export()
             {
@@ -241,8 +249,11 @@ namespace osu.Game.Overlays.Settings.Sections
                 base.LoadComplete();
 
                 currentSkin = skins.CurrentSkin.GetBoundCopy();
-                currentSkin.BindValueChanged(skin => Enabled.Value = skin.NewValue.SkinInfo.PerformRead(s => !s.Protected), true);
+                currentSkin.BindValueChanged(_ => updateState());
+                currentSkin.BindDisabledChanged(_ => updateState(), true);
             }
+
+            private void updateState() => Enabled.Value = !currentSkin.Disabled && currentSkin.Value.SkinInfo.PerformRead(s => !s.Protected);
 
             private void delete()
             {
@@ -284,7 +295,7 @@ namespace osu.Game.Overlays.Settings.Sections
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
                             MatchingFilter = true,
-                            Text = "Save",
+                            Text = WebCommonStrings.ButtonsSave,
                         }
                     }
                 };
@@ -301,11 +312,11 @@ namespace osu.Game.Overlays.Settings.Sections
                 base.PopIn();
             }
 
-            private void rename() => skins.CurrentSkinInfo.Value.PerformWrite(skin =>
+            private void rename()
             {
-                skin.Name = textBox.Text;
+                skins.Rename(skins.CurrentSkinInfo.Value, textBox.Text);
                 PopOut();
-            });
+            }
         }
     }
 }

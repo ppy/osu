@@ -218,23 +218,36 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Delete a beatmap difficulty.
+        /// Hide a beatmap difficulty.
+        /// Will fail if all difficulties are about to be hidden.
         /// </summary>
         /// <param name="beatmapInfo">The beatmap difficulty to hide.</param>
-        public void Hide(BeatmapInfo beatmapInfo)
+        public bool Hide(BeatmapInfo beatmapInfo)
         {
-            Realm.Run(r =>
+            return Realm.Run(r =>
             {
                 using (var transaction = r.BeginWrite())
                 {
                     if (!beatmapInfo.IsManaged)
                         beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
 
+                    if (!CanHide(beatmapInfo))
+                        return false;
+
                     beatmapInfo.Hidden = true;
                     transaction.Commit();
+                    return true;
                 }
             });
         }
+
+        public bool CanHide(BeatmapInfo beatmapInfo) => Realm.Run(r =>
+        {
+            if (!beatmapInfo.IsManaged)
+                beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
+
+            return beatmapInfo.BeatmapSet!.Beatmaps.Count(b => !b.Hidden) > 1;
+        });
 
         /// <summary>
         /// Restore a beatmap difficulty.
@@ -271,6 +284,7 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
+        /// IMPORTANT: This should not be used outside of tests. Consider using <see cref="RealmDetachedBeatmapStore"/> instead.
         /// </summary>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
         public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
@@ -313,6 +327,18 @@ namespace osu.Game.Beatmaps
              .Filter($@"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false")
              .Filter(query, arguments)
              .FirstOrDefault()?.Detach());
+
+        /// <summary>
+        /// Perform a lookup query on available <see cref="BeatmapInfo"/>s for a specific online ID.
+        /// </summary>
+        /// <returns>A matching local beatmap info if existing and in a valid state.</returns>
+        public BeatmapInfo? QueryOnlineBeatmapId(int id) => Realm.Run(r =>
+            r.All<BeatmapInfo>()
+             .ForOnlineId(id)
+             // See https://github.com/ppy/osu/issues/36234 for why this isn't a SingleOrDefault().
+             .FirstOrDefault()
+             ?.Detach()
+        );
 
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
@@ -462,9 +488,11 @@ namespace osu.Game.Beatmaps
         public Task<ExternalEditOperation<BeatmapSetInfo>> BeginExternalEditing(BeatmapSetInfo model) =>
             beatmapImporter.BeginExternalEditing(model);
 
-        public Task Export(BeatmapSetInfo beatmap) => beatmapExporter.ExportAsync(beatmap.ToLive(Realm));
+        public Task Export(BeatmapSetInfo beatmapSet) => beatmapExporter.ExportAsync(beatmapSet.ToLive(Realm));
 
-        public Task ExportLegacy(BeatmapSetInfo beatmap) => legacyBeatmapExporter.ExportAsync(beatmap.ToLive(Realm));
+        public Task ExportLegacy(BeatmapSetInfo beatmapSet) => legacyBeatmapExporter.ExportAsync(beatmapSet.ToLive(Realm));
+
+        public Task ExportLegacy(BeatmapInfo beatmap) => legacyBeatmapExporter.ExportAsync(beatmap.ToLive(Realm));
 
         private void updateHashAndMarkDirty(BeatmapSetInfo setInfo)
         {
@@ -554,6 +582,16 @@ namespace osu.Game.Beatmaps
             transaction.Commit();
         });
 
+        public void MarkNotPlayed(BeatmapInfo beatmapSetInfo) => Realm.Run(r =>
+        {
+            using var transaction = r.BeginWrite();
+
+            var beatmap = r.Find<BeatmapInfo>(beatmapSetInfo.ID)!;
+            beatmap.LastPlayed = null;
+
+            transaction.Commit();
+        });
+
         #region Implementation of ICanAcceptFiles
 
         public Task Import(params string[] paths) => beatmapImporter.Import(paths);
@@ -619,6 +657,14 @@ namespace osu.Game.Beatmaps
         }
 
         public override bool IsAvailableLocally(BeatmapSetInfo model) => Realm.Run(realm => realm.All<BeatmapSetInfo>().Any(s => s.OnlineID == model.OnlineID && !s.DeletePending));
+
+        public bool IsAvailableLocally(IBeatmapInfo model)
+        {
+            return Realm.Run(r => r.All<BeatmapInfo>()
+                                   .Filter($@"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false")
+                                   .Filter($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}", model.OnlineID)
+                                   .Any());
+        }
 
         #endregion
 

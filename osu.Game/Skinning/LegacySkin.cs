@@ -145,8 +145,10 @@ namespace osu.Game.Skinning
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.ColumnIndex.Value]));
 
                 case LegacyManiaSkinConfigurationLookups.WidthForNoteHeightScale:
-                    Debug.Assert(maniaLookup.ColumnIndex != null);
-                    return SkinUtils.As<TValue>(new Bindable<float>(existing.WidthForNoteHeightScale));
+                    float width = existing.WidthForNoteHeightScale;
+                    if (width <= 0)
+                        width = existing.MinimumColumnWidth;
+                    return SkinUtils.As<TValue>(new Bindable<float>(width));
 
                 case LegacyManiaSkinConfigurationLookups.HitPosition:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.HitPosition));
@@ -410,6 +412,9 @@ namespace osu.Game.Skinning
                                         leaderboard.Origin = Anchor.CentreLeft;
                                         leaderboard.X = 10;
                                     }
+
+                                    foreach (var d in container.OfType<ISerialisableDrawable>())
+                                        d.UsesFixedAnchor = true;
                                 })
                                 {
                                     new LegacyDefaultComboCounter(),
@@ -446,6 +451,9 @@ namespace osu.Game.Skinning
                                     hitError.Origin = Anchor.CentreLeft;
                                     hitError.Rotation = -90;
                                 }
+
+                                foreach (var d in container.OfType<ISerialisableDrawable>())
+                                    d.UsesFixedAnchor = true;
                             })
                             {
                                 Children = new Drawable[]
@@ -538,6 +546,10 @@ namespace osu.Game.Skinning
                 case "Menu/fountain-star":
                     componentName = "star2";
                     break;
+
+                case @"Intro/Welcome/welcome_text":
+                    componentName = @"welcome_text";
+                    break;
             }
 
             Texture? texture = null;
@@ -594,12 +606,17 @@ namespace osu.Game.Skinning
         {
             var lookupNames = hitSample.LookupNames.SelectMany(getFallbackSampleNames);
 
-            if (!UseCustomSampleBanks && !string.IsNullOrEmpty(hitSample.Suffix))
+            if (!string.IsNullOrEmpty(hitSample.Suffix))
             {
-                // for compatibility with stable, exclude the lookup names with the custom sample bank suffix, if they are not valid for use in this skin.
+                // for compatibility with stable:
+                // - if the skin can use custom sample banks, it MUST use the custom sample bank suffix. it is not allowed to fall back to a non-custom sound.
+                // - if the skin cannot use custom sample banks, it MUST NOT use the custom sample bank suffix.
                 // using .EndsWith() is intentional as it ensures parity in all edge cases
-                // (see LegacyTaikoSampleInfo for an example of one - prioritising the taiko prefix should still apply, but the sample bank should not).
-                lookupNames = lookupNames.Where(name => !name.EndsWith(hitSample.Suffix, StringComparison.Ordinal));
+                // (see LegacyTaikoSampleInfo for an example of one - prioritising the taiko prefix should still apply).
+                if (UseCustomSampleBanks)
+                    lookupNames = lookupNames.Where(name => name.EndsWith(hitSample.Suffix, StringComparison.Ordinal));
+                else
+                    lookupNames = lookupNames.Where(name => !name.EndsWith(hitSample.Suffix, StringComparison.Ordinal));
             }
 
             foreach (string l in lookupNames)

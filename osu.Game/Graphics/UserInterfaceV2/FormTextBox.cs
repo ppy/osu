@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -17,10 +19,11 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public partial class FormTextBox : CompositeDrawable, IHasCurrentValue<string>
+    public partial class FormTextBox : CompositeDrawable, IHasCurrentValue<string>, IFormControl
     {
         public Bindable<string> Current
         {
@@ -87,7 +90,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private void load(OsuColour colours)
         {
             RelativeSizeAxes = Axes.X;
-            Height = 50;
+            AutoSizeAxes = Axes.Y;
 
             Masking = true;
             CornerRadius = 5;
@@ -105,10 +108,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     RelativeSizeAxes = Axes.Both,
                     Colour = Colour4.Transparent,
                 },
-                new Container
+                new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding(9),
+                    Spacing = new Vector2(0, 4),
                     Children = new Drawable[]
                     {
                         caption = new FormFieldCaption
@@ -120,8 +125,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         },
                         textBox = CreateTextBox().With(t =>
                         {
-                            t.Anchor = Anchor.BottomRight;
-                            t.Origin = Anchor.BottomRight;
                             t.RelativeSizeAxes = Axes.X;
                             t.Width = 1;
                             t.PlaceholderText = PlaceholderText;
@@ -157,6 +160,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             focusManager = GetContainingFocusManager()!;
             textBox.Focused.BindValueChanged(_ => updateState());
+
+            current.BindValueChanged(_ => ValueChanged?.Invoke());
             current.BindDisabledChanged(_ => updateState(), true);
         }
 
@@ -185,26 +190,22 @@ namespace osu.Game.Graphics.UserInterfaceV2
             textBox.ReadOnly = disabled;
             textBox.Alpha = 1;
 
-            caption.Colour = disabled ? colourProvider.Foreground1 : colourProvider.Content2;
+            caption.Colour = disabled ? colourProvider.Background1 : colourProvider.Content2;
             textBox.Colour = disabled ? colourProvider.Foreground1 : colourProvider.Content1;
 
-            if (!disabled)
-            {
-                BorderThickness = IsHovered || textBox.Focused.Value ? 2 : 0;
+            BorderThickness = IsHovered || textBox.Focused.Value ? 2 : 0;
+
+            if (disabled)
+                BorderColour = colourProvider.Dark1;
+            else
                 BorderColour = textBox.Focused.Value ? colourProvider.Highlight1 : colourProvider.Light4;
 
-                if (textBox.Focused.Value)
-                    background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
-                else if (IsHovered)
-                    background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
-                else
-                    background.Colour = colourProvider.Background5;
-            }
+            if (textBox.Focused.Value)
+                background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
+            else if (IsHovered)
+                background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
             else
-            {
-                BorderThickness = 0;
-                background.Colour = colourProvider.Background4;
-            }
+                background.Colour = colourProvider.Background5;
         }
 
         internal partial class InnerTextBox : OsuTextBox
@@ -247,5 +248,15 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 OnInputError?.Invoke();
             }
         }
+
+        public event Action? ValueChanged;
+
+        public bool IsDefault => current.IsDefault;
+
+        public void SetDefault() => current.SetDefault();
+
+        public bool IsDisabled => current.Disabled;
+
+        public IEnumerable<LocalisableString> FilterTerms => Caption.Yield();
     }
 }

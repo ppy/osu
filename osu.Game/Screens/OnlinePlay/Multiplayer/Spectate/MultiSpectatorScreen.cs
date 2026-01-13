@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -63,6 +65,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private readonly Room room;
 
+        private PlayerSettingsOverlay playerSettingsOverlay = null!;
+        private Bindable<bool> configSettingsOverlay = null!;
+
         /// <summary>
         /// Creates a new <see cref="MultiSpectatorScreen"/>.
         /// </summary>
@@ -78,8 +83,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
+            configSettingsOverlay = config.GetBindable<bool>(OsuSetting.ReplaySettingsOverlay);
+
             FillFlowContainer leaderboardFlow;
             Container scoreDisplayContainer;
 
@@ -131,7 +138,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 {
                     ReadyToStart = performInitialSeek,
                 },
-                new PlayerSettingsOverlay()
+                playerSettingsOverlay = new PlayerSettingsOverlay
+                {
+                    Alpha = 0,
+                }
             };
 
             for (int i = 0; i < Users.Count; i++)
@@ -154,7 +164,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             });
             leaderboardFlow.Insert(0, Leaderboard = new DrawableGameplayLeaderboard
             {
-                CollapseDuringGameplay = { Value = false }
+                CollapseDuringGameplay = { Value = false },
+                AlwaysShown = true,
             });
 
             LoadComponentAsync(new GameplayChatDisplay(room)
@@ -171,23 +182,47 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             // Start with adjustments from the first player to keep a sane state.
             bindAudioAdjustments(instances.First());
+
+            configSettingsOverlay.BindValueChanged(_ => updateVisibility(), true);
+        }
+
+        private void updateVisibility()
+        {
+            if (configSettingsOverlay.Value)
+                playerSettingsOverlay.Show();
+            else
+                playerSettingsOverlay.Hide();
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (!isCandidateAudioSource(currentAudioSource?.SpectatorPlayerClock))
-            {
-                currentAudioSource = instances.Where(i => isCandidateAudioSource(i.SpectatorPlayerClock)).MinBy(i => Math.Abs(i.SpectatorPlayerClock.CurrentTime - syncManager.CurrentMasterTime));
+            checkAudioSource();
+        }
 
-                // Only bind adjustments if there's actually a valid source, else just use the previous ones to ensure no sudden changes to audio.
-                if (currentAudioSource != null)
-                    bindAudioAdjustments(currentAudioSource);
+        private void checkAudioSource()
+        {
+            // always use the maximised player instance as the current audio source if there is one
+            if (grid.MaximisedCell?.Content is PlayerArea maximisedPlayer && maximisedPlayer == currentAudioSource)
+                return;
 
-                foreach (var instance in instances)
-                    instance.Mute = instance != currentAudioSource;
-            }
+            // if there is no maximised player instance and the previous audio source is still good to use, keep using it
+            if (grid.MaximisedCell == null && isCandidateAudioSource(currentAudioSource?.SpectatorPlayerClock))
+                return;
+
+            // at this point we're in one of the following scenarios:
+            // - the maximised player instance is not the current audio source => we want to switch to the maximised player instance
+            // - there is no maximised player instance, and the previous audio source is stopped => find another running audio source
+            currentAudioSource = grid.MaximisedCell?.Content as PlayerArea
+                                 ?? instances.Where(i => isCandidateAudioSource(i.SpectatorPlayerClock)).MinBy(i => Math.Abs(i.SpectatorPlayerClock.CurrentTime - syncManager.CurrentMasterTime));
+
+            // Only bind adjustments if there's actually a valid source, else just use the previous ones to ensure no sudden changes to audio.
+            if (currentAudioSource != null)
+                bindAudioAdjustments(currentAudioSource);
+
+            foreach (var instance in instances)
+                instance.Mute = instance != currentAudioSource;
         }
 
         private void bindAudioAdjustments(PlayerArea first)
@@ -281,7 +316,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             // On a manual exit, set the player back to idle unless gameplay has finished.
             // Of note, this doesn't cover exiting using alt-f4 or menu home option.
             if (multiplayerClient.Room.State != MultiplayerRoomState.Open)
-                multiplayerClient.ChangeState(MultiplayerUserState.Idle);
+                multiplayerClient.ChangeState(MultiplayerUserState.Idle).FireAndForget();
 
             return base.OnBackButton();
         }

@@ -19,6 +19,11 @@ indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
+# temporary workaround for https://youtrack.jetbrains.com/issue/RIDER-130051/Cannot-resolve-symbol-inspections-incorrectly-firing-for-xmldoc-protected-member-references
+resharper_c_sharp_warnings_cs1574_cs1584_cs1581_cs1580_highlighting = hint
+# temporary workaround for https://youtrack.jetbrains.com/issue/RIDER-130381/Rider-does-not-respect-propagated-NoWarn-CS1591?backToIssues=false
+dotnet_diagnostic.CS1591.severity = none
+
 #license header
 file_header_template = Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.\nSee the LICENCE file in the repository root for full licence text.
 

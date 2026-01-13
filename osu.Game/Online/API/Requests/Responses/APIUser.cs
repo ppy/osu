@@ -22,7 +22,8 @@ namespace osu.Game.Online.API.Requests.Responses
         /// </summary>
         public const int SYSTEM_USER_ID = 0;
 
-        [JsonProperty(@"id")]
+        // In osu-web, deleted users have a null ID. When deserializing, we ignore the null value and use 1 instead.
+        [JsonProperty(@"id", NullValueHandling = NullValueHandling.Ignore)]
         public int Id { get; set; } = 1;
 
         [JsonProperty(@"join_date")]
@@ -244,6 +245,20 @@ namespace osu.Game.Online.API.Requests.Responses
 
                 statistics = value;
             }
+        }
+
+        // Only provided via /users/ batch lookups. Usually implicitly comes inside `UserStatistics`.
+        [JsonProperty(@"global_rank")]
+        [CanBeNull]
+        public GlobalRank Rank { get; set; }
+
+        public class GlobalRank
+        {
+            [JsonProperty(@"rank")]
+            public int? Rank;
+
+            [JsonProperty(@"ruleset_id")]
+            public int RulesetId;
         }
 
         [JsonProperty(@"rank_history")]
