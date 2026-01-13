@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +21,10 @@ namespace osu.Game.Overlays.Mods
 {
     public partial class ModPresetColumn : ModSelectColumn
     {
+        public IEnumerable<ModPresetState> PreselectableItems =>
+            ItemsFlow.OfType<ModPresetPanel>()
+                     .Select(p => p.ModState);
+
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
@@ -79,14 +84,19 @@ namespace osu.Game.Overlays.Mods
                 return;
             }
 
-            latestLoadTask = LoadComponentsAsync(presets.Select(p => new ModPresetPanel(p.ToLive(realm))
-            {
-                Shear = Vector2.Zero
-            }), loaded =>
-            {
-                removeAndDisposePresetPanels();
-                ItemsFlow.AddRange(loaded);
-            }, (cancellationTokenSource = new CancellationTokenSource()).Token);
+            latestLoadTask = LoadComponentsAsync(
+                presets.Select(p =>
+                {
+                    var state = new ModPresetState(p.ToLive(realm));
+                    return new ModPresetPanel(state)
+                        { Shear = Vector2.Zero };
+                }),
+                loaded =>
+                {
+                    removeAndDisposePresetPanels();
+                    ItemsFlow.AddRange(loaded);
+                },
+                (cancellationTokenSource = new CancellationTokenSource()).Token);
 
             void removeAndDisposePresetPanels()
             {

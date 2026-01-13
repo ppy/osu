@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Spacing = new Vector2(0, 5),
-                ChildrenEnumerable = createTestPresets().Select(preset => new ModPresetPanel(preset.ToLiveUnmanaged()))
+                ChildrenEnumerable = createTestPresets().Select(preset => new ModPresetPanel(new ModPresetState(preset.ToLiveUnmanaged())))
             });
         }
 
@@ -51,11 +51,15 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             ModPresetPanel? panel = null;
 
-            AddStep("create panel", () => Child = panel = new ModPresetPanel(createTestPresets().First().ToLiveUnmanaged())
+            AddStep("create panel", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Width = 0.5f
+                var presetState = new ModPresetState(createTestPresets().First().ToLiveUnmanaged());
+                Child = panel = new ModPresetPanel(presetState)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 0.5f
+                };
             });
             AddAssert("panel is not active", () => !panel.AsNonNull().Active.Value);
 
@@ -97,11 +101,15 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             ModPresetPanel? panel = null;
 
-            AddStep("create panel", () => Child = panel = new ModPresetPanel(createTestPresets().First().ToLiveUnmanaged())
+            AddStep("create panel", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Width = 0.5f
+                var presetState = new ModPresetState(createTestPresets().First().ToLiveUnmanaged());
+                Child = panel = new ModPresetPanel(presetState)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 0.5f
+                };
             });
 
             AddStep("activate panel", () => panel.AsNonNull().TriggerClick());
@@ -128,20 +136,25 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             ModPresetPanel? panel = null;
 
-            AddStep("create panel", () => Child = panel = new ModPresetPanel(new ModPreset
+            AddStep("create panel", () =>
             {
-                Name = "Autopilot included",
-                Description = "no way",
-                Mods = new Mod[]
+                var presetState = new ModPresetState(new ModPreset
                 {
-                    new OsuModAutopilot()
-                },
-                Ruleset = new OsuRuleset().RulesetInfo
-            }.ToLiveUnmanaged())
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Width = 0.5f
+                    Name = "Autopilot included",
+                    Description = "no way",
+                    Mods = new Mod[]
+                    {
+                        new OsuModAutopilot()
+                    },
+                    Ruleset = new OsuRuleset().RulesetInfo
+                }.ToLiveUnmanaged());
+
+                Child = panel = new ModPresetPanel(presetState)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 0.5f
+                };
             });
 
             AddStep("Add touch device to selected mods", () => SelectedMods.Value = new Mod[] { new OsuModTouchDevice() });

@@ -108,6 +108,11 @@ namespace osu.Game.Overlays.Mods
 
         public IEnumerable<ModState> AllAvailableMods => AvailableMods.Value.SelectMany(pair => pair.Value);
 
+        private IEnumerable<ModPresetState> allAvailablePresets =>
+            columnFlow.Columns
+                      .OfType<ModPresetColumn>()
+                      .SelectMany(c => c.PreselectableItems);
+
         private Bindable<bool> textSearchStartsActive = null!;
 
         private ColumnScrollContainer columnScroll = null!;
@@ -245,7 +250,7 @@ namespace osu.Game.Overlays.Mods
                     column.SearchTerm = query.NewValue;
 
                 if (SearchTextBox.HasFocus)
-                    preselectMod();
+                    preselectModOrPreset();
             }, true);
 
             // Start scrolling from the end, to give the user a sense that
@@ -257,7 +262,7 @@ namespace osu.Game.Overlays.Mods
             });
         }
 
-        private void preselectMod()
+        private void preselectModOrPreset()
         {
             var visibleMods = columnFlow.Columns.OfType<ModColumn>().Where(c => c.IsPresent).SelectMany(c => c.AvailableMods.Where(m => m.Visible));
 
@@ -269,12 +274,51 @@ namespace osu.Game.Overlays.Mods
 
             foreach (var mod in AllAvailableMods)
                 mod.Preselected.Value = mod == preselectedMod && SearchTextBox.Current.Value.Length > 0;
+
+            if (preselectedMod != null)
+            {
+                foreach (var preset in allAvailablePresets)
+                    preset.Preselected.Value = false;
+
+                return;
+            }
+
+            string[] searchWords = SearchTerm.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            ModPresetState? preselectedPreset =
+                allAvailablePresets
+                    .FirstOrDefault(preset => preset.Preset.PerformRead(pr =>
+                    {
+                        var terms = new List<string>
+                        {
+                            pr.Name,
+                            pr.Description
+                        };
+
+                        terms.AddRange(pr.Mods.SelectMany(m => new[]
+                        {
+                            m.Name.ToString(),
+                            m.Acronym.ToString(),
+                            m.Description.ToString()
+                        }));
+
+                        return searchWords.All(word =>
+                            terms.Any(t =>
+                                !string.IsNullOrEmpty(t) &&
+                                t.Contains(word, StringComparison.OrdinalIgnoreCase)));
+                    }));
+
+            foreach (var preset in allAvailablePresets)
+                preset.Preselected.Value = preset == preselectedPreset && SearchTextBox.Current.Value.Length > 0;
         }
 
         private void clearPreselection()
         {
             foreach (var mod in AllAvailableMods)
                 mod.Preselected.Value = false;
+
+            foreach (var preset in allAvailablePresets)
+                preset.Preselected.Value = false;
         }
 
         public new ModSelectFooterContent? DisplayedFooterContent => base.DisplayedFooterContent as ModSelectFooterContent;
@@ -676,7 +720,7 @@ namespace osu.Game.Overlays.Mods
             if (focus)
             {
                 SearchTextBox.TakeFocus();
-                preselectMod();
+                preselectModOrPreset();
             }
             else
             {
