@@ -15,6 +15,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
@@ -160,9 +161,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                 Caption = Caption,
                                 TooltipText = HintText,
                             },
-                            label = new OsuSpriteText
+                            label = new TruncatingSpriteText
                             {
                                 RelativeSizeAxes = Axes.X,
+                                Padding = new MarginPadding { Right = 25 },
+                                AlwaysPresent = true,
                             },
                         }
                     },
@@ -213,14 +216,17 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             private void updateState()
             {
-                label.Alpha = string.IsNullOrEmpty(SearchBar.SearchTerm.Value) ? 1 : 0;
-
                 caption.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content2;
                 label.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content1;
                 chevron.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content1;
                 DisabledColour = Colour4.White;
 
                 bool dropdownOpen = Dropdown.Menu.State == MenuState.Open;
+
+                if (dropdownOpen)
+                    label.Alpha = AlwaysShowSearchBar || !string.IsNullOrEmpty(SearchBar.SearchTerm.Value) ? 0 : 1;
+                else
+                    label.Alpha = 1;
 
                 BorderThickness = IsHovered || dropdownOpen ? 2 : 0;
 
@@ -251,7 +257,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
             protected override void PopIn() => this.FadeIn();
             protected override void PopOut() => this.FadeOut();
 
-            protected override TextBox CreateTextBox() => TextBox = new FormTextBox.InnerTextBox();
+            protected override TextBox CreateTextBox() => TextBox = new FormTextBox.InnerTextBox
+            {
+                PlaceholderText = HomeStrings.SearchPlaceholder,
+            };
 
             [BackgroundDependencyLoader]
             private void load()
@@ -259,7 +268,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 TextBox.Anchor = Anchor.BottomLeft;
                 TextBox.Origin = Anchor.BottomLeft;
                 TextBox.RelativeSizeAxes = Axes.X;
-                TextBox.Margin = new MarginPadding(9);
+                Padding = new MarginPadding { Left = 9, Bottom = 9, Right = 34 };
             }
         }
 
