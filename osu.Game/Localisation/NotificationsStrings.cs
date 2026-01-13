@@ -191,9 +191,9 @@ Click to see what's new!", version);
         public static LocalisableString CollectionsImportProgressTotal(int count, int totalCount) => new TranslatableString(getKey(@"collections_import_progress_total"), @"Imported {0} of {1} collections", count, totalCount);
 
         /// <summary>
-        /// "This error has been automatically reported to the devs."
+        /// "This error has been automatically reported to the dev team."
         /// </summary>
-        public static LocalisableString ErrorAutomaticallyReported => new TranslatableString(getKey(@"error_automatically_reported"), @"This error has been automatically reported to the devs.");
+        public static LocalisableString ErrorAutomaticallyReported => new TranslatableString(getKey(@"error_automatically_reported"), @"This error has been automatically reported to the dev team.");
 
         /// <summary>
         /// "A newer release of osu! has been found ({0} → {1})."
