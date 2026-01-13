@@ -1380,10 +1380,17 @@ namespace osu.Game
 
             if (generalLogRecentCount < short_term_display_limit)
             {
+                LocalisableString message;
+
+                if (entry.Exception != null && IsDeployedBuild)
+                    message = LocalisableString.Interpolate($"{entry.Message.Truncate(256)}\n\n{NotificationsStrings.ErrorAutomaticallyReported}");
+                else
+                    message = entry.Message.Truncate(256);
+
                 Schedule(() => Notifications.Post(new SimpleErrorNotification
                 {
                     Icon = entry.Level == LogLevel.Important ? FontAwesome.Solid.ExclamationCircle : FontAwesome.Solid.Bomb,
-                    Text = LocalisableString.Interpolate($"{entry.Message.Truncate(256)}{(entry.Exception != null && IsDeployedBuild ? LocalisableString.Interpolate($"\n\n{NotificationsStrings.ErrorAutomaticallyReported}") : string.Empty)}"),
+                    Text = message
                 }));
             }
             else if (generalLogRecentCount == short_term_display_limit)
