@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Chat
         private readonly Message message;
 
         public ReportChatPopover(Message message)
-            : base(ReportStrings.UserTitle(message.Sender?.Username ?? @"Someone"))
+            : base(ReportStrings.UserTitle(message.Sender?.Username ?? @"Someone"), false)
         {
             this.message = message;
         }

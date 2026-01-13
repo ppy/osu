@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Comments
         private readonly Comment comment;
 
         public ReportCommentPopover(Comment comment)
-            : base(ReportStrings.CommentTitle(comment.User?.Username ?? comment.LegacyName ?? @"Someone"))
+            : base(ReportStrings.CommentTitle(comment.User?.Username ?? comment.LegacyName ?? @"Someone"), false)
         {
             this.comment = comment;
         }
