@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Navigation
     public partial class TestSceneSkinEditorNavigation : OsuGameTestScene
     {
         private SoloSongSelect songSelect;
-        private ModSelectOverlay modSelect => songSelect.ChildrenOfType<ModSelectOverlay>().First();
+        private ModSelectOverlay modSelect => Game.ChildrenOfType<ModSelectOverlay>().First();
 
         private SkinEditor skinEditor => Game.ChildrenOfType<SkinEditor>().FirstOrDefault();
 
