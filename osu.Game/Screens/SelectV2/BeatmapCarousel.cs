@@ -54,6 +54,8 @@ namespace osu.Game.Screens.SelectV2
 
         public const float SPACING = 3f;
 
+        private FilterControl? filterControl { get; set; }
+
         private IBindableList<BeatmapSetInfo> detachedBeatmaps = null!;
 
         private readonly LoadingLayer loading;
@@ -342,6 +344,9 @@ namespace osu.Game.Screens.SelectV2
 
                 if (CurrentGroupedBeatmap != null && value.Equals(CurrentGroupedBeatmap.Beatmap))
                     return;
+
+                filterControl ??= Dependencies.Get<FilterControl>();
+                filterControl?.UpdateToInclude(value);
 
                 // it is not universally guaranteed that the carousel items will be materialised at the time this is set.
                 // therefore, in cases where it is known that they will not be, default to a null group.

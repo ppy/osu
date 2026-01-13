@@ -317,6 +317,34 @@ namespace osu.Game.Screens.SelectV2
             searchTextBox.Current.Value = query;
         }
 
+        /// <summary>
+        /// Updates the needed filters to include the specified beatmap.
+        /// </summary>
+        /// <param name="beatmap"></param>
+        ///
+        public void UpdateToInclude(BeatmapInfo? beatmap)
+        {
+            if (beatmap == null) return;
+
+            if (!currentCriteria?.CollectionBeatmapMD5Hashes?.Contains(beatmap.MD5Hash) ?? false)
+            {
+                collectionDropdown.Current.Value = collectionDropdown.Items.OfType<AllBeatmapsCollectionFilterMenuItem>().First();
+            }
+
+            if (beatmap.StarRating < currentCriteria?.UserStarDifficulty.Min)
+            {
+                double precision = difficultyRangeSlider.LowerBound is BindableNumberWithCurrent<double> n ? n.Precision : 0.1;
+                difficultyRangeSlider.LowerBound.Value = Math.Floor(beatmap.StarRating / precision) * precision;
+            }
+            else if (beatmap.StarRating > currentCriteria?.UserStarDifficulty.Max)
+            {
+                double precision = difficultyRangeSlider.UpperBound is BindableNumberWithCurrent<double> n ? n.Precision : 0.1;
+                difficultyRangeSlider.UpperBound.Value = Math.Ceiling(beatmap.StarRating / precision) * precision;
+            }
+
+            // TODO: Check if it needs to remove the search query too.
+        }
+
         protected override void PopIn()
         {
             this.MoveToX(0, SongSelect.ENTER_DURATION, Easing.OutQuint)
