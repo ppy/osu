@@ -181,6 +181,8 @@ namespace osu.Game.Database
                 return ruleset;
             }
 
+            List<(Guid, BeatmapInfo, double)> buffer = new List<(Guid, BeatmapInfo, double)>();
+
             foreach (Guid id in beatmapIds)
             {
                 if (notification?.State == ProgressNotificationState.Cancelled)
@@ -193,7 +195,7 @@ namespace osu.Game.Database
                 var beatmap = realmAccess.Run(r => r.Find<BeatmapInfo>(id)?.Detach());
 
                 if (beatmap == null)
-                    return;
+                    continue;
 
                 try
                 {
@@ -205,12 +207,8 @@ namespace osu.Game.Database
                     var calculator = ruleset.CreateDifficultyCalculator(working);
 
                     double starRating = calculator.Calculate().StarRating;
-                    realmAccess.Write(r =>
-                    {
-                        if (r.Find<BeatmapInfo>(id) is BeatmapInfo liveBeatmapInfo)
-                            liveBeatmapInfo.StarRating = starRating;
-                    });
-                    ((IWorkingBeatmapCache)beatmapManager).Invalidate(beatmap);
+
+                    buffer.Add((id, beatmap, starRating));
                     ++processedCount;
                 }
                 catch (Exception e)
@@ -219,6 +217,26 @@ namespace osu.Game.Database
                     ++failedCount;
                 }
             }
+
+
+            realmAccess.Write(r =>
+            {
+                foreach ((Guid id, BeatmapInfo beatmap, double starRating) in buffer)
+                {
+                    try
+                    {
+                        if (r.Find<BeatmapInfo>(id) is BeatmapInfo liveBeatmapInfo)
+                            liveBeatmapInfo.StarRating = starRating;
+                        ((IWorkingBeatmapCache)beatmapManager).Invalidate(beatmap);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Log($"Background processing failed on {beatmap}: {e}");
+                        --processedCount;
+                        ++failedCount;
+                    }
+                }
+            });
 
             completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
         }
@@ -680,6 +698,8 @@ namespace osu.Game.Database
             int processedCount = 0;
             int failedCount = 0;
 
+            List<(Guid, BeatmapInfo, HashSet<string>)> buffer = new List<(Guid, BeatmapInfo, HashSet<string>)>(); 
+
             foreach (var id in beatmapIds)
             {
                 if (notification?.State == ProgressNotificationState.Cancelled)
@@ -693,31 +713,28 @@ namespace osu.Game.Database
                 {
                     // Can't use async overload because we're not on the update thread.
                     // ReSharper disable once MethodHasAsyncOverload
-                    realmAccess.Write(r =>
+                    var beatmap = realmAccess.Run(r => r.Find<BeatmapInfo>(id)?.Detach());
+
+                    if (beatmap == null)
+                        continue;
+
+                    bool lookupSucceeded = localMetadataSource.TryLookup(beatmap, out var result);
+
+                    if (lookupSucceeded)
                     {
-                        BeatmapInfo beatmap = r.Find<BeatmapInfo>(id)!;
+                        Debug.Assert(result != null);
 
-                        bool lookupSucceeded = localMetadataSource.TryLookup(beatmap, out var result);
+                        var userTags = result.UserTags.ToHashSet();
 
-                        if (lookupSucceeded)
+                        if (!userTags.SetEquals(beatmap.Metadata.UserTags))
                         {
-                            Debug.Assert(result != null);
-
-                            var userTags = result.UserTags.ToHashSet();
-
-                            if (!userTags.SetEquals(beatmap.Metadata.UserTags))
-                            {
-                                beatmap.Metadata.UserTags.Clear();
-                                beatmap.Metadata.UserTags.AddRange(userTags);
-                                return true;
-                            }
-
-                            return false;
+                            buffer.Add((id, beatmap, userTags));
                         }
-
+                    }
+                    else
+                    {
                         Logger.Log(@$"Could not find {beatmap.GetDisplayString()} in local cache while backpopulating missing user tags");
-                        return false;
-                    });
+                    }
 
                     ++processedCount;
                 }
@@ -732,6 +749,15 @@ namespace osu.Game.Database
                 }
             }
 
+
+            realmAccess.Write(r =>
+            {
+                foreach ((Guid id, BeatmapInfo beatmap, HashSet<string> userTags) in buffer)
+                {
+                    beatmap.Metadata.UserTags.Clear();
+                    beatmap.Metadata.UserTags.AddRange(userTags);
+                }
+            });
             completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
             config.SetValue(OsuSetting.LastOnlineTagsPopulation, metadataSourceFetchDate);
         }
