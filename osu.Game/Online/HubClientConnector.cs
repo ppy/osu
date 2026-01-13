@@ -66,8 +66,6 @@ namespace osu.Game.Online
                     }
 
                     options.AccessTokenProvider = () => Task.FromResult<string?>(API.AccessToken);
-                    // non-standard header name kept for backwards compatibility, can be removed after server side has migrated to `VERSION_HASH_HEADER`
-                    options.Headers.Add(@"OsuVersionHash", versionHash);
                     options.Headers.Add(VERSION_HASH_HEADER, versionHash);
                     options.Headers.Add(CLIENT_SESSION_ID_HEADER, API.SessionIdentifier.ToString());
                 });
