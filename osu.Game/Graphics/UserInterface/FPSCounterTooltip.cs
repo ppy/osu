@@ -82,7 +82,7 @@ namespace osu.Game.Graphics.UserInterface
                         ? $"/{(clock.MaximumUpdateHz > 0 && clock.MaximumUpdateHz < 10000 ? clock.MaximumUpdateHz.ToString("0") : "∞"),4}"
                         : string.Empty;
 
-                    textFlow.AddParagraph($"{clock.FramesPerSecond:0}{maximum}fps ({clock.ElapsedFrameTime:0.00}ms)");
+                    textFlow.AddParagraph($"{clock.FramesPerSecond:0}{maximum} fps ({clock.ElapsedFrameTime:0.00} ms)");
                 }
             }
         }

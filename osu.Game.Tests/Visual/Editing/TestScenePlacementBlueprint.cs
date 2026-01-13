@@ -38,6 +38,42 @@ namespace osu.Game.Tests.Visual.Editing
         private GlobalActionContainer globalActionContainer => this.ChildrenOfType<GlobalActionContainer>().Single();
 
         [Test]
+        public void TestPlaceThenUndo()
+        {
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to center of playfield", () => InputManager.MoveMouseTo(this.ChildrenOfType<Playfield>().Single()));
+            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("one circle added", () => EditorBeatmap.HitObjects, () => Has.One.Items);
+
+            AddStep("undo", () => Editor.Undo());
+
+            AddAssert("circle removed", () => EditorBeatmap.HitObjects, () => Is.Empty);
+        }
+
+        [Test]
+        public void TestTimingLost()
+        {
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to center of playfield", () => InputManager.MoveMouseTo(this.ChildrenOfType<Playfield>().Single()));
+
+            AddAssert("placement ready", () => this.ChildrenOfType<ComposeBlueprintContainer>().Single().CurrentPlacement, () => Is.Not.Null);
+
+            AddStep("nuke timing", () => EditorBeatmap.ControlPointInfo.Clear());
+
+            AddAssert("placement not available", () => this.ChildrenOfType<ComposeBlueprintContainer>().Single().CurrentPlacement, () => Is.Null);
+
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+
+            AddAssert("placement not available", () => this.ChildrenOfType<ComposeBlueprintContainer>().Single().CurrentPlacement, () => Is.Null);
+
+            AddStep("add back timing", () => EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+
+            AddAssert("placement ready", () => this.ChildrenOfType<ComposeBlueprintContainer>().Single().CurrentPlacement, () => Is.Not.Null);
+        }
+
+        [Test]
         public void TestDeleteUsingMiddleMouse()
         {
             AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));

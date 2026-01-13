@@ -54,12 +54,6 @@ namespace osu.Game.Screens.SelectV2
         private IRulesetStore rulesets { get; set; } = null!;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; } = null!;
-
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
-
-        [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
         [Resolved]
@@ -278,9 +272,12 @@ namespace osu.Game.Screens.SelectV2
                 backgroundBorder.Colour = diffColour;
                 backgroundDifficultyTint.Colour = ColourInfo.GradientHorizontal(diffColour.Opacity(0.25f), diffColour.Opacity(0f));
 
-                difficultyIcon.Colour = starRatingDisplay.DisplayedStars.Value > OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider.Background5;
-
                 triangles.Colour = ColourInfo.GradientVertical(diffColour.Opacity(0.25f), diffColour.Opacity(0f));
+            }
+
+            if (difficultyIcon.Colour != starRatingDisplay.DisplayedDifficultyTextColour)
+            {
+                difficultyIcon.Colour = starRatingDisplay.DisplayedDifficultyTextColour;
             }
         }
 

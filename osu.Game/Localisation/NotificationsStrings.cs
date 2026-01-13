@@ -135,6 +135,86 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString Mention => new TranslatableString(getKey(@"mention"), @"Mention");
 
+        /// <summary>
+        /// "Online: {0}"
+        /// </summary>
+        public static LocalisableString FriendOnline(string info) => new TranslatableString(getKey(@"friend_online"), @"Online: {0}", info);
+
+        /// <summary>
+        /// "Offline: {0}"
+        /// </summary>
+        public static LocalisableString FriendOffline(string info) => new TranslatableString(getKey(@"friend_offline"), @"Offline: {0}", info);
+
+        /// <summary>
+        /// "Connection to API was lost. Can't continue with online play."
+        /// </summary>
+        public static LocalisableString APIDisconnect => new TranslatableString(getKey(@"api_disconnect"), @"Connection to API was lost. Can't continue with online play.");
+
+        /// <summary>
+        /// "Connection to the multiplayer server was lost. Exiting multiplayer."
+        /// </summary>
+        public static LocalisableString MultiplayerDisconnect => new TranslatableString(getKey(@"multiplayer_disconnect"), @"Connection to the multiplayer server was lost. Exiting multiplayer.");
+
+        /// <summary>
+        /// "You have been logged out on this device due to a login to your account on another device."
+        /// </summary>
+        public static LocalisableString AnotherDeviceDisconnect => new TranslatableString(getKey(@"another_device_disconnect"), @"You have been logged out on this device due to a login to your account on another device.");
+
+        /// <summary>
+        /// "You have been logged out due to a change to your account. Please log in again."
+        /// </summary>
+        public static LocalisableString AccountChangeDisconnect => new TranslatableString(getKey(@"account_change_disconnect"), @"You have been logged out due to a change to your account. Please log in again.");
+
+        /// <summary>
+        /// "Downloading {0}"
+        /// </summary>
+        public static LocalisableString Downloading(string info) => new TranslatableString(getKey(@"downloading"), @"Downloading {0}", info);
+
+        /// <summary>
+        /// "Collections import is initialising..."
+        /// </summary>
+        public static LocalisableString CollectionsImportInitialising => new TranslatableString(getKey(@"collections_import_initialising"), @"Collections import is initialising...");
+
+        /// <summary>
+        /// "Reading collections..."
+        /// </summary>
+        public static LocalisableString ReadingCollections => new TranslatableString(getKey(@"reading_collections"), @"Reading collections...");
+
+        /// <summary>
+        /// "Imported {0} collections"
+        /// </summary>
+        public static LocalisableString CollectionsImportProgress(int count) => new TranslatableString(getKey(@"collections_import_progress"), @"Imported {0} collections", count);
+
+        /// <summary>
+        /// "Imported {0} of {1} collections"
+        /// </summary>
+        public static LocalisableString CollectionsImportProgressTotal(int count, int totalCount) => new TranslatableString(getKey(@"collections_import_progress_total"), @"Imported {0} of {1} collections", count, totalCount);
+
+        /// <summary>
+        /// "This error has been automatically reported to the dev team."
+        /// </summary>
+        public static LocalisableString ErrorAutomaticallyReported => new TranslatableString(getKey(@"error_automatically_reported"), @"This error has been automatically reported to the dev team.");
+
+        /// <summary>
+        /// "A newer release of osu! has been found ({0} → {1})."
+        /// </summary>
+        public static LocalisableString UpdateAvailable(string oldVersion, string newVersion) => new TranslatableString(getKey(@"update_available"), @"A newer release of osu! has been found ({0} → {1}).", oldVersion, newVersion);
+
+        /// <summary>
+        /// "Click here to download the new version, which can be installed over the top of your existing installation."
+        /// </summary>
+        public static LocalisableString UpdateAvailableManualInstall => new TranslatableString(getKey(@"update_available_manual_install"), @"Click here to download the new version, which can be installed over the top of your existing installation.");
+
+        /// <summary>
+        /// "Check with your package manager / provider to bring osu! up-to-date!"
+        /// </summary>
+        public static LocalisableString UpdateAvailablePackageManaged => new TranslatableString(getKey(@"update_available_package_managed"), @"Check with your package manager / provider to bring osu! up-to-date!");
+
+        /// <summary>
+        /// "An action was interrupted due to a dialog being displayed."
+        /// </summary>
+        public static LocalisableString ActionInterruptedByDialog => new TranslatableString(getKey(@"action_interrupted_by_dialog"), @"An action was interrupted due to a dialog being displayed.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
