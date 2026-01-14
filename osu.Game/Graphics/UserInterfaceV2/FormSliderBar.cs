@@ -133,6 +133,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private readonly Bindable<Language> currentLanguage = new Bindable<Language>();
 
+        public bool TakeFocus() => GetContainingFocusManager()?.ChangeFocus(textBox) == true;
+
         public FormSliderBar()
         {
             LabelFormat ??= defaultLabelFormat;
