@@ -12,7 +12,6 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mania.Difficulty.Skills;
-using osu.Game.Rulesets.Mania.Difficulty.Utils;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
@@ -23,20 +22,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaDifficultyCalculator : DifficultyCalculator
     {
-        private const double difficulty_multiplier = 1;
-        private const double final_scaling_factor = 0.975;
-        private const double strain_threshold = 0.01;
-
-        // Difficulty calculation weights
-        private const double high_percentile_weight = 0.22; // 0.25 * 0.88
-        private const double mid_percentile_weight = 0.188; // 0.20 * 0.94
-        private const double power_mean_weight = 0.55;
-
-        private const double rescale_high_threshold = 9.0;
-        private const double rescale_high_factor = 1.2;
-
-        public readonly double[] DifficultyPercentilesHigh = { 0.945, 0.935, 0.925, 0.915 };
-        public readonly double[] DifficultyPercentilesMid = { 0.845, 0.835, 0.825, 0.815 };
+        private const double difficulty_multiplier = 0.975;
 
         private readonly bool isForCurrentRuleset;
 
@@ -55,48 +41,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             var totalSkill = (Strain)skills.First(s => s is Strain);
 
-            var objectStrains = totalSkill.GetObjectStrains().ToList();
-            double weightedNoteCount = totalSkill.GetWeightedNoteCount();
-
-            double sr = calculateDifficultyValue(objectStrains, weightedNoteCount);
+            double baseDifficulty = totalSkill.DifficultyValue();
 
             return new ManiaDifficultyAttributes
             {
-                StarRating = sr * difficulty_multiplier,
+                StarRating = baseDifficulty * difficulty_multiplier,
                 Mods = mods,
                 MaxCombo = beatmap.HitObjects.Sum(maxComboForObject),
             };
-        }
-
-        private double calculateDifficultyValue(List<double> combinedStrains, double weightedNoteCount)
-        {
-            double[] sorted = combinedStrains.Where(s => s > 0).ToArray();
-            if (sorted.Length == 0) return 0.0;
-
-            Array.Sort(sorted);
-
-            double highPercentileMean = DifficultyValueUtils.CalculatePercentileMean(sorted, DifficultyPercentilesHigh);
-            double midPercentileMean = DifficultyValueUtils.CalculatePercentileMean(sorted, DifficultyPercentilesMid);
-            double powerMean = DifficultyValueUtils.CalculatePowerMean(sorted, 5.0);
-
-            double rawDifficulty = high_percentile_weight * highPercentileMean +
-                                   mid_percentile_weight * midPercentileMean +
-                                   power_mean_weight * powerMean;
-
-            return applyFinalScaling(rawDifficulty, weightedNoteCount);
-        }
-
-        private double applyFinalScaling(double rawDifficulty, double weightedNoteCount)
-        {
-            double scaled = rawDifficulty * weightedNoteCount / (weightedNoteCount + 60.0);
-
-            if (scaled > rescale_high_threshold)
-            {
-                scaled = rescale_high_threshold + (scaled - rescale_high_threshold) /
-                    rescale_high_factor;
-            }
-
-            return scaled * final_scaling_factor;
         }
 
         private static int maxComboForObject(HitObject hitObject)
@@ -115,10 +67,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             LegacySortHelper<HitObject>.Sort(sortedObjects,
                 Comparer<HitObject>.Create((a, b) => (int)Math.Round(a.StartTime) - (int)Math.Round(b.StartTime)));
 
-            if (sortedObjects.Length <= 1)
-                return Array.Empty<DifficultyHitObject>();
-
-            var objects = new List<DifficultyHitObject>(Math.Max(0, sortedObjects.Length - 1));
+            var objects = new List<DifficultyHitObject>();
             List<DifficultyHitObject>[] perColumnObjects = new List<DifficultyHitObject>[totalColumns];
 
             for (int column = 0; column < totalColumns; column++)
@@ -146,13 +95,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         protected override IEnumerable<DifficultyHitObject> SortObjects(IEnumerable<DifficultyHitObject> input) => input;
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate) => new Skill[]
         {
-            return new Skill[]
-            {
-                new Strain(mods),
-            };
-        }
+            new Strain(mods),
+        };
 
         protected override Mod[] DifficultyAdjustmentMods
         {
