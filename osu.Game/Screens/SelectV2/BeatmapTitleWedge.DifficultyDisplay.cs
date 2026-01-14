@@ -24,6 +24,7 @@ using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.SelectV2
 {
@@ -302,10 +303,13 @@ namespace osu.Game.Screens.SelectV2
 
                 difficultyText.MaxWidth = Math.Max(nameLine.DrawWidth - mappedByText.DrawWidth - mapperText.DrawWidth - 20, 0);
 
-                difficultyText.Colour = colours.ForStarDifficultyText(starRatingDisplay.DisplayedStars.Value);
-                mappedByText.Colour = colours.ForStarDifficultyText(starRatingDisplay.DisplayedStars.Value);
-                countStatisticsDisplay.AccentColour = colours.ForStarDifficultyText(starRatingDisplay.DisplayedStars.Value);
-                difficultyStatisticsDisplay.AccentColour = colours.ForStarDifficultyText(starRatingDisplay.DisplayedStars.Value);
+                // Use difficulty colour until it gets too dark to be visible against dark backgrounds.
+                Color4 col = starRatingDisplay.DisplayedStars.Value >= OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.ForStarDifficultyText(starRatingDisplay.DisplayedStars.Value) : starRatingDisplay.DisplayedDifficultyColour;
+
+                difficultyText.Colour = col;
+                mappedByText.Colour = col;
+                countStatisticsDisplay.AccentColour = col;
+                difficultyStatisticsDisplay.AccentColour = col;
             }
 
             private partial class MapperLinkContainer : OsuHoverContainer
