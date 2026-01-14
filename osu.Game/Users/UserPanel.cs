@@ -141,6 +141,7 @@ namespace osu.Game.Users
         {
             Size = new Vector2(52, 26),
             CornerRadius = 3.25f,
+            Action = Action,
         };
 
         public MenuItem[] ContextMenuItems

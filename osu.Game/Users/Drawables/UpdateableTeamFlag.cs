@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -41,6 +42,13 @@ namespace osu.Game.Users.Drawables
             set => base.EdgeEffect = value;
         }
 
+        /// <summary>
+        /// Perform an action in addition to showing the team profile.
+        /// This should be used to perform auxiliary tasks and not as a primary action for clicking a flag (to maintain a consistent UX).
+        /// Ignored if `isInteractive` is false.
+        /// </summary>
+        public Action? Action;
+
         protected override double LoadDelay => 200;
 
         private readonly bool isInteractive;
@@ -78,6 +86,7 @@ namespace osu.Game.Users.Drawables
                 return new ClickableTeamFlag(team, showTooltipOnHover)
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Action = Action,
                 };
             }
 
