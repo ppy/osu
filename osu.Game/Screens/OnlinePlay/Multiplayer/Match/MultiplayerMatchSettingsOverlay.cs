@@ -370,7 +370,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                         break;
 
                     case nameof(Room.Type):
-                        updateRoomName();
+                        updateRoomType();
                         break;
 
                     case nameof(Room.QueueMode):
