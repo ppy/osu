@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Edit.Timing
 {
     internal partial class EffectSection : Section<EffectControlPoint>
     {
-        private LabelledSwitchButton kiai = null!;
+        private FormCheckBox kiai = null!;
 
         private FormSliderBar<double> scrollSpeedSlider { get; set; } = null!;
 
@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             Flow.AddRange(new Drawable[]
             {
-                kiai = new LabelledSwitchButton { Label = "Kiai Time" },
+                kiai = new FormCheckBox { Caption = "Kiai Time" },
                 scrollSpeedSlider = new FormSliderBar<double>
                 {
                     Caption = "Scroll Speed",
