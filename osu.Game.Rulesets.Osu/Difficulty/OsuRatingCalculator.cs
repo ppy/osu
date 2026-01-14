@@ -187,7 +187,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             bool isAlwaysPartiallyVisible = mods.OfType<OsuModHidden>().Any(m => m.OnlyFadeApproachCircles.Value) || mods.OfType<OsuModTraceable>().Any();
 
             // Start from normal curve, rewarding lower AR up to AR7
-            double readingBonus = 0.04 * (12.0 - Math.Max(approachRate, 7));
+            // TC forcefully requires a lower reading bonus for now as it's post-applied in PP which makes it multiplicative with the regular AR bonuses
+            // This means it has an advantage over HD, so we decrease the multiplier to compensate
+            // This should be removed once we're able to apply TC bonuses in SR (depends on real-time difficulty calculations being possible)
+            double readingBonus = (isAlwaysPartiallyVisible ? 0.025 : 0.04) * (12.0 - Math.Max(approachRate, 7));
 
             readingBonus *= visibilityFactor;
 
@@ -196,11 +199,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // For AR up to 0 - reduce reward for very low ARs when object is visible
             if (approachRate < 7)
-                readingBonus += (isAlwaysPartiallyVisible ? 0.03 : 0.045) * (7.0 - Math.Max(approachRate, 0)) * sliderVisibilityFactor;
+                readingBonus += (isAlwaysPartiallyVisible ? 0.02 : 0.045) * (7.0 - Math.Max(approachRate, 0)) * sliderVisibilityFactor;
 
             // Starting from AR0 - cap values so they won't grow to infinity
             if (approachRate < 0)
-                readingBonus += (isAlwaysPartiallyVisible ? 0.075 : 0.1) * (1 - Math.Pow(1.5, approachRate)) * sliderVisibilityFactor;
+                readingBonus += (isAlwaysPartiallyVisible ? 0.01 : 0.1) * (1 - Math.Pow(1.5, approachRate)) * sliderVisibilityFactor;
 
             return readingBonus;
         }

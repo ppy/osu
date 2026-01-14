@@ -46,6 +46,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             : base(beatmapSet, allowExpansion)
         {
             content = new BeatmapCardContent(height);
+
+            Action = DefaultAction;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -278,8 +280,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             }
 
             createStatistics();
-
-            Action = () => beatmapSetOverlay?.FetchAndShowBeatmapSet(BeatmapSet.OnlineID);
         }
 
         private LocalisableString createArtistText()

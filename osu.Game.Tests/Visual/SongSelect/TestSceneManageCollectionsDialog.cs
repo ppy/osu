@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -27,13 +28,14 @@ namespace osu.Game.Tests.Visual.SongSelect
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
         private DialogOverlay dialogOverlay = null!;
+        private RulesetStore rulesets = null!;
         private BeatmapManager beatmapManager = null!;
         private ManageCollectionsDialog dialog = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
-            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, Audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
 
@@ -379,5 +381,13 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void assertCollectionName(int index, string name)
             => AddUntilStep($"item {index + 1} has correct name",
                 () => dialog.ChildrenOfType<DrawableCollectionList>().Single().OrderedItems.ElementAtOrDefault(index)?.ChildrenOfType<TextBox>().First().Text == name);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
+        }
     }
 }

@@ -249,5 +249,52 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             CheckDisplayedBeatmapSetsCount(10);
             CheckDisplayedBeatmapsCount(30);
         }
+
+        [Test]
+        public void TestGroupDoesNotExpandAgainOnRefilterIfManuallyCollapsed()
+        {
+            ApplyToFilterAndWaitForFilter("filter", c => c.SearchText = BeatmapSets[2].Metadata.Title);
+
+            CheckDisplayedGroupsCount(1);
+            CheckDisplayedBeatmapSetsCount(1);
+            CheckDisplayedBeatmapsCount(3);
+
+            CheckHasSelection();
+
+            ApplyToFilterAndWaitForFilter("remove filter", c => c.SearchText = string.Empty);
+
+            CheckDisplayedGroupsCount(5);
+            CheckDisplayedBeatmapSetsCount(10);
+            CheckDisplayedBeatmapsCount(30);
+
+            ToggleGroupCollapse();
+
+            ApplyToFilterAndWaitForFilter("apply no-op filter", c => c.AllowConvertedBeatmaps = !c.AllowConvertedBeatmaps);
+            AddAssert("group didn't re-expand", () => Carousel.ExpandedGroup, () => Is.Null);
+
+            ToggleGroupCollapse();
+            AddAssert("beatmap set re-expanded correctly", () => Carousel.ExpandedBeatmapSet?.BeatmapSet, () => Is.EqualTo(BeatmapSets[2]));
+
+            ApplyToFilterAndWaitForFilter("filter", c => c.SearchText = BeatmapSets[1].Metadata.Title);
+
+            CheckDisplayedGroupsCount(1);
+            CheckDisplayedBeatmapSetsCount(1);
+            CheckDisplayedBeatmapsCount(3);
+
+            CheckHasSelection();
+        }
+
+        [Test]
+        public void TestManuallyCollapsingCurrentGroupAndOpeningAnother()
+        {
+            SelectNextSet();
+            ToggleGroupCollapse();
+            SelectNextGroup();
+            AddUntilStep("no beatmap panels visible", () => GetVisiblePanels<PanelBeatmap>().Count(), () => Is.Zero);
+
+            SelectNextSet();
+            SelectNextSet();
+            AddUntilStep("no beatmap panels visible", () => GetVisiblePanels<PanelBeatmap>().Count(), () => Is.Zero);
+        }
     }
 }

@@ -76,12 +76,19 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("drawables unchanged", () => Carousel.ChildrenOfType<Panel>(), () => Is.EqualTo(originalDrawables));
         }
 
-        [Test]
-        public void TestScrollPositionMaintainedWhenSetUpdated()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestScrollPositionMaintainedWhenSetUpdated(bool difficultySort)
         {
-            PanelBeatmapSet panel = null!;
+            if (difficultySort)
+            {
+                SortAndGroupBy(SortMode.Difficulty, GroupMode.Difficulty);
+                assertDidFilter(1);
+            }
 
-            AddStep("find panel", () => panel = Carousel.ChildrenOfType<PanelBeatmapSet>().Single(p => p.ChildrenOfType<OsuSpriteText>().Any(t => t.Text.ToString() == "beatmap")));
+            Panel panel = null!;
+
+            AddStep("find panel", () => panel = Carousel.ChildrenOfType<Panel>().First(p => p.Item != null && p.ChildrenOfType<OsuSpriteText>().Any(t => t.Text.ToString() == "beatmap")));
 
             AddStep("select panel", () => panel.TriggerClick());
 
@@ -105,7 +112,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 };
             });
 
-            assertDidFilter();
+            assertDidFilter(difficultySort ? 2 : 1);
             WaitForFiltering();
 
             AddAssert("scroll is still at end", () => Carousel.ChildrenOfType<UserTrackingScrollContainer>().Single().IsScrolledToEnd());
@@ -180,11 +187,19 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             assertDidNotFilter();
         }
 
-        [TestCase(false)]
-        [TestCase(true)]
-        public void TestSelectionHeld(bool hashChanged)
+        [TestCase(false, false)]
+        [TestCase(false, true)]
+        [TestCase(true, false)]
+        [TestCase(true, true)]
+        public void TestSelectionHeld(bool difficultySort, bool hashChanged)
         {
             SelectNextSet();
+
+            if (difficultySort)
+            {
+                SortAndGroupBy(SortMode.Difficulty, GroupMode.Difficulty);
+                assertDidFilter(1);
+            }
 
             WaitForSetSelection(1, 0);
             AddAssert("selection is updateable beatmap", () => Carousel.CurrentBeatmap, () => Is.EqualTo(baseTestBeatmap.Beatmaps[0]));
@@ -196,10 +211,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     b.Hash = "new hash";
             });
 
+            int baseFilterCount = difficultySort ? 1 : 0;
+
             if (hashChanged)
-                assertDidFilter();
+                assertDidFilter(baseFilterCount + 1);
             else
-                assertDidNotFilter();
+                assertDidFilter(baseFilterCount);
 
             WaitForFiltering();
 
@@ -413,7 +430,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
         }
 
-        private void assertDidFilter() => AddAssert("did filter", () => Carousel.FilterCount, () => Is.EqualTo(initial_filter_count + 1));
+        private void assertDidFilter(int count = 1) => AddAssert("did filter", () => Carousel.FilterCount, () => Is.EqualTo(initial_filter_count + count));
 
         private void assertDidNotFilter() => AddAssert("did not filter", () => Carousel.FilterCount, () => Is.EqualTo(initial_filter_count));
 

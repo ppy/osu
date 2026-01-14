@@ -134,12 +134,6 @@ namespace osu.Game.Screens.SelectV2
                             Margin = new MarginPadding { Top = 4f },
                             Children = new Drawable[]
                             {
-                                updateButton = new PanelUpdateBeatmapButton
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Margin = new MarginPadding { Right = 5f, Top = -2f },
-                                },
                                 statusPill = new BeatmapSetOnlineStatusPill
                                 {
                                     Origin = Anchor.CentreLeft,
@@ -147,6 +141,12 @@ namespace osu.Game.Screens.SelectV2
                                     TextSize = OsuFont.Style.Caption2.Size,
                                     Margin = new MarginPadding { Right = 5f },
                                     Animated = false,
+                                },
+                                updateButton = new PanelUpdateBeatmapButton
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Margin = new MarginPadding { Right = 5f, Top = -2f },
                                 },
                                 difficultiesDisplay = new DifficultySpectrumDisplay
                                 {

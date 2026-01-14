@@ -26,8 +26,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (current.BaseObject is Spinner)
                 return 0;
 
-            var currentOsuObject = (OsuDifficultyHitObject)current;
-
             double rhythmComplexitySum = 0;
 
             double deltaDifferenceEpsilon = ((OsuDifficultyHitObject)current).HitWindowGreat * 0.3;
@@ -64,9 +62,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 double currHistoricalDecay = Math.Min(noteDecay, timeDecay); // either we're limited by time or limited by object count.
 
-                double currDelta = currObj.StrainTime;
-                double prevDelta = prevObj.StrainTime;
-                double lastDelta = lastObj.StrainTime;
+                // Use custom cap value to ensure that that at this point delta time is actually zero
+                double currDelta = Math.Max(currObj.DeltaTime, 1e-7);
+                double prevDelta = Math.Max(prevObj.DeltaTime, 1e-7);
+                double lastDelta = Math.Max(lastObj.DeltaTime, 1e-7);
 
                 // calculate how much current delta difference deserves a rhythm bonus
                 // this function is meant to reduce rhythm bonus for deltas that are multiples of each other (i.e 100 and 200)
@@ -175,10 +174,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 prevObj = currObj;
             }
 
-            double rhythmDifficulty = Math.Sqrt(4 + rhythmComplexitySum * rhythm_overall_multiplier) / 2.0; // produces multiplier that can be applied to strain. range [1, infinity) (not really though)
-            rhythmDifficulty *= 1 - currentOsuObject.GetDoubletapness((OsuDifficultyHitObject)current.Next(0));
-
-            return rhythmDifficulty;
+            return Math.Sqrt(4 + rhythmComplexitySum * rhythm_overall_multiplier) / 2.0; // produces multiplier that can be applied to strain. range [1, infinity) (not really though);
         }
 
         private class Island : IEquatable<Island>
