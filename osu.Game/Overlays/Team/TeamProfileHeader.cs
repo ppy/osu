@@ -31,6 +31,11 @@ namespace osu.Game.Overlays.Team
                     RelativeSizeAxes = Axes.X,
                     TeamData = { BindTarget = TeamData },
                 },
+                new BottomHeaderContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    TeamData = { BindTarget = TeamData },
+                },
             }
         };
 
