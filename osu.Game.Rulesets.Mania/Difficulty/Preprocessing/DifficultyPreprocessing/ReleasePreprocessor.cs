@@ -108,10 +108,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.DifficultyPreprocessi
                 var currentTail = data.LongNoteTails[i];
                 var nextTail = data.LongNoteTails[i + 1];
 
+                if (nextTail.EndTime <= currentTail.EndTime) continue;
+
                 // Find time range for this release sequence
                 int startIndex = StrainArrayUtils.FindLeftBound(data.StrainTimePoints, currentTail.EndTime);
-                int endIndex = StrainArrayUtils.FindLeftBound(data.StrainTimePoints, nextTail.EndTime);
-                if (endIndex <= startIndex) continue;
+                int endIndex = StrainArrayUtils.FindLeftBound(data.StrainTimePoints, nextTail.EndTime, startFrom: startIndex);
 
                 // Calculate release intensity based on timing and individual difficulties
                 double releaseTimeDelta = 0.001 * (nextTail.EndTime - currentTail.EndTime);

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 
@@ -37,10 +38,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.DifficultyPreprocessi
             int timePointCount = data.StrainTimePoints.Length;
             double[][] timingDeltas = new double[data.KeyCount][];
 
+            List<DifficultyHitObject>[] columnNoteArray = data.AllNotes.First().PerColumnObjects;
+
             for (int column = 0; column < data.KeyCount; column++)
             {
                 double[] columnDeltas = new double[timePointCount];
-                List<ManiaDifficultyHitObject> columnNotes = data.AllNotes.First().PerColumnObjects.Select(list => list.Cast<ManiaDifficultyHitObject>().ToList()).ToArray()[column];
+                List<DifficultyHitObject> columnNotes = columnNoteArray[column];
 
                 // Initialize with default value (no pattern detected)
                 const double no_pattern_value = 1e9;
@@ -58,7 +61,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.DifficultyPreprocessi
                 // Process consecutive note pairs
                 for (int noteIndex = 0; noteIndex < columnNotes.Count; noteIndex++)
                 {
-                    var currentNote = columnNotes[noteIndex];
+                    var currentNote = (ManiaDifficultyHitObject)columnNotes[noteIndex];
                     var nextNote = currentNote.NextInColumn();
 
                     if (nextNote == null) break;
@@ -90,12 +93,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.DifficultyPreprocessi
         private static double[] calculateBaseUnevenness(ManiaDifficultyData data, bool[][] keyUsagePatterns, double[][] timingDeltas)
         {
             int keyCount = data.KeyCount;
-            int accuracyTimePoints = data.StrainTimePoints.Length;
+            int strainTimePoints = data.StrainTimePoints.Length;
 
-            if (accuracyTimePoints == 0) return Array.Empty<double>();
+            if (strainTimePoints == 0) return Array.Empty<double>();
 
-            double[] unevennessBase = new double[accuracyTimePoints];
-            for (int i = 0; i < accuracyTimePoints; i++)
+            double[] unevennessBase = new double[strainTimePoints];
+            for (int i = 0; i < strainTimePoints; i++)
                 unevennessBase[i] = 1.0;
 
             if (keyCount < 2) return unevennessBase;
@@ -103,31 +106,31 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.DifficultyPreprocessi
             int baseTimePoints = data.StrainTimePoints.Length;
 
             // Process each accuracy time point directly without pre-computing all differences
-            for (int accuracyIndex = 0; accuracyIndex < accuracyTimePoints; accuracyIndex++)
+            for (int strainPointIndex = 0; strainPointIndex < strainTimePoints; strainPointIndex++)
             {
-                double accuracyTime = data.StrainTimePoints[accuracyIndex];
-                int baseTimeIndex = StrainArrayUtils.FindLeftBound(data.StrainTimePoints, accuracyTime);
+                if (strainPointIndex >= baseTimePoints)
+                    strainPointIndex = baseTimePoints - 1;
 
-                if (baseTimeIndex >= baseTimePoints) baseTimeIndex = baseTimePoints - 1;
-                if (baseTimeIndex < 0) continue;
+                if (strainPointIndex < 0)
+                    continue;
 
                 int previousActiveColumn = -1;
 
                 for (int column = 0; column < keyCount; column++)
                 {
-                    if (!keyUsagePatterns[column][baseTimeIndex]) continue;
+                    if (!keyUsagePatterns[column][strainPointIndex]) continue;
 
                     if (previousActiveColumn >= 0)
                     {
-                        double leftDelta = timingDeltas[previousActiveColumn][baseTimeIndex];
-                        double rightDelta = timingDeltas[column][baseTimeIndex];
+                        double leftDelta = timingDeltas[previousActiveColumn][strainPointIndex];
+                        double rightDelta = timingDeltas[column][strainPointIndex];
 
                         double absoluteDifference = Math.Abs(leftDelta - rightDelta);
                         double slowPatternPenalty = 0.4 * Math.Max(0.0, Math.Max(leftDelta, rightDelta) - 0.11);
                         double timingDifference = absoluteDifference + slowPatternPenalty;
 
                         double penalty = calculateUnevennessPenalty(timingDifference, leftDelta, rightDelta);
-                        unevennessBase[accuracyIndex] *= penalty;
+                        unevennessBase[strainPointIndex] *= penalty;
                     }
 
                     previousActiveColumn = column;

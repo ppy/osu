@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         public readonly List<DifficultyHitObject>[] PerColumnObjects;
 
         public ManiaDifficultyData DifficultyData;
+        public int StrainTimePointIndex;
 
         public ManiaDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, List<DifficultyHitObject>[] perColumnObjects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)

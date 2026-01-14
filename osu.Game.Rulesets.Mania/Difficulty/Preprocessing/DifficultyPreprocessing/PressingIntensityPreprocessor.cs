@@ -64,12 +64,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.DifficultyPreprocessi
                 int noteEndTime = (int)Math.Round(note.EndTime);
 
                 // Progressive Scan: Advance from current position
-                int leftWindowIndex = StrainArrayUtils.FindLeftBound(data.StrainTimePoints,
-                    noteStartTime - key_usage_window_ms);
-                int leftIndex = StrainArrayUtils.FindLeftBound(data.StrainTimePoints, noteStartTime);
-                int rightIndex = StrainArrayUtils.FindLeftBound(data.StrainTimePoints, noteEndTime);
-                int rightWindowIndex = StrainArrayUtils.FindLeftBound(data.StrainTimePoints,
-                    noteEndTime + key_usage_window_ms);
+                int leftIndex = note.StrainTimePointIndex;
+                int rightIndex = noteStartTime == noteEndTime ? leftIndex : StrainArrayUtils.FindLeftBound(data.StrainTimePoints, noteEndTime, startFrom: leftIndex);
+
+                int leftWindowIndex = StrainArrayUtils.FindLeftBound(data.StrainTimePoints, noteStartTime - key_usage_window_ms, endAt: leftIndex);
+                int rightWindowIndex = StrainArrayUtils.FindLeftBound(data.StrainTimePoints, noteEndTime + key_usage_window_ms, startFrom: rightIndex);
 
                 double baseUsage = 3.75 + Math.Min(noteEndTime - noteStartTime, 1500) / 150.0;
                 int column = note.Column;
@@ -100,13 +99,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.DifficultyPreprocessi
         /// <summary>
         /// Applies gradually decreasing usage in the time windows around notes.
         /// </summary>
-        private static void applyWindowUsage(double[] columnUsage, double[] baseTimeCorners, int windowStart, int windowEnd, int referenceTime, double baseUsage, double denominator, int timePoints)
+        private static void applyWindowUsage(double[] columnUsage, double[] strainTimePoints, int windowStart, int windowEnd, int referenceTime, double baseUsage, double denominator, int timePoints)
         {
             for (int i = windowStart; i < windowEnd && i < timePoints; i++)
             {
                 if (i >= 0)
                 {
-                    double timeDifference = Math.Abs(baseTimeCorners[i] - referenceTime);
+                    double timeDifference = Math.Abs(strainTimePoints[i] - referenceTime);
                     double reducedUsage = baseUsage - baseUsage / denominator * (timeDifference * timeDifference);
                     columnUsage[i] += reducedUsage;
                 }
@@ -223,9 +222,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.DifficultyPreprocessi
         /// </summary>
         private static void processNoteSequence(ManiaDifficultyHitObject currentNote, ManiaDifficultyHitObject nextNote, double deltaTime, ManiaDifficultyData data, LongNoteDensityData longNoteDensity, double[] anchorValues, double[] pressingIntensityBase, int timePoints)
         {
+            if (nextNote.StartTime <= currentNote.StartTime)
+                return;
+
             int startIndex = StrainArrayUtils.FindLeftBound(data.StrainTimePoints, currentNote.StartTime);
             int endIndex = StrainArrayUtils.FindLeftBound(data.StrainTimePoints, nextNote.StartTime);
-            if (endIndex <= startIndex) return;
 
             double deltaTimeSeconds = 0.001 * deltaTime;
 

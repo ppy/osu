@@ -154,9 +154,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Utils
         /// Finds the leftmost position where a value can be inserted to maintain sorted order.
         /// Uses binary search for O(log n) performance.
         /// </summary>
-        public static int FindLeftBound(double[] sortedArray, double targetValue)
+        public static int FindLeftBound(double[] sortedArray, double targetValue, int startFrom = 0, int endAt = -1)
         {
-            int left = 0, right = sortedArray.Length;
+            int left = startFrom;
+            int right = endAt >= 0 ? endAt : sortedArray.Length;
 
             while (left < right)
             {

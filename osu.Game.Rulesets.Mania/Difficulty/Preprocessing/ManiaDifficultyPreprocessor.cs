@@ -39,6 +39,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             data.MaxTime = (int)(data.AllNotes.LastOrDefault()?.EndTime + 1 ?? 0);
 
             data.StrainTimePoints = StrainPointPreprocessor.CreateStrainPoints(data);
+            setStrainPointIndices(data.StrainTimePoints, hitObjects);
             LongNoteDensityPreprocessor.ProcessAndAssign(data);
 
             data.SharedKeyUsage = CrossColumnPreprocessor.ComputeKeyUsage(data);
@@ -92,6 +93,21 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             else
             {
                 data.LongNoteTails = new List<ManiaDifficultyHitObject>();
+            }
+        }
+
+        private static void setStrainPointIndices(double[] strainTimePoints, List<DifficultyHitObject> hitObjects)
+        {
+            int strainPointIndex = 0;
+
+            foreach (var obj in hitObjects)
+            {
+                while (strainTimePoints[strainPointIndex] < obj.StartTime)
+                {
+                    strainPointIndex++;
+                }
+
+                ((ManiaDifficultyHitObject)obj).StrainTimePointIndex = strainPointIndex;
             }
         }
 
