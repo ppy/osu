@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,6 +30,8 @@ namespace osu.Game.Online.Metadata
 
         public override IBindableDictionary<int, UserPresence> FriendPresences => friendPresences;
         private readonly BindableDictionary<int, UserPresence> friendPresences = new BindableDictionary<int, UserPresence>();
+
+        private readonly IBindableList<APIRelation> localFriends = new BindableList<APIRelation>();
 
         public override IBindable<DailyChallengeInfo?> DailyChallengeInfo => dailyChallengeInfo;
         private readonly Bindable<DailyChallengeInfo?> dailyChallengeInfo = new Bindable<DailyChallengeInfo?>();
@@ -97,6 +100,20 @@ namespace osu.Game.Online.Metadata
                 if (localUser.Value is not GuestUser)
                     UpdateActivity(activity.NewValue).FireAndForget();
             }, true);
+
+            localFriends.BindTo(api.LocalUserState.Friends);
+            localFriends.BindCollectionChanged(onFriendsChanged, true);
+        }
+
+        private void onFriendsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems == null) return;
+
+            foreach (APIRelation relation in e.NewItems)
+            {
+                if (userPresences.TryGetValue(relation.TargetID, out var presence))
+                    friendPresences[relation.TargetID] = presence;
+            }
         }
 
         private bool catchingUp;
