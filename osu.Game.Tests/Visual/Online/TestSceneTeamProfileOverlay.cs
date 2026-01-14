@@ -1,0 +1,122 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System;
+using System.Linq;
+using NUnit.Framework;
+using osu.Framework.Graphics;
+using osu.Framework.Testing;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Placeholders;
+using osu.Game.Overlays;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Tests.Resources;
+
+namespace osu.Game.Tests.Visual.Online
+{
+    [TestFixture]
+    public partial class TestSceneTeamProfileOverlay : OsuTestScene
+    {
+        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
+
+        private TeamProfileOverlay overlay = null!;
+
+        [SetUpSteps]
+        public void SetUp()
+        {
+            AddStep("create team overlay", () =>
+            {
+                overlay = new TeamProfileOverlay();
+
+                Child = new DependencyProvidingContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    CachedDependencies = new (Type, object)[] { (typeof(TeamProfileOverlay), overlay) },
+                    Child = overlay,
+                };
+            });
+        }
+
+        [Test]
+        public void TestBasic()
+        {
+            AddStep("setup request handling", () =>
+            {
+                dummyAPI.HandleRequest = req =>
+                {
+                    if (req is GetTeamRequest getTeamRequest)
+                    {
+                        getTeamRequest.TriggerSuccess(TEST_TEAM);
+                        return true;
+                    }
+
+                    return false;
+                };
+            });
+            AddStep("show team", () => overlay.ShowTeam(new APITeam { Id = 1 }));
+        }
+
+        [Test]
+        public void TestLogin()
+        {
+            GetTeamRequest pendingRequest = null!;
+
+            AddStep("setup request handling", () =>
+            {
+                dummyAPI.HandleRequest = req =>
+                {
+                    if (dummyAPI.State.Value == APIState.Online && req is GetTeamRequest getTeamRequest)
+                    {
+                        pendingRequest = getTeamRequest;
+                        return true;
+                    }
+
+                    return false;
+                };
+            });
+            AddStep("logout", () => dummyAPI.Logout());
+            AddStep("show team", () => overlay.ShowTeam(new APITeam { Id = 1 }));
+            AddUntilStep("login prompt is present", () => this.ChildrenOfType<LoginPlaceholder>().First().IsPresent, () => Is.True);
+            AddStep("login", () =>
+            {
+                dummyAPI.Login("username", "password");
+                dummyAPI.AuthenticateSecondFactor("12345678");
+            });
+            AddUntilStep("loading layer is present", () => this.ChildrenOfType<LoadingLayer>().Any(l => l.IsPresent));
+            AddWaitStep("wait some", 3);
+            AddStep("complete request", () => pendingRequest.TriggerSuccess(TEST_TEAM));
+            AddUntilStep("loading layer is not present", () => this.ChildrenOfType<LoadingLayer>().All(l => !l.IsPresent));
+        }
+
+        public static readonly APITeam TEST_TEAM = new APITeam
+        {
+            Name = "mom?",
+            Id = 1,
+            ShortName = "MOM",
+            CoverUrl = TestResources.COVER_IMAGE_1,
+            FlagUrl = "https://assets.ppy.sh/teams/flag/1/b46fb10dbfd8a35dc50e6c00296c0dc6172dffc3ed3d3a4b379277ba498399fe.png",
+            DefaultRulesetId = new CatchRuleset().LegacyID,
+            CreatedAt = new DateTimeOffset(2026, 1, 1, 13, 6, 0, TimeSpan.Zero),
+            Description = @"cool team yeah",
+            IsOpen = true,
+            MembersCount = 1,
+            EmptySlots = 8,
+            Leader = new APIUser
+            {
+                Id = 2,
+                Username = "peppy",
+                CoverUrl = TestResources.COVER_IMAGE_3,
+            },
+            Statistics = new APITeamStatistics
+            {
+                Rank = 2,
+                Performance = 7923,
+                PlayCount = 95342,
+                RankedScore = 546346745,
+            },
+        };
+    }
+}
