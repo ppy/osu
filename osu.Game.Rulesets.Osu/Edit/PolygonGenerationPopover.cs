@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 Width = 220,
                 AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(20),
+                Spacing = new Vector2(5),
                 Children = new Drawable[]
                 {
                     distanceSnapInput = new FormSliderBar<double>
