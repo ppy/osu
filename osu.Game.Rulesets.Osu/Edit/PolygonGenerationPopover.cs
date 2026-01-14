@@ -77,7 +77,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                             Precision = 0.1,
                             Value = ((OsuHitObjectComposer)composer).DistanceSnapProvider.DistanceSpacingMultiplier.Value,
                         },
-                        TransferValueOnCommit = true,
                         TabbableContentContainer = this
                     },
                     offsetAngleInput = new FormSliderBar<int>
@@ -89,7 +88,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                             MaxValue = 180,
                             Precision = 1
                         },
-                        TransferValueOnCommit = true,
                         TabbableContentContainer = this
                     },
                     repeatCountInput = new FormSliderBar<int>
@@ -101,7 +99,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                             MaxValue = 10,
                             Precision = 1
                         },
-                        TransferValueOnCommit = true,
                         TabbableContentContainer = this
                     },
                     pointInput = new FormSliderBar<int>
@@ -113,7 +110,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                             MaxValue = 32,
                             Precision = 1,
                         },
-                        TransferValueOnCommit = true,
                         TabbableContentContainer = this
                     },
                     commitButton = new RoundedButton

@@ -67,7 +67,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                             Precision = 1
                         },
                         KeyboardStep = 1f,
-                        TransferValueOnCommit = true,
                         TabbableContentContainer = this
                     },
                     rotationOrigin = new EditorRadioButtonCollection

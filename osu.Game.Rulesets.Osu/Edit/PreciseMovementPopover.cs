@@ -62,7 +62,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                         {
                             Precision = 1,
                         },
-                        TransferValueOnCommit = true,
                         TabbableContentContainer = this
                     },
                     new FormSliderBar<float>
@@ -72,7 +71,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                         {
                             Precision = 1,
                         },
-                        TransferValueOnCommit = true,
                         TabbableContentContainer = this
                     },
                     relativeCheckbox = new OsuCheckbox(false)
