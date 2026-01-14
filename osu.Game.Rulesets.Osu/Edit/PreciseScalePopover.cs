@@ -141,8 +141,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
-            //TODO:Make this slider focused. SliderWithTextBoxInput had specific focused case and at the current moment I can't seem to find any analogue.
-            // ScheduleAfterChildren(() => scaleInput.TakeFocus());
+            ScheduleAfterChildren(() => scaleInput.TakeFocus());
             scaleInput.Current.BindValueChanged(scale => scaleInfo.Value = scaleInfo.Value with { Scale = scale.NewValue });
 
             xCheckBox.Current.BindValueChanged(_ =>

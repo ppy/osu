@@ -98,8 +98,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
-            //TODO:Make this slider focused. SliderWithTextBoxInput had specific focused case and at the current moment I can't seem to find any analogue.
-            // ScheduleAfterChildren(() => angleInput.TakeFocus());
+            ScheduleAfterChildren(() => angleInput.TakeFocus());
             angleInput.Current.BindValueChanged(angle => rotationInfo.Value = rotationInfo.Value with { Degrees = angle.NewValue });
 
             rotationHandler.CanRotateAroundSelectionOrigin.BindValueChanged(e =>
