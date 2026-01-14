@@ -9,7 +9,6 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -334,7 +333,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     scalingSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
 
                 scalingSettings.AutoSizeAxes = scalingMode.Value != ScalingMode.Off ? Axes.Y : Axes.None;
-                scalingSettings.ForEach(item =>
+
+                foreach (SettingsItemV2 item in scalingSettings)
                 {
                     FormSliderBar<float> slider = (FormSliderBar<float>)item.Control;
 
@@ -345,7 +345,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         slider.TransferValueOnCommit = scalingMode.Value == ScalingMode.Everything;
                         item.CanBeShown.Value = scalingMode.Value != ScalingMode.Off;
                     }
-                });
+                }
             }
         }
 
