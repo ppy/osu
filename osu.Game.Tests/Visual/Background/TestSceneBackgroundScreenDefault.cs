@@ -230,6 +230,24 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         [Test]
+        public void TestBackgroundScaleModeSwitch()
+        {
+            setSourceMode(BackgroundSource.Beatmap);
+
+            AddUntilStep("default background fill mode is fill", () => getCurrentBackground()?.Sprite.FillMode == FillMode.Fill);
+
+            AddStep("change beatmap", () => Beatmap.Value = createTestWorkingBeatmapWithUniqueBackground());
+            AddAssert("background changed", () => screen.CheckLastLoadChange() == true);
+            AddUntilStep("wait for beatmap background to be loaded", () => getCurrentBackground()?.GetType() == typeof(BeatmapBackground));
+
+            setScaleMode(BackgroundScaleMode.ScaleToFit);
+            AddUntilStep("background fill mode is fit", () => getCurrentBackground()?.Sprite.FillMode == FillMode.Fit);
+
+            setScaleMode(BackgroundScaleMode.ScaleToFill);
+            AddUntilStep("background fill mode is fill", () => getCurrentBackground()?.Sprite.FillMode == FillMode.Fill);
+        }
+
+        [Test]
         public void TestBackgroundTypeSwitch()
         {
             setSupporter(true);
@@ -286,6 +304,9 @@ namespace osu.Game.Tests.Visual.Background
             AddUntilStep("wait for beatmap background to be loaded", () => (getCurrentBackground())?.GetType() == typeof(Graphics.Backgrounds.Background));
             AddAssert("next cycles background", () => screen.Next());
         }
+
+        private void setScaleMode(BackgroundScaleMode scaleMode) =>
+            AddStep($"set background scale mode to {scaleMode}", () => config.SetValue(OsuSetting.BackgroundScaleMode, scaleMode));
 
         private void setSourceMode(BackgroundSource source) =>
             AddStep($"set background mode to {source}", () => config.SetValue(OsuSetting.MenuBackgroundSource, source));
