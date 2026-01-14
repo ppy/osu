@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public IconUsage ButtonIcon { get; init; } = FontAwesome.Solid.ChevronRight;
 
-        private Color4? backgroundColour;
+        private readonly Color4? backgroundColour;
 
         /// <summary>
         /// Sets a custom background colour for the button.
@@ -48,12 +48,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public Color4? BackgroundColour
         {
             get => backgroundColour;
-            set
+            init
             {
                 backgroundColour = value;
 
-                if (IsLoaded && value != null)
-                    button.BackgroundColour = value.Value;
+                if (IsLoaded)
+                    updateState();
             }
         }
 
@@ -156,10 +156,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            if (BackgroundColour != null)
-                button.BackgroundColour = BackgroundColour.Value;
-
             Enabled.BindValueChanged(_ => updateState(), true);
         }
 
@@ -188,7 +184,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void updateState()
         {
-            text.Colour = !Enabled.Value ? colourProvider.Background1 : colourProvider.Content1;
+            text.Colour = Enabled.Value ? colourProvider.Content1 : colourProvider.Background1;
 
             background.FadeColour(IsHovered
                 ? ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4)
@@ -196,10 +192,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             content.BorderThickness = IsHovered ? 2 : 0;
 
-            if (!Enabled.Value)
-                content.BorderColour = BackgroundColour != null ? Interpolation.ValueAt(0.75, BackgroundColour.Value, colourProvider.Dark1, 0, 1) : colourProvider.Dark1;
+            if (BackgroundColour != null)
+            {
+                button.BackgroundColour = BackgroundColour.Value;
+                content.BorderColour = Enabled.Value ? BackgroundColour.Value : Interpolation.ValueAt(0.75, BackgroundColour.Value, colourProvider.Dark1, 0, 1);
+            }
             else
-                content.BorderColour = BackgroundColour ?? colourProvider.Light4;
+                content.BorderColour = Enabled.Value ? colourProvider.Light4 : colourProvider.Dark1;
         }
 
         public partial class Button : OsuButton
