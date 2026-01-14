@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Team.Header;
+using osu.Game.Overlays.Team.Header.Components;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Team
@@ -37,6 +38,11 @@ namespace osu.Game.Overlays.Team
                     TeamData = { BindTarget = TeamData },
                 },
             }
+        };
+
+        protected override Drawable CreateTabControlContent() => new TeamRulesetSelector
+        {
+            TeamData = { BindTarget = TeamData },
         };
 
         private partial class TeamHeaderTitle : OverlayTitle

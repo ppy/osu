@@ -12,7 +12,11 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Placeholders;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Team.Header.Components;
 using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Online
@@ -91,6 +95,42 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("loading layer is not present", () => this.ChildrenOfType<LoadingLayer>().All(l => !l.IsPresent));
         }
 
+        [Test]
+        public void TestRulesets()
+        {
+            GetTeamRequest pendingRequest = null!;
+
+            AddStep("setup request handling", () =>
+            {
+                dummyAPI.HandleRequest = req =>
+                {
+                    if (dummyAPI.State.Value == APIState.Online && req is GetTeamRequest getTeamRequest)
+                    {
+                        pendingRequest = getTeamRequest;
+                        return true;
+                    }
+
+                    return false;
+                };
+            });
+            AddStep("osu", () => overlay.ShowTeam(new APITeam { Id = 1 }, new OsuRuleset().RulesetInfo));
+            AddWaitStep("wait some", 3);
+            AddStep("complete request", () => pendingRequest.TriggerSuccess(TEST_TEAM));
+            AddAssert("osu is selected", () => this.ChildrenOfType<TeamRulesetSelector>().First().Current.Value, () => Is.EqualTo(new OsuRuleset().RulesetInfo));
+            AddStep("taiko", () => overlay.ShowTeam(new APITeam { Id = 1 }, new TaikoRuleset().RulesetInfo));
+            AddWaitStep("wait some", 3);
+            AddStep("complete request", () => pendingRequest.TriggerSuccess(TEST_TEAM));
+            AddAssert("taiko is selected", () => this.ChildrenOfType<TeamRulesetSelector>().First().Current.Value, () => Is.EqualTo(new TaikoRuleset().RulesetInfo));
+            AddStep("catch", () => overlay.ShowTeam(new APITeam { Id = 1 }, new CatchRuleset().RulesetInfo));
+            AddWaitStep("wait some", 3);
+            AddStep("complete request", () => pendingRequest.TriggerSuccess(TEST_TEAM));
+            AddAssert("catch is selected", () => this.ChildrenOfType<TeamRulesetSelector>().First().Current.Value, () => Is.EqualTo(new CatchRuleset().RulesetInfo));
+            AddStep("mania", () => overlay.ShowTeam(new APITeam { Id = 1 }, new ManiaRuleset().RulesetInfo));
+            AddWaitStep("wait some", 3);
+            AddStep("complete request", () => pendingRequest.TriggerSuccess(TEST_TEAM));
+            AddAssert("mania is selected", () => this.ChildrenOfType<TeamRulesetSelector>().First().Current.Value, () => Is.EqualTo(new ManiaRuleset().RulesetInfo));
+        }
+
         public static readonly APITeam TEST_TEAM = new APITeam
         {
             Name = "mom?",
@@ -98,7 +138,7 @@ namespace osu.Game.Tests.Visual.Online
             ShortName = "MOM",
             CoverUrl = TestResources.COVER_IMAGE_1,
             FlagUrl = "https://assets.ppy.sh/teams/flag/1/b46fb10dbfd8a35dc50e6c00296c0dc6172dffc3ed3d3a4b379277ba498399fe.png",
-            DefaultRulesetId = new CatchRuleset().LegacyID,
+            DefaultRulesetId = new OsuRuleset().RulesetInfo.OnlineID,
             CreatedAt = new DateTimeOffset(2026, 1, 1, 13, 6, 0, TimeSpan.Zero),
             Description = @"cool team yeah",
             IsOpen = true,
