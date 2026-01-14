@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
         public override double DifficultyValue()
         {
-            double[] sorted = ObjectStrains.Where(s => s > 0).ToArray();
+            double[] sorted = ObjectDifficulties.Where(s => s > 0).ToArray();
             if (sorted.Length == 0) return 0.0;
 
             Array.Sort(sorted);
