@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit.Timing
                     Current = new EffectControlPoint().ScrollSpeedBindable,
                     KeyboardStep = 0.1f,
                     TransferValueOnCommit = true,
-                    TabbableContentContainer = this,
+                    TabbableContentContainer = this
                 },
             });
         }

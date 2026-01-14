@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         private BindableNumber<float> xBindable = null!;
         private BindableNumber<float> yBindable = null!;
 
-        private SliderWithTextBoxInput<float> xInput = null!;
+        private FormSliderBar<float> xInput { get; set; } = null!;
         private OsuCheckbox relativeCheckbox = null!;
 
         public PreciseMovementPopover()
@@ -55,28 +55,30 @@ namespace osu.Game.Rulesets.Osu.Edit
                 Spacing = new Vector2(20),
                 Children = new Drawable[]
                 {
-                    xInput = new SliderWithTextBoxInput<float>("X:")
+                    xInput = new FormSliderBar<float>
                     {
+                        Caption = "X:",
                         Current = xBindable = new BindableNumber<float>
                         {
                             Precision = 1,
                         },
-                        Instantaneous = true,
-                        TabbableContentContainer = this,
+                        TransferValueOnCommit = true,
+                        TabbableContentContainer = this
                     },
-                    new SliderWithTextBoxInput<float>("Y:")
+                    new FormSliderBar<float>
                     {
+                        Caption = "Y:",
                         Current = yBindable = new BindableNumber<float>
                         {
                             Precision = 1,
                         },
-                        Instantaneous = true,
-                        TabbableContentContainer = this,
+                        TransferValueOnCommit = true,
+                        TabbableContentContainer = this
                     },
                     relativeCheckbox = new OsuCheckbox(false)
                     {
                         RelativeSizeAxes = Axes.X,
-                        LabelText = "Relative movement",
+                        LabelText = "Relative movement"
                     }
                 }
             };
@@ -86,7 +88,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
-            ScheduleAfterChildren(() => xInput.TakeFocus());
+            //TODO:Make this slider focused. SliderWithTextBoxInput had specific focused case and at the current moment I can't seem to find any analogue.
+            // ScheduleAfterChildren(() => xInput.Focused());
         }
 
         protected override void PopIn()

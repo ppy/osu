@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private readonly Bindable<PreciseScaleInfo> scaleInfo = new Bindable<PreciseScaleInfo>(new PreciseScaleInfo(1, EditorOrigin.GridCentre, true, true));
 
-        private SliderWithTextBoxInput<float> scaleInput = null!;
+        private FormSliderBar<float> scaleInput { get; set; } = null!;
         private BindableNumber<float> scaleInputBindable = null!;
         private EditorRadioButtonCollection scaleOrigin = null!;
 
@@ -69,8 +69,9 @@ namespace osu.Game.Rulesets.Osu.Edit
                 Spacing = new Vector2(20),
                 Children = new Drawable[]
                 {
-                    scaleInput = new SliderWithTextBoxInput<float>("Scale:")
+                    scaleInput = new FormSliderBar<float>
                     {
+                        Caption = "Scale:",
                         Current = scaleInputBindable = new BindableNumber<float>
                         {
                             MinValue = 0.05f,
@@ -80,7 +81,8 @@ namespace osu.Game.Rulesets.Osu.Edit
                             Default = 1,
                         },
                         KeyboardStep = 0.01f,
-                        Instantaneous = true
+                        TransferValueOnCommit = true,
+                        TabbableContentContainer = this
                     },
                     scaleOrigin = new EditorRadioButtonCollection
                     {
@@ -139,7 +141,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
-            ScheduleAfterChildren(() => scaleInput.TakeFocus());
+            //TODO:Make this slider focused. SliderWithTextBoxInput had specific focused case and at the current moment I can't seem to find any analogue.
+            // ScheduleAfterChildren(() => scaleInput.TakeFocus());
             scaleInput.Current.BindValueChanged(scale => scaleInfo.Value = scaleInfo.Value with { Scale = scale.NewValue });
 
             xCheckBox.Current.BindValueChanged(_ =>

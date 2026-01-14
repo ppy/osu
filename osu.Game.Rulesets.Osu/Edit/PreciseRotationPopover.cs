@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private readonly Bindable<PreciseRotationInfo> rotationInfo = new Bindable<PreciseRotationInfo>(new PreciseRotationInfo(0, EditorOrigin.GridCentre));
 
-        private SliderWithTextBoxInput<float> angleInput = null!;
+        private FormSliderBar<float> angleInput { get; set; } = null!;
         private EditorRadioButtonCollection rotationOrigin = null!;
 
         private RadioButton gridCentreButton = null!;
@@ -57,8 +57,9 @@ namespace osu.Game.Rulesets.Osu.Edit
                 Spacing = new Vector2(20),
                 Children = new Drawable[]
                 {
-                    angleInput = new SliderWithTextBoxInput<float>("Angle (degrees):")
+                    angleInput = new FormSliderBar<float>
                     {
+                        Caption = "Angle (degrees):",
                         Current = new BindableNumber<float>
                         {
                             MinValue = -360,
@@ -66,7 +67,8 @@ namespace osu.Game.Rulesets.Osu.Edit
                             Precision = 1
                         },
                         KeyboardStep = 1f,
-                        Instantaneous = true
+                        TransferValueOnCommit = true,
+                        TabbableContentContainer = this
                     },
                     rotationOrigin = new EditorRadioButtonCollection
                     {
@@ -96,7 +98,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
-            ScheduleAfterChildren(() => angleInput.TakeFocus());
+            //TODO:Make this slider focused. SliderWithTextBoxInput had specific focused case and at the current moment I can't seem to find any analogue.
+            // ScheduleAfterChildren(() => angleInput.TakeFocus());
             angleInput.Current.BindValueChanged(angle => rotationInfo.Value = rotationInfo.Value with { Degrees = angle.NewValue });
 
             rotationHandler.CanRotateAroundSelectionOrigin.BindValueChanged(e =>
