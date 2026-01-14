@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -12,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -28,62 +30,133 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public LocalisableString Caption { get; init; }
 
+        /// <summary>
+        /// Sets text inside the button.
+        /// </summary>
         public LocalisableString ButtonText { get; init; }
 
-        public Action? Action { get; init; }
+        /// <summary>
+        /// Sets a custom button icon. Not shown when <see cref="ButtonText"/> is set.
+        /// </summary>
+        public IconUsage ButtonIcon { get; init; } = FontAwesome.Solid.ChevronRight;
+
+        private readonly Color4? backgroundColour;
+
+        /// <summary>
+        /// Sets a custom background colour for the button.
+        /// </summary>
+        public Color4? BackgroundColour
+        {
+            get => backgroundColour;
+            init
+            {
+                backgroundColour = value;
+
+                if (IsLoaded)
+                    updateState();
+            }
+        }
+
+        /// <summary>
+        /// The action to invoke when the button is clicked.
+        /// </summary>
+        public Action? Action { get; set; }
+
+        /// <summary>
+        /// Whether the button is enabled.
+        /// </summary>
+        public readonly BindableBool Enabled = new BindableBool(true);
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        private Container content = null!;
+        private Box background = null!;
+        private OsuTextFlowContainer text = null!;
+        private Button button = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
             RelativeSizeAxes = Axes.X;
-            Height = 50;
+            AutoSizeAxes = Axes.Y;
 
-            Masking = true;
-            CornerRadius = 5;
-            CornerExponent = 2.5f;
-
-            InternalChildren = new Drawable[]
+            InternalChild = content = new Container
             {
-                new Box
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Masking = true,
+                CornerRadius = 5,
+                CornerExponent = 2.5f,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding
+                    background = new Box
                     {
-                        Left = 9,
-                        Right = 5,
-                        Vertical = 5,
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = colourProvider.Background5,
                     },
-                    Children = new Drawable[]
+                    new TrianglesV2
                     {
-                        new OsuTextFlowContainer
+                        SpawnRatio = 0.5f,
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = ColourInfo.GradientVertical(colourProvider.Background4, colourProvider.Background5),
+                    },
+                    new HoverClickSounds(HoverSampleSet.Button)
+                    {
+                        Enabled = { BindTarget = Enabled },
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Width = 0.45f,
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Text = Caption,
+                            Left = 9,
+                            Right = 5,
+                            Vertical = 5,
                         },
-                        new Button
+                        Children = new Drawable[]
                         {
-                            Action = Action,
-                            Text = ButtonText,
-                            RelativeSizeAxes = ButtonText == default ? Axes.None : Axes.X,
-                            Width = ButtonText == default ? 90 : 0.45f,
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreRight,
-                        }
+                            text = new OsuTextFlowContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Text = Caption,
+                            },
+                            button = new Button
+                            {
+                                Action = () => Action?.Invoke(),
+                                Text = ButtonText,
+                                Icon = ButtonIcon,
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                Enabled = { BindTarget = Enabled },
+                            }
+                        },
                     },
-                },
+                }
             };
+
+            if (ButtonText == default)
+            {
+                text.Padding = new MarginPadding { Right = 100 };
+                button.Width = 90;
+            }
+            else
+            {
+                text.Width = 0.55f;
+                text.Padding = new MarginPadding { Right = 10 };
+                button.RelativeSizeAxes = Axes.X;
+                button.Width = 0.45f;
+            }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Enabled.BindValueChanged(_ => updateState(), true);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -98,12 +171,34 @@ namespace osu.Game.Graphics.UserInterfaceV2
             updateState();
         }
 
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (Enabled.Value)
+            {
+                background.FlashColour(ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark2), 800, Easing.OutQuint);
+                button.TriggerClick();
+            }
+
+            return true;
+        }
+
         private void updateState()
         {
-            BorderThickness = IsHovered ? 2 : 0;
+            text.Colour = Enabled.Value ? colourProvider.Content1 : colourProvider.Background1;
 
-            if (IsHovered)
-                BorderColour = colourProvider.Light4;
+            background.FadeColour(IsHovered
+                ? ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4)
+                : colourProvider.Background5, 200, Easing.OutQuint);
+
+            content.BorderThickness = IsHovered ? 2 : 0;
+
+            if (BackgroundColour != null)
+            {
+                button.BackgroundColour = BackgroundColour.Value;
+                content.BorderColour = Enabled.Value ? BackgroundColour.Value : Interpolation.ValueAt(0.75, BackgroundColour.Value, colourProvider.Dark1, 0, 1);
+            }
+            else
+                content.BorderColour = Enabled.Value ? colourProvider.Light4 : colourProvider.Dark1;
         }
 
         public partial class Button : OsuButton
@@ -125,6 +220,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 }
             }
 
+            public IconUsage Icon { get; init; }
+
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider overlayColourProvider)
             {
@@ -135,7 +232,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 {
                     Add(new SpriteIcon
                     {
-                        Icon = FontAwesome.Solid.ChevronRight,
+                        Icon = Icon,
                         Size = new Vector2(16),
                         Shadow = true,
                         Anchor = Anchor.Centre,
