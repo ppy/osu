@@ -4,11 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 
-namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
+namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.DifficultyPreprocessing
 {
-    public class UnevennessPreprocessor
+    public static class UnevennessPreprocessor
     {
         private const int accuracy_smoothing_window_ms = 250;
 
@@ -16,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         /// Computes the unevenness values across all-time points.
         /// This measures how irregular the timing patterns are between adjacent columns.
         /// </summary>
-        public static double[] ComputeValues(ManiaDifficultyContext data)
+        public static double[] ComputeValues(ManiaDifficultyData data)
         {
             bool[][] keyUsagePatterns = data.SharedKeyUsage ?? CrossColumnPreprocessor.ComputeKeyUsage(data);
             double[][] timingDeltasByColumn = computeTimingDeltasByColumn(data);
@@ -24,20 +25,16 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
             double[] baseUnevenness = calculateBaseUnevenness(data, keyUsagePatterns, timingDeltasByColumn);
 
             // Interpolate to match target time resolution
-            return StrainArrayUtils.InterpolateArray(
-                data.CornerData.TimeCorners,
-                data.CornerData.AccuracyTimeCorners,
-                baseUnevenness
-            );
+            return baseUnevenness;
         }
 
         /// <summary>
         /// Computes timing deltas (time between consecutive notes) for each column.
         /// This is used to analyze timing irregularities.
         /// </summary>
-        private static double[][] computeTimingDeltasByColumn(ManiaDifficultyContext data)
+        private static double[][] computeTimingDeltasByColumn(ManiaDifficultyData data)
         {
-            int timePointCount = data.CornerData.BaseTimeCorners.Length;
+            int timePointCount = data.StrainTimePoints.Length;
             double[][] timingDeltas = new double[data.KeyCount][];
 
             for (int column = 0; column < data.KeyCount; column++)
@@ -67,9 +64,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
                     if (nextNote == null) break;
 
                     int startIndex = StrainArrayUtils.FindLeftBoundProgressive(
-                        data.CornerData.BaseTimeCorners, ref searchIndex, currentNote.StartTime);
+                        data.StrainTimePoints, ref searchIndex, currentNote.StartTime);
                     int endIndex = StrainArrayUtils.FindLeftBoundProgressive(
-                        data.CornerData.BaseTimeCorners, ref searchIndex, nextNote.StartTime);
+                        data.StrainTimePoints, ref searchIndex, nextNote.StartTime);
 
                     if (endIndex <= startIndex) continue;
 
@@ -90,10 +87,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         /// Calculates the base unevenness without smoothing.
         /// This analyzes timing differences between adjacent active columns.
         /// </summary>
-        private static double[] calculateBaseUnevenness(ManiaDifficultyContext data, bool[][] keyUsagePatterns, double[][] timingDeltas)
+        private static double[] calculateBaseUnevenness(ManiaDifficultyData data, bool[][] keyUsagePatterns, double[][] timingDeltas)
         {
             int keyCount = data.KeyCount;
-            int accuracyTimePoints = data.CornerData.AccuracyTimeCorners.Length;
+            int accuracyTimePoints = data.StrainTimePoints.Length;
 
             if (accuracyTimePoints == 0) return Array.Empty<double>();
 
@@ -103,13 +100,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
 
             if (keyCount < 2) return unevennessBase;
 
-            int baseTimePoints = data.CornerData.BaseTimeCorners.Length;
+            int baseTimePoints = data.StrainTimePoints.Length;
 
             // Process each accuracy time point directly without pre-computing all differences
             for (int accuracyIndex = 0; accuracyIndex < accuracyTimePoints; accuracyIndex++)
             {
-                double accuracyTime = data.CornerData.AccuracyTimeCorners[accuracyIndex];
-                int baseTimeIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, accuracyTime);
+                double accuracyTime = data.StrainTimePoints[accuracyIndex];
+                int baseTimeIndex = StrainArrayUtils.FindLeftBound(data.StrainTimePoints, accuracyTime);
 
                 if (baseTimeIndex >= baseTimePoints) baseTimeIndex = baseTimePoints - 1;
                 if (baseTimeIndex < 0) continue;
@@ -138,7 +135,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
             }
 
             return StrainArrayUtils.ApplySmoothingToArray(
-                data.CornerData.AccuracyTimeCorners,
+                data.StrainTimePoints,
                 unevennessBase,
                 accuracy_smoothing_window_ms,
                 1.0,

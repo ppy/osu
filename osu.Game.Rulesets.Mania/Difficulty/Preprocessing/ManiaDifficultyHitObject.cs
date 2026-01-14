@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
 
@@ -15,13 +16,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         public bool IsLong => EndTime > StartTime;
 
         private readonly int columnIndex;
-        public ManiaDifficultyContext DifficultyContext;
         public readonly List<DifficultyHitObject>[] PerColumnObjects;
+
+        public ManiaDifficultyData DifficultyData;
 
         public ManiaDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, List<DifficultyHitObject>[] perColumnObjects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
-            DifficultyContext = new ManiaDifficultyContext();
+            DifficultyData = new ManiaDifficultyData();
             PerColumnObjects = perColumnObjects;
             columnIndex = perColumnObjects[Column].Count;
         }

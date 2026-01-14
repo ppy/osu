@@ -5,11 +5,12 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 
-namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
+namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.DifficultyPreprocessing
 {
-    public class SameColumnPreprocessor
+    public static class SameColumnPreprocessor
     {
         private const int smoothing_window_ms = 500;
         private const double jack_nerf_coefficient = 7e-5;
@@ -20,12 +21,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         /// Computes the same-column pressure values across all time points.
         /// This measures the difficulty of rapid repeated presses in individual columns.
         /// </summary>
-        public static double[] ComputeValues(ManiaDifficultyContext data)
+        public static double[] ComputeValues(ManiaDifficultyData data)
         {
-            int timePointCount = data.CornerData.BaseTimeCorners.Length;
+            int timePointCount = data.StrainTimePoints.Length;
             if (timePointCount == 0) return Array.Empty<double>();
 
-            double[] baseTimeCorners = data.CornerData.BaseTimeCorners;
+            double[] baseTimeCorners = data.StrainTimePoints;
             int keyCount = data.KeyCount;
             double hitLeniencyFactorSqrt = Math.Sqrt(Math.Sqrt(data.HitLeniency));
 
@@ -55,18 +56,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
             }
 
             // Interpolate to match target time resolution
-            return StrainArrayUtils.InterpolateArray(
-                data.CornerData.TimeCorners,
-                data.CornerData.BaseTimeCorners,
-                combinedSameColumn
-            );
+            return combinedSameColumn;
         }
 
         /// <summary>
         /// Calculates the intensity values for each column independently.
         /// This finds rapid sequences within individual columns.
         /// </summary>
-        private static void calculatePerColumnIntensities(ManiaDifficultyContext data, double[] intensityBuffer, double[] deltaBuffer, double[] baseTimeCorners, double hitLeniencyFactor, int keyCount, int timePointCount)
+        private static void calculatePerColumnIntensities(ManiaDifficultyData data, double[] intensityBuffer, double[] deltaBuffer, double[] baseTimeCorners, double hitLeniencyFactor, int keyCount, int timePointCount)
         {
             List<ManiaDifficultyHitObject>[] notesByColumn = data.AllNotes.First().PerColumnObjects.Select(list => list.Cast<ManiaDifficultyHitObject>().ToList()).ToArray();
 

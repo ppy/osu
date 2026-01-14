@@ -3,11 +3,12 @@
 
 using System;
 using osu.Game.Rulesets.Difficulty.Utils;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 
-namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
+namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.DifficultyPreprocessing
 {
-    public class ReleasePreprocessor
+    public static class ReleasePreprocessor
     {
         private const int smoothing_window_ms = 500;
 
@@ -15,13 +16,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         /// Computes the release factor values across all time points.
         /// This focuses on the difficulty of timing long note releases correctly.
         /// </summary>
-        public static double[] ComputeValues(ManiaDifficultyContext data)
+        public static double[] ComputeValues(ManiaDifficultyData data)
         {
             double[] baseRelease = calculateBaseReleaseFactor(data);
 
             // Apply smoothing to create stable difficulty curves
             double[] smoothed = StrainArrayUtils.ApplySmoothingToArray(
-                data.CornerData.BaseTimeCorners,
+                data.StrainTimePoints,
                 baseRelease,
                 smoothing_window_ms,
                 0.001,
@@ -29,20 +30,16 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
             );
 
             // Interpolate to match target time resolution
-            return StrainArrayUtils.InterpolateArray(
-                data.CornerData.TimeCorners,
-                data.CornerData.BaseTimeCorners,
-                smoothed
-            );
+            return smoothed;
         }
 
         /// <summary>
         /// Calculates the base release factor without smoothing.
         /// This is the core algorithm that determines release timing difficulty.
         /// </summary>
-        private static double[] calculateBaseReleaseFactor(ManiaDifficultyContext data)
+        private static double[] calculateBaseReleaseFactor(ManiaDifficultyData data)
         {
-            int timePoints = data.CornerData.BaseTimeCorners.Length;
+            int timePoints = data.StrainTimePoints.Length;
             double[] releaseFactorBase = new double[timePoints];
 
             int longNoteTailCount = data.LongNoteTails.Count;
@@ -61,7 +58,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         /// Calculates individual difficulty values for each long note release.
         /// This considers the note length and timing to the next note in the same column.
         /// </summary>
-        private static double[] calculateIndividualReleaseDifficulties(ManiaDifficultyContext data)
+        private static double[] calculateIndividualReleaseDifficulties(ManiaDifficultyData data)
         {
             double[] releaseDifficulties = new double[data.LongNoteTails.Count];
 
@@ -104,7 +101,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         /// Processes consecutive long note tails to determine release timing difficulty.
         /// The difficulty comes from coordinating multiple releases in sequence.
         /// </summary>
-        private static void processConsecutiveLongNoteTails(ManiaDifficultyContext data, double[] releaseDifficulties, double[] releaseFactorBase, int timePoints)
+        private static void processConsecutiveLongNoteTails(ManiaDifficultyData data, double[] releaseDifficulties, double[] releaseFactorBase, int timePoints)
         {
             for (int i = 0; i + 1 < data.LongNoteTails.Count; i++)
             {
@@ -112,8 +109,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
                 var nextTail = data.LongNoteTails[i + 1];
 
                 // Find time range for this release sequence
-                int startIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, currentTail.EndTime);
-                int endIndex = StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, nextTail.EndTime);
+                int startIndex = StrainArrayUtils.FindLeftBound(data.StrainTimePoints, currentTail.EndTime);
+                int endIndex = StrainArrayUtils.FindLeftBound(data.StrainTimePoints, nextTail.EndTime);
                 if (endIndex <= startIndex) continue;
 
                 // Calculate release intensity based on timing and individual difficulties

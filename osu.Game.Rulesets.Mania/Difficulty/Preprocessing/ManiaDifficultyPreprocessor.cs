@@ -7,9 +7,9 @@ using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Corner;
-using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Density;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.DifficultyPreprocessing;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.UtilityPreprocessing;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 {
@@ -29,16 +29,16 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         /// </summary>
         public static void ProcessAndAssign(List<DifficultyHitObject> hitObjects, IBeatmap beatmap)
         {
-            var data = new ManiaDifficultyContext
+            var data = new ManiaDifficultyData
             {
                 KeyCount = ((ManiaBeatmap)beatmap).TotalColumns,
                 HitLeniency = calculateHitLeniency(beatmap)
             };
 
-            processDifficultyHitObjects(data, hitObjects);
-            calculateMaxTime(data);
+            createDifficultyHitObjectLists(data, hitObjects);
+            data.MaxTime = (int)(data.AllNotes.LastOrDefault()?.EndTime + 1 ?? 0);
 
-            CornerPreprocessor.ProcessAndAssign(data);
+            data.StrainTimePoints = StrainPointPreprocessor.CreateStrainPoints(data);
             LongNoteDensityPreprocessor.ProcessAndAssign(data);
 
             data.SharedKeyUsage = CrossColumnPreprocessor.ComputeKeyUsage(data);
@@ -51,14 +51,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 
             computeSupplementaryMetrics(data);
 
-            hitObjects.ForEach(hitObject =>
-                ((ManiaDifficultyHitObject)hitObject).DifficultyContext = data);
+            hitObjects.ForEach(hitObject => ((ManiaDifficultyHitObject)hitObject).DifficultyData = data);
         }
 
         /// <summary>
         /// Categorizes hit objects into specialized <see cref="ManiaDifficultyHitObject"/> lists and performs initial setup.
         /// </summary>
-        private static void processDifficultyHitObjects(ManiaDifficultyContext data, List<DifficultyHitObject> hitObjects)
+        private static void createDifficultyHitObjectLists(ManiaDifficultyData data, List<DifficultyHitObject> hitObjects)
         {
             if (hitObjects.Count == 0)
             {
@@ -97,27 +96,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         }
 
         /// <summary>
-        /// Calculates the maximum time boundary for the beatmap based on the last hit object.
-        /// Used for clamping time values and defining end boundaries in calculations.
-        /// </summary>
-        private static void calculateMaxTime(ManiaDifficultyContext data)
-        {
-            var notes = data.AllNotes;
-
-            if (notes.Count == 0)
-            {
-                data.MaxTime = 0;
-                return;
-            }
-
-            var last = notes[^1];
-
-            // Determine max time considering both start and end times of the last object
-            double maxTime = Math.Max(last.StartTime, last.IsLong ? last.EndTime : last.StartTime);
-            data.MaxTime = (int)Math.Ceiling(maxTime) + 1;
-        }
-
-        /// <summary>
         /// Calculates hit window leniency based on the beatmap's Overall Difficulty.
         /// </summary>
         /// <returns>Hit leniency value in milliseconds (clamped to reasonable bounds)</returns>
@@ -138,7 +116,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         /// - Active key count (simultaneous key presses)
         /// These are computed at base time corners and then interpolated to final time corners.
         /// </summary>
-        private static void computeSupplementaryMetrics(ManiaDifficultyContext data)
+        private static void computeSupplementaryMetrics(ManiaDifficultyData data)
         {
             // Prepare sorted note times for density calculations
             double[] noteHitTimes = data.AllNotes.Select(note => note.StartTime).ToArray();
@@ -146,14 +124,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 
             // Get key usage patterns from cross-column preprocessor
             bool[][] keyUsagePatterns = data.SharedKeyUsage ?? CrossColumnPreprocessor.ComputeKeyUsage(data);
-            int timePointCount = data.CornerData.BaseTimeCorners.Length;
+            int timePointCount = data.StrainTimePoints.Length;
 
             double[] localNoteCountBase = new double[timePointCount];
             double[] activeKeyCountBase = new double[timePointCount];
 
             for (int timeIndex = 0; timeIndex < timePointCount; timeIndex++)
             {
-                double currentTime = data.CornerData.BaseTimeCorners[timeIndex];
+                double currentTime = data.StrainTimePoints[timeIndex];
 
                 // Count notes in 1-second window (500ms before/after)
                 localNoteCountBase[timeIndex] = countNotesInWindow(noteHitTimes, currentTime, 500.0);
@@ -162,10 +140,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             }
 
             // Interpolate to final time corners using step function (preserves discrete values)
-            data.LocalNoteCount = interpolateWithStepFunction(data.CornerData.TimeCorners,
-                data.CornerData.BaseTimeCorners, localNoteCountBase);
-            data.ActiveKeyCount = interpolateWithStepFunction(data.CornerData.TimeCorners,
-                data.CornerData.BaseTimeCorners, activeKeyCountBase);
+            data.LocalNoteCount = interpolateWithStepFunction(data.StrainTimePoints,
+                data.StrainTimePoints, localNoteCountBase);
+            data.ActiveKeyCount = interpolateWithStepFunction(data.StrainTimePoints,
+                data.StrainTimePoints, activeKeyCountBase);
         }
 
         /// <summary>

@@ -5,11 +5,12 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
 using osu.Game.Rulesets.Mania.Difficulty.Utils;
 
-namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
+namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.DifficultyPreprocessing
 {
-    public class CrossColumnPreprocessor
+    public static class CrossColumnPreprocessor
     {
         private const int column_activity_window_ms = 150;
         private const int smoothing_window_ms = 500;
@@ -18,13 +19,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         /// Computes the cross-column pressure values across all time points.
         /// This involves calculating base pressure values and then applying smoothing.
         /// </summary>
-        public static double[] ComputeValues(ManiaDifficultyContext data)
+        public static double[] ComputeValues(ManiaDifficultyData data)
         {
             double[] baseCrossColumnPressure = calculateBaseCrossColumnPressure(data);
 
             // Apply smoothing to reduce noise and make the difficulty curve more stable
             double[] smoothedPressure = StrainArrayUtils.ApplySmoothingToArray(
-                data.CornerData.BaseTimeCorners,
+                data.StrainTimePoints,
                 baseCrossColumnPressure,
                 smoothing_window_ms,
                 0.001,
@@ -32,26 +33,22 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
             );
 
             // Interpolate to match the target time resolution
-            return StrainArrayUtils.InterpolateArray(
-                data.CornerData.TimeCorners,
-                data.CornerData.BaseTimeCorners,
-                smoothedPressure
-            );
+            return smoothedPressure;
         }
 
         /// <summary>
         /// Calculates the base cross-column pressure without smoothing.
         /// This is the core algorithm that determines how difficult cross-column patterns are.
         /// </summary>
-        private static double[] calculateBaseCrossColumnPressure(ManiaDifficultyContext data)
+        private static double[] calculateBaseCrossColumnPressure(ManiaDifficultyData data)
         {
-            int timePointCount = data.CornerData.BaseTimeCorners.Length;
+            int timePointCount = data.StrainTimePoints.Length;
             if (timePointCount == 0) return Array.Empty<double>();
 
             double[] crossColumnPressure = new double[timePointCount];
             double[] crossHandCoefficients = getCrossHandCoefficients(data.KeyCount);
             bool[][] keyUsageByTime = data.SharedKeyUsage ?? ComputeKeyUsage(data);
-            double[] baseTimeCorners = data.CornerData.BaseTimeCorners;
+            double[] baseTimeCorners = data.StrainTimePoints;
 
             // Create a lookup table for which keys are active at each time point
             byte[] activeKeyLookup = ArrayPool<byte>.Shared.Rent(data.KeyCount * Math.Max(1, timePointCount));
@@ -110,7 +107,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         /// Processes each column boundary to calculate cross-column difficulty.
         /// A boundary exists between each pair of adjacent columns.
         /// </summary>
-        private static void processColumnBoundaries(ManiaDifficultyContext data, double[] crossIntensityBuffer, double[] fastPressureBuffer, byte[] activeByTime, double[] crossHandCoefficients, double[] baseTimeCorners, int timePointCount)
+        private static void processColumnBoundaries(ManiaDifficultyData data, double[] crossIntensityBuffer, double[] fastPressureBuffer, byte[] activeByTime, double[] crossHandCoefficients, double[] baseTimeCorners, int timePointCount)
         {
             List<ManiaDifficultyHitObject>[] columns = data.AllNotes.First().PerColumnObjects.Select(list => list.Cast<ManiaDifficultyHitObject>().ToList()).ToArray();
 
@@ -169,7 +166,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         /// Processes notes from two columns to calculate cross-column pressure at a boundary.
         /// </summary>
         private static void processBoundaryNotes(List<ManiaDifficultyHitObject> leftNotes, List<ManiaDifficultyHitObject> rightNotes,
-                                                 int boundaryIndex, ManiaDifficultyContext data, double[] crossIntensityBuffer, double[] fastPressureBuffer,
+                                                 int boundaryIndex, ManiaDifficultyData data, double[] crossIntensityBuffer, double[] fastPressureBuffer,
                                                  byte[] activeByTime, double[] crossHandCoefficients, double[] baseTimeCorners, int timePointCount)
         {
             int leftIndex = 0, rightIndex = 0;
@@ -221,7 +218,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         /// <summary>
         /// Calculates the difficulty contribution for the time interval between two notes.
         /// </summary>
-        private static void calculateIntervalDifficulty(ManiaDifficultyHitObject previousNote, ManiaDifficultyHitObject currentNote, int boundaryIndex, ManiaDifficultyContext data, double[] crossIntensityBuffer, double[] fastPressureBuffer, byte[] activeByTime, double[] crossHandCoefficients, double[] baseTimeCorners, int timePointCount, int baseOffset, ref int searchIndex)
+        private static void calculateIntervalDifficulty(ManiaDifficultyHitObject previousNote, ManiaDifficultyHitObject currentNote, int boundaryIndex, ManiaDifficultyData data, double[] crossIntensityBuffer, double[] fastPressureBuffer, byte[] activeByTime, double[] crossHandCoefficients, double[] baseTimeCorners, int timePointCount, int baseOffset, ref int searchIndex)
         {
             int startIndex = StrainArrayUtils.FindLeftBoundProgressive(baseTimeCorners, ref searchIndex, previousNote.StartTime);
             int endIndex = StrainArrayUtils.FindLeftBoundProgressive(baseTimeCorners, ref searchIndex, currentNote.StartTime);
@@ -372,9 +369,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
         /// Computes which keys are considered "active" (recently pressed or held) at each time point.
         /// This is used to determine when cross-column patterns are more difficult due to finger coordination.
         /// </summary>
-        public static bool[][] ComputeKeyUsage(ManiaDifficultyContext data)
+        public static bool[][] ComputeKeyUsage(ManiaDifficultyData data)
         {
-            int timePoints = data.CornerData.BaseTimeCorners.Length;
+            int timePoints = data.StrainTimePoints.Length;
             bool[][] keyUsage = new bool[data.KeyCount][];
 
             for (int column = 0; column < data.KeyCount; column++)
@@ -393,8 +390,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Components
                 else
                     windowEndTime = Math.Min(data.MaxTime - 1, note.StartTime + column_activity_window_ms);
 
-                int startIndex = Math.Max(0, StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, windowStartTime));
-                int endIndex = Math.Max(0, StrainArrayUtils.FindLeftBound(data.CornerData.BaseTimeCorners, windowEndTime));
+                int startIndex = Math.Max(0, StrainArrayUtils.FindLeftBound(data.StrainTimePoints, windowStartTime));
+                int endIndex = Math.Max(0, StrainArrayUtils.FindLeftBound(data.StrainTimePoints, windowEndTime));
 
                 if (startIndex >= endIndex) continue;
 

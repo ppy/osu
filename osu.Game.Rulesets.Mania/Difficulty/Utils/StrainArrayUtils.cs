@@ -20,34 +20,29 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Utils
             var arrayPool = ArrayPool<double>.Shared;
             double[] cumulativeSum = arrayPool.Rent(Math.Max(1, pointCount));
 
-            try
+            // Build cumulative sum for efficient window queries
+            BuildCumulativeSum(cumulativeSum, timePoints, values, 0, pointCount);
+
+            double[] smoothedResults = new double[pointCount];
+            int lastStartIndex = 0, lastEndIndex = 0;
+
+            // Apply smoothing to each point using sliding window
+            for (int pointIndex = 0; pointIndex < pointCount; pointIndex++)
             {
-                // Build cumulative sum for efficient window queries
-                BuildCumulativeSum(cumulativeSum, timePoints, values, 0, pointCount);
+                double centerTime = timePoints[pointIndex];
+                double windowStart = Math.Max(centerTime - windowSizeMs, timePoints[0]);
+                double windowEnd = Math.Min(centerTime + windowSizeMs, timePoints[pointCount - 1]);
 
-                double[] smoothedResults = new double[pointCount];
-                int lastStartIndex = 0, lastEndIndex = 0;
+                // Calculate sum within the window using progressive queries
+                double windowSum = QueryCumulativeSumProgressive(windowEnd, timePoints, cumulativeSum, values, 0, ref lastEndIndex) - QueryCumulativeSumProgressive(windowStart, timePoints, cumulativeSum, values, 0, ref lastStartIndex);
 
-                // Apply smoothing to each point using sliding window
-                for (int pointIndex = 0; pointIndex < pointCount; pointIndex++)
-                {
-                    double centerTime = timePoints[pointIndex];
-                    double windowStart = Math.Max(centerTime - windowSizeMs, timePoints[0]);
-                    double windowEnd = Math.Min(centerTime + windowSizeMs, timePoints[pointCount - 1]);
-
-                    // Calculate sum within the window using progressive queries
-                    double windowSum = QueryCumulativeSumProgressive(windowEnd, timePoints, cumulativeSum, values, 0, ref lastEndIndex) - QueryCumulativeSumProgressive(windowStart, timePoints, cumulativeSum, values, 0, ref lastStartIndex);
-
-                    // Apply the appropriate smoothing mode
-                    smoothedResults[pointIndex] = applySmoothingMode(windowSum, windowStart, windowEnd, scale, mode);
-                }
-
-                return smoothedResults;
+                // Apply the appropriate smoothing mode
+                smoothedResults[pointIndex] = applySmoothingMode(windowSum, windowStart, windowEnd, scale, mode);
             }
-            finally
-            {
-                arrayPool.Return(cumulativeSum, clearArray: true);
-            }
+
+            arrayPool.Return(cumulativeSum, clearArray: true);
+
+            return smoothedResults;
         }
 
         /// <summary>
@@ -153,68 +148,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Utils
             double valueContribution = values[valuesOffset + leftIndex] * timeDifference;
 
             return cumulativeSum[leftIndex] + valueContribution;
-        }
-
-        /// <summary>
-        /// Performs linear interpolation to map values from one time resolution to another.
-        /// This is essential for converting between different sampling rates in difficulty calculation.
-        /// </summary>
-        public static double[] InterpolateArray(double[] targetTimePoints, double[] sourceTimePoints, double[] sourceValues)
-        {
-            if (targetTimePoints.Length == 0)
-                return Array.Empty<double>();
-
-            if (sourceTimePoints.Length == 0 || sourceValues.Length == 0)
-            {
-                return new double[targetTimePoints.Length];
-            }
-
-            int targetCount = targetTimePoints.Length;
-            int sourceCount = sourceTimePoints.Length;
-            double[] interpolatedResults = new double[targetCount];
-
-            int sourceIndex = 0;
-            double leftBound = sourceTimePoints[0];
-            double rightBound = sourceTimePoints[sourceCount - 1];
-
-            // Interpolate each target point
-            for (int targetIndex = 0; targetIndex < targetCount; targetIndex++)
-            {
-                double targetTime = targetTimePoints[targetIndex];
-
-                if (targetTime <= leftBound)
-                {
-                    interpolatedResults[targetIndex] = sourceValues[0];
-                    continue;
-                }
-
-                if (targetTime >= rightBound)
-                {
-                    interpolatedResults[targetIndex] = sourceValues[sourceCount - 1];
-                    continue;
-                }
-
-                // Find the appropriate interval using progressive search
-                while (sourceIndex + 1 < sourceCount && sourceTimePoints[sourceIndex + 1] <= targetTime)
-                    sourceIndex++;
-
-                int rightIndex = sourceIndex + 1;
-                double timeDenominator = sourceTimePoints[rightIndex] - sourceTimePoints[sourceIndex];
-
-                if (timeDenominator == 0.0)
-                {
-                    // Avoid division by zero
-                    interpolatedResults[targetIndex] = sourceValues[sourceIndex];
-                }
-                else
-                {
-                    // Linear interpolation
-                    double interpolationFactor = (targetTime - sourceTimePoints[sourceIndex]) / timeDenominator;
-                    interpolatedResults[targetIndex] = sourceValues[sourceIndex] * (1.0 - interpolationFactor) + sourceValues[rightIndex] * interpolationFactor;
-                }
-            }
-
-            return interpolatedResults;
         }
 
         /// <summary>

@@ -3,7 +3,7 @@
 
 using System;
 
-namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Density
+namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data
 {
     /// <summary>
     /// Represents density contribution from long notes over time.

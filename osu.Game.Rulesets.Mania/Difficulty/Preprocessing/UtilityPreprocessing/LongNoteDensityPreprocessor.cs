@@ -3,8 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
 
-namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Density
+namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.UtilityPreprocessing
 {
     public class LongNoteDensityPreprocessor
     {
@@ -12,7 +13,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Density
         /// Builds density data for long notes, which affects how difficult pressing patterns are.
         /// Long notes create sustained finger usage that impacts coordination.
         /// </summary>
-        public static void ProcessAndAssign(ManiaDifficultyContext data)
+        public static void ProcessAndAssign(ManiaDifficultyData data)
         {
             var longNoteDensity = new LongNoteDensityData
             {
