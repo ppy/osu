@@ -13,8 +13,10 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Team;
+using osu.Game.Overlays.Team.Sections;
 using osu.Game.Rulesets;
 using osu.Game.Teams;
+using osuTK;
 
 namespace osu.Game.Overlays
 {
@@ -76,6 +78,18 @@ namespace osu.Game.Overlays
                     Children = new Drawable[]
                     {
                         Header,
+                        new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, 10),
+                            Padding = new MarginPadding(10),
+                            Children = new Drawable[]
+                            {
+                                new InfoSection { TeamData = { BindTarget = teamData } },
+                            },
+                        },
                     },
                 },
             };
