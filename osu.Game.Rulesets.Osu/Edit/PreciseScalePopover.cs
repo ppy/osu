@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     scaleInput = new FormSliderBar<float>
                     {
-                        Caption = "Scale:",
+                        Caption = "Scale",
                         Current = scaleInputBindable = new BindableNumber<float>
                         {
                             MinValue = 0.05f,

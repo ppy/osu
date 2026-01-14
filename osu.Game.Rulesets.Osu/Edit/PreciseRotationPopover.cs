@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     angleInput = new FormSliderBar<float>
                     {
-                        Caption = "Angle (degrees):",
+                        Caption = "Angle (degrees)",
                         Current = new BindableNumber<float>
                         {
                             MinValue = -360,

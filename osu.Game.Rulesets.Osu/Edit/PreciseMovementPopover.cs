@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     xInput = new FormSliderBar<float>
                     {
-                        Caption = "X:",
+                        Caption = "X",
                         Current = xBindable = new BindableNumber<float>
                         {
                             Precision = 1,
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     },
                     new FormSliderBar<float>
                     {
-                        Caption = "Y:",
+                        Caption = "Y",
                         Current = yBindable = new BindableNumber<float>
                         {
                             Precision = 1,
