@@ -69,8 +69,8 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                         AutoSizeAxes = Axes.Y,
                         Padding = new MarginPadding
                         {
-                            Left = SettingsPanel.ContentPaddingV2.Left + 9,
-                            Right = SettingsPanel.ContentPaddingV2.Right + 5
+                            Left = SettingsPanel.CONTENT_PADDING.Left + 9,
+                            Right = SettingsPanel.CONTENT_PADDING.Right + 5
                         },
                         Child = notchContainer = new Container<Circle>
                         {
@@ -89,14 +89,14 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     hintNote = new SettingsNote
                     {
                         RelativeSizeAxes = Axes.X,
-                        Padding = SettingsPanel.ContentPaddingV2,
+                        Padding = SettingsPanel.CONTENT_PADDING,
                         TextAnchor = Anchor.TopCentre,
                     },
                     applySuggestion = new RoundedButton
                     {
                         RelativeSizeAxes = Axes.X,
                         Text = AudioSettingsStrings.ApplySuggestedOffset,
-                        Padding = SettingsPanel.ContentPaddingV2,
+                        Padding = SettingsPanel.CONTENT_PADDING,
                         Action = () =>
                         {
                             if (SuggestedOffset.Value.HasValue)

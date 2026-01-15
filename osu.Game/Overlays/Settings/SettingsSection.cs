@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.Settings
                                 {
                                     Font = OsuFont.TorusAlternate.With(size: header_size),
                                     Text = Header,
-                                    Margin = SettingsPanel.ContentPaddingV2,
+                                    Margin = SettingsPanel.CONTENT_PADDING,
                                 },
                                 FlowContent
                             }

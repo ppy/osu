@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
-            Padding = new MarginPadding { Top = 20, Bottom = 30, Left = SettingsPanel.ContentPaddingV2.Left, Right = SettingsPanel.ContentPaddingV2.Right };
+            Padding = new MarginPadding { Top = 20, Bottom = 30, Left = SettingsPanel.CONTENT_PADDING.Left, Right = SettingsPanel.CONTENT_PADDING.Right };
 
             FillFlowContainer modes;
 
