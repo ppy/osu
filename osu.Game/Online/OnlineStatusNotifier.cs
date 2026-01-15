@@ -109,8 +109,13 @@ namespace osu.Game.Online
                     return;
                 }
 
-                if (getCurrentScreen() is Player)
-                    notifyApiDisconnection();
+                switch (getCurrentScreen())
+                {
+                    case SpectatorPlayer: // obvious issues
+                    case SubmittingPlayer: // replay sending issues
+                        notifyApiDisconnection();
+                        break;
+                }
             }));
         }
 
