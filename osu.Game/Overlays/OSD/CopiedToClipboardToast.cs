@@ -8,7 +8,7 @@ namespace osu.Game.Overlays.OSD
     public partial class CopiedToClipboardToast : Toast
     {
         public CopiedToClipboardToast()
-            : base(CommonStrings.General, ToastStrings.CopiedToClipboard, "")
+            : base(CommonStrings.General, ToastStrings.CopiedToClipboard)
         {
         }
     }
