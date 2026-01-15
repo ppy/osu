@@ -233,6 +233,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             TooltipFormat = TooltipFormat,
                             DisplayAsPercentage = DisplayAsPercentage,
                             PlaySamplesOnAdjust = PlaySamplesOnAdjust,
+                            ResetToDefault = () =>
+                            {
+                                if (!IsDisabled)
+                                    SetDefault();
+                            }
                         }
                     },
                 },
@@ -398,6 +403,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private partial class InnerSlider : OsuSliderBar<T>
         {
+            public Action? ResetToDefault { get; set; }
+
             public BindableBool Focused { get; } = new BindableBool();
 
             public BindableBool IsDragging { get; set; } = new BindableBool();
@@ -453,11 +460,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         Padding = new MarginPadding { Horizontal = RangePadding, },
                         Child = nub = new InnerSliderNub
                         {
-                            ResetToDefault = () =>
-                            {
-                                if (!Current.Disabled)
-                                    Current.SetDefault();
-                            }
+                            ResetToDefault = ResetToDefault,
                         }
                     },
                     sounds = new HoverClickSounds()
