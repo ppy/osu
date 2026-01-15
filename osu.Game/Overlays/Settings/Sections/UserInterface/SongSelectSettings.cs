@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -13,9 +14,6 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
     public partial class SongSelectSettings : SettingsSubsection
     {
-        private FormEnumDropdown<ModSelectHotkeyStyle> modSelectHotkeyStyle = null!;
-        private FormCheckBox modSelectTextSearchStartsActive = null!;
-
         protected override LocalisableString Header => UserInterfaceStrings.SongSelectHeader;
 
         [BackgroundDependencyLoader]
@@ -36,21 +34,21 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     Caption = UserInterfaceStrings.RandomSelectionAlgorithm,
                     Current = config.GetBindable<RandomSelectAlgorithm>(OsuSetting.RandomSelectAlgorithm),
                 }),
-                new SettingsItemV2(modSelectHotkeyStyle = new FormEnumDropdown<ModSelectHotkeyStyle>
+                new SettingsItemV2(new FormEnumDropdown<ModSelectHotkeyStyle>
                 {
                     Caption = UserInterfaceStrings.ModSelectHotkeyStyle,
                     Current = config.GetBindable<ModSelectHotkeyStyle>(OsuSetting.ModSelectHotkeyStyle),
                 })
                 {
-                    ApplyClassicDefault = () => modSelectHotkeyStyle.Current.Value = ModSelectHotkeyStyle.Classic,
+                    ApplyClassicDefault = c => ((IHasCurrentValue<ModSelectHotkeyStyle>)c).Current.Value = ModSelectHotkeyStyle.Classic,
                 },
-                new SettingsItemV2(modSelectTextSearchStartsActive = new FormCheckBox
+                new SettingsItemV2(new FormCheckBox
                 {
                     Caption = UserInterfaceStrings.ModSelectTextSearchStartsActive,
                     Current = config.GetBindable<bool>(OsuSetting.ModSelectTextSearchStartsActive),
                 })
                 {
-                    ApplyClassicDefault = () => modSelectTextSearchStartsActive.Current.Value = false,
+                    ApplyClassicDefault = c => ((IHasCurrentValue<bool>)c).Current.Value = false,
                 },
                 new SettingsItemV2(new FormCheckBox
                 {
