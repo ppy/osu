@@ -151,11 +151,6 @@ Click to see what's new!", version);
         public static LocalisableString APIConnectionInterrupted => new TranslatableString(getKey(@"api_connection_interrupted"), @"Connection to online services was interrupted. osu! will be operating with limited functionality.");
 
         /// <summary>
-        /// "Connection to the multiplayer server was lost. Exiting multiplayer."
-        /// </summary>
-        public static LocalisableString MultiplayerDisconnect => new TranslatableString(getKey(@"multiplayer_disconnect"), @"Connection to the multiplayer server was lost. Exiting multiplayer.");
-
-        /// <summary>
         /// "You have been logged out on this device due to a login to your account on another device."
         /// </summary>
         public static LocalisableString AnotherDeviceDisconnect => new TranslatableString(getKey(@"another_device_disconnect"), @"You have been logged out on this device due to a login to your account on another device.");
