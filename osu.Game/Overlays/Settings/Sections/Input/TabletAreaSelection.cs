@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             this.handler = handler;
 
-            Padding = SettingsPanel.ContentPaddingV2;
+            Padding = SettingsPanel.CONTENT_PADDING;
         }
 
         [BackgroundDependencyLoader]

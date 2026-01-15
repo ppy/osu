@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Settings.Sections
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Horizontal,
-                    Padding = SettingsPanel.ContentPaddingV2,
+                    Padding = SettingsPanel.CONTENT_PADDING,
                     Children = new Drawable[]
                     {
                         // This is all super-temporary until we move skin settings to their own panel / overlay.

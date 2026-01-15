@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Settings
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Padding = SettingsPanel.ContentPaddingV2,
+                Padding = SettingsPanel.CONTENT_PADDING,
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {

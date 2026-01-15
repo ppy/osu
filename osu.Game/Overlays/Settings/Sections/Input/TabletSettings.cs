@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = SettingsPanel.ContentPaddingV2,
+                    Padding = SettingsPanel.CONTENT_PADDING,
                     Child = new Container
                     {
                         RelativeSizeAxes = Axes.X,
@@ -219,7 +219,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         }),
                         new RotationPresetButtons(tabletHandler)
                         {
-                            Padding = SettingsPanel.ContentPaddingV2,
+                            Padding = SettingsPanel.CONTENT_PADDING,
                         },
                         new SettingsItemV2(new FormSliderBar<float>
                         {
