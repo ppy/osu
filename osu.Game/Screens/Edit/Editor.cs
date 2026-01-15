@@ -1620,8 +1620,9 @@ namespace osu.Game.Screens.Edit
         private partial class BeatmapEditorToast : Toast
         {
             public BeatmapEditorToast(LocalisableString value, string beatmapDisplayName)
-                : base(InputSettingsStrings.EditorSection, value, beatmapDisplayName)
+                : base(InputSettingsStrings.EditorSection, value)
             {
+                ExtraText = beatmapDisplayName;
             }
         }
 

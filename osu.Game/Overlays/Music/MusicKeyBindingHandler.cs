@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -86,7 +85,7 @@ namespace osu.Game.Overlays.Music
             private readonly GlobalAction action;
 
             public MusicActionToast(LocalisableString value, GlobalAction action)
-                : base(ToastStrings.MusicPlayback, value, string.Empty)
+                : base(ToastStrings.MusicPlayback, value)
             {
                 this.action = action;
             }
@@ -94,7 +93,7 @@ namespace osu.Game.Overlays.Music
             [BackgroundDependencyLoader]
             private void load(RealmKeyBindingStore keyBindingStore)
             {
-                ShortcutText.Text = keyBindingStore.GetBindingsStringFor(action).ToUpper();
+                ExtraText = keyBindingStore.GetBindingsStringFor(action);
             }
         }
     }
