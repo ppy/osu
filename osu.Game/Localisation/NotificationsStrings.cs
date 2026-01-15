@@ -230,6 +230,21 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString LogsExportFinished => new TranslatableString(getKey(@"logs_export_finished"), @"Exported logs! Click to view.");
 
+        /// <summary>
+        /// "Running osu! as {0} does not improve performance, may break integrations and poses a security risk. Please run the game as a normal user."
+        /// </summary>
+        public static LocalisableString ElevatedPrivileges(LocalisableString user) => new TranslatableString(getKey(@"elevated_privileges"), @"Running osu! as {0} does not improve performance, may break integrations and poses a security risk. Please run the game as a normal user.", user);
+
+        /// <summary>
+        /// "root"
+        /// </summary>
+        public static LocalisableString ElevatedPrivilegesRoot => new TranslatableString(getKey(@"elevated_privileges_root"), @"root");
+
+        /// <summary>
+        /// "administrator"
+        /// </summary>
+        public static LocalisableString ElevatedPrivilegesAdministrator => new TranslatableString(getKey(@"elevated_privileges_administrator"), @"administrator");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
