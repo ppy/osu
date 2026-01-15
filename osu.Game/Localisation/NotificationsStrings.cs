@@ -245,6 +245,11 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString ElevatedPrivilegesAdministrator => new TranslatableString(getKey(@"elevated_privileges_administrator"), @"administrator");
 
+        /// <summary>
+        /// "Screenshot {0} saved!"
+        /// </summary>
+        public static LocalisableString ScreenshotSaved(string filename) => new TranslatableString(getKey(@"screenshot_saved"), @"Screenshot {0} saved!", filename);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
