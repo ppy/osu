@@ -250,6 +250,16 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString ScreenshotSaved(string filename) => new TranslatableString(getKey(@"screenshot_saved"), @"Screenshot {0} saved!", filename);
 
+        /// <summary>
+        /// "The multiplayer server will be right back..."
+        /// </summary>
+        public static LocalisableString MultiplayerServerShuttingDownImmediately => new TranslatableString(getKey(@"multiplayer_server_shutting_down_immediately"), @"The multiplayer server will be right back...");
+
+        /// <summary>
+        /// "The multiplayer server is restarting in {0}."
+        /// </summary>
+        public static LocalisableString MultiplayerServerShuttingDownRemaining(string remainingTime) => new TranslatableString(getKey(@"multiplayer_server_shutting_down_remaining"), @"The multiplayer server is restarting in {0}.", remainingTime);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
