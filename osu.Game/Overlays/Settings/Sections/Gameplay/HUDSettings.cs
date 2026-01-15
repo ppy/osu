@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -12,8 +13,6 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
     public partial class HUDSettings : SettingsSubsection
     {
-        private FormCheckBox showHealthDisplayWhenCantFail = null!;
-
         protected override LocalisableString Header => GameplaySettingsStrings.HUDHeader;
 
         [BackgroundDependencyLoader]
@@ -57,14 +56,14 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     Caption = GameplaySettingsStrings.AlwaysShowHoldForMenuButton,
                     Current = config.GetBindable<bool>(OsuSetting.AlwaysShowHoldForMenuButton),
                 }),
-                new SettingsItemV2(showHealthDisplayWhenCantFail = new FormCheckBox
+                new SettingsItemV2(new FormCheckBox
                 {
                     Caption = GameplaySettingsStrings.ShowHealthDisplayWhenCantFail,
                     Current = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail),
                 })
                 {
                     Keywords = new[] { "hp", "bar" },
-                    ApplyClassicDefault = () => showHealthDisplayWhenCantFail.Current.Value = false,
+                    ApplyClassicDefault = c => ((IHasCurrentValue<bool>)c).Current.Value = false,
                 },
             };
         }

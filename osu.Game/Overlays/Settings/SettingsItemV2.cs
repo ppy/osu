@@ -112,9 +112,9 @@ namespace osu.Game.Overlays.Settings
         /// If set, this setting is considered as having a "classic" default value,
         /// and this is the function for overwriting the control with that value.
         /// </summary>
-        public Action? ApplyClassicDefault { get; set; }
+        public Action<IFormControl>? ApplyClassicDefault { get; set; }
 
-        void ISettingsItem.ApplyClassicDefault() => ApplyClassicDefault?.Invoke();
+        void ISettingsItem.ApplyClassicDefault() => ApplyClassicDefault?.Invoke(Control);
 
         public void ApplyDefault()
         {

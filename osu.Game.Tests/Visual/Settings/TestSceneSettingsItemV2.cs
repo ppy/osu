@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
@@ -31,7 +32,6 @@ namespace osu.Game.Tests.Visual.Settings
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         private FormSliderBar<float> sliderBar = null!;
-        private FormSliderBar<float> classicSliderBar = null!;
 
         private SearchContainer searchContainer = null!;
 
@@ -173,7 +173,7 @@ namespace osu.Game.Tests.Visual.Settings
                                         {
                                             ShowRevertToDefaultButton = false
                                         },
-                                        new SettingsItemV2(classicSliderBar = new FormSliderBar<float>
+                                        new SettingsItemV2(new FormSliderBar<float>
                                         {
                                             Caption = "Slider with classic default",
                                             Current = new BindableFloat
@@ -185,7 +185,7 @@ namespace osu.Game.Tests.Visual.Settings
                                             },
                                         })
                                         {
-                                            ApplyClassicDefault = () => classicSliderBar.Current.Value = 2,
+                                            ApplyClassicDefault = c => ((IHasCurrentValue<float>)c).Current.Value = 2,
                                         },
                                     },
                                 },

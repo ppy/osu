@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -12,8 +13,6 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
     public partial class GeneralSettings : SettingsSubsection
     {
-        private FormSliderBar<double> holdToConfirmSlider = null!;
-
         protected override LocalisableString Header => CommonStrings.General;
 
         [BackgroundDependencyLoader]
@@ -38,7 +37,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     Caption = UserInterfaceStrings.Parallax,
                     Current = config.GetBindable<bool>(OsuSetting.MenuParallax)
                 }),
-                new SettingsItemV2(holdToConfirmSlider = new FormSliderBar<double>
+                new SettingsItemV2(new FormSliderBar<double>
                 {
                     Caption = UserInterfaceStrings.HoldToConfirmActivationTime,
                     Current = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay),
@@ -47,7 +46,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 })
                 {
                     Keywords = new[] { @"delay" },
-                    ApplyClassicDefault = () => holdToConfirmSlider.Current.Value = 0,
+                    ApplyClassicDefault = c => ((IHasCurrentValue<double>)c).Current.Value = 0,
                 },
             };
         }
