@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
@@ -14,8 +15,6 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public partial class OsuSettingsSubsection : RulesetSettingsSubsection
     {
-        private FormCheckBox snakingOutSliders = null!;
-
         protected override LocalisableString Header => "osu!";
 
         public OsuSettingsSubsection(Ruleset ruleset)
@@ -35,13 +34,13 @@ namespace osu.Game.Rulesets.Osu.UI
                     Caption = RulesetSettingsStrings.SnakingInSliders,
                     Current = config.GetBindable<bool>(OsuRulesetSetting.SnakingInSliders)
                 }),
-                new SettingsItemV2(snakingOutSliders = new FormCheckBox
+                new SettingsItemV2(new FormCheckBox
                 {
                     Caption = RulesetSettingsStrings.SnakingOutSliders,
                     Current = config.GetBindable<bool>(OsuRulesetSetting.SnakingOutSliders)
                 })
                 {
-                    ApplyClassicDefault = () => snakingOutSliders.Current.Value = false,
+                    ApplyClassicDefault = c => ((IHasCurrentValue<bool>)c).Current.Value = false,
                 },
                 new SettingsItemV2(new FormCheckBox
                 {
