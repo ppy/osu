@@ -89,7 +89,7 @@ namespace osu.Game.Online
                     notificationOverlay?.Post(new SimpleErrorNotification
                     {
                         Icon = FontAwesome.Solid.ExclamationCircle,
-                        Text = NotificationsStrings.APIDisconnect,
+                        Text = NotificationsStrings.APIConnectionInterrupted,
                     });
                 }
             });
