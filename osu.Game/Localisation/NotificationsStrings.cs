@@ -210,6 +210,26 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString ActionInterruptedByDialog => new TranslatableString(getKey(@"action_interrupted_by_dialog"), @"An action was interrupted due to a dialog being displayed.");
 
+        /// <summary>
+        /// "Exporting {0}..."
+        /// </summary>
+        public static LocalisableString FileExportOngoing(string filename) => new TranslatableString(getKey(@"file_export_ongoing"), @"Exporting {0}...", filename);
+
+        /// <summary>
+        /// "Exported {0}! Click to view."
+        /// </summary>
+        public static LocalisableString FileExportFinished(string filename) => new TranslatableString(getKey(@"file_export_finished"), @"Exported {0}! Click to view.", filename);
+
+        /// <summary>
+        /// "Exporting logs..."
+        /// </summary>
+        public static LocalisableString LogsExportOngoing => new TranslatableString(getKey(@"logs_export_ongoing"), @"Exporting logs...");
+
+        /// <summary>
+        /// "Exported logs! Click to view."
+        /// </summary>
+        public static LocalisableString LogsExportFinished => new TranslatableString(getKey(@"logs_export_finished"), @"Exported logs! Click to view.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
