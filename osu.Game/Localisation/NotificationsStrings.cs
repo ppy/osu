@@ -260,6 +260,16 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString MultiplayerServerShuttingDownRemaining(string remainingTime) => new TranslatableString(getKey(@"multiplayer_server_shutting_down_remaining"), @"The multiplayer server is restarting in {0}.", remainingTime);
 
+        /// <summary>
+        /// "Created new collection &quot;{0}&quot; with {1} beatmaps."
+        /// </summary>
+        public static LocalisableString CollectionCreated(string name, int beatmapsCount) => new TranslatableString(getKey(@"collection_created"), @"Created new collection ""{0}"" with {1} beatmaps.", name, beatmapsCount);
+
+        /// <summary>
+        /// "Added {0} beatmaps to collection &quot;{1}&quot;."
+        /// </summary>
+        public static LocalisableString CollectionBeatmapsAdded(string name, int beatmapsCount) => new TranslatableString(getKey(@"collection_beatmaps_added"), @"Added {0} beatmaps to collection ""{1}"".", beatmapsCount, name);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
