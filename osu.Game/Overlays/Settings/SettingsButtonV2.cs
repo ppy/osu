@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Settings
         {
             RelativeSizeAxes = Axes.X;
             Margin = new MarginPadding { Vertical = -1.5f };
-            Padding = SettingsPanel.ContentPaddingV2;
+            Padding = SettingsPanel.CONTENT_PADDING;
         }
 
         public IEnumerable<string> Keywords { get; set; } = Array.Empty<string>();

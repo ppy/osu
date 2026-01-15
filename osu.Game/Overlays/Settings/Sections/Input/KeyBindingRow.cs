@@ -128,7 +128,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Padding = new MarginPadding { Right = SettingsPanel.ContentPaddingV2.Right };
+            Padding = new MarginPadding { Right = SettingsPanel.CONTENT_PADDING.Right };
 
             InternalChildren = new Drawable[]
             {
@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = SettingsPanel.ContentPaddingV2.Left },
+                    Padding = new MarginPadding { Left = SettingsPanel.CONTENT_PADDING.Left },
                     Children = new Drawable[]
                     {
                         content = new Container
