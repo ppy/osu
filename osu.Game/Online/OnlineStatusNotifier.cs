@@ -17,6 +17,7 @@ using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.OnlinePlay;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Online
 {
@@ -75,22 +76,16 @@ namespace osu.Game.Online
 
             apiState.BindValueChanged(state =>
             {
-                if (state.NewValue == APIState.Online)
+                switch (state.NewValue)
                 {
-                    userNotified = false;
-                    return;
-                }
+                    case APIState.Online:
+                        userNotified = false;
+                        return;
 
-                if (userNotified) return;
-
-                if (state.NewValue == APIState.Offline && getCurrentScreen() is OnlinePlayScreen)
-                {
-                    userNotified = true;
-                    notificationOverlay?.Post(new SimpleErrorNotification
-                    {
-                        Icon = FontAwesome.Solid.ExclamationCircle,
-                        Text = NotificationsStrings.APIConnectionInterrupted,
-                    });
+                    case APIState.Offline:
+                        if (getCurrentScreen() is OnlinePlayScreen)
+                            notifyApiDisconnection();
+                        break;
                 }
             });
 
@@ -102,22 +97,32 @@ namespace osu.Game.Online
                     return;
                 }
 
-                if (userNotified) return;
-
                 if (multiplayerClient.Room != null)
-                {
-                    userNotified = true;
-                    notificationOverlay?.Post(new SimpleErrorNotification
-                    {
-                        Icon = FontAwesome.Solid.ExclamationCircle,
-                        Text = NotificationsStrings.APIConnectionInterrupted,
-                    });
-                }
+                    notifyApiDisconnection();
             }));
 
-            spectatorState.BindValueChanged(_ =>
+            spectatorState.BindValueChanged(connected => Schedule(() =>
             {
-                // TODO: handle spectator server failure somehow?
+                if (connected.NewValue)
+                {
+                    userNotified = false;
+                    return;
+                }
+
+                if (getCurrentScreen() is Player)
+                    notifyApiDisconnection();
+            }));
+        }
+
+        private void notifyApiDisconnection()
+        {
+            if (userNotified) return;
+
+            userNotified = true;
+            notificationOverlay?.Post(new SimpleErrorNotification
+            {
+                Icon = FontAwesome.Solid.ExclamationCircle,
+                Text = NotificationsStrings.APIConnectionInterrupted,
             });
         }
 
