@@ -12,14 +12,13 @@ namespace osu.Game.Overlays.Notifications
 {
     public abstract partial class UserAvatarNotification : SimpleNotification
     {
-        private readonly APIUser? user;
+        protected readonly APIUser User;
 
         protected DrawableAvatar Avatar { get; private set; } = null!;
 
-        protected UserAvatarNotification(APIUser? user, LocalisableString text = default)
+        protected UserAvatarNotification(APIUser user, LocalisableString text = default)
         {
-            this.user = user;
-
+            User = user;
             Icon = default;
             Text = text;
         }
@@ -31,7 +30,7 @@ namespace osu.Game.Overlays.Notifications
             IconContent.CornerRadius = CORNER_RADIUS;
             IconContent.ChangeChildDepth(IconDrawable, float.MinValue);
 
-            LoadComponentAsync(Avatar = new DrawableAvatar(user)
+            LoadComponentAsync(Avatar = new DrawableAvatar(User)
             {
                 FillMode = FillMode.Fill,
             }, IconContent.Add);

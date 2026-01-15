@@ -12,12 +12,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -36,6 +38,8 @@ namespace osu.Game.Screens.SelectV2
         public const float HEIGHT_FROM_SCREEN_TOP = 141 - corner_radius;
 
         private const float corner_radius = 10;
+
+        public Bindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
 
         private SongSelectSearchTextBox searchTextBox = null!;
         private ShearedToggleButton showConvertedBeatmapsButton = null!;
@@ -111,6 +115,7 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 RelativeSizeAxes = Axes.X,
                                 HoldFocus = true,
+                                ScopedBeatmapSet = ScopedBeatmapSet,
                             },
                         },
                         new GridContainer
@@ -158,6 +163,7 @@ namespace osu.Game.Screens.SelectV2
                                 new Dimension(maxSize: 180),
                                 new Dimension(GridSizeMode.Absolute, 5),
                                 new Dimension(),
+                                new Dimension(GridSizeMode.AutoSize),
                             },
                             Content = new[]
                             {
@@ -182,6 +188,10 @@ namespace osu.Game.Screens.SelectV2
                                 }
                             }
                         },
+                        new ScopedBeatmapSetDisplay
+                        {
+                            ScopedBeatmapSet = ScopedBeatmapSet,
+                        }
                     },
                 }
             };
@@ -240,6 +250,7 @@ namespace osu.Game.Screens.SelectV2
 
             localUser.BindValueChanged(_ => updateCriteria());
             localUserFavouriteBeatmapSets.BindCollectionChanged((_, _) => updateCriteria());
+            ScopedBeatmapSet.BindValueChanged(_ => updateCriteria(clearScopedSet: false));
 
             updateCriteria();
         }
@@ -260,6 +271,7 @@ namespace osu.Game.Screens.SelectV2
 
             var criteria = new FilterCriteria
             {
+                SelectedBeatmapSet = ScopedBeatmapSet.Value,
                 Sort = sortDropdown.Current.Value,
                 Group = groupDropdown.Current.Value,
                 AllowConvertedBeatmaps = showConvertedBeatmapsButton.Active.Value,
@@ -282,8 +294,16 @@ namespace osu.Game.Screens.SelectV2
             return criteria;
         }
 
-        private void updateCriteria()
+        private void updateCriteria(bool clearScopedSet = true)
         {
+            if (clearScopedSet && ScopedBeatmapSet.Value != null)
+            {
+                ScopedBeatmapSet.Value = null;
+                // because `ScopedBeatmapSet` has a value change callback bound to it that calls `updateCriteria()` again,
+                // we can just do nothing other than clear it to avoid extra work and duplicated `CriteriaChanged` invocations
+                return;
+            }
+
             currentCriteria = CreateCriteria();
             CriteriaChanged?.Invoke(currentCriteria);
         }
@@ -311,11 +331,38 @@ namespace osu.Game.Screens.SelectV2
 
         internal partial class SongSelectSearchTextBox : ShearedFilterTextBox
         {
-            protected override InnerSearchTextBox CreateInnerTextBox() => new InnerTextBox();
+            public Bindable<BeatmapSetInfo?> ScopedBeatmapSet
+            {
+                get => scopedBeatmapSet.Current;
+                set => scopedBeatmapSet.Current = value;
+            }
+
+            private readonly BindableWithCurrent<BeatmapSetInfo?> scopedBeatmapSet = new BindableWithCurrent<BeatmapSetInfo?>();
+
+            protected override InnerSearchTextBox CreateInnerTextBox() => new InnerTextBox
+            {
+                ScopedBeatmapSet = ScopedBeatmapSet,
+            };
 
             private partial class InnerTextBox : InnerFilterTextBox
             {
+                public Bindable<BeatmapSetInfo?> ScopedBeatmapSet
+                {
+                    get => scopedBeatmapSet.Current;
+                    set => scopedBeatmapSet.Current = value;
+                }
+
+                private readonly BindableWithCurrent<BeatmapSetInfo?> scopedBeatmapSet = new BindableWithCurrent<BeatmapSetInfo?>();
+
                 public override bool HandleLeftRightArrows => false;
+
+                public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+                {
+                    if (e.Action == GlobalAction.Back && scopedBeatmapSet.Value != null)
+                        return false;
+
+                    return base.OnPressed(e);
+                }
 
                 public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
                 {

@@ -291,7 +291,9 @@ namespace osu.Game.Screens.Footer
                 return;
 
             Debug.Assert(activeOverlayContent != null);
+
             activeOverlayContent.Hide();
+            activeOverlayContent.Expire();
 
             double timeUntilRun = activeOverlayContent.LatestTransformEndTime - Time.Current;
 
@@ -299,6 +301,7 @@ namespace osu.Game.Screens.Footer
             {
                 var button = temporarilyHiddenButtons[i];
                 hiddenButtonsContainer.Remove(button, false);
+
                 // temporarily bypass autosize on the X axis to prevent the buttons taking space
                 // immediately upon being moved back to the flow.
                 // this prevents the overlay content jumping to the right during its fade-out.
@@ -312,12 +315,13 @@ namespace osu.Game.Screens.Footer
 
             updateColourScheme(OverlayColourScheme.Aquamarine.GetHue());
 
-            activeOverlayContent.Delay(timeUntilRun).Schedule(() =>
+            Scheduler.AddDelayed(() =>
             {
                 // overlay content is done displaying, re-enable autosize on all active buttons
                 foreach (var button in buttonsFlow)
                     button.BypassAutoSizeAxes = Axes.None;
-            }).Expire();
+            }, timeUntilRun);
+
             activeOverlayContent = null;
             ActiveOverlay = null;
         }
