@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -26,7 +27,7 @@ namespace osu.Game.Graphics.UserInterfaceV2.FileSelection
             d.Alpha = 0;
         });
 
-        protected override DirectorySelectorDirectory CreateRootDirectoryItem() => new OsuBreadcrumbDisplayComputer();
+        protected override DirectorySelectorDirectory CreateRootDirectoryItem() => new OsuBreadcrumbDisplayDevice();
 
         protected override DirectorySelectorDirectory CreateDirectoryItem(DirectoryInfo directory, string? displayName = null) => new OsuBreadcrumbDisplayDirectory(directory, displayName);
 
@@ -47,12 +48,12 @@ namespace osu.Game.Graphics.UserInterfaceV2.FileSelection
             });
         }
 
-        private partial class OsuBreadcrumbDisplayComputer : OsuBreadcrumbDisplayDirectory
+        private partial class OsuBreadcrumbDisplayDevice : OsuBreadcrumbDisplayDirectory
         {
             protected override IconUsage? Icon => null;
 
-            public OsuBreadcrumbDisplayComputer()
-                : base(null, "Computer")
+            public OsuBreadcrumbDisplayDevice()
+                : base(null, UserInterfaceStrings.Device.ToString())
             {
             }
         }
