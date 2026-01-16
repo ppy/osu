@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -63,6 +65,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private readonly Room room;
 
+        private PlayerSettingsOverlay playerSettingsOverlay = null!;
+        private Bindable<bool> configSettingsOverlay = null!;
+
         /// <summary>
         /// Creates a new <see cref="MultiSpectatorScreen"/>.
         /// </summary>
@@ -78,8 +83,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
+            configSettingsOverlay = config.GetBindable<bool>(OsuSetting.ReplaySettingsOverlay);
+
             FillFlowContainer leaderboardFlow;
             Container scoreDisplayContainer;
 
@@ -131,7 +138,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 {
                     ReadyToStart = performInitialSeek,
                 },
-                new PlayerSettingsOverlay()
+                playerSettingsOverlay = new PlayerSettingsOverlay
+                {
+                    Alpha = 0,
+                }
             };
 
             for (int i = 0; i < Users.Count; i++)
@@ -172,6 +182,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             // Start with adjustments from the first player to keep a sane state.
             bindAudioAdjustments(instances.First());
+
+            configSettingsOverlay.BindValueChanged(_ => updateVisibility(), true);
+        }
+
+        private void updateVisibility()
+        {
+            if (configSettingsOverlay.Value)
+                playerSettingsOverlay.Show();
+            else
+                playerSettingsOverlay.Hide();
         }
 
         protected override void Update()

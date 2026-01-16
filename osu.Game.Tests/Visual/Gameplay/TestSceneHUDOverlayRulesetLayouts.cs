@@ -119,7 +119,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                             Children = new Drawable[]
                             {
                                 drawableRuleset,
-                                new HUDOverlay(drawableRuleset, [])
+                                new HUDOverlay(drawableRuleset, [], new PlayerConfiguration())
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 }
