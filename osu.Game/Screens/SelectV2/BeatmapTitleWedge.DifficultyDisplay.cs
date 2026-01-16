@@ -206,8 +206,13 @@ namespace osu.Game.Screens.SelectV2
             {
                 base.LoadComplete();
 
-                beatmap.BindValueChanged(_ => updateDisplay());
-                ruleset.BindValueChanged(_ => updateDisplay());
+                // it is not uncommon for the beatmap and the ruleset to change in conjunction during a single update frame.
+                // in that process, it is possible for the global bindable triad (beatmap / ruleset / mods) to briefly be partially invalid in combination (e.g. mods invalid for given ruleset).
+                // `updateDisplay()` will initiate a difficulty calculation, and if it is allowed to run in that invalid intermediate state, it will loudly fail.
+                // therefore, all changes that may initiate a difficulty calculation are debounced until the next frame to ensure the global bindable state is fully consistent -
+                // and it's what you'd want to do anyway for performance reasons.
+                beatmap.BindValueChanged(_ => Scheduler.AddOnce(updateDisplay));
+                ruleset.BindValueChanged(_ => Scheduler.AddOnce(updateDisplay));
 
                 mods.BindValueChanged(m =>
                 {
