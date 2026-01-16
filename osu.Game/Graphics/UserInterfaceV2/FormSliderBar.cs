@@ -403,9 +403,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             if (DisplayAsPercentage)
             {
-                textBox.Text = currentNumberInstantaneous.Value
-                                                         .ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS, true)
-                                                         .Replace(CultureInfo.CurrentCulture.NumberFormat.PercentSymbol, string.Empty);
+                double floatValue = double.CreateTruncating(currentNumberInstantaneous.Value);
+
+                if (currentNumberInstantaneous.Value is int)
+                    floatValue /= 100;
+
+                textBox.Text = floatValue.ToStandardFormattedString(Math.Max(0, OsuSliderBar<T>.MAX_DECIMAL_DIGITS - 2));
             }
             else
                 textBox.Text = currentNumberInstantaneous.Value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS);
