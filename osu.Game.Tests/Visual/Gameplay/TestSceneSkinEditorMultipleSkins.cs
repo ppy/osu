@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                     var drawableRuleset = ruleset.CreateDrawableRulesetWith(beatmap, mods);
 
-                    var hudOverlay = new HUDOverlay(drawableRuleset, mods)
+                    var hudOverlay = new HUDOverlay(drawableRuleset, mods, new PlayerConfiguration())
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
