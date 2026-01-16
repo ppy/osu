@@ -206,8 +206,8 @@ namespace osu.Game.Screens.SelectV2
             {
                 base.LoadComplete();
 
-                beatmap.BindValueChanged(_ => updateDisplay());
-                ruleset.BindValueChanged(_ => updateDisplay());
+                beatmap.BindValueChanged(_ => Scheduler.AddOnce(updateDisplay));
+                ruleset.BindValueChanged(_ => Scheduler.AddOnce(updateDisplay));
 
                 mods.BindValueChanged(m =>
                 {
