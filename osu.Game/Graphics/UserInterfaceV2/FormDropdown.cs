@@ -40,6 +40,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private FormDropdownHeader header = null!;
 
+        private const float header_menu_spacing = 5;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -47,6 +49,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             header.Caption = Caption;
             header.HintText = HintText;
+
+            // there's bottom margin applied inside the header to give spacing between the header and the menu.
+            // however when the menu is closed the extra spacing remains present. to remove it, apply negative bottom padding here.
+            Margin = new MarginPadding { Bottom = -header_menu_spacing };
         }
 
         protected override void LoadComplete()
@@ -144,6 +150,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 Masking = true;
                 CornerRadius = 5;
+
+                Margin = new MarginPadding { Bottom = header_menu_spacing };
 
                 Foreground.Padding = new MarginPadding(9);
                 Foreground.Children = new Drawable[]
@@ -278,10 +286,25 @@ namespace osu.Game.Graphics.UserInterfaceV2
             private void load(OverlayColourProvider colourProvider)
             {
                 ItemsContainer.Padding = new MarginPadding(9);
-                Margin = new MarginPadding { Top = 5 };
 
                 MaskingContainer.BorderThickness = 2;
                 MaskingContainer.BorderColour = colourProvider.Highlight1;
+            }
+
+            protected override void AnimateOpen()
+            {
+                base.AnimateOpen();
+
+                // there's negative bottom margin applied on the whole dropdown control to remove extra spacing when the menu is closed.
+                // however, when the menu is open, we want spacing between the menu and the next control below it. therefore apply bottom margin here.
+                // we use a transform to keep the open animation smooth while margin is adjusted.
+                this.TransformTo(nameof(Margin), new MarginPadding { Bottom = header_menu_spacing }, 300, Easing.OutQuint);
+            }
+
+            protected override void AnimateClose()
+            {
+                base.AnimateClose();
+                this.TransformTo(nameof(Margin), new MarginPadding { Bottom = 0 }, 300, Easing.OutQuint);
             }
         }
     }
