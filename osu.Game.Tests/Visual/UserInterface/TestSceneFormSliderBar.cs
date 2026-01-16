@@ -64,8 +64,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
-        [Test]
-        public void TestNubDoubleClickRevertToDefault()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestNubDoubleClickRevertToDefault(bool transferValueOnCommit)
         {
             OsuSpriteText text;
             FormSliderBar<float> slider = null!;
@@ -86,6 +87,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         slider = new FormSliderBar<float>
                         {
                             Caption = "Slider",
+                            TransferValueOnCommit = transferValueOnCommit,
                             Current = new BindableFloat
                             {
                                 MinValue = 0,
@@ -98,24 +100,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                 };
                 slider.Current.BindValueChanged(_ => text.Text = $"Current value is: {slider.Current.Value}", true);
             });
-            AddStep("set slider to 1", () => slider.Current.Value = 1);
-
-            AddStep("move mouse to nub", () => InputManager.MoveMouseTo(slider.ChildrenOfType<Circle>().Single()));
-
-            AddStep("double click nub", () =>
-            {
-                InputManager.Click(MouseButton.Left);
-                InputManager.Click(MouseButton.Left);
-            });
-
-            AddAssert("slider is default", () => slider.Current.IsDefault);
-
-            AddStep("set transfer value on commit to true", () =>
-            {
-                if (slider.IsNotNull())
-                    slider.TransferValueOnCommit = true;
-            });
-
             AddStep("set slider to 1", () => slider.Current.Value = 1);
 
             AddStep("move mouse to nub", () => InputManager.MoveMouseTo(slider.ChildrenOfType<Circle>().Single()));
