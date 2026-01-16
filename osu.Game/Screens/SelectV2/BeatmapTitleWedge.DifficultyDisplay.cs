@@ -48,9 +48,6 @@ namespace osu.Game.Screens.SelectV2
             [Resolved]
             private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
-            [Resolved]
-            private OsuColour colours { get; set; } = null!;
-
             private StarRatingDisplay starRatingDisplay = null!;
             private FillFlowContainer nameLine = null!;
             private OsuSpriteText difficultyText = null!;
@@ -304,7 +301,7 @@ namespace osu.Game.Screens.SelectV2
                 difficultyText.MaxWidth = Math.Max(nameLine.DrawWidth - mappedByText.DrawWidth - mapperText.DrawWidth - 20, 0);
 
                 // Use difficulty colour until it gets too dark to be visible against dark backgrounds.
-                Color4 col = starRatingDisplay.DisplayedStars.Value >= OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : starRatingDisplay.DisplayedDifficultyColour;
+                Color4 col = starRatingDisplay.DisplayedStars.Value >= OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? starRatingDisplay.DisplayedDifficultyTextColour : starRatingDisplay.DisplayedDifficultyColour;
 
                 difficultyText.Colour = col;
                 mappedByText.Colour = col;

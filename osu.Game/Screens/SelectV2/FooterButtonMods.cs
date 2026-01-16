@@ -65,6 +65,11 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        [Resolved]
+        private OsuGameBase game { get; set; } = null!;
+
+        private IBindable<Language> currentLanguage = null!;
+
         public FooterButtonMods(ModSelectOverlay overlay)
             : base(overlay)
         {
@@ -155,6 +160,9 @@ namespace osu.Game.Screens.SelectV2
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            currentLanguage = game.CurrentLanguage.GetBoundCopy();
+            currentLanguage.BindValueChanged(_ => ScheduleAfterChildren(updateDisplay));
 
             Current.BindValueChanged(m =>
             {

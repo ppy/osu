@@ -398,6 +398,30 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             checkMatchedBeatmaps(6);
         }
 
+        [Test]
+        public void TestDismissingScopeDoesNotClearSearchTextBox()
+        {
+            ImportBeatmapForRuleset(0);
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+            SortBy(SortMode.Artist);
+            checkMatchedBeatmaps(6);
+
+            AddStep("set text filter", () => filterTextBox.Current.Value = Beatmaps.GetAllUsableBeatmapSets().First().Metadata.Title);
+            WaitForFiltering();
+            checkMatchedBeatmaps(3);
+
+            AddStep("click spread indicator", () => this.ChildrenOfType<PanelBeatmapSet.SpreadDisplay>().Single(d => d.Enabled.Value).TriggerClick());
+            WaitForFiltering();
+            checkMatchedBeatmaps(3);
+
+            AddStep("press Escape", () => InputManager.Key(Key.Escape));
+            WaitForFiltering();
+            checkMatchedBeatmaps(3);
+            AddAssert("text filter not emptied", () => filterTextBox.Current.Value, () => Is.Not.Empty);
+        }
+
         private NoResultsPlaceholder? getPlaceholder() => SongSelect.ChildrenOfType<NoResultsPlaceholder>().FirstOrDefault();
 
         private void checkMatchedBeatmaps(int expected) => AddUntilStep($"{expected} matching shown", () => Carousel.MatchedBeatmapsCount, () => Is.EqualTo(expected));
