@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Penalize angle repetition, but only if the last angle had a big bonus.
                 // Omitting this check leads to me getting "Value was either too large or too small for a Decimal" errors
                 if (bonusRatio > 0.01)
-                    wideAngleBonus *= 1 - bonusRatio * Math.Min(calcWideAngleBonus(currAngle), Math.Pow(calcWideAngleBonus(lastAngle), 3));
+                    wideAngleBonus *= 1 - DifficultyCalculationUtils.Smootherstep(bonusRatio, 0, 1) * Math.Min(calcWideAngleBonus(currAngle), Math.Pow(calcWideAngleBonus(lastAngle), 3));
 
                 // Apply wiggle bonus for jumps that are [radius, 3*diameter] in distance, with < 110 angle
                 // https://www.desmos.com/calculator/dp0v0nvowc
