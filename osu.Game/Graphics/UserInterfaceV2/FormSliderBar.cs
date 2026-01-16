@@ -403,13 +403,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private partial class InnerSlider : OsuSliderBar<T>
         {
-            public Action? ResetToDefault { get; set; }
-
             public BindableBool Focused { get; } = new BindableBool();
 
-            public BindableBool IsDragging { get; set; } = new BindableBool();
+            public BindableBool IsDragging { get; } = new BindableBool();
 
-            public Action? OnCommit { get; set; }
+            public Action? ResetToDefault { get; init; }
+
+            public Action? OnCommit { get; init; }
 
             public sealed override LocalisableString TooltipText => base.TooltipText;
 
