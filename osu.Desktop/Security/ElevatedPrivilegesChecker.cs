@@ -33,7 +33,7 @@ namespace osu.Desktop.Security
         {
             public ElevatedPrivilegesNotification()
             {
-                Text = NotificationsStrings.ElevatedPrivileges(RuntimeInfo.IsUnix ? "root" : "administrator");
+                Text = NotificationsStrings.ElevatedPrivileges(RuntimeInfo.IsUnix ? "root" : "Administrator");
             }
 
             [BackgroundDependencyLoader]
