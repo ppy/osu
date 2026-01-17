@@ -330,7 +330,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         break;
 
                     case Bindable<double> bindableDouble:
-                        bindableDouble.Value = double.Parse(textBox.Current.Value);
+                        bindableDouble.Value = double.Parse(textBox.Current.Value) / (DisplayAsPercentage ? 100 : 1);
+                        break;
+
+                    case Bindable<float> bindableFloat:
+                        bindableFloat.Value = float.Parse(textBox.Current.Value) / (DisplayAsPercentage ? 100 : 1);
                         break;
 
                     default:
@@ -397,7 +401,18 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             if (updatingFromTextBox) return;
 
-            textBox.Text = currentNumberInstantaneous.Value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS);
+            if (DisplayAsPercentage)
+            {
+                double floatValue = double.CreateTruncating(currentNumberInstantaneous.Value);
+
+                if (currentNumberInstantaneous.Value is int)
+                    floatValue /= 100;
+
+                textBox.Text = floatValue.ToStandardFormattedString(Math.Max(0, OsuSliderBar<T>.MAX_DECIMAL_DIGITS - 2));
+            }
+            else
+                textBox.Text = currentNumberInstantaneous.Value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS);
+
             valueLabel.Text = LabelFormat(currentNumberInstantaneous.Value);
         }
 
