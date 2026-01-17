@@ -160,8 +160,8 @@ namespace osu.Game.Screens.SelectV2
             if (criteria.Group == GroupMode.RankAchieved)
                 return false;
 
-            // In the majority case we group sets together for display.
-            return true;
+            // In the majority case we group sets together based on the user's preference.
+            return !criteria.SeparateAllDifficulties;
         }
 
         private List<GroupMapping> getGroups(List<CarouselItem> items, FilterCriteria criteria)
