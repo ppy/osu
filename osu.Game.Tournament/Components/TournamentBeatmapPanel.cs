@@ -123,7 +123,8 @@ namespace osu.Game.Tournament.Components
                     Name = "Mod icon container",
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Padding = new MarginPadding { Vertical = 10, Right = 20 },
+                    Margin = new MarginPadding(16),
+                    Width = 60,
                     RelativeSizeAxes = Axes.Y,
                     Direction = FillDirection.Horizontal,
                 },
@@ -150,6 +151,7 @@ namespace osu.Game.Tournament.Components
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
+                    RelativeSizeAxes = Axes.Both
                 });
             }
         }

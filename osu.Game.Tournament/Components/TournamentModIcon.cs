@@ -26,7 +26,6 @@ namespace osu.Game.Tournament.Components
         public TournamentModIcon(string modAcronym)
         {
             this.modAcronym = modAcronym;
-            AutoSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
