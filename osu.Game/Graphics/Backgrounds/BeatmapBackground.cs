@@ -26,6 +26,8 @@ namespace osu.Game.Graphics.Backgrounds
 
         private readonly Bindable<float> letterboxWidth = new Bindable<float>();
 
+        private readonly Bindable<float> letterboxHeight = new Bindable<float>();
+
         public BeatmapBackground(WorkingBeatmap beatmap, string fallbackTextureName = @"Backgrounds/bg1")
         {
             Beatmap = beatmap;
@@ -33,6 +35,8 @@ namespace osu.Game.Graphics.Backgrounds
 
             Box leftLetterbox;
             Box rightLetterbox;
+            Box topLetterbox;
+            Box bottomLetterbox;
 
             AddInternal(new Container
             {
@@ -52,6 +56,20 @@ namespace osu.Game.Graphics.Backgrounds
                         Origin = Anchor.CentreRight,
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Black,
+                    },
+                    topLetterbox = new Box
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black,
+                    },
+                    bottomLetterbox = new Box
+                    {
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black,
                     }
                 }
             });
@@ -60,6 +78,12 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 leftLetterbox.ResizeWidthTo(margin.NewValue / 2f);
                 rightLetterbox.ResizeWidthTo(margin.NewValue / 2f);
+            }, true);
+
+            letterboxHeight.BindValueChanged(margin =>
+            {
+                topLetterbox.ResizeHeightTo(margin.NewValue / 2f);
+                bottomLetterbox.ResizeHeightTo(margin.NewValue / 2f);
             }, true);
         }
 
@@ -86,12 +110,22 @@ namespace osu.Game.Graphics.Backgrounds
                     Sprite.FillMode = FillMode.Fill;
 
                     letterboxWidth.Value = 0f;
+                    letterboxHeight.Value = 0f;
                     break;
 
                 case BackgroundScaleMode.ScaleToFit:
                     Sprite.FillMode = FillMode.Fit;
 
-                    letterboxWidth.Value = (DrawWidth - Sprite.DrawWidth) / DrawWidth;
+                    if (DrawWidth > Sprite.DrawWidth)
+                        letterboxWidth.Value = (DrawWidth - Sprite.DrawWidth) / DrawWidth;
+                    else
+                        letterboxWidth.Value = 0f;
+
+                    if (DrawHeight > Sprite.DrawHeight)
+                        letterboxHeight.Value = (DrawHeight - Sprite.DrawHeight) / DrawHeight;
+                    else
+                        letterboxHeight.Value = 0f;
+
                     break;
 
                 default:
