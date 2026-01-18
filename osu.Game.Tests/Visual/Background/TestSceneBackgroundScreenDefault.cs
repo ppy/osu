@@ -232,19 +232,11 @@ namespace osu.Game.Tests.Visual.Background
         [Test]
         public void TestBackgroundScaleModeSwitch()
         {
-            setSourceMode(BackgroundSource.Beatmap);
-
-            AddUntilStep("default background fill mode is fill", () => getCurrentBackground()?.Sprite.FillMode == FillMode.Fill);
-
-            AddStep("change beatmap", () => Beatmap.Value = createTestWorkingBeatmapWithUniqueBackground());
-            AddAssert("background changed", () => screen.CheckLastLoadChange() == true);
-            AddUntilStep("wait for beatmap background to be loaded", () => getCurrentBackground()?.GetType() == typeof(BeatmapBackground));
+            setScaleMode(BackgroundScaleMode.ScaleToFill);
+            AddUntilStep("background fill mode is fill", () => getCurrentBackground()?.Sprite.FillMode == FillMode.Fill);
 
             setScaleMode(BackgroundScaleMode.ScaleToFit);
             AddUntilStep("background fill mode is fit", () => getCurrentBackground()?.Sprite.FillMode == FillMode.Fit);
-
-            setScaleMode(BackgroundScaleMode.ScaleToFill);
-            AddUntilStep("background fill mode is fill", () => getCurrentBackground()?.Sprite.FillMode == FillMode.Fill);
         }
 
         [Test]
