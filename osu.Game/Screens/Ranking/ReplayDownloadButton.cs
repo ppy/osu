@@ -98,6 +98,8 @@ namespace osu.Game.Screens.Ranking
 
             Score.BindValueChanged(score =>
             {
+                // An export may be pending from the last score.
+                // Reset this to meet user expectations (a new score which has just been switched to shouldn't export)
                 State.ValueChanged -= exportWhenReady;
 
                 downloadTracker?.RemoveAndDisposeImmediately();
@@ -142,6 +144,7 @@ namespace osu.Game.Screens.Ranking
                     }
                     else
                     {
+                        // A download needs to be performed before we can export this replay.
                         button.TriggerClick();
                         if (button.Enabled.Value)
                             State.BindValueChanged(exportWhenReady, true);
