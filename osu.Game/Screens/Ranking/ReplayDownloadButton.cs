@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -35,7 +37,15 @@ namespace osu.Game.Screens.Ranking
             get
             {
                 if (State.Value == DownloadState.LocallyAvailable)
+                {
+                    // Verify the score actually has a replay file
+                    // Note: This check is imperfect because .osr files may exist without replay data,
+                    // but it's better than nothing without loading and parsing the entire file
+                    if (Score.Value?.Files.Any(f => f.Filename.EndsWith(".osr", StringComparison.OrdinalIgnoreCase)) != true)
+                        return ReplayAvailability.NotAvailable;
+
                     return ReplayAvailability.Local;
+                }
 
                 if (Score.Value?.HasOnlineReplay == true)
                     return ReplayAvailability.Online;
