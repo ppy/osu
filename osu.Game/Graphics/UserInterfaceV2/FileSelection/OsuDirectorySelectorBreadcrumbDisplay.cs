@@ -8,7 +8,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -28,7 +30,7 @@ namespace osu.Game.Graphics.UserInterfaceV2.FileSelection
 
         protected override DirectorySelectorDirectory CreateRootDirectoryItem() => new OsuBreadcrumbDisplayComputer();
 
-        protected override DirectorySelectorDirectory CreateDirectoryItem(DirectoryInfo directory, string? displayName = null) => new OsuBreadcrumbDisplayDirectory(directory, displayName);
+        protected override DirectorySelectorDirectory CreateDirectoryItem(DirectoryInfo directory, LocalisableString? displayName = null) => new OsuBreadcrumbDisplayDirectory(directory, displayName);
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -59,7 +61,7 @@ namespace osu.Game.Graphics.UserInterfaceV2.FileSelection
 
         private partial class OsuBreadcrumbDisplayDirectory : DirectorySelectorDirectory
         {
-            public OsuBreadcrumbDisplayDirectory(DirectoryInfo? directory, string? displayName = null)
+            public OsuBreadcrumbDisplayDirectory(DirectoryInfo? directory, LocalisableString? displayName = null)
                 : base(directory, displayName)
             {
             }
