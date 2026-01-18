@@ -76,14 +76,14 @@ namespace osu.Game.Graphics.Backgrounds
 
             letterboxWidth.BindValueChanged(margin =>
             {
-                leftLetterbox.ResizeWidthTo(margin.NewValue / 2f);
-                rightLetterbox.ResizeWidthTo(margin.NewValue / 2f);
+                leftLetterbox.ResizeWidthTo(margin.NewValue);
+                rightLetterbox.ResizeWidthTo(margin.NewValue);
             }, true);
 
             letterboxHeight.BindValueChanged(margin =>
             {
-                topLetterbox.ResizeHeightTo(margin.NewValue / 2f);
-                bottomLetterbox.ResizeHeightTo(margin.NewValue / 2f);
+                topLetterbox.ResizeHeightTo(margin.NewValue);
+                bottomLetterbox.ResizeHeightTo(margin.NewValue);
             }, true);
         }
 
@@ -117,12 +117,12 @@ namespace osu.Game.Graphics.Backgrounds
                     Sprite.FillMode = FillMode.Fit;
 
                     if (DrawWidth > Sprite.DrawWidth)
-                        letterboxWidth.Value = (DrawWidth - Sprite.DrawWidth) / DrawWidth;
+                        letterboxWidth.Value = (DrawWidth - Sprite.DrawWidth) / DrawWidth / 2f;
                     else
                         letterboxWidth.Value = 0f;
 
                     if (DrawHeight > Sprite.DrawHeight)
-                        letterboxHeight.Value = (DrawHeight - Sprite.DrawHeight) / DrawHeight;
+                        letterboxHeight.Value = (DrawHeight - Sprite.DrawHeight) / DrawHeight / 2f;
                     else
                         letterboxHeight.Value = 0f;
 
