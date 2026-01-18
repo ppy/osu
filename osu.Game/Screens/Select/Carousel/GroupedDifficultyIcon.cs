@@ -47,7 +47,13 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override bool OnClick(ClickEvent e)
         {
-            Items.First().State.Value = CarouselItemState.Selected;
+            var firstItem = Items.First();
+
+            // Avoid setting state on items that may be stale due to rapid selection changes
+            if (firstItem.State.Value == CarouselItemState.Collapsed)
+                return true;
+
+            firstItem.State.Value = CarouselItemState.Selected;
             return true;
         }
 

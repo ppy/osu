@@ -28,6 +28,10 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override bool OnClick(ClickEvent e)
         {
+            // Avoid setting state on items that may be stale due to rapid selection changes
+            if (Item.State.Value == CarouselItemState.Collapsed)
+                return true;
+
             Item.State.Value = CarouselItemState.Selected;
             return true;
         }
