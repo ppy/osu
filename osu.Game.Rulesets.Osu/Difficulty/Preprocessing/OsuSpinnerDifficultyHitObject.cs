@@ -7,9 +7,9 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 {
-    public class OsuDifficultyHitObject : DifficultyHitObject
+    public class OsuSpinnerDifficultyHitObject : OsuDifficultyHitObject
     {
-        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index)
+        public OsuSpinnerDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
         }

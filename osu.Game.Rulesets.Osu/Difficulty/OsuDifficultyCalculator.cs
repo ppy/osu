@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Difficulty.Utils;
@@ -154,12 +155,29 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
+            List<OsuTappableDifficultyHitObject> tappbleObjects = new List<OsuTappableDifficultyHitObject>();
+
+            HitObject lastTappableObj = beatmap.HitObjects.First();
 
             // The first jump is formed by the first two hitobjects of the map.
             // If the map has less than two OsuHitObjects, the enumerator will not return anything.
             for (int i = 1; i < beatmap.HitObjects.Count; i++)
             {
-                objects.Add(new OsuDifficultyHitObject(beatmap.HitObjects[i], beatmap.HitObjects[i - 1], clockRate, objects, objects.Count));
+                HitObject currObj = beatmap.HitObjects[i];
+
+                if (currObj is Spinner)
+                {
+                    objects.Add(new OsuSpinnerDifficultyHitObject(currObj, beatmap.HitObjects[i - 1], clockRate, objects, objects.Count));
+                }
+                else
+                {
+                    var difficultyObject = new OsuTappableDifficultyHitObject(currObj, beatmap.HitObjects[i - 1], lastTappableObj, clockRate, objects, objects.Count, tappbleObjects, tappbleObjects.Count);
+
+                    objects.Add(difficultyObject);
+                    tappbleObjects.Add(difficultyObject);
+
+                    lastTappableObj = currObj;
+                }
             }
 
             return objects;

@@ -34,10 +34,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current, IReadOnlyList<Mod> mods)
         {
-            if (current.BaseObject is Spinner)
+            if (current is not OsuTappableDifficultyHitObject osuCurrent)
                 return 0;
 
-            var osuCurrent = (OsuDifficultyHitObject)current;
             var osuHitObject = (OsuHitObject)(osuCurrent.BaseObject);
 
             double scalingFactor = 52.0 / osuHitObject.Radius;
@@ -46,14 +45,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double result = 0.0;
 
-            OsuDifficultyHitObject lastObj = osuCurrent;
+            OsuTappableDifficultyHitObject lastObj = osuCurrent;
 
             double angleRepeatCount = 0.0;
 
             // This is iterating backwards in time from the current object.
-            for (int i = 0; i < Math.Min(current.Index, 10); i++)
+            for (int i = 0; i < Math.Min(osuCurrent.IndexTappable, 10); i++)
             {
-                var currentObj = (OsuDifficultyHitObject)current.Previous(i);
+                var currentObj = osuCurrent.PreviousTappable(i)!;
                 var currentHitObject = (OsuHitObject)(currentObj.BaseObject);
 
                 cumulativeStrainTime += lastObj.AdjustedDeltaTime;
