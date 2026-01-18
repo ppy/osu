@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double acute_angle_multiplier = 2.55;
         private const double slider_multiplier = 1.35;
         private const double velocity_change_multiplier = 0.75;
-        private const double wiggle_multiplier = 1.02;
+        private const double wiggle_multiplier = 1.02; // Maximum multiplier value of 1.02, increasing further reduces difficulty as distance increases
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
