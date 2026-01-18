@@ -38,12 +38,17 @@ namespace osu.Game.Screens.Ranking
             {
                 if (State.Value == DownloadState.LocallyAvailable)
                 {
-                    // Verify the score actually has a replay file
-                    // Note: This check is imperfect because .osr files may exist without replay data,
-                    // but it's better than nothing without loading and parsing the entire file
-                    if (Score.Value?.Files.Any(f => f.Filename.EndsWith(".osr", StringComparison.OrdinalIgnoreCase)) != true)
-                        return ReplayAvailability.NotAvailable;
+                    bool hasOsrFile = Score.Value?.Files.Any(f => f.Filename.EndsWith(".osr", StringComparison.OrdinalIgnoreCase)) == true;
 
+                    if (hasOsrFile)
+                    {
+                        if (Score.Value != null)
+                        {
+                            var score = scoreManager.GetScore(Score.Value);
+                            if (score?.Replay == null || score.Replay.Frames.Count == 0)
+                                return ReplayAvailability.NotAvailable;
+                        }
+                    }
                     return ReplayAvailability.Local;
                 }
 
@@ -93,8 +98,6 @@ namespace osu.Game.Screens.Ranking
 
             Score.BindValueChanged(score =>
             {
-                // An export may be pending from the last score.
-                // Reset this to meet user expectations (a new score which has just been switched to shouldn't export)
                 State.ValueChanged -= exportWhenReady;
 
                 downloadTracker?.RemoveAndDisposeImmediately();
@@ -139,7 +142,6 @@ namespace osu.Game.Screens.Ranking
                     }
                     else
                     {
-                        // A download needs to be performed before we can export this replay.
                         button.TriggerClick();
                         if (button.Enabled.Value)
                             State.BindValueChanged(exportWhenReady, true);

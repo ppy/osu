@@ -1,8 +1,9 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
 
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -14,8 +15,10 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
@@ -48,6 +51,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("delete previous imports", () =>
             {
                 scoreManager.Delete(s => s.OnlineID == online_score_id);
+                scoreManager.Delete(s => s.OnlineID <= 0);
             });
         }
 
@@ -160,6 +164,65 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             checkState(DownloadState.NotDownloaded);
             AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
+        }
+
+        [Test]
+        public void TestImportedOsrFileWithoutReplayData()
+        {
+            ScoreInfo importedScore = null;
+            MemoryStream scoreStream = null;
+
+            AddStep("import score from .osr without replay data", () =>
+            {
+                var scoreInfo = getScoreInfo(false, false);
+                var score = new Score
+                {
+                    ScoreInfo = scoreInfo,
+                    Replay = new Replay()
+                };
+
+                scoreStream = new MemoryStream();
+                var beatmap = beatmapManager.GetWorkingBeatmap(scoreInfo.BeatmapInfo).GetPlayableBeatmap(scoreInfo.Ruleset);
+                var encoder = new LegacyScoreEncoder(score, beatmap);
+                encoder.Encode(scoreStream, leaveOpen: true);
+
+                scoreStream.Seek(0, SeekOrigin.Begin);
+
+                var importTask = new ImportTask(scoreStream, "test_score.osr");
+                scoreManager.Import(new[] { importTask });
+            });
+
+            AddUntilStep("wait for import", () =>
+            {
+                importedScore = scoreManager.Query(s => true);
+                return importedScore != null;
+            });
+
+            AddAssert("score has .osr file", () => importedScore.Files.Any(f => f.Filename.EndsWith(".osr")));
+            AddAssert("score has no online replay flag", () => !importedScore.HasOnlineReplay);
+
+            AddStep("verify loaded score has no replay frames", () =>
+            {
+                var loadedScore = scoreManager.GetScore(importedScore);
+                var frameCount = loadedScore?.Replay?.Frames.Count ?? 0;
+                System.Console.WriteLine($"Loaded score replay frame count: {frameCount}");
+            });
+
+            AddStep("create button with imported score", () =>
+            {
+                Child = downloadButton = new TestReplayDownloadButton(importedScore)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                };
+            });
+
+            AddUntilStep("wait for load", () => downloadButton.IsLoaded);
+
+            checkState(DownloadState.LocallyAvailable);
+            AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
+
+            AddStep("cleanup stream", () => scoreStream?.Dispose());
         }
 
         [Test]
