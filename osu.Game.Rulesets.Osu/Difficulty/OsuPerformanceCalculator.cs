@@ -201,10 +201,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (effectiveMissCount > 0)
             {
                 aimEstimatedSliderBreaks = calculateEstimatedSliderBreaks(attributes.AimTopWeightedSliderFactor, attributes);
-
                 double relevantMissCount = Math.Min(effectiveMissCount + aimEstimatedSliderBreaks, totalImperfectHits + countSliderTickMiss);
-
-                aimValue *= calculateMissPenalty(relevantMissCount, attributes.AimDifficultStrainCount);
+                aimValue *= 0.94 / ((relevantMissCount / (2 * Math.Sqrt(attributes.AimDifficultStrainCount))) + 1);
             }
 
             // TC bonuses are excluded when blinds is present as the increased visual difficulty is unimportant when notes cannot be seen.
@@ -234,10 +232,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (effectiveMissCount > 0)
             {
                 speedEstimatedSliderBreaks = calculateEstimatedSliderBreaks(attributes.SpeedTopWeightedSliderFactor, attributes);
-
                 double relevantMissCount = Math.Min(effectiveMissCount + speedEstimatedSliderBreaks, totalImperfectHits + countSliderTickMiss);
-
-                speedValue *= calculateMissPenalty(relevantMissCount, attributes.SpeedDifficultStrainCount);
+                speedValue *= 0.96 / ((relevantMissCount / (4 * Math.Pow(Math.Log(attributes.SpeedDifficultStrainCount), 0.94))) + 1);
             }
 
             // TC bonuses are excluded when blinds is present as the increased visual difficulty is unimportant when notes cannot be seen.
@@ -490,11 +486,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return adjustedSpeedValue / speedValue;
         }
-
-        // Miss penalty assumes that a player will miss on the hardest parts of a map,
-        // so we use the amount of relatively difficult sections to adjust miss penalty
-        // to make it more punishing on maps with lower amount of hard sections.
-        private double calculateMissPenalty(double missCount, double difficultStrainCount) => 0.96 / ((missCount / (4 * Math.Pow(Math.Log(difficultStrainCount), 0.94))) + 1);
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
