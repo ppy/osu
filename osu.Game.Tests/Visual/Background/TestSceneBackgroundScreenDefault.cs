@@ -232,6 +232,8 @@ namespace osu.Game.Tests.Visual.Background
         [Test]
         public void TestBackgroundScaleModeSwitch()
         {
+            setSourceMode(BackgroundSource.Beatmap);
+
             setScaleMode(BackgroundScaleMode.ScaleToFill);
             AddUntilStep("background fill mode is fill", () => getCurrentBackground()?.Sprite.FillMode == FillMode.Fill);
 
