@@ -105,6 +105,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
 
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.R }, GlobalAction.RandomSkin),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.Down }, GlobalAction.NextSkin),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.Up }, GlobalAction.PreviousSkin),
 
             new KeyBinding(InputKey.F10, GlobalAction.ToggleGameplayMouseButtons),
             new KeyBinding(InputKey.F12, GlobalAction.TakeScreenshot),
@@ -337,6 +339,12 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.RandomSkin))]
         RandomSkin,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.NextSkin))]
+        NextSkin,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.PreviousSkin))]
+        PreviousSkin,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.TogglePauseReplay))]
         TogglePauseReplay,
