@@ -21,6 +21,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osuTK;
 using osuTK.Graphics;
 
@@ -93,8 +94,8 @@ namespace osu.Game.Screens.Play.HUD
             button.HoldActivationDelay.BindValueChanged(v =>
             {
                 text.Text = v.NewValue > 0
-                    ? "hold for menu"
-                    : "press for menu";
+                    ? UserInterfaceStrings.HoldForMenu
+                    : UserInterfaceStrings.PressForMenu;
             }, true);
 
             touchActive = sessionStatics.GetBindable<bool>(Static.TouchInputActive);
