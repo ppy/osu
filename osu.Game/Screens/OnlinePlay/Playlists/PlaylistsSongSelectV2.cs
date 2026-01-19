@@ -18,7 +18,6 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Footer;
-using osu.Game.Screens.Menu;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Utils;
 
@@ -47,6 +46,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         public PlaylistsSongSelectV2(Room room)
         {
             this.room = room;
+
+            ShowOsuLogo = false;
 
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
             LeftPadding = new MarginPadding { Top = CORNER_RADIUS_HIDE_OFFSET + Header.HEIGHT };
@@ -200,21 +201,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             addToPlaylistFooterButton.Disappear().Expire();
             return false;
-        }
-
-        protected override void LogoArriving(OsuLogo logo, bool resuming)
-        {
-            // Intentionally not calling base so the logo isn't shown.
-        }
-
-        protected override void LogoExiting(OsuLogo logo)
-        {
-            // Intentionally not calling base so the logo isn't shown.
-        }
-
-        protected override void LogoSuspending(OsuLogo logo)
-        {
-            // Intentionally not calling base so the logo isn't shown.
         }
 
         public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons()
