@@ -8,9 +8,11 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osuTK;
@@ -26,6 +28,8 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
+        private IPresetHotkeyHandler hotkeyHandler = null!;
+
         private const float contracted_width = WIDTH - 120;
 
         [BackgroundDependencyLoader]
@@ -37,6 +41,8 @@ namespace osu.Game.Overlays.Mods
             AddPresetButton addPresetButton;
             ItemsFlow.Add(addPresetButton = new AddPresetButton());
             ItemsFlow.SetLayoutPosition(addPresetButton, float.PositiveInfinity);
+
+            hotkeyHandler = SequentialModHotkeyHandler.CreateForPresets();
         }
 
         protected override void LoadComplete()
@@ -93,6 +99,14 @@ namespace osu.Game.Overlays.Mods
                 foreach (var panel in ItemsFlow.OfType<ModPresetPanel>().ToArray())
                     panel.RemoveAndDisposeImmediately();
             }
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.ControlPressed || e.AltPressed || e.ShiftPressed || e.Repeat)
+                return false;
+
+            return hotkeyHandler.HandlePresetHotkeyPressed(e, ItemsFlow.OfType<ModPresetPanel>());
         }
 
         protected override void Dispose(bool isDisposing)

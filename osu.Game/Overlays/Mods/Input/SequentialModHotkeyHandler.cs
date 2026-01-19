@@ -12,10 +12,10 @@ namespace osu.Game.Overlays.Mods.Input
 {
     /// <summary>
     /// This implementation of <see cref="IModHotkeyHandler"/> receives a sequence of <see cref="Key"/>s,
-    /// and maps the sequence of keys onto the items it is provided in <see cref="HandleHotkeyPressed"/>.
+    /// and maps the sequence of keys onto the items it is provided in <see cref="HandleModHotkeyPressed"/> and <see cref="HandlePresetHotkeyPressed"/>.
     /// In this case, particular mods are not bound to particular keys, the hotkeys are a byproduct of mod ordering.
     /// </summary>
-    public class SequentialModHotkeyHandler : IModHotkeyHandler
+    public class SequentialModHotkeyHandler : IModHotkeyHandler, IPresetHotkeyHandler
     {
         public static SequentialModHotkeyHandler Create(ModType modType)
         {
@@ -33,6 +33,11 @@ namespace osu.Game.Overlays.Mods.Input
                 default:
                     throw new ArgumentOutOfRangeException(nameof(modType), modType, $"Cannot create {nameof(SequentialModHotkeyHandler)} for provided mod type");
             }
+        }
+
+        public static SequentialModHotkeyHandler CreateForPresets()
+        {
+            return new SequentialModHotkeyHandler(new[] { Key.Number1, Key.Number2, Key.Number3, Key.Number4, Key.Number5, Key.Number6, Key.Number7, Key.Number8, Key.Number9, Key.Number0 });
         }
 
         private readonly Key[] toggleKeys;
@@ -53,6 +58,21 @@ namespace osu.Game.Overlays.Mods.Input
                 return false;
 
             modState.Active.Toggle();
+            return true;
+        }
+
+        public bool HandlePresetHotkeyPressed(KeyDownEvent e, IEnumerable<ModPresetPanel> availablePresets)
+        {
+            int index = Array.IndexOf(toggleKeys, e.Key);
+            if (index < 0)
+                return false;
+
+            var panel = availablePresets.ElementAtOrDefault(index);
+            if (panel == null)
+                return false;
+
+            panel.Toggle();
+
             return true;
         }
     }
