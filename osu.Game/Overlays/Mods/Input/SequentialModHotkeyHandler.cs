@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Mods.Input
             toggleKeys = keys;
         }
 
-        public bool HandleHotkeyPressed(KeyDownEvent e, IEnumerable<ModState> availableMods)
+        public bool HandleModHotkeyPressed(KeyDownEvent e, IEnumerable<ModState> availableMods)
         {
             int index = Array.IndexOf(toggleKeys, e.Key);
             if (index < 0)
