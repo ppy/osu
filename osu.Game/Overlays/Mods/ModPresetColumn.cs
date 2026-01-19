@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.ControlPressed || e.AltPressed || e.ShiftPressed || e.Repeat)
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed || e.Repeat)
                 return false;
 
             return hotkeyHandler.HandlePresetHotkeyPressed(e, ItemsFlow.OfType<ModPresetPanel>());
