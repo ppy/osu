@@ -175,6 +175,16 @@ namespace osu.Game.Localisation
         public static LocalisableString SelectedMods => new TranslatableString(getKey(@"selected_mods"), @"Selected Mods");
 
         /// <summary>
+        /// "hold for menu"
+        /// </summary>
+        public static LocalisableString HoldForMenu => new TranslatableString(getKey(@"hold_for_menu"), @"hold for menu");
+
+        /// <summary>
+        /// "press for menu"
+        /// </summary>
+        public static LocalisableString PressForMenu => new TranslatableString(getKey(@"press_for_menu"), @"press for menu");
+
+        /// <summary>
         /// "Device"
         /// </summary>
         public static LocalisableString Device => new TranslatableString(getKey(@"device"), @"Device");
