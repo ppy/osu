@@ -120,7 +120,8 @@ namespace osu.Game.Screens.Edit.Setup
                 };
                 numberBox.OnCommit += (_, _) =>
                 {
-                    committedIndex = int.Parse(numberBox.Current.Value);
+                    if (int.TryParse(numberBox.Current.Value, out int parsed))
+                        committedIndex = parsed;
                     Hide();
                 };
             }
