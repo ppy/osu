@@ -35,6 +35,7 @@ using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.PlayerSettings;
+using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Skinning;
 using osu.Game.Users;
@@ -88,6 +89,7 @@ namespace osu.Game.Screens.Play
         private GridContainer sideContent = null!;
 
         private Bindable<bool> showStoryboards = null!;
+        private Bindable<BeatmapDetailTab> configDetailTab = null!;
 
         private bool backgroundBrightnessReduction;
 
@@ -197,6 +199,7 @@ namespace osu.Game.Screens.Play
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
             batteryWarningShownOnce = sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce);
             showStoryboards = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
+            configDetailTab = config.GetBindable<BeatmapDetailTab>(OsuSetting.BeatmapDetailTab);
 
             const float padding = 25;
 
@@ -340,8 +343,29 @@ namespace osu.Game.Screens.Play
             leaderboardManager?.FetchWithCriteria(new LeaderboardCriteria(
                 Beatmap.Value.BeatmapInfo,
                 Ruleset.Value,
-                leaderboardManager?.CurrentCriteria?.Scope ?? BeatmapLeaderboardScope.Global,
+                leaderboardManager?.CurrentCriteria?.Scope ?? getDefaultLeaderboardScope(),
                 leaderboardManager?.CurrentCriteria?.ExactMods), force);
+        }
+
+        private BeatmapLeaderboardScope getDefaultLeaderboardScope()
+        {
+            switch (configDetailTab.Value)
+            {
+                case BeatmapDetailTab.Local:
+                    return BeatmapLeaderboardScope.Local;
+
+                case BeatmapDetailTab.Country:
+                    return BeatmapLeaderboardScope.Country;
+
+                case BeatmapDetailTab.Friends:
+                    return BeatmapLeaderboardScope.Friend;
+
+                case BeatmapDetailTab.Team:
+                    return BeatmapLeaderboardScope.Team;
+
+                default:
+                    return BeatmapLeaderboardScope.Global;
+            }
         }
 
         #region Screen handling
