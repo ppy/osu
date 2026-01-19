@@ -95,8 +95,8 @@ namespace osu.Game.Screens.Play.HUD
             button.HoldActivationDelay.BindValueChanged(v =>
             {
                 text.Text = v.NewValue > 0
-                    ? UserInterfaceStrings.HoldForMenu.ToLower()
-                    : UserInterfaceStrings.PressForMenu.ToLower();
+                    ? UserInterfaceStrings.HoldForMenu
+                    : UserInterfaceStrings.PressForMenu;
             }, true);
 
             touchActive = sessionStatics.GetBindable<bool>(Static.TouchInputActive);
