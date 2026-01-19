@@ -105,6 +105,16 @@ namespace osu.Game.Localisation
         public static LocalisableString RandomSkinShortcut(LocalisableString keybind) => new TranslatableString(getKey(@"random_skin_shortcut"), @"Press {0} to switch to a random skin!", keybind);
 
         /// <summary>
+        /// "Press {0} to go to the next skin!"
+        /// </summary>
+        public static LocalisableString NextSkinShortcut(LocalisableString keybind) => new TranslatableString(getKey(@"next_skin_shortcut"), @"Press {0} to go to the next skin!", keybind);
+
+        /// <summary>
+        /// "Press {0} to go to the previous skin!"
+        /// </summary>
+        public static LocalisableString PreviousSkinShortcut(LocalisableString keybind) => new TranslatableString(getKey(@"previous_skin_shortcut"), @"Press {0} to go to the previous skin!", keybind);
+
+        /// <summary>
         /// "While watching a replay, press {0} to toggle replay settings!"
         /// </summary>
         public static LocalisableString ToggleReplaySettingsShortcut(LocalisableString keybind) => new TranslatableString(getKey(@"toggle_replay_settings_shortcut"), @"While watching a replay, press {0} to toggle replay settings!", keybind);
