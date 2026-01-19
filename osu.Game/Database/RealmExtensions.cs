@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
@@ -89,6 +90,36 @@ namespace osu.Game.Database
                 transaction?.Commit();
 
                 return result;
+            }
+            finally
+            {
+                transaction?.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Perform a bulk write operation against the provided realm instance.
+        /// </summary>
+        /// <remarks>
+        /// This will automatically start a transaction if not already in one.
+        /// </remarks>
+        /// <param name="realm">The realm to operate on.</param>
+        /// <param name="functions">The write operations to run.</param>
+        public static void BulkWrite(this Realm realm, List<Action<Realm>> functions)
+        {
+            Transaction? transaction = null;
+
+            try
+            {
+                if (!realm.IsInTransaction)
+                    transaction = realm.BeginWrite();
+
+                foreach (var function in functions)
+                {
+                    function(realm);
+                }
+
+                transaction?.Commit();
             }
             finally
             {
