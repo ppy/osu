@@ -53,6 +53,14 @@ namespace osu.Game.Overlays.Mods
             selectedMods.BindValueChanged(_ => selectedModsChanged(), true);
         }
 
+        public void Toggle()
+        {
+            if (!Active.Value)
+                Select();
+            else
+                Deselect();
+        }
+
         protected override void Select()
         {
             // this implicitly presumes that if a system mod declares incompatibility with a non-system mod,
