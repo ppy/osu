@@ -248,6 +248,7 @@ namespace osu.Game.Skinning
             Realm.Run(r =>
             {
                 var chosen = r.Find<SkinInfo>(nextId);
+
                 if (chosen == null)
                 {
                     CurrentSkinInfo.Value = ArgonSkin.CreateInfo().ToLiveUnmanaged();
