@@ -49,6 +49,7 @@ namespace osu.Game.Screens.Ranking
                                 return ReplayAvailability.NotAvailable;
                         }
                     }
+
                     return ReplayAvailability.Local;
                 }
 

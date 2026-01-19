@@ -202,13 +202,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("score has .osr file", () => importedScore.Files.Any(f => f.Filename.EndsWith(".osr", StringComparison.OrdinalIgnoreCase)));
             AddAssert("score has no online replay flag", () => !importedScore.HasOnlineReplay);
 
-            AddStep("verify loaded score has no replay frames", () =>
-            {
-                var loadedScore = scoreManager.GetScore(importedScore);
-                var frameCount = loadedScore?.Replay?.Frames.Count ?? 0;
-                System.Console.WriteLine($"Loaded score replay frame count: {frameCount}");
-            });
-
             AddStep("create button with imported score", () =>
             {
                 Child = downloadButton = new TestReplayDownloadButton(importedScore)
