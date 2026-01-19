@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Users;
 
@@ -20,6 +21,16 @@ namespace osu.Game.Online.Metadata
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
+
+        private readonly IBindableList<APIRelation> localFriends = new BindableList<APIRelation>();
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            localFriends.BindTo(api.LocalUserState.Friends);
+            localFriends.BindCollectionChanged((_, _) => RefreshFriends().FireAndForget());
+        }
 
         #region Beatmap metadata updates
 
