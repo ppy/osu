@@ -130,6 +130,44 @@ namespace osu.Game.Skinning
             };
         }
 
+        /// <summary>
+        /// Returns the dropdown ordering for use mainly by the skin selection UI.
+        /// Inserts the defaults first, then 'random skin', then custom ones.
+        /// Returns a list of <see cref="Live{SkinInfo}"/> items.
+        /// </summary>
+        public IEnumerable<Live<SkinInfo>> GetDropdownItems()
+        {
+            var results = new List<Live<SkinInfo>>();
+
+            Realm.Run(r =>
+            {
+                var all = r.All<SkinInfo>()
+                           .Where(s => !s.DeletePending)
+                           .OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase)
+                           .ToArray();
+
+                // add defaults in fixed order (assumes they exist in the DB)
+                results.Add(all.Single(s => s.ID == SkinInfo.ARGON_SKIN).ToLive(Realm));
+                results.Add(all.Single(s => s.ID == SkinInfo.ARGON_PRO_SKIN).ToLive(Realm));
+                results.Add(all.Single(s => s.ID == SkinInfo.TRIANGLES_SKIN).ToLive(Realm));
+                results.Add(all.Single(s => s.ID == SkinInfo.CLASSIC_SKIN).ToLive(Realm));
+                results.Add(all.Single(s => s.ID == SkinInfo.RETRO_SKIN).ToLive(Realm));
+
+                // random entry (unmanaged/live-unrelated)
+                results.Add(new SkinInfo
+                {
+                    ID = SkinInfo.RANDOM_SKIN,
+                    Name = "<Random Skin>"
+                }.ToLiveUnmanaged());
+
+                // append remaining non-protected skins (keeping the ordering from the realm query)
+                foreach (var s in all.Where(s => !s.Protected))
+                    results.Add(s.ToLive(Realm));
+            });
+
+            return results;
+        }
+
         public void SelectRandomSkin()
         {
             Realm.Run(r =>
@@ -157,6 +195,78 @@ namespace osu.Game.Skinning
                 CurrentSkinInfo.Value = chosen.ToLive(Realm);
             });
         }
+
+        /// <summary>
+        /// Cycle through skins by a signed step count.
+        /// Uses the skin selection UI ordering but skips the "Random Skin" entry.
+        /// </summary>
+        /// <param name="step">Number of skins to move by (negative to move backwards).</param>
+        public void CycleSkins(int step)
+        {
+            if (step == 0)
+                return;
+
+            // don't change selection if current skin is externally disabled/mounted for editing.
+            if (CurrentSkinInfo.Disabled)
+                return;
+
+            // Required local for iOS. Will cause runtime crash if inlined.
+            Guid currentSkinId = CurrentSkinInfo.Value.ID;
+
+            var items = GetDropdownItems().ToArray();
+
+            if (items.Length == 0)
+            {
+                CurrentSkinInfo.Value = ArgonSkin.CreateInfo().ToLiveUnmanaged();
+                return;
+            }
+
+            int currentIndex = Array.FindIndex(items, s => s.ID == currentSkinId);
+
+            int direction = Math.Sign(step);
+            int moves = Math.Abs(step);
+
+            int idx = currentIndex >= 0 ? currentIndex : (direction > 0 ? -1 : 0);
+
+            while (moves > 0)
+            {
+                if (direction > 0)
+                    idx = (idx + 1) % items.Length;
+                else
+                    idx = (idx - 1 + items.Length) % items.Length;
+
+                // Skip random skin (confusing)
+                if (items[idx].ID == SkinInfo.RANDOM_SKIN)
+                    continue;
+
+                moves--;
+            }
+
+            var nextId = items[idx].ID;
+
+            // Retrieve the chosen skin from realm and set as current.
+            Realm.Run(r =>
+            {
+                var chosen = r.Find<SkinInfo>(nextId);
+                if (chosen == null)
+                {
+                    CurrentSkinInfo.Value = ArgonSkin.CreateInfo().ToLiveUnmanaged();
+                    return;
+                }
+
+                CurrentSkinInfo.Value = chosen.ToLive(Realm);
+            });
+        }
+
+        /// <summary>
+        /// Cycle one skin backward.
+        /// </summary>
+        public void SelectPreviousSkin() => CycleSkins(-1);
+
+        /// <summary>
+        /// Cycle one skin forward.
+        /// </summary>
+        public void SelectNextSkin() => CycleSkins(1);
 
         /// <summary>
         /// Retrieve a <see cref="Skin"/> instance for the provided <see cref="SkinInfo"/>
