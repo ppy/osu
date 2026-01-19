@@ -152,6 +152,8 @@ namespace osu.Game.Online.Metadata
 
         public abstract Task EndWatchingMultiplayerRoom(long id);
 
+        public abstract Task RefreshFriends();
+
         public event Action<MultiplayerRoomScoreSetEvent>? MultiplayerRoomScoreSet;
 
         Task IMetadataClient.MultiplayerRoomScoreSet(MultiplayerRoomScoreSetEvent roomScoreSetEvent)
