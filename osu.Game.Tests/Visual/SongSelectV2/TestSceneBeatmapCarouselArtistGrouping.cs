@@ -254,6 +254,19 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestGroupDoesExpandAfterRandomTraversal()
+        {
+            SelectNextSet();
+
+            ToggleGroupCollapse();
+            AddAssert("group not expanded", () => Carousel.ExpandedGroup, () => Is.Null);
+
+            SelectRandomSet();
+
+            AddAssert("group expanded", () => Carousel.ExpandedGroup, () => Is.Not.Null);
+        }
+
+        [Test]
         public void TestGroupDoesNotExpandAgainOnRefilterIfManuallyCollapsed()
         {
             ApplyToFilterAndWaitForFilter("filter", c => c.SearchText = BeatmapSets[2].Metadata.Title);
