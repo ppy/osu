@@ -59,21 +59,24 @@ namespace osu.Game.Rulesets.Mods
                     if (bindable.IsDefault)
                         continue;
 
-                    string valueText;
-
-                    switch (bindable)
-                    {
-                        case Bindable<bool> b:
-                            valueText = b.Value ? "On" : "Off";
-                            break;
-
-                        default:
-                            valueText = bindable.ToString() ?? string.Empty;
-                            break;
-                    }
-
-                    yield return (attr.Label, valueText);
+                    yield return (attr.Label, GetSettingTooltipText(bindable));
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets the tooltip text for a specific mod setting.
+        /// Can be overridden to provide custom formatting for specific settings.
+        /// </summary>
+        protected virtual LocalisableString GetSettingTooltipText(IBindable bindable)
+        {
+            switch (bindable)
+            {
+                case Bindable<bool> b:
+                    return b.Value ? "On" : "Off";
+
+                default:
+                    return bindable.ToString() ?? string.Empty;
             }
         }
 
