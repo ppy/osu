@@ -222,6 +222,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         protected void SelectPrevPanel() => AddStep("select prev panel", () => InputManager.Key(Key.Up));
         protected void SelectNextSet() => AddStep("select next set", () => InputManager.Key(Key.Right));
         protected void SelectPrevSet() => AddStep("select prev set", () => InputManager.Key(Key.Left));
+        protected void SelectRandomSet() => AddStep("select random set", () => Carousel.NextRandom());
 
         protected void Select() => AddStep("select", () => InputManager.Key(Key.Enter));
 
