@@ -100,19 +100,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ModCustomisationSettings => new TranslatableString(getKey(@"mod_customisation_settings"), @"Many mods have customisation settings that drastically change how they function. Click the Customise button in mod select to view settings!");
 
         /// <summary>
-        /// "Press {0} to switch to a random skin!"
+        /// "Press {0} to switch to a random skin! You can also use {1} and {2} to cycle through skins."
         /// </summary>
-        public static LocalisableString RandomSkinShortcut(LocalisableString keybind) => new TranslatableString(getKey(@"random_skin_shortcut"), @"Press {0} to switch to a random skin!", keybind);
-
-        /// <summary>
-        /// "Press {0} to go to the next skin!"
-        /// </summary>
-        public static LocalisableString NextSkinShortcut(LocalisableString keybind) => new TranslatableString(getKey(@"next_skin_shortcut"), @"Press {0} to go to the next skin!", keybind);
-
-        /// <summary>
-        /// "Press {0} to go to the previous skin!"
-        /// </summary>
-        public static LocalisableString PreviousSkinShortcut(LocalisableString keybind) => new TranslatableString(getKey(@"previous_skin_shortcut"), @"Press {0} to go to the previous skin!", keybind);
+        public static LocalisableString SkinChangeShortcuts(LocalisableString[] keybind) => new TranslatableString(getKey(@"random_skin_shortcut"), @"Press {0} to switch to a random skin! You can also use {1} and {2} to cycle through skins.", keybind[0], keybind[1], keybind[2]);
 
         /// <summary>
         /// "While watching a replay, press {0} to toggle replay settings!"
