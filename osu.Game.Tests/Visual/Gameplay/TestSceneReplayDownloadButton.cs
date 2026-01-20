@@ -200,7 +200,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("score has .osr file", () => importedScore.Files.Any(f => f.Filename.EndsWith(".osr", StringComparison.OrdinalIgnoreCase)));
             AddAssert("score has no online replay flag", () => !importedScore.HasOnlineReplay);
-            AddAssert("score has no local replay flag", () => !importedScore.HasLocalReplay);
+            AddAssert("score has no local replay flag", () => importedScore.HasLocalReplay == false);
 
             AddStep("create button with imported score", () =>
             {

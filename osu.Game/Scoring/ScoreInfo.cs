@@ -117,7 +117,7 @@ namespace osu.Game.Scoring
         /// <summary>
         /// Whether a replay is available locally for this score.
         /// </summary>
-        public bool HasLocalReplay { get; set; }
+        public bool? HasLocalReplay { get; set; }
 
         public DateTimeOffset Date { get; set; }
 
