@@ -135,7 +135,7 @@ namespace osu.Game.Skinning
         /// Inserts the defaults first, then 'random skin', then custom ones.
         /// Returns a list of <see cref="Live{SkinInfo}"/> items.
         /// </summary>
-        public IEnumerable<Live<SkinInfo>> GetDropdownItems()
+        public IEnumerable<Live<SkinInfo>> GetAllUsableSkins()
         {
             var results = new List<Live<SkinInfo>>();
 
@@ -197,77 +197,51 @@ namespace osu.Game.Skinning
         }
 
         /// <summary>
-        /// Cycle through skins by a signed step count.
+        /// Cycle through skins.
         /// Uses the skin selection UI ordering but skips the "Random Skin" entry.
         /// </summary>
-        /// <param name="step">Number of skins to move by (negative to move backwards).</param>
-        public void CycleSkins(int step)
+        /// <param name="reverse">Optionally cycle in reverse.</param>
+        private void cycleSkins(bool reverse = false)
         {
-            if (step == 0)
-                return;
-
             // don't change selection if current skin is externally disabled/mounted for editing.
             if (CurrentSkinInfo.Disabled)
                 return;
 
-            // Required local for iOS. Will cause runtime crash if inlined.
-            Guid currentSkinId = CurrentSkinInfo.Value.ID;
+            var availableSkins = GetAllUsableSkins().ToArray();
 
-            var items = GetDropdownItems().ToArray();
+            int currentIndex = Array.FindIndex(availableSkins, s => s.ID == CurrentSkinInfo.Value.ID);
 
-            if (items.Length == 0)
+            // If the current skin isn't selectable anymore, start from the top.
+            if (currentIndex == -1)
+                currentIndex = 0;
+
+            int desiredIndex = currentIndex;
+
+            do
             {
-                CurrentSkinInfo.Value = ArgonSkin.CreateInfo().ToLiveUnmanaged();
-                return;
-            }
-
-            int currentIndex = Array.FindIndex(items, s => s.ID == currentSkinId);
-
-            int direction = Math.Sign(step);
-            int moves = Math.Abs(step);
-
-            int idx = currentIndex >= 0 ? currentIndex : (direction > 0 ? -1 : 0);
-
-            while (moves > 0)
-            {
-                if (direction > 0)
-                    idx = (idx + 1) % items.Length;
+                if (!reverse)
+                    desiredIndex = (desiredIndex + 1) % availableSkins.Length;
                 else
-                    idx = (idx - 1 + items.Length) % items.Length;
+                    desiredIndex = (desiredIndex - 1 + availableSkins.Length) % availableSkins.Length;
+            } while (availableSkins[desiredIndex].ID == SkinInfo.RANDOM_SKIN);
 
-                // Skip random skin (confusing)
-                if (items[idx].ID == SkinInfo.RANDOM_SKIN)
-                    continue;
-
-                moves--;
-            }
-
-            var nextId = items[idx].ID;
-
-            // Retrieve the chosen skin from realm and set as current.
             Realm.Run(r =>
             {
-                var chosen = r.Find<SkinInfo>(nextId);
+                var chosenSkin = r.Find<SkinInfo>(availableSkins[desiredIndex].ID);
 
-                if (chosen == null)
-                {
-                    CurrentSkinInfo.Value = ArgonSkin.CreateInfo().ToLiveUnmanaged();
-                    return;
-                }
-
-                CurrentSkinInfo.Value = chosen.ToLive(Realm);
+                CurrentSkinInfo.Value = chosenSkin.ToLive(Realm);
             });
         }
 
         /// <summary>
         /// Cycle one skin backward.
         /// </summary>
-        public void SelectPreviousSkin() => CycleSkins(-1);
+        public void SelectPreviousSkin() => cycleSkins(reverse: true);
 
         /// <summary>
         /// Cycle one skin forward.
         /// </summary>
-        public void SelectNextSkin() => CycleSkins(1);
+        public void SelectNextSkin() => cycleSkins();
 
         /// <summary>
         /// Retrieve a <see cref="Skin"/> instance for the provided <see cref="SkinInfo"/>
