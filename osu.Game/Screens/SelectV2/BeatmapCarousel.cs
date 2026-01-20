@@ -352,12 +352,6 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
-        /// <summary>
-        /// Tracks whether the user has manually requested to collapse an open group.
-        /// In this case, refilters should not forcibly expand groups until the user expands a group again themselves.
-        /// </summary>
-        private bool userCollapsedGroup;
-
         protected override void HandleItemActivated(CarouselItem item)
         {
             try
@@ -370,18 +364,10 @@ namespace osu.Game.Screens.SelectV2
                         {
                             setExpansionStateOfGroup(ExpandedGroup, false);
                             ExpandedGroup = null;
-                            userCollapsedGroup = true;
                             return;
                         }
 
                         setExpandedGroup(group);
-
-                        if (userCollapsedGroup)
-                        {
-                            if (grouping.BeatmapSetsGroupedTogether && CurrentGroupedBeatmap != null)
-                                setExpandedSet(new GroupedBeatmapSet(CurrentGroupedBeatmap.Group, CurrentGroupedBeatmap.Beatmap.BeatmapSet!));
-                            userCollapsedGroup = false;
-                        }
 
                         // If the active selection is within this group, it should get keyboard focus immediately.
                         if (CurrentSelectionItem?.IsVisible == true && CurrentSelection is GroupedBeatmap gb)
@@ -421,9 +407,6 @@ namespace osu.Game.Screens.SelectV2
                     throw new InvalidOperationException("Groups should never become selected");
 
                 case GroupedBeatmap groupedBeatmap:
-                    if (userCollapsedGroup)
-                        break;
-
                     setExpandedGroup(groupedBeatmap.Group);
 
                     if (grouping.BeatmapSetsGroupedTogether)
@@ -797,9 +780,6 @@ namespace osu.Game.Screens.SelectV2
             bool resetDisplay = grouping.BeatmapSetsGroupedTogether != BeatmapCarouselFilterGrouping.ShouldGroupBeatmapsTogether(criteria);
 
             Criteria = criteria;
-
-            if (criteria.Group == GroupMode.None)
-                userCollapsedGroup = false;
 
             loadingDebounce ??= Scheduler.AddDelayed(() =>
             {
