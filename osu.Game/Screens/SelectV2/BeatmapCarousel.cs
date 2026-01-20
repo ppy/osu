@@ -32,7 +32,6 @@ using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select;
-using osu.Game.Screens.Select.Filter;
 using Realms;
 
 namespace osu.Game.Screens.SelectV2
@@ -495,8 +494,9 @@ namespace osu.Game.Screens.SelectV2
 
             if (groupingRemainsOff || groupStillValid)
             {
-                // Only update the visual state of the selected item.
-                HandleItemSelected(currentGroupedBeatmap);
+                // Update the visual state of the selected item if it should still be expanded post filter.
+                if (currentGroupedBeatmap != null && currentGroupedBeatmap.Group == groupForReselection)
+                    setExpandedSet(new GroupedBeatmapSet(currentGroupedBeatmap.Group, currentGroupedBeatmap.Beatmap.BeatmapSet!));
             }
             else if (currentGroupedBeatmap != null)
             {
