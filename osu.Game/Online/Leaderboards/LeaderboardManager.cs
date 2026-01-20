@@ -61,7 +61,7 @@ namespace osu.Game.Online.Leaderboards
                 throw new InvalidOperationException(@$"{nameof(FetchWithCriteria)} must be called from the update thread.");
 
             // Use the provided scope or fall back to the default from config
-            BeatmapLeaderboardScope actualScope = newCriteria.Scope ?? getDefaultLeaderboardScope();
+            BeatmapLeaderboardScope actualScope = newCriteria.Scope ?? GetDefaultLeaderboardScope();
             // Create a new criteria with the actual scope
             newCriteria = newCriteria with { Scope = actualScope };
 
@@ -175,7 +175,7 @@ namespace osu.Game.Online.Leaderboards
         }
 
         // gets the default leaderboard scope based on user configuration
-        protected BeatmapLeaderboardScope getDefaultLeaderboardScope()
+        protected BeatmapLeaderboardScope GetDefaultLeaderboardScope()
         {
             switch (config.Get<BeatmapDetailTab>(OsuSetting.BeatmapDetailTab))
             {

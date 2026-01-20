@@ -3,8 +3,6 @@
 
 using System;
 using NUnit.Framework;
-using osu.Game.Configuration;
-using osu.Game.Online.Leaderboards;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Leaderboards;
 
