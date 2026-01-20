@@ -12,10 +12,10 @@ using osu.Framework.Input.Events;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
-using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osuTK;
+using osuTK.Input;
 using Realms;
 
 namespace osu.Game.Overlays.Mods
@@ -28,9 +28,9 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
-        private IPresetHotkeyHandler hotkeyHandler = null!;
-
         private const float contracted_width = WIDTH - 120;
+
+        private readonly Key[] toggleKeys = { Key.Number1, Key.Number2, Key.Number3, Key.Number4, Key.Number5, Key.Number6, Key.Number7, Key.Number8, Key.Number9, Key.Number0 };
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -41,8 +41,6 @@ namespace osu.Game.Overlays.Mods
             AddPresetButton addPresetButton;
             ItemsFlow.Add(addPresetButton = new AddPresetButton());
             ItemsFlow.SetLayoutPosition(addPresetButton, float.PositiveInfinity);
-
-            hotkeyHandler = SequentialModHotkeyHandler.CreateForPresets();
         }
 
         protected override void LoadComplete()
@@ -106,7 +104,17 @@ namespace osu.Game.Overlays.Mods
             if (e.ControlPressed || e.AltPressed || e.SuperPressed || e.Repeat)
                 return false;
 
-            return hotkeyHandler.HandlePresetHotkeyPressed(e, ItemsFlow.OfType<ModPresetPanel>());
+            int index = Array.IndexOf(toggleKeys, e.Key);
+            if (index < 0)
+                return false;
+
+            var panel = ItemsFlow.OfType<ModPresetPanel>().ElementAtOrDefault(index);
+            if (panel == null)
+                return false;
+
+            panel.Toggle();
+
+            return true;
         }
 
         protected override void Dispose(bool isDisposing)
