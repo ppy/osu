@@ -482,39 +482,36 @@ namespace osu.Game.Screens.SelectV2
 
             attemptSelectSingleFilteredResult();
 
-            // Store selected group before handling selection (it may implicitly change the expanded group).
-            var groupForReselection = ExpandedGroup;
-
-            var currentGroupedBeatmap = CurrentSelection as GroupedBeatmap;
-
-            // The filter might have changed the set of available groups, which means that the current selection may point to a stale group.
-            // Check whether that is the case.
-            bool groupingRemainsOff = currentGroupedBeatmap?.Group == null && grouping.GroupItems.Count == 0;
-            bool groupStillValid = currentGroupedBeatmap?.Group != null && grouping.ItemMap.ContainsKey(currentGroupedBeatmap);
-
-            if (groupingRemainsOff || groupStillValid)
+            if (CurrentSelection is GroupedBeatmap selection)
             {
-                // Update the visual state of the selected item if it should still be expanded post filter.
-                if (currentGroupedBeatmap != null && currentGroupedBeatmap.Group == groupForReselection)
-                    setExpandedSet(new GroupedBeatmapSet(currentGroupedBeatmap.Group, currentGroupedBeatmap.Beatmap.BeatmapSet!));
-            }
-            else if (currentGroupedBeatmap != null)
-            {
-                // If the group no longer exists (or the item no longer exists in the previous group), grab an arbitrary other instance of the beatmap under the first group encountered.
-                var newSelection = GetCarouselItems()?.Select(i => i.Model).OfType<GroupedBeatmap>().FirstOrDefault(gb => gb.Beatmap.Equals(currentGroupedBeatmap.Beatmap));
+                // The filter might have changed the set of available groups, which means that the current selection may point to a stale group.
+                // Check whether that is the case.
+                bool groupingRemainsOff = selection.Group == null && grouping.GroupItems.Count == 0;
+                bool groupStillValid = selection.Group != null && grouping.ItemMap.ContainsKey(selection);
 
-                // Only change the selection if we actually got a positive hit.
-                // This is necessary so that selection isn't lost if the panel reappears later due to e.g. unapplying some filter criteria that made it disappear in the first place.
-                if (newSelection != null)
+                if (groupingRemainsOff || groupStillValid)
                 {
-                    CurrentSelection = newSelection;
-                    groupForReselection = newSelection.Group;
+                    if (selection.Group == ExpandedGroup)
+                    {
+                        // Update the visual state of the selected item if it should still be expanded post filter.
+                        HandleItemSelected(CurrentSelection);
+                    }
+                }
+                else
+                {
+                    // If the group no longer exists (or the item no longer exists in the previous group), grab an arbitrary other instance of the beatmap under the first group encountered.
+                    var newSelection = GetCarouselItems()?.Select(i => i.Model).OfType<GroupedBeatmap>().FirstOrDefault(gb => gb.Beatmap.Equals(selection.Beatmap));
+
+                    // Only change the selection if we actually got a positive hit.
+                    // This is necessary so that selection isn't lost if the panel reappears later due to e.g. unapplying some filter criteria that made it disappear in the first place.
+                    if (newSelection != null)
+                    {
+                        CurrentSelection = newSelection;
+                        // have to run this here as the above operation may noop on model equality.
+                        HandleItemSelected(CurrentSelection);
+                    }
                 }
             }
-
-            // If a group was selected that is not the one containing the selection, attempt to reselect it.
-            if (groupForReselection != null && grouping.GroupItems.TryGetValue(groupForReselection, out _))
-                setExpandedGroup(groupForReselection);
 
             foreach (var item in Scroll.Panels.OfType<PanelBeatmapSet>().Where(p => p.Item != null))
                 updateVisibleBeatmaps((GroupedBeatmapSet)item.Item!.Model, item);
