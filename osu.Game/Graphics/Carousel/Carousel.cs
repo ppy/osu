@@ -491,6 +491,14 @@ namespace osu.Game.Graphics.Carousel
                     Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Keyboard, 1));
                     return true;
 
+                case GlobalAction.SelectPreviousPage:
+                    Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Page, -1));
+                    return true;
+
+                case GlobalAction.SelectNextPage:
+                    Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Page, 1));
+                    return true;
+
                 case GlobalAction.ActivatePreviousSet:
                     Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Set, -1));
                     return true;
@@ -547,6 +555,10 @@ namespace osu.Game.Graphics.Carousel
                         traverseKeyboardSelection(traversal.Direction);
                         break;
 
+                    case TraversalType.Page:
+                        traverseKeyboardPage(traversal.Direction);
+                        break;
+
                     case TraversalType.Set:
                         traverseSetSelection(traversal.Direction);
                         break;
@@ -561,7 +573,7 @@ namespace osu.Game.Graphics.Carousel
             }
         }
 
-        private enum TraversalType { Keyboard, Set, Group }
+        private enum TraversalType { Keyboard, Page, Set, Group }
 
         private record TraversalOperation(TraversalType Type, int Direction);
 
@@ -615,6 +627,59 @@ namespace osu.Game.Graphics.Carousel
                     return;
                 }
             } while (newIndex != originalIndex);
+        }
+
+        /// <summary>
+        /// Performs a page-wise keyboard traversal in the carousel, moving the selection by approximately one "page" of items.
+        /// </summary>
+        /// <param name="direction">Positive for downwards, negative for upwards.</param>
+        private void traverseKeyboardPage(int direction)
+        {
+            if (carouselItems == null || carouselItems.Count == 0)
+                return;
+
+            int startIndex = currentKeyboardSelection.Index ?? (direction > 0 ? carouselItems.Count - 1 : 0);
+
+            // Compute the number of visible panels to treat as one page.
+            // Reduced by 50% to account for the search bar covering the top items.
+            int visiblePanelsCount = Math.Max(1, Scroll.Panels.Count / 2);
+            int visibleCount = 0;
+            int i = startIndex;
+
+            while (i >= 0 && i < carouselItems.Count)
+            {
+                i += direction;
+
+                if (i < 0 || i >= carouselItems.Count)
+                    break;
+
+                var item = carouselItems[i];
+
+                if (!item.IsVisible)
+                    continue;
+
+                visibleCount++;
+
+                if (visibleCount >= visiblePanelsCount)
+                {
+                    setKeyboardSelection(item.Model);
+                    ScrollToSelection();
+                    playTraversalSound();
+                    return;
+                }
+            }
+
+            // If we are at the beginning or end and there are not enough items left to scroll through a complete page, then we go to the last or first item.
+            var fallback = direction > 0
+                ? carouselItems.LastOrDefault(x => x.IsVisible)
+                : carouselItems.FirstOrDefault(x => x.IsVisible);
+
+            if (fallback != null && !CheckModelEquality(fallback.Model, currentKeyboardSelection.Model))
+            {
+                setKeyboardSelection(fallback.Model);
+                ScrollToSelection();
+                playTraversalSound();
+            }
         }
 
         /// <summary>
