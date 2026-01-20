@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Ranking
             var criteria = new LeaderboardCriteria(
                 Score.BeatmapInfo!,
                 Score.Ruleset,
-                leaderboardManager.CurrentCriteria?.Scope ?? BeatmapLeaderboardScope.Global,
+                null, // Use null to let LeaderboardManager handle default scope
                 leaderboardManager.CurrentCriteria?.ExactMods
             );
 

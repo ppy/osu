@@ -17,7 +17,9 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Configuration;
 using osu.Game.Scoring;
+using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Leaderboards;
 using Realms;
 
@@ -46,6 +48,9 @@ namespace osu.Game.Online.Leaderboards
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
         /// <summary>
         /// Fetch leaderboard content with the new criteria specified in the background.
         /// On completion, <see cref="Scores"/> will be updated with the results from this call (unless a more recent call with a different criteria has completed).
@@ -54,6 +59,11 @@ namespace osu.Game.Online.Leaderboards
         {
             if (!ThreadSafety.IsUpdateThread)
                 throw new InvalidOperationException(@$"{nameof(FetchWithCriteria)} must be called from the update thread.");
+
+            // Use the provided scope or fall back to the default from config
+            BeatmapLeaderboardScope actualScope = newCriteria.Scope ?? getDefaultLeaderboardScope();
+            // Create a new criteria with the actual scope
+            newCriteria = newCriteria with { Scope = actualScope };
 
             if (!forceRefresh && CurrentCriteria?.Equals(newCriteria) == true && scores.Value?.FailState == null)
                 return;
@@ -69,7 +79,7 @@ namespace osu.Game.Online.Leaderboards
                 return;
             }
 
-            switch (newCriteria.Scope)
+            switch (actualScope)
             {
                 case BeatmapLeaderboardScope.Local:
                 {
@@ -105,13 +115,13 @@ namespace osu.Game.Online.Leaderboards
                         return;
                     }
 
-                    if ((newCriteria.Scope.RequiresSupporter(newCriteria.ExactMods != null)) && !api.LocalUser.Value.IsSupporter)
+                    if ((actualScope.RequiresSupporter(newCriteria.ExactMods != null)) && !api.LocalUser.Value.IsSupporter)
                     {
                         scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotSupporter);
                         return;
                     }
 
-                    if (newCriteria.Scope == BeatmapLeaderboardScope.Team && api.LocalUser.Value.Team == null)
+                    if (actualScope == BeatmapLeaderboardScope.Team && api.LocalUser.Value.Team == null)
                     {
                         scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NoTeam);
                         return;
@@ -128,7 +138,7 @@ namespace osu.Game.Online.Leaderboards
                             requestMods = newCriteria.ExactMods;
                     }
 
-                    var newRequest = new GetScoresRequest(newCriteria.Beatmap, newCriteria.Ruleset, newCriteria.Scope, requestMods);
+                    var newRequest = new GetScoresRequest(newCriteria.Beatmap, newCriteria.Ruleset, actualScope, requestMods);
                     newRequest.Success += response =>
                     {
                         if (inFlightOnlineRequest != null && !newRequest.Equals(inFlightOnlineRequest))
@@ -161,6 +171,28 @@ namespace osu.Game.Online.Leaderboards
                     api.Queue(inFlightOnlineRequest = newRequest);
                     break;
                 }
+            }
+        }
+
+        // gets the default leaderboard scope based on user configuration
+        protected BeatmapLeaderboardScope getDefaultLeaderboardScope()
+        {
+            switch (config.Get<BeatmapDetailTab>(OsuSetting.BeatmapDetailTab))
+            {
+                case BeatmapDetailTab.Local:
+                    return BeatmapLeaderboardScope.Local;
+
+                case BeatmapDetailTab.Country:
+                    return BeatmapLeaderboardScope.Country;
+
+                case BeatmapDetailTab.Friends:
+                    return BeatmapLeaderboardScope.Friend;
+
+                case BeatmapDetailTab.Team:
+                    return BeatmapLeaderboardScope.Team;
+
+                default:
+                    return BeatmapLeaderboardScope.Global;
             }
         }
 
@@ -209,7 +241,7 @@ namespace osu.Game.Online.Leaderboards
     public record LeaderboardCriteria(
         BeatmapInfo? Beatmap,
         RulesetInfo? Ruleset,
-        BeatmapLeaderboardScope Scope,
+        BeatmapLeaderboardScope? Scope,
         Mod[]? ExactMods,
         LeaderboardSortMode Sorting = LeaderboardSortMode.Score
     );
