@@ -119,7 +119,7 @@ namespace osu.Game.Overlays.Settings.Sections
             // For simplicity repopulate the full list.
             dropdownItems.Clear();
 
-            var items = skins.GetDropdownItems().ToArray();
+            var items = skins.GetAllUsableSkins().ToArray();
             dropdownItems.AddRange(items);
 
             Schedule(() => skinDropdown.Items = dropdownItems);
