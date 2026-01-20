@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
@@ -20,9 +21,9 @@ namespace osu.Game.Overlays.Mods
 {
     public partial class ModPresetPanel : ModSelectPanel, IHasCustomTooltip<ModPreset>, IHasContextMenu, IHasPopover
     {
-        public readonly Live<ModPreset> Preset;
+        public Live<ModPreset> Preset => ModState.Preset;
 
-        public override BindableBool Active { get; } = new BindableBool();
+        public override BindableBool Active => ModState.Active;
 
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
@@ -32,12 +33,14 @@ namespace osu.Game.Overlays.Mods
 
         private ModSettingChangeTracker? settingChangeTracker;
 
-        public ModPresetPanel(Live<ModPreset> preset)
-        {
-            Preset = preset;
+        public ModPresetState ModState;
 
-            Title = preset.Value.Name;
-            Description = preset.Value.Description;
+        public ModPresetPanel(ModPresetState state)
+        {
+            ModState = state;
+
+            Title = Preset.Value.Name;
+            Description = Preset.Value.Description;
         }
 
         [BackgroundDependencyLoader]
@@ -49,6 +52,24 @@ namespace osu.Game.Overlays.Mods
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            ModState.Preselected.BindValueChanged(b =>
+            {
+                if (b.NewValue)
+                {
+                    Content.EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Glow,
+                        Colour = AccentColour,
+                        Hollow = true,
+                        Radius = 2,
+                    };
+                }
+                else
+                {
+                    Content.EdgeEffect = default;
+                }
+            }, true);
 
             selectedMods.BindValueChanged(_ => selectedModsChanged(), true);
         }
@@ -73,8 +94,10 @@ namespace osu.Game.Overlays.Mods
         private void selectedModsChanged()
         {
             settingChangeTracker?.Dispose();
-            settingChangeTracker = new ModSettingChangeTracker(selectedMods.Value);
-            settingChangeTracker.SettingChanged = _ => updateActiveState();
+            settingChangeTracker = new ModSettingChangeTracker(selectedMods.Value)
+            {
+                SettingChanged = _ => updateActiveState()
+            };
             updateActiveState();
         }
 
