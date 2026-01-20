@@ -1262,6 +1262,7 @@ namespace osu.Game.Screens.Play
                 score.ScoreInfo.Hash = s.Hash;
                 score.ScoreInfo.ID = s.ID;
                 score.ScoreInfo.Files.AddRange(s.Files.Detach());
+                score.ScoreInfo.HasLocalReplay = s.HasLocalReplay;
             });
 
             return Task.CompletedTask;

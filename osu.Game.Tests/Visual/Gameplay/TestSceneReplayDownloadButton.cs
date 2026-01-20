@@ -224,9 +224,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             Live<ScoreInfo> imported = null;
 
-            AddStep("create button without replay", () =>
+            AddStep("create button with online replay", () =>
             {
-                Child = downloadButton = new TestReplayDownloadButton(getScoreInfo(false))
+                Child = downloadButton = new TestReplayDownloadButton(getScoreInfo(true))
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -244,7 +244,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("delete score", () => scoreManager.Delete(imported.Value));
 
             checkState(DownloadState.NotDownloaded);
-            AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
+            AddAssert("button is enabled", () => downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
         }
 
         [Test]
