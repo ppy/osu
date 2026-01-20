@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
@@ -41,7 +42,7 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        private Drawable modsWedge = null!;
+        private Container modsWedge = null!;
         private ModDisplay modDisplay = null!;
         private Container modContainer = null!;
         private ModCountText overflowModCountDisplay = null!;
@@ -58,7 +59,7 @@ namespace osu.Game.Screens.OnlinePlay
             Icon = FontAwesome.Solid.ExchangeAlt;
             AccentColour = colours.Lime1;
 
-            Add(modsWedge = new Container
+            Add(modsWedge = new ModsWedgeContainer
             {
                 Y = -5f,
                 Depth = float.MaxValue,
@@ -185,6 +186,13 @@ namespace osu.Game.Screens.OnlinePlay
                 else
                     text.Text = ModSelectOverlayStrings.Mods(Mods.Value.Count).ToUpper();
             }
+        }
+
+        internal partial class ModsWedgeContainer : Container
+        {
+            protected override bool OnMouseDown(MouseDownEvent e) => true;
+
+            protected override bool OnHover(HoverEvent e) => true;
         }
     }
 }
