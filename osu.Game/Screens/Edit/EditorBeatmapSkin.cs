@@ -101,7 +101,10 @@ namespace osu.Game.Screens.Edit
 
             string[] possiblePrefixes = possibleSounds.SelectMany(sound => possibleBanks.Select(bank => $@"{bank}-{sound}")).ToArray();
 
-            Dictionary<int, SampleSet> sampleSets = new Dictionary<int, SampleSet>();
+            Dictionary<int, SampleSet> sampleSets = new Dictionary<int, SampleSet>
+            {
+                [1] = new SampleSet(1),
+            };
 
             if (Skin.Samples != null)
             {
