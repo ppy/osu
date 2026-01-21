@@ -104,6 +104,21 @@ namespace osu.Desktop
 
         private static readonly SaveSettingsDelegate SaveSettings;
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate NvStatus SetSleepModeDelegate(IntPtr pDevice, ref NvSetSleepModeParams pParams);
+
+        private static readonly SetSleepModeDelegate SetSleepMode;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate NvStatus SetLatencyMarkerDelegate(IntPtr pDevice, ref NvFrameMarkerParams pParams);
+
+        private static readonly SetLatencyMarkerDelegate SetLatencyMarker;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate NvStatus SleepDelegate(IntPtr pDevice);
+
+        private static readonly SleepDelegate Sleep;
+
         public static NvStatus Status { get; private set; } = NvStatus.OK;
         public static bool Available { get; private set; }
 
@@ -338,6 +353,36 @@ namespace osu.Desktop
             return !checkError(SaveSettings(sessionHandle), nameof(SaveSettings));
         }
 
+        internal static NvStatus SetSleepModeHelper(IntPtr devicePtr, bool enable, bool boost, bool useMarkersOptimize, uint minimumIntervalUs)
+        {
+            if (!Available)
+                return NvStatus.NO_IMPLEMENTATION;
+
+            NvSetSleepModeParams sleepParams = new NvSetSleepModeParams
+            {
+                version = NvSetSleepModeParams.Stride,
+                bLowLatencyMode = enable ? (byte)1 : (byte)0,
+                bLowLatencyBoost = boost ? (byte)1 : (byte)0,
+                minimumIntervalUs = 0,
+                bUseMarkersToOptimize = useMarkersOptimize ? (byte)1 : (byte)0,
+            };
+
+            return SetSleepMode(devicePtr, ref sleepParams);
+        }
+
+        internal static NvStatus SetLatencyMarkerHelper(IntPtr devicePtr, uint marker, ulong frameId)
+        {
+            var frameMarkerParams = new NvFrameMarkerParams
+            {
+                version = NvFrameMarkerParams.Stride,
+                frameID = frameId,
+                markerType = marker
+            };
+            return SetLatencyMarker(devicePtr, ref frameMarkerParams);
+        }
+
+        internal static NvStatus FrameSleepHelper(IntPtr devicePtr) => Sleep(devicePtr);
+
         /// <summary>
         /// Creates a session to access the driver configuration.
         /// </summary>
@@ -400,6 +445,9 @@ namespace osu.Desktop
                     getDelegate(0x7FA2173A, out EnumApplications);
                     getDelegate(0x4347A9DE, out CreateApplication);
                     getDelegate(0xFCBC7E14, out SaveSettings);
+                    getDelegate(0xAC1CA9E0, out SetSleepMode);
+                    getDelegate(0xD9984C05, out SetLatencyMarker);
+                    getDelegate(0x852CD1D2, out Sleep);
                 }
 
                 if (createSession())
@@ -424,6 +472,40 @@ namespace osu.Desktop
         private static extern IntPtr queryInterface64(uint id);
 
         private delegate NvStatus InitializeDelegate();
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    internal struct NvSetSleepModeParams
+    {
+        public uint version;
+        public byte bLowLatencyMode;
+        public byte bLowLatencyBoost;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+        private byte[] _pad0; // explicit padding to align next uint
+
+        public uint minimumIntervalUs; // NvU32
+
+        public byte bUseMarkersToOptimize; // NvBool (1 byte)
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 31)]
+        private byte[] rsvd; // reserved (must be zeroed)
+
+        public static uint Stride => (uint)Marshal.SizeOf(typeof(NvSetSleepModeParams)) | (1u << 16);
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct NvFrameMarkerParams
+    {
+        public uint version;
+        public ulong frameID;
+        public uint markerType;
+        public ulong rsvd0;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 56)]
+        public byte[] rsvd;
+
+        public static uint Stride => (uint)Marshal.SizeOf(typeof(NvFrameMarkerParams)) | (1u << 16);
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
