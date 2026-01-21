@@ -20,7 +20,6 @@ using osu.Game.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Framework.Input.StateChanges;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps.ControlPoints;
 
@@ -258,15 +257,6 @@ namespace osu.Game.Screens.Menu
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            // HORRIBLE HACK
-            // This is here so that on mobile, the main menu button that progresses to song select can correctly progress to song select v2 when held.
-            // Once the temporary solution of holding the button to access song select v2 is removed, this should be too.
-            // Without this, the long-press-to-right-click flow intercepts the hold and converts it to a right click which would not trigger the button
-            // and therefore not progress to song select.
-            if (e.Button == MouseButton.Right && e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
-                trigger(e);
-            // END OF HORRIBLE HACK
-
             boxHoverLayer.FadeTo(0, 1000, Easing.OutQuint);
             base.OnMouseUp(e);
         }
