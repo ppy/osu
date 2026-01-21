@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 }
                 catch (Exception exception)
                 {
-                    Logger.Log($"Failed to load ruleset settings for {ruleset.RulesetInfo.Name}. Please check for an update from the developer. {exception}", level: LogLevel.Error);
+                    Logger.Error(exception, $@"Failed to load ruleset settings for {ruleset.RulesetInfo.Name}. Please check for an update from the developer.", LoggingTarget.Runtime, true);
                 }
             }
         }
