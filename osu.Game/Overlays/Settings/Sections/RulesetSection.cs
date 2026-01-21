@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -34,9 +35,9 @@ namespace osu.Game.Overlays.Settings.Sections
                     if (section != null)
                         Add(section);
                 }
-                catch
+                catch (Exception exception)
                 {
-                    Logger.Log($"Failed to load ruleset settings for {ruleset.RulesetInfo.Name}. Please check for an update from the developer.", level: LogLevel.Error);
+                    Logger.Log($"Failed to load ruleset settings for {ruleset.RulesetInfo.Name}. Please check for an update from the developer. {exception}", level: LogLevel.Error);
                 }
             }
         }
