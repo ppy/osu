@@ -18,6 +18,8 @@ namespace osu.Game.Graphics.Containers
 
         private readonly Container content = new Container { RelativeSizeAxes = Axes.Both };
 
+        private HoverSounds samples = null!;
+
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             // base call is checked for cases when `OsuClickableContainer` has masking applied to it directly (ie. externally in object initialisation).
             base.ReceivePositionalInputAt(screenSpacePos)
@@ -33,6 +35,14 @@ namespace osu.Game.Graphics.Containers
             this.sampleSet = sampleSet;
         }
 
+        public void TriggerClickWithSound()
+        {
+            TriggerClick();
+
+            // TriggerClick doesn't recursively fire the event so we need to manually do this.
+            (samples as HoverClickSounds)?.PlayClickSample();
+        }
+
         public virtual LocalisableString TooltipText { get; set; }
 
         [BackgroundDependencyLoader]
@@ -46,7 +56,7 @@ namespace osu.Game.Graphics.Containers
 
             AddRangeInternal(new Drawable[]
             {
-                CreateHoverSounds(sampleSet),
+                samples = CreateHoverSounds(sampleSet),
                 content,
             });
         }

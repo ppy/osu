@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual
         private Skin legacySkin;
         private Skin argonSkin;
         private Skin specialSkin;
-        private Skin oldSkin;
+        private Skin retroSkin;
 
         [Resolved]
         private GameHost host { get; set; }
@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual
             metricsSkin = new TestLegacySkin(new SkinInfo { Name = "metrics-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), this, true);
             legacySkin = new DefaultLegacySkin(this);
             specialSkin = new TestLegacySkin(new SkinInfo { Name = "special-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/special_skin"), this, true);
-            oldSkin = new TestLegacySkin(new SkinInfo { Name = "old-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/old_skin"), this, true);
+            retroSkin = new RetroSkin(this);
         }
 
         private readonly List<Drawable> createdDrawables = new List<Drawable>();
@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual
             Cell(2).Child = createProvider(metricsSkin, creationFunction, beatmap);
             Cell(3).Child = createProvider(legacySkin, creationFunction, beatmap);
             Cell(4).Child = createProvider(specialSkin, creationFunction, beatmap);
-            Cell(5).Child = createProvider(oldSkin, creationFunction, beatmap);
+            Cell(5).Child = createProvider(retroSkin, creationFunction, beatmap);
         }
 
         protected IEnumerable<Drawable> CreatedDrawables => createdDrawables;

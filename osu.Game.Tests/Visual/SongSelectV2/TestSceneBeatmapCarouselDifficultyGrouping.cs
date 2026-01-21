@@ -337,5 +337,31 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddAssert("expanded group is still first", () => (Carousel.ExpandedGroup as StarDifficultyGroupDefinition)?.Difficulty.Stars, () => Is.EqualTo(0));
         }
+
+        [Test]
+        public void TestExpandedGroupDoesNotExpandAgainOnRefilterIfManuallyCollapsed()
+        {
+            SelectPrevSet();
+
+            WaitForBeatmapSelection(2, 9);
+            AddAssert("expanded group is last", () => (Carousel.ExpandedGroup as StarDifficultyGroupDefinition)?.Difficulty.Stars, () => Is.EqualTo(6));
+
+            SelectNextPanel();
+            Select();
+
+            WaitForBeatmapSelection(2, 9);
+            AddAssert("expanded group is first", () => (Carousel.ExpandedGroup as StarDifficultyGroupDefinition)?.Difficulty.Stars, () => Is.EqualTo(0));
+
+            ToggleGroupCollapse();
+
+            // doesn't actually filter anything away, but triggers a filter.
+            ApplyToFilterAndWaitForFilter("filter", c => c.SearchText = "Some");
+            AddAssert("group didn't re-expand", () => (Carousel.ExpandedGroup as StarDifficultyGroupDefinition)?.Difficulty.Stars, () => Is.Null);
+
+            ToggleGroupCollapse();
+
+            ApplyToFilterAndWaitForFilter("filter", c => c.SearchText = "Som");
+            AddAssert("expanded group is first", () => (Carousel.ExpandedGroup as StarDifficultyGroupDefinition)?.Difficulty.Stars, () => Is.EqualTo(0));
+        }
     }
 }
