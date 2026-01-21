@@ -7,7 +7,6 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
-using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -20,15 +19,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainDecayBase => 0.15;
         protected override double SumDecayWeight => 0.9;
 
-        private readonly bool hasHiddenMod;
-
         public Flashlight(Mod[] mods)
             : base(mods)
         {
-            hasHiddenMod = mods.Any(m => m is OsuModHidden);
         }
 
-        protected override double StrainValueOf(DifficultyHitObject current) => FlashlightEvaluator.EvaluateDifficultyOf(current, hasHiddenMod);
+        protected override double ObjectDifficultyOf(DifficultyHitObject current) => FlashlightEvaluator.EvaluateDifficultyOf(current, Mods);
 
         public override double DifficultyValue() => GetCurrentStrainPeaks().Sum();
 
