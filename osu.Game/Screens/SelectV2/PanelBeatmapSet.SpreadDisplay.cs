@@ -27,7 +27,8 @@ namespace osu.Game.Screens.SelectV2
         public partial class SpreadDisplay : OsuAnimatedButton
         {
             public Bindable<BeatmapSetInfo?> BeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
-            public Bindable<HashSet<BeatmapInfo>?> VisibleBeatmaps { get; } = new Bindable<HashSet<BeatmapInfo>?>();
+
+            public IBindable<HashSet<BeatmapInfo>?> VisibleBeatmaps { get; } = new Bindable<HashSet<BeatmapInfo>?>();
 
             public BindableBool Expanded { get; } = new BindableBool();
 
