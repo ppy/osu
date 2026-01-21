@@ -90,14 +90,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Penalize angle repetition.
                 aimComplexityBonus = angleBonus * Math.Pow(baseFactor + (1 - baseFactor) * vectorRepetition * stackFactor, 2);
 
-                acuteAngleBonus = calcAcuteAngleBonus(currAngle);
+                if (Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) < 1.25 * Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) // If rhythms are the same.
+                {
+                    acuteAngleBonus = calcAcuteAngleBonus(currAngle);
 
-                // Penalize angle repetition.
-                acuteAngleBonus *= 0.15 + 0.85 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 3)));
+                    // Penalize angle repetition.
+                    acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 3)));
 
-                // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
-                acuteAngleBonus *= DifficultyCalculationUtils.Smootherstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime, 2), 300, 400) *
-                                   DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, diameter, diameter * 2) * stackFactor;
+                    // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
+                    acuteAngleBonus *= angleBonus *
+                                       DifficultyCalculationUtils.Smootherstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime, 2), 300, 400) *
+                                       DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, diameter, diameter * 2);
+                }
 
                 wideAngleBonus = calcWideAngleBonus(currAngle);
 
@@ -128,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                     if (distance < 1)
                     {
-                        wideAngleBonus *= 1 - 0.35 * (1 - distance);
+                        wideAngleBonus *= 1 - 0.5 * (1 - distance);
                     }
                 }
             }
@@ -163,7 +167,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             aimStrain += velocityChangeBonus * 1.2;
 
             // Add in acute angle bonus or wide angle bonus, whichever is larger.
-            aimStrain += Math.Max(acuteAngleBonus * 6.5, wideAngleBonus * 1.5);
+            aimStrain += Math.Max(acuteAngleBonus * 3.5, wideAngleBonus * 1.7);
 
             // Apply high circle size bonus
             aimStrain *= osuCurrObj.SmallCircleBonus;
