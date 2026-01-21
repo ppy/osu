@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         protected override double SkillMultiplier => 0.05512;
         protected override double StrainDecayBase => 0.15;
-        protected override double SumDecayWeight => 0.9;
+        protected override double SumDecayExponent => 0.9;
 
         public Flashlight(Mod[] mods)
             : base(mods)

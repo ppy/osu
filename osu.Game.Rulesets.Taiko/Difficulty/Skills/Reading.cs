@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     {
         protected override double SkillMultiplier => 1.0;
         protected override double StrainDecayBase => 0.4;
-        protected override double SumDecayWeight => 0.9;
+        protected override double SumDecayExponent => 0.9;
 
         public Reading(Mod[] mods)
             : base(mods)

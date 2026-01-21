@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
     {
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 1;
-        protected override double SumDecayWeight => 0.9;
+        protected override double SumDecayExponent => 0.9;
 
         private const double individual_decay_base = 0.125;
         private const double overall_decay_base = 0.30;

@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
     {
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 0.2;
-        protected override double SumDecayWeight => 0.94;
+        protected override double SumDecayExponent => 0.94;
 
         protected override int SectionLength => 750;
 

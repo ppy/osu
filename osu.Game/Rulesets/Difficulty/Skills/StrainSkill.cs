@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// The weight by which each strain value decays when summing strains.
         /// </summary>
-        protected abstract double SumDecayWeight { get; }
+        protected abstract double SumDecayExponent { get; }
 
         /// <summary>
         /// The length of each strain section.
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             if (ObjectDifficulties.Count == 0)
                 return 0.0;
 
-            double consistentTopStrain = difficultyValue * (1 - SumDecayWeight); // What would the top strain be if all strain values were identical
+            double consistentTopStrain = difficultyValue * (1 - SumDecayExponent); // What would the top strain be if all strain values were identical
 
             if (consistentTopStrain == 0)
                 return ObjectDifficulties.Count;
@@ -160,7 +160,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             foreach (double strain in peaks.OrderDescending())
             {
                 difficulty += strain * weight;
-                weight *= SumDecayWeight;
+                weight *= SumDecayExponent;
             }
 
             return difficulty;

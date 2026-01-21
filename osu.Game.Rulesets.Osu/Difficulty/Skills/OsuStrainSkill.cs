@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public abstract class OsuStrainSkill : StrainSkill
     {
-        protected override double SumDecayWeight => 0.9;
+        protected override double SumDecayExponent => 0.9;
 
         /// <summary>
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             foreach (double strain in strains.OrderDescending())
             {
                 difficulty += strain * weight;
-                weight *= SumDecayWeight;
+                weight *= SumDecayExponent;
             }
 
             return difficulty;
