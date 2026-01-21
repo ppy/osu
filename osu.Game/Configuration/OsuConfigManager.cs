@@ -149,6 +149,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
+            SetDefault(OsuSetting.KeepGameplayAfterFailed, false);
             SetDefault(OsuSetting.KeyOverlay, false);
             SetDefault(OsuSetting.ReplaySettingsOverlay, true);
             SetDefault(OsuSetting.ReplayPlaybackControlsExpanded, true);
@@ -367,6 +368,7 @@ namespace osu.Game.Configuration
 
         ShowHealthDisplayWhenCantFail,
         FadePlayfieldWhenHealthLow,
+        KeepGameplayAfterFailed,
 
         /// <summary>
         /// Disables mouse buttons clicks during gameplay.

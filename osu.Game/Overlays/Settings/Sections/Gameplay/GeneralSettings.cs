@@ -36,6 +36,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = GameplaySettingsStrings.StarFountains,
                     Current = config.GetBindable<bool>(OsuSetting.StarFountains)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = GameplaySettingsStrings.KeepPlayingAfterFailed,
+                    Current = config.GetBindable<bool>(OsuSetting.KeepGameplayAfterFailed)
+                }
             };
         }
     }
