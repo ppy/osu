@@ -18,11 +18,13 @@ namespace osu.Game.Rulesets.Taiko.Configuration
             base.InitialiseDefaults();
 
             SetDefault(TaikoRulesetSetting.TouchControlScheme, TaikoTouchControlScheme.KDDK);
+            SetDefault(TaikoRulesetSetting.SnapJudgementLocation, false);
         }
     }
 
     public enum TaikoRulesetSetting
     {
-        TouchControlScheme
+        TouchControlScheme,
+        SnapJudgementLocation
     }
 }
