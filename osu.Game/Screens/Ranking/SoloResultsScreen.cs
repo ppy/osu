@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
-using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
@@ -20,6 +19,8 @@ namespace osu.Game.Screens.Ranking
     public partial class SoloResultsScreen : ResultsScreen
     {
         private readonly IBindable<LeaderboardScores?> globalScores = new Bindable<LeaderboardScores?>();
+
+        private TaskCompletionSource<LeaderboardScores>? requestTaskSource;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -38,26 +39,37 @@ namespace osu.Game.Screens.Ranking
             globalScores.BindTo(leaderboardManager.Scores);
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (requestTaskSource?.Task.IsCompleted == false)
+                requestTaskSource.SetCanceled();
+        }
+
         protected override async Task<ScoreInfo[]> FetchScores()
         {
             Debug.Assert(Score != null);
 
-            if (Score.BeatmapInfo!.OnlineID <= 0 || Score.BeatmapInfo.Status <= BeatmapOnlineStatus.Pending)
-                return [];
-
+            // sort mode intentionally omitted to default to score - results screen only supports sorting by score, so don't pass any other to avoid confusion
             var criteria = new LeaderboardCriteria(
                 Score.BeatmapInfo!,
                 Score.Ruleset,
                 leaderboardManager.CurrentCriteria?.Scope ?? BeatmapLeaderboardScope.Global,
                 leaderboardManager.CurrentCriteria?.ExactMods
             );
-            var requestTaskSource = new TaskCompletionSource<LeaderboardScores>();
+
+            Debug.Assert(requestTaskSource == null || requestTaskSource.Task.IsCompleted);
+
+            requestTaskSource = new TaskCompletionSource<LeaderboardScores>();
+
             globalScores.BindValueChanged(_ =>
             {
                 if (globalScores.Value != null && leaderboardManager.CurrentCriteria?.Equals(criteria) == true)
                     requestTaskSource.TrySetResult(globalScores.Value);
             });
-            leaderboardManager.FetchWithCriteria(criteria, forceRefresh: true);
+
+            Schedule(() => leaderboardManager.FetchWithCriteria(criteria, forceRefresh: true));
 
             var result = await requestTaskSource.Task.ConfigureAwait(false);
 
@@ -78,11 +90,26 @@ namespace osu.Game.Screens.Ranking
                 // this simplifies handling later.
                 if (clonedScore.Equals(Score) || clonedScore.MatchesOnlineID(Score))
                 {
+                    // this is a precautionary guard that prevents `Score` from appearing multiple times in the list.
+                    // that can occur in rare cases wherein two local scores have the same online ID but different replay contents
+                    // (this is possible e.g. in cases of client-side vs server-side recorded replays, see https://github.com/ppy/osu-server-spectator/issues/193)
+                    if (sortedScores.Contains(Score))
+                        continue;
+
                     Score.Position = clonedScore.Position;
                     sortedScores.Add(Score);
                 }
-                else if (criteria.Scope == BeatmapLeaderboardScope.Local || clonedScore.UserID != api.LocalUser.Value.OnlineID || clonedScore.TotalScore > Score.TotalScore)
+                else
+                {
+                    bool isOnlineLeaderboard = criteria.Scope != BeatmapLeaderboardScope.Local;
+                    bool presentingLocalUserScore = Score.UserID == api.LocalUser.Value.OnlineID;
+                    bool presentedLocalUserScoreIsBetter = presentingLocalUserScore && clonedScore.UserID == api.LocalUser.Value.OnlineID && clonedScore.TotalScore < Score.TotalScore;
+
+                    if (isOnlineLeaderboard && presentedLocalUserScoreIsBetter)
+                        continue;
+
                     sortedScores.Add(clonedScore);
+                }
             }
 
             // if we haven't encountered a match for the presented score, we still need to attach it.

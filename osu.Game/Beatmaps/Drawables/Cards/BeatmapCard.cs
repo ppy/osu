@@ -7,7 +7,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
@@ -22,7 +24,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         public const float TRANSITION_DURATION = 340;
         public const float CORNER_RADIUS = 8;
 
-        protected const float WIDTH = 345;
+        public const float WIDTH = 345;
 
         public IBindable<bool> Expanded { get; }
 
@@ -35,6 +37,18 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         protected readonly BeatmapDownloadTracker DownloadTracker;
 
+        private readonly Bindable<bool> preferNoVideo = new BindableBool();
+        private InputManager? containingInputManager;
+
+        [Resolved]
+        private BeatmapSetOverlay? beatmapSetOverlay { get; set; }
+
+        [Resolved]
+        private BeatmapModelDownloader? beatmaps { get; set; }
+
+        [Resolved]
+        private OsuGame? game { get; set; }
+
         protected BeatmapCard(APIBeatmapSet beatmapSet, bool allowExpansion = true)
             : base(HoverSampleSet.Button)
         {
@@ -45,10 +59,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             DownloadTracker = new BeatmapDownloadTracker(beatmapSet);
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(BeatmapSetOverlay? beatmapSetOverlay)
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager configManager)
         {
-            Action = () => beatmapSetOverlay?.FetchAndShowBeatmapSet(BeatmapSet.OnlineID);
+            configManager.BindWith(OsuSetting.PreferNoVideo, preferNoVideo);
 
             AddInternal(DownloadTracker);
         }
@@ -60,6 +74,30 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             DownloadTracker.State.BindValueChanged(_ => UpdateState());
             Expanded.BindValueChanged(_ => UpdateState(), true);
             FinishTransforms(true);
+
+            containingInputManager = GetContainingInputManager();
+
+            if (Action == null)
+                throw new InvalidOperationException($"An action should be assigned to this {nameof(BeatmapCard)}. To use the default, assign {nameof(DefaultAction)}.");
+        }
+
+        protected void DefaultAction()
+        {
+            if (containingInputManager?.CurrentState.Keyboard.ShiftPressed == true)
+            {
+                switch (DownloadTracker.State.Value)
+                {
+                    case DownloadState.NotDownloaded:
+                        if (!BeatmapSet.Availability.DownloadDisabled) beatmaps?.Download(BeatmapSet, preferNoVideo.Value);
+                        break;
+
+                    case DownloadState.LocallyAvailable:
+                        game?.PresentBeatmap(BeatmapSet);
+                        break;
+                }
+            }
+            else
+                beatmapSetOverlay?.FetchAndShowBeatmapSet(BeatmapSet.OnlineID);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -103,7 +141,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             }
         }
 
-        public MenuItem[] ContextMenuItems => new MenuItem[]
+        public virtual MenuItem[] ContextMenuItems => new MenuItem[]
         {
             new OsuMenuItem(ContextMenuStrings.ViewBeatmap, MenuItemType.Highlighted, Action),
         };

@@ -24,12 +24,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public bool RoomJoined => MultiplayerClient.RoomJoined;
 
-        protected Room CreateDefaultRoom()
+        protected Room CreateDefaultRoom(MatchType type = MatchType.HeadToHead)
         {
             return new Room
             {
                 Name = "test name",
-                Type = MatchType.HeadToHead,
+                Type = type,
                 Playlist =
                 [
                     new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)

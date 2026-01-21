@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
         }
 
-        public static int GetColumnCount(LegacyBeatmapConversionDifficultyInfo difficulty, IReadOnlyList<Mod>? mods = null)
+        public static int GetColumnCount(LegacyBeatmapConversionDifficultyInfo difficulty, IReadOnlyCollection<Mod>? mods = null)
         {
             var converter = new ManiaBeatmapConverter(null, difficulty, new ManiaRuleset());
 

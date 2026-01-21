@@ -51,8 +51,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneMultiplayer : ScreenTestScene
     {
+        private RulesetStore rulesets = null!;
         private BeatmapManager beatmaps = null!;
         private BeatmapSetInfo importedSet = null!;
+        private BeatmapSetInfo importedSet2 = null!;
 
         private TestMultiplayerComponents multiplayerComponents = null!;
 
@@ -66,7 +68,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             BeatmapStore beatmapStore;
 
-            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
             Dependencies.CacheAs(beatmapStore = new RealmDetachedBeatmapStore());
             Dependencies.Cache(Realm);
@@ -81,12 +83,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("import beatmap", () =>
             {
                 beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+
+                importedSet = beatmaps.GetAllUsableBeatmapSets().First();
+                importedSet2 = beatmaps.Import(CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet!)!.Value.Detach();
+
                 Realm.Write(r =>
                 {
                     foreach (var beatmapInfo in r.All<BeatmapInfo>())
                         beatmapInfo.OnlineMD5Hash = beatmapInfo.MD5Hash;
                 });
-                importedSet = beatmaps.GetAllUsableBeatmapSets().First();
             });
 
             AddStep("load multiplayer", () => LoadScreen(multiplayerComponents = new TestMultiplayerComponents()));
@@ -1095,6 +1100,112 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("global beatmap matches second playlist item", () => Beatmap.Value.BeatmapInfo.OnlineID, () => Is.EqualTo(multiplayerClient.ClientRoom!.Playlist[1].BeatmapID));
         }
 
+        /// <summary>
+        /// Tests that the local user is not able to change their play style if they haven't downloaded the beatmap (beatmap carousel will be empty).
+        /// </summary>
+        [Test]
+        public void TestCanNotEditDifficultyIfNotDownloaded()
+        {
+            IBeatmap roomBeatmap = null!;
+
+            createRoom(() =>
+            {
+                roomBeatmap = CreateBeatmap(new OsuRuleset().RulesetInfo);
+
+                return new Room
+                {
+                    Name = "Test Room",
+                    QueueMode = QueueMode.AllPlayers,
+                    Playlist =
+                    [
+                        new PlaylistItem(CreateAPIBeatmap(roomBeatmap.BeatmapInfo))
+                        {
+                            RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                            Freestyle = true
+                        }
+                    ]
+                };
+            });
+
+            AddAssert("editing disallowed", () => !this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().UserStyleEditingEnabled);
+            AddStep("import beatmap", () => beatmaps.Import(roomBeatmap.BeatmapInfo.BeatmapSet!));
+            AddAssert("editing allowed", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().UserStyleEditingEnabled);
+        }
+
+        /// <summary>
+        /// Test that the user selection screen is not exited when the beatmap is changed to the same set.
+        /// </summary>
+        [Test]
+        public void TestUserStyleSelectionDoesNotExitWhenBeatmapSetNotChanged()
+        {
+            createRoom(() => new Room
+            {
+                Name = "Test Room",
+                QueueMode = QueueMode.AllPlayers,
+                Playlist =
+                [
+                    new PlaylistItem(importedSet.Beatmaps.First())
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        Freestyle = true
+                    }
+                ]
+            });
+
+            AddStep("open user style selection", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().ShowUserStyleSelect());
+            AddUntilStep("style selection screen opened", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() == true);
+
+            AddStep("change beatmap", () =>
+            {
+                var newItem = multiplayerClient.ServerRoom!.Playlist[0].Clone();
+                var newBeatmap = importedSet.Beatmaps.Last();
+                newItem.BeatmapID = newBeatmap.OnlineID;
+                newItem.BeatmapChecksum = newBeatmap.MD5Hash;
+
+                multiplayerClient.EditPlaylistItem(newItem);
+            });
+
+            AddWaitStep("wait for potential beatmap change", 2);
+            AddAssert("style selection screen still open", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() == true);
+        }
+
+        /// <summary>
+        /// Tests that the user selection screen is exited when the beatmap is changed to another set.
+        /// </summary>
+        [Test]
+        public void TestUserStyleSelectionExitedWhenBeatmapSetChanged()
+        {
+            createRoom(() => new Room
+            {
+                Name = "Test Room",
+                QueueMode = QueueMode.AllPlayers,
+                Playlist =
+                [
+                    new PlaylistItem(importedSet.Beatmaps.First())
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        Freestyle = true
+                    }
+                ]
+            });
+
+            AddStep("open user style selection", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().ShowUserStyleSelect());
+            AddUntilStep("style selection screen opened", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() == true);
+
+            AddStep("change beatmap set", () =>
+            {
+                var newItem = multiplayerClient.ServerRoom!.Playlist[0].Clone();
+                var newBeatmap = importedSet2.Beatmaps.Last();
+                newItem.BeatmapID = newBeatmap.OnlineID;
+                newItem.BeatmapChecksum = newBeatmap.MD5Hash;
+
+                multiplayerClient.EditPlaylistItem(newItem);
+            });
+
+            AddUntilStep("selected beatmap changed", () => Beatmap.Value.BeatmapInfo.Equals(importedSet2.Beatmaps.First()));
+            AddUntilStep("style selection screen closed", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() != true);
+        }
+
         private void enterGameplay()
         {
             pressReadyButton();
@@ -1136,6 +1247,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
 
             AddUntilStep("wait for join", () => multiplayerClient.RoomJoined);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
         }
     }
 }

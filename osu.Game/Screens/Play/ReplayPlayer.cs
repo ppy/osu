@@ -1,15 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
@@ -29,33 +29,43 @@ namespace osu.Game.Screens.Play
 
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
 
-        private readonly bool replayIsFailedScore;
-
-        private PlaybackSettings playbackSettings;
-
         [Cached(typeof(IGameplayLeaderboardProvider))]
         private readonly SoloGameplayLeaderboardProvider leaderboardProvider = new SoloGameplayLeaderboardProvider();
 
-        protected override UserActivity InitialActivity => new UserActivity.WatchingReplay(Score.ScoreInfo);
+        protected override UserActivity? InitialActivity =>
+            // score may be null if LoadedBeatmapSuccessfully is false.
+            Score == null ? null : new UserActivity.WatchingReplay(Score.ScoreInfo);
 
         private bool isAutoplayPlayback => GameplayState.Mods.OfType<ModAutoplay>().Any();
 
-        // Disallow replays from failing. (see https://github.com/ppy/osu/issues/6108)
+        private double? lastFrameTime;
+
+        private ReplayFailIndicator? failIndicator;
+        private PlaybackSettings? playbackSettings;
+
         protected override bool CheckModsAllowFailure()
         {
-            if (!replayIsFailedScore && !isAutoplayPlayback)
-                return false;
+            // autoplay should be able to fail if the beatmap is not humanly beatable
+            if (isAutoplayPlayback)
+                return base.CheckModsAllowFailure();
 
-            return base.CheckModsAllowFailure();
+            // non-autoplay replays should be able to fail, but only after they've exhausted their frames.
+            // note that the rank isn't checked here - that's because it is generally unreliable.
+            // stable replays, as well as lazer replays recorded prior to https://github.com/ppy/osu/pull/28058,
+            // do not even *contain* the user's rank.
+            // not to mention possible gameplay mechanics changes that could make a replay fail sooner than it really should.
+            if (GameplayClockContainer.CurrentTime >= lastFrameTime)
+                return base.CheckModsAllowFailure();
+
+            return false;
         }
 
-        public ReplayPlayer(Score score, PlayerConfiguration configuration = null)
+        public ReplayPlayer(Score score, PlayerConfiguration? configuration = null)
             : this((_, _) => score, configuration)
         {
-            replayIsFailedScore = score.ScoreInfo.Rank == ScoreRank.F;
         }
 
-        public ReplayPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration configuration = null)
+        public ReplayPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration? configuration = null)
             : base(configuration)
         {
             this.createScore = createScore;
@@ -90,11 +100,23 @@ namespace osu.Game.Screens.Play
                 playbackSettings.UserPlaybackRate.BindTo(master.UserPlaybackRate);
 
             HUDOverlay.PlayerSettingsOverlay.AddAtStart(playbackSettings);
+            AddInternal(failIndicator = new ReplayFailIndicator(GameplayClockContainer)
+            {
+                GoToResults = () =>
+                {
+                    if (!this.IsCurrentScreen())
+                        return;
+
+                    ValidForResume = false;
+                    this.Push(new SoloResultsScreen(Score.ScoreInfo));
+                }
+            });
         }
 
         protected override void PrepareReplay()
         {
             DrawableRuleset?.SetReplayScore(Score);
+            lastFrameTime = Score.Replay.Frames.LastOrDefault()?.Time;
         }
 
         protected override Score CreateScore(IBeatmap beatmap) => createScore(beatmap, Mods.Value);
@@ -111,6 +133,9 @@ namespace osu.Game.Screens.Play
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (!LoadedBeatmapSuccessfully)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.StepReplayBackward:
@@ -122,11 +147,11 @@ namespace osu.Game.Screens.Play
                     return true;
 
                 case GlobalAction.SeekReplayBackward:
-                    SeekInDirection(-5 * (float)playbackSettings.UserPlaybackRate.Value);
+                    SeekInDirection(-5 * (float)playbackSettings!.UserPlaybackRate.Value);
                     return true;
 
                 case GlobalAction.SeekReplayForward:
-                    SeekInDirection(5 * (float)playbackSettings.UserPlaybackRate.Value);
+                    SeekInDirection(5 * (float)playbackSettings!.UserPlaybackRate.Value);
                     return true;
 
                 case GlobalAction.TogglePauseReplay:
@@ -164,6 +189,38 @@ namespace osu.Game.Screens.Play
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+        }
+
+        protected override void PerformFail()
+        {
+            // base logic intentionally suppressed - we have our own custom fail interaction
+            ScoreProcessor.FailScore(Score.ScoreInfo);
+            failIndicator!.Display();
+        }
+
+        public override void OnSuspending(ScreenTransitionEvent e)
+        {
+            stopAllAudioEffects();
+            base.OnSuspending(e);
+        }
+
+        public override bool OnExiting(ScreenExitEvent e)
+        {
+            // safety against filters or samples from the indicator playing long after the screen is exited
+            failIndicator?.RemoveAndDisposeImmediately();
+            return base.OnExiting(e);
+        }
+
+        private void stopAllAudioEffects()
+        {
+            // safety against filters or samples from the indicator playing long after the screen is exited
+            failIndicator?.RemoveAndDisposeImmediately();
+
+            if (GameplayClockContainer is MasterGameplayClockContainer master)
+            {
+                playbackSettings?.UserPlaybackRate.UnbindFrom(master.UserPlaybackRate);
+                master.UserPlaybackRate.SetDefault();
+            }
         }
     }
 }

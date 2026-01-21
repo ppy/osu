@@ -191,6 +191,20 @@ namespace osu.Game.Screens.Edit.Submission
             });
 
             completedSample = audio.Samples.Get(@"UI/bss-complete");
+
+            if (Beatmap.Value.BeatmapSetInfo.OnlineID > 0)
+            {
+                var req = new GetBeatmapSetRequest(Beatmap.Value.BeatmapSetInfo.OnlineID);
+                api.Queue(req);
+                settings.LatestOnlineStateRequest = req;
+            }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            configManager.BindWith(OsuSetting.EditorSubmissionNotifyOnDiscussionReplies, settings.NotifyOnDiscussionReplies);
         }
 
         private void createBeatmapSet()

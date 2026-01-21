@@ -81,12 +81,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             changeHandler?.BeginChange();
 
             objectsInScale = selectedMovableObjects.ToDictionary(ho => ho, ho => new OriginalHitObjectState(ho));
-            OriginalSurroundingQuad = objectsInScale.Count == 1 && objectsInScale.First().Key is Slider slider
-                ? GeometryUtils.GetSurroundingQuad(slider.Path.ControlPoints.Select(p => slider.Position + p.Position))
-                : GeometryUtils.GetSurroundingQuad(objectsInScale.Keys);
-            originalConvexHull = objectsInScale.Count == 1 && objectsInScale.First().Key is Slider slider2
-                ? GeometryUtils.GetConvexHull(slider2.Path.ControlPoints.Select(p => slider2.Position + p.Position))
-                : GeometryUtils.GetConvexHull(objectsInScale.Keys);
+            OriginalSurroundingQuad = GeometryUtils.GetSurroundingQuad(objectsInScale.Keys);
+            originalConvexHull = GeometryUtils.GetConvexHull(objectsInScale.Keys);
             defaultOrigin = GeometryUtils.MinimumEnclosingCircle(originalConvexHull).Item1;
         }
 
@@ -312,7 +308,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private void moveSelectionInBounds()
         {
-            Quad quad = GeometryUtils.GetSurroundingQuad(objectsInScale!.Keys);
+            Quad quad = GeometryUtils.GetSurroundingQuad(objectsInScale!.Keys, true);
 
             Vector2 delta = Vector2.Zero;
 

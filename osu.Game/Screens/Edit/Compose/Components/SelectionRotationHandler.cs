@@ -30,6 +30,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Implementation-defined origin point to rotate around when no explicit origin is provided.
         /// This field is only assigned during a rotation operation.
+        ///
+        /// Coordinates are in local space for this container.
         /// </summary>
         public Vector2? DefaultOrigin { get; protected set; }
 

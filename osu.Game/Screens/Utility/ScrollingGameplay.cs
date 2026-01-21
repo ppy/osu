@@ -188,7 +188,7 @@ namespace osu.Game.Screens.Utility
 
                 HitEvent = new HitEvent(Clock.CurrentTime - HitTime, 1.0, HitResult.Good, new HitObject
                 {
-                    HitWindows = new HitWindows(),
+                    HitWindows = new DefaultHitWindows(),
                 }, null, null);
 
                 Hit?.Invoke(HitEvent.Value);

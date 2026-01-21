@@ -16,7 +16,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Audio;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -57,9 +56,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected virtual double GetTime() => HitObject is IHasRepeats r ? HitObject.StartTime + r.Duration / r.SpanCount() / 2 : HitObject.StartTime;
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load()
         {
-            HitObject.DefaultsApplied += _ => updateText();
             Label.AllowMultiline = false;
             LabelContainer.AutoSizeAxes = Axes.None;
             updateText();
@@ -73,6 +71,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            HitObject.DefaultsApplied += onDefaultsApplied;
 
             if (timelineBlueprintContainer != null)
                 contracted.BindTo(timelineBlueprintContainer.SamplePointContracted);
@@ -96,12 +96,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             FinishTransforms();
         }
 
+        private void onDefaultsApplied(HitObject hitObject)
+        {
+            updateText();
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
             if (editor != null)
                 editor.ShowSampleEditPopoverRequested -= onShowSampleEditPopoverRequested;
+
+            HitObject.DefaultsApplied -= onDefaultsApplied;
         }
 
         private void onShowSampleEditPopoverRequested(double time)

@@ -13,25 +13,21 @@ using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.Play
 {
     public abstract partial class SpectatorPlayer : Player
     {
+        // TODO: maybe consider giving this proper scores.
+        // `SoloGameplayLeaderboardProvider` doesn't immediately work because there's no guarantee that `LeaderboardManager` global state matches the currently spectated beatmap.
+        [Cached(typeof(IGameplayLeaderboardProvider))]
+        private readonly EmptyGameplayLeaderboardProvider leaderboardProvider = new EmptyGameplayLeaderboardProvider();
+
         [Resolved]
         protected SpectatorClient SpectatorClient { get; private set; } = null!;
 
         private readonly Score score;
-
-        protected override bool CheckModsAllowFailure()
-        {
-            if (!allowFail)
-                return false;
-
-            return base.CheckModsAllowFailure();
-        }
-
-        private bool allowFail;
 
         protected SpectatorPlayer(Score score, PlayerConfiguration? configuration = null)
             : base(configuration)
@@ -65,12 +61,6 @@ namespace osu.Game.Screens.Play
                 }
             }, true);
         }
-
-        /// <summary>
-        /// Should be called when it is apparent that the player being spectated has failed.
-        /// This will subsequently stop blocking the fail screen from displaying (usually done out of safety).
-        /// </summary>
-        public void AllowFail() => allowFail = true;
 
         protected override void StartGameplay()
         {

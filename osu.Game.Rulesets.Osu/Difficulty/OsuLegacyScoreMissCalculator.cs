@@ -115,15 +115,32 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double missCount = 0;
 
+            // If sliders in the map are hard - it's likely for player to drop sliderends
+            // If map has easy sliders - it's more likely for player to sliderbreak
+            double likelyMissedSliderendPortion = 0.04 + 0.06 * Math.Pow(Math.Min(attributes.AimTopWeightedSliderFactor, 1), 2);
+
             // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
-            // In classic scores we can't know the amount of dropped sliders so we estimate to 10% of all sliders on the map
-            double fullComboThreshold = attributes.MaxCombo - 0.1 * attributes.SliderCount;
+            // In classic scores we can't know the amount of dropped sliders so we estimate it
+            double fullComboThreshold = attributes.MaxCombo - Math.Min(4 + likelyMissedSliderendPortion * attributes.SliderCount, attributes.SliderCount);
 
             if (score.MaxCombo < fullComboThreshold)
                 missCount = Math.Pow(fullComboThreshold / Math.Max(1.0, score.MaxCombo), 2.5);
 
             // In classic scores there can't be more misses than a sum of all non-perfect judgements
             missCount = Math.Min(missCount, totalImperfectHits);
+
+            // Every slider has *at least* 2 combo attributed in classic mechanics.
+            // If they broke on a slider with a tick, then this still works since they would have lost at least 2 combo (the tick and the end)
+            // Using this as a max means a score that loses 1 combo on a map can't possibly have been a slider break.
+            // It must have been a slider end.
+            int maxPossibleSliderBreaks = Math.Min(attributes.SliderCount, (attributes.MaxCombo - score.MaxCombo) / 2);
+
+            int scoreMissCount = score.Statistics.GetValueOrDefault(HitResult.Miss);
+
+            double sliderBreaks = missCount - scoreMissCount;
+
+            if (sliderBreaks > maxPossibleSliderBreaks)
+                missCount = scoreMissCount + maxPossibleSliderBreaks;
 
             return missCount;
         }

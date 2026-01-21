@@ -28,6 +28,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
+using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 using ChatStrings = osu.Game.Localisation.ChatStrings;
@@ -91,6 +92,9 @@ namespace osu.Game.Overlays.Chat
 
         [Resolved]
         private Bindable<Channel?>? currentChannel { get; set; }
+
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
 
         private readonly APIUser user;
         private readonly OsuSpriteText drawableText;
@@ -208,6 +212,9 @@ namespace osu.Game.Overlays.Chat
 
                 items.Add(new OsuMenuItemSpacer());
                 items.Add(new OsuMenuItem(UsersStrings.ReportButtonText, MenuItemType.Destructive, ReportRequested));
+                items.Add(api.Blocks.Any(b => b.TargetID == user.OnlineID)
+                    ? new OsuMenuItem(UsersStrings.BlocksButtonUnblock, MenuItemType.Standard, () => dialogOverlay?.Push(ConfirmBlockActionDialog.Unblock(user)))
+                    : new OsuMenuItem(UsersStrings.BlocksButtonBlock, MenuItemType.Destructive, () => dialogOverlay?.Push(ConfirmBlockActionDialog.Block(user))));
 
                 return items.ToArray();
             }

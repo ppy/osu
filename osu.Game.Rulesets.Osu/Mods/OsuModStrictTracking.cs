@@ -4,17 +4,19 @@
 using System;
 using System.Linq;
 using System.Threading;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Beatmaps;
-using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 
@@ -24,6 +26,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => @"Strict Tracking";
         public override string Acronym => @"ST";
+        public override IconUsage? Icon => OsuIcon.ModStrictTracking;
         public override ModType Type => ModType.DifficultyIncrease;
         public override LocalisableString Description => @"Once you start a slider, follow precisely or get a miss.";
         public override double ScoreMultiplier => 1.0;
@@ -83,7 +86,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
             }
 
-            public override Judgement CreateJudgement() => new OsuJudgement();
+            public override Judgement CreateJudgement() => new StrictTrackingTailJudgement();
+        }
+
+        public class StrictTrackingTailJudgement : SliderTailCircle.TailJudgement
+        {
+            public override HitResult MinResult => HitResult.LargeTickMiss;
         }
 
         private partial class StrictTrackingDrawableSliderTail : DrawableSliderTail
