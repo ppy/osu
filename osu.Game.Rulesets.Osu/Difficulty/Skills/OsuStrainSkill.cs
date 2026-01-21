@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.
         /// This is done in order to decrease their impact on the overall difficulty of the map for this skill.
         /// </summary>
-        protected virtual int ReducedSectionCount => 0;
+        protected virtual int ReducedSectionCount => 10;
 
         /// <summary>
         /// The baseline multiplier applied to the section with the biggest strain.
