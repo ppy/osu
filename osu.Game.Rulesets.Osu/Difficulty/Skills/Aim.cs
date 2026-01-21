@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private readonly List<double> sliderStrains = new List<double>();
 
-        protected override double StrainValueOf(DifficultyHitObject current) => AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders);
+        protected override double ObjectDifficultyOf(DifficultyHitObject current) => AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {

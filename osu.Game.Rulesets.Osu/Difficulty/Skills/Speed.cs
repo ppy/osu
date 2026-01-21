@@ -34,12 +34,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => (CurrentStrain * currentRhythm) * StrainDecay(time - current.Previous(0).StartTime);
 
-        protected override double StrainValueOf(DifficultyHitObject current) => SpeedEvaluator.EvaluateDifficultyOf(current, Mods);
+        protected override double ObjectDifficultyOf(DifficultyHitObject current) => SpeedEvaluator.EvaluateDifficultyOf(current, Mods);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             CurrentStrain *= StrainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
-            CurrentStrain += StrainValueOf(current) * SkillMultiplier;
+            CurrentStrain += ObjectDifficultyOf(current) * SkillMultiplier;
 
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
 

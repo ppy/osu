@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             catcherSpeedMultiplier = clockRate;
         }
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        protected override double ObjectDifficultyOf(DifficultyHitObject current)
         {
             return MovementEvaluator.EvaluateDifficultyOf(current, catcherSpeedMultiplier);
         }

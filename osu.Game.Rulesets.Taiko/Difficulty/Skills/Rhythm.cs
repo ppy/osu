@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             this.greatHitWindow = greatHitWindow;
         }
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        protected override double ObjectDifficultyOf(DifficultyHitObject current)
         {
             double difficulty = RhythmEvaluator.EvaluateDifficultyOf(current, greatHitWindow);
 

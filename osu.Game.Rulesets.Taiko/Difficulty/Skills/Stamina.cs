@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             this.isConvert = isConvert;
         }
 
-        protected override double StrainValueOf(DifficultyHitObject current) => StaminaEvaluator.EvaluateDifficultyOf(current);
+        protected override double ObjectDifficultyOf(DifficultyHitObject current) => StaminaEvaluator.EvaluateDifficultyOf(current);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {

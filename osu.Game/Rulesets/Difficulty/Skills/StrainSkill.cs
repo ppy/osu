@@ -54,9 +54,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected double StrainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
 
         /// <summary>
-        /// Calculates the strain value of a <see cref="DifficultyHitObject"/>. This value is affected by previously processed objects.
+        /// Returns the difficulty value of the current <see cref="DifficultyHitObject"/>. This value is calculated with or without respect to previous objects.
         /// </summary>
-        protected abstract double StrainValueOf(DifficultyHitObject current);
+        protected abstract double ObjectDifficultyOf(DifficultyHitObject current);
 
         /// <summary>
         /// Returns the strain value at <see cref="DifficultyHitObject"/>. This value is calculated with or without respect to previous objects.
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected virtual double StrainValueAt(DifficultyHitObject current)
         {
             CurrentStrain *= StrainDecay(current.DeltaTime);
-            CurrentStrain += StrainValueOf(current) * SkillMultiplier;
+            CurrentStrain += ObjectDifficultyOf(current) * SkillMultiplier;
 
             return CurrentStrain;
         }
