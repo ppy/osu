@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             if (ObjectDifficulties.Count == 0)
                 return 0.0;
 
-            double consistentTopStrain = difficultyValue * (1 - DecayWeight); // What would the top strain be if all strain values were identical
+            double consistentTopStrain = difficultyValue * (1 - SumDecayWeight); // What would the top strain be if all strain values were identical
 
             if (consistentTopStrain == 0)
                 return ObjectDifficulties.Count;
