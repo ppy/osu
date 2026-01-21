@@ -181,7 +181,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 return DeltaTime / Math.Max(Math.Max(DeltaTime, deltaDifference), 1);
             }
 
-            // It's easier to gallop if you have more time between doubles
             // Get max between next and prev ratio to avoid nerfing triples
             double speedRatio = Math.Max(getSpeedRatio(osuPrevObj), getSpeedRatio(osuNextObj));
 
