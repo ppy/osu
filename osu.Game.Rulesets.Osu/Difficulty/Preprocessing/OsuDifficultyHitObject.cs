@@ -180,9 +180,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             {
                 double currDeltaTime = Math.Max(1, DeltaTime);
                 double nextDeltaTime = Math.Max(1, osuNextObj.DeltaTime);
+
                 double deltaDifference = Math.Abs(nextDeltaTime - currDeltaTime);
+
                 double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
-                double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / HitWindowGreat), 2);
+                double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / HitWindowGreat), 5);
+
                 return 1.0 - Math.Pow(speedRatio, 1 - windowRatio);
             }
 
