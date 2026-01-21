@@ -484,34 +484,25 @@ namespace osu.Game.Screens.SelectV2
 
             if (CurrentSelection is GroupedBeatmap selection)
             {
-                // The filter might have changed the set of available groups, which means that the current selection may point to a stale group.
-                // Check whether that is the case.
-                bool groupingRemainsOff = selection.Group == null && grouping.GroupItems.Count == 0;
-                bool groupStillValid = selection.Group != null && grouping.ItemMap.ContainsKey(selection);
-
-                if (groupingRemainsOff || groupStillValid)
-                {
-                    if (selection.Group == ExpandedGroup)
-                    {
-                        // Update the visual state of the selected item if it should still be expanded post filter.
-                        HandleItemSelected(CurrentSelection);
-                    }
-                }
-                else
+                // Check whether the selection-group mapping is still valid post-filter.
+                if (!grouping.ItemMap.ContainsKey(selection))
                 {
                     // If the group no longer exists (or the item no longer exists in the previous group), grab an arbitrary other instance of the beatmap under the first group encountered.
-                    var newSelection = GetCarouselItems()?.Select(i => i.Model).OfType<GroupedBeatmap>().FirstOrDefault(gb => gb.Beatmap.Equals(selection.Beatmap));
+                    var newSelection = GetCarouselItems()?
+                                       .Select(i => i.Model)
+                                       .OfType<GroupedBeatmap>()
+                                       .FirstOrDefault(gb => CheckModelEquality(gb.Beatmap, selection.Beatmap));
 
                     // Only change the selection if we actually got a positive hit.
                     // This is necessary so that selection isn't lost if the panel reappears later due to e.g. unapplying some filter criteria that made it disappear in the first place.
                     if (newSelection != null)
-                    {
                         CurrentSelection = newSelection;
-                        // have to run this here as the above operation may noop on model equality.
-                        HandleItemSelected(CurrentSelection);
-                    }
                 }
             }
+
+            // Transfer the previous flag states across to the new models.
+            if (ExpandedBeatmapSet != null) setExpandedSet(ExpandedBeatmapSet);
+            if (ExpandedGroup != null) setExpandedGroup(ExpandedGroup);
 
             foreach (var item in Scroll.Panels.OfType<PanelBeatmapSet>().Where(p => p.Item != null))
                 updateVisibleBeatmaps((GroupedBeatmapSet)item.Item!.Model, item);
@@ -664,6 +655,8 @@ namespace osu.Game.Screens.SelectV2
 
         private void setExpansionStateOfSetItems(GroupedBeatmapSet set, bool expanded)
         {
+            bool canMakeVisible = !grouping.GroupItems.Any() || ExpandedGroup == set.Group;
+
             if (grouping.SetItems.TryGetValue(set, out var items))
             {
                 foreach (var i in items)
@@ -671,7 +664,7 @@ namespace osu.Game.Screens.SelectV2
                     if (i.Model is GroupedBeatmapSet)
                         i.IsExpanded = expanded;
                     else
-                        i.IsVisible = expanded;
+                        i.IsVisible = canMakeVisible && expanded;
                 }
             }
         }
