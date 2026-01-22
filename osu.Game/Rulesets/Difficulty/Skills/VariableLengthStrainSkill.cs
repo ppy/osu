@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
         /// </summary>
-        public sealed override void Process(DifficultyHitObject current)
+        protected sealed override double ProcessInternal(DifficultyHitObject current)
         {
             // If we're on the first object, set up the first section to end `MaxSectionLength` after it.
             if (current.Index == 0)
@@ -115,13 +115,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             double strain = StrainValueAt(current);
 
-            ObjectStrains.Add(strain);
-
             // If it's the first object, we don't want to end the section since it's always going to be the new peak.
             if (current.Index == 0)
             {
                 currentSectionPeak = strain;
-                return;
+                return strain;
             }
 
             // If the current strain is smaller than the current peak, add it to the queue
@@ -146,18 +144,20 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 currentSectionEnd = currentSectionBegin + MaxSectionLength;
                 currentSectionPeak = strain;
             }
+
+            return strain;
         }
 
         /// <summary>
         /// Calculates the number of strains weighted against the top strain.
         /// The result is scaled by clock rate as it affects the total number of strains.
         /// </summary>
-        public virtual double CountTopWeightedStrains()
+        public virtual double CountTopWeightedStrains(double difficultyValue)
         {
             if (ObjectStrains.Count == 0)
                 return 0.0;
 
-            double consistentTopStrain = DifficultyValue() * (1 - DecayWeight); // What would the top strain be if all strain values were identical
+            double consistentTopStrain = difficultyValue * (1 - DecayWeight); // What would the top strain be if all strain values were identical
 
             if (consistentTopStrain == 0)
                 return ObjectStrains.Count;
