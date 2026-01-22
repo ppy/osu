@@ -59,7 +59,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public int PlayCount { get; set; }
 
         [JsonProperty(@"ranked_score")]
-        public int RankedScore { get; set; }
+        public long RankedScore { get; set; }
 
         [JsonProperty(@"performance")]
         public int Performance { get; set; }
