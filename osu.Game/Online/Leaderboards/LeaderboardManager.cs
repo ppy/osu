@@ -219,13 +219,13 @@ namespace osu.Game.Online.Leaderboards
                 var performanceCalculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator();
 
                 if (attributes?.DifficultyAttributes == null || performanceCalculator == null)
-                    return;
+                    continue;
 
                 var result = performanceCalculator.Calculate(score, attributes.Value.DifficultyAttributes);
                 score.PP = result.Total;
             }
         }
-        
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
