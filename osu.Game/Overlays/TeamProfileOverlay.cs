@@ -88,6 +88,7 @@ namespace osu.Game.Overlays
                             Children = new Drawable[]
                             {
                                 new InfoSection { TeamData = { BindTarget = teamData } },
+                                new MembersSection { TeamData = { BindTarget = teamData } },
                             },
                         },
                     },
