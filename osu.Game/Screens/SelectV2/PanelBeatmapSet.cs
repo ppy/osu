@@ -157,7 +157,6 @@ namespace osu.Game.Screens.SelectV2
                                 {
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
-                                    Expanded = { BindTarget = Expanded },
                                     VisibleBeatmaps = { BindTarget = VisibleBeatmaps },
                                 },
                             },
@@ -189,6 +188,8 @@ namespace osu.Game.Screens.SelectV2
                 chevronIcon.ResizeWidthTo(0f, DURATION, Easing.OutQuint);
                 chevronIcon.FadeTo(0f, DURATION, Easing.OutQuint);
             }
+
+            spreadDisplay.Expanded.Value = Expanded.Value;
         }
 
         protected override void PrepareForUse()

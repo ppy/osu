@@ -134,6 +134,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private readonly Bindable<Language> currentLanguage = new Bindable<Language>();
 
+        public bool TakeFocus() => GetContainingFocusManager()?.ChangeFocus(textBox) == true;
+
         public FormSliderBar()
         {
             LabelFormat ??= defaultLabelFormat;
@@ -233,6 +235,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             TooltipFormat = TooltipFormat,
                             DisplayAsPercentage = DisplayAsPercentage,
                             PlaySamplesOnAdjust = PlaySamplesOnAdjust,
+                            ResetToDefault = () =>
+                            {
+                                if (!IsDisabled)
+                                    SetDefault();
+                            }
                         }
                     },
                 },
@@ -323,7 +330,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         break;
 
                     case Bindable<double> bindableDouble:
-                        bindableDouble.Value = double.Parse(textBox.Current.Value);
+                        bindableDouble.Value = double.Parse(textBox.Current.Value) / (DisplayAsPercentage ? 100 : 1);
+                        break;
+
+                    case Bindable<float> bindableFloat:
+                        bindableFloat.Value = float.Parse(textBox.Current.Value) / (DisplayAsPercentage ? 100 : 1);
                         break;
 
                     default:
@@ -390,7 +401,18 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             if (updatingFromTextBox) return;
 
-            textBox.Text = currentNumberInstantaneous.Value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS);
+            if (DisplayAsPercentage)
+            {
+                double floatValue = double.CreateTruncating(currentNumberInstantaneous.Value);
+
+                if (currentNumberInstantaneous.Value is int)
+                    floatValue /= 100;
+
+                textBox.Text = floatValue.ToStandardFormattedString(Math.Max(0, OsuSliderBar<T>.MAX_DECIMAL_DIGITS - 2));
+            }
+            else
+                textBox.Text = currentNumberInstantaneous.Value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS);
+
             valueLabel.Text = LabelFormat(currentNumberInstantaneous.Value);
         }
 
@@ -400,9 +422,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             public BindableBool Focused { get; } = new BindableBool();
 
-            public BindableBool IsDragging { get; set; } = new BindableBool();
+            public BindableBool IsDragging { get; } = new BindableBool();
 
-            public Action? OnCommit { get; set; }
+            public Action? ResetToDefault { get; init; }
+
+            public Action? OnCommit { get; init; }
 
             public sealed override LocalisableString TooltipText => base.TooltipText;
 
@@ -453,11 +477,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         Padding = new MarginPadding { Horizontal = RangePadding, },
                         Child = nub = new InnerSliderNub
                         {
-                            ResetToDefault = () =>
-                            {
-                                if (!Current.Disabled)
-                                    Current.SetDefault();
-                            }
+                            ResetToDefault = ResetToDefault,
                         }
                     },
                     sounds = new HoverClickSounds()
