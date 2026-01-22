@@ -13,7 +13,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -23,14 +22,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private readonly double clockRate;
         private readonly bool hasHiddenMod;
-        private readonly double preempt;
 
         public Reading(IBeatmap beatmap, Mod[] mods, double clockRate)
             : base(mods)
         {
             this.clockRate = clockRate;
             hasHiddenMod = mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value);
-            preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, OsuHitObject.PREEMPT_MAX, OsuHitObject.PREEMPT_MID, OsuHitObject.PREEMPT_MIN) / clockRate;
             objectList = beatmap.HitObjects;
         }
 
@@ -45,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             currentDifficulty *= strainDecay(current.DeltaTime);
 
-            currentDifficulty += ReadingEvaluator.EvaluateDifficultyOf(current, objectList.Count, clockRate, preempt, hasHiddenMod) * skillMultiplier;
+            currentDifficulty += ReadingEvaluator.EvaluateDifficultyOf(current, hasHiddenMod) * skillMultiplier;
 
             return currentDifficulty;
         }

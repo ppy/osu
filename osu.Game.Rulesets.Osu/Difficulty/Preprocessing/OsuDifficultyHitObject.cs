@@ -110,10 +110,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double SmallCircleBonus { get; private set; }
 
+        /// <summary>
+        /// The clock rate.
+        /// </summary>
+        public double ClockRate { get; private set; }
+
+        /// <summary>
+        /// The object preempt ms, adjusted for the clock rate.
+        /// </summary>
+        public double PreEmpt { get; private set; }
+
         private readonly OsuDifficultyHitObject? lastLastDifficultyObject;
         private readonly OsuDifficultyHitObject? lastDifficultyObject;
 
-        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index)
+        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, double preEmpt, List<DifficultyHitObject> objects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
             lastLastDifficultyObject = index > 1 ? (OsuDifficultyHitObject)objects[index - 2] : null;
@@ -123,6 +133,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             AdjustedDeltaTime = Math.Max(DeltaTime, MIN_DELTA_TIME);
 
             SmallCircleBonus = Math.Max(1.0, 1.0 + (30 - BaseObject.Radius) / 40);
+
+            ClockRate = clockRate;
+            PreEmpt = preEmpt;
 
             if (BaseObject is Slider sliderObject)
             {
