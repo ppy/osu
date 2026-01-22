@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double wide_angle_multiplier = 1.5;
         private const double acute_angle_multiplier = 2.24;
         private const double velocity_change_multiplier = 0.75;
-        private const double wiggle_multiplier = 0.53;
+        private const double wiggle_multiplier = 0.53; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
 
         public const double SLIDER_MULTIPLIER = 1.27;
 
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     acuteAngleBonus = CalcAcuteAngleBonus(currAngle);
 
                     // Penalize angle repetition.
-                    acuteAngleBonus *= 0.083 + 0.66 * (1 - Math.Min(acuteAngleBonus, Math.Pow(CalcAcuteAngleBonus(lastAngle), 3)));
+                    acuteAngleBonus *= 0.08 + 0.66 * (1 - Math.Min(acuteAngleBonus, Math.Pow(CalcAcuteAngleBonus(lastAngle), 3)));
 
                     // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
                     acuteAngleBonus *= angleBonus *
@@ -167,6 +167,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (withSliderTravelDistance)
                 aimStrain += sliderBonus * SLIDER_MULTIPLIER;
 
+            aimStrain *= HighBpmBonus(osuCurrObj.AdjustedDeltaTime);
+
             return aimStrain;
         }
 
@@ -223,6 +225,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             return (1 - bigDistanceDifferenceFactor * lowSpacingFactor);
         }
+
+        public static double HighBpmBonus(double ms) => 1 / (1 - Math.Pow(0.15, ms / 1000));
 
         private static double calcWideAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(40), double.DegreesToRadians(140));
         public static double CalcAcuteAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(140), double.DegreesToRadians(40));

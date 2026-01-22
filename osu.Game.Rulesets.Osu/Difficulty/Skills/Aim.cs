@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
+using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 
@@ -38,9 +40,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            currentStrain *= strainDecay(current.DeltaTime);
+            double decay = strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
 
-            currentStrain += StrainValueOf(current) * skillMultiplier;
+            currentStrain *= decay;
+            currentStrain += StrainValueOf(current) * (1 - decay) * skillMultiplier;
 
             if (current.BaseObject is Slider)
                 sliderStrains.Add(currentStrain);
