@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets
             }
             catch (Exception e)
             {
-                LogFailedLoad(filename, e);
+                logRulesetFailure(filename, e);
             }
 
             return null;
@@ -169,7 +169,7 @@ namespace osu.Game.Rulesets
             }
             catch (Exception e)
             {
-                LogFailedLoad(assembly.GetName().Name!.Split('.').Last(), e);
+                logRulesetFailure(assembly.GetName().Name!.Split('.').Last(), e);
             }
         }
 
@@ -184,10 +184,12 @@ namespace osu.Game.Rulesets
             AppDomain.CurrentDomain.AssemblyResolve -= resolveRulesetDependencyAssembly;
         }
 
-        protected void LogFailedLoad(string name, Exception exception)
+        public static void LogRulesetFailure(RulesetInfo ruleset, Exception e) => logRulesetFailure(ruleset.Name, e);
+
+        private static void logRulesetFailure(string name, Exception exception)
         {
-            Logger.Log($"Could not load ruleset \"{name}\". Please check for an update from the developer.", level: LogLevel.Error);
-            Logger.Log($"Ruleset load failed: {exception}");
+            Logger.Log($"An issue with ruleset \"{name}\" occurred. Please check for an update from the developer.", level: LogLevel.Error);
+            Logger.Log(exception.ToString());
         }
 
         #region Implementation of IRulesetStore
