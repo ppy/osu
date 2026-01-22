@@ -499,6 +499,8 @@ namespace osu.Game.Screens.Edit
 
         protected override void Dispose(bool isDisposing)
         {
+            editorBeatmap?.Dispose();
+
             base.Dispose(isDisposing);
 
             // redundant (should have happened via a `resetTrack()` call in `OnExiting()`), but done for safety
