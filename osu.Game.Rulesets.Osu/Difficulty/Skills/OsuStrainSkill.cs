@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using System.Linq;
 using osu.Framework.Utils;
 
@@ -28,6 +30,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
         {
+        }
+
+        protected override double StrainValueAt(DifficultyHitObject current)
+        {
+            double decay = StrainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
+
+            CurrentStrain *= decay;
+            CurrentStrain += ObjectDifficultyOf(current) * (1 - decay) * SkillMultiplier;
+
+            return CurrentStrain;
         }
 
         public override double DifficultyValue()
