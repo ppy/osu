@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Beatmaps
 
         protected abstract string ResourceAssembly { get; }
 
-        protected void Test(double expectedStarRating, int expectedMaxCombo, string name, params Mod[] mods)
+        protected void Test(double? expectedStarRating, int expectedMaxCombo, string name, params Mod[] mods)
         {
             var attributes = CreateDifficultyCalculator(GetBeatmap(name)).Calculate(mods);
 
