@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             ProgressNotification notification = new ProgressNotification
             {
                 State = ProgressNotificationState.Active,
-                Text = "Exporting logs...",
+                Text = NotificationsStrings.LogsExportOngoing,
             };
 
             notifications?.Post(notification);
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 throw;
             }
 
-            notification.CompletionText = "Exported logs! Click to view.";
+            notification.CompletionText = NotificationsStrings.LogsExportFinished;
             notification.CompletionClickAction = () => exportStorage.PresentFileExternally(archive_filename);
 
             notification.State = ProgressNotificationState.Completed;

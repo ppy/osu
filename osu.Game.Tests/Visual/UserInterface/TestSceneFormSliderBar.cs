@@ -64,9 +64,11 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
-        [Test]
-        public void TestNubDoubleClickRevertToDefault()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestNubDoubleClickRevertToDefault(bool transferValueOnCommit)
         {
+            OsuSpriteText text;
             FormSliderBar<float> slider = null!;
 
             AddStep("create content", () =>
@@ -81,9 +83,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Spacing = new Vector2(10),
                     Children = new Drawable[]
                     {
+                        text = new OsuSpriteText(),
                         slider = new FormSliderBar<float>
                         {
                             Caption = "Slider",
+                            TransferValueOnCommit = transferValueOnCommit,
                             Current = new BindableFloat
                             {
                                 MinValue = 0,
@@ -94,6 +98,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         },
                     }
                 };
+                slider.Current.BindValueChanged(_ => text.Text = $"Current value is: {slider.Current.Value}", true);
             });
             AddStep("set slider to 1", () => slider.Current.Value = 1);
 

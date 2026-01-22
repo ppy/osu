@@ -48,9 +48,6 @@ namespace osu.Game.Screens.SelectV2
             [Resolved]
             private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
-            [Resolved]
-            private OsuColour colours { get; set; } = null!;
-
             private StarRatingDisplay starRatingDisplay = null!;
             private FillFlowContainer nameLine = null!;
             private OsuSpriteText difficultyText = null!;
@@ -209,8 +206,13 @@ namespace osu.Game.Screens.SelectV2
             {
                 base.LoadComplete();
 
-                beatmap.BindValueChanged(_ => updateDisplay());
-                ruleset.BindValueChanged(_ => updateDisplay());
+                // it is not uncommon for the beatmap and the ruleset to change in conjunction during a single update frame.
+                // in that process, it is possible for the global bindable triad (beatmap / ruleset / mods) to briefly be partially invalid in combination (e.g. mods invalid for given ruleset).
+                // `updateDisplay()` will initiate a difficulty calculation, and if it is allowed to run in that invalid intermediate state, it will loudly fail.
+                // therefore, all changes that may initiate a difficulty calculation are debounced until the next frame to ensure the global bindable state is fully consistent -
+                // and it's what you'd want to do anyway for performance reasons.
+                beatmap.BindValueChanged(_ => Scheduler.AddOnce(updateDisplay));
+                ruleset.BindValueChanged(_ => Scheduler.AddOnce(updateDisplay));
 
                 mods.BindValueChanged(m =>
                 {
@@ -304,7 +306,7 @@ namespace osu.Game.Screens.SelectV2
                 difficultyText.MaxWidth = Math.Max(nameLine.DrawWidth - mappedByText.DrawWidth - mapperText.DrawWidth - 20, 0);
 
                 // Use difficulty colour until it gets too dark to be visible against dark backgrounds.
-                Color4 col = starRatingDisplay.DisplayedStars.Value >= OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : starRatingDisplay.DisplayedDifficultyColour;
+                Color4 col = starRatingDisplay.DisplayedStars.Value >= OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? starRatingDisplay.DisplayedDifficultyTextColour : starRatingDisplay.DisplayedDifficultyColour;
 
                 difficultyText.Colour = col;
                 mappedByText.Colour = col;
