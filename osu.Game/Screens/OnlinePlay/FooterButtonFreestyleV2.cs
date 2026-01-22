@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Screens.Footer;
 
 namespace osu.Game.Screens.OnlinePlay
@@ -32,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay
         [BackgroundDependencyLoader]
         private void load()
         {
-            Text = "Freestyle";
+            Text = OnlinePlayStrings.FooterButtonFreestyle;
             Icon = FontAwesome.Solid.ExchangeAlt;
             AccentColour = colours.Lime1;
         }

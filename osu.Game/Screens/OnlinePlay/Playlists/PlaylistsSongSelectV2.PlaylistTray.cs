@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osuTK;
@@ -92,7 +93,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                             {
                                                 Y = 20,
                                                 Font = OsuFont.Style.Caption2,
-                                                Text = "Manage items on previous screen"
+                                                Text = OnlinePlayStrings.PlaylistTrayDescription
                                             },
                                         }
                                     },
@@ -166,7 +167,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                         scroll.ScrollToStart(animated: false);
                     ScheduleAfterChildren(() => scroll.ScrollToEnd());
 
-                    Scheduler.AddDelayed(() => text.Text = $"{room.Playlist.Count} item(s)", 100);
+                    Scheduler.AddDelayed(() => text.Text = OnlinePlayStrings.PlaylistTrayItems(room.Playlist.Count), 100);
                 }
 
                 this.FadeIn(200)

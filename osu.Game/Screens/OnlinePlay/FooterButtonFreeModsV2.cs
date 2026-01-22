@@ -54,7 +54,7 @@ namespace osu.Game.Screens.OnlinePlay
         [BackgroundDependencyLoader]
         private void load()
         {
-            Text = "Freemods";
+            Text = OnlinePlayStrings.FooterButtonFreemods;
             Icon = FontAwesome.Solid.ExchangeAlt;
             AccentColour = colours.Lime1;
 
@@ -181,7 +181,7 @@ namespace osu.Game.Screens.OnlinePlay
             private void updateText()
             {
                 if (Freestyle.Value)
-                    text.Text = "ALL MODS";
+                    text.Text = ModSelectOverlayStrings.AllMods.ToUpper();
                 else
                     text.Text = ModSelectOverlayStrings.Mods(Mods.Value.Count).ToUpper();
             }
