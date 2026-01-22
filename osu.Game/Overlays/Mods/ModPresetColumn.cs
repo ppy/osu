@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -83,10 +84,20 @@ namespace osu.Game.Overlays.Mods
                 return;
             }
 
-            latestLoadTask = LoadComponentsAsync(presets.Select(p => new ModPresetPanel(p.ToLive(realm))
+            var panels = new List<ModPresetPanel>();
+
+            for (int i = 0; i < presets.Count; i++)
             {
-                Shear = Vector2.Zero
-            }), loaded =>
+                var preset = presets[i];
+
+                panels.Add(new ModPresetPanel(preset.ToLive(realm))
+                {
+                    Index = i <= 10 ? (i + 1) % 10 : null,
+                    Shear = Vector2.Zero
+                });
+            }
+
+            latestLoadTask = LoadComponentsAsync(panels, loaded =>
             {
                 removeAndDisposePresetPanels();
                 ItemsFlow.AddRange(loaded);
