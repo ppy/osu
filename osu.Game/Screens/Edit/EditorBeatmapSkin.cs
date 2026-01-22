@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Edit
 
                         if (string.IsNullOrEmpty(indexString))
                             index = 1;
-                        if (int.TryParse(indexString, out int parsed))
+                        if (int.TryParse(indexString, out int parsed) && parsed >= 2)
                             index = parsed;
 
                         if (!index.HasValue)
