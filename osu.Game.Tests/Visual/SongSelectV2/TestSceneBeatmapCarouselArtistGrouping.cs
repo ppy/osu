@@ -267,7 +267,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
-        public void TestFilterWhileCollapsedUpdatesVisualStateConnectly()
+        public void TestFilterWhileCollapsedUpdatesVisualStateCorrectly()
         {
             SelectNextSet();
 
