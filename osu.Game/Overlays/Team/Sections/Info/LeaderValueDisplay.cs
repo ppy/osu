@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Team.Sections.Info
                     if (user == null)
                         return;
 
-                    container.AddLink(user.Username, LinkAction.OpenUserProfile, user.Id);
+                    container.AddLink(user.Username, LinkAction.OpenUserProfile, user);
                 });
         }
     }
