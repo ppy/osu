@@ -30,7 +30,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// <summary>
         /// Hint text containing an extended description of this slider bar, displayed in a tooltip when hovering the caption.
         /// </summary>
-        public LocalisableString HintText { get; init; }
+        public LocalisableString HintText
+        {
+            get => header.HintText;
+            set => header.HintText = value;
+        }
 
         /// <summary>
         /// The maximum height of the dropdown's menu.

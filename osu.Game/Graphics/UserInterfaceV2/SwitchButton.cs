@@ -51,7 +51,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     {
                         RelativeSizeAxes = Axes.Both,
                         AlwaysPresent = true,
-                        Alpha = 0
                     },
                     new Container
                     {
@@ -92,7 +91,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private void updateState()
         {
             nub.MoveToX(Current.Value ? nubContainer.DrawWidth - nub.DrawWidth : 0, 200, Easing.OutQuint);
-            fill.FadeTo(Current.Value ? 1 : 0, 250, Easing.OutQuint);
 
             updateColours();
         }
@@ -112,7 +110,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
         protected override void OnUserChange(bool value)
         {
             base.OnUserChange(value);
+            PlaySample(value);
+        }
 
+        public void PlaySample(bool value)
+        {
             if (value)
                 sampleChecked?.Play();
             else
@@ -135,7 +137,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 bool hover = IsHovered && !Current.Disabled;
 
                 borderColour = hover ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Highlight1.Opacity(0.3f);
-                switchColour = hover ? colourProvider.Highlight1 : colourProvider.Light4;
+                switchColour = hover || Current.Value ? colourProvider.Highlight1 : colourProvider.Light4;
 
                 if (!Current.Value)
                 {
@@ -143,7 +145,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     switchColour = switchColour.MultiplyAlpha(0.8f);
                 }
 
-                fill.Colour = colourProvider.Background6;
+                fill.Colour = Current.Value ? colourProvider.Colour4.Darken(0.2f) : colourProvider.Background6;
             }
 
             nubContainer.FadeColour(switchColour, 250, Easing.OutQuint);
