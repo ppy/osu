@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets
                     catch (Exception ex)
                     {
                         r.Available = false;
-                        LogFailedLoad(r.Name, ex);
+                        LogRulesetFailure(r, ex);
                     }
                 }
 
