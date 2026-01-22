@@ -46,6 +46,9 @@ namespace osu.Game.Utils
         {
             this.game = game;
 
+            if (Environment.GetEnvironmentVariable("OSU_DISABLE_ERROR_REPORTING") == "1")
+                return;
+
             if (!game.IsDeployedBuild || !game.CreateEndpoints().WebsiteUrl.EndsWith(@".ppy.sh", StringComparison.Ordinal))
                 return;
 
