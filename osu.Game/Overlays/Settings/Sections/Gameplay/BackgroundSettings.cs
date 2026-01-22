@@ -32,6 +32,12 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },
+                new SettingsEnumDropdown<BackgroundScaleMode>
+                {
+                    ClassicDefault = BackgroundScaleMode.ScaleToFit,
+                    LabelText = GameplaySettingsStrings.BackgroundScaleMode,
+                    Current = config.GetBindable<BackgroundScaleMode>(OsuSetting.BackgroundScaleMode),
+                },
                 new SettingsCheckbox
                 {
                     LabelText = GameplaySettingsStrings.LightenDuringBreaks,
