@@ -14,7 +14,8 @@ namespace osu.Game.Overlays.Settings
 {
     public sealed partial class SettingsItemV2 : CompositeDrawable, ISettingsItem, IConditionalFilterable
     {
-        private readonly IFormControl control;
+        public readonly IFormControl Control;
+
         private readonly SettingsRevertToDefaultButton revertButton;
 
         private readonly BindableBool controlDefault = new BindableBool(true);
@@ -32,7 +33,7 @@ namespace osu.Game.Overlays.Settings
 
         public SettingsItemV2(IFormControl control)
         {
-            this.control = control;
+            Control = control;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -41,7 +42,7 @@ namespace osu.Game.Overlays.Settings
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS_RIGHT },
+                Padding = SettingsPanel.CONTENT_PADDING,
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
@@ -78,8 +79,8 @@ namespace osu.Game.Overlays.Settings
         {
             base.LoadComplete();
 
-            controlDefault.Value = control.IsDefault;
-            controlEnabled.Value = !control.IsDisabled;
+            controlDefault.Value = Control.IsDefault;
+            controlEnabled.Value = !Control.IsDisabled;
 
             controlDefault.BindValueChanged(_ => updateDefaultState());
             controlEnabled.BindValueChanged(_ => updateDefaultState(), true);
@@ -99,8 +100,8 @@ namespace osu.Game.Overlays.Settings
         protected override void Update()
         {
             base.Update();
-            controlDefault.Value = control.IsDefault;
-            controlEnabled.Value = !control.IsDisabled;
+            controlDefault.Value = Control.IsDefault;
+            controlEnabled.Value = !Control.IsDisabled;
         }
 
         #region ISettingsItem
@@ -111,20 +112,20 @@ namespace osu.Game.Overlays.Settings
         /// If set, this setting is considered as having a "classic" default value,
         /// and this is the function for overwriting the control with that value.
         /// </summary>
-        public Action? ApplyClassicDefault { get; set; }
+        public Action<IFormControl>? ApplyClassicDefault { get; set; }
 
-        void ISettingsItem.ApplyClassicDefault() => ApplyClassicDefault?.Invoke();
+        void ISettingsItem.ApplyClassicDefault() => ApplyClassicDefault?.Invoke(Control);
 
         public void ApplyDefault()
         {
-            if (!control.IsDisabled)
-                control.SetDefault();
+            if (!Control.IsDisabled)
+                Control.SetDefault();
         }
 
         public event Action SettingChanged
         {
-            add => control.ValueChanged += value;
-            remove => control.ValueChanged -= value;
+            add => Control.ValueChanged += value;
+            remove => Control.ValueChanged -= value;
         }
 
         #endregion
@@ -140,7 +141,7 @@ namespace osu.Game.Overlays.Settings
             get
             {
                 var filterTerms = new List<LocalisableString>(Keywords.Select(k => (LocalisableString)k));
-                filterTerms.AddRange(control.FilterTerms);
+                filterTerms.AddRange(Control.FilterTerms);
 
                 if (HasClassicDefault)
                     filterTerms.Add(CLASSIC_DEFAULT_SEARCH_TERM);

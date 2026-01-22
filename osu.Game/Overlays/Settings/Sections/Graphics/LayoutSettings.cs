@@ -9,7 +9,6 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -18,7 +17,7 @@ using osu.Framework.Platform;
 using osu.Framework.Platform.Windows;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osuTK;
 using osuTK.Graphics;
@@ -29,8 +28,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
     {
         protected override LocalisableString Header => GraphicsSettingsStrings.LayoutHeader;
 
-        private FillFlowContainer<SettingsSlider<float>> scalingSettings = null!;
-        private SettingsSlider<float> dimSlider = null!;
+        private FillFlowContainer<SettingsItemV2> scalingSettings = null!;
 
         private readonly Bindable<Display> currentDisplay = new Bindable<Display>();
 
@@ -51,12 +49,19 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private IWindow? window;
 
-        private SettingsDropdown<Size> resolutionFullscreenDropdown = null!;
-        private SettingsDropdown<Size> resolutionWindowedDropdown = null!;
-        private SettingsDropdown<Display> displayDropdown = null!;
-        private SettingsDropdown<WindowMode> windowModeDropdown = null!;
-        private SettingsCheckbox minimiseOnFocusLossCheckbox = null!;
-        private SettingsCheckbox safeAreaConsiderationsCheckbox = null!;
+        private readonly BindableBool resolutionFullscreenCanBeShown = new BindableBool(true);
+        private readonly BindableBool resolutionWindowedCanBeShown = new BindableBool(true);
+        private readonly BindableBool displayDropdownCanBeShown = new BindableBool(true);
+        private readonly BindableBool minimiseOnFocusLossCanBeShown = new BindableBool(true);
+        private readonly BindableBool safeAreaConsiderationsCanBeShown = new BindableBool(true);
+
+        private FormDropdown<Size> resolutionWindowedDropdown = null!;
+        private FormDropdown<Display> displayDropdown = null!;
+        private FormDropdown<WindowMode> windowModeDropdown = null!;
+
+        private FormSliderBar<float> dimSlider = null!;
+
+        private readonly Bindable<SettingsNote.Data?> windowModeDropdownNote = new Bindable<SettingsNote.Data?>();
 
         private Bindable<double> windowedPositionX = null!;
         private Bindable<double> windowedPositionY = null!;
@@ -98,105 +103,137 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             Children = new Drawable[]
             {
-                windowModeDropdown = new SettingsDropdown<WindowMode>
+                new SettingsItemV2(windowModeDropdown = new FormDropdown<WindowMode>
                 {
-                    LabelText = GraphicsSettingsStrings.ScreenMode,
+                    Caption = GraphicsSettingsStrings.ScreenMode,
                     Items = window?.SupportedWindowModes,
-                    CanBeShown = { Value = window?.SupportedWindowModes.Count() > 1 },
                     Current = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
-                },
-                displayDropdown = new DisplaySettingsDropdown
+                })
                 {
-                    LabelText = GraphicsSettingsStrings.Display,
+                    CanBeShown = { Value = window?.SupportedWindowModes.Count() > 1 },
+                    Note = { BindTarget = windowModeDropdownNote },
+                },
+                new SettingsItemV2(displayDropdown = new DisplayDropdown
+                {
+                    Caption = GraphicsSettingsStrings.Display,
                     Items = window?.Displays,
                     Current = currentDisplay,
-                },
-                resolutionFullscreenDropdown = new ResolutionSettingsDropdown
+                })
                 {
-                    LabelText = GraphicsSettingsStrings.Resolution,
-                    ShowsDefaultIndicator = false,
+                    CanBeShown = { BindTarget = displayDropdownCanBeShown }
+                },
+                new SettingsItemV2(new ResolutionDropdown
+                {
+                    Caption = GraphicsSettingsStrings.Resolution,
                     ItemSource = resolutionsFullscreen,
                     Current = sizeFullscreen
-                },
-                resolutionWindowedDropdown = new ResolutionSettingsDropdown
+                })
                 {
-                    LabelText = GraphicsSettingsStrings.Resolution,
-                    ShowsDefaultIndicator = false,
+                    CanBeShown = { BindTarget = resolutionFullscreenCanBeShown },
+                    ShowRevertToDefaultButton = false,
+                },
+                new SettingsItemV2(resolutionWindowedDropdown = new ResolutionDropdown
+                {
+                    Caption = GraphicsSettingsStrings.Resolution,
                     ItemSource = resolutionsWindowed,
                     Current = windowedResolution
-                },
-                minimiseOnFocusLossCheckbox = new SettingsCheckbox
+                })
                 {
-                    LabelText = GraphicsSettingsStrings.MinimiseOnFocusLoss,
+                    CanBeShown = { BindTarget = resolutionWindowedCanBeShown },
+                    ShowRevertToDefaultButton = false,
+                },
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = GraphicsSettingsStrings.MinimiseOnFocusLoss,
                     Current = config.GetBindable<bool>(FrameworkSetting.MinimiseOnFocusLossInFullscreen),
+                })
+                {
+                    CanBeShown = { BindTarget = minimiseOnFocusLossCanBeShown },
                     Keywords = new[] { "alt-tab", "minimize", "focus", "hide" },
                 },
-                safeAreaConsiderationsCheckbox = new SettingsCheckbox
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = GraphicsSettingsStrings.ShrinkGameToSafeArea,
+                    Caption = GraphicsSettingsStrings.ShrinkGameToSafeArea,
                     Current = osuConfig.GetBindable<bool>(OsuSetting.SafeAreaConsiderations),
-                },
-                new SettingsSlider<float, UIScaleSlider>
+                })
                 {
-                    LabelText = GraphicsSettingsStrings.UIScaling,
+                    CanBeShown = { BindTarget = safeAreaConsiderationsCanBeShown },
+                },
+                new SettingsItemV2(new FormSliderBar<float>
+                {
+                    Caption = GraphicsSettingsStrings.UIScaling,
                     TransferValueOnCommit = true,
                     Current = osuConfig.GetBindable<float>(OsuSetting.UIScale),
                     KeyboardStep = 0.01f,
-                    Keywords = new[] { "scale", "letterbox" },
-                },
-                new SettingsEnumDropdown<ScalingMode>
+                    LabelFormat = v => $@"{v:0.##}x",
+                })
                 {
-                    LabelText = GraphicsSettingsStrings.ScreenScaling,
-                    Current = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling),
                     Keywords = new[] { "scale", "letterbox" },
                 },
-                scalingSettings = new FillFlowContainer<SettingsSlider<float>>
+                new SettingsItemV2(new FormEnumDropdown<ScalingMode>
+                {
+                    Caption = GraphicsSettingsStrings.ScreenScaling,
+                    Current = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling),
+                })
+                {
+                    Keywords = new[] { "scale", "letterbox" },
+                },
+                scalingSettings = new FillFlowContainer<SettingsItemV2>
                 {
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Masking = true,
+                    Spacing = new Vector2(0, SettingsSection.ITEM_SPACING_V2),
                     Children = new[]
                     {
-                        new SettingsSlider<float>
+                        new SettingsItemV2(new FormSliderBar<float>
                         {
-                            LabelText = GraphicsSettingsStrings.HorizontalPosition,
-                            Keywords = new[] { "screen", "scaling" },
+                            Caption = GraphicsSettingsStrings.HorizontalPosition,
                             Current = scalingPositionX,
                             KeyboardStep = 0.01f,
-                            DisplayAsPercentage = true
-                        },
-                        new SettingsSlider<float>
+                            DisplayAsPercentage = true,
+                        }.With(bindPreviewEvent))
                         {
-                            LabelText = GraphicsSettingsStrings.VerticalPosition,
                             Keywords = new[] { "screen", "scaling" },
+                        },
+                        new SettingsItemV2(new FormSliderBar<float>
+                        {
+                            Caption = GraphicsSettingsStrings.VerticalPosition,
                             Current = scalingPositionY,
                             KeyboardStep = 0.01f,
-                            DisplayAsPercentage = true
-                        },
-                        new SettingsSlider<float>
+                            DisplayAsPercentage = true,
+                        }.With(bindPreviewEvent))
                         {
-                            LabelText = GraphicsSettingsStrings.HorizontalScale,
                             Keywords = new[] { "screen", "scaling" },
+                        },
+                        new SettingsItemV2(new FormSliderBar<float>
+                        {
+                            Caption = GraphicsSettingsStrings.HorizontalScale,
                             Current = scalingSizeX,
                             KeyboardStep = 0.01f,
-                            DisplayAsPercentage = true
-                        },
-                        new SettingsSlider<float>
+                            DisplayAsPercentage = true,
+                        }.With(bindPreviewEvent))
                         {
-                            LabelText = GraphicsSettingsStrings.VerticalScale,
                             Keywords = new[] { "screen", "scaling" },
+                        },
+                        new SettingsItemV2(new FormSliderBar<float>
+                        {
+                            Caption = GraphicsSettingsStrings.VerticalScale,
                             Current = scalingSizeY,
                             KeyboardStep = 0.01f,
-                            DisplayAsPercentage = true
-                        },
-                        dimSlider = new SettingsSlider<float>
+                            DisplayAsPercentage = true,
+                        }.With(bindPreviewEvent))
                         {
-                            LabelText = GameplaySettingsStrings.BackgroundDim,
+                            Keywords = new[] { "screen", "scaling" },
+                        },
+                        new SettingsItemV2(dimSlider = new FormSliderBar<float>
+                        {
+                            Caption = GameplaySettingsStrings.BackgroundDim,
                             Current = scalingBackgroundDim,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true,
-                        },
+                        }.With(bindPreviewEvent)),
                     }
                 },
             };
@@ -207,8 +244,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            scalingSettings.ForEach(s => bindPreviewEvent(s.Current));
 
             windowModeDropdown.Current.BindValueChanged(_ =>
             {
@@ -298,18 +333,19 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     scalingSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
 
                 scalingSettings.AutoSizeAxes = scalingMode.Value != ScalingMode.Off ? Axes.Y : Axes.None;
-                scalingSettings.ForEach(s =>
+
+                foreach (SettingsItemV2 item in scalingSettings)
                 {
-                    if (s == dimSlider)
-                    {
-                        s.CanBeShown.Value = scalingMode.Value == ScalingMode.Everything || scalingMode.Value == ScalingMode.ExcludeOverlays;
-                    }
+                    FormSliderBar<float> slider = (FormSliderBar<float>)item.Control;
+
+                    if (slider == dimSlider)
+                        item.CanBeShown.Value = scalingMode.Value == ScalingMode.Everything || scalingMode.Value == ScalingMode.ExcludeOverlays;
                     else
                     {
-                        s.TransferValueOnCommit = scalingMode.Value == ScalingMode.Everything;
-                        s.CanBeShown.Value = scalingMode.Value != ScalingMode.Off;
+                        slider.TransferValueOnCommit = scalingMode.Value == ScalingMode.Everything;
+                        item.CanBeShown.Value = scalingMode.Value != ScalingMode.Off;
                     }
-                });
+                }
             }
         }
 
@@ -325,12 +361,12 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private void updateDisplaySettingsVisibility()
         {
-            resolutionFullscreenDropdown.CanBeShown.Value = windowModeDropdown.Current.Value == WindowMode.Fullscreen && resolutionsFullscreen.Count > 1;
-            resolutionWindowedDropdown.CanBeShown.Value = windowModeDropdown.Current.Value == WindowMode.Windowed && resolutionsWindowed.Count > 1;
+            resolutionFullscreenCanBeShown.Value = windowModeDropdown.Current.Value == WindowMode.Fullscreen && resolutionsFullscreen.Count > 1;
+            resolutionWindowedCanBeShown.Value = windowModeDropdown.Current.Value == WindowMode.Windowed && resolutionsWindowed.Count > 1;
 
-            displayDropdown.CanBeShown.Value = displayDropdown.Items.Count() > 1;
-            minimiseOnFocusLossCheckbox.CanBeShown.Value = RuntimeInfo.IsDesktop && windowModeDropdown.Current.Value == WindowMode.Fullscreen;
-            safeAreaConsiderationsCheckbox.CanBeShown.Value = host.Window?.SafeAreaPadding.Value.Total != Vector2.Zero;
+            displayDropdownCanBeShown.Value = displayDropdown.Items.Count() > 1;
+            minimiseOnFocusLossCanBeShown.Value = RuntimeInfo.IsDesktop && windowModeDropdown.Current.Value == WindowMode.Fullscreen;
+            safeAreaConsiderationsCanBeShown.Value = host.Window?.SafeAreaPadding.Value.Total != Vector2.Zero;
         }
 
         private void updateScreenModeWarning()
@@ -339,16 +375,16 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             if (RuntimeInfo.OS == RuntimeInfo.Platform.macOS && !FrameworkEnvironment.UseSDL3)
             {
                 if (windowModeDropdown.Current.Value == WindowMode.Fullscreen)
-                    windowModeDropdown.SetNoticeText(LayoutSettingsStrings.FullscreenMacOSNote, true);
+                    windowModeDropdownNote.Value = new SettingsNote.Data(LayoutSettingsStrings.FullscreenMacOSNote, SettingsNote.Type.Critical);
                 else
-                    windowModeDropdown.ClearNoticeText();
+                    windowModeDropdownNote.Value = null;
 
                 return;
             }
 
             if (windowModeDropdown.Current.Value != WindowMode.Fullscreen)
             {
-                windowModeDropdown.SetNoticeText(GraphicsSettingsStrings.NotFullscreenNote, true);
+                windowModeDropdownNote.Value = new SettingsNote.Data(GraphicsSettingsStrings.NotFullscreenNote, SettingsNote.Type.Warning);
                 return;
             }
 
@@ -357,28 +393,28 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 switch (fullscreenCapability.Value)
                 {
                     case FullscreenCapability.Unknown:
-                        windowModeDropdown.SetNoticeText(LayoutSettingsStrings.CheckingForFullscreenCapabilities, true);
+                        windowModeDropdownNote.Value = new SettingsNote.Data(LayoutSettingsStrings.CheckingForFullscreenCapabilities, SettingsNote.Type.Informational);
                         break;
 
                     case FullscreenCapability.Capable:
-                        windowModeDropdown.SetNoticeText(LayoutSettingsStrings.OsuIsRunningExclusiveFullscreen);
+                        windowModeDropdownNote.Value = new SettingsNote.Data(LayoutSettingsStrings.OsuIsRunningExclusiveFullscreen, SettingsNote.Type.Informational);
                         break;
 
                     case FullscreenCapability.Incapable:
-                        windowModeDropdown.SetNoticeText(LayoutSettingsStrings.UnableToRunExclusiveFullscreen, true);
+                        windowModeDropdownNote.Value = new SettingsNote.Data(LayoutSettingsStrings.UnableToRunExclusiveFullscreen, SettingsNote.Type.Warning);
                         break;
                 }
             }
             else
             {
                 // We can only detect exclusive fullscreen status on windows currently.
-                windowModeDropdown.ClearNoticeText();
+                windowModeDropdownNote.Value = null;
             }
         }
 
-        private void bindPreviewEvent(Bindable<float> bindable)
+        private void bindPreviewEvent(FormSliderBar<float> slider)
         {
-            bindable.ValueChanged += _ =>
+            slider.Current.ValueChanged += _ =>
             {
                 switch (scalingMode.Value)
                 {
@@ -421,37 +457,22 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             }
         }
 
-        private partial class UIScaleSlider : RoundedSliderBar<float>
+        private partial class DisplayDropdown : FormDropdown<Display>
         {
-            public override LocalisableString TooltipText => base.TooltipText + "x";
-        }
-
-        private partial class DisplaySettingsDropdown : SettingsDropdown<Display>
-        {
-            protected override OsuDropdown<Display> CreateDropdown() => new DisplaySettingsDropdownControl();
-
-            private partial class DisplaySettingsDropdownControl : DropdownControl
+            protected override LocalisableString GenerateItemText(Display item)
             {
-                protected override LocalisableString GenerateItemText(Display item)
-                {
-                    return $"{item.Index}: {item.Name} ({item.Bounds.Width}x{item.Bounds.Height})";
-                }
+                return $"{item.Index}: {item.Name} ({item.Bounds.Width}x{item.Bounds.Height})";
             }
         }
 
-        private partial class ResolutionSettingsDropdown : SettingsDropdown<Size>
+        private partial class ResolutionDropdown : FormDropdown<Size>
         {
-            protected override OsuDropdown<Size> CreateDropdown() => new ResolutionDropdownControl();
-
-            private partial class ResolutionDropdownControl : DropdownControl
+            protected override LocalisableString GenerateItemText(Size item)
             {
-                protected override LocalisableString GenerateItemText(Size item)
-                {
-                    if (item == new Size(9999, 9999))
-                        return CommonStrings.Default;
+                if (item == new Size(9999, 9999))
+                    return CommonStrings.Default;
 
-                    return $"{item.Width}x{item.Height}";
-                }
+                return $"{item.Width}x{item.Height}";
             }
         }
 

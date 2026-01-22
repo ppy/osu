@@ -35,21 +35,21 @@ namespace osu.Game.Overlays.Settings.Sections.General
         {
             AddRange(new Drawable[]
             {
-                new SettingsButton
+                new SettingsButtonV2
                 {
                     Text = GeneralSettingsStrings.RunSetupWizard,
                     Keywords = new[] { @"first run", @"initial", @"getting started", @"import", @"tutorial", @"recommended beatmaps" },
                     TooltipText = FirstRunSetupOverlayStrings.FirstRunSetupDescription,
                     Action = () => firstRunSetupOverlay?.Show(),
                 },
-                new SettingsButton
+                new SettingsButtonV2
                 {
                     Text = GeneralSettingsStrings.LearnMoreAboutLazer,
                     TooltipText = GeneralSettingsStrings.LearnMoreAboutLazerTooltip,
                     BackgroundColour = colours.YellowDark,
                     Action = () => game?.ShowWiki(@"Help_centre/Upgrading_to_lazer")
                 },
-                new SettingsButton
+                new SettingsButtonV2
                 {
                     Text = GeneralSettingsStrings.ReportIssue,
                     TooltipText = GeneralSettingsStrings.ReportIssueTooltip,
@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             if (supportsExport)
             {
-                Add(new SettingsButton
+                Add(new SettingsButtonV2
                 {
                     Text = GeneralSettingsStrings.ExportLogs,
                     BackgroundColour = colours.YellowDarker.Darken(0.5f),

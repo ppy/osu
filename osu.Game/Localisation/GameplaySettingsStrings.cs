@@ -120,9 +120,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ModsHeader => new TranslatableString(getKey(@"mods_header"), @"Mods");
 
         /// <summary>
-        /// "Increase visibility of first object when visual impairment mods are enabled"
+        /// "Increase first object visibility on visual impairment mods"
         /// </summary>
-        public static LocalisableString IncreaseFirstObjectVisibility => new TranslatableString(getKey(@"increase_first_object_visibility"), @"Increase visibility of first object when visual impairment mods are enabled");
+        public static LocalisableString IncreaseFirstObjectVisibility => new TranslatableString(getKey(@"increase_first_object_visibility"), @"Increase first object visibility on visual impairment mods");
 
         /// <summary>
         /// "Hide during gameplay"
