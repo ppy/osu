@@ -38,9 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            CurrentStrain *= StrainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
-            CurrentStrain += ObjectDifficultyOf(current) * SkillMultiplier;
-
+            CurrentStrain = base.StrainValueAt(current);
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
 
             double totalStrain = CurrentStrain * currentRhythm;
