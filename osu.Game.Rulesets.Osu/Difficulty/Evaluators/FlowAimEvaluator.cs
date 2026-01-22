@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class FlowAimEvaluator
     {
         // The reason why this exist in evaluator instead of FlowAim skill - it's because it's very important to keep flowaim in the same scaling as snapaim on evaluator level
-        private const double flow_multiplier = 1.095;
+        private const double flow_multiplier = 6.2;
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
@@ -38,25 +38,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 velocity = Math.Max(velocity, movementVelocity + travelVelocity); // take the larger total combined velocity.
             }
 
-            double distanceInfluence;
+            double distancePowerAddition;
 
-            // Rescale the distance to make it closer d/t
             if (osuCurrObj.LazyJumpDistance > diameter)
             {
                 // Controls distance scaling for high spaced flow aim
-                distanceInfluence = Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.45);
+                distancePowerAddition = Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.45);
             }
             else
             {
                 // Controls distance scaling for low spaced flow aim
-                distanceInfluence = Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.7);
+                distancePowerAddition = Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.7);
             }
 
-            double flowDifficulty = velocity * distanceInfluence;
+            // Rescale velocity by raising t to the power of 2 and distance to the power determined earlier
+            double flowDifficulty = velocity * (distancePowerAddition * diameter) / osuCurrObj.AdjustedDeltaTime;
 
             // Flow aim is harder on High BPM
-            const double base_speedflow_multiplier = 0.07; // Base multiplier for speedflow bonus
-            const double bpm_factor = 10; // How steep the bonus is, higher values means more bonus for high BPM
+            const double base_speedflow_multiplier = 0.1; // Base multiplier for speedflow bonus
+            const double bpm_factor = 18; // How steep the bonus is, higher values means more bonus for high BPM
 
             // Autobalance, it's expected for bonus multiplier to be 1 for the bpm base
             double bpmBase = DifficultyCalculationUtils.BPMToMilliseconds(220, 4);
@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double angleChangeBonus = CalculateFlowAngleChangeBonus(current);
 
                 // Don't account for distance bonuse here
-                angleBonus = Math.Max(acuteAngleBonus, angleChangeBonus) / Math.Max(distanceInfluence, 0.01);
+                angleBonus = Math.Max(acuteAngleBonus, angleChangeBonus) / Math.Max(distancePowerAddition, 0.01);
 
                 // If all three notes are overlapping - don't reward angle bonuses as you don't have to do additional movement
                 double overlappedNotesWeight = 1;
@@ -99,6 +99,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 angleBonus *= overlappedNotesWeight;
             }
 
+            // Add all bonuses
             flowDifficulty *= (1 + angleBonus);
             flowDifficulty += speedflowBonus;
             flowDifficulty *= flow_multiplier * Math.Sqrt(osuCurrObj.SmallCircleBonus);
@@ -106,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuLast0Obj.BaseObject is Slider && withSliderTravelDistance)
             {
                 double sliderBonus = osuLast0Obj.TravelDistance / osuLast0Obj.TravelTime;
-                flowDifficulty += sliderBonus * AimEvaluator.SLIDER_MULTIPLIER;
+                flowDifficulty += sliderBonus * AimEvaluator.SLIDER_MULTIPLIER * AimEvaluator.HighBpmBonus(osuCurrObj.AdjustedDeltaTime);
             }
 
             return flowDifficulty;
