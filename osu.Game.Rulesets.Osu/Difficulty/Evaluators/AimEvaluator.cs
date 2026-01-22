@@ -162,8 +162,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (withSliderTravelDistance)
                 aimStrain += sliderBonus * slider_multiplier;
 
+            aimStrain *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
+
             return aimStrain;
         }
+
+        private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.15, ms / 1000));
 
         private static double calcWideAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(40), double.DegreesToRadians(140));
 
