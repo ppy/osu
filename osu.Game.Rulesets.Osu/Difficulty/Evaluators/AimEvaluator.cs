@@ -13,10 +13,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double wide_angle_multiplier = 1.5;
         private const double acute_angle_multiplier = 2.24;
+        private const double slider_multiplier = 1.27;
         private const double velocity_change_multiplier = 0.75;
         private const double wiggle_multiplier = 0.53; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
-
-        public const double SLIDER_MULTIPLIER = 1.27;
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
@@ -73,7 +72,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double wideAngleBonus = 0;
             double acuteAngleBonus = 0;
-            double sliderBonus = 0;
             double velocityChangeBonus = 0;
             double wiggleBonus = 0;
 
@@ -148,12 +146,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) / Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime), 2);
             }
 
-            if (osuLastObj.BaseObject is Slider)
-            {
-                // Reward sliders based on velocity.
-                sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
-            }
-
             aimStrain += wiggleBonus * wiggle_multiplier;
             aimStrain += velocityChangeBonus * velocity_change_multiplier;
 
@@ -162,14 +154,29 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Apply high circle size bonus
             aimStrain *= osuCurrObj.SmallCircleBonus;
+            aimStrain *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
 
             // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)
-                aimStrain += sliderBonus * SLIDER_MULTIPLIER;
-
-            aimStrain *= HighBpmBonus(osuCurrObj.AdjustedDeltaTime);
+                aimStrain += CalculateSliderBonus(osuCurrObj, osuLastObj);
 
             return aimStrain;
+        }
+
+        public static double CalculateSliderBonus(OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuLastObj)
+        {
+            if (osuLastObj.BaseObject is Slider)
+            {
+                // Reward sliders based on velocity.
+                double sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
+
+                // Add high bpm bonus
+                sliderBonus *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
+
+                return sliderBonus * slider_multiplier;
+            }
+
+            return 0;
         }
 
         private static double calculateSnappingDifficulty(double currDistance, OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuLastObj)
@@ -226,7 +233,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return (1 - bigDistanceDifferenceFactor * lowSpacingFactor);
         }
 
-        public static double HighBpmBonus(double ms) => 1 / (1 - Math.Pow(0.15, ms / 1000));
+        private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.15, ms / 1000));
 
         private static double calcWideAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(40), double.DegreesToRadians(140));
         public static double CalcAcuteAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(140), double.DegreesToRadians(40));

@@ -104,11 +104,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             flowDifficulty += speedflowBonus;
             flowDifficulty *= flow_multiplier * Math.Sqrt(osuCurrObj.SmallCircleBonus);
 
-            if (osuLast0Obj.BaseObject is Slider && withSliderTravelDistance)
-            {
-                double sliderBonus = osuLast0Obj.TravelDistance / osuLast0Obj.TravelTime;
-                flowDifficulty += sliderBonus * AimEvaluator.SLIDER_MULTIPLIER * AimEvaluator.HighBpmBonus(osuCurrObj.AdjustedDeltaTime);
-            }
+            // Add in additional slider velocity bonus.
+            if (withSliderTravelDistance)
+                flowDifficulty += AimEvaluator.CalculateSliderBonus(osuCurrObj, osuLast0Obj);
 
             return flowDifficulty;
         }
