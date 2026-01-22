@@ -2,18 +2,21 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osuTK;
+using osuTK.Input;
 using Realms;
 
 namespace osu.Game.Overlays.Mods
@@ -27,6 +30,8 @@ namespace osu.Game.Overlays.Mods
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         private const float contracted_width = WIDTH - 120;
+
+        private readonly Key[] toggleKeys = { Key.Number1, Key.Number2, Key.Number3, Key.Number4, Key.Number5, Key.Number6, Key.Number7, Key.Number8, Key.Number9, Key.Number0 };
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -79,10 +84,20 @@ namespace osu.Game.Overlays.Mods
                 return;
             }
 
-            latestLoadTask = LoadComponentsAsync(presets.Select(p => new ModPresetPanel(p.ToLive(realm))
+            var panels = new List<ModPresetPanel>();
+
+            for (int i = 0; i < presets.Count; i++)
             {
-                Shear = Vector2.Zero
-            }), loaded =>
+                var preset = presets[i];
+
+                panels.Add(new ModPresetPanel(preset.ToLive(realm))
+                {
+                    Index = i <= 10 ? (i + 1) % 10 : null,
+                    Shear = Vector2.Zero
+                });
+            }
+
+            latestLoadTask = LoadComponentsAsync(panels, loaded =>
             {
                 removeAndDisposePresetPanels();
                 ItemsFlow.AddRange(loaded);
@@ -93,6 +108,24 @@ namespace osu.Game.Overlays.Mods
                 foreach (var panel in ItemsFlow.OfType<ModPresetPanel>().ToArray())
                     panel.RemoveAndDisposeImmediately();
             }
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed || e.Repeat)
+                return false;
+
+            int index = Array.IndexOf(toggleKeys, e.Key);
+            if (index < 0)
+                return false;
+
+            var panel = ItemsFlow.OfType<ModPresetPanel>().ElementAtOrDefault(index);
+            if (panel == null)
+                return false;
+
+            panel.Toggle();
+
+            return true;
         }
 
         protected override void Dispose(bool isDisposing)
