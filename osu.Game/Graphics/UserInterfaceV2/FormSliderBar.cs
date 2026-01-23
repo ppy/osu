@@ -405,8 +405,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 double floatValue = double.CreateTruncating(currentNumberInstantaneous.Value);
 
-                if (currentNumberInstantaneous.Value is int)
-                    floatValue /= 100;
+                if (currentNumberInstantaneous.Value is double or float)
+                    floatValue *= 100;
 
                 textBox.Text = floatValue.ToStandardFormattedString(Math.Max(0, OsuSliderBar<T>.MAX_DECIMAL_DIGITS - 2));
             }
