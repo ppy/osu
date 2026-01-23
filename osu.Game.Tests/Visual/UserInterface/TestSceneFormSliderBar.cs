@@ -169,6 +169,17 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Key(Key.Enter);
             });
             AddAssert("slider is still at 1", () => slider.Current.Value, () => Is.EqualTo(1));
+
+            AddStep("re-enable slider", () => slider.Current.Disabled = false);
+
+            AddStep("move mouse to nub", () => InputManager.MoveMouseTo(slider.ChildrenOfType<Circle>().Single()));
+
+            AddStep("double click nub", () =>
+            {
+                InputManager.Click(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("slider is at 5", () => slider.Current.Value, () => Is.EqualTo(5));
         }
 
         [Test]
