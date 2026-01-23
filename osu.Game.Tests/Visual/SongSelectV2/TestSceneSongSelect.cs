@@ -22,7 +22,6 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
-using osu.Game.Screens.Select.Filter;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
@@ -142,41 +141,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddUntilStep("wait for osu beatmap selected", () => Beatmap.Value.BeatmapInfo.Ruleset.OnlineID, () => Is.EqualTo(0));
 
             void onScreenPushed(IScreen lastScreen, IScreen newScreen) => screensPushed.Add(lastScreen);
-        }
-
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestHoveringLeftSideReexpandsGroupSelectionIsIn(bool mouseOverPanel)
-        {
-            ImportBeatmapForRuleset(0);
-
-            LoadSongSelect();
-            SortAndGroupBy(SortMode.Difficulty, GroupMode.Difficulty);
-
-            AddStep("move mouse to carousel", () => InputManager.MoveMouseTo(Carousel));
-
-            AddUntilStep("expanded group is below 1 star",
-                () => (Carousel.ChildrenOfType<PanelGroupStarDifficulty>().SingleOrDefault(p => p.Expanded.Value)?.Item?.Model as StarDifficultyGroupDefinition)?.Difficulty.Stars,
-                () => Is.EqualTo(0));
-
-            AddStep("select next group", () =>
-            {
-                InputManager.PressKey(Key.ShiftLeft);
-                InputManager.Key(Key.Right);
-                InputManager.ReleaseKey(Key.ShiftLeft);
-            });
-            AddUntilStep("expanded group is 3 star",
-                () => (Carousel.ChildrenOfType<PanelGroupStarDifficulty>().SingleOrDefault(p => p.Expanded.Value)?.Item?.Model as StarDifficultyGroupDefinition)?.Difficulty.Stars,
-                () => Is.EqualTo(3));
-
-            if (mouseOverPanel)
-                AddStep("move mouse over left panel", () => InputManager.MoveMouseTo(this.ChildrenOfType<BeatmapTitleWedge>().Single()));
-            else
-                AddStep("move mouse to left side container", () => InputManager.MoveMouseTo(this.ChildrenOfType<Screens.Select.SongSelect.LeftSideInteractionContainer>().Single()));
-
-            AddUntilStep("expanded group is below 1 star",
-                () => (Carousel.ChildrenOfType<PanelGroupStarDifficulty>().Single(p => p.Expanded.Value).Item?.Model as StarDifficultyGroupDefinition)?.Difficulty.Stars,
-                () => Is.EqualTo(0));
         }
 
         #region Hotkeys
@@ -693,6 +657,51 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddUntilStep("wait for no beatmap", () => Beatmap.IsDefault);
             AddAssert("options disabled", () => !this.ChildrenOfType<FooterButtonOptions>().Single().Enabled.Value);
+        }
+
+        /// <summary>
+        /// tests that clicking the osu! logo immediately after selecting a different difficulty
+        /// (before the selection debounce completes) starts the correct beatmap.
+        /// this tests the fix for https://github.com/ppy/osu/issues/36074
+        /// </summary>
+        [Test]
+        public void TestPlayCorrectBeatmapWhenSelectionNotFullyLoaded()
+        {
+            // import a beatmap set with multiple difficulties
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+
+            // wait for initial beatmap to be selected
+            AddUntilStep("wait for first beatmap selected", () => !Beatmap.IsDefault);
+
+            BeatmapInfo? firstBeatmap = null;
+            AddStep("store first difficulty", () => firstBeatmap = Beatmap.Value.BeatmapInfo);
+
+            // start loading the first difficulty
+            AddStep("click logo to start loading", () => this.ChildrenOfType<OsuLogo>().Single().TriggerClick());
+            AddUntilStep("wait for player loader", () => Stack.CurrentScreen is PlayerLoader);
+
+            // return to song select
+            AddStep("press escape to return", () => InputManager.Key(Key.Escape));
+            AddUntilStep("wait for return to song select", () => SongSelect.IsCurrentScreen());
+
+            // press down and schedule logo click to happen shortly after (but before 150ms debounce)
+            // this reproduces the race condition where Beatmap.Value hasn't updated yet
+            AddStep("select next difficulty and click logo immediately", () =>
+            {
+                InputManager.Key(Key.Down);
+                Schedule(() => this.ChildrenOfType<OsuLogo>().Single().TriggerClick());
+            });
+
+            AddUntilStep("wait for player loader", () => Stack.CurrentScreen is PlayerLoader);
+
+            // verify we're loading the second difficulty, not the first
+            // without the fix, this would fail because Beatmap.Value still has the old value
+            AddAssert("player is loading second difficulty", () =>
+                Beatmap.Value.BeatmapInfo.ID != firstBeatmap!.ID);
+
+            AddUntilStep("wait for return to song select", () => SongSelect.IsCurrentScreen());
         }
 
         #endregion

@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -20,25 +19,27 @@ namespace osu.Game.Graphics.UserInterfaceV2
 {
     public partial class SwitchButton : Checkbox
     {
+        public const float WIDTH = 45;
+
         private const float border_thickness = 4.5f;
         private const float padding = 1.25f;
 
         private readonly Box fill;
-        private readonly Container switchContainer;
-        private readonly Drawable switchCircle;
-        private readonly CircularBorderContainer circularContainer;
+        private readonly Container nubContainer;
+        private readonly Drawable nub;
+        private readonly CircularContainer content;
 
-        private Color4 enabledColour;
-        private Color4 disabledColour;
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         private Sample? sampleChecked;
         private Sample? sampleUnchecked;
 
         public SwitchButton()
         {
-            Size = new Vector2(45, 20);
+            Size = new Vector2(WIDTH, 20);
 
-            InternalChild = circularContainer = new CircularBorderContainer
+            InternalChild = content = new CircularContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 BorderColour = Color4.White,
@@ -50,21 +51,19 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     {
                         RelativeSizeAxes = Axes.Both,
                         AlwaysPresent = true,
-                        Alpha = 0
                     },
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding(border_thickness + padding),
-                        Child = switchContainer = new Container
+                        Child = nubContainer = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Child = switchCircle = new CircularContainer
+                            Child = nub = new Circle
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 FillMode = FillMode.Fit,
                                 Masking = true,
-                                Child = new Box { RelativeSizeAxes = Axes.Both }
                             }
                         }
                     }
@@ -73,14 +72,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider? colourProvider, OsuColour colours, AudioManager audio)
+        private void load(AudioManager audio)
         {
-            enabledColour = colourProvider?.Highlight1 ?? colours.BlueDark;
-            disabledColour = colourProvider?.Background3 ?? colours.Gray3;
-
-            switchContainer.Colour = enabledColour;
-            fill.Colour = disabledColour;
-
             sampleChecked = audio.Samples.Get(@"UI/check-on");
             sampleUnchecked = audio.Samples.Get(@"UI/check-off");
         }
@@ -89,49 +82,74 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             base.LoadComplete();
 
-            Current.BindValueChanged(updateState, true);
+            Current.BindDisabledChanged(_ => updateColours());
+            Current.BindValueChanged(_ => updateState(), true);
+
             FinishTransforms(true);
         }
 
-        private void updateState(ValueChangedEvent<bool> state)
+        private void updateState()
         {
-            switchCircle.MoveToX(state.NewValue ? switchContainer.DrawWidth - switchCircle.DrawWidth : 0, 200, Easing.OutQuint);
-            fill.FadeTo(state.NewValue ? 1 : 0, 250, Easing.OutQuint);
+            nub.MoveToX(Current.Value ? nubContainer.DrawWidth - nub.DrawWidth : 0, 200, Easing.OutQuint);
 
-            updateBorder();
+            updateColours();
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            updateBorder();
+            updateColours();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            updateBorder();
+            updateColours();
             base.OnHoverLost(e);
         }
 
         protected override void OnUserChange(bool value)
         {
             base.OnUserChange(value);
+            PlaySample(value);
+        }
 
+        public void PlaySample(bool value)
+        {
             if (value)
                 sampleChecked?.Play();
             else
                 sampleUnchecked?.Play();
         }
 
-        private void updateBorder()
+        private void updateColours()
         {
-            circularContainer.TransformBorderTo((Current.Value ? enabledColour : disabledColour).Lighten(IsHovered ? 0.3f : 0));
-        }
+            ColourInfo borderColour;
+            ColourInfo switchColour;
 
-        private partial class CircularBorderContainer : CircularContainer
-        {
-            public void TransformBorderTo(ColourInfo colour)
-                => this.TransformTo(nameof(BorderColour), colour, 250, Easing.OutQuint);
+            if (Current.Disabled)
+            {
+                borderColour = colourProvider.Dark2;
+                switchColour = colourProvider.Dark1;
+                fill.Colour = colourProvider.Dark5;
+            }
+            else
+            {
+                bool hover = IsHovered && !Current.Disabled;
+
+                borderColour = hover ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Highlight1.Opacity(0.3f);
+                switchColour = hover || Current.Value ? colourProvider.Highlight1 : colourProvider.Light4;
+
+                if (!Current.Value)
+                {
+                    borderColour = borderColour.MultiplyAlpha(0.8f);
+                    switchColour = switchColour.MultiplyAlpha(0.8f);
+                }
+
+                fill.Colour = Current.Value ? colourProvider.Colour4.Darken(0.2f) : colourProvider.Background6;
+            }
+
+            nubContainer.FadeColour(switchColour, 250, Easing.OutQuint);
+            content.TransformTo(nameof(BorderColour), borderColour, 250, Easing.OutQuint);
         }
     }
 }

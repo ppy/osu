@@ -192,6 +192,8 @@ namespace osu.Game.Beatmaps.Drawables
             "2412260 Koto Spirit - Locus of Hexagram.osz",
             "2412232 Will Stetson - Of Our Time.osz",
             "2412292 ArXe - Locus Amoenus (feat. Megurine Luka).osz",
+            "2412328 Akiri - Vespera Stella.osz",
+            "2412331 takehirotei - Haiboku no Altra Vita.osz",
         };
 
         private static readonly string[] bundled_osu =
@@ -465,7 +467,6 @@ namespace osu.Game.Beatmaps.Drawables
             @"2055329 miraie & blackwinterwells - facade.osz",
             @"2069877 Sephid - Thunderstrike 1988.osz",
             @"2119716 Aethoro - Snowy.osz",
-            @"2120379 Synthion - VIVIDVELOCITY.osz",
             @"2124805 Frums (unknown ""lambda"") - 19ZZ.osz",
             @"2127811 Wiklund - Joy of Living (Cut Ver.).osz",
         };

@@ -9,20 +9,24 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Handlers;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
 using osu.Game.Localisation;
 using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public partial class TabletSettings : SettingsSubsection
+    public partial class TabletSettings : InputSubsection
     {
         public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "area" });
 
@@ -34,6 +38,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private readonly Bindable<Vector2> areaOffset = new Bindable<Vector2>();
         private readonly Bindable<Vector2> areaSize = new Bindable<Vector2>();
+        private readonly Bindable<Vector2> outputAreaSize = new Bindable<Vector2>();
+        private readonly Bindable<Vector2> outputAreaOffset = new Bindable<Vector2>();
         private readonly IBindable<TabletInfo> tablet = new Bindable<TabletInfo>();
 
         private readonly BindableNumber<float> offsetX = new BindableNumber<float> { MinValue = 0, Precision = 1 };
@@ -45,6 +51,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private readonly BindableNumber<float> rotation = new BindableNumber<float> { MinValue = 0, MaxValue = 360, Precision = 1 };
 
         private readonly BindableNumber<float> pressureThreshold = new BindableNumber<float> { MinValue = 0.0f, MaxValue = 1.0f, Precision = 0.005f };
+
+        private Bindable<ScalingMode> scalingMode = null!;
+        private Bindable<float> scalingSizeX = null!;
+        private Bindable<float> scalingSizeY = null!;
 
         [Resolved]
         private GameHost host { get; set; }
@@ -67,66 +77,92 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private FillFlowContainer mainSettings;
 
-        private FillFlowContainer noTabletMessage;
+        private Container noTabletMessage;
 
         protected override LocalisableString Header => TabletSettingsStrings.Tablet;
 
         public TabletSettings(ITabletHandler tabletHandler)
+            : base((InputHandler)tabletHandler)
         {
             this.tabletHandler = tabletHandler;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationManager localisation)
+        private void load(OsuColour colours, LocalisationManager localisation, OsuConfigManager osuConfig, OverlayColourProvider colourProvider)
         {
-            Children = new Drawable[]
+            scalingMode = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
+            scalingSizeX = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX);
+            scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
+
+            AddRange(new Drawable[]
             {
-                new SettingsCheckbox
-                {
-                    LabelText = CommonStrings.Enabled,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Current = enabled,
-                },
-                noTabletMessage = new FillFlowContainer
+                noTabletMessage = new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS },
-                    Spacing = new Vector2(5f),
-                    Children = new Drawable[]
+                    Padding = SettingsPanel.CONTENT_PADDING,
+                    Child = new Container
                     {
-                        new OsuSpriteText
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Masking = true,
+                        CornerRadius = 5,
+                        CornerExponent = 2.5f,
+                        Children = new Drawable[]
                         {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Text = TabletSettingsStrings.NoTabletDetected,
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = colourProvider.Dark2,
+                            },
+                            new FillFlowContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(5f),
+                                Padding = new MarginPadding { Horizontal = 8, Vertical = 10 },
+                                Children = new Drawable[]
+                                {
+                                    new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                        Text = TabletSettingsStrings.NoTabletDetected,
+                                        Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
+                                        Colour = colourProvider.Content2,
+                                    },
+                                    new LinkFlowContainer(cp =>
+                                    {
+                                        cp.Colour = colours.Orange1;
+                                        cp.Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold);
+                                    })
+                                    {
+                                        TextAnchor = Anchor.TopCentre,
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                    }.With(t =>
+                                    {
+                                        t.NewLine();
+
+                                        const string url = @"https://opentabletdriver.net/Wiki/FAQ/General";
+                                        var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedString(TabletSettingsStrings.NoTabletDetectedDescription(url)));
+
+                                        t.AddLinks(formattedSource.Text, formattedSource.Links);
+                                    }),
+                                }
+                            },
                         },
-                        new LinkFlowContainer(cp => cp.Colour = colours.Yellow)
-                        {
-                            TextAnchor = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                        }.With(t =>
-                        {
-                            t.NewLine();
-
-                            const string url = @"https://opentabletdriver.net/Wiki/FAQ/General";
-                            var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedString(TabletSettingsStrings.NoTabletDetectedDescription(url)));
-
-                            t.AddLinks(formattedSource.Text, formattedSource.Links);
-                        }),
-                    }
+                    },
                 },
                 mainSettings = new FillFlowContainer
                 {
                     Alpha = 0,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(0, 8),
+                    Spacing = new Vector2(0, SettingsSection.ITEM_SPACING_V2),
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
@@ -135,7 +171,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             RelativeSizeAxes = Axes.X,
                             Height = 300,
                         },
-                        new DangerousSettingsButton
+                        new DangerousSettingsButtonV2
                         {
                             Text = TabletSettingsStrings.ResetToFullArea,
                             Action = () =>
@@ -145,82 +181,79 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                 areaOffset.SetDefault();
                                 areaSize.SetDefault();
                             },
-                            CanBeShown = { BindTarget = enabled }
                         },
-                        new SettingsButton
+                        new SettingsButtonV2
                         {
                             Text = TabletSettingsStrings.ConformToCurrentGameAspectRatio,
                             Action = () =>
                             {
-                                forceAspectRatio((float)host.Window.ClientSize.Width / host.Window.ClientSize.Height);
+                                float gameplayWidth = host.Window.ClientSize.Width;
+                                float gameplayHeight = host.Window.ClientSize.Height;
+
+                                if (scalingMode.Value == ScalingMode.Everything)
+                                {
+                                    gameplayWidth *= scalingSizeX.Value;
+                                    gameplayHeight *= scalingSizeY.Value;
+                                }
+
+                                forceAspectRatio(gameplayWidth / gameplayHeight);
                             },
-                            CanBeShown = { BindTarget = enabled }
                         },
-                        new SettingsSlider<float>
+                        new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = TabletSettingsStrings.XOffset,
+                            Caption = TabletSettingsStrings.XOffset,
                             Current = offsetX,
-                            CanBeShown = { BindTarget = enabled }
-                        },
-                        new SettingsSlider<float>
+                        }),
+                        new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = TabletSettingsStrings.YOffset,
+                            Caption = TabletSettingsStrings.YOffset,
                             Current = offsetY,
-                            CanBeShown = { BindTarget = enabled }
-                        },
-                        new SettingsSlider<float>
+                        }),
+                        new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = TabletSettingsStrings.Rotation,
+                            Caption = TabletSettingsStrings.Rotation,
                             Current = rotation,
-                            CanBeShown = { BindTarget = enabled }
-                        },
+                        }),
                         new RotationPresetButtons(tabletHandler)
                         {
-                            Padding = new MarginPadding
-                            {
-                                Horizontal = SettingsPanel.CONTENT_MARGINS
-                            }
+                            Padding = SettingsPanel.CONTENT_PADDING,
                         },
-                        new SettingsSlider<float>
+                        new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = TabletSettingsStrings.AspectRatio,
+                            Caption = TabletSettingsStrings.AspectRatio,
                             Current = aspectRatio,
-                            CanBeShown = { BindTarget = enabled }
-                        },
-                        new SettingsCheckbox
+                        }),
+                        new SettingsItemV2(new FormCheckBox
                         {
-                            LabelText = TabletSettingsStrings.LockAspectRatio,
+                            Caption = TabletSettingsStrings.LockAspectRatio,
                             Current = aspectLock,
-                            CanBeShown = { BindTarget = enabled }
-                        },
-                        new SettingsSlider<float>
+                        }),
+                        new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = CommonStrings.Width,
+                            Caption = CommonStrings.Width,
                             Current = sizeX,
-                            CanBeShown = { BindTarget = enabled }
-                        },
-                        new SettingsSlider<float>
+                        }),
+                        new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = CommonStrings.Height,
+                            Caption = CommonStrings.Height,
                             Current = sizeY,
-                            CanBeShown = { BindTarget = enabled }
-                        },
-                        new SettingsPercentageSlider<float>
+                        }),
+                        new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = TabletSettingsStrings.TipPressureForClick,
+                            Caption = TabletSettingsStrings.TipPressureForClick,
                             Current = pressureThreshold,
-                            CanBeShown = { BindTarget = enabled }
-                        },
+                            DisplayAsPercentage = true,
+                        }),
                     }
                 },
-            };
+            });
         }
 
         protected override void LoadComplete()
@@ -248,6 +281,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 sizeX.Value = val.NewValue.X;
                 sizeY.Value = val.NewValue.Y;
             }), true);
+
+            outputAreaSize.BindTo(tabletHandler.OutputAreaSize);
+            outputAreaOffset.BindTo(tabletHandler.OutputAreaOffset);
 
             sizeX.BindValueChanged(val =>
             {

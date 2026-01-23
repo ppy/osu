@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -13,11 +15,12 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public partial class FormDropdown<T> : OsuDropdown<T>
+    public partial class FormDropdown<T> : OsuDropdown<T>, IFormControl
     {
         /// <summary>
         /// Caption describing this slider bar, displayed on top of the controls.
@@ -27,9 +30,21 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// <summary>
         /// Hint text containing an extended description of this slider bar, displayed in a tooltip when hovering the caption.
         /// </summary>
-        public LocalisableString HintText { get; init; }
+        public LocalisableString HintText
+        {
+            get => header.HintText;
+            set => header.HintText = value;
+        }
+
+        /// <summary>
+        /// The maximum height of the dropdown's menu.
+        /// By default, this is set to 200px high. Set to <see cref="float.PositiveInfinity"/> to remove such limit.
+        /// </summary>
+        public float MaxHeight { get; set; } = 200;
 
         private FormDropdownHeader header = null!;
+
+        private const float header_menu_spacing = 5;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -38,14 +53,46 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             header.Caption = Caption;
             header.HintText = HintText;
+
+            // there's bottom margin applied inside the header to give spacing between the header and the menu.
+            // however when the menu is closed the extra spacing remains present. to remove it, apply negative bottom padding here.
+            Margin = new MarginPadding { Bottom = -header_menu_spacing };
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Current.BindValueChanged(_ => ValueChanged?.Invoke());
+        }
+
+        public virtual IEnumerable<LocalisableString> FilterTerms
+        {
+            get
+            {
+                yield return Caption;
+
+                foreach (var item in MenuItems)
+                    yield return item.Text.Value;
+            }
+        }
+
+        public event Action? ValueChanged;
+
+        public bool IsDefault => Current.IsDefault;
+
+        public void SetDefault() => Current.SetDefault();
+
+        public bool IsDisabled => Current.Disabled;
 
         protected override DropdownHeader CreateHeader() => header = new FormDropdownHeader
         {
             Dropdown = this,
         };
 
-        protected override DropdownMenu CreateMenu() => new FormDropdownMenu();
+        protected override DropdownMenu CreateMenu() => new FormDropdownMenu
+        {
+            MaxHeight = MaxHeight,
+        };
 
         private partial class FormDropdownHeader : DropdownHeader
         {
@@ -105,30 +152,34 @@ namespace osu.Game.Graphics.UserInterfaceV2
             [BackgroundDependencyLoader]
             private void load()
             {
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.None;
-                Height = 50;
-
                 Masking = true;
                 CornerRadius = 5;
 
-                Foreground.AutoSizeAxes = Axes.None;
-                Foreground.RelativeSizeAxes = Axes.Both;
+                Margin = new MarginPadding { Bottom = header_menu_spacing };
+
                 Foreground.Padding = new MarginPadding(9);
                 Foreground.Children = new Drawable[]
                 {
-                    caption = new FormFieldCaption
-                    {
-                        Anchor = Anchor.TopLeft,
-                        Origin = Anchor.TopLeft,
-                        Caption = Caption,
-                        TooltipText = HintText,
-                    },
-                    label = new OsuSpriteText
+                    new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 4),
+                        Children = new Drawable[]
+                        {
+                            caption = new FormFieldCaption
+                            {
+                                Caption = Caption,
+                                TooltipText = HintText,
+                            },
+                            label = new TruncatingSpriteText
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Padding = new MarginPadding { Right = 25 },
+                                AlwaysPresent = true,
+                            },
+                        }
                     },
                     chevron = new SpriteIcon
                     {
@@ -136,10 +187,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                         Size = new Vector2(16),
+                        Margin = new MarginPadding { Right = 5 },
                     },
                 };
 
-                AddInternal(new HoverClickSounds());
+                AddInternal(new HoverClickSounds
+                {
+                    Enabled = { BindTarget = Enabled },
+                });
             }
 
             protected override void LoadComplete()
@@ -173,31 +228,31 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             private void updateState()
             {
-                label.Alpha = string.IsNullOrEmpty(SearchBar.SearchTerm.Value) ? 1 : 0;
-
-                caption.Colour = Dropdown.Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
-                label.Colour = Dropdown.Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
-                chevron.Colour = Dropdown.Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
+                caption.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content2;
+                label.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content1;
+                chevron.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content1;
                 DisabledColour = Colour4.White;
 
                 bool dropdownOpen = Dropdown.Menu.State == MenuState.Open;
 
-                if (!Dropdown.Current.Disabled)
-                {
-                    BorderThickness = IsHovered || dropdownOpen ? 2 : 0;
+                if (dropdownOpen)
+                    label.Alpha = AlwaysShowSearchBar || !string.IsNullOrEmpty(SearchBar.SearchTerm.Value) ? 0 : 1;
+                else
+                    label.Alpha = 1;
+
+                BorderThickness = IsHovered || dropdownOpen ? 2 : 0;
+
+                if (Dropdown.Current.Disabled)
+                    BorderColour = colourProvider.Dark1;
+                else
                     BorderColour = dropdownOpen ? colourProvider.Highlight1 : colourProvider.Light4;
 
-                    if (dropdownOpen)
-                        Background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
-                    else if (IsHovered)
-                        Background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
-                    else
-                        Background.Colour = colourProvider.Background5;
-                }
+                if (dropdownOpen)
+                    Background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
+                else if (IsHovered)
+                    Background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
                 else
-                {
-                    Background.Colour = colourProvider.Background4;
-                }
+                    Background.Colour = colourProvider.Background5;
             }
 
             private void updateChevron()
@@ -214,7 +269,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
             protected override void PopIn() => this.FadeIn();
             protected override void PopOut() => this.FadeOut();
 
-            protected override TextBox CreateTextBox() => TextBox = new FormTextBox.InnerTextBox();
+            protected override TextBox CreateTextBox() => TextBox = new FormTextBox.InnerTextBox
+            {
+                PlaceholderText = HomeStrings.SearchPlaceholder,
+            };
 
             [BackgroundDependencyLoader]
             private void load()
@@ -222,7 +280,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 TextBox.Anchor = Anchor.BottomLeft;
                 TextBox.Origin = Anchor.BottomLeft;
                 TextBox.RelativeSizeAxes = Axes.X;
-                TextBox.Margin = new MarginPadding(9);
+                Padding = new MarginPadding { Left = 9, Bottom = 9, Right = 34 };
             }
         }
 
@@ -232,10 +290,25 @@ namespace osu.Game.Graphics.UserInterfaceV2
             private void load(OverlayColourProvider colourProvider)
             {
                 ItemsContainer.Padding = new MarginPadding(9);
-                Margin = new MarginPadding { Top = 5 };
 
                 MaskingContainer.BorderThickness = 2;
                 MaskingContainer.BorderColour = colourProvider.Highlight1;
+            }
+
+            protected override void AnimateOpen()
+            {
+                base.AnimateOpen();
+
+                // there's negative bottom margin applied on the whole dropdown control to remove extra spacing when the menu is closed.
+                // however, when the menu is open, we want spacing between the menu and the next control below it. therefore apply bottom margin here.
+                // we use a transform to keep the open animation smooth while margin is adjusted.
+                this.TransformTo(nameof(Margin), new MarginPadding { Bottom = header_menu_spacing }, 300, Easing.OutQuint);
+            }
+
+            protected override void AnimateClose()
+            {
+                base.AnimateClose();
+                this.TransformTo(nameof(Margin), new MarginPadding { Bottom = 0 }, 300, Easing.OutQuint);
             }
         }
     }

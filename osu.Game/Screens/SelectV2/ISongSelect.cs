@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
@@ -11,6 +13,7 @@ namespace osu.Game.Screens.SelectV2
     /// <summary>
     /// Actions exposed by song select which are used by subcomponents to perform top-level operations.
     /// </summary>
+    [Cached]
     public interface ISongSelect
     {
         /// <summary>
@@ -43,5 +46,10 @@ namespace osu.Game.Screens.SelectV2
         /// Gets relevant actionable items for beatmap context menus, based on the type of song select.
         /// </summary>
         IEnumerable<OsuMenuItem> GetForwardActions(BeatmapInfo beatmap);
+
+        /// <summary>
+        /// Set this to a non-<see langword="null"/> value in order to temporarily bypass filter and show all difficulties of the given beatmap set.
+        /// </summary>
+        Bindable<BeatmapSetInfo?> ScopedBeatmapSet { get; }
     }
 }

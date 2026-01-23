@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -37,6 +38,8 @@ namespace osu.Game.Screens.SelectV2
     {
         public const float HEIGHT = CarouselItem.DEFAULT_HEIGHT * 1.6f;
 
+        public Bindable<HashSet<BeatmapInfo>?> VisibleBeatmaps { get; } = new Bindable<HashSet<BeatmapInfo>?>();
+
         private Box chevronBackground = null!;
         private PanelSetBackground setBackground = null!;
         private ScheduledDelegate? scheduledBackgroundRetrieval;
@@ -46,7 +49,7 @@ namespace osu.Game.Screens.SelectV2
         private Drawable chevronIcon = null!;
         private PanelUpdateBeatmapButton updateButton = null!;
         private BeatmapSetOnlineStatusPill statusPill = null!;
-        private DifficultySpectrumDisplay difficultiesDisplay = null!;
+        private SpreadDisplay spreadDisplay = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -150,10 +153,11 @@ namespace osu.Game.Screens.SelectV2
                                     Origin = Anchor.CentreLeft,
                                     Margin = new MarginPadding { Right = 5f, Top = -2f },
                                 },
-                                difficultiesDisplay = new DifficultySpectrumDisplay
+                                spreadDisplay = new SpreadDisplay
                                 {
-                                    Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
+                                    Anchor = Anchor.CentreLeft,
+                                    VisibleBeatmaps = { BindTarget = VisibleBeatmaps },
                                 },
                             },
                         }
@@ -184,6 +188,8 @@ namespace osu.Game.Screens.SelectV2
                 chevronIcon.ResizeWidthTo(0f, DURATION, Easing.OutQuint);
                 chevronIcon.FadeTo(0f, DURATION, Easing.OutQuint);
             }
+
+            spreadDisplay.Expanded.Value = Expanded.Value;
         }
 
         protected override void PrepareForUse()
@@ -199,7 +205,7 @@ namespace osu.Game.Screens.SelectV2
             artistText.Text = new RomanisableString(beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist);
             updateButton.BeatmapSet = beatmapSet;
             statusPill.Status = beatmapSet.Status;
-            difficultiesDisplay.BeatmapSet = beatmapSet;
+            spreadDisplay.BeatmapSet.Value = beatmapSet;
         }
 
         protected override void FreeAfterUse()
@@ -210,7 +216,7 @@ namespace osu.Game.Screens.SelectV2
             scheduledBackgroundRetrieval = null;
             setBackground.Beatmap = null;
             updateButton.BeatmapSet = null;
-            difficultiesDisplay.BeatmapSet = null;
+            spreadDisplay.BeatmapSet.Value = null;
         }
 
         [Resolved]
@@ -272,7 +278,7 @@ namespace osu.Game.Screens.SelectV2
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
                     items.Add(new OsuMenuItem(SongSelectStrings.RestoreAllHidden, MenuItemType.Standard, () => songSelect?.RestoreAllHidden(beatmapSet)));
 
-                items.Add(new OsuMenuItem(SongSelectStrings.DeleteBeatmap, MenuItemType.Destructive, () => songSelect?.Delete(beatmapSet)));
+                items.Add(new OsuMenuItem(CommonStrings.DeleteWithConfirmation, MenuItemType.Destructive, () => songSelect?.Delete(beatmapSet)));
                 return items.ToArray();
             }
         }
@@ -296,7 +302,7 @@ namespace osu.Game.Screens.SelectV2
 
             return new TernaryStateToggleMenuItem(collection.Name, MenuItemType.Standard, s =>
             {
-                liveCollection.PerformWrite(c =>
+                Task.Run(() => liveCollection.PerformWrite(c =>
                 {
                     foreach (var b in beatmapSet.Beatmaps)
                     {
@@ -314,7 +320,7 @@ namespace osu.Game.Screens.SelectV2
                                 break;
                         }
                     }
-                });
+                }));
             })
             {
                 State = { Value = state }

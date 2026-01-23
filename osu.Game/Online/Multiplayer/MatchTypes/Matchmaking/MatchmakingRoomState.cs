@@ -28,14 +28,20 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
         public int CurrentRound { get; set; }
 
         /// <summary>
-        /// The playlist items that were picked as gameplay candidates.
+        /// The playlist items that were picked as candidates by user.
         /// </summary>
+        /// <remarks>
+        /// May contain <c>-1</c> when any users picked the "random" playlist item.
+        /// </remarks>
         [Key(2)]
         public long[] CandidateItems { get; set; } = [];
 
         /// <summary>
-        /// The final gameplay candidate.
+        /// A playlist item from <see cref="CandidateItems"/> that was randomly picked by the server.
         /// </summary>
+        /// <remarks>
+        /// May be <c>-1</c> to indicate the "random" playlist item was chosen.
+        /// </remarks>
         [Key(3)]
         public long CandidateItem { get; set; }
 
@@ -44,6 +50,15 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
         /// </summary>
         [Key(4)]
         public MatchmakingUserList Users { get; set; } = new MatchmakingUserList();
+
+        /// <summary>
+        /// A playlist item from the room's playlist that will be played in the current round.
+        /// </summary>
+        /// <remarks>
+        /// The value of this property may not equal <see cref="CandidateItem"/> or exist in <see cref="CandidateItems"/>.
+        /// </remarks>
+        [Key(5)]
+        public long GameplayItem { get; set; }
 
         /// <summary>
         /// Advances to the next round.
@@ -81,10 +96,10 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
 
                 foreach (var score in scoreGroup)
                 {
-                    MatchmakingUser mmUser = Users[score.UserID];
+                    MatchmakingUser mmUser = Users.GetOrAdd(score.UserID);
                     mmUser.Points += placementPoints[placement - 1];
 
-                    MatchmakingRound mmRound = mmUser.Rounds[CurrentRound];
+                    MatchmakingRound mmRound = mmUser.Rounds.GetOrAdd(CurrentRound);
                     mmRound.Placement = placement;
                     mmRound.TotalScore = score.TotalScore;
                     mmRound.Accuracy = score.Accuracy;

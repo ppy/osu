@@ -65,6 +65,11 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        [Resolved]
+        private OsuGameBase game { get; set; } = null!;
+
+        private IBindable<Language> currentLanguage = null!;
+
         public FooterButtonMods(ModSelectOverlay overlay)
             : base(overlay)
         {
@@ -80,7 +85,7 @@ namespace osu.Game.Screens.SelectV2
             AddRange(new[]
             {
                 unrankedBadge = new UnrankedBadge(),
-                modDisplayBar = new Container
+                modDisplayBar = new ModDisplayBarContainer
                 {
                     Y = -5f,
                     Depth = float.MaxValue,
@@ -155,6 +160,9 @@ namespace osu.Game.Screens.SelectV2
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            currentLanguage = game.CurrentLanguage.GetBoundCopy();
+            currentLanguage.BindValueChanged(_ => ScheduleAfterChildren(updateDisplay));
 
             Current.BindValueChanged(m =>
             {
@@ -335,6 +343,13 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
+        internal partial class ModDisplayBarContainer : Container
+        {
+            protected override bool OnMouseDown(MouseDownEvent e) => true;
+
+            protected override bool OnHover(HoverEvent e) => true;
+        }
+
         internal partial class UnrankedBadge : CompositeDrawable, IHasTooltip
         {
             public LocalisableString TooltipText { get; }
@@ -378,6 +393,10 @@ namespace osu.Game.Screens.SelectV2
                     }
                 };
             }
+
+            protected override bool OnMouseDown(MouseDownEvent e) => true;
+
+            protected override bool OnHover(HoverEvent e) => true;
         }
     }
 }

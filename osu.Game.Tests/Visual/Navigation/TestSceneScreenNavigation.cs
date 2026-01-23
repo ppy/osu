@@ -24,6 +24,7 @@ using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Carousel;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Notifications.WebSocket;
@@ -33,6 +34,7 @@ using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Toolbar;
+using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Configuration;
@@ -92,21 +94,22 @@ namespace osu.Game.Tests.Visual.Navigation
 
                 AddStep("edit playlist", () => InputManager.Key(Key.Enter));
 
-                AddUntilStep("wait for song select", () => (playlistScreen.CurrentSubScreen as PlaylistsSongSelect)?.BeatmapSetsLoaded == true);
+                AddUntilStep("wait for song select", () => playlistScreen.CurrentSubScreen is PlaylistsSongSelectV2 songSelect && songSelect.IsLoaded && !songSelect.IsFiltering);
 
                 AddUntilStep("wait for selection", () => !Game.Beatmap.IsDefault);
 
                 AddStep("add item", () => InputManager.Key(Key.Enter));
+                AddStep("exit screen", () => InputManager.Key(Key.Escape));
 
                 AddUntilStep("wait for return to playlist screen", () => playlistScreen.CurrentSubScreen is PlaylistsRoomSubScreen);
 
                 AddStep("go back to song select", () =>
                 {
-                    InputManager.MoveMouseTo(playlistScreen.ChildrenOfType<PurpleRoundedButton>().Single(b => b.Text == "Edit playlist"));
+                    InputManager.MoveMouseTo(playlistScreen.ChildrenOfType<PurpleRoundedButton>().Single(b => b.Text == "+ Add more beatmaps"));
                     InputManager.Click(MouseButton.Left);
                 });
 
-                AddUntilStep("wait for song select", () => (playlistScreen.CurrentSubScreen as PlaylistsSongSelect)?.BeatmapSetsLoaded == true);
+                AddUntilStep("wait for song select", () => playlistScreen.CurrentSubScreen is PlaylistsSongSelectV2 songSelect && songSelect.IsLoaded && !songSelect.IsFiltering);
 
                 AddStep("press home button", () =>
                 {
@@ -139,13 +142,12 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestExitSongSelectWithEscape()
         {
-            SoloSongSelect songSelect = null;
             ModSelectOverlay modSelect = null;
 
-            PushAndConfirm(() => songSelect = new SoloSongSelect());
+            PushAndConfirm(() => new SoloSongSelect());
             AddStep("Show mods overlay", () =>
             {
-                modSelect = songSelect!.ChildrenOfType<ModSelectOverlay>().Single();
+                modSelect = Game!.ChildrenOfType<ModSelectOverlay>().Single();
                 modSelect.Show();
             });
             AddAssert("Overlay was shown", () => modSelect.State.Value == Visibility.Visible);
@@ -307,11 +309,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestOpenModSelectOverlayUsingAction()
         {
-            SoloSongSelect songSelect = null;
-
-            PushAndConfirm(() => songSelect = new SoloSongSelect());
+            PushAndConfirm(() => new SoloSongSelect());
             AddStep("Show mods overlay", () => InputManager.Key(Key.F1));
-            AddAssert("Overlay was shown", () => songSelect!.ChildrenOfType<ModSelectOverlay>().Single().State.Value == Visibility.Visible);
+            AddAssert("Overlay was shown", () => Game!.ChildrenOfType<ModSelectOverlay>().Single().State.Value == Visibility.Visible);
         }
 
         [Test]
@@ -728,7 +728,7 @@ namespace osu.Game.Tests.Visual.Navigation
             PushAndConfirm(() => songSelect = new SoloSongSelect());
             AddStep("Show mods overlay", () =>
             {
-                modSelect = songSelect!.ChildrenOfType<ModSelectOverlay>().Single();
+                modSelect = Game!.ChildrenOfType<ModSelectOverlay>().Single();
                 modSelect.Show();
             });
             AddAssert("Overlay was shown", () => modSelect.State.Value == Visibility.Visible);
@@ -803,13 +803,12 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             AddUntilStep("Wait for toolbar to load", () => Game.Toolbar.IsLoaded);
 
-            SoloSongSelect songSelect = null;
             ModSelectOverlay modSelect = null;
 
-            PushAndConfirm(() => songSelect = new SoloSongSelect());
+            PushAndConfirm(() => new SoloSongSelect());
             AddStep("Show mods overlay", () =>
             {
-                modSelect = songSelect!.ChildrenOfType<ModSelectOverlay>().Single();
+                modSelect = Game!.ChildrenOfType<ModSelectOverlay>().Single();
                 modSelect.Show();
             });
             AddAssert("Overlay was shown", () => modSelect.State.Value == Visibility.Visible);
@@ -1329,6 +1328,34 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("nothing selected", () => Game.Beatmap.IsDefault);
             AddStep("present deleted beatmap", () => Game.PresentBeatmap(beatmap));
             AddAssert("still nothing selected", () => Game.Beatmap.IsDefault);
+        }
+
+        [Test]
+        public void TestVolumeMeterDragDoesNotDismissFocusedOverlay()
+        {
+            AddStep("show beatmap overlay", () => Game.ShowBeatmapSet(1));
+            AddUntilStep("beatmap overlay still visible",
+                () => Game.ChildrenOfType<BeatmapSetOverlay>().SingleOrDefault()?.State.Value,
+                () => Is.EqualTo(Visibility.Visible));
+            AddStep("set game volume to max", () => Game.Dependencies.Get<FrameworkConfigManager>().SetValue(FrameworkSetting.VolumeUniversal, 1d));
+            AddStep("move to centre", () => InputManager.MoveMouseTo(Game));
+            AddStep("alt-scroll down", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.ScrollVerticalBy(-1);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+            AddUntilStep("wait for volume overlay to show", () => Game.ChildrenOfType<VolumeOverlay>().SingleOrDefault()?.State.Value, () => Is.EqualTo(Visibility.Visible));
+            AddStep("start dragging meter", () =>
+            {
+                InputManager.MoveMouseTo(Game.ChildrenOfType<VolumeMeter>().First().ChildrenOfType<OsuSpriteText>().First());
+                InputManager.PressButton(MouseButton.Left);
+            });
+            AddStep("drag away", () => InputManager.MoveMouseTo(Game.ChildrenOfType<VolumeMeter>().First().ChildrenOfType<OsuSpriteText>().First(), new Vector2(0, -100)));
+            AddStep("release mouse", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddAssert("beatmap overlay still visible",
+                () => Game.ChildrenOfType<BeatmapSetOverlay>().SingleOrDefault()?.State.Value,
+                () => Is.EqualTo(Visibility.Visible));
         }
 
         private Func<Player> playToResults()

@@ -18,6 +18,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Skinning;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
@@ -76,11 +77,7 @@ namespace osu.Game.Screens.Play
         /// Add a settings group to the HUD overlay. Intended to be used by rulesets to add replay-specific settings.
         /// </summary>
         /// <param name="settings">The settings group to be shown.</param>
-        public void AddSettings(PlayerSettingsGroup settings) => Schedule(() =>
-        {
-            settings.Expanded.Value = false;
-            HUDOverlay.PlayerSettingsOverlay.Add(settings);
-        });
+        public void AddSettings(PlayerSettingsGroup settings) => Schedule(() => HUDOverlay.PlayerSettingsOverlay.Add(settings));
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -100,15 +97,18 @@ namespace osu.Game.Screens.Play
                 playbackSettings.UserPlaybackRate.BindTo(master.UserPlaybackRate);
 
             HUDOverlay.PlayerSettingsOverlay.AddAtStart(playbackSettings);
-            AddInternal(failIndicator = new ReplayFailIndicator(GameplayClockContainer)
+            AddInternal(new RulesetSkinProvidingContainer(GameplayState.Ruleset, GameplayState.Beatmap, Beatmap.Value.Skin)
             {
-                GoToResults = () =>
+                Child = failIndicator = new ReplayFailIndicator(GameplayClockContainer)
                 {
-                    if (!this.IsCurrentScreen())
-                        return;
+                    GoToResults = () =>
+                    {
+                        if (!this.IsCurrentScreen())
+                            return;
 
-                    ValidForResume = false;
-                    this.Push(new SoloResultsScreen(Score.ScoreInfo));
+                        ValidForResume = false;
+                        this.Push(new SoloResultsScreen(Score.ScoreInfo));
+                    }
                 }
             });
         }
