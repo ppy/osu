@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
@@ -59,7 +58,7 @@ namespace osu.Game.Screens.OnlinePlay
             Icon = FontAwesome.Solid.ExchangeAlt;
             AccentColour = colours.Lime1;
 
-            Add(modsWedge = new ModsWedgeContainer
+            Add(modsWedge = new InputBlockingContainer
             {
                 Y = -5f,
                 Depth = float.MaxValue,
@@ -186,13 +185,6 @@ namespace osu.Game.Screens.OnlinePlay
                 else
                     text.Text = ModSelectOverlayStrings.Mods(Mods.Value.Count).ToUpper();
             }
-        }
-
-        internal partial class ModsWedgeContainer : Container
-        {
-            protected override bool OnMouseDown(MouseDownEvent e) => true;
-
-            protected override bool OnHover(HoverEvent e) => true;
         }
     }
 }
