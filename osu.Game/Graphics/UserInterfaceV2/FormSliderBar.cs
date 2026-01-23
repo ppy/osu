@@ -35,13 +35,20 @@ namespace osu.Game.Graphics.UserInterfaceV2
             set
             {
                 current.Current = value;
+
+                // the above `Current` set could have disabled the instantaneous bindable too,
+                // but we still need to copy out `Default` manually,
+                // so lift that disable for a second and then restore it
+                currentNumberInstantaneous.Disabled = false;
                 currentNumberInstantaneous.Default = current.Default;
+                currentNumberInstantaneous.Disabled = current.Disabled;
             }
         }
 
         private readonly BindableNumberWithCurrent<T> current = new BindableNumberWithCurrent<T>();
 
         private readonly BindableNumber<T> currentNumberInstantaneous = new BindableNumber<T>();
+        private readonly InnerSlider slider;
 
         /// <summary>
         /// Whether changes to the value should instantaneously transfer to outside bindables.
@@ -84,20 +91,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public LocalisableString HintText { get; init; }
 
-        private float keyboardStep;
-
         /// <summary>
         /// A custom step value for each key press which actuates a change on this control.
         /// </summary>
         public float KeyboardStep
         {
-            get => keyboardStep;
-            set
-            {
-                keyboardStep = value;
-                if (IsLoaded)
-                    slider.KeyboardStep = value;
-            }
+            get => slider.KeyboardStep;
+            set => slider.KeyboardStep = value;
         }
 
         /// <summary>
@@ -125,7 +125,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private Box flashLayer = null!;
         private FormTextBox.InnerTextBox textBox = null!;
         private OsuSpriteText valueLabel = null!;
-        private InnerSlider slider = null!;
         private FormFieldCaption captionText = null!;
         private IFocusManager focusManager = null!;
 
@@ -140,6 +139,56 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             LabelFormat ??= defaultLabelFormat;
             TooltipFormat ??= v => LabelFormat(v);
+
+            // the reason why this slider is created in constructor rather than in BDL like the rest of drawable hierarchy is as follows:
+            // `SliderBar<T>` (the base framework class for all sliders) also does its `Current` initialisation in its ctor.
+            // if that precedent is not followed, it is possible to run into a crippling issue
+            // when a `FormSliderBar` instance is on a screen and said screen is exited before said instance's `LoadComplete()` is invoked.
+            // in that case, the screen exit will unbind the `InnerSlider`'s internal bindings & value change callbacks:
+            // https://github.com/ppy/osu-framework/blob/23ac694fa2c342ce39f563c8a1b975119249d5e9/osu.Framework/Screens/ScreenStack.cs#L353
+            // the callbacks are supposed to propagate `{Min,Max}Value` from `Current` to its internal `currentNumberInstantaneous` bindable:
+            // https://github.com/ppy/osu-framework/blob/64624795b0816261dfc5e930e1d9b9ec7e8bb8c5/osu.Framework/Graphics/UserInterface/SliderBar.cs#L62-L63
+            // thus, the callbacks getting unbound by the screen exit prevents `{Min,Max}Value` from ever correctly propagating, which finally causes a crash at
+            // https://github.com/ppy/osu-framework/blob/64624795b0816261dfc5e930e1d9b9ec7e8bb8c5/osu.Framework/Graphics/UserInterface/SliderBar.cs#L112 ->
+            // https://github.com/ppy/osu-framework/blob/64624795b0816261dfc5e930e1d9b9ec7e8bb8c5/osu.Framework/Graphics/UserInterface/SliderBar.cs#L88-L92.
+            // moving the slider creation & binding to constructor does little to fix the issue other than to make it less likely to be hit.
+            slider = new InnerSlider
+            {
+                Current = currentNumberInstantaneous,
+                OnCommit = () => current.Value = currentNumberInstantaneous.Value,
+                TooltipFormat = TooltipFormat,
+                DisplayAsPercentage = DisplayAsPercentage,
+                PlaySamplesOnAdjust = PlaySamplesOnAdjust,
+                ResetToDefault = () =>
+                {
+                    if (!IsDisabled)
+                        SetDefault();
+                }
+            };
+
+            current.ValueChanged += e =>
+            {
+                currentNumberInstantaneous.Value = e.NewValue;
+                ValueChanged?.Invoke();
+            };
+
+            current.MinValueChanged += v => currentNumberInstantaneous.MinValue = v;
+            current.MaxValueChanged += v => currentNumberInstantaneous.MaxValue = v;
+            current.PrecisionChanged += v => currentNumberInstantaneous.Precision = v;
+            current.DisabledChanged += disabled =>
+            {
+                if (disabled)
+                {
+                    // revert any changes before disabling to make sure we are in a consistent state.
+                    currentNumberInstantaneous.Value = current.Value;
+                }
+
+                currentNumberInstantaneous.Disabled = disabled;
+                if (IsLoaded)
+                    updateState();
+            };
+
+            current.CopyTo(currentNumberInstantaneous);
         }
 
         [BackgroundDependencyLoader]
@@ -224,23 +273,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                 },
                             },
                         },
-                        slider = new InnerSlider
+                        slider.With(s =>
                         {
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreRight,
-                            RelativeSizeAxes = Axes.X,
-                            Width = 0.5f,
-                            Current = currentNumberInstantaneous,
-                            OnCommit = () => current.Value = currentNumberInstantaneous.Value,
-                            TooltipFormat = TooltipFormat,
-                            DisplayAsPercentage = DisplayAsPercentage,
-                            PlaySamplesOnAdjust = PlaySamplesOnAdjust,
-                            ResetToDefault = () =>
-                            {
-                                if (!IsDisabled)
-                                    SetDefault();
-                            }
-                        }
+                            s.Anchor = Anchor.CentreRight;
+                            s.Origin = Anchor.CentreRight;
+                            s.RelativeSizeAxes = Axes.X;
+                            s.Width = 0.5f;
+                        })
                     },
                 },
             };
@@ -253,7 +292,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             base.LoadComplete();
 
-            slider.KeyboardStep = keyboardStep;
             captionText.Caption = caption;
 
             focusManager = GetContainingFocusManager()!;
@@ -265,28 +303,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
             slider.IsDragging.BindValueChanged(_ => updateState());
             slider.Focused.BindValueChanged(_ => updateState());
 
-            current.ValueChanged += e =>
-            {
-                currentNumberInstantaneous.Value = e.NewValue;
-                ValueChanged?.Invoke();
-            };
-
-            current.MinValueChanged += v => currentNumberInstantaneous.MinValue = v;
-            current.MaxValueChanged += v => currentNumberInstantaneous.MaxValue = v;
-            current.PrecisionChanged += v => currentNumberInstantaneous.Precision = v;
-            current.DisabledChanged += disabled =>
-            {
-                if (disabled)
-                {
-                    // revert any changes before disabling to make sure we are in a consistent state.
-                    currentNumberInstantaneous.Value = current.Value;
-                }
-
-                currentNumberInstantaneous.Disabled = disabled;
-                updateState();
-            };
-
-            current.CopyTo(currentNumberInstantaneous);
             currentLanguage.BindValueChanged(_ => Schedule(updateValueDisplay));
             currentNumberInstantaneous.BindDisabledChanged(_ => updateState());
             currentNumberInstantaneous.BindValueChanged(e =>
