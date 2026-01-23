@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Team.Sections
 {
-    public class MembersSection : ProfileSection
+    public partial class MembersSection : ProfileSection
     {
         public readonly Bindable<TeamProfileData?> TeamData = new Bindable<TeamProfileData?>();
 
@@ -33,6 +33,7 @@ namespace osu.Game.Overlays.Team.Sections
                 Children = new Drawable[]
                 {
                     leaderGroup = new LeaderGroup(),
+                    new MembersGroup { TeamData = { BindTarget = TeamData } },
                 },
             };
         }

@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -57,6 +58,15 @@ namespace osu.Game.Tests.Visual.Online
                         return true;
                     }
 
+                    if (req is GetTeamMembersRequest getTeamMembersRequest)
+                    {
+                        getTeamMembersRequest.TriggerSuccess(new TeamMembersResponse
+                        {
+                            Items = (from i in Enumerable.Range(1, 10) select GenerateMember(i)).ToArray(),
+                            Total = 10,
+                        });
+                    }
+
                     return false;
                 };
             });
@@ -76,6 +86,15 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         pendingRequest = getTeamRequest;
                         return true;
+                    }
+
+                    if (req is GetTeamMembersRequest getTeamMembersRequest)
+                    {
+                        getTeamMembersRequest.TriggerSuccess(new TeamMembersResponse
+                        {
+                            Items = (from i in Enumerable.Range(1, 10) select GenerateMember(i)).ToArray(),
+                            Total = 10,
+                        });
                     }
 
                     return false;
@@ -108,6 +127,15 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         pendingRequest = getTeamRequest;
                         return true;
+                    }
+
+                    if (req is GetTeamMembersRequest getTeamMembersRequest)
+                    {
+                        getTeamMembersRequest.TriggerSuccess(new TeamMembersResponse
+                        {
+                            Items = (from i in Enumerable.Range(1, 10) select GenerateMember(i)).ToArray(),
+                            Total = 10,
+                        });
                     }
 
                     return false;
@@ -158,5 +186,29 @@ namespace osu.Game.Tests.Visual.Online
                 RankedScore = 546346745,
             },
         };
+
+        public static APITeamMember GenerateMember(int id) => new APITeamMember
+        {
+            CreatedAt = "2026-01-22T019:05:15+00:00",
+            User = GenerateUser(id),
+        };
+
+        public static readonly string[] COVERS =
+        {
+            TestResources.COVER_IMAGE_1,
+            TestResources.COVER_IMAGE_2,
+            TestResources.COVER_IMAGE_3,
+            TestResources.COVER_IMAGE_4,
+        };
+
+        public static APIUser GenerateUser(int id)
+        {
+            return new APIUser
+            {
+                Id = id,
+                Username = $"user{id}",
+                CoverUrl = COVERS[RNG.Next(0, COVERS.Length - 1)],
+            };
+        }
     }
 }
