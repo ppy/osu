@@ -85,7 +85,7 @@ namespace osu.Game.Screens.SelectV2
             AddRange(new[]
             {
                 unrankedBadge = new UnrankedBadge(),
-                modDisplayBar = new ModDisplayBarContainer
+                modDisplayBar = new InputBlockingContainer
                 {
                     Y = -5f,
                     Depth = float.MaxValue,
@@ -343,14 +343,7 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
-        internal partial class ModDisplayBarContainer : Container
-        {
-            protected override bool OnMouseDown(MouseDownEvent e) => true;
-
-            protected override bool OnHover(HoverEvent e) => true;
-        }
-
-        internal partial class UnrankedBadge : CompositeDrawable, IHasTooltip
+        internal partial class UnrankedBadge : InputBlockingContainer, IHasTooltip
         {
             public LocalisableString TooltipText { get; }
 
@@ -393,10 +386,6 @@ namespace osu.Game.Screens.SelectV2
                     }
                 };
             }
-
-            protected override bool OnMouseDown(MouseDownEvent e) => true;
-
-            protected override bool OnHover(HoverEvent e) => true;
         }
     }
 }
