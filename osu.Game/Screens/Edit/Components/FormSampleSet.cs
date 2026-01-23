@@ -284,7 +284,7 @@ namespace osu.Game.Screens.Edit.Components
                 triangles.Colour = ColourInfo.GradientVertical(triangleGradientSecondColour.Value, BackgroundColour);
             }
 
-            private void recycleSamples()
+            private void recycleSamples() => Schedule(() =>
             {
                 if (hoverSounds?.Parent == this)
                 {
@@ -306,7 +306,7 @@ namespace osu.Game.Screens.Edit.Components
                 {
                     sample = null;
                 }
-            }
+            });
 
             protected override bool OnHover(HoverEvent e)
             {
