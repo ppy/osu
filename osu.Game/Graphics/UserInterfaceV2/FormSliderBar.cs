@@ -405,8 +405,21 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 double floatValue = double.CreateTruncating(currentNumberInstantaneous.Value);
 
-                if (currentNumberInstantaneous.Value is int)
-                    floatValue /= 100;
+                // if `DisplayAsPercentage` is true and `T` is not `int`, then `Current` / `currentNumberInstantaneous` are in the range of [0,1].
+                // in the text box, we want to show the percentage in the range of [0,100], but without the percentage sign.
+                // the reason we don't want a percentage sign is that `TextBox`es with numerical `TextInputType`s
+                // have framework-side limitations on which characters they accept and they won't accept a percentage sign.
+                //
+                // therefore, the instantaneous value needs to be multiplied by 100 if it's not `int`, so that `ToStandardFormattedString()`,
+                // which is called *intentionally* without `asPercentage: true` specified as to not emit the percentage sign, spits out the correct number.
+                //
+                // additionally note that `ToStandardFormattedString()`, when called with `asPercentage: true` specified, does the *inverse* of this,
+                // which is that it brings the formatted number *into* the [0,1] range,
+                // because .NET number formatting *automatically* multiplies the formatted number by 100 when it is told to stringify a number as percentage
+                // (https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings#the--custom-specifier-3).
+                // it's all very confusing.
+                if (currentNumberInstantaneous.Value is not int)
+                    floatValue *= 100;
 
                 textBox.Text = floatValue.ToStandardFormattedString(Math.Max(0, OsuSliderBar<T>.MAX_DECIMAL_DIGITS - 2));
             }
@@ -573,7 +586,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             protected sealed override LocalisableString GetTooltipText(T value) => TooltipFormat(value);
         }
 
-        private partial class InnerSliderNub : Circle
+        public partial class InnerSliderNub : Circle
         {
             public Action? ResetToDefault { get; set; }
 
