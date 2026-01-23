@@ -50,7 +50,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (mods.OfType<OsuModAutopilot>().Any())
                 distanceBonus = 0;
 
-            return distanceBonus * 1000 / strainTime;
+            double strain = distanceBonus * 1000 / strainTime;
+
+            strain *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
+
+            return strain;
         }
+
+        private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.3, ms / 1000));
     }
 }

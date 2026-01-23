@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
+using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 
@@ -45,11 +46,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            currentAimStrain *= strainDecayAim(current.DeltaTime);
-            currentAimStrain += AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierAim;
+            double decayAim = strainDecayAim(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
+            double decaySpeed = strainDecaySpeed(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
 
-            currentSpeedStrain *= strainDecaySpeed(current.DeltaTime);
-            currentSpeedStrain += SpeedAimEvaluator.EvaluateDifficultyOf(current, Mods) * skillMultiplierSpeed;
+            currentAimStrain *= decayAim;
+            currentAimStrain += AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * (1 - decayAim) * skillMultiplierAim;
+
+            currentSpeedStrain *= decaySpeed;
+            currentSpeedStrain += SpeedAimEvaluator.EvaluateDifficultyOf(current, Mods) * (1 - decaySpeed) * skillMultiplierSpeed;
 
             double totalStrain = DifficultyCalculationUtils.Norm(meanExponent, currentAimStrain, currentSpeedStrain);
 
