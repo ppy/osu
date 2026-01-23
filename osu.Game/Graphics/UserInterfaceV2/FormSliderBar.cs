@@ -573,7 +573,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             protected sealed override LocalisableString GetTooltipText(T value) => TooltipFormat(value);
         }
 
-        private partial class InnerSliderNub : Circle
+        public partial class InnerSliderNub : Circle
         {
             public Action? ResetToDefault { get; set; }
 
