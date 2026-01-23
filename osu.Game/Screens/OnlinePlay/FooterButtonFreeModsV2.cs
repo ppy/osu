@@ -41,7 +41,7 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        private Drawable modsWedge = null!;
+        private Container modsWedge = null!;
         private ModDisplay modDisplay = null!;
         private Container modContainer = null!;
         private ModCountText overflowModCountDisplay = null!;
@@ -58,7 +58,7 @@ namespace osu.Game.Screens.OnlinePlay
             Icon = FontAwesome.Solid.ExchangeAlt;
             AccentColour = colours.Lime1;
 
-            Add(modsWedge = new Container
+            Add(modsWedge = new InputBlockingContainer
             {
                 Y = -5f,
                 Depth = float.MaxValue,
