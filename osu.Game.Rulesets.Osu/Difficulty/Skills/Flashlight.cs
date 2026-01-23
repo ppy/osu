@@ -15,27 +15,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Flashlight : StrainSkill
     {
+        protected override double SkillMultiplier => 0.05512;
+        protected override double StrainDecayBase => 0.15;
+        protected override double SumDecayExponent => 0.9;
+
         public Flashlight(Mod[] mods)
             : base(mods)
         {
         }
 
-        private double skillMultiplier => 0.05512;
-        private double strainDecayBase => 0.15;
-
-        private double currentStrain;
-
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
-
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous(0).StartTime);
-
-        protected override double StrainValueAt(DifficultyHitObject current)
-        {
-            currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += FlashlightEvaluator.EvaluateDifficultyOf(current, Mods) * skillMultiplier;
-
-            return currentStrain;
-        }
+        protected override double ObjectDifficultyOf(DifficultyHitObject current) => FlashlightEvaluator.EvaluateDifficultyOf(current, Mods);
 
         public override double DifficultyValue() => GetCurrentStrainPeaks().Sum();
 

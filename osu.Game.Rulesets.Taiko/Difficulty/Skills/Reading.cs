@@ -14,19 +14,20 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// <summary>
     /// Calculates the reading coefficient of taiko difficulty.
     /// </summary>
-    public class Reading : StrainDecaySkill
+    public class Reading : StrainSkill
     {
         protected override double SkillMultiplier => 1.0;
         protected override double StrainDecayBase => 0.4;
-
-        private double currentStrain;
+        protected override double SumDecayExponent => 0.9;
 
         public Reading(Mod[] mods)
             : base(mods)
         {
         }
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        private double currentStrain;
+
+        protected override double ObjectDifficultyOf(DifficultyHitObject current)
         {
             // Drum Rolls and Swells are exempt.
             if (current.BaseObject is not Hit)

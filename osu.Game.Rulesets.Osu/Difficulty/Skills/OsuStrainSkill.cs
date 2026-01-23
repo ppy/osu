@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using System.Linq;
 using osu.Framework.Utils;
 
@@ -12,6 +14,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public abstract class OsuStrainSkill : StrainSkill
     {
+        protected override double SumDecayExponent => 0.9;
+
         /// <summary>
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.
         /// This is done in order to decrease their impact on the overall difficulty of the map for this skill.
@@ -26,6 +30,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
         {
+        }
+
+        protected override double StrainValueAt(DifficultyHitObject current)
+        {
+            double decay = StrainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
+
+            CurrentStrain *= decay;
+            CurrentStrain += ObjectDifficultyOf(current) * (1 - decay) * SkillMultiplier;
+
+            return CurrentStrain;
         }
 
         public override double DifficultyValue()
@@ -51,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             foreach (double strain in strains.OrderDescending())
             {
                 difficulty += strain * weight;
-                weight *= DecayWeight;
+                weight *= SumDecayExponent;
             }
 
             return difficulty;

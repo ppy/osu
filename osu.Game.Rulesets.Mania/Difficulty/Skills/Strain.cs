@@ -10,13 +10,14 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
-    public class Strain : StrainDecaySkill
+    public class Strain : StrainSkill
     {
-        private const double individual_decay_base = 0.125;
-        private const double overall_decay_base = 0.30;
-
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 1;
+        protected override double SumDecayExponent => 0.9;
+
+        private const double individual_decay_base = 0.125;
+        private const double overall_decay_base = 0.30;
 
         private readonly double[] individualStrains;
         private double highestIndividualStrain;
@@ -29,7 +30,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             overallStrain = 1;
         }
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        protected override double ObjectDifficultyOf(DifficultyHitObject current)
         {
             var maniaCurrent = (ManiaDifficultyHitObject)current;
 

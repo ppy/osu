@@ -8,12 +8,11 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 {
-    public class Movement : StrainDecaySkill
+    public class Movement : StrainSkill
     {
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 0.2;
-
-        protected override double DecayWeight => 0.94;
+        protected override double SumDecayExponent => 0.94;
 
         protected override int SectionLength => 750;
 
@@ -36,7 +35,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             catcherSpeedMultiplier = clockRate;
         }
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        protected override double ObjectDifficultyOf(DifficultyHitObject current)
         {
             return MovementEvaluator.EvaluateDifficultyOf(current, catcherSpeedMultiplier);
         }

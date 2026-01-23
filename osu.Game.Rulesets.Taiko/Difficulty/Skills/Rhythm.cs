@@ -12,10 +12,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// <summary>
     /// Calculates the rhythm coefficient of taiko difficulty.
     /// </summary>
-    public class Rhythm : StrainDecaySkill
+    public class Rhythm : StrainSkill
     {
         protected override double SkillMultiplier => 1.0;
         protected override double StrainDecayBase => 0.4;
+        protected override double SumDecayExponent => 0.9;
 
         private readonly double greatHitWindow;
 
@@ -25,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             this.greatHitWindow = greatHitWindow;
         }
 
-        protected override double StrainValueOf(DifficultyHitObject current)
+        protected override double ObjectDifficultyOf(DifficultyHitObject current)
         {
             double difficulty = RhythmEvaluator.EvaluateDifficultyOf(current, greatHitWindow);
 
