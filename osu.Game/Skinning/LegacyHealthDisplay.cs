@@ -233,6 +233,7 @@ namespace osu.Game.Skinning
             public override void Flash(bool isEpic)
             {
                 Bulge();
+                explode.Texture = Main.Texture;
                 explode.Blending = isEpic ? BlendingParameters.Additive : BlendingParameters.Inherit;
                 explode.ScaleTo(1).Then().ScaleTo(isEpic ? 2 : 1.6f, 120, Easing.Out);
                 explode.FadeOutFromOne(120, Easing.Out);
