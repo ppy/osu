@@ -200,8 +200,9 @@ namespace osu.Game.Tests.NonVisual
                 {
                 }
 
-                public override void Process(DifficultyHitObject current)
+                protected override double ProcessInternal(DifficultyHitObject current)
                 {
+                    return 0;
                 }
 
                 public override double DifficultyValue() => 1;

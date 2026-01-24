@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double acute_angle_multiplier = 2.55;
         private const double slider_multiplier = 1.35;
         private const double velocity_change_multiplier = 0.75;
-        private const double wiggle_multiplier = 1.02;
+        private const double wiggle_multiplier = 1.02; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
@@ -164,6 +164,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (withSliderTravelDistance)
                 aimStrain += sliderBonus * slider_multiplier;
 
+            aimStrain *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
+
             return aimStrain;
         }
 
@@ -195,17 +197,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double doubletapHitWindow = osuCurrObj.HitWindowGreat;
 
             // If strain time is too high for this hitwindow - don't punish it
-            double relevantStrainTime = Math.Max(osuLast0Obj.StrainTime, osuLast2Obj.StrainTime);
+            double relevantStrainTime = Math.Max(osuLast0Obj.AdjustedDeltaTime, osuLast2Obj.AdjustedDeltaTime);
             doubletapHitWindow *= DifficultyCalculationUtils.Smoothstep(doubletapHitWindow, relevantStrainTime / 2, relevantStrainTime);
 
             // Don't nerf if difference in straintimes is too big
-            doubletapHitWindow *= DifficultyCalculationUtils.ReverseLerp(osuLast0Obj.StrainTime, osuCurrObj.StrainTime * 0.4, osuCurrObj.StrainTime * 0.9);
+            doubletapHitWindow *= DifficultyCalculationUtils.ReverseLerp(osuLast0Obj.AdjustedDeltaTime, osuCurrObj.AdjustedDeltaTime * 0.4, osuCurrObj.AdjustedDeltaTime * 0.9);
 
             // Divide by 2 because only half of hitwindow is used to abuse consecutive jumps
             double strainTimeAdjust = doubletappability * doubletapHitWindow / 2;
 
-            return osuCurrObj.StrainTime / (osuCurrObj.StrainTime + strainTimeAdjust);
+            return osuCurrObj.AdjustedDeltaTime / (osuCurrObj.AdjustedDeltaTime + strainTimeAdjust);
         }
+
+        private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.15, ms / 1000));
 
         private static double calcWideAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(40), double.DegreesToRadians(140));
 
