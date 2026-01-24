@@ -246,8 +246,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     lastCursorPosition = prevSlider.HeadCircle.StackedPosition;
                 Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastDifficultyObject);
 
-                double angle = Math.Abs(calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition));
-                double sliderAngle = Math.Abs(calculateSliderAngle(lastDifficultyObject!, lastLastCursorPosition));
+                double angle = calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition);
+                double sliderAngle = calculateSliderAngle(lastDifficultyObject!, lastLastCursorPosition);
 
                 Angle = Math.Min(angle, sliderAngle);
             }
@@ -382,7 +382,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             float dot = Vector2.Dot(v1, v2);
             float det = v1.X * v2.Y - v1.Y * v2.X;
 
-            return Math.Atan2(det, dot);
+            return Math.Abs(Math.Atan2(det, dot));
         }
 
         private Vector2 getEndCursorPosition(OsuDifficultyHitObject difficultyHitObject)
