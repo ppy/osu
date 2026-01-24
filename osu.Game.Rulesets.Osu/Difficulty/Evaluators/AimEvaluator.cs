@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double wide_angle_multiplier = 1.5;
         private const double acute_angle_uncomfy_multiplier = 1.7;
         private const double acute_angle_comfy_multiplier = 0.187;
-        private const double slider_multiplier = 1.27;
+        private const double slider_multiplier = 1.4;
         private const double velocity_change_multiplier = 0.75;
         private const double wiggle_multiplier = 0.53; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
 
@@ -163,17 +163,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)
-                aimStrain += CalculateSliderBonus(osuCurrObj, osuLastObj);
+                aimStrain += CalculateSliderBonus(osuCurrObj);
 
             return aimStrain;
         }
 
-        public static double CalculateSliderBonus(OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuLastObj)
+        public static double CalculateSliderBonus(OsuDifficultyHitObject osuCurrObj)
         {
-            if (osuLastObj.BaseObject is Slider)
+            if (osuCurrObj.BaseObject is Slider)
             {
                 // Reward sliders based on velocity.
-                double sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
+                double sliderBonus = osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
 
                 // Add high bpm bonus
                 sliderBonus *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
