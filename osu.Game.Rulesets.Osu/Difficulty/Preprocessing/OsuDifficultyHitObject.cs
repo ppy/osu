@@ -244,6 +244,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             {
                 if (lastDifficultyObject!.BaseObject is Slider prevSlider && lastDifficultyObject.TravelDistance > 0)
                     lastCursorPosition = prevSlider.HeadCircle.StackedPosition;
+
                 Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastDifficultyObject);
 
                 double angle = calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition);
