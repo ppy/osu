@@ -36,6 +36,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public readonly double AdjustedDeltaTime;
 
         /// <summary>
+        /// Time (in ms) between the object first appearing and the time it needs to be clicked.
+        /// <see cref="OsuHitObject.TimePreempt"/> adjusted by clock rate.
+        /// </summary>
+        public readonly double Preempt;
+
+        /// <summary>
+        /// Beatmap playback rate.
+        /// </summary>
+        public readonly double ClockRate;
+
+        /// <summary>
         /// Normalised distance from the "lazy" end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
         /// <para>
         /// The "lazy" end position is the position at which the cursor ends up if the previous hitobject is followed with as minimal movement as possible (i.e. on the edge of slider follow circles).
@@ -110,20 +121,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double SmallCircleBonus { get; private set; }
 
-        /// <summary>
-        /// The clock rate.
-        /// </summary>
-        public double ClockRate { get; private set; }
-
-        /// <summary>
-        /// The object preempt ms, adjusted for the clock rate.
-        /// </summary>
-        public double PreEmpt { get; private set; }
-
         private readonly OsuDifficultyHitObject? lastLastDifficultyObject;
         private readonly OsuDifficultyHitObject? lastDifficultyObject;
 
-        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, double preEmpt, List<DifficultyHitObject> objects, int index)
+        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
             lastLastDifficultyObject = index > 1 ? (OsuDifficultyHitObject)objects[index - 2] : null;
@@ -135,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             SmallCircleBonus = Math.Max(1.0, 1.0 + (30 - BaseObject.Radius) / 40);
 
             ClockRate = clockRate;
-            PreEmpt = preEmpt;
+            Preempt = BaseObject.TimePreempt / clockRate;
 
             if (BaseObject is Slider sliderObject)
             {
