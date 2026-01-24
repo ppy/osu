@@ -143,10 +143,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) / Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime), 2);
             }
 
-            if (osuLastObj.BaseObject is Slider)
+            if (osuCurrObj.BaseObject is Slider)
             {
                 // Reward sliders based on velocity.
-                sliderBonus = osuLastObj.TravelDistance / osuLastObj.TravelTime;
+                sliderBonus = osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
             }
 
             aimStrain += wiggleBonus * wiggle_multiplier;
