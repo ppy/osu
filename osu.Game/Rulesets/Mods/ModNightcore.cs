@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
@@ -69,7 +70,8 @@ namespace osu.Game.Rulesets.Mods
     {
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
-            drawableRuleset.Overlays.Add(new NightcoreBeatContainer());
+            double sliderTickRate = drawableRuleset.Beatmap.Difficulty.SliderTickRate;
+            drawableRuleset.Overlays.Add(new NightcoreBeatContainer(sliderTickRate));
         }
 
         public partial class NightcoreBeatContainer : BeatSyncedContainer
@@ -82,9 +84,17 @@ namespace osu.Game.Rulesets.Mods
             private int? firstBeat;
             private int lastBeat = -1;
 
+            private readonly bool playHats;
+
             public NightcoreBeatContainer()
+                : this(2)
+            {
+            }
+
+            public NightcoreBeatContainer(double sliderTickRate)
             {
                 Divisor = 2;
+                playHats = Precision.AlmostEquals(sliderTickRate % 2, 0);
             }
 
             [BackgroundDependencyLoader]
@@ -155,7 +165,8 @@ namespace osu.Game.Rulesets.Mods
                                 break;
 
                             default:
-                                hatSample?.Play();
+                                if (playHats)
+                                    hatSample?.Play();
                                 break;
                         }
 
@@ -173,12 +184,8 @@ namespace osu.Game.Rulesets.Mods
                                 break;
 
                             default:
-                                // note that in stable hat samples would only play if the beatmap tick rate was even
-                                // (https://github.com/peppy/osu-stable-reference/blob/6ab0cf1f9f7b3449f5c0d8defcd458aae72cdb88/osu!/Audio/NightcoreBeat.cs#L30-L32)
-                                // that kind of presumes that only music timed in 4/4 exists, and does not really work well
-                                // if the beatmap e.g. mixes 4/4 and 3/4 signature timing control points.
-                                // therefore this conditional behaviour is not reimplemented.
-                                hatSample?.Play();
+                                if (playHats)
+                                    hatSample?.Play();
                                 break;
                         }
 
