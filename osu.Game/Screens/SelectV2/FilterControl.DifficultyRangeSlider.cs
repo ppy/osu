@@ -166,13 +166,12 @@ namespace osu.Game.Screens.SelectV2
                     Colour4 nubColour = ColourUtils.SampleFromLinearGradient(spectrum, (float)Math.Round(value, 2, MidpointRounding.AwayFromZero));
                     nubColour = nubColour.Lighten(0.4f);
 
-                    if (value >= 8.0)
-                        nubColour = colours.Gray4;
-
                     Nub.AccentColour = nubColour;
                     Nub.GlowingAccentColour = nubColour.Lighten(0.2f);
                     Nub.ShadowColour = Color4.Black.Opacity(0.2f);
-                    NubText.Colour = OsuColour.ForegroundTextColourFor(nubColour);
+                    NubText.Colour = isUpper && Current.IsDefault
+                        ? OsuColour.ForegroundTextColourFor(nubColour)
+                        : colours.ForStarDifficultyText(value);
 
                     base.UpdateDisplay(value);
                 }
