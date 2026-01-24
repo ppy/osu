@@ -12,8 +12,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class AimEvaluator
     {
         private const double wide_angle_multiplier = 1.5;
-        private const double acute_angle_multiplier = 1.7;
-        private const double acute_angle_comfy_ratio = 0.11; // Portion of the acute angle that's rewarded to comfy angles
+        private const double acute_angle_uncomfy_multiplier = 1.7;
+        private const double acute_angle_comfy_multiplier = 0.187;
         private const double slider_multiplier = 1.27;
         private const double velocity_change_multiplier = 0.75;
         private const double wiggle_multiplier = 0.53; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
@@ -90,8 +90,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 {
                     acuteAngleBonus = CalcAcuteAngleBonus(currAngle);
 
+                    // We're taking uncomfy as a base here
+                    double comfyAdjustRatio = acute_angle_comfy_multiplier / acute_angle_uncomfy_multiplier;
+                    double uncomfyAdjustRatio = (acute_angle_uncomfy_multiplier - acute_angle_comfy_multiplier) / acute_angle_uncomfy_multiplier;
+
                     // Penalize angle repetition.
-                    acuteAngleBonus *= acute_angle_comfy_ratio + (1.0 - acute_angle_comfy_ratio) * (1 - Math.Min(acuteAngleBonus, Math.Pow(CalcAcuteAngleBonus(lastAngle), 3)));
+                    acuteAngleBonus *= comfyAdjustRatio + uncomfyAdjustRatio * (1 - Math.Min(acuteAngleBonus, Math.Pow(CalcAcuteAngleBonus(lastAngle), 3)));
 
                     // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
                     acuteAngleBonus *= angleBonus *
@@ -151,7 +155,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             aimStrain += velocityChangeBonus * velocity_change_multiplier;
 
             // Add in acute angle bonus or wide angle bonus, whichever is larger.
-            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier);
+            aimStrain += Math.Max(acuteAngleBonus * acute_angle_uncomfy_multiplier, wideAngleBonus * wide_angle_multiplier);
 
             // Apply high circle size bonus
             aimStrain *= osuCurrObj.SmallCircleBonus;
