@@ -408,8 +408,7 @@ namespace osu.Game.Screens.SelectV2
                 case GroupedBeatmap groupedBeatmap:
                     setExpandedGroup(groupedBeatmap.Group);
 
-                    if (grouping.BeatmapSetsGroupedTogether)
-                        setExpandedSet(new GroupedBeatmapSet(groupedBeatmap.Group, groupedBeatmap.Beatmap.BeatmapSet!));
+                    setExpandedSet(new GroupedBeatmapSet(groupedBeatmap.Group, groupedBeatmap.Beatmap.BeatmapSet!));
                     break;
             }
         }
@@ -647,10 +646,11 @@ namespace osu.Game.Screens.SelectV2
 
         private void setExpandedSet(GroupedBeatmapSet set)
         {
-            if (ExpandedBeatmapSet != null)
+            if (grouping.BeatmapSetsGroupedTogether && ExpandedBeatmapSet != null)
                 setExpansionStateOfSetItems(ExpandedBeatmapSet, false);
             ExpandedBeatmapSet = set;
-            setExpansionStateOfSetItems(ExpandedBeatmapSet, true);
+            if (grouping.BeatmapSetsGroupedTogether)
+                setExpansionStateOfSetItems(ExpandedBeatmapSet, true);
         }
 
         private void setExpansionStateOfSetItems(GroupedBeatmapSet set, bool expanded)
