@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -9,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
+using osu.Game.Online.Chat;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Overlays.Team.Header.Components;
 using osu.Game.Resources.Localisation.Web;
@@ -85,6 +87,15 @@ namespace osu.Game.Overlays.Team.Header
         {
             public readonly Bindable<TeamProfileData?> TeamData = new Bindable<TeamProfileData?>();
 
+            [Resolved]
+            private TeamProfileOverlay? teamProfileOverlay { get; set; }
+
+            [Resolved]
+            private ChatOverlay? chatOverlay { get; set; }
+
+            [Resolved]
+            private ChannelManager? channelManager { get; set; }
+
             public TeamChatButton()
             {
                 Content.Padding = new MarginPadding { Vertical = 10, Horizontal = 30 };
@@ -99,6 +110,16 @@ namespace osu.Game.Overlays.Team.Header
 
                 Action = () =>
                 {
+                    // This assumes that a user is only in one team at once,
+                    // and that osu-web will provide that channel in the presence response.
+                    var channel = channelManager?.JoinedChannels.FirstOrDefault(c => c.Type == ChannelType.Team);
+
+                    if (channel == null || channelManager == null)
+                        return;
+
+                    channelManager.CurrentChannel.Value = channel;
+                    teamProfileOverlay?.Hide();
+                    chatOverlay?.Show();
                 };
             }
         }
