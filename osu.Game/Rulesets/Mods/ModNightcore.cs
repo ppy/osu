@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
@@ -70,7 +71,8 @@ namespace osu.Game.Rulesets.Mods
     {
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
-            drawableRuleset.Overlays.Add(new NightcoreBeatContainer());
+            double sliderTickRate = drawableRuleset.Beatmap.Difficulty.SliderTickRate;
+            drawableRuleset.Overlays.Add(new NightcoreBeatContainer(sliderTickRate));
         }
 
         public partial class NightcoreBeatContainer : BeatSyncedContainer
@@ -82,9 +84,17 @@ namespace osu.Game.Rulesets.Mods
 
             private int? firstBeat;
 
+            private readonly bool playHats;
+
             public NightcoreBeatContainer()
+                : this(2)
+            {
+            }
+
+            public NightcoreBeatContainer(double sliderTickRate)
             {
                 Divisor = 2;
+                playHats = Precision.AlmostEquals(sliderTickRate % 2, 0);
             }
 
             [BackgroundDependencyLoader]
@@ -141,7 +151,8 @@ namespace osu.Game.Rulesets.Mods
                                 break;
 
                             default:
-                                hatSample?.Play();
+                                if (playHats)
+                                    hatSample?.Play();
                                 break;
                         }
 
@@ -159,7 +170,8 @@ namespace osu.Game.Rulesets.Mods
                                 break;
 
                             default:
-                                hatSample?.Play();
+                                if (playHats)
+                                    hatSample?.Play();
                                 break;
                         }
 
