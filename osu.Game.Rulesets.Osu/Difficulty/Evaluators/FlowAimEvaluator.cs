@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)
-                flowDifficulty += AimEvaluator.CalculateSliderBonus(osuCurrObj, osuLast0Obj);
+                flowDifficulty += AimEvaluator.CalculateSliderBonus(osuCurrObj);
 
             return flowDifficulty;
         }
