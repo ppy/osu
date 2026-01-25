@@ -18,7 +18,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// Evaluates the difficulty of tapping the current object, based on:
         /// <list type="bullet">
         /// <item><description>time between pressing the previous and current object,</description></item>
-        /// <item><description>distance between those objects,</description></item>
         /// <item><description>and how easily they can be cheesed.</description></item>
         /// </list>
         /// </summary>
@@ -27,7 +26,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (current.BaseObject is Spinner)
                 return 0;
 
-            // derive strainTime for calculation
             var osuCurrObj = (OsuDifficultyHitObject)current;
 
             double strainTime = osuCurrObj.AdjustedDeltaTime;
