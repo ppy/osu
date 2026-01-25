@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Denormalize the distance 
             double distance = Math.Pow(normalizedDistance, distanceExponent) * Math.Pow(diameter, 2);
 
-            // Rescale velocity by raising t to the power of 2 and distance
+            // Calculate the base difficulty by using rescaled distance and time
             double flowDifficulty = distance / Math.Pow(osuCurrObj.AdjustedDeltaTime, 2);
 
             double angleBonus = 0;
