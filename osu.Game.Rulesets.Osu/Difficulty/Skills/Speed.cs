@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double decay = strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
 
             currentDifficulty *= decay;
-            currentDifficulty += SpeedEvaluator.EvaluateDifficultyOf(current, Mods) * (1 - decay) * skillMultiplier;
+            currentDifficulty += SpeedEvaluator.EvaluateDifficultyOf(current) * (1 - decay) * skillMultiplier;
 
             double currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
 

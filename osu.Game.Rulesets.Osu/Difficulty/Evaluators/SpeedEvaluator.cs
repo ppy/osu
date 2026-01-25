@@ -2,10 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 
@@ -20,16 +18,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// Evaluates the difficulty of tapping the current object, based on:
         /// <list type="bullet">
         /// <item><description>time between pressing the previous and current object,</description></item>
-        /// <item><description>distance between those objects,</description></item>
         /// <item><description>and how easily they can be cheesed.</description></item>
         /// </list>
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current, IReadOnlyList<Mod> mods)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
                 return 0;
 
-            // derive strainTime for calculation
             var osuCurrObj = (OsuDifficultyHitObject)current;
 
             double strainTime = osuCurrObj.AdjustedDeltaTime;
