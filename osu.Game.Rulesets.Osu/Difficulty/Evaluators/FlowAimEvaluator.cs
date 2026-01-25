@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class FlowAimEvaluator
     {
         // The reason why this exist in evaluator instead of FlowAim skill - it's because it's very important to keep flowaim in the same scaling as snapaim on evaluator level
-        private const double flow_multiplier = 6.02;
+        private const double flow_multiplier = 6.01;
 
         private const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
         private const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
@@ -27,13 +27,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var osuLast0Obj = (OsuDifficultyHitObject)current.Previous(0);
             var osuLast1Obj = (OsuDifficultyHitObject)current.Previous(1);
 
-            double normalizedDistance = osuCurrObj.LazyJumpDistance / diameter;
-
-            // We want to have different distance exponent for spacing above and below diameter
-            double distanceExponent = normalizedDistance > 1 ? 1.5 : 1.7;
-
-            // Denormalize the distance 
-            double distance = Math.Pow(normalizedDistance, distanceExponent) * Math.Pow(diameter, 2);
+            // Rescale the distance
+            // We use the power on normalized distance so we don't have to rebalance everything when changing the exponent
+            double distance = Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 1.5) * Math.Pow(diameter, 2);
 
             // Calculate the base difficulty by using rescaled distance and time
             double flowDifficulty = distance / Math.Pow(osuCurrObj.AdjustedDeltaTime, 2);
