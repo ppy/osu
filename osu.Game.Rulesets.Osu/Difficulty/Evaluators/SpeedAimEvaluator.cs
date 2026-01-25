@@ -17,11 +17,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double single_spacing_threshold = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25; // 1.25 circles distance between centers
 
         /// <summary>
-        /// Evaluates the difficulty of tapping the current object, based on:
+        /// Evaluates the difficulty of aiming the current object, based on:
         /// <list type="bullet">
-        /// <item><description>time between pressing the previous and current object,</description></item>
         /// <item><description>distance between those objects,</description></item>
-        /// <item><description>and how easily they can be cheesed.</description></item>
         /// </list>
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current, IReadOnlyList<Mod> mods)
