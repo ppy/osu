@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentAimStrain += AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * (1 - decayAim) * skillMultiplierAim;
 
             currentSpeedStrain *= decaySpeed;
-            currentSpeedStrain += SpeedAimEvaluator.EvaluateDifficultyOf(current, Mods) * (1 - decaySpeed) * skillMultiplierSpeed;
+            currentSpeedStrain += SpeedAimEvaluator.EvaluateDifficultyOf(current) * (1 - decaySpeed) * skillMultiplierSpeed;
 
             double totalStrain = DifficultyCalculationUtils.Norm(meanExponent, currentAimStrain, currentSpeedStrain);
 
