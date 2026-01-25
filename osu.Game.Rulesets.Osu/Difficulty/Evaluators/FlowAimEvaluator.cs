@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class FlowAimEvaluator
     {
         // The reason why this exist in evaluator instead of FlowAim skill - it's because it's very important to keep flowaim in the same scaling as snapaim on evaluator level
-        private const double flow_multiplier = 6.2;
+        private const double flow_multiplier = 6.02;
 
         private const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
         private const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double normalizedDistance = osuCurrObj.LazyJumpDistance / diameter;
 
             // We want to have different distance exponent for spacing above and below diameter
-            double distanceExponent = normalizedDistance > 1 ? 1.45 : 1.7;
+            double distanceExponent = normalizedDistance > 1 ? 1.5 : 1.7;
 
             // Denormalize the distance 
             double distance = Math.Pow(normalizedDistance, distanceExponent) * Math.Pow(diameter, 2);
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         public static double CalculateSpeedflowBonus(DifficultyHitObject current)
         {
-            const double base_speedflow_multiplier = 0.1; // Base multiplier for speedflow bonus
+            const double base_speedflow_multiplier = 0.13; // Base multiplier for speedflow bonus
             const double bpm_factor = 18; // How steep the bonus is, higher values means more bonus for high BPM
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
