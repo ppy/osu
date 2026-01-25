@@ -9,6 +9,8 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
@@ -20,10 +22,14 @@ namespace osu.Game.Overlays.Team.Header
     {
         public readonly Bindable<TeamProfileData?> TeamData = new Bindable<TeamProfileData?>();
 
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
         private ProfileCoverBackground cover = null!;
         private UpdateableTeamFlag teamFlag = null!;
         private OsuSpriteText teamName = null!;
         private OsuSpriteText shortName = null!;
+        private ExternalLinkButton showTeamExternal = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -84,9 +90,23 @@ namespace osu.Game.Overlays.Team.Header
                                     Spacing = new Vector2(0, 5),
                                     Children = new Drawable[]
                                     {
-                                        teamName = new OsuSpriteText
+                                        new FillFlowContainer
                                         {
-                                            Font = OsuFont.GetFont(size: 24, weight: FontWeight.Regular),
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(5, 0),
+                                            Children = new Drawable[]
+                                            {
+                                                teamName = new OsuSpriteText
+                                                {
+                                                    Font = OsuFont.GetFont(size: 24, weight: FontWeight.Regular),
+                                                },
+                                                showTeamExternal = new ExternalLinkButton
+                                                {
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Origin = Anchor.CentreLeft,
+                                                },
+                                            },
                                         },
                                         shortName = new OsuSpriteText
                                         {
@@ -114,6 +134,7 @@ namespace osu.Game.Overlays.Team.Header
             teamFlag.Team = team;
             teamName.Text = team?.Name ?? string.Empty;
             shortName.Text = team != null ? $"[{team.ShortName}]" : string.Empty;
+            showTeamExternal.Link = $@"{api.Endpoints.WebsiteUrl}/teams/{team?.Id ?? 0}";
         }
 
         private partial class ProfileCoverBackground : CoverBackground
