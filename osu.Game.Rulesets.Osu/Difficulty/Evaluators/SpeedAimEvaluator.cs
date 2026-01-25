@@ -23,11 +23,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (current.BaseObject is Spinner)
                 return 0;
 
-            // derive strainTime for calculation
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuPrevObj = current.Index > 0 ? (OsuDifficultyHitObject)current.Previous(0) : null;
-
-            double strainTime = osuCurrObj.AdjustedDeltaTime;
 
             double travelDistance = osuPrevObj?.TravelDistance ?? 0;
             double distance = travelDistance + osuCurrObj.MinimumJumpDistance;
@@ -41,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Apply reduced small circle bonus because flow aim difficulty on small circles doesn't scale as hard as jumps
             distanceBonus *= Math.Sqrt(osuCurrObj.SmallCircleBonus);
 
-            double strain = distanceBonus * 1000 / strainTime;
+            double strain = distanceBonus * 1000 / osuCurrObj.AdjustedDeltaTime;
 
             strain *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
 
