@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
         /// <list type="bullet">
-        /// <item><description>distance between those objects,</description></item>
+        /// <item><description>distance between the previous and current object</description></item>
         /// </list>
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
