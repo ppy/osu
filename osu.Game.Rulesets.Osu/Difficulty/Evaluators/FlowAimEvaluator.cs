@@ -27,44 +27,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var osuLast0Obj = (OsuDifficultyHitObject)current.Previous(0);
             var osuLast1Obj = (OsuDifficultyHitObject)current.Previous(1);
 
-            // Start with velocity
-            double velocity = osuCurrObj.LazyJumpDistance / osuCurrObj.AdjustedDeltaTime;
+            double normalizedDistance = osuCurrObj.LazyJumpDistance / diameter;
 
-            if (osuLast0Obj.BaseObject is Slider && withSliderTravelDistance)
-            {
-                double travelVelocity = osuLast0Obj.TravelDistance / osuLast0Obj.TravelTime; // calculate the slider velocity from slider head to slider end.
-                double movementVelocity = osuCurrObj.MinimumJumpDistance / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
+            // We want to have different distance exponent for spacing above and below diameter
+            double distanceExponent = normalizedDistance > 1 ? 1.45 : 1.7;
 
-                velocity = Math.Max(velocity, movementVelocity + travelVelocity); // take the larger total combined velocity.
-            }
+            // Denormalize the distance 
+            double distance = Math.Pow(normalizedDistance, distanceExponent) * Math.Pow(diameter, 2);
 
-            double distancePowerAddition;
-
-            if (osuCurrObj.LazyJumpDistance > diameter)
-            {
-                // Controls distance scaling for high spaced flow aim
-                distancePowerAddition = Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.45);
-            }
-            else
-            {
-                // Controls distance scaling for low spaced flow aim
-                distancePowerAddition = Math.Pow(osuCurrObj.LazyJumpDistance / diameter, 0.7);
-            }
-
-            // Rescale velocity by raising t to the power of 2 and distance to the power determined earlier
-            double flowDifficulty = velocity * (distancePowerAddition * diameter) / osuCurrObj.AdjustedDeltaTime;
-
-            // Flow aim is harder on High BPM
-            const double base_speedflow_multiplier = 0.1; // Base multiplier for speedflow bonus
-            const double bpm_factor = 18; // How steep the bonus is, higher values means more bonus for high BPM
-
-            // Autobalance, it's expected for bonus multiplier to be 1 for the bpm base
-            double bpmBase = DifficultyCalculationUtils.BPMToMilliseconds(220, 4);
-            double bpmFactorMultiplierAtBase = bpmBase / (bpmBase - bpm_factor) - 1;
-            double multiplier = base_speedflow_multiplier / bpmFactorMultiplierAtBase;
-
-
-
+            // Rescale velocity by raising t to the power of 2 and distance
+            double flowDifficulty = distance / Math.Pow(osuCurrObj.AdjustedDeltaTime, 2);
 
             double angleBonus = 0;
 
@@ -94,9 +66,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             flowDifficulty += angleBonus + speedflowBonus;
             flowDifficulty *= flow_multiplier * Math.Sqrt(osuCurrObj.SmallCircleBonus);
 
-            // Add in additional slider velocity bonus.
+            // Add in additional slider velocity bonus
+            // In order for compensate for lack of slider velocity in base difficulty - increase this bonus
             if (withSliderTravelDistance)
-                flowDifficulty += AimEvaluator.CalculateSliderBonus(osuCurrObj);
+                flowDifficulty += AimEvaluator.CalculateSliderBonus(osuCurrObj) * 1.8;
 
             return flowDifficulty;
         }
