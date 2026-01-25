@@ -183,17 +183,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         }
 
         /// <summary>
-        /// Returns the amount of time a note spends invisible with the hidden mod at the current approach rate.
-        /// </summary>
-        public double DurationSpentInvisible()
-        {
-            double fadeOutStartTime = BaseObject.StartTime - BaseObject.TimePreempt + BaseObject.TimeFadeIn;
-            double fadeOutDuration = BaseObject.TimePreempt * OsuModHidden.FADE_OUT_DURATION_MULTIPLIER;
-
-            return (fadeOutStartTime + fadeOutDuration) - (BaseObject.StartTime - BaseObject.TimePreempt);
-        }
-
-        /// <summary>
         /// Returns how possible is it to doubletap this object together with the next one and get perfect judgement in range from 0 to 1
         /// </summary>
         public double GetDoubletapness(OsuDifficultyHitObject? osuNextObj)
