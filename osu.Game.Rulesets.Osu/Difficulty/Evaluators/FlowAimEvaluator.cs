@@ -73,9 +73,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double acuteAngleBonus = CalculateFlowAcuteAngleBonus(current);
                 double angleChangeBonus = CalculateFlowAngleChangeBonus(current);
 
-                // Don't account for distance bonuse here
-                angleBonus = Math.Max(acuteAngleBonus, angleChangeBonus) / Math.Max(distancePowerAddition, 0.01);
-
                 // If all three notes are overlapping - don't reward angle bonuses as you don't have to do additional movement
                 double overlappedNotesWeight = 1;
 
@@ -88,14 +85,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     overlappedNotesWeight = 1 - o1 * o2 * o3;
                 }
 
-                angleBonus *= overlappedNotesWeight;
+                angleBonus = Math.Max(acuteAngleBonus, angleChangeBonus) * overlappedNotesWeight;
             }
 
             double speedflowBonus = CalculateSpeedflowBonus(current);
 
             // Add all bonuses
-            flowDifficulty *= (1 + angleBonus);
-            flowDifficulty += speedflowBonus;
+            flowDifficulty += angleBonus + speedflowBonus;
             flowDifficulty *= flow_multiplier * Math.Sqrt(osuCurrObj.SmallCircleBonus);
 
             // Add in additional slider velocity bonus.
@@ -156,7 +152,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double currAngle = (double)osuCurrObj.Angle;
 
-            double acuteAngleBonus = AimEvaluator.CalcAcuteAngleBonus(currAngle);
+            // Use d/t^2 velocity as a base
+            double bonusBase = osuCurrObj.LazyJumpDistance * diameter / Math.Pow(osuCurrObj.AdjustedDeltaTime, 2);
+
+            double acuteAngleBonus = bonusBase * AimEvaluator.CalcAcuteAngleBonus(currAngle);
 
             // If spacing is too low - decrease reward
             acuteAngleBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, radius, diameter);
@@ -186,7 +185,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.AdjustedDeltaTime;
             double prevVelocity = osuLast0Obj.LazyJumpDistance / osuLast0Obj.AdjustedDeltaTime;
             double minVelocity = Math.Min(currVelocity, prevVelocity);
-            double bonusBase = minVelocity / Math.Max(currVelocity, 0.01);
+
+            // Adjust to d/t^2 to match evaluator scaling
+            double bonusBase = minVelocity * diameter / osuCurrObj.AdjustedDeltaTime;
 
             double angleChangeBonus = Math.Pow(Math.Sin((currAngle - lastAngle) / 2), 2) * bonusBase;
 
