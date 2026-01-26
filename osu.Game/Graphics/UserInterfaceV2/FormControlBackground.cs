@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK.Graphics;
 
@@ -52,6 +53,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private readonly Box box;
 
+        private readonly HoverSounds sounds;
+
         public FormControlBackground()
         {
             RelativeSizeAxes = Axes.Both;
@@ -69,6 +72,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     Colour = Color4.White,
                     RelativeSizeAxes = Axes.Both,
                 },
+                sounds = new HoverSounds(),
             };
         }
 
@@ -87,6 +91,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void updateStyling()
         {
+            sounds.Enabled.Value = !styleDisabled;
+
             ColourInfo colour = colourProvider.Background4.Darken(0.1f);
             ColourInfo borderColour = colourProvider.Light4;
 

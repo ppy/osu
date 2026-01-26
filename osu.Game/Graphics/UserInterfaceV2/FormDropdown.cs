@@ -203,11 +203,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         }
                     },
                 };
-
-                AddInternal(new HoverClickSounds
-                {
-                    Enabled = { BindTarget = Enabled },
-                });
             }
 
             protected override void LoadComplete()
