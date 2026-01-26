@@ -31,7 +31,8 @@ namespace osu.Game.Overlays.Settings
 
         public SettingsRevertToDefaultButton()
         {
-            Size = new Vector2(WIDTH, 50);
+            RelativeSizeAxes = Axes.Y;
+            Width = WIDTH;
         }
 
         [BackgroundDependencyLoader]
