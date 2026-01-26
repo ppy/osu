@@ -258,7 +258,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double relevantCountGreat = Math.Max(0, countGreat - relevantTotalDiff);
             double relevantCountOk = Math.Max(0, countOk - Math.Max(0, relevantTotalDiff - countGreat));
             double relevantCountMeh = Math.Max(0, countMeh - Math.Max(0, relevantTotalDiff - countGreat - countOk));
-            double relevantAccuracy = attributes.SpeedNoteCount == 0 ? 0 : (relevantCountGreat * 6.0 + relevantCountOk * 2.0 + relevantCountMeh) / (attributes.SpeedNoteCount * 6.0);
+            double relevantCountMiss = Math.Max(0, countMiss - Math.Max(0, relevantTotalDiff - countGreat - countOk - countMeh));
+            double relevantAccuracy = attributes.SpeedNoteCount == 0 ? 0 : calculateAccuracy(relevantCountGreat, relevantCountOk, relevantCountMeh, relevantCountMiss, attributes.SpeedNoteCount);
 
             // Scale the speed value with accuracy and OD.
             speedValue *= Math.Pow((accuracy + relevantAccuracy) / 2.0, (14.5 - overallDifficulty) / 2);
@@ -277,8 +278,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (!usingClassicSliderAccuracy || usingScoreV2)
                 amountHitObjectsWithAccuracy += attributes.SliderCount;
 
+            double sliderErrors = 0;
+            if (!usingClassicSliderAccuracy)
+                sliderErrors = countSliderEndsDropped + countSliderTickMiss;
+
             if (amountHitObjectsWithAccuracy > 0)
-                betterAccuracyPercentage = ((countGreat - Math.Max(totalHits - amountHitObjectsWithAccuracy, 0)) * 6 + countOk * 2 + countMeh) / (double)(amountHitObjectsWithAccuracy * 6);
+                betterAccuracyPercentage = ((countGreat - Math.Max(totalHits - amountHitObjectsWithAccuracy - sliderErrors, 0)) * 6 + (countOk + countMiss + sliderErrors) * 2 + countMeh) / (double)(amountHitObjectsWithAccuracy * 6);
             else
                 betterAccuracyPercentage = 0;
 
@@ -529,6 +534,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         // so we use the amount of relatively difficult sections to adjust miss penalty
         // to make it more punishing on maps with lower amount of hard sections.
         private double calculateMissPenalty(double missCount, double difficultStrainCount) => 0.96 / ((missCount / (4 * Math.Pow(Math.Log(difficultStrainCount), 0.94))) + 1);
+
+        private double calculateAccuracy(double countGreat, double countOk, double countMeh, double countMiss, double totalHits)
+            => usingClassicSliderAccuracy
+                ? (countGreat * 6 + countOk * 2 + countMeh + countMiss * 2) / (totalHits * 6)
+                : (countGreat * 6 + countOk * 2 + countMeh) / ((totalHits - countMiss) * 6);
+
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
