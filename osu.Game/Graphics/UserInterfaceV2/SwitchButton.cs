@@ -19,20 +19,22 @@ namespace osu.Game.Graphics.UserInterfaceV2
 {
     public partial class SwitchButton : Checkbox
     {
-        public const float WIDTH = 60;
+        public const float WIDTH = 56;
 
         private readonly Box fill;
-        private readonly CircularContainer content;
+        private readonly Container content;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        public bool ExpandOnCurrent { get; init; } = true;
 
         private Sample? sampleChecked;
         private Sample? sampleUnchecked;
 
         public SwitchButton()
         {
-            Size = new Vector2(WIDTH, 20);
+            Size = new Vector2(WIDTH, 16);
 
             InternalChild = content = new CircularContainer
             {
@@ -40,8 +42,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
                 BorderColour = Color4.White,
-                BorderThickness = 4,
+                BorderThickness = 3.2f,
                 Masking = true,
+                CornerExponent = 2.5f,
                 Children = new Drawable[]
                 {
                     fill = new Box
@@ -98,7 +101,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void updateState()
         {
-            Color4 fillColour = colourProvider.Background6;
+            Color4 fillColour = colourProvider.Background5.Opacity(0);
             Color4 borderColour = colourProvider.Light4;
 
             if (IsHovered)
@@ -118,7 +121,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             fill.FadeColour(fillColour, 250, Easing.OutQuint);
 
             content.TransformTo(nameof(BorderColour), (ColourInfo)borderColour, 250, Easing.OutQuint);
-            content.ResizeWidthTo(Current.Value ? 1 : 0.75f, 250, Easing.OutQuint);
+            content.ResizeWidthTo(ExpandOnCurrent && Current.Value ? 1 : 0.75f, 250, Easing.OutQuint);
         }
     }
 }

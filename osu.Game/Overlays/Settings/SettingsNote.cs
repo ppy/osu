@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Settings
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Padding = new MarginPadding { Top = 5, Bottom = 5 },
+                Padding = new MarginPadding { Top = SettingsSection.ITEM_SPACING_V2 },
                 Child = new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -74,8 +74,8 @@ namespace osu.Game.Overlays.Settings
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             Current.BindValueChanged(_ => updateDisplay(), true);
-            FinishTransforms(true);
         }
 
         private void updateDisplay()

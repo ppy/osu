@@ -111,18 +111,19 @@ namespace osu.Game.Overlays.Settings.Sections
                 {
                     switchButton = new SwitchButton
                     {
-                        Anchor = Anchor.TopLeft,
-                        Origin = Anchor.TopLeft,
-                        Scale = new Vector2(0.6f),
-                        Position = new Vector2(12, 8),
-                        Rotation = 90,
+                        ExpandOnCurrent = false,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Width = 15,
+                        Height = 22,
                     },
                     headerText = new OsuSpriteText
                     {
                         Text = header,
-                        Font = OsuFont.GetFont(size: 20),
+                        Font = OsuFont.Style.Heading2,
                         Margin = new MarginPadding { Vertical = 12 },
-                        X = 20,
+                        X = 18,
+                        Y = -1,
                     },
                     new HoverSounds(),
                 };
