@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             currentBurstStrain *= strainDecayBurst(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
             currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
-            currentBurstStrain += SpeedEvaluator.EvaluateDifficultyOf(current, Mods) * burstMultiplier;
+            currentBurstStrain += SpeedEvaluator.EvaluateDifficultyOf(current) * burstMultiplier;
 
             if (WithoutStamina)
             {

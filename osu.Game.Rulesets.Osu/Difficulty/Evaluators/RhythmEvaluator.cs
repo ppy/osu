@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const int history_time_max = 5 * 1000; // 5 seconds
         private const int history_objects_max = 32;
         private const double rhythm_overall_multiplier = 1.15;
-        private const double rhythm_ratio_multiplier = 15.0;
+        private const double rhythm_ratio_multiplier = 30.0;
 
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
@@ -25,8 +25,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             if (current.BaseObject is Spinner)
                 return 0;
-
-            var currentOsuObject = (OsuDifficultyHitObject)current;
 
             double rhythmComplexitySum = 0;
 
@@ -176,10 +174,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 prevObj = currObj;
             }
 
-            double rhythmDifficulty = Math.Sqrt(4 + rhythmComplexitySum * rhythm_overall_multiplier) / 2.0; // produces multiplier that can be applied to strain. range [1, infinity) (not really though)
-            rhythmDifficulty *= 1 - currentOsuObject.GetDoubletapness((OsuDifficultyHitObject)current.Next(0));
-
-            return rhythmDifficulty;
+            return Math.Sqrt(4 + rhythmComplexitySum * rhythm_overall_multiplier) / 2.0; // produces multiplier that can be applied to strain. range [1, infinity) (not really though);
         }
 
         private class Island : IEquatable<Island>

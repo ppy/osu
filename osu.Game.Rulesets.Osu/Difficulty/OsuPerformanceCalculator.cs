@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -145,8 +146,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedValue = computeSpeedValue(score, osuAttributes);
             double accuracyValue = computeAccuracyValue(score, osuAttributes);
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
+            double readingValue = computeReadingValue(osuAttributes);
 
-            double totalValue = DifficultyCalculationUtils.Norm(PERFORMANCE_NORM_EXPONENT, aimValue, speedValue, accuracyValue, flashlightValue) * multiplier;
+            double totalValue = DifficultyCalculationUtils.Norm(PERFORMANCE_NORM_EXPONENT, aimValue, speedValue, accuracyValue, readingValue, flashlightValue) * multiplier;
 
             return new OsuPerformanceAttributes
             {
@@ -154,6 +156,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Speed = speedValue,
                 Accuracy = accuracyValue,
                 Flashlight = flashlightValue,
+                Reading = readingValue,
                 EffectiveMissCount = effectiveMissCount,
                 ComboBasedEstimatedMissCount = comboBasedEstimatedMissCount,
                 ScoreBasedEstimatedMissCount = scoreBasedEstimatedMissCount,
@@ -194,7 +197,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimValue = OsuStrainSkill.DifficultyToPerformance(aimDifficulty);
 
-            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
+            double lengthBonus = 0.95 + 0.3 * Math.Min(1.0, totalHits / 2000.0) +
                                  (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
             aimValue *= lengthBonus;
 
@@ -212,7 +215,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * drainRate * drainRate);
             else if (score.Mods.Any(m => m is OsuModTraceable))
             {
-                aimValue *= 1.0 + OsuRatingCalculator.CalculateVisibilityBonus(score.Mods, approachRate, sliderFactor: attributes.SliderFactor);
+                aimValue *= 1.0 + calculateTraceableBonus(attributes.SliderFactor);
             }
 
             aimValue *= accuracy;
@@ -229,7 +232,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             speedDifficulty *= (1 - attributes.StaminaFactor) * DifficultyCalculationUtils.Erf(25.0 / (Math.Sqrt(2) * (double)speedDeviation)) + attributes.StaminaFactor;
 
-            double speedValue = OsuStrainSkill.DifficultyToPerformance(speedDifficulty);
+            double speedValue = HarmonicSkill.DifficultyToPerformance(speedDifficulty);
 
             if (effectiveMissCount > 0)
             {
@@ -248,7 +251,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
             else if (score.Mods.Any(m => m is OsuModTraceable))
             {
-                speedValue *= 1.0 + OsuRatingCalculator.CalculateVisibilityBonus(score.Mods, approachRate);
+                speedValue *= 1.0 + calculateTraceableBonus();
             }
 
             double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
@@ -297,7 +300,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
                 accuracyValue *= 1.14;
-            else if (score.Mods.Any(m => m is OsuModHidden || m is OsuModTraceable))
+            else if (score.Mods.Any(m => m is OsuModTraceable))
             {
                 // Decrease bonus for AR > 10
                 accuracyValue *= 1 + 0.08 * DifficultyCalculationUtils.ReverseLerp(approachRate, 11.5, 10);
@@ -328,6 +331,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightValue;
         }
 
+        private double computeReadingValue(OsuDifficultyAttributes attributes)
+        {
+            double readingValue = HarmonicSkill.DifficultyToPerformance(attributes.ReadingDifficulty);
+
+            if (effectiveMissCount > 0)
+                readingValue *= calculateMissPenalty(effectiveMissCount + aimEstimatedSliderBreaks, attributes.ReadingDifficultNoteCount);
+
+            // Scale the reading value with accuracy _harshly_.
+            readingValue *= Math.Pow(accuracy, 3);
+
+            return readingValue;
+        }
+
         private double calculateComboBasedEstimatedMissCount(OsuDifficultyAttributes attributes)
         {
             if (attributes.SliderCount <= 0)
@@ -337,9 +353,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (usingClassicSliderAccuracy)
             {
+                // If sliders in the map are hard - it's likely for player to drop sliderends
+                // If map has easy sliders - it's more likely for player to sliderbreak
+                double likelyMissedSliderendPortion = 0.04 + 0.06 * Math.Pow(Math.Min(attributes.AimTopWeightedSliderFactor, 1), 2);
+
                 // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
-                // In classic scores we can't know the amount of dropped sliders so we estimate to 10% of all sliders on the map
-                double fullComboThreshold = attributes.MaxCombo - 0.1 * attributes.SliderCount;
+                // In classic scores we can't know the amount of dropped sliders so we estimate it
+                double fullComboThreshold = attributes.MaxCombo - Math.Min(4 + likelyMissedSliderendPortion * attributes.SliderCount, attributes.SliderCount);
 
                 if (scoreMaxCombo < fullComboThreshold)
                     missCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
@@ -485,6 +505,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             adjustedSpeedValue = double.Lerp(adjustedSpeedValue, speedValue, lerp);
 
             return adjustedSpeedValue / speedValue;
+        }
+
+        /// <summary>
+        /// Calculates a visibility bonus that is applicable to Traceable.
+        /// </summary>
+        private double calculateTraceableBonus(double sliderFactor = 1)
+        {
+            // Start from normal curve, rewarding lower AR up to AR7
+            double traceableBonus = 0.025 * (12.0 - Math.Max(approachRate, 7));
+
+            // We want to reward slider aim on low AR less
+            double sliderVisibilityFactor = Math.Pow(sliderFactor, 3);
+
+            // For AR up to 0 - reduce reward for very low ARs when object is visible
+            if (approachRate < 7)
+                traceableBonus += 0.02 * (7.0 - Math.Max(approachRate, 0)) * sliderVisibilityFactor;
+
+            // Starting from AR0 - cap values so they won't grow to infinity
+            if (approachRate < 0)
+                traceableBonus += 0.01 * (1 - Math.Pow(1.5, approachRate)) * sliderVisibilityFactor;
+
+            return traceableBonus;
         }
 
         // Miss penalty assumes that a player will miss on the hardest parts of a map,

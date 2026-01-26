@@ -55,15 +55,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             var speed = skills.OfType<Speed>().Single(s => !s.WithoutStamina);
             var speedWithoutStamina = skills.OfType<Speed>().Single(s => s.WithoutStamina);
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
+            var reading = skills.OfType<Reading>().Single();
 
             double aimDifficultyValue = aim.DifficultyValue();
             double aimNoSlidersDifficultyValue = aimWithoutSliders.DifficultyValue();
             double speedDifficultyValue = speed.DifficultyValue();
-            double speedNoStaminaDifficultyValue = speedWithoutStamina.DifficultyValue();
-            double speedNotes = speed.RelevantNoteCount();
+            double readingDifficultyValue = reading.DifficultyValue();
 
+            double speedNoStaminaDifficultyValue = speedWithoutStamina.DifficultyValue();
             double aimDifficultStrainCount = aim.CountTopWeightedStrains(aimDifficultyValue);
             double speedDifficultStrainCount = speed.CountTopWeightedObjectDifficulties(speedDifficultyValue);
+            double readingDifficultNoteCount = reading.CountTopWeightedObjectDifficulties(readingDifficultyValue);
+
+            double speedNotes = speed.RelevantNoteCount();
 
             double aimNoSlidersTopWeightedSliderCount = aimWithoutSliders.CountTopWeightedSliders(aimNoSlidersDifficultyValue);
             double aimNoSlidersDifficultStrainCount = aimWithoutSliders.CountTopWeightedStrains(aimNoSlidersDifficultyValue);
@@ -75,7 +79,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double difficultSliders = aim.GetDifficultSliders();
 
-            double approachRate = CalculateRateAdjustedApproachRate(beatmap.Difficulty.ApproachRate, clockRate);
             double overallDifficulty = CalculateRateAdjustedOverallDifficulty(beatmap.Difficulty.OverallDifficulty, clockRate);
 
             int hitCircleCount = beatmap.HitObjects.Count(h => h is HitCircle);
@@ -84,13 +87,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             int totalHits = beatmap.HitObjects.Count;
 
-            double mechanicalDifficultyRating = calculateMechanicalDifficultyRating(aimDifficultyValue, speedDifficultyValue);
-            double sliderFactor = aimDifficultyValue > 0 ? OsuRatingCalculator.CalculateDifficultyRating(aimNoSlidersDifficultyValue) / OsuRatingCalculator.CalculateDifficultyRating(aimDifficultyValue) : 1;
+            double sliderFactor = aimDifficultyValue > 0
+                ? OsuRatingCalculator.CalculateDifficultyRating(aimNoSlidersDifficultyValue) / OsuRatingCalculator.CalculateDifficultyRating(aimDifficultyValue)
+                : 1;
 
-            var osuRatingCalculator = new OsuRatingCalculator(mods, totalHits, approachRate, overallDifficulty, mechanicalDifficultyRating, sliderFactor);
+            var osuRatingCalculator = new OsuRatingCalculator(mods, totalHits, overallDifficulty);
 
             double aimRating = osuRatingCalculator.ComputeAimRating(aimDifficultyValue);
             double speedRating = osuRatingCalculator.ComputeSpeedRating(speedDifficultyValue);
+            double readingRating = osuRatingCalculator.ComputeReadingRating(readingDifficultyValue);
 
             double staminaFactor = speedRating > 0 ? Math.Min(1, osuRatingCalculator.ComputeSpeedRating(speedNoStaminaDifficultyValue) / speedRating) : 1;
 
@@ -100,16 +105,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 flashlightRating = osuRatingCalculator.ComputeFlashlightRating(flashlight.DifficultyValue());
 
             double sliderNestedScorePerObject = LegacyScoreUtils.CalculateNestedScorePerObject(beatmap, totalHits);
-            double legacyScoreBaseMultiplier = LegacyScoreUtils.CalculateDifficultyPeppyStars(beatmap);
+            double legacyScoreBaseMultiplier = LegacyScoreUtils.CalculateDifficultyPeppyStars(WorkingBeatmap.Beatmap);
 
             var simulator = new OsuLegacyScoreSimulator();
             var scoreAttributes = simulator.Simulate(WorkingBeatmap, beatmap);
 
             double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
-            double baseSpeedPerformance = OsuStrainSkill.DifficultyToPerformance(speedRating);
+            double baseSpeedPerformance = HarmonicSkill.DifficultyToPerformance(speedRating);
+            double baseReadingPerformance = HarmonicSkill.DifficultyToPerformance(readingRating);
             double baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
 
-            double basePerformance = DifficultyCalculationUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, baseAimPerformance, baseSpeedPerformance, baseFlashlightPerformance);
+            double basePerformance = DifficultyCalculationUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, baseAimPerformance, baseSpeedPerformance, baseReadingPerformance, baseFlashlightPerformance);
 
             double starRating = calculateStarRating(basePerformance);
 
@@ -123,9 +129,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SpeedNoteCount = speedNotes,
                 StaminaFactor = staminaFactor,
                 FlashlightDifficulty = flashlightRating,
+                ReadingDifficulty = readingRating,
                 SliderFactor = sliderFactor,
                 AimDifficultStrainCount = aimDifficultStrainCount,
                 SpeedDifficultStrainCount = speedDifficultStrainCount,
+                ReadingDifficultNoteCount = readingDifficultNoteCount,
                 AimTopWeightedSliderFactor = aimTopWeightedSliderFactor,
                 SpeedTopWeightedSliderFactor = speedTopWeightedSliderFactor,
                 MaxCombo = beatmap.GetMaxCombo(),
@@ -138,16 +146,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             };
 
             return attributes;
-        }
-
-        private double calculateMechanicalDifficultyRating(double aimDifficultyValue, double speedDifficultyValue)
-        {
-            double aimValue = OsuStrainSkill.DifficultyToPerformance(OsuRatingCalculator.CalculateDifficultyRating(aimDifficultyValue));
-            double speedValue = OsuStrainSkill.DifficultyToPerformance(OsuRatingCalculator.CalculateDifficultyRating(speedDifficultyValue));
-
-            double totalValue = DifficultyCalculationUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, aimValue, speedValue);
-
-            return calculateStarRating(totalValue);
         }
 
         private double calculateStarRating(double basePerformance)
@@ -176,7 +174,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 new Aim(mods, true),
                 new Aim(mods, false),
                 new Speed(mods, false),
-                new Speed(mods, true)
+                new Speed(mods, true),
+                new Reading(beatmap, mods, clockRate)
             };
 
             if (mods.Any(h => h is OsuModFlashlight))
