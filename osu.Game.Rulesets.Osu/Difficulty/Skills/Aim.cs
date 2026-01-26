@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Utils;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
@@ -32,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double skillMultiplierAim => 26.0;
         private double skillMultiplierSpeed => 1.3;
-        private double skillMultiplierTotal => 1.02;
+        private double skillMultiplierTotal => 1.01;
         private double meanExponent => 1.2;
 
         private readonly List<double> sliderStrains = new List<double>();
@@ -50,11 +51,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double decayAim = strainDecayAim(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
             double decaySpeed = strainDecaySpeed(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
 
+            double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders);
+            double speedDifficulty = SpeedAimEvaluator.EvaluateDifficultyOf(current);
+
+            if (Mods.Any(m => m is OsuModTouchDevice))
+            {
+                aimDifficulty = Math.Pow(aimDifficulty, 0.8);
+                speedDifficulty = Math.Pow(speedDifficulty, 0.95);
+            }
+
             currentAimStrain *= decayAim;
-            currentAimStrain += AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * (1 - decayAim) * skillMultiplierAim;
+            currentAimStrain += aimDifficulty * (1 - decayAim) * skillMultiplierAim;
 
             currentSpeedStrain *= decaySpeed;
-            currentSpeedStrain += SpeedAimEvaluator.EvaluateDifficultyOf(current) * (1 - decaySpeed) * skillMultiplierSpeed;
+            currentSpeedStrain += speedDifficulty * (1 - decaySpeed) * skillMultiplierSpeed;
 
             double totalStrain = DifficultyCalculationUtils.Norm(meanExponent, currentAimStrain, currentSpeedStrain);
 
