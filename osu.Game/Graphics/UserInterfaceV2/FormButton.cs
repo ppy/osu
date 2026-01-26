@@ -88,10 +88,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Children = new Drawable[]
                 {
                     background = new FormControlBackground(),
-                    new HoverClickSounds(HoverSampleSet.Button)
-                    {
-                        Enabled = { BindTarget = Enabled },
-                    },
                     new Container
                     {
                         RelativeSizeAxes = Axes.X,
