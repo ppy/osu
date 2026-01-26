@@ -35,6 +35,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public readonly double AdjustedDeltaTime;
 
+        /// Time (in ms) between the object first appearing and the time it needs to be clicked.
+        /// <see cref="OsuHitObject.TimePreempt"/> adjusted by clock rate.
+        /// </summary>
+        public readonly double Preempt;
+
+        /// <summary>
+        /// Beatmap playback rate.
+        /// </summary>
+        public readonly double ClockRate;
+
         /// <summary>
         /// Normalised distance from the start position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
@@ -129,6 +139,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             SmallCircleBonus = Math.Max(1.0, 1.0 + (30 - BaseObject.Radius) / 40);
 
+            ClockRate = clockRate;
+            Preempt = BaseObject.TimePreempt / clockRate;
+
             if (BaseObject is Slider sliderObject)
             {
                 HitWindowGreat = 2 * sliderObject.HeadCircle.HitWindows.WindowFor(HitResult.Great) / clockRate;
@@ -153,7 +166,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             double fadeInStartTime = BaseObject.StartTime - BaseObject.TimePreempt;
-            double fadeInDuration = BaseObject.TimeFadeIn;
+
+            // Equal to `OsuHitObject.TimeFadeIn` minus any adjustments from the HD mod.
+            double fadeInDuration = 400 * Math.Min(1, BaseObject.TimePreempt / OsuHitObject.PREEMPT_MIN);
 
             if (hidden)
             {
@@ -169,6 +184,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             return Math.Clamp((time - fadeInStartTime) / fadeInDuration, 0.0, 1.0);
+        }
+
+        /// <summary>
+        /// Returns the amount of time a note spends invisible with the hidden mod at the current approach rate.
+        /// </summary>
+        public double DurationSpentInvisible()
+        {
+            double fadeOutStartTime = BaseObject.StartTime - BaseObject.TimePreempt + BaseObject.TimeFadeIn;
+            double fadeOutDuration = BaseObject.TimePreempt * OsuModHidden.FADE_OUT_DURATION_MULTIPLIER;
+
+            return (fadeOutStartTime + fadeOutDuration) - (BaseObject.StartTime - BaseObject.TimePreempt);
         }
 
         /// <summary>
@@ -248,15 +274,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (lastLastDifficultyObject != null && lastLastDifficultyObject.BaseObject is not Spinner)
             {
+                if (lastDifficultyObject!.BaseObject is Slider prevSlider && lastDifficultyObject.TravelDistance > 0)
+                    lastCursorPosition = prevSlider.HeadCircle.StackedPosition;
+
                 Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastDifficultyObject);
 
-                Vector2 v1 = lastLastCursorPosition - LastObject.StackedPosition;
-                Vector2 v2 = BaseObject.StackedPosition - lastCursorPosition;
+                double angle = calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition);
+                double sliderAngle = calculateSliderAngle(lastDifficultyObject!, lastLastCursorPosition);
 
-                float dot = Vector2.Dot(v1, v2);
-                float det = v1.X * v2.Y - v1.Y * v2.X;
-
-                Angle = Math.Abs(Math.Atan2(det, dot));
+                Angle = Math.Min(angle, sliderAngle);
             }
         }
 
@@ -366,6 +392,30 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 if (i == nestedObjects.Count - 1)
                     LazyEndPosition = currCursorPosition;
             }
+        }
+
+        private double calculateSliderAngle(OsuDifficultyHitObject lastDifficultyObject, Vector2 lastLastCursorPosition)
+        {
+            Vector2 lastCursorPosition = getEndCursorPosition(lastDifficultyObject);
+
+            if (lastDifficultyObject.BaseObject is Slider prevSlider && lastDifficultyObject.TravelDistance > 0)
+            {
+                OsuHitObject secondLastNestedObject = (OsuHitObject)prevSlider.NestedHitObjects[^2];
+                lastLastCursorPosition = secondLastNestedObject.StackedPosition;
+            }
+
+            return calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition);
+        }
+
+        private double calculateAngle(Vector2 currentPosition, Vector2 lastPosition, Vector2 lastLastPosition)
+        {
+            Vector2 v1 = lastLastPosition - lastPosition;
+            Vector2 v2 = currentPosition - lastPosition;
+
+            float dot = Vector2.Dot(v1, v2);
+            float det = v1.X * v2.Y - v1.Y * v2.X;
+
+            return Math.Abs(Math.Atan2(det, dot));
         }
 
         private Vector2 getEndCursorPosition(OsuDifficultyHitObject difficultyHitObject)
