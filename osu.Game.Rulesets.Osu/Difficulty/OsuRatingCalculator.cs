@@ -31,9 +31,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimRating = CalculateDifficultyRating(aimDifficultyValue);
 
-            if (mods.Any(m => m is OsuModTouchDevice))
-                aimRating = Math.Pow(aimRating, 0.8);
-
             if (mods.Any(m => m is OsuModRelax))
                 aimRating *= 0.9;
 
