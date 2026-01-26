@@ -111,11 +111,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double speedRating = CalculateDifficultyRating(speedDifficultyValue);
 
-            double ratingMultiplier = 1.0;
+            if (mods.Any(m => m is OsuModAutopilot))
+                speedRating *= 0.5;
 
-            ratingMultiplier *= 0.95 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 750;
+            if (mods.Any(m => m is OsuModMagnetised))
+            {
+                // reduce speed rating because of the speed distance scaling, with maximum reduction being 0.7x
+                float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
+                speedRating *= 1.0 - magnetisedStrength * 0.3;
+            }
 
-            return speedRating * Math.Cbrt(ratingMultiplier);
+            return speedRating;
         }
 
         public double ComputeReadingRating(double readingDifficultyValue)

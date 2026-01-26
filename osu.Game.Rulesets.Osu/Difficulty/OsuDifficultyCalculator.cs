@@ -117,8 +117,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double baseSpeedPerformance = HarmonicSkill.DifficultyToPerformance(speedRating);
             double baseReadingPerformance = HarmonicSkill.DifficultyToPerformance(readingRating);
             double baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
+            double baseCognitionPerformance = DifficultyCalculationUtils.Norm(2, baseReadingPerformance, baseFlashlightPerformance);
 
-            double basePerformance = DifficultyCalculationUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, SumMechanicalDifficulty(baseAimPerformance, baseSpeedPerformance), baseReadingPerformance, baseFlashlightPerformance);
+            double basePerformance = DifficultyCalculationUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, SumMechanicalDifficulty(baseAimPerformance, baseSpeedPerformance), baseCognitionPerformance);
 
             double starRating = calculateStarRating(basePerformance);
 
@@ -156,7 +157,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public static double SumMechanicalDifficulty(double aim, double speed)
         {
             // Decrease this to nerf maps that mix aim and speed
-            const double addition_portion = 0.57;
+            const double addition_portion = 0.55;
 
             // We take this min to max ratio as a basepoint to be not changed when addition_portion is changed
             const double balance_base_point = 0.2;
