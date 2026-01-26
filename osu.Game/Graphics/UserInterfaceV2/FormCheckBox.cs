@@ -15,10 +15,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Localisation;
 using osu.Game.Overlays;
-using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -44,7 +41,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private Box background = null!;
         private FormFieldCaption caption = null!;
-        private OsuSpriteText text = null!;
 
         private Sample? sampleChecked;
         private Sample? sampleUnchecked;
@@ -77,23 +73,19 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     Padding = new MarginPadding(9),
                     Children = new Drawable[]
                     {
-                        new FillFlowContainer
+                        new Container
                         {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
                             Padding = new MarginPadding { Right = SwitchButton.WIDTH + 5 },
-                            Spacing = new Vector2(0f, 4f),
                             Children = new Drawable[]
                             {
                                 caption = new FormFieldCaption
                                 {
                                     Caption = Caption,
                                     TooltipText = HintText,
-                                },
-                                text = new OsuSpriteText
-                                {
-                                    RelativeSizeAxes = Axes.X,
                                 },
                             },
                         },
@@ -159,9 +151,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private void updateState()
         {
             caption.Colour = Current.Disabled ? colourProvider.Background1 : colourProvider.Content2;
-            text.Colour = Current.Disabled ? colourProvider.Background1 : colourProvider.Content1;
-
-            text.Text = Current.Value ? CommonStrings.Enabled : CommonStrings.Disabled;
 
             // use FadeColour to override any existing colour transform (i.e. FlashColour on click).
             background.FadeColour(IsHovered
