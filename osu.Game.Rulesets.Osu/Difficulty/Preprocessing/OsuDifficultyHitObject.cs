@@ -57,8 +57,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// Minimum between <see cref="LazyJumpDistance"/> and tail jump distance, subtracted by the portion of follow circle radius.
         /// It takes the minimum distance between:
-        /// <br> - Next object and the point where you're on the edge of the follow circle when it's reaching the end of the slider.</br>
-        /// <br> - Next object and the point where you're on the edge of the follow circle when it's reaching the lazy end position.</br>
+        /// <br> - Next object and the point where you're on the closest to next object edge of the follow circle when it's reaching the end of the slider.</br>
+        /// <br> - Next object and the point where you're on the closest to next object edge of the follow circle when it's reaching the lazy end position.</br>
         /// <para>
         /// In case of slider body going away from the next hitobject, this value is slightly smaller than <see cref="LazyJumpDistance"/>.
         /// In case of slider body going towards the next hitobject, this value is significantly smaller than <see cref="LazyJumpDistance"/>.
