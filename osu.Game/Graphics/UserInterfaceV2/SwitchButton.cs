@@ -121,7 +121,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
             fill.FadeColour(fillColour, 250, Easing.OutQuint);
 
             content.TransformTo(nameof(BorderColour), (ColourInfo)borderColour, 250, Easing.OutQuint);
-            content.ResizeWidthTo(ExpandOnCurrent && Current.Value ? 1 : 0.75f, 250, Easing.OutQuint);
+
+            if (ExpandOnCurrent && Current.Value)
+                content.ResizeWidthTo(1f, 200, Easing.OutElasticQuarter);
+            else
+                content.ResizeWidthTo(0.75f, 120, Easing.OutExpo);
         }
     }
 }
