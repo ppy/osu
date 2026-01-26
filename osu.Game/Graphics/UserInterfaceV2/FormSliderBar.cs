@@ -200,6 +200,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             Masking = true;
             CornerRadius = 5;
+            CornerExponent = 2.5f;
 
             InternalChildren = new Drawable[]
             {
@@ -558,20 +559,20 @@ namespace osu.Game.Graphics.UserInterfaceV2
             private void updateState()
             {
                 sounds.Enabled.Value = !Current.Disabled;
-                rightBox.Colour = colourProvider.Background6;
+                rightBox.Colour = colourProvider.Background5;
 
-                Color4 leftColour;
+                Color4 leftColour = colourProvider.Light4;
                 Color4 nubColour;
+
+                if (IsHovered || HasFocus || IsDragged)
+                    nubColour = colourProvider.Highlight1;
+                else
+                    nubColour = colourProvider.Highlight1.Darken(0.1f);
 
                 if (Current.Disabled)
                 {
-                    leftColour = colourProvider.Dark3;
-                    nubColour = colourProvider.Dark1;
-                }
-                else
-                {
-                    leftColour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Highlight1.Opacity(0.3f);
-                    nubColour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1 : colourProvider.Light4;
+                    nubColour = nubColour.Darken(0.4f);
+                    leftColour = leftColour.Darken(0.4f);
                 }
 
                 leftBox.FadeColour(leftColour, 250, Easing.OutQuint);
@@ -580,7 +581,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             protected override void UpdateValue(float value)
             {
-                nub.MoveToX(value, 200, Easing.OutPow10);
+                nub.MoveToX(value, 250, Easing.OutElasticQuarter);
             }
 
             protected override bool Commit()
@@ -603,6 +604,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             [BackgroundDependencyLoader]
             private void load()
             {
+                CornerExponent = 2.5f;
                 Width = InnerSlider.NUB_WIDTH;
                 RelativeSizeAxes = Axes.Y;
                 RelativePositionAxes = Axes.X;
