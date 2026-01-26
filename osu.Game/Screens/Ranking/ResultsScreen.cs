@@ -370,7 +370,7 @@ namespace osu.Game.Screens.Ranking
                 }
 
                 // allow a frame for scroll container to adjust its dimensions with the added scores before fetching again.
-                Schedule(() => tcs.SetResult());
+                Schedule(tcs.SetResult);
 
                 if (ScorePanelList.IsEmpty)
                 {

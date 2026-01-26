@@ -170,21 +170,21 @@ namespace osu.Game.Beatmaps.Formats
             {
                 SampleControlPoint sampleControlPoint = (beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePointAt(hitObject.StartTime + CONTROL_POINT_LENIENCY + 1)
                                                         ?? SampleControlPoint.DEFAULT;
-                hitObject.Samples = hitObject.Samples.Select(o => sampleControlPoint.ApplyTo(o)).ToList();
+                hitObject.Samples = hitObject.Samples.Select(sampleControlPoint.ApplyTo).ToList();
 
                 for (int i = 0; i < hasRepeats.NodeSamples.Count; i++)
                 {
                     double time = hitObject.StartTime + i * hasRepeats.Duration / hasRepeats.SpanCount() + CONTROL_POINT_LENIENCY;
                     var nodeSamplePoint = (beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePointAt(time) ?? SampleControlPoint.DEFAULT;
 
-                    hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Select(o => nodeSamplePoint.ApplyTo(o)).ToList();
+                    hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Select(nodeSamplePoint.ApplyTo).ToList();
                 }
             }
             else
             {
                 SampleControlPoint sampleControlPoint = (beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePointAt(hitObject.GetEndTime() + CONTROL_POINT_LENIENCY)
                                                         ?? SampleControlPoint.DEFAULT;
-                hitObject.Samples = hitObject.Samples.Select(o => sampleControlPoint.ApplyTo(o)).ToList();
+                hitObject.Samples = hitObject.Samples.Select(sampleControlPoint.ApplyTo).ToList();
             }
         }
 
