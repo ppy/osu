@@ -19,14 +19,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
 {
     public partial class SwitchButton : Checkbox
     {
-        public const float WIDTH = 45;
-
-        private const float border_thickness = 4.5f;
-        private const float padding = 1.25f;
+        public const float WIDTH = 60;
 
         private readonly Box fill;
-        private readonly Container nubContainer;
-        private readonly Drawable nub;
         private readonly CircularContainer content;
 
         [Resolved]
@@ -41,9 +36,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             InternalChild = content = new CircularContainer
             {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
                 BorderColour = Color4.White,
-                BorderThickness = border_thickness,
+                BorderThickness = 4,
                 Masking = true,
                 Children = new Drawable[]
                 {
@@ -52,21 +49,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         RelativeSizeAxes = Axes.Both,
                         AlwaysPresent = true,
                     },
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding(border_thickness + padding),
-                        Child = nubContainer = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Child = nub = new Circle
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                FillMode = FillMode.Fit,
-                                Masking = true,
-                            }
-                        }
-                    }
                 }
             };
         }
@@ -82,28 +64,21 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             base.LoadComplete();
 
-            Current.BindDisabledChanged(_ => updateColours());
+            Current.BindDisabledChanged(_ => updateState());
             Current.BindValueChanged(_ => updateState(), true);
 
             FinishTransforms(true);
         }
 
-        private void updateState()
-        {
-            nub.MoveToX(Current.Value ? nubContainer.DrawWidth - nub.DrawWidth : 0, 200, Easing.OutQuint);
-
-            updateColours();
-        }
-
         protected override bool OnHover(HoverEvent e)
         {
-            updateColours();
+            updateState();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            updateColours();
+            updateState();
             base.OnHoverLost(e);
         }
 
@@ -121,35 +96,29 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 sampleUnchecked?.Play();
         }
 
-        private void updateColours()
+        private void updateState()
         {
-            ColourInfo borderColour;
-            ColourInfo switchColour;
+            Color4 fillColour = colourProvider.Background6;
+            Color4 borderColour = colourProvider.Light4;
+
+            if (IsHovered)
+                borderColour = colourProvider.Highlight1;
+            else if (Current.Value)
+                borderColour = colourProvider.Highlight1.Darken(0.1f);
+
+            if (Current.Value)
+                fillColour = borderColour;
 
             if (Current.Disabled)
             {
-                borderColour = colourProvider.Dark2;
-                switchColour = colourProvider.Dark1;
-                fill.Colour = colourProvider.Dark5;
-            }
-            else
-            {
-                bool hover = IsHovered && !Current.Disabled;
-
-                borderColour = hover ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Highlight1.Opacity(0.3f);
-                switchColour = hover || Current.Value ? colourProvider.Highlight1 : colourProvider.Light4;
-
-                if (!Current.Value)
-                {
-                    borderColour = borderColour.MultiplyAlpha(0.8f);
-                    switchColour = switchColour.MultiplyAlpha(0.8f);
-                }
-
-                fill.Colour = Current.Value ? colourProvider.Colour4.Darken(0.2f) : colourProvider.Background6;
+                fillColour = fillColour.Darken(0.4f);
+                borderColour = borderColour.Darken(0.4f);
             }
 
-            nubContainer.FadeColour(switchColour, 250, Easing.OutQuint);
-            content.TransformTo(nameof(BorderColour), borderColour, 250, Easing.OutQuint);
+            fill.FadeColour(fillColour, 250, Easing.OutQuint);
+
+            content.TransformTo(nameof(BorderColour), (ColourInfo)borderColour, 250, Easing.OutQuint);
+            content.ResizeWidthTo(Current.Value ? 1 : 0.75f, 250, Easing.OutQuint);
         }
     }
 }
