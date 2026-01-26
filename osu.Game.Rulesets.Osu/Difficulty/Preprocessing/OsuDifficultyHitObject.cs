@@ -102,13 +102,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// The distance travelled by the cursor upon completion of this <see cref="OsuDifficultyHitObject"/> if it is a <see cref="Slider"/>
         /// and was hit with as few movements as possible.
         /// </summary>
-        public double LazyTravelDistance { get; private set; }
+        public double BaseTravelDistance { get; private set; }
 
         /// <summary>
         /// The time taken by the cursor upon completion of this <see cref="OsuDifficultyHitObject"/> if it is a <see cref="Slider"/>
         /// and was hit with as few movements as possible.
         /// </summary>
-        public double LazyTravelTime { get; private set; }
+        public double BaseTravelTime { get; private set; }
 
         /// <summary>
         /// Angle the player has to take to hit this <see cref="OsuDifficultyHitObject"/>.
@@ -200,8 +200,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (BaseObject is Slider currentSlider)
             {
                 // Bonus for repeat sliders until a better per nested object strain system can be achieved.
-                TravelDistance = LazyTravelDistance * Math.Max(1, DiffUtils.Pow(currentSlider.RepeatCount, 0.3));
-                TravelTime = Math.Max(LazyTravelTime / clockRate, MIN_DELTA_TIME);
+                TravelDistance = BaseTravelDistance * Math.Max(1, DiffUtils.Pow(currentSlider.RepeatCount, 0.3));
+                TravelTime = Math.Max(BaseTravelTime / clockRate, MIN_DELTA_TIME);
             }
 
             MinimumJumpTime = AdjustedDeltaTime;
@@ -224,7 +224,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (LastObject is Slider lastSlider && lastDifficultyObject != null)
             {
-                double lastTravelTime = Math.Max(lastDifficultyObject.LazyTravelTime / clockRate, MIN_DELTA_TIME);
+                double lastTravelTime = Math.Max(lastDifficultyObject.BaseTravelTime / clockRate, MIN_DELTA_TIME);
                 MinimumJumpTime = Math.Max(AdjustedDeltaTime - lastTravelTime, MIN_DELTA_TIME);
 
                 //
@@ -322,9 +322,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 nestedObjects = reordered;
             }
 
-            LazyTravelTime = trackingEndTime - slider.StartTime;
+            BaseTravelTime = trackingEndTime - slider.StartTime;
 
-            double endTimeMin = LazyTravelTime / slider.SpanDuration;
+            double endTimeMin = BaseTravelTime / slider.SpanDuration;
             if (endTimeMin % 2 >= 1)
                 endTimeMin = 1 - endTimeMin % 1;
             else
@@ -370,7 +370,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     // this finds the positional delta from the required radius and the current position, and updates the currCursorPosition accordingly, as well as rewarding distance.
                     currCursorPosition = Vector2.Add(currCursorPosition, Vector2.Multiply(currMovement, (float)((currMovementLength - requiredMovement) / currMovementLength)));
                     currMovementLength *= (currMovementLength - requiredMovement) / currMovementLength;
-                    LazyTravelDistance += currMovementLength;
+                    BaseTravelDistance += currMovementLength;
                 }
 
                 if (i == nestedObjects.Count - 1)
