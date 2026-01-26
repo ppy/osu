@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// The time taken to travel through <see cref="LazyJumpDistance"/>, with a minimum value of 25ms.
         /// </summary>
-        public double MinimumJumpTime { get; private set; }
+        public double LazyJumpTime { get; private set; }
 
         /// <summary>
         /// The distance travelled by the cursor upon completion of this <see cref="OsuDifficultyHitObject"/> if it is a <see cref="Slider"/>
@@ -235,13 +235,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             Vector2 lastCursorPosition = lastDifficultyObject != null ? getEndCursorPosition(lastDifficultyObject) : LastObject.StackedPosition;
 
             LazyJumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
-            MinimumJumpTime = AdjustedDeltaTime;
+            LazyJumpTime = AdjustedDeltaTime;
             MinimumJumpDistance = LazyJumpDistance;
 
             if (LastObject is Slider lastSlider && lastDifficultyObject != null)
             {
                 double lastTravelTime = Math.Max(lastDifficultyObject.BaseTravelTime / clockRate, MIN_DELTA_TIME);
-                MinimumJumpTime = Math.Max(AdjustedDeltaTime - lastTravelTime, MIN_DELTA_TIME);
+                LazyJumpTime = Math.Max(AdjustedDeltaTime - lastTravelTime, MIN_DELTA_TIME);
 
                 //
                 // There are two types of slider-to-object patterns to consider in order to better approximate the real movement a player will take to jump between the hitobjects.
