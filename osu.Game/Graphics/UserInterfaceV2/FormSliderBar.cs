@@ -451,7 +451,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
             private Box leftBox = null!;
             private Box rightBox = null!;
             private InnerSliderNub nub = null!;
-            private HoverClickSounds sounds = null!;
             public const float NUB_WIDTH = 10;
 
             [Resolved]
@@ -496,7 +495,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             ResetToDefault = ResetToDefault,
                         }
                     },
-                    sounds = new HoverClickSounds()
                 };
             }
 
@@ -558,7 +556,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             private void updateState()
             {
-                sounds.Enabled.Value = !Current.Disabled;
                 rightBox.Colour = colourProvider.Background5;
 
                 Color4 leftColour = colourProvider.Light4;
