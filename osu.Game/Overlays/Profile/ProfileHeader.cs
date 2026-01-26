@@ -20,6 +20,8 @@ namespace osu.Game.Overlays.Profile
         private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
 
+        private TopHeaderContainer topHeaderContainer = null!;
+
         public ProfileHeader()
         {
             ContentSidePadding = WaveOverlayContainer.HORIZONTAL_PADDING;
@@ -43,7 +45,7 @@ namespace osu.Game.Overlays.Profile
             Direction = FillDirection.Vertical,
             Children = new Drawable[]
             {
-                new TopHeaderContainer
+                topHeaderContainer = new TopHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     User = { BindTarget = User },
@@ -74,6 +76,15 @@ namespace osu.Game.Overlays.Profile
                 },
             }
         };
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // This is basically a tooltip display on hover, so we should display above everything.
+            // If this ever breaks let's just trash the design and make it a standard tooltip.
+            AddInternal(topHeaderContainer.PreviousUsernamesDisplay.CreateProxy());
+        }
 
         protected override OverlayTitle CreateTitle() => new ProfileHeaderTitle();
 
