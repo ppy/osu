@@ -210,7 +210,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             int index = 0;
             double currentTimeGap = 0;
 
-            OsuDifficultyHitObject? loopObjPrev0 = current;
+            OsuDifficultyHitObject loopObjPrev0 = current;
             OsuDifficultyHitObject? loopObjPrev1 = null;
             OsuDifficultyHitObject? loopObjPrev2 = null;
 
@@ -227,9 +227,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 if (loopObj.Angle.IsNotNull() && current.Angle.IsNotNull())
                 {
                     double angleDifference = Math.Abs(current.Angle.Value - loopObj.Angle.Value);
-
                     double angleDifferenceAlternating = Math.PI;
-                    if (loopObjPrev0?.Angle != null && loopObjPrev1?.Angle != null && loopObjPrev2?.Angle != null)
+
+                    if (loopObjPrev0.Angle != null && loopObjPrev1?.Angle != null && loopObjPrev2?.Angle != null)
                     {
                         angleDifferenceAlternating = Math.Abs(loopObjPrev1.Angle.Value - loopObj.Angle.Value);
                         angleDifferenceAlternating += Math.Abs(loopObjPrev2.Angle.Value - loopObjPrev0.Angle.Value);
