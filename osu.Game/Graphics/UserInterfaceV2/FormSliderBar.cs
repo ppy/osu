@@ -121,7 +121,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public Func<T, LocalisableString> TooltipFormat { get; init; }
 
-        private Box background = null!;
+        private FormControlBackground background = null!;
         private Box flashLayer = null!;
         private FormTextBox.InnerTextBox textBox = null!;
         private OsuSpriteText valueLabel = null!;
@@ -202,11 +202,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             InternalChildren = new Drawable[]
             {
-                background = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
-                },
+                background = new FormControlBackground(),
                 flashLayer = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -398,19 +394,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
             textBox.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background1 : colourProvider.Content1;
             valueLabel.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background1 : colourProvider.Content1;
 
-            BorderThickness = childHasFocus || IsHovered || slider.IsDragging.Value ? 2 : 0;
-
-            if (Current.Disabled)
-                BorderColour = colourProvider.Dark1;
-            else
-                BorderColour = childHasFocus ? colourProvider.Highlight1 : colourProvider.Light4;
-
-            if (childHasFocus)
-                background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
-            else if (IsHovered || slider.IsDragging.Value)
-                background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
-            else
-                background.Colour = colourProvider.Background5;
+            background.StyleDisabled = Current.Disabled;
+            background.StyleFocused = childHasFocus;
+            background.StyleHovered = IsHovered || slider.IsDragging.Value;
         }
 
         private void updateValueDisplay()
