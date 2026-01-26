@@ -260,9 +260,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Find the proportion of 300s on speed notes assuming the hit window was the effective hit window.
             double effectiveAccuracy = DifficultyCalculationUtils.Erf(effectiveHitWindow / (double)speedDeviation);
 
-            // OD 11.11 SS stays the same.
-            speedValue *= 1 + 557 / 4860.0;
-
             // Scale speed value by normalized accuracy.
             speedValue *= Math.Pow(effectiveAccuracy, 2);
 
