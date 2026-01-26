@@ -53,7 +53,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             var aim = skills.OfType<Aim>().Single(a => a.IncludeSliders);
             var aimWithoutSliders = skills.OfType<Aim>().Single(a => !a.IncludeSliders);
             var speed = skills.OfType<Speed>().Single(s => !s.WithoutStamina);
-            var speedWithoutStamina = skills.OfType<Speed>().Single(s => s.WithoutStamina);
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
             var reading = skills.OfType<Reading>().Single();
 
@@ -62,7 +61,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedDifficultyValue = speed.DifficultyValue();
             double readingDifficultyValue = reading.DifficultyValue();
 
-            double speedNoStaminaDifficultyValue = speedWithoutStamina.DifficultyValue();
             double aimDifficultStrainCount = aim.CountTopWeightedStrains(aimDifficultyValue);
             double speedDifficultStrainCount = speed.CountTopWeightedObjectDifficulties(speedDifficultyValue);
             double readingDifficultNoteCount = reading.CountTopWeightedObjectDifficulties(readingDifficultyValue);
@@ -97,8 +95,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedRating = osuRatingCalculator.ComputeSpeedRating(speedDifficultyValue);
             double readingRating = osuRatingCalculator.ComputeReadingRating(readingDifficultyValue);
 
-            double staminaFactor = speedRating > 0 ? Math.Min(1, osuRatingCalculator.ComputeSpeedRating(speedNoStaminaDifficultyValue) / speedRating) : 1;
-
             double flashlightRating = 0.0;
 
             if (flashlight is not null)
@@ -127,7 +123,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 AimDifficultSliderCount = difficultSliders,
                 SpeedDifficulty = speedRating,
                 SpeedNoteCount = speedNotes,
-                StaminaFactor = staminaFactor,
                 FlashlightDifficulty = flashlightRating,
                 ReadingDifficulty = readingRating,
                 SliderFactor = sliderFactor,
