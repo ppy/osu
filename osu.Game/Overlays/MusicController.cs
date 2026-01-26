@@ -337,7 +337,7 @@ namespace osu.Game.Overlays
 
             IDisposable duckOperation = Duck(parameters);
 
-            Scheduler.AddDelayed(() => duckOperation.Dispose(), delayUntilRestore);
+            Scheduler.AddDelayed(duckOperation.Dispose, delayUntilRestore);
         }
 
         private bool next(bool allowProtectedTracks)

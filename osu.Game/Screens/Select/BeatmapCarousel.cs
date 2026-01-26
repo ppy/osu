@@ -528,7 +528,7 @@ namespace osu.Game.Screens.Select
 
                 if (!notYetVisitedSets.Any())
                 {
-                    previouslyVisitedRandomSets.RemoveAll(s => visibleSets.Contains(s));
+                    previouslyVisitedRandomSets.RemoveAll(visibleSets.Contains);
                     notYetVisitedSets = visibleSets;
                 }
 

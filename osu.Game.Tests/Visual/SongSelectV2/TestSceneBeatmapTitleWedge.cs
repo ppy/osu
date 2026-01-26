@@ -197,15 +197,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddUntilStep("favourites count is 2345", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString(), () => Is.EqualTo("2,345"));
 
             AddStep("click favourite button", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().TriggerClick());
-            AddStep("allow request to complete", () => resetEvent.Set());
+            AddStep("allow request to complete", resetEvent.Set);
             AddUntilStep("favourites count is 2346", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString(), () => Is.EqualTo("2,346"));
 
-            AddStep("reset event", () => resetEvent.Reset());
+            AddStep("reset event", resetEvent.Reset);
             AddStep("click favourite button", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().TriggerClick());
-            AddStep("allow request to complete", () => resetEvent.Set());
+            AddStep("allow request to complete", resetEvent.Set);
             AddUntilStep("favourites count is 2345", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString(), () => Is.EqualTo("2,345"));
 
-            AddStep("reset event", () => resetEvent.Reset());
+            AddStep("reset event", resetEvent.Reset);
             AddStep("click favourite button", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().TriggerClick());
             AddStep("change to another beatmap", () =>
             {
@@ -217,7 +217,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 Beatmap.Value = working;
                 onlineLookupResult.Value = online;
             });
-            AddStep("allow request to complete", () => resetEvent.Set());
+            AddStep("allow request to complete", resetEvent.Set);
             AddUntilStep("favourites count is 9999", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().Text.ToString(), () => Is.EqualTo("9,999"));
 
             AddStep("set up request handler to fail", () =>
@@ -239,11 +239,11 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     }
                 };
             });
-            AddStep("reset event", () => resetEvent.Reset());
+            AddStep("reset event", resetEvent.Reset);
             AddStep("click favourite button", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().TriggerClick());
             AddAssert("spinner visible", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single()
                                                    .ChildrenOfType<LoadingSpinner>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
-            AddStep("allow request to complete", () => resetEvent.Set());
+            AddStep("allow request to complete", resetEvent.Set);
             AddAssert("spinner hidden", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single()
                                                   .ChildrenOfType<LoadingSpinner>().Single().State.Value, () => Is.EqualTo(Visibility.Hidden));
         }
