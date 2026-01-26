@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuPrevObj = current.Index > 0 ? (OsuDifficultyHitObject)current.Previous(0) : null;
 
-            double travelDistance = osuPrevObj?.LazyTravelDistance ?? 0;
+            double travelDistance = osuPrevObj?.BaseTravelDistance ?? 0;
             double distance = travelDistance + osuCurrObj.LazyJumpDistance;
 
             // Cap distance at single_spacing_threshold
