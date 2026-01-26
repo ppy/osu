@@ -127,6 +127,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
             Hide();
         }
 
+        protected override bool OnHover(HoverEvent e) => true;
+        protected override bool OnClick(ClickEvent e) => true;
+
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
