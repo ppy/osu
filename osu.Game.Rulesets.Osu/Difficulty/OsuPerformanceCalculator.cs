@@ -255,7 +255,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // An effective hit window is created based on the speed SR. The higher the speed difficulty, the shorter the hit window.
             // For example, a speed SR of 3.0 leads to an effective hit window of 20ms, which is OD 10.
-            double effectiveHitWindow = Math.Sqrt(20 * 60 / attributes.SpeedDifficulty);
+            double effectiveHitWindow = Math.Sqrt(30 * 60 / attributes.SpeedDifficulty);
 
             // Find the proportion of 300s on speed notes assuming the hit window was the effective hit window.
             double effectiveAccuracy = DifficultyCalculationUtils.Erf(effectiveHitWindow / (double)speedDeviation);
