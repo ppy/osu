@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 using (var zip = ZipArchive.Create())
                 {
                     foreach (string? f in logStorage.GetFiles(string.Empty, "*.log"))
-                        FileUtils.AttemptOperation(z => z.AddEntry(f, logStorage.GetStream(f), true), zip);
+                        FileUtils.AttemptOperation(z => z.AddEntry(f, logStorage.GetStream(f), closeStream: true), zip, throwOnFailure: false);
 
                     zip.SaveTo(outStream);
                 }
