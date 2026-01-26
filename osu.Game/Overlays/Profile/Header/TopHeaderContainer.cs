@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Profile.Header
         private GroupBadgeFlow groupBadgeFlow = null!;
         private ToggleCoverButton coverToggle = null!;
 
-        public PreviousUsernamesDisplay PreviousUsernamesDisplay = new PreviousUsernamesDisplay();
+        public PreviousUsernamesDisplay PreviousUsernamesDisplay { get; } = new PreviousUsernamesDisplay();
 
         private Bindable<bool> coverExpanded = null!;
 
