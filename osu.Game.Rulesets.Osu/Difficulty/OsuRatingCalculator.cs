@@ -31,9 +31,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimRating = CalculateDifficultyRating(aimDifficultyValue);
 
-            if (mods.Any(m => m is OsuModTouchDevice))
-                aimRating = Math.Pow(aimRating, 0.8);
-
             if (mods.Any(m => m is OsuModRelax))
                 aimRating *= 0.9;
 
@@ -68,11 +65,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedRating *= 1.0 - magnetisedStrength * 0.3;
             }
 
-            double ratingMultiplier = 1.0;
-
-            ratingMultiplier *= 0.95 + Math.Pow(Math.Max(0, overallDifficulty), 2) / 750;
-
-            return speedRating * Math.Cbrt(ratingMultiplier);
+            return speedRating;
         }
 
         public double ComputeReadingRating(double readingDifficultyValue)
