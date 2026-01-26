@@ -145,6 +145,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             private FormFieldCaption caption = null!;
             private OsuSpriteText label = null!;
             private SpriteIcon chevron = null!;
+            private FormControlBackground background = null!;
 
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -157,37 +158,49 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                 Margin = new MarginPadding { Bottom = header_menu_spacing };
 
-                Foreground.Padding = new MarginPadding(9);
+                // We use our own background for more control.
+                Background.Alpha = 0;
+
                 Foreground.Children = new Drawable[]
                 {
-                    new FillFlowContainer
+                    background = new FormControlBackground(),
+                    new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 4),
+                        Padding = new MarginPadding(9),
                         Children = new Drawable[]
                         {
-                            caption = new FormFieldCaption
-                            {
-                                Caption = Caption,
-                                TooltipText = HintText,
-                            },
-                            label = new TruncatingSpriteText
+                            new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Padding = new MarginPadding { Right = 25 },
-                                AlwaysPresent = true,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(0, 4),
+                                Children = new Drawable[]
+                                {
+                                    caption = new FormFieldCaption
+                                    {
+                                        Caption = Caption,
+                                        TooltipText = HintText,
+                                    },
+                                    label = new TruncatingSpriteText
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Padding = new MarginPadding { Right = 25 },
+                                        AlwaysPresent = true,
+                                    },
+                                }
+                            },
+                            chevron = new SpriteIcon
+                            {
+                                Icon = FontAwesome.Solid.ChevronDown,
+                                Anchor = Anchor.BottomRight,
+                                Origin = Anchor.BottomRight,
+                                Size = new Vector2(16),
+                                Margin = new MarginPadding { Right = 5 },
                             },
                         }
-                    },
-                    chevron = new SpriteIcon
-                    {
-                        Icon = FontAwesome.Solid.ChevronDown,
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Size = new Vector2(16),
-                        Margin = new MarginPadding { Right = 5 },
                     },
                 };
 
@@ -240,25 +253,16 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 else
                     label.Alpha = 1;
 
-                BorderThickness = IsHovered || dropdownOpen ? 2 : 0;
-
-                if (Dropdown.Current.Disabled)
-                    BorderColour = colourProvider.Dark1;
-                else
-                    BorderColour = dropdownOpen ? colourProvider.Highlight1 : colourProvider.Light4;
-
-                if (dropdownOpen)
-                    Background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
-                else if (IsHovered)
-                    Background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
-                else
-                    Background.Colour = colourProvider.Background5;
+                background.StyleDisabled = Dropdown.Current.Disabled;
+                background.StyleHovered = IsHovered;
+                background.StyleFocused = dropdownOpen;
             }
 
             private void updateChevron()
             {
                 bool open = Dropdown.Menu.State == MenuState.Open;
                 chevron.ScaleTo(open ? new Vector2(1f, -1f) : Vector2.One, 300, Easing.OutQuint);
+                chevron.MoveToY(open ? -chevron.DrawHeight : 0, 300, Easing.OutQuint);
             }
         }
 
