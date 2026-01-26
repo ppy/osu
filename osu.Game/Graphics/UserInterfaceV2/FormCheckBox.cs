@@ -9,9 +9,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
@@ -39,7 +37,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public LocalisableString HintText { get; init; }
 
-        private Box background = null!;
+        private FormControlBackground background = null!;
         private FormFieldCaption caption = null!;
 
         private Sample? sampleChecked;
@@ -55,17 +53,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Masking = true;
-            CornerRadius = 5;
-            CornerExponent = 2.5f;
-
             InternalChildren = new Drawable[]
             {
-                background = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
-                },
+                background = new FormControlBackground(),
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -111,7 +101,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 updateState();
                 playSamples();
-                background.FlashColour(ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark2), 800, Easing.OutQuint);
+                background.Flash();
 
                 ValueChanged?.Invoke();
             });
@@ -151,14 +141,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private void updateState()
         {
             caption.Colour = Current.Disabled ? colourProvider.Background1 : colourProvider.Content2;
-
-            // use FadeColour to override any existing colour transform (i.e. FlashColour on click).
-            background.FadeColour(IsHovered
-                ? ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4)
-                : colourProvider.Background5);
-
-            BorderThickness = IsHovered ? 2 : 0;
-            BorderColour = Current.Disabled ? colourProvider.Dark1 : colourProvider.Light4;
+            background.StyleHovered = IsHovered;
+            background.StyleDisabled = IsDisabled;
         }
 
         public IEnumerable<LocalisableString> FilterTerms => Caption.Yield();
