@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -59,6 +60,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
             CornerRadius = 5;
             CornerExponent = 2.5f;
 
+            BorderThickness = 2.5f;
+
             InternalChildren = new Drawable[]
             {
                 box = new Box
@@ -84,8 +87,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void updateStyling()
         {
-            ColourInfo colour = colourProvider.Background5;
+            ColourInfo colour = colourProvider.Background4.Darken(0.1f);
             ColourInfo borderColour = colourProvider.Light4;
+
             bool border = false;
 
             if (styleDisabled)
@@ -105,10 +109,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 border = true;
             }
 
-            BorderThickness = border ? 2 : 0;
-            BorderColour = borderColour;
+            this.TransformTo(nameof(BorderColour), border ? borderColour : colour, 250, Easing.OutQuint);
 
-            box.FadeColour(colour, 500, Easing.OutQuint);
+            box.FadeColour(colour, 250, Easing.OutQuint);
         }
     }
 }

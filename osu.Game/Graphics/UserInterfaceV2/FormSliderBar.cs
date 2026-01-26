@@ -22,6 +22,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osuTK.Graphics;
 using Vector2 = osuTK.Vector2;
 
 namespace osu.Game.Graphics.UserInterfaceV2
@@ -325,8 +326,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             currentNumberInstantaneous.TriggerChange();
             current.Value = currentNumberInstantaneous.Value;
 
-            flashLayer.Colour = ColourInfo.GradientVertical(colourProvider.Dark2.Opacity(0), colourProvider.Dark2);
-            flashLayer.FadeOutFromOne(800, Easing.OutQuint);
+            background.Flash();
         }
 
         private void tryUpdateSliderFromTextBox()
@@ -502,7 +502,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
             protected override void LoadComplete()
             {
                 base.LoadComplete();
+
                 Current.BindDisabledChanged(_ => updateState(), true);
+                FinishTransforms(true);
             }
 
             protected override void UpdateAfterChildren()
@@ -557,8 +559,23 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 sounds.Enabled.Value = !Current.Disabled;
                 rightBox.Colour = colourProvider.Background6;
-                leftBox.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Highlight1.Opacity(0.3f);
-                nub.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1 : colourProvider.Light4;
+
+                Color4 leftColour;
+                Color4 nubColour;
+
+                if (Current.Disabled)
+                {
+                    leftColour = colourProvider.Dark3;
+                    nubColour = colourProvider.Dark1;
+                }
+                else
+                {
+                    leftColour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Highlight1.Opacity(0.3f);
+                    nubColour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1 : colourProvider.Light4;
+                }
+
+                leftBox.FadeColour(leftColour, 250, Easing.OutQuint);
+                nub.FadeColour(nubColour, 250, Easing.OutQuint);
             }
 
             protected override void UpdateValue(float value)

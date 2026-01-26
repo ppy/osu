@@ -70,6 +70,7 @@ namespace osu.Game.Overlays.Settings
                     {
                         RelativeSizeAxes = Axes.X,
                         Current = { BindTarget = Note },
+                        Depth = 1,
                     },
                 },
             };

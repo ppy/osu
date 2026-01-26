@@ -16,6 +16,7 @@ using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Screens.Play.PlayerSettings;
+using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
 {
@@ -52,6 +53,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
+                Spacing = new Vector2(SettingsSection.ITEM_SPACING_V2),
                 Children = new Drawable[]
                 {
                     new SettingsItemV2(new FormSliderBar<double>
@@ -67,30 +69,23 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Padding = new MarginPadding
-                        {
-                            Left = SettingsPanel.CONTENT_PADDING.Left + 9,
-                            Right = SettingsPanel.CONTENT_PADDING.Right + 5
-                        },
-                        Child = notchContainer = new Container<Circle>
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Width = 0.5f,
-                            Height = 10,
-                            Margin = new MarginPadding { Top = 2 },
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            Padding = new MarginPadding
-                            {
-                                Horizontal = FormSliderBar<double>.InnerSlider.NUB_WIDTH / 2
-                            },
-                        },
-                    },
-                    hintNote = new SettingsNote
-                    {
-                        RelativeSizeAxes = Axes.X,
                         Padding = SettingsPanel.CONTENT_PADDING,
-                        TextAnchor = Anchor.TopCentre,
+                        Children = new Drawable[]
+                        {
+                            notchContainer = new Container<Circle>
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Width = 0.5f,
+                                Height = 10,
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                Padding = new MarginPadding
+                                {
+                                    Horizontal = FormSliderBar<double>.InnerSlider.NUB_WIDTH / 2
+                                },
+                            },
+                            hintNote = new SettingsNote { RelativeSizeAxes = Axes.X },
+                        }
                     },
                     applySuggestion = new RoundedButton
                     {
@@ -166,18 +161,23 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 applySuggestion.Enabled.Value = false;
                 notchContainer.Hide();
                 hintNote.Current.Value = new SettingsNote.Data(AudioSettingsStrings.SuggestedOffsetNote, SettingsNote.Type.Informational);
+                hintNote.MoveToY(0, 200, Easing.OutQuint);
             }
             else if (Math.Abs(SuggestedOffset.Value.Value - current.Value) < 1)
             {
                 applySuggestion.Enabled.Value = false;
                 notchContainer.Show();
                 hintNote.Current.Value = new SettingsNote.Data(AudioSettingsStrings.SuggestedOffsetCorrect(averageHitErrorHistory.Count), SettingsNote.Type.Informational);
+                hintNote.MoveToY(10, 200, Easing.OutQuint);
             }
             else
             {
                 applySuggestion.Enabled.Value = true;
                 notchContainer.Show();
-                hintNote.Current.Value = new SettingsNote.Data(AudioSettingsStrings.SuggestedOffsetValueReceived(averageHitErrorHistory.Count, SuggestedOffset.Value.Value.ToStandardFormattedString(0)), SettingsNote.Type.Informational);
+                hintNote.Current.Value =
+                    new SettingsNote.Data(AudioSettingsStrings.SuggestedOffsetValueReceived(averageHitErrorHistory.Count, SuggestedOffset.Value.Value.ToStandardFormattedString(0)),
+                        SettingsNote.Type.Informational);
+                hintNote.MoveToY(10, 200, Easing.OutQuint);
             }
         }
     }
