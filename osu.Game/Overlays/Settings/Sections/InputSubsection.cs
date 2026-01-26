@@ -12,7 +12,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections
@@ -85,14 +84,14 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private partial class ToggleableHeader : CompositeDrawable
         {
-            private readonly LocalisableString header;
+            private readonly LocalisableString text;
             private readonly bool toggleable;
 
             public readonly BindableBool Current = new BindableBool(true);
 
-            public ToggleableHeader(LocalisableString header, bool toggleable)
+            public ToggleableHeader(LocalisableString text, bool toggleable)
             {
-                this.header = header;
+                this.text = text;
                 this.toggleable = toggleable;
             }
 
@@ -119,7 +118,7 @@ namespace osu.Game.Overlays.Settings.Sections
                     },
                     headerText = new OsuSpriteText
                     {
-                        Text = header,
+                        Text = $"Device: {text}",
                         Font = OsuFont.Style.Heading2,
                         Margin = new MarginPadding { Vertical = 12 },
                         X = 18,
