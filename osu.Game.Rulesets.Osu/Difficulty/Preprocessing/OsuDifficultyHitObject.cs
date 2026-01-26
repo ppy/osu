@@ -55,35 +55,36 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double LazyJumpDistance { get; private set; }
 
         /// <summary>
-        /// Normalised shortest distance to consider for a jump between the previous <see cref="OsuDifficultyHitObject"/> and this <see cref="OsuDifficultyHitObject"/>.
+        /// Minimum between <see cref="LazyJumpDistance"/> and tail jump distance, subtracted by the portion of follow circle radius.
+        /// It takes the minimum distance between:
+        /// <br> - Next object and the point where you're on the edge of the follow circle when it's reaching the end of the slider.</br>
+        /// <br> - Next object and the point where you're on the edge of the follow circle when it's reaching the lazy end position.</br>
+        /// <para>
+        /// In case of slider body going away from the next hitobject, this value is slightly smaller than <see cref="LazyJumpDistance"/>.
+        /// In case of slider body going towards the next hitobject, this value is significantly smaller than <see cref="LazyJumpDistance"/>.
+        /// </para>
         /// </summary>
         /// <remarks>
-        /// This is bounded from above by <see cref="LazyJumpDistance"/>, and is smaller than the former if a more natural path is able to be taken through the previous <see cref="OsuDifficultyHitObject"/>.
+        /// WARNING: This value is always smaller than <see cref="LazyJumpDistance"/> and doesn't corresponds to any continuous movement.
         /// </remarks>
-        /// <example>
-        /// Suppose a linear slider - circle pattern.
-        /// <br />
-        /// Following the slider lazily (see: <see cref="LazyJumpDistance"/>) will result in underestimating the true end position of the slider as being closer towards the start position.
-        /// As a result, <see cref="LazyJumpDistance"/> overestimates the jump distance because the player is able to take a more natural path by following through the slider to its end,
-        /// such that the jump is felt as only starting from the slider's true end position.
-        /// <br />
-        /// Now consider a slider - circle pattern where the circle is stacked along the path inside the slider.
-        /// In this case, the lazy end position correctly estimates the true end position of the slider and provides the more natural movement path.
-        /// </example>
         public double MinimumJumpDistance { get; private set; }
 
         /// <summary>
-        /// The time taken to travel through <see cref="MinimumJumpDistance"/>, with a minimum value of 25ms.
+        /// The time taken to travel through <see cref="LazyJumpDistance"/>, with a minimum value of 25ms.
         /// </summary>
         public double MinimumJumpTime { get; private set; }
 
         /// <summary>
-        /// Normalised distance between the start and end position of this <see cref="OsuDifficultyHitObject"/>.
+        /// The distance travelled by the cursor upon completion of this <see cref="OsuDifficultyHitObject"/> if it is a <see cref="Slider"/>
+        /// and was hit with as few movements as possible.
+        /// Unlike <see cref="BaseTravelDistance"/>, this value includes a bonus for repeat sliders.
         /// </summary>
         public double TravelDistance { get; private set; }
 
         /// <summary>
-        /// The time taken to travel through <see cref="TravelDistance"/>, with a minimum value of 25ms for <see cref="Slider"/> objects.
+        /// The time taken by the cursor upon completion of this <see cref="OsuDifficultyHitObject"/> if it is a <see cref="Slider"/>
+        /// and was hit with as few movements as possible, with a minimum value of 25ms.
+        /// Scaled by clock rate.
         /// </summary>
         public double TravelTime { get; private set; }
 
@@ -102,6 +103,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// The time taken by the cursor upon completion of this <see cref="OsuDifficultyHitObject"/> if it is a <see cref="Slider"/>
         /// and was hit with as few movements as possible.
+        /// Not scaled by clock rate.
         /// </summary>
         public double BaseTravelTime { get; private set; }
 
