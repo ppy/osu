@@ -46,8 +46,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         private double totalLength;
 
-        protected readonly List<double> ObjectStrains = new List<double>(); // Store individual strains
-
         /// <summary>
         /// Stores previous strains so that, if a high difficulty hit object is followed by a lower
         /// difficulty hit object, the high difficulty hit object gets a full strain instead of being cut short.
@@ -154,16 +152,16 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         public virtual double CountTopWeightedStrains(double difficultyValue)
         {
-            if (ObjectStrains.Count == 0)
+            if (ObjectDifficulties.Count == 0)
                 return 0.0;
 
             double consistentTopStrain = difficultyValue * (1 - DecayWeight); // What would the top strain be if all strain values were identical
 
             if (consistentTopStrain == 0)
-                return ObjectStrains.Count;
+                return ObjectDifficulties.Count;
 
             // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return ObjectStrains.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
+            return ObjectDifficulties.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
         }
 
         /// <summary>
