@@ -141,8 +141,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private void updateState()
         {
             caption.Colour = Current.Disabled ? colourProvider.Background1 : colourProvider.Content2;
-            background.StyleHovered = IsHovered;
-            background.StyleDisabled = IsDisabled;
+
+            if (IsDisabled)
+                background.VisualStyle = VisualStyle.Disabled;
+            else if (IsHovered)
+                background.VisualStyle = VisualStyle.Hovered;
+            else
+                background.VisualStyle = VisualStyle.Normal;
         }
 
         public IEnumerable<LocalisableString> FilterTerms => Caption.Yield();
