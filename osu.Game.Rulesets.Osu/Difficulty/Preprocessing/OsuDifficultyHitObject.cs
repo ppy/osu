@@ -35,6 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public readonly double AdjustedDeltaTime;
 
+        /// <summary>
         /// Time (in ms) between the object first appearing and the time it needs to be clicked.
         /// <see cref="OsuHitObject.TimePreempt"/> adjusted by clock rate.
         /// </summary>
