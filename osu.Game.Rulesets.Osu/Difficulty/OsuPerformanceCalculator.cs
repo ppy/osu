@@ -367,7 +367,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     missCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
 
                     // Apply a gradient to ensure combo threshold isn't all or nothing
-                    missCount *= DifficultyCalculationUtils.Smoothstep(scoreMaxCombo, fullComboThreshold + leniencyBounds, fullComboThreshold - leniencyBounds);
+                    // Graph is skewed such that lower numbers of drops are treated more favorably
+                    missCount *= Math.Pow(DifficultyCalculationUtils.Smoothstep(scoreMaxCombo, fullComboThreshold + leniencyBounds, fullComboThreshold - leniencyBounds), 1.5);
                 }
 
                 // In classic scores there can't be more misses than a sum of all non-perfect judgements
@@ -540,7 +541,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         // to make it more punishing on maps with lower amount of hard sections.
         private double calculateMissPenalty(double missCount, double difficultStrainCount) => double.Lerp(1,
             0.96 / ((missCount / (4 * Math.Pow(Math.Log(difficultStrainCount), 0.94))) + 1), // Actual miss penalty (for misses >= 1)
-            DifficultyCalculationUtils.Smoothstep(missCount, 0, 1) // Scales penalty for 0 < misses < 1
+            Math.Pow(DifficultyCalculationUtils.Smoothstep(missCount, 0, 1), 0.5) // Scales penalty for 0 < misses < 1
         );
 
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
