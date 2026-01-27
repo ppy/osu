@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
-            double currDistance = withSliderTravelDistance ? osuCurrObj.LazyJumpFromEndDistance : osuCurrObj.JumpDistance;
+            double currDistance = withSliderTravelDistance ? osuCurrObj.LazyJumpDistance : osuCurrObj.JumpDistance;
             double currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
 
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // As above, do the same for the previous hitobject.
-            double prevDistance = withSliderTravelDistance ? osuLastObj.LazyJumpFromEndDistance : osuLastObj.JumpDistance;
+            double prevDistance = withSliderTravelDistance ? osuLastObj.LazyJumpDistance : osuLastObj.JumpDistance;
             double prevVelocity = prevDistance / osuLastObj.AdjustedDeltaTime;
 
             if (osuLastLastObj.BaseObject is Slider && withSliderTravelDistance)
@@ -132,8 +132,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 if (withSliderTravelDistance)
                 {
                     // We want to use the average velocity over the whole object when awarding differences, not the individual jump and slider path velocities.
-                    prevVelocity = (osuLastObj.LazyJumpFromEndDistance + osuLastLastObj.TravelDistance) / osuLastObj.AdjustedDeltaTime;
-                    currVelocity = (osuCurrObj.LazyJumpFromEndDistance + osuLastObj.TravelDistance) / osuCurrObj.AdjustedDeltaTime;
+                    prevVelocity = (osuLastObj.LazyJumpDistance + osuLastLastObj.TravelDistance) / osuLastObj.AdjustedDeltaTime;
+                    currVelocity = (osuCurrObj.LazyJumpDistance + osuLastObj.TravelDistance) / osuCurrObj.AdjustedDeltaTime;
                 }
 
                 // Scale with ratio of difference compared to 0.5 * max dist.
