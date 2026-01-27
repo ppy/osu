@@ -135,7 +135,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             caption.Colour = colourProvider.Content2;
 
-            background.StyleHovered = IsHovered;
+            if (IsHovered)
+                background.VisualStyle = VisualStyle.Hovered;
+            else
+                background.VisualStyle = VisualStyle.Normal;
         }
 
         private void updateColours()

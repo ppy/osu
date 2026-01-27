@@ -185,9 +185,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
             caption.Colour = disabled ? colourProvider.Background1 : colourProvider.Content2;
             textBox.Colour = disabled ? colourProvider.Foreground1 : colourProvider.Content1;
 
-            background.StyleDisabled = Current.Disabled;
-            background.StyleFocused = textBox.Focused.Value;
-            background.StyleHovered = IsHovered;
+            if (Current.Disabled)
+                background.VisualStyle = VisualStyle.Disabled;
+            else if (textBox.Focused.Value)
+                background.VisualStyle = VisualStyle.Focused;
+            else if (IsHovered)
+                background.VisualStyle = VisualStyle.Hovered;
+            else
+                background.VisualStyle = VisualStyle.Normal;
         }
 
         internal partial class InnerTextBox : OsuTextBox

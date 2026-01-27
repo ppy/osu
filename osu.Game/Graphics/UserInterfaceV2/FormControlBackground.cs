@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -18,36 +19,15 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public const float CORNER_EXPONENT = 2.5f;
         public const float BORDER_THICKNESS = 2.5f;
 
-        private bool styleDisabled;
+        private VisualStyle visualStyle;
 
-        public bool StyleDisabled
+        public VisualStyle VisualStyle
         {
+            get => visualStyle;
             set
             {
-                styleDisabled = value;
-                updateStyling();
-            }
-        }
-
-        private bool styleFocused;
-
-        public bool StyleFocused
-        {
-            set
-            {
-                styleFocused = value;
-                updateStyling();
-            }
-        }
-
-        private bool styleHovered;
-
-        public bool StyleHovered
-        {
-            set
-            {
-                styleHovered = value;
-                updateStyling();
+                visualStyle = value;
+                updateStyle();
             }
         }
 
@@ -83,7 +63,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             base.LoadComplete();
 
-            updateStyling();
+            updateStyle();
             FinishTransforms(true);
         }
 
@@ -92,35 +72,54 @@ namespace osu.Game.Graphics.UserInterfaceV2
             box.FlashColour(ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark2), 800, Easing.OutQuint);
         }
 
-        private void updateStyling()
+        private void updateStyle()
         {
-            sounds.Enabled.Value = !styleDisabled;
+            sounds.Enabled.Value = visualStyle != VisualStyle.Disabled;
 
-            ColourInfo colour = colourProvider.Background4.Darken(0.1f);
-            ColourInfo borderColour = colourProvider.Light4;
+            ColourInfo colour;
+            ColourInfo borderColour;
 
             bool border = false;
 
-            if (styleDisabled)
+            switch (visualStyle)
             {
-                colour = colourProvider.Background4;
-                borderColour = colourProvider.Dark1;
-            }
-            else if (styleFocused)
-            {
-                colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
-                border = true;
-                borderColour = colourProvider.Highlight1;
-            }
-            else if (styleHovered)
-            {
-                colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
-                border = true;
+                case VisualStyle.Normal:
+                    colour = colourProvider.Background4.Darken(0.1f);
+                    borderColour = colourProvider.Light4;
+                    break;
+
+                case VisualStyle.Disabled:
+                    colour = colourProvider.Background4;
+                    borderColour = colourProvider.Dark1;
+                    break;
+
+                case VisualStyle.Hovered:
+                    colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
+                    borderColour = colourProvider.Light4;
+                    border = true;
+                    break;
+
+                case VisualStyle.Focused:
+                    colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
+                    border = true;
+                    borderColour = colourProvider.Highlight1;
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
             this.TransformTo(nameof(BorderColour), border ? borderColour : colour, 250, Easing.OutQuint);
 
             box.FadeColour(colour, 250, Easing.OutQuint);
         }
+    }
+
+    public enum VisualStyle
+    {
+        Normal,
+        Disabled,
+        Hovered,
+        Focused
     }
 }
