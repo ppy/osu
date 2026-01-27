@@ -198,6 +198,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             protected override float LeftRightPadding => 0;
 
+            public InnerTextBox()
+            {
+                DrawBorder = false;
+            }
+
             [BackgroundDependencyLoader]
             private void load()
             {
