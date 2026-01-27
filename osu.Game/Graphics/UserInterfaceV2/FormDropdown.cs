@@ -156,8 +156,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Masking = true;
                 CornerRadius = 5;
 
-                Margin = new MarginPadding { Bottom = header_menu_spacing };
-
                 // We use our own background for more control.
                 Background.Alpha = 0;
 
@@ -290,7 +288,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 ItemsContainer.Padding = new MarginPadding(9);
 
-                MaskingContainer.BorderThickness = 2;
+                MaskingContainer.BorderThickness = FormControlBackground.BORDER_THICKNESS;
+                MaskingContainer.CornerExponent = FormControlBackground.CORNER_EXPONENT;
                 MaskingContainer.BorderColour = colourProvider.Highlight1;
             }
 
@@ -301,13 +300,17 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 // there's negative bottom margin applied on the whole dropdown control to remove extra spacing when the menu is closed.
                 // however, when the menu is open, we want spacing between the menu and the next control below it. therefore apply bottom margin here.
                 // we use a transform to keep the open animation smooth while margin is adjusted.
-                this.TransformTo(nameof(Margin), new MarginPadding { Bottom = header_menu_spacing }, 300, Easing.OutQuint);
+                this.TransformTo(nameof(Margin), new MarginPadding
+                {
+                    Top = header_menu_spacing,
+                    Bottom = header_menu_spacing
+                }, 50, Easing.OutQuint);
             }
 
             protected override void AnimateClose()
             {
                 base.AnimateClose();
-                this.TransformTo(nameof(Margin), new MarginPadding { Bottom = 0 }, 300, Easing.OutQuint);
+                this.TransformTo(nameof(Margin), new MarginPadding { Bottom = 0 }, 300);
             }
         }
     }

@@ -15,6 +15,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
 {
     public partial class FormControlBackground : CompositeDrawable
     {
+        public const float CORNER_EXPONENT = 2.5f;
+        public const float BORDER_THICKNESS = 2.5f;
+
         private bool styleDisabled;
 
         public bool StyleDisabled
@@ -61,9 +64,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             Masking = true;
             CornerRadius = 5;
-            CornerExponent = 2.5f;
 
-            BorderThickness = 2.5f;
+            CornerExponent = CORNER_EXPONENT;
+            BorderThickness = BORDER_THICKNESS;
 
             InternalChildren = new Drawable[]
             {
