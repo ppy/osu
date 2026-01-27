@@ -512,7 +512,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         private double calculateTraceableBonus(double sliderFactor = 1)
         {
-            // We want to reward slider aim less, more so at higher CS to nerf maps such as C-Type
+            // We want to reward slider aim less, more so at higher CS to nerf maps such as A-Type
             double highARSliderVisibilityFactor = 1 - ((1 - Math.Pow(sliderFactor, 3)) / 2);
             double lowARSliderVisibilityFactor = Math.Pow(sliderFactor, 3);
             double highCSSliderVisibilityFactor = Math.Pow(Math.Min(-0.2 * circleSize + 2.2, 1), 1.8);
