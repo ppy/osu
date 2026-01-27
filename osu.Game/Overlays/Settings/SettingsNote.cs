@@ -26,14 +26,6 @@ namespace osu.Game.Overlays.Settings
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public new MarginPadding Padding
-        {
-            get => base.Padding;
-            set => base.Padding = value;
-        }
-
-        public Anchor TextAnchor { get; init; } = Anchor.TopLeft;
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -61,7 +53,6 @@ namespace osu.Game.Overlays.Settings
                         },
                         text = new OsuTextFlowContainer(s => s.Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold))
                         {
-                            TextAnchor = TextAnchor,
                             Padding = new MarginPadding(8),
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -76,12 +67,14 @@ namespace osu.Game.Overlays.Settings
             base.LoadComplete();
 
             Current.BindValueChanged(_ => updateDisplay(), true);
+            FinishTransforms(true);
         }
 
         private void updateDisplay()
         {
             // Explicitly use ClearTransforms to clear any existing auto-size transform before modifying size / flag.
-            ClearTransforms();
+            // TODO: This is dodgy as hell and needs to go.
+            ClearTransforms(false, @"baseSize");
 
             if (Current.Value == null)
             {
