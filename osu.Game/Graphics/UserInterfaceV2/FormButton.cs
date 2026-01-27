@@ -9,11 +9,9 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Framework.Utils;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -70,8 +68,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        private Container content = null!;
-        private Box background = null!;
+        private FormControlBackground background = null!;
         private OsuTextFlowContainer text = null!;
         private Button button = null!;
 
@@ -81,7 +78,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            InternalChild = content = new Container
+            InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -90,21 +87,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 CornerExponent = 2.5f,
                 Children = new Drawable[]
                 {
-                    background = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background5,
-                    },
-                    new TrianglesV2
-                    {
-                        SpawnRatio = 0.5f,
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(colourProvider.Background4, colourProvider.Background5),
-                    },
-                    new HoverClickSounds(HoverSampleSet.Button)
-                    {
-                        Enabled = { BindTarget = Enabled },
-                    },
+                    background = new FormControlBackground(),
                     new Container
                     {
                         RelativeSizeAxes = Axes.X,
@@ -175,7 +158,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             if (Enabled.Value)
             {
-                background.FlashColour(ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark2), 800, Easing.OutQuint);
+                background.Flash();
                 button.TriggerClick();
             }
 
@@ -186,19 +169,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             text.Colour = Enabled.Value ? colourProvider.Content1 : colourProvider.Background1;
 
-            background.FadeColour(IsHovered
-                ? ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4)
-                : colourProvider.Background5, 200, Easing.OutQuint);
-
-            content.BorderThickness = IsHovered ? 2 : 0;
-
-            if (BackgroundColour != null)
-            {
-                button.BackgroundColour = BackgroundColour.Value;
-                content.BorderColour = Enabled.Value ? BackgroundColour.Value : Interpolation.ValueAt(0.75, BackgroundColour.Value, colourProvider.Dark1, 0, 1);
-            }
+            if (!Enabled.Value)
+                background.VisualStyle = VisualStyle.Disabled;
+            else if (IsHovered)
+                background.VisualStyle = VisualStyle.Hovered;
             else
-                content.BorderColour = Enabled.Value ? colourProvider.Light4 : colourProvider.Dark1;
+                background.VisualStyle = VisualStyle.Normal;
+
+            // TODO: Support BackgroundColour?
         }
 
         public partial class Button : OsuButton

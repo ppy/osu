@@ -16,7 +16,6 @@ namespace osu.Game.Overlays.Settings
         public SettingsButtonV2()
         {
             RelativeSizeAxes = Axes.X;
-            Margin = new MarginPadding { Vertical = -1.5f };
             Padding = SettingsPanel.CONTENT_PADDING;
         }
 

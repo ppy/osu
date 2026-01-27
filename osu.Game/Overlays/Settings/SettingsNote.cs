@@ -26,14 +26,6 @@ namespace osu.Game.Overlays.Settings
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public new MarginPadding Padding
-        {
-            get => base.Padding;
-            set => base.Padding = value;
-        }
-
-        public Anchor TextAnchor { get; init; } = Anchor.TopLeft;
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -44,7 +36,7 @@ namespace osu.Game.Overlays.Settings
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Padding = new MarginPadding { Top = 5, Bottom = 5 },
+                Padding = new MarginPadding { Top = SettingsSection.ITEM_SPACING_V2 },
                 Child = new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -61,7 +53,6 @@ namespace osu.Game.Overlays.Settings
                         },
                         text = new OsuTextFlowContainer(s => s.Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold))
                         {
-                            TextAnchor = TextAnchor,
                             Padding = new MarginPadding(8),
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -74,6 +65,7 @@ namespace osu.Game.Overlays.Settings
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             Current.BindValueChanged(_ => updateDisplay(), true);
             FinishTransforms(true);
         }
@@ -81,7 +73,9 @@ namespace osu.Game.Overlays.Settings
         private void updateDisplay()
         {
             // Explicitly use ClearTransforms to clear any existing auto-size transform before modifying size / flag.
-            ClearTransforms();
+            // TODO: This is dodgy as hell and needs to go.
+            ClearTransforms(false, @"baseSize");
+            ClearTransforms(false, nameof(Height));
 
             if (Current.Value == null)
             {

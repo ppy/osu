@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Localisation;
 using osuTK;
@@ -16,9 +15,9 @@ namespace osu.Game.Overlays.Settings
 {
     public partial class SettingsRevertToDefaultButton : OsuClickableContainer
     {
-        public const float WIDTH = 32;
+        public const float WIDTH = 28;
 
-        public float IconSize { get; init; } = 14;
+        public float IconSize { get; init; } = 10;
 
         private Box background = null!;
         private SpriteIcon spriteIcon = null!;
@@ -31,7 +30,8 @@ namespace osu.Game.Overlays.Settings
 
         public SettingsRevertToDefaultButton()
         {
-            Size = new Vector2(WIDTH, 50);
+            RelativeSizeAxes = Axes.Y;
+            Width = WIDTH;
         }
 
         [BackgroundDependencyLoader]
@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Settings
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Colour = colourProvider.Light1,
-                    Icon = OsuIcon.Undo,
+                    Icon = FontAwesome.Solid.Undo,
                     Margin = new MarginPadding { Left = 12, Right = 5 },
                     Size = new Vector2(IconSize),
                 }

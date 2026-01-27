@@ -12,8 +12,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
-using osuTK;
 using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
@@ -85,14 +85,14 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private partial class ToggleableHeader : CompositeDrawable
         {
-            private readonly LocalisableString header;
+            private readonly LocalisableString text;
             private readonly bool toggleable;
 
             public readonly BindableBool Current = new BindableBool(true);
 
-            public ToggleableHeader(LocalisableString header, bool toggleable)
+            public ToggleableHeader(LocalisableString text, bool toggleable)
             {
-                this.header = header;
+                this.text = text;
                 this.toggleable = toggleable;
             }
 
@@ -111,18 +111,19 @@ namespace osu.Game.Overlays.Settings.Sections
                 {
                     switchButton = new SwitchButton
                     {
-                        Anchor = Anchor.TopLeft,
-                        Origin = Anchor.TopLeft,
-                        Scale = new Vector2(0.6f),
-                        Position = new Vector2(12, 8),
-                        Rotation = 90,
+                        ExpandOnCurrent = false,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Width = 15,
+                        Height = 22,
                     },
                     headerText = new OsuSpriteText
                     {
-                        Text = header,
-                        Font = OsuFont.GetFont(size: 20),
+                        Text = InputSettingsStrings.Device(text),
+                        Font = OsuFont.Style.Heading2,
                         Margin = new MarginPadding { Vertical = 12 },
-                        X = 20,
+                        X = 18,
+                        Y = -1,
                     },
                     new HoverSounds(),
                 };

@@ -33,7 +33,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public BindableBool CanAdd { get; } = new BindableBool(true);
 
-        private Box background = null!;
+        private FormControlBackground background = null!;
         private FormFieldCaption caption = null!;
         private FillFlowContainer flow = null!;
         private RoundedButton addButton = null!;
@@ -47,16 +47,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Masking = true;
-            CornerRadius = 5;
-
             InternalChildren = new Drawable[]
             {
-                background = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
-                },
+                background = new FormControlBackground(),
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -140,13 +133,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void updateState()
         {
-            background.Colour = colourProvider.Background5;
             caption.Colour = colourProvider.Content2;
 
-            BorderThickness = IsHovered ? 2 : 0;
-
             if (IsHovered)
-                BorderColour = colourProvider.Light4;
+                background.VisualStyle = VisualStyle.Hovered;
+            else
+                background.VisualStyle = VisualStyle.Normal;
         }
 
         private void updateColours()
