@@ -212,9 +212,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
             caption.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
             filenameText.Colour = Current.Disabled || Current.Value == null ? colourProvider.Foreground1 : colourProvider.Content1;
 
-            background.StyleDisabled = Current.Disabled;
-            background.StyleFocused = popoverState.Value == Visibility.Visible;
-            background.StyleHovered = IsHovered;
+            if (Current.Disabled)
+                background.VisualStyle = VisualStyle.Disabled;
+            else if (popoverState.Value == Visibility.Visible)
+                background.VisualStyle = VisualStyle.Focused;
+            else if (IsHovered)
+                background.VisualStyle = VisualStyle.Hovered;
+            else
+                background.VisualStyle = VisualStyle.Normal;
         }
 
         protected override void Dispose(bool isDisposing)

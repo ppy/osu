@@ -169,8 +169,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             text.Colour = Enabled.Value ? colourProvider.Content1 : colourProvider.Background1;
 
-            background.StyleHovered = IsHovered;
-            background.StyleDisabled = !Enabled.Value;
+            if (!Enabled.Value)
+                background.VisualStyle = VisualStyle.Disabled;
+            else if (IsHovered)
+                background.VisualStyle = VisualStyle.Hovered;
+            else
+                background.VisualStyle = VisualStyle.Normal;
 
             // TODO: Support BackgroundColour?
         }

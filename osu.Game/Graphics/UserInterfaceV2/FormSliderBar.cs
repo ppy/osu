@@ -395,9 +395,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
             textBox.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background1 : colourProvider.Content1;
             valueLabel.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background1 : colourProvider.Content1;
 
-            background.StyleDisabled = Current.Disabled;
-            background.StyleFocused = childHasFocus;
-            background.StyleHovered = IsHovered || slider.IsDragging.Value;
+            if (Current.Disabled)
+                background.VisualStyle = VisualStyle.Disabled;
+            else if (childHasFocus)
+                background.VisualStyle = VisualStyle.Focused;
+            else if (IsHovered || slider.IsDragging.Value)
+                background.VisualStyle = VisualStyle.Hovered;
+            else
+                background.VisualStyle = VisualStyle.Normal;
         }
 
         private void updateValueDisplay()

@@ -246,9 +246,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 else
                     label.Alpha = 1;
 
-                background.StyleDisabled = Dropdown.Current.Disabled;
-                background.StyleHovered = IsHovered;
-                background.StyleFocused = dropdownOpen;
+                if (Dropdown.Current.Disabled)
+                    background.VisualStyle = VisualStyle.Disabled;
+                else if (dropdownOpen)
+                    background.VisualStyle = VisualStyle.Focused;
+                else if (IsHovered)
+                    background.VisualStyle = VisualStyle.Hovered;
+                else
+                    background.VisualStyle = VisualStyle.Normal;
             }
 
             private void updateChevron()
