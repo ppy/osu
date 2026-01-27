@@ -2,13 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
@@ -34,6 +38,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 tracking.BindValueChanged(tracking =>
                 {
                     if (DrawableObject.Judged)
+                        return;
+
+                    // Don't run this when rewinding, the transforms will be handled by
+                    // `applyTransformsWhenRewinding` in such a situation.
+                    if ((Clock as IGameplayClock)?.IsRewinding == true)
                         return;
 
                     using (BeginAbsoluteSequence(Math.Max(Time.Current, DrawableObject.HitObject?.StartTime ?? 0)))
@@ -69,6 +78,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             // Immediately play out any pending transforms from press/release
             FinishTransforms(true);
+
+            // The appropriate slider transforms will not be applied if the replay is being
+            // played backwards. We apply them here if the follow circle is being instantiated
+            // in such a situation.
+            if ((Clock as IGameplayClock)?.IsRewinding == true && Time.Current > drawableObject.HitObject.GetEndTime())
+                applyTransformsWhenRewinding();
         }
 
         private void updateStateTransforms(DrawableHitObject d, ArmedState state)
@@ -113,6 +128,46 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                     break;
             }
+        }
+
+        private void applyTransformsWhenRewinding()
+        {
+            Debug.Assert(DrawableObject != null);
+
+            var trackingHistory = new Queue<(double time, bool tracking)>(DrawableObject.Result.TrackingHistory.Reverse());
+            var nested = new Queue<DrawableHitObject>(DrawableObject.NestedHitObjects.Where(dho => dho is DrawableSliderTick or DrawableSliderRepeat));
+
+            // Applying the transforms in the same order as they would have been applied
+            // during regular gameplay.
+            // - tracking update
+            // - any hit objects that have been hit after it
+            // - next tracking update
+            // - and so on
+            while (trackingHistory.Count > 0)
+            {
+                var history = trackingHistory.Dequeue();
+
+                if (history.time < DrawableObject.LifetimeStart || history.time > DrawableObject.LifetimeEnd)
+                    continue;
+
+                using (BeginAbsoluteSequence(Math.Max(history.time, DrawableObject.HitObject?.StartTime ?? 0)))
+                {
+                    if (history.tracking)
+                        OnSliderPress();
+                    else
+                        OnSliderRelease();
+                }
+
+                while (
+                    nested.Count > 0
+                    && (trackingHistory.Count == 0 || nested.Peek().Result.TimeAbsolute <= trackingHistory.Peek().time))
+                {
+                    var dho = nested.Dequeue();
+                    updateStateTransforms(dho, dho.IsHit ? ArmedState.Hit : ArmedState.Miss);
+                }
+            }
+
+            updateStateTransforms(DrawableObject.TailCircle, DrawableObject.TailCircle.IsHit ? ArmedState.Hit : ArmedState.Miss);
         }
 
         protected override void Dispose(bool isDisposing)

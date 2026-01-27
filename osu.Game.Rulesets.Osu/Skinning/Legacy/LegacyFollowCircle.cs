@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using osu.Framework.Graphics;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
@@ -24,7 +25,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             Debug.Assert(DrawableObject != null);
 
-            double remainingTime = Math.Max(0, DrawableObject.HitStateUpdateTime - Time.Current);
+            double pressTime = (Clock as IGameplayClock)?.IsRewinding == false ? Time.Current : DrawableObject.HeadCircle.Result.TimeAbsolute;
+            double remainingTime = Math.Max(0, DrawableObject.HitStateUpdateTime - pressTime);
 
             // Note that the scale adjust here is 2 instead of DrawableSliderBall.FOLLOW_AREA to match legacy behaviour.
             // This means the actual tracking area for gameplay purposes is larger than the sprite (but skins may be accounting for this).
