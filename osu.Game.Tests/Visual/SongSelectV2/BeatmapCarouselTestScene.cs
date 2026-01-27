@@ -44,6 +44,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         protected TestBeatmapCarousel Carousel = null!;
 
+        protected bool RetainSelection { get; set; }
+
         protected OsuScrollContainer<Drawable> Scroll => Carousel.ChildrenOfType<OsuScrollContainer<Drawable>>().Single();
 
         [Cached(typeof(BeatmapStore))]
@@ -78,7 +80,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             Dependencies.Cache(Realm);
         }
 
-        protected void CreateCarousel()
+        protected void CreateCarousel(bool retainSelection = false)
         {
             AddStep("create components", () =>
             {
@@ -86,6 +88,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 BeatmapSetRequestedSelections.Clear();
                 BeatmapRecommendationFunction = null;
                 NewItemsPresentedInvocationCount = 0;
+
+                GroupedBeatmap? previousSelection = retainSelection ? Carousel.CurrentGroupedBeatmap : null;
 
                 Box topBox;
                 Children = new Drawable[]
@@ -120,6 +124,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                             {
                                 Carousel = new TestBeatmapCarousel
                                 {
+                                    CurrentGroupedBeatmap = previousSelection,
                                     NewItemsPresented = _ => NewItemsPresentedInvocationCount++,
                                     RequestSelection = b =>
                                     {

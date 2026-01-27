@@ -408,8 +408,7 @@ namespace osu.Game.Screens.SelectV2
                 case GroupedBeatmap groupedBeatmap:
                     setExpandedGroup(groupedBeatmap.Group);
 
-                    if (grouping.BeatmapSetsGroupedTogether)
-                        setExpandedSet(new GroupedBeatmapSet(groupedBeatmap.Group, groupedBeatmap.Beatmap.BeatmapSet!));
+                    setExpandedSet(new GroupedBeatmapSet(groupedBeatmap.Group, groupedBeatmap.Beatmap.BeatmapSet!));
                     break;
             }
         }
@@ -647,14 +646,28 @@ namespace osu.Game.Screens.SelectV2
 
         private void setExpandedSet(GroupedBeatmapSet set)
         {
-            if (ExpandedBeatmapSet != null)
-                setExpansionStateOfSetItems(ExpandedBeatmapSet, false);
+            GroupedBeatmapSet? lastExpandedSet = ExpandedBeatmapSet;
+
+            // It's important that we update the stored ExpandedBeatmapSet even when
+            // sets are not grouped together.
+            //
+            // This is stored when selection is changed and used later to ensure correct
+            // visual states are achieved (see call of this method in `HandleFilterCompleted`
+            // for an important case).
             ExpandedBeatmapSet = set;
+
+            if (!grouping.BeatmapSetsGroupedTogether)
+                return;
+
+            setExpansionStateOfSetItems(lastExpandedSet, false);
             setExpansionStateOfSetItems(ExpandedBeatmapSet, true);
         }
 
-        private void setExpansionStateOfSetItems(GroupedBeatmapSet set, bool expanded)
+        private void setExpansionStateOfSetItems(GroupedBeatmapSet? set, bool expanded)
         {
+            if (set == null)
+                return;
+
             bool canMakeVisible = !grouping.GroupItems.Any() || ExpandedGroup == set.Group;
 
             if (grouping.SetItems.TryGetValue(set, out var items))
