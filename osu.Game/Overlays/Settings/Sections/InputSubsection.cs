@@ -13,6 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
@@ -118,7 +119,7 @@ namespace osu.Game.Overlays.Settings.Sections
                     },
                     headerText = new OsuSpriteText
                     {
-                        Text = $"Device: {text}",
+                        Text = InputSettingsStrings.Device(text),
                         Font = OsuFont.Style.Heading2,
                         Margin = new MarginPadding { Vertical = 12 },
                         X = 18,
