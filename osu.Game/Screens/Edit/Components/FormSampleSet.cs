@@ -15,7 +15,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -48,7 +47,7 @@ namespace osu.Game.Screens.Edit.Components
         private readonly BindableWithCurrent<EditorBeatmapSkin.SampleSet?> current = new BindableWithCurrent<EditorBeatmapSkin.SampleSet?>();
         private readonly Dictionary<(string name, string bank), SampleButton> buttons = new Dictionary<(string, string), SampleButton>();
 
-        private Box background = null!;
+        private FormControlBackground background = null!;
         private FormFieldCaption caption = null!;
 
         [Resolved]
@@ -62,13 +61,13 @@ namespace osu.Game.Screens.Edit.Components
 
             Masking = true;
             CornerRadius = 5;
+            CornerExponent = 2.5f;
 
             InternalChildren = new Drawable[]
             {
-                background = new Box
+                background = new FormControlBackground
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
                 },
                 new FillFlowContainer
                 {
@@ -167,13 +166,9 @@ namespace osu.Game.Screens.Edit.Components
 
         private void updateState()
         {
-            background.Colour = colourProvider.Background5;
             caption.Colour = colourProvider.Content2;
 
-            BorderThickness = IsHovered ? 2 : 0;
-
-            if (IsHovered)
-                BorderColour = colourProvider.Light4;
+            background.VisualStyle = IsHovered ? VisualStyle.Hovered : VisualStyle.Normal;
         }
 
         public partial class SampleButton : OsuButton, IHasPopover, IHasContextMenu
