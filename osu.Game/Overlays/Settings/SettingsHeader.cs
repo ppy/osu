@@ -37,8 +37,7 @@ namespace osu.Game.Overlays.Settings
                     {
                         Left = SettingsPanel.CONTENT_PADDING.Left,
                         Right = SettingsPanel.CONTENT_PADDING.Right,
-                        Top = Toolbar.Toolbar.TOOLTIP_HEIGHT,
-                        Bottom = 30
+                        Vertical = 20,
                     }
                 }.With(flow =>
                 {
