@@ -133,7 +133,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 // Apply a gradient to ensure combo threshold isn't all or nothing
                 // Graph is skewed such that lower numbers of drops are treated more favorably
-                missCount *= Math.Pow(DifficultyCalculationUtils.Smoothstep(score.MaxCombo, fullComboThreshold + leniencyBounds, fullComboThreshold - leniencyBounds), 1.5);
+                // Constants are such that having scoreMaxCombo == fullComboThreshold produces ~0.5 misses
+                missCount *= Math.Pow(DifficultyCalculationUtils.Smoothstep(score.MaxCombo, fullComboThreshold + leniencyBounds, fullComboThreshold - leniencyBounds * 0.558), 2);
             }
 
             // In classic scores there can't be more misses than a sum of all non-perfect judgements
