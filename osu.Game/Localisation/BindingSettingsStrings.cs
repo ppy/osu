@@ -10,9 +10,9 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.BindingSettings";
 
         /// <summary>
-        /// "Shortcut and gameplay bindings"
+        /// "Shortcuts and gameplay bindings"
         /// </summary>
-        public static LocalisableString ShortcutAndGameplayBindings => new TranslatableString(getKey(@"shortcut_and_gameplay_bindings"), @"Shortcut and gameplay bindings");
+        public static LocalisableString ShortcutAndGameplayBindings => new TranslatableString(getKey(@"shortcut_and_gameplay_bindings"), @"Shortcuts and gameplay bindings");
 
         /// <summary>
         /// "Configure"

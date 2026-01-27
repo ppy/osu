@@ -22,6 +22,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osuTK.Graphics;
 using Vector2 = osuTK.Vector2;
 
 namespace osu.Game.Graphics.UserInterfaceV2
@@ -121,7 +122,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public Func<T, LocalisableString> TooltipFormat { get; init; }
 
-        private Box background = null!;
+        private FormControlBackground background = null!;
         private Box flashLayer = null!;
         private FormTextBox.InnerTextBox textBox = null!;
         private OsuSpriteText valueLabel = null!;
@@ -199,14 +200,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             Masking = true;
             CornerRadius = 5;
+            CornerExponent = 2.5f;
 
             InternalChildren = new Drawable[]
             {
-                background = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
-                },
+                background = new FormControlBackground(),
                 flashLayer = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -329,8 +327,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             currentNumberInstantaneous.TriggerChange();
             current.Value = currentNumberInstantaneous.Value;
 
-            flashLayer.Colour = ColourInfo.GradientVertical(colourProvider.Dark2.Opacity(0), colourProvider.Dark2);
-            flashLayer.FadeOutFromOne(800, Easing.OutQuint);
+            background.Flash();
         }
 
         private void tryUpdateSliderFromTextBox()
@@ -398,19 +395,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
             textBox.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background1 : colourProvider.Content1;
             valueLabel.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background1 : colourProvider.Content1;
 
-            BorderThickness = childHasFocus || IsHovered || slider.IsDragging.Value ? 2 : 0;
-
             if (Current.Disabled)
-                BorderColour = colourProvider.Dark1;
-            else
-                BorderColour = childHasFocus ? colourProvider.Highlight1 : colourProvider.Light4;
-
-            if (childHasFocus)
-                background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
+                background.VisualStyle = VisualStyle.Disabled;
+            else if (childHasFocus)
+                background.VisualStyle = VisualStyle.Focused;
             else if (IsHovered || slider.IsDragging.Value)
-                background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
+                background.VisualStyle = VisualStyle.Hovered;
             else
-                background.Colour = colourProvider.Background5;
+                background.VisualStyle = VisualStyle.Normal;
         }
 
         private void updateValueDisplay()
@@ -464,7 +456,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
             private Box leftBox = null!;
             private Box rightBox = null!;
             private InnerSliderNub nub = null!;
-            private HoverClickSounds sounds = null!;
             public const float NUB_WIDTH = 10;
 
             [Resolved]
@@ -509,14 +500,15 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             ResetToDefault = ResetToDefault,
                         }
                     },
-                    sounds = new HoverClickSounds()
                 };
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
+
                 Current.BindDisabledChanged(_ => updateState(), true);
+                FinishTransforms(true);
             }
 
             protected override void UpdateAfterChildren()
@@ -569,24 +561,29 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             private void updateState()
             {
-                sounds.Enabled.Value = !Current.Disabled;
-                rightBox.Colour = colourProvider.Background6;
+                rightBox.Colour = colourProvider.Background5;
+
+                Color4 leftColour = colourProvider.Light4;
+                Color4 nubColour;
+
+                if (IsHovered || HasFocus || IsDragged)
+                    nubColour = colourProvider.Highlight1;
+                else
+                    nubColour = colourProvider.Highlight1.Darken(0.1f);
 
                 if (Current.Disabled)
                 {
-                    leftBox.Colour = colourProvider.Dark3;
-                    nub.Colour = colourProvider.Dark1;
+                    nubColour = nubColour.Darken(0.4f);
+                    leftColour = leftColour.Darken(0.4f);
                 }
-                else
-                {
-                    leftBox.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1.Opacity(0.5f) : colourProvider.Highlight1.Opacity(0.3f);
-                    nub.Colour = HasFocus || IsHovered || IsDragged ? colourProvider.Highlight1 : colourProvider.Light4;
-                }
+
+                leftBox.FadeColour(leftColour, 250, Easing.OutQuint);
+                nub.FadeColour(nubColour, 250, Easing.OutQuint);
             }
 
             protected override void UpdateValue(float value)
             {
-                nub.MoveToX(value, 200, Easing.OutPow10);
+                nub.MoveToX(value, 250, Easing.OutElasticQuarter);
             }
 
             protected override bool Commit()
@@ -609,6 +606,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             [BackgroundDependencyLoader]
             private void load()
             {
+                CornerExponent = 2.5f;
                 Width = InnerSlider.NUB_WIDTH;
                 RelativeSizeAxes = Axes.Y;
                 RelativePositionAxes = Axes.X;

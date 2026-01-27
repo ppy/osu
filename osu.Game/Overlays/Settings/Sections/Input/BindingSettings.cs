@@ -23,7 +23,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     Text = BindingSettingsStrings.Configure,
                     TooltipText = BindingSettingsStrings.ChangeBindingsButton,
-                    Action = keyConfig.ToggleVisibility
+                    Action = keyConfig.ToggleVisibility,
+                    Height = 60
                 },
             };
         }

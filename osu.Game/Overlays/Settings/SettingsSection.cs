@@ -35,10 +35,10 @@ namespace osu.Game.Overlays.Settings
         public virtual IEnumerable<LocalisableString> FilterTerms => new[] { Header };
 
         public const int ITEM_SPACING = 14;
-        public const int ITEM_SPACING_V2 = 7;
+        public const int ITEM_SPACING_V2 = 4;
 
         private const int header_size = 24;
-        private const int border_size = 4;
+        private const int border_size = 2;
 
         private bool matchingFilter = true;
 

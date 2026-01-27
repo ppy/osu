@@ -77,7 +77,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public LocalisableString PlaceholderText { get; init; }
 
-        private Box background = null!;
+        private FormControlBackground background = null!;
         private Box flashLayer = null!;
         private InnerTextBox textBox = null!;
         private FormFieldCaption caption = null!;
@@ -92,17 +92,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Masking = true;
-            CornerRadius = 5;
-            CornerExponent = 2.5f;
-
             InternalChildren = new Drawable[]
             {
-                background = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
-                },
+                background = new FormControlBackground(),
                 flashLayer = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -193,19 +185,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
             caption.Colour = disabled ? colourProvider.Background1 : colourProvider.Content2;
             textBox.Colour = disabled ? colourProvider.Foreground1 : colourProvider.Content1;
 
-            BorderThickness = IsHovered || textBox.Focused.Value ? 2 : 0;
-
-            if (disabled)
-                BorderColour = colourProvider.Dark1;
-            else
-                BorderColour = textBox.Focused.Value ? colourProvider.Highlight1 : colourProvider.Light4;
-
-            if (textBox.Focused.Value)
-                background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
+            if (Current.Disabled)
+                background.VisualStyle = VisualStyle.Disabled;
+            else if (textBox.Focused.Value)
+                background.VisualStyle = VisualStyle.Focused;
             else if (IsHovered)
-                background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
+                background.VisualStyle = VisualStyle.Hovered;
             else
-                background.Colour = colourProvider.Background5;
+                background.VisualStyle = VisualStyle.Normal;
         }
 
         internal partial class InnerTextBox : OsuTextBox
@@ -216,12 +203,16 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             protected override float LeftRightPadding => 0;
 
+            public InnerTextBox()
+            {
+                DrawBorder = false;
+            }
+
             [BackgroundDependencyLoader]
             private void load()
             {
                 Height = 16;
                 TextContainer.Height = 1;
-                Masking = false;
                 BackgroundUnfocused = BackgroundFocused = BackgroundCommit = Colour4.Transparent;
             }
 

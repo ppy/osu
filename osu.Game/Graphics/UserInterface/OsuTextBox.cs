@@ -42,6 +42,8 @@ namespace osu.Game.Graphics.UserInterface
             Margin = new MarginPadding { Left = 2 },
         };
 
+        protected bool DrawBorder { get; init; }
+
         private OsuCaret? caret;
 
         private bool selectionStarted;
@@ -256,7 +258,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnFocus(FocusEvent e)
         {
-            if (Masking)
+            if (DrawBorder)
                 BorderThickness = 3;
 
             base.OnFocus(e);
@@ -268,7 +270,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnFocusLost(FocusLostEvent e)
         {
-            if (Masking)
+            if (DrawBorder)
                 BorderThickness = 0;
 
             base.OnFocusLost(e);
