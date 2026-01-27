@@ -85,7 +85,7 @@ namespace osu.Game.Screens.SelectV2
             AddRange(new[]
             {
                 unrankedBadge = new UnrankedBadge(),
-                modDisplayBar = new Container
+                modDisplayBar = new InputBlockingContainer
                 {
                     Y = -5f,
                     Depth = float.MaxValue,
@@ -343,7 +343,7 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
-        internal partial class UnrankedBadge : CompositeDrawable, IHasTooltip
+        internal partial class UnrankedBadge : InputBlockingContainer, IHasTooltip
         {
             public LocalisableString TooltipText { get; }
 

@@ -30,7 +30,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// <summary>
         /// Hint text containing an extended description of this slider bar, displayed in a tooltip when hovering the caption.
         /// </summary>
-        public LocalisableString HintText { get; init; }
+        public LocalisableString HintText
+        {
+            get => header.HintText;
+            set => header.HintText = value;
+        }
 
         /// <summary>
         /// The maximum height of the dropdown's menu.
@@ -40,6 +44,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private FormDropdownHeader header = null!;
 
+        private const float header_menu_spacing = 5;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -47,6 +53,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             header.Caption = Caption;
             header.HintText = HintText;
+
+            // there's bottom margin applied inside the header to give spacing between the header and the menu.
+            // however when the menu is closed the extra spacing remains present. to remove it, apply negative bottom padding here.
+            Margin = new MarginPadding { Bottom = -header_menu_spacing };
         }
 
         protected override void LoadComplete()
@@ -135,6 +145,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             private FormFieldCaption caption = null!;
             private OsuSpriteText label = null!;
             private SpriteIcon chevron = null!;
+            private FormControlBackground background = null!;
 
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -145,44 +156,51 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Masking = true;
                 CornerRadius = 5;
 
-                Foreground.Padding = new MarginPadding(9);
+                // We use our own background for more control.
+                Background.Alpha = 0;
+
                 Foreground.Children = new Drawable[]
                 {
-                    new FillFlowContainer
+                    background = new FormControlBackground(),
+                    new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 4),
+                        Padding = new MarginPadding(9),
                         Children = new Drawable[]
                         {
-                            caption = new FormFieldCaption
-                            {
-                                Caption = Caption,
-                                TooltipText = HintText,
-                            },
-                            label = new TruncatingSpriteText
+                            new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Padding = new MarginPadding { Right = 25 },
-                                AlwaysPresent = true,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(0, 4),
+                                Children = new Drawable[]
+                                {
+                                    caption = new FormFieldCaption
+                                    {
+                                        Caption = Caption,
+                                        TooltipText = HintText,
+                                    },
+                                    label = new TruncatingSpriteText
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Padding = new MarginPadding { Right = 25 },
+                                        AlwaysPresent = true,
+                                    },
+                                }
+                            },
+                            chevron = new SpriteIcon
+                            {
+                                Icon = FontAwesome.Solid.ChevronDown,
+                                Anchor = Anchor.BottomRight,
+                                Origin = Anchor.BottomRight,
+                                Size = new Vector2(16),
+                                Margin = new MarginPadding { Right = 5 },
                             },
                         }
                     },
-                    chevron = new SpriteIcon
-                    {
-                        Icon = FontAwesome.Solid.ChevronDown,
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Size = new Vector2(16),
-                        Margin = new MarginPadding { Right = 5 },
-                    },
                 };
-
-                AddInternal(new HoverClickSounds
-                {
-                    Enabled = { BindTarget = Enabled },
-                });
             }
 
             protected override void LoadComplete()
@@ -228,25 +246,21 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 else
                     label.Alpha = 1;
 
-                BorderThickness = IsHovered || dropdownOpen ? 2 : 0;
-
                 if (Dropdown.Current.Disabled)
-                    BorderColour = colourProvider.Dark1;
-                else
-                    BorderColour = dropdownOpen ? colourProvider.Highlight1 : colourProvider.Light4;
-
-                if (dropdownOpen)
-                    Background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
+                    background.VisualStyle = VisualStyle.Disabled;
+                else if (dropdownOpen)
+                    background.VisualStyle = VisualStyle.Focused;
                 else if (IsHovered)
-                    Background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
+                    background.VisualStyle = VisualStyle.Hovered;
                 else
-                    Background.Colour = colourProvider.Background5;
+                    background.VisualStyle = VisualStyle.Normal;
             }
 
             private void updateChevron()
             {
                 bool open = Dropdown.Menu.State == MenuState.Open;
                 chevron.ScaleTo(open ? new Vector2(1f, -1f) : Vector2.One, 300, Easing.OutQuint);
+                chevron.MoveToY(open ? -chevron.DrawHeight : 0, 300, Easing.OutQuint);
             }
         }
 
@@ -278,10 +292,30 @@ namespace osu.Game.Graphics.UserInterfaceV2
             private void load(OverlayColourProvider colourProvider)
             {
                 ItemsContainer.Padding = new MarginPadding(9);
-                Margin = new MarginPadding { Top = 5 };
 
-                MaskingContainer.BorderThickness = 2;
+                MaskingContainer.BorderThickness = FormControlBackground.BORDER_THICKNESS;
+                MaskingContainer.CornerExponent = FormControlBackground.CORNER_EXPONENT;
                 MaskingContainer.BorderColour = colourProvider.Highlight1;
+            }
+
+            protected override void AnimateOpen()
+            {
+                base.AnimateOpen();
+
+                // there's negative bottom margin applied on the whole dropdown control to remove extra spacing when the menu is closed.
+                // however, when the menu is open, we want spacing between the menu and the next control below it. therefore apply bottom margin here.
+                // we use a transform to keep the open animation smooth while margin is adjusted.
+                this.TransformTo(nameof(Margin), new MarginPadding
+                {
+                    Top = header_menu_spacing,
+                    Bottom = header_menu_spacing
+                }, 50, Easing.OutQuint);
+            }
+
+            protected override void AnimateClose()
+            {
+                base.AnimateClose();
+                this.TransformTo(nameof(Margin), new MarginPadding { Bottom = 0 }, 300);
             }
         }
     }

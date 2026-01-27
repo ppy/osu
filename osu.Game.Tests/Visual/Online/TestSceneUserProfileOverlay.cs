@@ -240,6 +240,7 @@ namespace osu.Game.Tests.Visual.Online
             CoverUrl = TestResources.COVER_IMAGE_1,
             JoinDate = DateTimeOffset.Now.AddDays(-1),
             LastVisit = DateTimeOffset.Now,
+            PreviousUsernames = ["ForgetMe", "MySpaceLover", "i once was a man named enis", "mr anderson"],
             Groups = new[]
             {
                 new APIUserGroup { Colour = "#EB47D0", ShortName = "DEV", Name = "Developers" },

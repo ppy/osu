@@ -25,15 +25,15 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         [Resolved]
         private INotificationOverlay? notificationOverlay { get; set; }
 
-        private SettingsButton undeleteButton = null!;
-        private SettingsButton deleteAllButton = null!;
+        private SettingsButtonV2 undeleteButton = null!;
+        private SettingsButtonV2 deleteAllButton = null!;
 
         [BackgroundDependencyLoader]
         private void load(IDialogOverlay? dialogOverlay)
         {
             AddRange(new Drawable[]
             {
-                deleteAllButton = new DangerousSettingsButton
+                deleteAllButton = new DangerousSettingsButtonV2
                 {
                     Text = MaintenanceSettingsStrings.DeleteAllModPresets,
                     Action = () =>
@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         }, DeleteConfirmationContentStrings.ModPresets));
                     }
                 },
-                undeleteButton = new SettingsButton
+                undeleteButton = new SettingsButtonV2
                 {
                     Text = MaintenanceSettingsStrings.RestoreAllRecentlyDeletedModPresets,
                     Action = () => Task.Run(undeleteModPresets).ContinueWith(t => Schedule(onModPresetsUndeleted, t))
