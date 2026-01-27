@@ -55,6 +55,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double overallDifficulty;
         private double approachRate;
+        private double circleSize;
         private double drainRate;
 
         private double? speedDeviation;
@@ -99,6 +100,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             approachRate = OsuDifficultyCalculator.CalculateRateAdjustedApproachRate(difficulty.ApproachRate, clockRate);
             overallDifficulty = OsuDifficultyCalculator.CalculateRateAdjustedOverallDifficulty(difficulty.OverallDifficulty, clockRate);
+            circleSize = difficulty.CircleSize;
             drainRate = difficulty.DrainRate;
 
             double comboBasedEstimatedMissCount = calculateComboBasedEstimatedMissCount(osuAttributes);
@@ -510,23 +512,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         private double calculateTraceableBonus(double sliderFactor = 1)
         {
-            // Start from normal curve, rewarding lower AR up to AR7
-            double traceableBonus = 0.025 * (12.0 - Math.Max(approachRate, 7));
+            // We want to reward slider aim less, more so at higher CS to nerf maps such as C-Type, capped at squaring the original slider nerf
+            double highARSliderVisibilityFactor = (1 - ((1 - Math.Pow(sliderFactor, 3)) / 2)) * Math.Max(Math.Pow(Math.Min(-0.2 * circleSize + 2.2, 1), 1.8), 1 - ((1 - Math.Pow(sliderFactor, 3)) / 2));
+            double lowARSliderVisibilityFactor = Math.Pow(sliderFactor, 3) * Math.Max(Math.Pow(Math.Min(-0.2 * circleSize + 2.2, 1), 1.8), Math.Pow(sliderFactor, 3));
 
-            // We want to reward slider aim on low AR less
-            double sliderVisibilityFactor = Math.Pow(sliderFactor, 3);
+            // Start from normal curve, rewarding lower AR up to AR7
+            double traceableBonus = 0.025 * (12.0 - Math.Max(approachRate, 7)) * highARSliderVisibilityFactor;
 
             // For AR up to 0 - reduce reward for very low ARs when object is visible
             if (approachRate < 7)
-                traceableBonus += 0.02 * (7.0 - Math.Max(approachRate, 0)) * sliderVisibilityFactor;
+                traceableBonus += 0.02 * (7.0 - Math.Max(approachRate, 0)) * lowARSliderVisibilityFactor;
 
             // Starting from AR0 - cap values so they won't grow to infinity
             if (approachRate < 0)
-                traceableBonus += 0.01 * (1 - Math.Pow(1.5, approachRate)) * sliderVisibilityFactor;
+                traceableBonus += 0.01 * (1 - Math.Pow(1.5, approachRate)) * lowARSliderVisibilityFactor;
 
             // AR8+ and especially AR10.3+ TC increases difficulty due to increased circle location uncertainty
             if (approachRate > 8)
-                traceableBonus += 0.004 * Math.Pow(approachRate - 8, 2);
+                traceableBonus += 0.004 * Math.Pow(approachRate - 8, 2) * highARSliderVisibilityFactor * 1.05;
 
             return traceableBonus;
         }
