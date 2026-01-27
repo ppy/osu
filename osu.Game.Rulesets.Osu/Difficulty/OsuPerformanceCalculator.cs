@@ -524,6 +524,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (approachRate < 0)
                 traceableBonus += 0.01 * (1 - Math.Pow(1.5, approachRate)) * sliderVisibilityFactor;
 
+            // AR8+ and especially AR10.3+ TC increases difficulty due to increased circle location uncertainty
+            if (approachRate > 8)
+                traceableBonus += 0.004 * Math.Pow(approachRate - 8, 2);
+
             return traceableBonus;
         }
 
