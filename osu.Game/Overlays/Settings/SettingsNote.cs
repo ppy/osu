@@ -75,6 +75,7 @@ namespace osu.Game.Overlays.Settings
             // Explicitly use ClearTransforms to clear any existing auto-size transform before modifying size / flag.
             // TODO: This is dodgy as hell and needs to go.
             ClearTransforms(false, @"baseSize");
+            ClearTransforms(false, nameof(Height));
 
             if (Current.Value == null)
             {
