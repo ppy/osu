@@ -11,22 +11,22 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.SelectV2;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay
 {
     public partial class FooterButtonFreeModsV2 : ScreenFooterButton
     {
-        private const float bar_height = 30f;
-
         public readonly Bindable<IReadOnlyList<Mod>> FreeMods = new Bindable<IReadOnlyList<Mod>>([]);
         public readonly Bindable<bool> Freestyle = new Bindable<bool>();
 
@@ -44,7 +44,7 @@ namespace osu.Game.Screens.OnlinePlay
         private Container modsWedge = null!;
         private ModDisplay modDisplay = null!;
         private Container modContainer = null!;
-        private ModCountText overflowModCountDisplay = null!;
+        private FooterButtonMods.ModCountText overflowModCountDisplay = null!;
 
         public FooterButtonFreeModsV2(ModSelectOverlay overlay)
             : base(overlay)
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay
                 Origin = Anchor.BottomLeft,
                 Shear = OsuGame.SHEAR,
                 CornerRadius = CORNER_RADIUS,
-                Size = new Vector2(BUTTON_WIDTH, bar_height),
+                Size = new Vector2(BUTTON_WIDTH, FooterButtonMods.BAR_HEIGHT),
                 Masking = true,
                 EdgeEffect = new EdgeEffectParameters
                 {
@@ -90,11 +90,6 @@ namespace osu.Game.Screens.OnlinePlay
                         Masking = true,
                         Children = new Drawable[]
                         {
-                            new Box
-                            {
-                                Colour = colourProvider.Background3,
-                                RelativeSizeAxes = Axes.Both,
-                            },
                             modDisplay = new ModDisplay(showExtendedInformation: true)
                             {
                                 Anchor = Anchor.Centre,
@@ -104,10 +99,9 @@ namespace osu.Game.Screens.OnlinePlay
                                 Current = { BindTarget = FreeMods },
                                 ExpansionMode = ExpansionMode.AlwaysContracted,
                             },
-                            overflowModCountDisplay = new ModCountText
+                            overflowModCountDisplay = new FooterButtonMods.ModCountText
                             {
                                 Mods = { BindTarget = FreeMods },
-                                Freestyle = { BindTarget = Freestyle }
                             },
                         }
                     },
@@ -119,13 +113,17 @@ namespace osu.Game.Screens.OnlinePlay
         {
             base.LoadComplete();
 
-            Freestyle.BindValueChanged(f => Enabled.Value = !f.NewValue, true);
+            Freestyle.BindValueChanged(f =>
+            {
+                Enabled.Value = !f.NewValue;
+                overflowModCountDisplay.CustomText = f.NewValue ? ModSelectOverlayStrings.AllMods.ToUpper() : (LocalisableString?)null;
+            }, true);
             FreeMods.BindValueChanged(m =>
             {
-                if (m.NewValue.Count == 0)
-                    modsWedge.FadeOut(200);
+                if (m.NewValue.Count == 0 && !Freestyle.Value)
+                    modsWedge.FadeOut(300, Easing.OutExpo);
                 else
-                    modsWedge.FadeIn(200);
+                    modsWedge.FadeIn(300, Easing.OutExpo);
             }, true);
         }
 
@@ -133,58 +131,21 @@ namespace osu.Game.Screens.OnlinePlay
         {
             base.Update();
 
-            if (modDisplay.DrawWidth * modDisplay.Scale.X > modContainer.DrawWidth)
+            // If there are freemods selected but the display has no width, it's still loading.
+            // Don't update visibility in this state or we will cause an awkward flash.
+            if (FreeMods.Value.Count > 0 && Precision.AlmostEquals(modDisplay.DrawWidth, 0))
+                return;
+
+            bool showCountText =
+                // When freestyle is enabled this text shows "ALL MODS"
+                Freestyle.Value
+                // Standard flow where mods are overflowing so we show count text.
+                || modDisplay.DrawWidth * modDisplay.Scale.X > modContainer.DrawWidth;
+
+            if (showCountText)
                 overflowModCountDisplay.Show();
             else
                 overflowModCountDisplay.Hide();
-        }
-
-        private partial class ModCountText : CompositeDrawable
-        {
-            public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>();
-            public readonly Bindable<bool> Freestyle = new Bindable<bool>();
-
-            private OsuSpriteText text = null!;
-
-            [Resolved]
-            private OverlayColourProvider colourProvider { get; set; } = null!;
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                RelativeSizeAxes = Axes.Both;
-
-                InternalChildren = new Drawable[]
-                {
-                    new Box
-                    {
-                        Colour = colourProvider.Background3,
-                        Alpha = 0.8f,
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    text = new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Bold),
-                        Shear = -OsuGame.SHEAR,
-                    }
-                };
-
-                Mods.BindValueChanged(_ => updateText());
-                Freestyle.BindValueChanged(_ => updateText());
-
-                updateText();
-            }
-
-            private void updateText()
-            {
-                if (Freestyle.Value)
-                    text.Text = ModSelectOverlayStrings.AllMods.ToUpper();
-                else
-                    text.Text = ModSelectOverlayStrings.Mods(Mods.Value.Count).ToUpper();
-            }
         }
     }
 }
