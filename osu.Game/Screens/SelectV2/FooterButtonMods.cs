@@ -36,7 +36,8 @@ namespace osu.Game.Screens.SelectV2
     {
         public Action? RequestDeselectAllMods { get; init; }
 
-        private const float bar_height = 30f;
+        public const float BAR_HEIGHT = 30f;
+
         private const float mod_display_portion = 0.65f;
 
         private readonly BindableWithCurrent<IReadOnlyList<Mod>> current = new BindableWithCurrent<IReadOnlyList<Mod>>(Array.Empty<Mod>());
@@ -92,7 +93,7 @@ namespace osu.Game.Screens.SelectV2
                     Origin = Anchor.BottomLeft,
                     Shear = OsuGame.SHEAR,
                     CornerRadius = CORNER_RADIUS,
-                    Size = new Vector2(BUTTON_WIDTH, bar_height),
+                    Size = new Vector2(BUTTON_WIDTH, BAR_HEIGHT),
                     Masking = true,
                     EdgeEffect = new EdgeEffectParameters
                     {
@@ -257,9 +258,10 @@ namespace osu.Game.Screens.SelectV2
                 overflowModCountDisplay.Hide();
         }
 
-        private partial class ModCountText : CompositeDrawable, IHasCustomTooltip<IReadOnlyList<Mod>>
+        public partial class ModCountText : VisibilityContainer, IHasCustomTooltip<IReadOnlyList<Mod>>
         {
             public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>();
+            public readonly Bindable<bool> Freestyle = new Bindable<bool>();
 
             private OsuSpriteText text = null!;
 
@@ -289,12 +291,24 @@ namespace osu.Game.Screens.SelectV2
                     }
                 };
 
-                Mods.BindValueChanged(v => text.Text = ModSelectOverlayStrings.Mods(v.NewValue.Count).ToUpper(), true);
+                Freestyle.BindValueChanged(_ => updateText());
+                Mods.BindValueChanged(_ => updateText(), true);
             }
 
             public ITooltip<IReadOnlyList<Mod>> GetCustomTooltip() => new ModOverflowTooltip(colourProvider);
 
             public IReadOnlyList<Mod>? TooltipContent => Mods.Value;
+
+            protected override void PopIn() => this.FadeIn(300, Easing.OutExpo);
+            protected override void PopOut() => this.FadeOut(300, Easing.OutExpo);
+
+            private void updateText()
+            {
+                if (Freestyle.Value)
+                    text.Text = ModSelectOverlayStrings.AllMods.ToUpper();
+                else
+                    text.Text = ModSelectOverlayStrings.Mods(Mods.Value.Count).ToUpper();
+            }
 
             public partial class ModOverflowTooltip : VisibilityContainer, ITooltip<IReadOnlyList<Mod>>
             {
@@ -356,7 +370,7 @@ namespace osu.Game.Screens.SelectV2
                 Shear = OsuGame.SHEAR;
                 CornerRadius = CORNER_RADIUS;
                 AutoSizeAxes = Axes.X;
-                Height = bar_height;
+                Height = BAR_HEIGHT;
                 Masking = true;
                 BorderColour = Color4.White;
                 BorderThickness = 2f;
