@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double currentAimStrain;
         private double currentSpeedStrain;
 
-        private double skillMultiplierAim => 25.6;
+        private double skillMultiplierAim => 25.7;
         private double skillMultiplierSpeed => 1.5;
         private double skillMultiplierTotal => 1.00;
         private double meanExponent => 1.2;
