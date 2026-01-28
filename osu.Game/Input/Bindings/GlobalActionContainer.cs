@@ -105,8 +105,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
 
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.R }, GlobalAction.RandomSkin),
-            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.T }, GlobalAction.NextSkin),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.E }, GlobalAction.PreviousSkin),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.T }, GlobalAction.NextSkin),
 
             new KeyBinding(InputKey.F10, GlobalAction.ToggleGameplayMouseButtons),
             new KeyBinding(InputKey.F12, GlobalAction.TakeScreenshot),

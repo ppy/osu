@@ -201,8 +201,8 @@ namespace osu.Game.Screens.Menu
                 case 23:
                     return MenuTipStrings.SkinChangeShortcuts([
                         keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.RandomSkin).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding,
+                        keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.PreviousSkin).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding,
                         keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.NextSkin).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding,
-                        keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.PreviousSkin).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding
                     ]);
 
                 case 24:
