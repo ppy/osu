@@ -19,6 +19,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Multiplayer.Countdown;
+using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
@@ -687,6 +688,9 @@ namespace osu.Game.Online.Multiplayer
 
                 // TODO: user should NEVER be null here, see https://github.com/ppy/osu/issues/17713.
                 if (user == null)
+                    return;
+
+                if (state is TeamVersusUserState && Room.MatchState is not TeamVersusRoomState)
                     return;
 
                 user.MatchState = state;

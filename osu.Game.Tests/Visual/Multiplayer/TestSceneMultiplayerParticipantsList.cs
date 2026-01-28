@@ -479,6 +479,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 () => Is.EqualTo(1));
         }
 
+        [Test]
+        public void TestSwitchRoomTypeAwayFromTeams()
+        {
+            AddStep("enable teams", () => MultiplayerClient.ChangeSettings(matchType: MatchType.TeamVersus));
+            int id = 3;
+            AddRepeatStep("add users", () => MultiplayerClient.AddUser(new APIUser
+            {
+                Id = Interlocked.Increment(ref id),
+                Username = $"user {id}",
+                CoverUrl = TestResources.COVER_IMAGE_3,
+            }), 10);
+            AddStep("disable teams", () => MultiplayerClient.ChangeSettings(matchType: MatchType.HeadToHead));
+            // simulate a situation where a team change event arrives after the match type was changed away from team
+            AddStep("update user with team versus state", () =>
+            {
+                var user = MultiplayerClient.ClientRoom!.Users.First();
+                (MultiplayerClient as IMultiplayerClient).MatchUserStateChanged(user.UserID, new TeamVersusUserState()).FireAndForget();
+            });
+            AddAssert("no team indicator is present", () => this.ChildrenOfType<TeamDisplay>().All(d => d.DisplayedTeam == null));
+        }
+
         private void createNewParticipantsList()
         {
             ParticipantsList? participantsList = null;
