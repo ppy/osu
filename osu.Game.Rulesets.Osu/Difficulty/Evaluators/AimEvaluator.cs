@@ -111,7 +111,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 wideAngleBonus *= angleBonus * Math.Pow(DifficultyCalculationUtils.ReverseLerp(currDistance, 0, SpeedAimEvaluator.SINGLE_SPACING_THRESHOLD), SpeedAimEvaluator.DISTANCE_EXPONENT);
 
                 // Do same as above for previous wide angle bonus
-                double prevWideAngleBonus = calcWideAngleBonus(lastAngle) * prevAngleBonus * DifficultyCalculationUtils.Smootherstep(osuLastObj.LazyJumpDistance, 0, diameter);
+                double prevWideAngleBonus = calcWideAngleBonus(lastAngle);
+                prevWideAngleBonus *= prevAngleBonus * Math.Pow(DifficultyCalculationUtils.ReverseLerp(prevDistance, 0, SpeedAimEvaluator.SINGLE_SPACING_THRESHOLD), SpeedAimEvaluator.DISTANCE_EXPONENT);
+
                 double bonusRatio = Math.Min(wideAngleBonus, prevWideAngleBonus) / Math.Max(wideAngleBonus, prevWideAngleBonus);
 
                 // Penalize angle repetition, but only if the last angle had a big bonus.
