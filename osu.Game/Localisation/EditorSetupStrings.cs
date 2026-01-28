@@ -189,6 +189,11 @@ namespace osu.Game.Localisation
         public static LocalisableString AudioTrack => new TranslatableString(getKey(@"audio_track"), @"Audio Track");
 
         /// <summary>
+        /// "Custom sample sets"
+        /// </summary>
+        public static LocalisableString CustomSampleSets => new TranslatableString(getKey(@"custom_sample_sets"), @"Custom sample sets");
+
+        /// <summary>
         /// "Click to select a track"
         /// </summary>
         public static LocalisableString ClickToSelectTrack => new TranslatableString(getKey(@"click_to_select_track"), @"Click to select a track");
