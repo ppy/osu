@@ -27,7 +27,7 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.RankedPlay
         /// A multiplier applied to life point damage.
         /// </summary>
         [Key(2)]
-        public double DamageMultiplier { get; set; }
+        public double DamageMultiplier { get; set; } = 1;
 
         /// <summary>
         /// A dictionary containing all users in the room.
@@ -39,7 +39,7 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.RankedPlay
         /// The ID of the user currently playing a card.
         /// </summary>
         [Key(4)]
-        public int ActiveUserId { get; set; }
+        public int? ActiveUserId { get; set; }
 
         /// <summary>
         /// The average star rating of all cards.
@@ -57,7 +57,7 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.RankedPlay
         /// The user currently playing a card.
         /// </summary>
         [IgnoreMember]
-        public RankedPlayUserInfo ActiveUser => Users[ActiveUserId];
+        public RankedPlayUserInfo? ActiveUser => ActiveUserId == null ? null : Users[ActiveUserId.Value];
 
         [IgnoreMember]
         public RankedPlayUserInfo? WinningUser => WinningUserId == null ? null : Users[WinningUserId.Value];
