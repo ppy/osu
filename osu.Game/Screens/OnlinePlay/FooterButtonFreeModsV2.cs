@@ -122,7 +122,7 @@ namespace osu.Game.Screens.OnlinePlay
             Freestyle.BindValueChanged(f => Enabled.Value = !f.NewValue, true);
             FreeMods.BindValueChanged(m =>
             {
-                if (m.NewValue.Count == 0)
+                if (m.NewValue.Count == 0 && !Freestyle.Value)
                     modsWedge.FadeOut(200);
                 else
                     modsWedge.FadeIn(200);
@@ -133,7 +133,7 @@ namespace osu.Game.Screens.OnlinePlay
         {
             base.Update();
 
-            if (modDisplay.DrawWidth * modDisplay.Scale.X > modContainer.DrawWidth)
+            if (Freestyle.Value || modDisplay.DrawWidth * modDisplay.Scale.X > modContainer.DrawWidth)
                 overflowModCountDisplay.Show();
             else
                 overflowModCountDisplay.Hide();
