@@ -156,7 +156,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private async Task populateAvailablePools()
         {
-            MatchmakingPool[] pools = await client.GetMatchmakingPools().ConfigureAwait(false);
+            MatchmakingPool[] pools = await client.GetMatchmakingPoolsOfType(MatchmakingPoolType.QuickPlay).ConfigureAwait(false);
 
             Schedule(() =>
             {
