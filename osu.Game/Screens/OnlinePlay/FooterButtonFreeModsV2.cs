@@ -5,11 +5,13 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
@@ -100,7 +102,6 @@ namespace osu.Game.Screens.OnlinePlay
                             overflowModCountDisplay = new FooterButtonMods.ModCountText
                             {
                                 Mods = { BindTarget = FreeMods },
-                                Freestyle = { BindTarget = Freestyle }
                             },
                         }
                     },
@@ -112,7 +113,11 @@ namespace osu.Game.Screens.OnlinePlay
         {
             base.LoadComplete();
 
-            Freestyle.BindValueChanged(f => Enabled.Value = !f.NewValue, true);
+            Freestyle.BindValueChanged(f =>
+            {
+                Enabled.Value = !f.NewValue;
+                overflowModCountDisplay.CustomText = f.NewValue ? ModSelectOverlayStrings.AllMods.ToUpper() : (LocalisableString?)null;
+            }, true);
             FreeMods.BindValueChanged(m =>
             {
                 if (m.NewValue.Count == 0 && !Freestyle.Value)
