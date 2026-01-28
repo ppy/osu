@@ -5,6 +5,7 @@ using System;
 using MessagePack;
 using osu.Game.Online.Matchmaking.Events;
 using osu.Game.Online.Multiplayer.Countdown;
+using osu.Game.Online.RankedPlay;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -17,6 +18,7 @@ namespace osu.Game.Online.Multiplayer
     [Union(0, typeof(CountdownStartedEvent))]
     [Union(1, typeof(CountdownStoppedEvent))]
     [Union(2, typeof(MatchmakingAvatarActionEvent))]
+    [Union(3, typeof(RankedPlayCardHandReplayEvent))]
     public abstract class MatchServerEvent
     {
     }
