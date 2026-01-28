@@ -312,7 +312,7 @@ namespace osu.Game.Screens.SelectV2
 
             public partial class ModOverflowTooltip : VisibilityContainer, ITooltip<IReadOnlyList<Mod>>
             {
-                private ModDisplay extendedModDisplay = null!;
+                private ModFlowDisplay extendedModDisplay = null!;
 
                 [Cached]
                 private OverlayColourProvider colourProvider;
@@ -336,11 +336,12 @@ namespace osu.Game.Screens.SelectV2
                             RelativeSizeAxes = Axes.Both,
                             Colour = colourProvider.Background5,
                         },
-                        extendedModDisplay = new ModDisplay
+                        extendedModDisplay = new ModFlowDisplay
                         {
+                            AutoSizeAxes = Axes.Both,
+                            MaximumSize = new Vector2(400, 0),
                             Margin = new MarginPadding { Vertical = 2f, Horizontal = 10f },
                             Scale = new Vector2(0.6f),
-                            ExpansionMode = ExpansionMode.AlwaysExpanded,
                         },
                     };
                 }
