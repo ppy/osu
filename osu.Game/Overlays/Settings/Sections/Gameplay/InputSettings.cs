@@ -20,18 +20,6 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         {
             Children = new Drawable[]
             {
-                new SettingsItemV2(new FormSliderBar<float>
-                {
-                    Caption = SkinSettingsStrings.GameplayCursorSize,
-                    Current = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
-                    KeyboardStep = 0.01f,
-                    LabelFormat = v => $"{v:0.##}x"
-                }),
-                new SettingsItemV2(new FormCheckBox
-                {
-                    Caption = SkinSettingsStrings.AutoCursorSize,
-                    Current = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
-                }),
                 new SettingsItemV2(new FormCheckBox
                 {
                     Caption = SkinSettingsStrings.GameplayCursorDuringTouch,

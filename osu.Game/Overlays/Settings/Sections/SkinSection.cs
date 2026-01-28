@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -61,7 +62,7 @@ namespace osu.Game.Overlays.Settings.Sections
         private IDisposable realmSubscription;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load([CanBeNull] SkinEditorOverlay skinEditor)
+        private void load([CanBeNull] SkinEditorOverlay skinEditor, OsuConfigManager config)
         {
             Children = new Drawable[]
             {
@@ -91,6 +92,18 @@ namespace osu.Game.Overlays.Settings.Sections
                     Text = SkinSettingsStrings.SkinLayoutEditor,
                     Action = () => skinEditor?.ToggleVisibility(),
                 },
+                new SettingsItemV2(new FormSliderBar<float>
+                {
+                    Caption = SkinSettingsStrings.GameplayCursorSize,
+                    Current = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
+                    KeyboardStep = 0.01f,
+                    LabelFormat = v => $"{v:0.##}x"
+                }),
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = SkinSettingsStrings.AutoCursorSize,
+                    Current = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
+                }),
             };
         }
 
