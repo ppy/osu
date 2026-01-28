@@ -52,11 +52,11 @@ namespace osu.Game.Beatmaps
 
                 foreach (BeatmapInfo beatmap in beatmapSet.Beatmaps)
                 {
-                    difficultyCache.Invalidate(beatmap);
-
                     var working = workingBeatmapCache.GetWorkingBeatmap(beatmap);
-                    var ruleset = working.BeatmapInfo.Ruleset.CreateInstance();
 
+                    difficultyCache.Invalidate(beatmap, working.BeatmapInfo);
+
+                    var ruleset = working.BeatmapInfo.Ruleset.CreateInstance();
                     var calculator = ruleset.CreateDifficultyCalculator(working);
 
                     beatmap.StarRating = calculator.Calculate().StarRating;
