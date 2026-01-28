@@ -31,8 +31,8 @@ namespace osu.Game.Overlays
     {
         public const float CONTENT_MARGINS = 20;
 
-        // extra margin to give room to the revert-to-default button in settings controls.
-        public const float CONTENT_MARGINS_RIGHT = 30;
+        // extra right padding to give room to the revert-to-default button in settings controls.
+        public static readonly MarginPadding CONTENT_PADDING = new MarginPadding { Left = 12, Right = 22 };
 
         public const float TRANSITION_LENGTH = 600;
 
@@ -133,8 +133,9 @@ namespace osu.Game.Overlays
                         AutoSizeAxes = Axes.Y,
                         Padding = new MarginPadding
                         {
-                            Vertical = 20,
-                            Horizontal = CONTENT_MARGINS
+                            Vertical = 6,
+                            Left = CONTENT_PADDING.Left,
+                            Right = CONTENT_PADDING.Right,
                         },
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
@@ -323,7 +324,7 @@ namespace osu.Game.Overlays
             {
                 HeaderBackground = new Box
                 {
-                    Colour = colourProvider.Background4,
+                    Colour = colourProvider.Background5,
                     RelativeSizeAxes = Axes.Both
                 };
 

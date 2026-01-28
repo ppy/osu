@@ -3,9 +3,10 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.UserInterface
@@ -19,29 +20,33 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
         {
             Children = new Drawable[]
             {
-                new SettingsCheckbox
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = UserInterfaceStrings.CursorRotation,
+                    Caption = UserInterfaceStrings.CursorRotation,
                     Current = config.GetBindable<bool>(OsuSetting.CursorRotation)
-                },
-                new SettingsSlider<float, SizeSlider<float>>
+                }),
+                new SettingsItemV2(new FormSliderBar<float>
                 {
-                    LabelText = UserInterfaceStrings.MenuCursorSize,
+                    Caption = UserInterfaceStrings.MenuCursorSize,
                     Current = config.GetBindable<float>(OsuSetting.MenuCursorSize),
-                    KeyboardStep = 0.01f
-                },
-                new SettingsCheckbox
+                    KeyboardStep = 0.01f,
+                    LabelFormat = v => $"{v:0.##}x"
+                }),
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = UserInterfaceStrings.Parallax,
+                    Caption = UserInterfaceStrings.Parallax,
                     Current = config.GetBindable<bool>(OsuSetting.MenuParallax)
-                },
-                new SettingsSlider<double, TimeSlider>
+                }),
+                new SettingsItemV2(new FormSliderBar<double>
                 {
-                    ClassicDefault = 0,
-                    LabelText = UserInterfaceStrings.HoldToConfirmActivationTime,
+                    Caption = UserInterfaceStrings.HoldToConfirmActivationTime,
                     Current = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay),
+                    KeyboardStep = 50,
+                    LabelFormat = v => $"{v:N0} ms",
+                })
+                {
                     Keywords = new[] { @"delay" },
-                    KeyboardStep = 50
+                    ApplyClassicDefault = c => ((IHasCurrentValue<double>)c).Current.Value = 0,
                 },
             };
         }

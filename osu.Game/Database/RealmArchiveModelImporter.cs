@@ -474,8 +474,10 @@ namespace osu.Game.Database
 
             foreach (RealmNamedFileUsage file in item.Files.Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f.Filename))
             {
-                using (Stream s = Files.Store.GetStream(file.File.GetStoragePath()))
-                    s.CopyTo(hashable);
+                using (Stream? s = Files.Store.GetStream(file.File.GetStoragePath()))
+                {
+                    s?.CopyTo(hashable);
+                }
             }
 
             if (hashable.Length > 0)

@@ -10,7 +10,8 @@ namespace osu.Game.Online.Matchmaking
         /// <summary>
         /// Retrieves all active matchmaking pools.
         /// </summary>
-        Task<MatchmakingPool[]> GetMatchmakingPools();
+        /// <param name="type"></param>
+        Task<MatchmakingPool[]> GetMatchmakingPoolsOfType(MatchmakingPoolType type);
 
         /// <summary>
         /// Joins the matchmaking lobby, allowing the local user to receive status updates.

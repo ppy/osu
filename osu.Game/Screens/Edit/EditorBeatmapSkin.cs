@@ -20,6 +20,12 @@ namespace osu.Game.Screens.Edit
     /// </summary>
     public class EditorBeatmapSkin : ISkin, IDisposable
     {
+        /// <summary>
+        /// Invoked when the beatmap skin changes.
+        /// This event is not locally scheduled to update thread or otherwise marshalled
+        /// in a way that would prevent invocation of a callback registered by a potentially-now-disposed caller.
+        /// Callers are expected to schedule locally as required.
+        /// </summary>
         public event Action? BeatmapSkinChanged;
 
         /// <summary>
@@ -101,7 +107,10 @@ namespace osu.Game.Screens.Edit
 
             string[] possiblePrefixes = possibleSounds.SelectMany(sound => possibleBanks.Select(bank => $@"{bank}-{sound}")).ToArray();
 
-            Dictionary<int, SampleSet> sampleSets = new Dictionary<int, SampleSet>();
+            Dictionary<int, SampleSet> sampleSets = new Dictionary<int, SampleSet>
+            {
+                [1] = new SampleSet(1),
+            };
 
             if (Skin.Samples != null)
             {
@@ -117,7 +126,7 @@ namespace osu.Game.Screens.Edit
 
                         if (string.IsNullOrEmpty(indexString))
                             index = 1;
-                        if (int.TryParse(indexString, out int parsed))
+                        if (int.TryParse(indexString, out int parsed) && parsed >= 2)
                             index = parsed;
 
                         if (!index.HasValue)

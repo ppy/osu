@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.Dialog;
@@ -20,8 +21,10 @@ namespace osu.Game.Overlays.Settings.Sections.General
     {
         protected override LocalisableString Header => GeneralSettingsStrings.UpdateHeader;
 
-        private SettingsButton checkForUpdatesButton = null!;
-        private SettingsEnumDropdown<ReleaseStream> releaseStreamDropdown = null!;
+        private SettingsButtonV2 checkForUpdatesButton = null!;
+        private FormEnumDropdown<ReleaseStream> releaseStreamDropdown = null!;
+
+        private readonly Bindable<SettingsNote.Data?> releaseStreamDropdownNote = new Bindable<SettingsNote.Data?>();
 
         private readonly Bindable<ReleaseStream> configReleaseStream = new Bindable<ReleaseStream>();
 
@@ -47,26 +50,28 @@ namespace osu.Game.Overlays.Settings.Sections.General
             // For simplicity, hide the concept of release streams from mobile users.
             if (isDesktop)
             {
-                Add(releaseStreamDropdown = new SettingsEnumDropdown<ReleaseStream>
+                Add(new SettingsItemV2(releaseStreamDropdown = new FormEnumDropdown<ReleaseStream>
                 {
-                    LabelText = GeneralSettingsStrings.ReleaseStream,
+                    Caption = GeneralSettingsStrings.ReleaseStream,
                     Current = { Value = configReleaseStream.Value },
+                })
+                {
                     Keywords = new[] { @"version" },
+                    ShowRevertToDefaultButton = updateManager!.FixedReleaseStream == null
                 });
 
                 if (updateManager!.FixedReleaseStream != null)
                 {
                     configReleaseStream.Value = updateManager.FixedReleaseStream.Value;
 
-                    releaseStreamDropdown.ShowsDefaultIndicator = false;
                     releaseStreamDropdown.Items = [updateManager.FixedReleaseStream.Value];
-                    releaseStreamDropdown.SetNoticeText(GeneralSettingsStrings.ChangeReleaseStreamPackageManagerWarning);
+                    releaseStreamDropdownNote.Value = new SettingsNote.Data(GeneralSettingsStrings.ChangeReleaseStreamPackageManagerWarning, SettingsNote.Type.Warning);
                 }
 
                 releaseStreamDropdown.Current.BindValueChanged(releaseStreamChanged);
             }
 
-            Add(checkForUpdatesButton = new SettingsButton
+            Add(checkForUpdatesButton = new SettingsButtonV2
             {
                 Text = GeneralSettingsStrings.CheckUpdate,
                 Action = () => checkForUpdates().FireAndForget()

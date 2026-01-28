@@ -1129,7 +1129,7 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
-        public abstract Task<MatchmakingPool[]> GetMatchmakingPools();
+        public abstract Task<MatchmakingPool[]> GetMatchmakingPoolsOfType(MatchmakingPoolType type);
 
         public abstract Task MatchmakingJoinLobby();
 

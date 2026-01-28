@@ -91,7 +91,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.RoundResults
 
                 var request = new IndexPlaylistScoresRequest(client.Room.RoomID, client.Room.Settings.PlaylistItemId);
                 request.Success += req => scoreTask.SetResult(req.Scores);
-                request.Failure += e => scoreTask.SetException(e);
+                request.Failure += scoreTask.SetException;
                 api.Queue(request);
 
                 await Task.WhenAll(beatmapTask, scoreTask.Task).ConfigureAwait(false);
