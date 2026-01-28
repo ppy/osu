@@ -104,10 +104,7 @@ namespace osu.Game.Tests.Database
                     Assert.AreNotEqual(detachedBeatmapSet.Status, BeatmapOnlineStatus.Ranked);
                     detachedBeatmapSet.Status = BeatmapOnlineStatus.Ranked;
 
-                    beatmapSet.PerformWrite(s =>
-                    {
-                        detachedBeatmapSet.CopyChangesToRealm(s);
-                    });
+                    beatmapSet.PerformWrite(detachedBeatmapSet.CopyChangesToRealm);
 
                     beatmapSet.PerformRead(s =>
                     {

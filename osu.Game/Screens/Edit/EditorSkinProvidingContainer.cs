@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Edit
             base.LoadComplete();
 
             if (beatmapSkin != null)
-                beatmapSkin.BeatmapSkinChanged += TriggerSourceChanged;
+                beatmapSkin.BeatmapSkinChanged += triggerSourceChanged;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -32,7 +32,9 @@ namespace osu.Game.Screens.Edit
             base.Dispose(isDisposing);
 
             if (beatmapSkin != null)
-                beatmapSkin.BeatmapSkinChanged -= TriggerSourceChanged;
+                beatmapSkin.BeatmapSkinChanged -= triggerSourceChanged;
         }
+
+        private void triggerSourceChanged() => Schedule(TriggerSourceChanged);
     }
 }

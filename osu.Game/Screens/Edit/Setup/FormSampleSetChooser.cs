@@ -13,6 +13,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -22,7 +23,7 @@ namespace osu.Game.Screens.Edit.Setup
 
         public FormSampleSetChooser()
         {
-            Caption = "Custom sample sets";
+            Caption = EditorSetupStrings.CustomSampleSets;
         }
 
         [BackgroundDependencyLoader]
@@ -37,9 +38,9 @@ namespace osu.Game.Screens.Edit.Setup
 
             populateItems();
             if (beatmapSkin != null)
-                beatmapSkin.BeatmapSkinChanged += populateItems;
+                beatmapSkin.BeatmapSkinChanged += scheduleItemPopulation;
 
-            Current.Value = Items.FirstOrDefault(i => i?.SampleSetIndex > 0);
+            Current.Value = Items.First(i => i?.SampleSetIndex > 0);
             Current.BindValueChanged(val =>
             {
                 if (val.NewValue?.SampleSetIndex == -1)
@@ -49,10 +50,12 @@ namespace osu.Game.Screens.Edit.Setup
 
         private void populateItems()
         {
-            var items = beatmapSkin?.GetAvailableSampleSets().ToList() ?? [];
+            var items = beatmapSkin?.GetAvailableSampleSets().ToList() ?? [new EditorBeatmapSkin.SampleSet(1)];
             items.Add(new EditorBeatmapSkin.SampleSet(-1, "Add new..."));
             Items = items;
         }
+
+        private void scheduleItemPopulation() => Schedule(populateItems);
 
         protected override LocalisableString GenerateItemText(EditorBeatmapSkin.SampleSet? item)
         {
@@ -88,7 +91,7 @@ namespace osu.Game.Screens.Edit.Setup
         protected override void Dispose(bool isDisposing)
         {
             if (beatmapSkin != null)
-                beatmapSkin.BeatmapSkinChanged -= populateItems;
+                beatmapSkin.BeatmapSkinChanged -= scheduleItemPopulation;
 
             base.Dispose(isDisposing);
         }
@@ -120,7 +123,8 @@ namespace osu.Game.Screens.Edit.Setup
                 };
                 numberBox.OnCommit += (_, _) =>
                 {
-                    committedIndex = int.Parse(numberBox.Current.Value);
+                    if (int.TryParse(numberBox.Current.Value, out int parsed))
+                        committedIndex = parsed;
                     Hide();
                 };
             }
