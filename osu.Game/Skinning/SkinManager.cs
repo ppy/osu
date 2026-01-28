@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -65,6 +66,12 @@ namespace osu.Game.Skinning
         private Skin trianglesSkin { get; }
 
         private Skin retroSkin { get; }
+
+        private static readonly Live<SkinInfo> random_skin_info = new SkinInfo
+        {
+            ID = SkinInfo.RANDOM_SKIN,
+            Name = "<Random Skin>",
+        }.ToLiveUnmanaged();
 
         public override bool PauseImports
         {
@@ -135,37 +142,31 @@ namespace osu.Game.Skinning
         /// Inserts the defaults first, then 'random skin', then custom ones.
         /// Returns a list of <see cref="Live{SkinInfo}"/> items.
         /// </summary>
-        public IEnumerable<Live<SkinInfo>> GetAllUsableSkins()
+        public IList<Live<SkinInfo>> GetAllUsableSkins()
         {
-            var results = new List<Live<SkinInfo>>();
+            var skins = new List<Live<SkinInfo>>();
 
-            Realm.Run(r =>
+            Realm.Run(realm =>
             {
-                var all = r.All<SkinInfo>()
-                           .Where(s => !s.DeletePending)
-                           .OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase)
-                           .ToArray();
+                skins.Add(realm.Find<SkinInfo>(SkinInfo.ARGON_SKIN).ToLive(Realm));
+                skins.Add(realm.Find<SkinInfo>(SkinInfo.ARGON_PRO_SKIN).ToLive(Realm));
+                skins.Add(realm.Find<SkinInfo>(SkinInfo.TRIANGLES_SKIN).ToLive(Realm));
+                skins.Add(realm.Find<SkinInfo>(SkinInfo.CLASSIC_SKIN).ToLive(Realm));
+                skins.Add(realm.Find<SkinInfo>(SkinInfo.RETRO_SKIN).ToLive(Realm));
 
-                // add defaults in fixed order (assumes they exist in the DB)
-                results.Add(all.Single(s => s.ID == SkinInfo.ARGON_SKIN).ToLive(Realm));
-                results.Add(all.Single(s => s.ID == SkinInfo.ARGON_PRO_SKIN).ToLive(Realm));
-                results.Add(all.Single(s => s.ID == SkinInfo.TRIANGLES_SKIN).ToLive(Realm));
-                results.Add(all.Single(s => s.ID == SkinInfo.CLASSIC_SKIN).ToLive(Realm));
-                results.Add(all.Single(s => s.ID == SkinInfo.RETRO_SKIN).ToLive(Realm));
+                skins.Add(random_skin_info);
 
-                // random entry (unmanaged/live-unrelated)
-                results.Add(new SkinInfo
-                {
-                    ID = SkinInfo.RANDOM_SKIN,
-                    Name = "<Random Skin>"
-                }.ToLiveUnmanaged());
+                var userSkins = realm.All<SkinInfo>()
+                                     .Where(s => !s.DeletePending && !s.Protected)
+                                     .OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase)
+                                     .AsEnumerable()
+                                     .Select(s => s.ToLive(Realm));
 
-                // append remaining non-protected skins (keeping the ordering from the realm query)
-                foreach (var s in all.Where(s => !s.Protected))
-                    results.Add(s.ToLive(Realm));
+                foreach (var s in userSkins.Where(s => !s.Value.Protected))
+                    skins.Add(s);
             });
 
-            return results;
+            return skins;
         }
 
         public void SelectRandomSkin()
@@ -196,52 +197,39 @@ namespace osu.Game.Skinning
             });
         }
 
-        /// <summary>
-        /// Cycle through skins.
-        /// Uses the skin selection UI ordering but skips the "Random Skin" entry.
-        /// </summary>
-        /// <param name="reverse">Optionally cycle in reverse.</param>
-        private void cycleSkins(bool reverse = false)
+        private void cycleSkins(int direction)
         {
+            Debug.Assert(direction != 0);
+
             // don't change selection if current skin is externally disabled/mounted for editing.
             if (CurrentSkinInfo.Disabled)
                 return;
 
-            var availableSkins = GetAllUsableSkins().ToArray();
+            var skins = GetAllUsableSkins();
 
-            int currentIndex = Array.FindIndex(availableSkins, s => s.ID == CurrentSkinInfo.Value.ID);
+            int i = skins.IndexOf(CurrentSkinInfo.Value);
 
             // If the current skin isn't selectable anymore, start from the top.
-            if (currentIndex == -1)
-                currentIndex = 0;
-
-            int desiredIndex = currentIndex;
+            if (i < 0 && direction < 0)
+                i = 0;
 
             do
             {
-                if (!reverse)
-                    desiredIndex = (desiredIndex + 1) % availableSkins.Length;
-                else
-                    desiredIndex = (desiredIndex - 1 + availableSkins.Length) % availableSkins.Length;
-            } while (availableSkins[desiredIndex].ID == SkinInfo.RANDOM_SKIN);
+                i = (i + direction + skins.Count) % skins.Count;
+            } while (skins[i].ID == SkinInfo.RANDOM_SKIN);
 
-            Realm.Run(r =>
-            {
-                var chosenSkin = r.Find<SkinInfo>(availableSkins[desiredIndex].ID);
-
-                CurrentSkinInfo.Value = chosenSkin.ToLive(Realm);
-            });
+            CurrentSkinInfo.Value = skins[i];
         }
 
         /// <summary>
         /// Cycle one skin backward.
         /// </summary>
-        public void SelectPreviousSkin() => cycleSkins(reverse: true);
+        public void SelectPreviousSkin() => cycleSkins(-1);
 
         /// <summary>
         /// Cycle one skin forward.
         /// </summary>
-        public void SelectNextSkin() => cycleSkins();
+        public void SelectNextSkin() => cycleSkins(1);
 
         /// <summary>
         /// Retrieve a <see cref="Skin"/> instance for the provided <see cref="SkinInfo"/>
