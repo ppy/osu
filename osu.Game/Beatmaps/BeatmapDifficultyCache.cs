@@ -82,8 +82,11 @@ namespace osu.Game.Beatmaps
                 modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
                 modSettingChangeTracker.SettingChanged += _ =>
                 {
-                    debouncedModSettingsChange?.Cancel();
-                    debouncedModSettingsChange = Scheduler.AddDelayed(updateTrackedBindables, 100);
+                    lock (bindableUpdateLock)
+                    {
+                        debouncedModSettingsChange?.Cancel();
+                        debouncedModSettingsChange = Scheduler.AddDelayed(updateTrackedBindables, 100);
+                    }
                 };
             }, true);
         }
@@ -195,6 +198,9 @@ namespace osu.Game.Beatmaps
         {
             lock (bindableUpdateLock)
             {
+                debouncedModSettingsChange?.Cancel();
+                debouncedModSettingsChange = null;
+
                 trackedUpdateCancellationSource.Cancel();
                 trackedUpdateCancellationSource = new CancellationTokenSource();
 
