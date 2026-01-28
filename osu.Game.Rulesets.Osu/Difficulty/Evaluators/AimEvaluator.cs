@@ -69,6 +69,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double sliderBonus = 0;
             double velocityChangeBonus = 0;
             double wiggleBonus = 0;
+            double angleRepetitionPenalty = 0;
 
             double aimStrain = currVelocity; // Start strain with regular velocity.
 
@@ -125,6 +126,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                         wideAngleBonus *= 1 - 0.35 * (1 - distance);
                     }
                 }
+
+                double repetitionRatio = lastAngle == Math.PI ? 0 : 
+                                        Math.Pow(Math.Cos(currAngle / 2) / Math.Cos(lastAngle / 2), 2);
+                repetitionRatio = repetitionRatio > 1 ? 1 / repetitionRatio : repetitionRatio;
+                angleRepetitionPenalty = 0.1 * repetitionRatio;
             }
 
             if (Math.Max(prevVelocity, currVelocity) != 0)
@@ -153,6 +159,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Reward sliders based on velocity.
                 sliderBonus = osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
             }
+            
+            // Nerf aim strain for repeated angles
+            aimStrain *= (1 - angleRepetitionPenalty);
 
             aimStrain += wiggleBonus * wiggle_multiplier;
             aimStrain += velocityChangeBonus * velocity_change_multiplier;
