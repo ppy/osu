@@ -11,6 +11,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class SpeedAimEvaluator
     {
         public const double SINGLE_SPACING_THRESHOLD = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25; // 1.25 circles distance between centers
+        public const double DISTANCE_EXPONENT = 3.9;
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
@@ -33,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             distance = Math.Min(distance, SINGLE_SPACING_THRESHOLD);
 
             // Max distance bonus is 1 * `distance_multiplier` at single_spacing_threshold
-            double distanceBonus = Math.Pow(distance / SINGLE_SPACING_THRESHOLD, 3.95);
+            double distanceBonus = Math.Pow(distance / SINGLE_SPACING_THRESHOLD, DISTANCE_EXPONENT);
 
             // Apply reduced small circle bonus because flow aim difficulty on small circles doesn't scale as hard as jumps
             distanceBonus *= Math.Sqrt(osuCurrObj.SmallCircleBonus);
