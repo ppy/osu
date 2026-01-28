@@ -114,7 +114,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double prevWideAngleBonus = calcWideAngleBonus(lastAngle);
                 prevWideAngleBonus *= prevAngleBonus * Math.Pow(DifficultyCalculationUtils.ReverseLerp(prevDistance, 0, SpeedAimEvaluator.SINGLE_SPACING_THRESHOLD), SpeedAimEvaluator.DISTANCE_EXPONENT);
 
-                double bonusRatio = Math.Min(wideAngleBonus, prevWideAngleBonus) / Math.Max(wideAngleBonus, prevWideAngleBonus);
+                double bonusRatio;
+
+                if (Math.Min(wideAngleBonus, prevWideAngleBonus) == 0) bonusRatio = 1;
+                else bonusRatio = Math.Min(wideAngleBonus, prevWideAngleBonus) / Math.Max(wideAngleBonus, prevWideAngleBonus);
 
                 // Penalize angle repetition, but only if the last angle had a big bonus.
                 // Omitting this check leads to me getting "Value was either too large or too small for a Decimal" errors
