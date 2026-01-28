@@ -333,13 +333,13 @@ namespace osu.Game.Online.Multiplayer
             return connector.Disconnect();
         }
 
-        public override Task<MatchmakingPool[]> GetMatchmakingPools()
+        public override Task<MatchmakingPool[]> GetMatchmakingPoolsOfType(MatchmakingPoolType type)
         {
             if (!IsConnected.Value)
                 return Task.FromResult(Array.Empty<MatchmakingPool>());
 
             Debug.Assert(connection != null);
-            return connection.InvokeAsync<MatchmakingPool[]>(nameof(IMatchmakingServer.GetMatchmakingPools));
+            return connection.InvokeAsync<MatchmakingPool[]>(nameof(IMatchmakingServer.GetMatchmakingPoolsOfType), type);
         }
 
         public override Task MatchmakingJoinLobby()
