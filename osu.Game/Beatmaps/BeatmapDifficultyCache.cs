@@ -75,6 +75,10 @@ namespace osu.Game.Beatmaps
 
             currentMods.BindValueChanged(mods =>
             {
+                // A change in bindable here doesn't guarantee that mods have actually changed.
+                if (mods.OldValue.SequenceEqual(mods.NewValue))
+                    return;
+
                 modSettingChangeTracker?.Dispose();
 
                 Scheduler.AddOnce(updateTrackedBindables);
