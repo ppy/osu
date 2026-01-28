@@ -8,8 +8,15 @@ namespace osu.Game.Online.RankedPlay
 {
     public interface IRankedPlayServer
     {
+        /// <summary>
+        /// Discards cards from the local user's hand during the <see cref="RankedPlayStage.CardDiscard"/> stage.
+        /// </summary>
         Task DiscardCards(RankedPlayCardItem[] cards);
 
+        /// <summary>
+        /// Plays a card from the local user's hand during the <see cref="RankedPlayStage.CardPlay"/> stage.
+        /// Only usable while the local user is the <see cref="RankedPlayRoomState.ActiveUserId">active player</see>.
+        /// </summary>
         Task PlayCard(RankedPlayCardItem card);
     }
 }
