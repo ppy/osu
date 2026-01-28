@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     }
                 }
 
-                double repetitionRatio = lastAngle == Math.PI ? 0 : 
+                double repetitionRatio = lastAngle == Math.PI ? 0 :
                                         Math.Pow(Math.Cos(currAngle / 2) / Math.Cos(lastAngle / 2), 2);
                 repetitionRatio = repetitionRatio > 1 ? 1 / repetitionRatio : repetitionRatio;
                 angleRepetitionPenalty = 0.1 * repetitionRatio;
@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Reward sliders based on velocity.
                 sliderBonus = osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
             }
-            
+
             // Nerf aim strain for repeated angles
             aimStrain *= (1 - angleRepetitionPenalty);
 
