@@ -782,7 +782,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             await ((IMultiplayerClient)this).MatchRoomStateChanged(clone(ServerRoom.MatchState)).ConfigureAwait(false);
         }
 
-        public override Task<MatchmakingPool[]> GetMatchmakingPools()
+        public override Task<MatchmakingPool[]> GetMatchmakingPoolsOfType(MatchmakingPoolType type)
         {
             return Task.FromResult<MatchmakingPool[]>(
             [
