@@ -261,7 +261,22 @@ namespace osu.Game.Screens.SelectV2
         public partial class ModCountText : VisibilityContainer, IHasCustomTooltip<IReadOnlyList<Mod>>
         {
             public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>();
-            public readonly Bindable<bool> Freestyle = new Bindable<bool>();
+
+            private LocalisableString? customText;
+
+            /// <summary>
+            /// When set, this will be shown instead of a mod count.
+            /// </summary>
+            public LocalisableString? CustomText
+            {
+                get => customText;
+                set
+                {
+                    customText = value;
+                    if (IsLoaded)
+                        updateText();
+                }
+            }
 
             private OsuSpriteText text = null!;
 
@@ -291,7 +306,6 @@ namespace osu.Game.Screens.SelectV2
                     }
                 };
 
-                Freestyle.BindValueChanged(_ => updateText());
                 Mods.BindValueChanged(_ => updateText(), true);
             }
 
@@ -304,8 +318,8 @@ namespace osu.Game.Screens.SelectV2
 
             private void updateText()
             {
-                if (Freestyle.Value)
-                    text.Text = ModSelectOverlayStrings.AllMods.ToUpper();
+                if (CustomText != null)
+                    text.Text = CustomText.Value;
                 else
                     text.Text = ModSelectOverlayStrings.Mods(Mods.Value.Count).ToUpper();
             }
