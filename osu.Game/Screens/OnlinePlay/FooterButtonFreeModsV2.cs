@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
@@ -90,11 +91,6 @@ namespace osu.Game.Screens.OnlinePlay
                         Masking = true,
                         Children = new Drawable[]
                         {
-                            new Box
-                            {
-                                Colour = colourProvider.Background3,
-                                RelativeSizeAxes = Axes.Both,
-                            },
                             modDisplay = new ModDisplay(showExtendedInformation: true)
                             {
                                 Anchor = Anchor.Centre,
@@ -123,9 +119,9 @@ namespace osu.Game.Screens.OnlinePlay
             FreeMods.BindValueChanged(m =>
             {
                 if (m.NewValue.Count == 0 && !Freestyle.Value)
-                    modsWedge.FadeOut(200);
+                    modsWedge.FadeOut(300, Easing.OutExpo);
                 else
-                    modsWedge.FadeIn(200);
+                    modsWedge.FadeIn(300, Easing.OutExpo);
             }, true);
         }
 
@@ -133,13 +129,24 @@ namespace osu.Game.Screens.OnlinePlay
         {
             base.Update();
 
-            if (Freestyle.Value || modDisplay.DrawWidth * modDisplay.Scale.X > modContainer.DrawWidth)
+            // If there are freemods selected but the display has no width, it's still loading.
+            // Don't update visibility in this state or we will cause an awkward flash.
+            if (FreeMods.Value.Count > 0 && Precision.AlmostEquals(modDisplay.DrawWidth, 0))
+                return;
+
+            bool showCountText =
+                // When freestyle is enabled this text shows "ALL MODS"
+                Freestyle.Value
+                // Standard flow where mods are overflowing so we show count text.
+                || modDisplay.DrawWidth * modDisplay.Scale.X > modContainer.DrawWidth;
+
+            if (showCountText)
                 overflowModCountDisplay.Show();
             else
                 overflowModCountDisplay.Hide();
         }
 
-        private partial class ModCountText : CompositeDrawable
+        private partial class ModCountText : VisibilityContainer
         {
             public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>();
             public readonly Bindable<bool> Freestyle = new Bindable<bool>();
@@ -177,6 +184,9 @@ namespace osu.Game.Screens.OnlinePlay
 
                 updateText();
             }
+
+            protected override void PopIn() => this.FadeIn(300, Easing.OutExpo);
+            protected override void PopOut() => this.FadeOut(300, Easing.OutExpo);
 
             private void updateText()
             {
