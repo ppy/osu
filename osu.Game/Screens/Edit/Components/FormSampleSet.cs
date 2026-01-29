@@ -289,18 +289,7 @@ namespace osu.Game.Screens.Edit.Components
 
                 AddInternal(hoverSounds = (ActualFilename.Value == null ? new HoverClickSounds(HoverSampleSet.Button) : new HoverSounds(HoverSampleSet.Button)));
 
-                if (ActualFilename.Value != null)
-                {
-                    // to cover all bases, invalidate the extensionless filename (which gameplay is most likely to use)
-                    // as well as the filename with extension (which we are using here).
-                    editorBeatmap?.BeatmapSkin?.Skin.Samples?.Invalidate(ExpectedFilename.Value);
-                    editorBeatmap?.BeatmapSkin?.Skin.Samples?.Invalidate(ActualFilename.Value);
-                    sample = editorBeatmap?.BeatmapSkin?.Skin.Samples?.Get(ActualFilename.Value);
-                }
-                else
-                {
-                    sample = null;
-                }
+                sample = ActualFilename.Value != null ? editorBeatmap?.BeatmapSkin?.Skin.Samples?.Get(ActualFilename.Value) : null;
             });
 
             protected override bool OnHover(HoverEvent e)
