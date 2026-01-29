@@ -182,6 +182,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Add high bpm bonus
                 sliderBonus *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
 
+                // Apply high circle size bonus
+                sliderBonus *= osuCurrObj.SmallCircleBonus;
+
                 return sliderBonus * slider_multiplier;
             }
 
