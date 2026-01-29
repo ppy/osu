@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
@@ -104,6 +105,10 @@ namespace osu.Game.Beatmaps
 
                 beatmapInfo = beatmapInfo.Detach();
 
+                // If this ever gets hit, a request has arrived with an outdated BeatmapInfo.
+                // An outdated BeatmapInfo may contain a reference to a previous version of the beatmap's files on disk.
+                Debug.Assert(confirmFileHashIsUpToDate(beatmapInfo), "working beatmap returned with outdated path");
+
                 workingCache.Add(working = new BeatmapManagerWorkingBeatmap(beatmapInfo, this));
 
                 // best effort; may be higher than expected.
@@ -111,6 +116,12 @@ namespace osu.Game.Beatmaps
 
                 return working;
             }
+        }
+
+        private bool confirmFileHashIsUpToDate(BeatmapInfo beatmapInfo)
+        {
+            string refetchPath = realm.Run(r => r.Find<BeatmapInfo>(beatmapInfo.ID)?.File?.File.Hash);
+            return refetchPath == null || refetchPath == beatmapInfo.File?.File.Hash;
         }
 
         #region IResourceStorageProvider
