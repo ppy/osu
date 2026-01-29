@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double sliderBonus = 0;
             double velocityChangeBonus = 0;
             double wiggleBonus = 0;
-            double aimComplexityBonus = 0;
+            double angleRepetitionNerf = 1;
 
             double aimStrain = currVelocity; // Start strain with regular velocity.
 
@@ -87,10 +87,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 double stackFactor = DifficultyCalculationUtils.Smootherstep(osuLastObj.LazyJumpDistance, 0, diameter);
 
-                double baseFactor = 1 - angleDif;
+                double baseFactor = 1 - 0.15 * calcAcuteAngleBonus(lastAngle) * angleDif;
 
                 // Penalize angle repetition.
-                aimComplexityBonus = angleBonus * Math.Pow(baseFactor + (1 - baseFactor) * vectorRepetition * stackFactor, 2);
+                angleRepetitionNerf = Math.Pow(baseFactor + (1 - baseFactor) * 0.95 * vectorRepetition * stackFactor, 2);
 
                 if (Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) < 1.25 * Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) // If rhythms are the same.
                 {
@@ -166,13 +166,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 sliderBonus = osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
             }
 
-            aimStrain += aimComplexityBonus * 0.5;
+            aimStrain *= angleRepetitionNerf;
 
             aimStrain += wiggleBonus * wiggle_multiplier;
-            aimStrain += velocityChangeBonus * 1.2;
+            aimStrain += velocityChangeBonus * velocity_change_multiplier;
 
             // Add in acute angle bonus or wide angle bonus, whichever is larger.
-            aimStrain += Math.Max(acuteAngleBonus * 3.0, wideAngleBonus * 2.0);
+            aimStrain += Math.Max(acuteAngleBonus * 2.8, wideAngleBonus * 1.2);
 
             // Apply high circle size bonus
             aimStrain *= osuCurrObj.SmallCircleBonus;
