@@ -38,7 +38,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// A sample store which can be used to perform user file lookups for this skin.
         /// </summary>
-        protected internal ISampleStore? Samples { get; }
+        protected internal ISampleStore? Samples { get; private set; }
 
         public readonly Live<SkinInfo> SkinInfo;
 
@@ -84,18 +84,7 @@ namespace osu.Game.Skinning
 
                 store.AddStore(new RealmBackedResourceStore<SkinInfo>(SkinInfo, resources.Files, resources.RealmAccess));
 
-                var samples = resources.AudioManager?.GetSampleStore(store);
-
-                if (samples != null)
-                {
-                    samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
-
-                    // osu-stable performs audio lookups in order of wav -> mp3 -> ogg.
-                    // The GetSampleStore() call above internally adds wav and mp3, so ogg is added at the end to ensure expected ordering.
-                    samples.AddExtension(@"ogg");
-                }
-
-                Samples = samples;
+                RecycleSamples();
                 Textures = new TextureStore(resources.Renderer, CreateTextureLoaderStore(resources, store));
             }
             else
@@ -151,6 +140,30 @@ namespace osu.Game.Skinning
                     Logger.Error(ex, "Failed to load skin configuration.");
                 }
             }
+        }
+
+        /// <summary>
+        /// Recreates <see cref="Samples"/>.
+        /// All users of samples from the skin are expected to manually re-retrieve their samples from this skin after this is called.
+        /// Exposed as public for the purpose of e.g. editing flows where the skin's set of available samples changes.
+        /// In such a scenario a full recycle of the store is required to avoid accidentally retrieving stale samples that don't exist in the skin anymore.
+        /// </summary>
+        public void RecycleSamples()
+        {
+            Samples?.Dispose();
+
+            var samples = resources?.AudioManager?.GetSampleStore(store);
+
+            if (samples != null)
+            {
+                samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
+
+                // osu-stable performs audio lookups in order of wav -> mp3 -> ogg.
+                // The GetSampleStore() call above internally adds wav and mp3, so ogg is added at the end to ensure expected ordering.
+                samples.AddExtension(@"ogg");
+            }
+
+            Samples = samples;
         }
 
         protected virtual IResourceStore<TextureUpload> CreateTextureLoaderStore(IStorageResourceProvider resources, IResourceStore<byte[]> storage)
