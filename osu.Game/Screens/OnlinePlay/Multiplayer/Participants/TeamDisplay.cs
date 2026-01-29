@@ -106,14 +106,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 clickableContent.TooltipText = "Change team";
             }
 
-            // reset to ensure samples don't play
-            DisplayedTeam = null;
-            updateState();
+            updateState(false);
         }
 
-        private void onRoomUpdated() => Scheduler.AddOnce(updateState);
+        private void onRoomUpdated() => Scheduler.AddOnce(() => updateState(true));
 
-        private void updateState()
+        private void updateState(bool playSamples)
         {
             // we don't have a way of knowing when an individual user's state has updated, so just handle on RoomUpdated for now.
 
@@ -129,7 +127,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             // only play the sample if an already valid team changes to another valid team.
             // this avoids playing a sound for each user if the match type is changed to/from a team mode.
-            if (newTeam != null && DisplayedTeam != null)
+            if (playSamples && newTeam != null && DisplayedTeam != null)
                 sampleTeamSwap?.Play();
 
             DisplayedTeam = newTeam;
