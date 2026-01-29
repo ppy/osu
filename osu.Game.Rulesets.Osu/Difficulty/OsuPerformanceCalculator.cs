@@ -321,6 +321,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (effectiveMissCount > 0)
                 flashlightValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
 
+            // Flashlight pp must be combo scaled to account for visible area shrinking with higher combo.
             flashlightValue *= attributes.MaxCombo <= 0 ? 1.0 : 0.25 + 0.75 * Math.Min(Math.Pow(scoreMaxCombo, 0.5) / Math.Pow(attributes.MaxCombo, 0.5), 1.0);
 
             // Scale the flashlight value with accuracy _slightly_.
