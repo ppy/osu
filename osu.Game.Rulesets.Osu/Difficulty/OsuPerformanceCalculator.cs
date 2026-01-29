@@ -321,7 +321,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (effectiveMissCount > 0)
                 flashlightValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
 
-            flashlightValue *= getComboScalingFactor(attributes);
+            flashlightValue *= attributes.MaxCombo <= 0 ? 1.0 : 0.25 + 0.75 * Math.Min(Math.Pow(scoreMaxCombo, 0.5) / Math.Pow(attributes.MaxCombo, 0.5), 1.0);
 
             // Scale the flashlight value with accuracy _slightly_.
             flashlightValue *= 0.5 + accuracy / 2.0;
@@ -531,7 +531,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         // so we use the amount of relatively difficult sections to adjust miss penalty
         // to make it more punishing on maps with lower amount of hard sections.
         private double calculateMissPenalty(double missCount, double difficultStrainCount) => 0.96 / ((missCount / (4 * Math.Pow(Math.Log(difficultStrainCount), 0.94))) + 1);
-        private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
         private int totalSuccessfulHits => countGreat + countOk + countMeh;
