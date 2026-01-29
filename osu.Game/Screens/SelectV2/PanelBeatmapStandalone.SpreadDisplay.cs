@@ -52,6 +52,12 @@ namespace osu.Game.Screens.SelectV2
                 AutoSizeAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
                 Content.CornerRadius = 5;
+
+                Action = () =>
+                {
+                    if (Beatmap.Value != null)
+                        scopedBeatmapSet.Value = Beatmap.Value.BeatmapSet!;
+                };
             }
 
             [BackgroundDependencyLoader]
@@ -214,8 +220,6 @@ namespace osu.Game.Screens.SelectV2
                         dot.Alpha = (1 + 4 * (float)(succeeding.Count - i) / succeeding.Count) / 5;
                     }
                 }
-
-                Action = () => scopedBeatmapSet.Value = Beatmap.Value.BeatmapSet!;
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)

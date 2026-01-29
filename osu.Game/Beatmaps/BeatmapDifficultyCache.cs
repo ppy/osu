@@ -75,6 +75,10 @@ namespace osu.Game.Beatmaps
 
             currentMods.BindValueChanged(mods =>
             {
+                // A change in bindable here doesn't guarantee that mods have actually changed.
+                if (mods.OldValue.SequenceEqual(mods.NewValue))
+                    return;
+
                 modSettingChangeTracker?.Dispose();
 
                 Scheduler.AddOnce(updateTrackedBindables);
@@ -82,15 +86,37 @@ namespace osu.Game.Beatmaps
                 modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
                 modSettingChangeTracker.SettingChanged += _ =>
                 {
-                    debouncedModSettingsChange?.Cancel();
-                    debouncedModSettingsChange = Scheduler.AddDelayed(updateTrackedBindables, 100);
+                    lock (bindableUpdateLock)
+                    {
+                        debouncedModSettingsChange?.Cancel();
+                        debouncedModSettingsChange = Scheduler.AddDelayed(updateTrackedBindables, 100);
+                    }
                 };
             }, true);
         }
 
-        public void Invalidate(IBeatmapInfo beatmap)
+        /// <summary>
+        /// Notify this cache that a beatmap has been invalidated/updated.
+        /// </summary>
+        /// <param name="oldBeatmap">The old beatmap model.</param>
+        /// <param name="newBeatmap">The updated beatmap model.</param>
+        public void Invalidate(IBeatmapInfo oldBeatmap, IBeatmapInfo newBeatmap)
         {
-            base.Invalidate(lookup => lookup.BeatmapInfo.Equals(beatmap));
+            base.Invalidate(lookup => lookup.BeatmapInfo.Equals(oldBeatmap));
+
+            lock (bindableUpdateLock)
+            {
+                bool trackedBindablesRefreshRequired = false;
+
+                foreach (var bsd in trackedBindables.Where(bsd => bsd.BeatmapInfo.Equals(oldBeatmap)))
+                {
+                    bsd.BeatmapInfo = newBeatmap;
+                    trackedBindablesRefreshRequired = true;
+                }
+
+                if (trackedBindablesRefreshRequired)
+                    Scheduler.AddOnce(updateTrackedBindables);
+            }
         }
 
         /// <summary>
@@ -195,6 +221,9 @@ namespace osu.Game.Beatmaps
         {
             lock (bindableUpdateLock)
             {
+                debouncedModSettingsChange?.Cancel();
+                debouncedModSettingsChange = null;
+
                 trackedUpdateCancellationSource.Cancel();
                 trackedUpdateCancellationSource = new CancellationTokenSource();
 
@@ -348,7 +377,7 @@ namespace osu.Game.Beatmaps
 
         private class BindableStarDifficulty : Bindable<StarDifficulty>
         {
-            public readonly IBeatmapInfo BeatmapInfo;
+            public IBeatmapInfo BeatmapInfo;
             public readonly CancellationToken CancellationToken;
 
             public BindableStarDifficulty(IBeatmapInfo beatmapInfo, CancellationToken cancellationToken)

@@ -104,9 +104,17 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
+            private Vector2? targetSize;
+
             // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
             protected override void UpdateSize(Vector2 newSize)
             {
+                // TODO: should probably fix this at a framework level (this method is running every frame which can spam transforms)
+                if (newSize == targetSize)
+                    return;
+
+                targetSize = newSize;
+
                 if (Direction == Direction.Vertical)
                 {
                     Width = newSize.X;

@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Taiko.Configuration;
@@ -26,11 +27,11 @@ namespace osu.Game.Rulesets.Taiko
 
             Children = new Drawable[]
             {
-                new SettingsEnumDropdown<TaikoTouchControlScheme>
+                new SettingsItemV2(new FormEnumDropdown<TaikoTouchControlScheme>
                 {
-                    LabelText = RulesetSettingsStrings.TouchControlScheme,
+                    Caption = RulesetSettingsStrings.TouchControlScheme,
                     Current = config.GetBindable<TaikoTouchControlScheme>(TaikoRulesetSetting.TouchControlScheme)
-                }
+                })
             };
         }
     }
