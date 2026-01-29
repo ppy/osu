@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double baseSpeedPerformance = HarmonicSkill.DifficultyToPerformance(speedRating);
             double baseReadingPerformance = HarmonicSkill.DifficultyToPerformance(readingRating);
             double baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
-            double baseCognitionPerformance = DifficultyCalculationUtils.Norm(2, baseReadingPerformance, baseFlashlightPerformance);
+            double baseCognitionPerformance = SumCognitionDifficulty(baseReadingPerformance, baseFlashlightPerformance);
 
             double basePerformance = DifficultyCalculationUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, baseAimPerformance, baseSpeedPerformance, baseCognitionPerformance);
 
@@ -142,6 +142,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             };
 
             return attributes;
+        }
+
+        public static double SumCognitionDifficulty(double reading, double flashlight)
+        {
+            // Base LP summed value, accounting for map being partially memorized with FL
+            double cognition = DifficultyCalculationUtils.Norm(2, reading, flashlight);
+
+            // Inrease FL bonus when it's lower than reading to avoid situations where high reading difficulty makes FL give practically 0 bonus
+            return flashlight >= reading ? cognition : double.Lerp(reading + flashlight, cognition, flashlight / reading);
         }
 
         private double calculateStarRating(double basePerformance)
