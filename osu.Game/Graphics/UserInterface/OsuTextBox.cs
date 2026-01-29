@@ -42,7 +42,7 @@ namespace osu.Game.Graphics.UserInterface
             Margin = new MarginPadding { Left = 2 },
         };
 
-        protected bool DrawBorder { get; init; }
+        protected bool DrawBorder { get; init; } = true;
 
         private OsuCaret? caret;
 
