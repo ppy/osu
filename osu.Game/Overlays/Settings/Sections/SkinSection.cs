@@ -44,12 +44,6 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "skins" });
 
-        private static readonly Live<SkinInfo> random_skin_info = new SkinInfo
-        {
-            ID = SkinInfo.RANDOM_SKIN,
-            Name = "<Random Skin>",
-        }.ToLiveUnmanaged();
-
         private readonly List<Live<SkinInfo>> dropdownItems = new List<Live<SkinInfo>>();
 
         [Resolved]
@@ -104,7 +98,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
             skinDropdown.Current.BindValueChanged(skin =>
             {
-                if (skin.NewValue == random_skin_info)
+                if (skin.NewValue.ID == SkinInfo.RANDOM_SKIN)
                 {
                     // before selecting random, set the skin back to the previous selection.
                     // this is done because at this point it will be random_skin_info, and would
@@ -121,21 +115,9 @@ namespace osu.Game.Overlays.Settings.Sections
             // Because we are using `Live<>` in this class, we don't need to worry about this scenario too much.
             if (!sender.Any())
                 return;
-
             // For simplicity repopulate the full list.
-            // In the future we should change this to properly handle ChangeSet events.
             dropdownItems.Clear();
-
-            dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.ARGON_SKIN).ToLive(realm));
-            dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.ARGON_PRO_SKIN).ToLive(realm));
-            dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.TRIANGLES_SKIN).ToLive(realm));
-            dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.CLASSIC_SKIN).ToLive(realm));
-            dropdownItems.Add(sender.Single(s => s.ID == SkinInfo.RETRO_SKIN).ToLive(realm));
-
-            dropdownItems.Add(random_skin_info);
-
-            foreach (var skin in sender.Where(s => !s.Protected))
-                dropdownItems.Add(skin.ToLive(realm));
+            dropdownItems.AddRange(skins.GetAllUsableSkins());
 
             Schedule(() => skinDropdown.Items = dropdownItems);
         }
