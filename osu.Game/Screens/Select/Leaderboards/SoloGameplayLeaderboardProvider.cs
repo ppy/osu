@@ -58,6 +58,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             scores.AddRange(newScores);
 
+            sort();
             Scheduler.AddDelayed(sort, 1000, true);
         }
 
