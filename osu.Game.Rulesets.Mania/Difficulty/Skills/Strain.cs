@@ -51,9 +51,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             return highestIndividualStrain + overallStrain - CurrentStrain;
         }
 
-        protected override double CalculateInitialStrain(double offset, DifficultyHitObject current) =>
-            applyDecay(highestIndividualStrain, offset - current.Previous(0).StartTime, individual_decay_base)
-            + applyDecay(overallStrain, offset - current.Previous(0).StartTime, overall_decay_base);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) =>
+            applyDecay(highestIndividualStrain, time - ((ManiaDifficultyHitObject)current).PrevHead(0)?.StartTime ?? 0, individual_decay_base)
+            + applyDecay(overallStrain, time - ((ManiaDifficultyHitObject)current).PrevHead(0)?.StartTime ?? 0, overall_decay_base);
 
         private double applyDecay(double value, double deltaTime, double decayBase)
             => value * Math.Pow(decayBase, deltaTime / 1000);

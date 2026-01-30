@@ -19,9 +19,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         public new double StartTime { get; }
         public new double EndTime { get; private set; }
 
-        public int? HeadIndex => Head?.headObjectIndex;
-        public int? TailIndex => Tail?.headObjectIndex;
-
         /// <summary>
         /// The time difference to the last processed head note in any other column.
         /// </summary>
