@@ -9,13 +9,13 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Localisation;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Skinning;
 using Realms;
@@ -27,6 +27,8 @@ namespace osu.Game.Tests.Visual.Settings
     [TestFixture]
     public partial class TestSceneSkinDropdown : OsuManualInputManagerTestScene
     {
+        private OverlayColourProvider colourProvider { get; set; } = new OverlayColourProvider(OverlayColourScheme.Purple);
+
         private SkinDropdown skinDropdown;
 
         private IDisposable realmSubscription;
@@ -73,20 +75,25 @@ namespace osu.Game.Tests.Visual.Settings
                 skinDropdown?.Expire();
 
                 Add(
-                    new Container
+                    new DependencyProvidingContainer
                     {
+                        CachedDependencies =
+                        [
+                            (typeof(OverlayColourProvider), colourProvider),
+                        ],
                         RelativeSizeAxes = Axes.X,
                         Padding = new MarginPadding { Left = 300, Right = 300 },
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Children =
                         [
-                            skinDropdown = new SkinDropdown
+                            new SettingsItemV2(skinDropdown = new SkinDropdown
                             {
                                 AlwaysShowSearchBar = true,
-                                LabelText = SkinSettingsStrings.CurrentSkin,
+                                AllowNonContiguousMatching = true,
+                                Caption = SkinSettingsStrings.CurrentSkin,
                                 Current = skins.CurrentSkinInfo,
-                            }
+                            })
                         ]
                     }
                 );

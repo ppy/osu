@@ -7,7 +7,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -16,462 +15,452 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Database;
-using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Input;
-using osuTK.Graphics;
 using osu.Framework.Input.StateChanges;
 
 namespace osu.Game.Overlays.Settings
 {
-    public partial class SkinDropdown : SettingsDropdown<Live<SkinInfo>>
+    public partial class SkinDropdown : FormDropdown<Live<SkinInfo>>
     {
-        protected override OsuDropdown<Live<SkinInfo>> CreateDropdown() => new SkinDropdownControl();
 
-        private partial class SkinDropdownControl : DropdownControl
+        protected override LocalisableString GenerateItemText(Live<SkinInfo> item) => item.ToString() ?? string.Empty;
+
+        protected override DropdownMenu CreateMenu() => new SkinDropdownMenu();
+
+        public partial class SkinDropdownMenu : OsuDropdownMenu
         {
-            protected override LocalisableString GenerateItemText(Live<SkinInfo> item) => item.ToString() ?? string.Empty;
-
-            protected override DropdownMenu CreateMenu() => new SkinDropdownMenu();
-
-            public partial class SkinDropdownMenu : OsuDropdownMenu
+            [BackgroundDependencyLoader(true)]
+            private void load()
             {
-                [BackgroundDependencyLoader(true)]
-                private void load(OverlayColourProvider? colourProvider, OsuColour colours)
+                MaxHeight = 200;
+
+                StateChanged += s =>
                 {
-                    BackgroundColour = colourProvider?.Background5 ?? Color4.Black;
-                    HoverColour = colourProvider?.Light4 ?? colours.PinkDarker;
-                    SelectionColour = colourProvider?.Background3 ?? colours.PinkDarker.Opacity(0.5f);
+                    if (s == MenuState.Closed)
+                        commitFavouriteChanges();
+                };
+            }
 
-                    MaxHeight = 200;
+            [Resolved]
+            private RealmAccess realm { get; set; } = null!;
 
-                    StateChanged += s =>
+            private readonly Dictionary<Guid, bool> pendingFavouriteChanges = new Dictionary<Guid, bool>();
+
+            private void trackFavouriteChange(Guid skinID, bool isFavourite)
+            {
+                pendingFavouriteChanges[skinID] = isFavourite;
+            }
+
+            private void commitFavouriteChanges()
+            {
+                realm.Write(r =>
+                {
+                    foreach ((Guid skinId, bool isFavourite) in pendingFavouriteChanges)
                     {
-                        if (s == MenuState.Closed)
-                            commitFavouriteChanges();
-                    };
-                }
+                        var skin = r.All<SkinInfo>().FirstOrDefault(s => s.ID == skinId);
+                        if (skin != null)
+                            skin.IsFavourite = isFavourite;
+                    }
+                });
 
-                [Resolved]
-                private RealmAccess realm { get; set; } = null!;
+                pendingFavouriteChanges.Clear();
+            }
 
-                private readonly Dictionary<Guid, bool> pendingFavouriteChanges = new Dictionary<Guid, bool>();
-
-                private void trackFavouriteChange(Guid skinID, bool isFavourite)
+            protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item)
+            {
+                if (item is DropdownMenuItem<Live<SkinInfo>> skinItem)
                 {
-                    pendingFavouriteChanges[skinID] = isFavourite;
-                }
-
-                private void commitFavouriteChanges()
-                {
-                    realm.Write(r =>
+                    bool isProtected = false;
+                    bool isRandomSkin = false;
+                    skinItem.Value.PerformRead(skin =>
                     {
-                        foreach ((Guid skinId, bool isFavourite) in pendingFavouriteChanges)
-                        {
-                            var skin = r.All<SkinInfo>().FirstOrDefault(s => s.ID == skinId);
-                            if (skin != null)
-                                skin.IsFavourite = isFavourite;
-                        }
+                        isProtected = skin.Protected;
+                        isRandomSkin = skin.ID == SkinInfo.RANDOM_SKIN;
                     });
 
-                    pendingFavouriteChanges.Clear();
+                    if (isProtected || isRandomSkin)
+                    {
+                        return new DrawableOsuDropdownMenuItem(item)
+                        {
+                            BackgroundColourHover = HoverColour,
+                            BackgroundColourSelected = SelectionColour
+                        };
+                    }
                 }
 
-                protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item)
+                return new DrawableSkinDropdownMenuItem(item)
                 {
+                    BackgroundColourHover = HoverColour,
+                    BackgroundColourSelected = SelectionColour
+                };
+            }
+
+            public partial class DrawableSkinDropdownMenuItem : DrawableOsuDropdownMenuItem
+            {
+                private bool isFavourite;
+
+                private float dragDelta;
+
+                private Content? content;
+
+                public SkinInfo? SkinData;
+
+                private Sample? sampleShow;
+
+                private Sample? sampleHide;
+
+                private SkinDropdownMenu? menu;
+
+                private readonly Box starBackground;
+
+                private readonly SpriteIcon starIcon;
+
+                private const int favourite_drag_end_threshold = 50;
+
+                private readonly ClickableContainer starContainer;
+
+                public override bool ChangeFocusOnClick => false;
+
+                public DrawableSkinDropdownMenuItem(MenuItem item)
+                    : base(item)
+                {
+                    AddInternal(starContainer = new NoFocusChangeClickableContainer
+                    {
+                        RelativeSizeAxes = Axes.Y,
+                        Width = 0,
+                        Depth = float.MaxValue,
+                        Alpha = 0,
+                        Action = () =>
+                        {
+                            starButtonFlash();
+                            triggerFavouriteChange();
+                        },
+                        Children =
+                        [
+                            starBackground = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Colour4.FromHex(@"#edae00"),
+                                Depth = 1
+                            },
+                            starIcon = new SpriteIcon
+                            {
+                                Size = new Vector2(10),
+                                BypassAutoSizeAxes = Axes.Y,
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                Colour = Colour4.White.Opacity(0.7f),
+                            }
+                        ]
+                    });
+                    Foreground.Padding = new MarginPadding(2);
+                    Foreground.AutoSizeAxes = Axes.Y;
+                    Foreground.RelativeSizeAxes = Axes.X;
+
+                    Masking = true;
+                    CornerRadius = 5;
+
                     if (item is DropdownMenuItem<Live<SkinInfo>> skinItem)
                     {
-                        bool isProtected = false;
-                        bool isRandomSkin = false;
                         skinItem.Value.PerformRead(skin =>
                         {
-                            isProtected = skin.Protected;
-                            isRandomSkin = skin.ID == SkinInfo.RANDOM_SKIN;
+                            if (Foreground.Children.FirstOrDefault() is Content)
+                                SkinData = skin;
                         });
-
-                        if (isProtected || isRandomSkin)
-                        {
-                            return new DrawableOsuDropdownMenuItem(item)
-                            {
-                                BackgroundColourHover = HoverColour,
-                                BackgroundColourSelected = SelectionColour
-                            };
-                        }
                     }
-
-                    return new DrawableSkinDropdownMenuItem(item)
-                    {
-                        BackgroundColourHover = HoverColour,
-                        BackgroundColourSelected = SelectionColour
-                    };
                 }
 
-                public partial class DrawableSkinDropdownMenuItem : DrawableOsuDropdownMenuItem
+                [BackgroundDependencyLoader(true)]
+                private void load(AudioManager audio)
                 {
-                    private bool isFavourite;
+                    updateIcon();
 
-                    private float dragDelta;
+                    sampleShow = audio.Samples.Get(@"UI/check-on");
+                    sampleHide = audio.Samples.Get(@"UI/check-off");
+                }
 
-                    private Content? content;
+                protected override bool OnDragStart(DragStartEvent e)
+                {
+                    if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
+                    {
+                        bool mostlyHorizontal = Math.Abs(e.Delta.X) > Math.Abs(e.Delta.Y);
 
-                    public SkinInfo? SkinData;
+                        if (mostlyHorizontal)
+                        {
+                            starContainer.FadeTo(1, 100, Easing.OutQuint);
+                            if (isFavourite)
+                                favouriteIndicatorAnimateOut();
+                        }
 
-                    private Sample? sampleShow;
+                        return mostlyHorizontal;
+                    }
 
-                    private Sample? sampleHide;
+                    return base.OnDragStart(e);
+                }
 
-                    private SkinDropdownMenu? menu;
+                private bool stateChanged;
 
-                    private readonly Box starBackground;
+                protected override void OnDrag(DragEvent e)
+                {
+                    dragDelta += e.Delta.X / 2;
 
-                    private readonly SpriteIcon starIcon;
+                    if (Math.Abs(dragDelta) < 0.01) return;
 
-                    private const int favourite_drag_end_threshold = 50;
+                    if (dragDelta >= favourite_drag_end_threshold && !stateChanged)
+                    {
+                        stateChanged = true;
+                        triggerFavouriteChange();
+                    }
 
-                    private readonly ClickableContainer starContainer;
+                    dragDelta = Math.Clamp(dragDelta, 0, 100);
+                    Background.MoveToX(dragDelta, 100, Easing.OutQuint);
+                    Foreground.MoveToX(dragDelta, 100, Easing.OutQuint);
+                    starContainer.ResizeWidthTo(dragDelta, 100, Easing.OutQuint);
+
+                    base.OnDrag(e);
+                }
+
+                protected override void OnDragEnd(DragEndEvent e)
+                {
+                    const int offset = 0;
+                    const int duration = 250;
+                    const Easing easing = Easing.OutQuint;
+
+                    Background.MoveToX(offset, duration, easing);
+                    Foreground.MoveToX(offset, duration, easing);
+                    starContainer.FadeTo(0, duration, easing).ResizeWidthTo(offset, duration, easing);
+                    if (isFavourite)
+                        favouriteIndicatorAnimateIn();
+
+                    stateChanged = false;
+                    dragDelta = 0;
+
+                    base.OnDragEnd(e);
+                }
+
+                protected override bool OnHover(HoverEvent e)
+                {
+                    if (!isFavourite && e.CurrentState.Mouse.LastSource is not ISourcedFromTouch)
+                        favouriteIndicatorAnimateIn();
+
+                    return base.OnHover(e);
+                }
+
+                protected override void OnHoverLost(HoverLostEvent e)
+                {
+                    if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
+                    {
+                        // Do nothing
+                    }
+                    else if (!isFavourite)
+                        favouriteIndicatorAnimateOut();
+
+                    base.OnHoverLost(e);
+                }
+
+                protected override bool OnMouseDown(MouseDownEvent e)
+                {
+                    if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
+                    {
+                        favouriteIndicatorAnimateIn();
+                        return triggerFavouriteChange();
+                    }
+
+                    if (e.Button == MouseButton.Right)
+                        return triggerFavouriteChange();
+
+                    return base.OnMouseDown(e);
+                }
+
+                private bool triggerFavouriteChange()
+                {
+                    if (isFavourite)
+                        sampleHide?.Play();
+                    else
+                        sampleShow?.Play();
+
+                    isFavourite = !isFavourite;
+                    updateIcon();
+
+                    content?.FavouriteIndicator.ChangeFavouriteIndicatorState();
+                    starButtonFlash();
+
+                    if (SkinData != null)
+                    {
+                        menu?.trackFavouriteChange(SkinData.ID, isFavourite);
+                    }
+
+                    return true;
+                }
+
+                private void updateIcon()
+                {
+                    starIcon.Icon = isFavourite ? FontAwesome.Solid.Star : FontAwesome.Regular.Star;
+                }
+
+                private void starButtonFlash()
+                {
+                    starBackground
+                        .FadeColour(Colour4.Gold, 150, Easing.OutQuint)
+                        .Then()
+                        .FadeColour(Colour4.FromHex(@"#edae00"), 250, Easing.OutQuint);
+
+                    starIcon
+                        .FadeColour(Colour4.White, 150, Easing.OutQuint)
+                        .ScaleTo(0.8f, 150, Easing.OutQuint)
+                        .Then()
+                        .FadeColour(Colour4.White.Opacity(0.7f), 250, Easing.OutQuint)
+                        .ScaleTo(1.0f, 250, Easing.OutQuint);
+                }
+
+                private void favouriteIndicatorAnimateIn()
+                {
+                    content?.FavouriteIndicator.ShowFavouriteIndicator(true);
+                }
+
+                private void favouriteIndicatorAnimateOut()
+                {
+                    content?.FavouriteIndicator.ShowFavouriteIndicator(false, 100, 350);
+                }
+
+                public partial class FavouriteIndicator : SpriteIcon
+                {
+                    private readonly DrawableSkinDropdownMenuItem skinItem;
+
+                    public readonly Colour4 ActiveColour = Colour4.Gold;
+
+                    private readonly Colour4 inactiveColour = Colour4.Black.Opacity(0.4f);
+
+                    public FavouriteIndicator(DrawableSkinDropdownMenuItem skinItemInstance)
+                    {
+                        skinItem = skinItemInstance;
+                    }
 
                     public override bool ChangeFocusOnClick => false;
 
-                    public DrawableSkinDropdownMenuItem(MenuItem item)
-                        : base(item)
+                    [BackgroundDependencyLoader(true)]
+                    private void load(RealmAccess realm)
                     {
-                        AddInternal(starContainer = new NoFocusChangeClickableContainer
-                        {
-                            RelativeSizeAxes = Axes.Y,
-                            Width = 0,
-                            Depth = float.MaxValue,
-                            Alpha = 0,
-                            Action = () =>
-                            {
-                                starButtonFlash();
-                                triggerFavouriteChange();
-                            },
-                            Children =
-                            [
-                                starBackground = new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Colour4.FromHex(@"#edae00"),
-                                    Depth = 1
-                                },
-                                starIcon = new SpriteIcon
-                                {
-                                    Size = new Vector2(10),
-                                    BypassAutoSizeAxes = Axes.Y,
-                                    Origin = Anchor.Centre,
-                                    Anchor = Anchor.Centre,
-                                    Colour = Colour4.White.Opacity(0.7f),
-                                }
-                            ]
-                        });
-                        Foreground.Padding = new MarginPadding(2);
-                        Foreground.AutoSizeAxes = Axes.Y;
-                        Foreground.RelativeSizeAxes = Axes.X;
+                        if (skinItem.SkinData == null) return;
 
-                        Masking = true;
-                        CornerRadius = 5;
+                        Alpha = skinItem.isFavourite ? 1 : 0;
 
-                        if (item is DropdownMenuItem<Live<SkinInfo>> skinItem)
+                        var skin = realm.Run(r => r.All<SkinInfo>().FirstOrDefault(s => s.ID == skinItem.SkinData.ID));
+
+                        if (skin != null)
                         {
-                            skinItem.Value.PerformRead(skin =>
-                            {
-                                if (Foreground.Children.FirstOrDefault() is Content)
-                                    SkinData = skin;
-                            });
+                            skinItem.isFavourite = skin.IsFavourite;
+                            ShowFavouriteIndicator(skinItem.isFavourite);
                         }
                     }
 
-                    [BackgroundDependencyLoader(true)]
-                    private void load(AudioManager audio)
+                    protected override void LoadComplete()
                     {
-                        updateIcon();
-
-                        sampleShow = audio.Samples.Get(@"UI/check-on");
-                        sampleHide = audio.Samples.Get(@"UI/check-off");
+                        skinItem.menu = this.FindClosestParent<SkinDropdownMenu>();
+                        base.LoadComplete();
                     }
 
-                    protected override bool OnDragStart(DragStartEvent e)
+                    protected override bool OnClick(ClickEvent e)
                     {
                         if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
-                        {
-                            bool mostlyHorizontal = Math.Abs(e.Delta.X) > Math.Abs(e.Delta.Y);
+                            return true;
 
-                            if (mostlyHorizontal)
-                            {
-                                starContainer.FadeTo(1, 100, Easing.OutQuint);
-                                if (isFavourite)
-                                    favouriteIndicatorAnimateOut();
-                            }
+                        ChangeFavouriteIndicatorState();
+                        skinItem.triggerFavouriteChange();
 
-                            return mostlyHorizontal;
-                        }
-
-                        return base.OnDragStart(e);
-                    }
-
-                    private bool stateChanged;
-
-                    protected override void OnDrag(DragEvent e)
-                    {
-                        dragDelta += e.Delta.X / 2;
-
-                        if (Math.Abs(dragDelta) < 0.01) return;
-
-                        if (dragDelta >= favourite_drag_end_threshold && !stateChanged)
-                        {
-                            stateChanged = true;
-                            triggerFavouriteChange();
-                        }
-
-                        dragDelta = Math.Clamp(dragDelta, 0, 100);
-                        Background.MoveToX(dragDelta, 100, Easing.OutQuint);
-                        Foreground.MoveToX(dragDelta, 100, Easing.OutQuint);
-                        starContainer.ResizeWidthTo(dragDelta, 100, Easing.OutQuint);
-
-                        base.OnDrag(e);
-                    }
-
-                    protected override void OnDragEnd(DragEndEvent e)
-                    {
-                        const int offset = 0;
-                        const int duration = 250;
-                        const Easing easing = Easing.OutQuint;
-
-                        Background.MoveToX(offset, duration, easing);
-                        Foreground.MoveToX(offset, duration, easing);
-                        starContainer.FadeTo(0, duration, easing).ResizeWidthTo(offset, duration, easing);
-                        if (isFavourite)
-                            favouriteIndicatorAnimateIn();
-
-                        stateChanged = false;
-                        dragDelta = 0;
-
-                        base.OnDragEnd(e);
+                        return true;
                     }
 
                     protected override bool OnHover(HoverEvent e)
                     {
-                        if (!isFavourite && e.CurrentState.Mouse.LastSource is not ISourcedFromTouch)
-                            favouriteIndicatorAnimateIn();
+                        if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
+                            return base.OnHover(e);
+
+                        this.ScaleTo(1.25f, 250, Easing.OutQuint);
 
                         return base.OnHover(e);
                     }
 
                     protected override void OnHoverLost(HoverLostEvent e)
                     {
-                        if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
-                        {
-                            // Do nothing
-                        }
-                        else if (!isFavourite)
-                            favouriteIndicatorAnimateOut();
-
-                        base.OnHoverLost(e);
+                        if (e.CurrentState.Mouse.LastSource is not ISourcedFromTouch)
+                            this.ScaleTo(1.0f, 250, Easing.OutQuint);
                     }
 
-                    protected override bool OnMouseDown(MouseDownEvent e)
+                    public void ShowFavouriteIndicator(bool show, int delay = 250, int duration = 250)
                     {
-                        if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
+                        Colour = skinItem.isFavourite ? ActiveColour : inactiveColour;
+
+                        if (show)
                         {
-                            favouriteIndicatorAnimateIn();
-                            return triggerFavouriteChange();
+                            this.ScaleTo(1.25f, duration, Easing.OutQuint).Then().ScaleTo(1.0f, duration, Easing.OutQuint);
+                            this.FadeInFromZero(duration, Easing.OutQuint);
                         }
-
-                        if (e.Button == MouseButton.Right)
-                            return triggerFavouriteChange();
-
-                        return base.OnMouseDown(e);
-                    }
-
-                    private bool triggerFavouriteChange()
-                    {
-                        if (isFavourite)
-                            sampleHide?.Play();
                         else
-                            sampleShow?.Play();
-
-                        isFavourite = !isFavourite;
-                        updateIcon();
-
-                        content?.FavouriteIndicator.ChangeFavouriteIndicatorState();
-                        starButtonFlash();
-
-                        if (SkinData != null)
                         {
-                            menu?.trackFavouriteChange(SkinData.ID, isFavourite);
+                            this.Delay(delay).ScaleTo(0.8f, duration, Easing.OutQuint);
+                            this.Delay(delay).FadeOutFromOne(duration, Easing.OutQuint);
                         }
-
-                        return true;
                     }
 
-                    private void updateIcon()
+                    public void ChangeFavouriteIndicatorState()
                     {
-                        starIcon.Icon = isFavourite ? FontAwesome.Solid.Star : FontAwesome.Regular.Star;
+                        this.ScaleTo(1.35f, 250, Easing.OutQuint).Then().ScaleTo(1.0f, 250, Easing.OutQuint);
+                        if (skinItem.isFavourite)
+                            this.FadeColour(ActiveColour, 250, Easing.OutQuint);
+                        else
+                            this.FadeColour(inactiveColour, 250, Easing.OutQuint);
+                    }
+                }
+
+                protected override Drawable CreateContent()
+                {
+                    content = new Content(this);
+                    return content;
+                }
+
+                protected new partial class Content : CompositeDrawable, IHasText
+                {
+                    public LocalisableString Text
+                    {
+                        get => Label.Text;
+                        set => Label.Text = value;
                     }
 
-                    private void starButtonFlash()
+                    public readonly OsuSpriteText Label;
+
+                    public readonly FavouriteIndicator FavouriteIndicator;
+
+                    public Content(DrawableSkinDropdownMenuItem skinItem)
                     {
-                        starBackground
-                            .FadeColour(Colour4.Gold, 150, Easing.OutQuint)
-                            .Then()
-                            .FadeColour(Colour4.FromHex(@"#edae00"), 250, Easing.OutQuint);
+                        RelativeSizeAxes = Axes.X;
+                        AutoSizeAxes = Axes.Y;
 
-                        starIcon
-                            .FadeColour(Colour4.White, 150, Easing.OutQuint)
-                            .ScaleTo(0.8f, 150, Easing.OutQuint)
-                            .Then()
-                            .FadeColour(Colour4.White.Opacity(0.7f), 250, Easing.OutQuint)
-                            .ScaleTo(1.0f, 250, Easing.OutQuint);
-                    }
-
-                    private void favouriteIndicatorAnimateIn()
-                    {
-                        content?.FavouriteIndicator.ShowFavouriteIndicator(true);
-                    }
-
-                    private void favouriteIndicatorAnimateOut()
-                    {
-                        content?.FavouriteIndicator.ShowFavouriteIndicator(false, 100, 350);
-                    }
-
-                    public partial class FavouriteIndicator : SpriteIcon
-                    {
-                        private readonly DrawableSkinDropdownMenuItem skinItem;
-
-                        public readonly Colour4 ActiveColour = Colour4.Gold;
-
-                        private readonly Colour4 inactiveColour = Colour4.Black.Opacity(0.4f);
-
-                        public FavouriteIndicator(DrawableSkinDropdownMenuItem skinItemInstance)
+                        InternalChildren = new Drawable[]
                         {
-                            skinItem = skinItemInstance;
-                        }
-
-                        public override bool ChangeFocusOnClick => false;
-
-                        [BackgroundDependencyLoader(true)]
-                        private void load(RealmAccess realm)
-                        {
-                            if (skinItem.SkinData == null) return;
-
-                            Alpha = skinItem.isFavourite ? 1 : 0;
-
-                            var skin = realm.Run(r => r.All<SkinInfo>().FirstOrDefault(s => s.ID == skinItem.SkinData.ID));
-
-                            if (skin != null)
+                            FavouriteIndicator = new FavouriteIndicator(skinItem)
                             {
-                                skinItem.isFavourite = skin.IsFavourite;
-                                ShowFavouriteIndicator(skinItem.isFavourite);
-                            }
-                        }
-
-                        protected override void LoadComplete()
-                        {
-                            skinItem.menu = this.FindClosestParent<SkinDropdownMenu>();
-                            base.LoadComplete();
-                        }
-
-                        protected override bool OnClick(ClickEvent e)
-                        {
-                            if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
-                                return true;
-
-                            ChangeFavouriteIndicatorState();
-                            skinItem.triggerFavouriteChange();
-
-                            return true;
-                        }
-
-                        protected override bool OnHover(HoverEvent e)
-                        {
-                            if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
-                                return base.OnHover(e);
-
-                            this.ScaleTo(1.25f, 250, Easing.OutQuint);
-
-                            return base.OnHover(e);
-                        }
-
-                        protected override void OnHoverLost(HoverLostEvent e)
-                        {
-                            if (e.CurrentState.Mouse.LastSource is not ISourcedFromTouch)
-                                this.ScaleTo(1.0f, 250, Easing.OutQuint);
-                        }
-
-                        public void ShowFavouriteIndicator(bool show, int delay = 250, int duration = 250)
-                        {
-                            Colour = skinItem.isFavourite ? ActiveColour : inactiveColour;
-
-                            if (show)
+                                Icon = FontAwesome.Solid.Star,
+                                Size = new Vector2(10),
+                                BypassAutoSizeAxes = Axes.Y,
+                                X = 6,
+                                Y = 0,
+                                Margin = new MarginPadding { Horizontal = 2 },
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.CentreLeft,
+                            },
+                            Label = new TruncatingSpriteText
                             {
-                                this.ScaleTo(1.25f, duration, Easing.OutQuint).Then().ScaleTo(1.0f, duration, Easing.OutQuint);
-                                this.FadeInFromZero(duration, Easing.OutQuint);
-                            }
-                            else
-                            {
-                                this.Delay(delay).ScaleTo(0.8f, duration, Easing.OutQuint);
-                                this.Delay(delay).FadeOutFromOne(duration, Easing.OutQuint);
-                            }
-                        }
-
-                        public void ChangeFavouriteIndicatorState()
-                        {
-                            this.ScaleTo(1.35f, 250, Easing.OutQuint).Then().ScaleTo(1.0f, 250, Easing.OutQuint);
-                            if (skinItem.isFavourite)
-                                this.FadeColour(ActiveColour, 250, Easing.OutQuint);
-                            else
-                                this.FadeColour(inactiveColour, 250, Easing.OutQuint);
-                        }
-                    }
-
-                    protected override Drawable CreateContent()
-                    {
-                        content = new Content(this);
-                        return content;
-                    }
-
-                    protected new partial class Content : CompositeDrawable, IHasText
-                    {
-                        public LocalisableString Text
-                        {
-                            get => Label.Text;
-                            set => Label.Text = value;
-                        }
-
-                        public readonly OsuSpriteText Label;
-
-                        public readonly FavouriteIndicator FavouriteIndicator;
-
-                        public Content(DrawableSkinDropdownMenuItem skinItem)
-                        {
-                            RelativeSizeAxes = Axes.X;
-                            AutoSizeAxes = Axes.Y;
-
-                            InternalChildren = new Drawable[]
-                            {
-                                FavouriteIndicator = new FavouriteIndicator(skinItem)
-                                {
-                                    Icon = FontAwesome.Solid.Star,
-                                    Size = new Vector2(10),
-                                    BypassAutoSizeAxes = Axes.Y,
-                                    X = 6,
-                                    Y = 0,
-                                    Margin = new MarginPadding { Horizontal = 2 },
-                                    Origin = Anchor.Centre,
-                                    Anchor = Anchor.CentreLeft,
-                                },
-                                Label = new TruncatingSpriteText
-                                {
-                                    Padding = new MarginPadding { Left = 16 },
-                                    Origin = Anchor.CentreLeft,
-                                    Anchor = Anchor.CentreLeft,
-                                    RelativeSizeAxes = Axes.X,
-                                },
-                            };
-                        }
+                                Padding = new MarginPadding { Left = 16 },
+                                Origin = Anchor.CentreLeft,
+                                Anchor = Anchor.CentreLeft,
+                                RelativeSizeAxes = Axes.X,
+                            },
+                        };
                     }
                 }
             }
