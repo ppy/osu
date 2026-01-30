@@ -6,6 +6,7 @@ using osu.Framework.Utils;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Mania.Objects;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
 {
@@ -15,31 +16,52 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
+            if (current.BaseObject is TailNote)
+                return 0;
+
             var maniaCurrent = (ManiaDifficultyHitObject)current;
-            double startTime = maniaCurrent.StartTime;
-            double endTime = maniaCurrent.EndTime;
+            double currStartTime = maniaCurrent.StartTime;
+            double currEndTime = maniaCurrent.Tail?.ActualTime ?? currStartTime;
             bool isOverlapping = false;
 
-            double closestEndTime = Math.Abs(endTime - startTime); // Lowest value we can assume with the current information
+            double closestEndTime = Math.Abs(currEndTime - currStartTime); // Lowest value we can assume with the current information
             double holdFactor = 1.0; // Factor to all additional strains in case something else is held
             double holdAddition = 0; // Addition to the current note in case it's a hold and has to be released awkwardly
 
-            foreach (var maniaPrevious in maniaCurrent.PreviousHitObjects)
+            // Bonus for interaction between LNs
+            foreach (var maniaPrevious in maniaCurrent.PreviousHeadObjects)
             {
-                if (maniaPrevious is null)
+                if (maniaPrevious is null || !maniaPrevious.IsHold)
+                {
+                    // This is wrong but yea match live woo hoo
+                    if (maniaPrevious is not null)
+                        closestEndTime = Math.Min(closestEndTime, Math.Abs(currEndTime - maniaPrevious.StartTime));
+
                     continue;
+                }
 
-                // The current note is overlapped if a previous note or end is overlapping the current note body
-                isOverlapping |= Precision.DefinitelyBigger(maniaPrevious.EndTime, startTime, 1) &&
-                                 Precision.DefinitelyBigger(endTime, maniaPrevious.EndTime, 1) &&
-                                 Precision.DefinitelyBigger(startTime, maniaPrevious.StartTime, 1);
+                // We count this note as overlapped if the current note is an LN and any other LN is arranged like this:
+                // Prev  Curr
+                //        O <- Current LN's tail comes after previous LN's tail
+                //  O     |
+                //  |     O <- Current LN's head intersects previous LN's body
+                //  O
+                if (maniaCurrent.IsHold)
+                {
+                    bool currentHeadIntersects = Precision.DefinitelyBigger(maniaPrevious.Tail!.ActualTime, currStartTime, 1)
+                                                 && Precision.DefinitelyBigger(currStartTime, maniaPrevious.StartTime, 1);
 
-                // We give a slight bonus to everything if something is held meanwhile
-                if (Precision.DefinitelyBigger(maniaPrevious.EndTime, endTime, 1) &&
-                    Precision.DefinitelyBigger(startTime, maniaPrevious.StartTime, 1))
+                    bool currentTailComesAfter = Precision.DefinitelyBigger(maniaCurrent.Tail!.ActualTime, maniaPrevious.Tail.ActualTime, 1);
+
+                    isOverlapping |= currentHeadIntersects && currentTailComesAfter;
+                }
+
+                // We also give a bonus to this note if an LN exists that starts before this note and ends after.
+                if (Precision.DefinitelyBigger(maniaPrevious.Tail!.ActualTime, currEndTime, 1) &&
+                    Precision.DefinitelyBigger(currStartTime, maniaPrevious.StartTime, 1))
                     holdFactor = 1.25;
 
-                closestEndTime = Math.Min(closestEndTime, Math.Abs(endTime - maniaPrevious.EndTime));
+                closestEndTime = Math.Min(closestEndTime, Math.Abs(currEndTime - maniaPrevious.Tail.ActualTime));
             }
 
             // The hold addition is given if there was an overlap, however it is only valid if there are no other note with a similar ending.
