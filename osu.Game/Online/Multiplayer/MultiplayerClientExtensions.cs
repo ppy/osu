@@ -3,11 +3,11 @@
 
 using System;
 using System.Diagnostics;
-using System.Net.WebSockets;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Logging;
+using osu.Game.Utils;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -23,12 +23,10 @@ namespace osu.Game.Online.Multiplayer
 
                     onError?.Invoke(exception);
 
-                    if (exception is WebSocketException wse && wse.Message == @"The remote party closed the WebSocket connection without completing the close handshake.")
-                    {
-                        // OnlineStatusNotifier is already letting users know about interruptions to connections.
-                        // Silence these because it gets very spammy otherwise.
+                    // OnlineStatusNotifier is already letting users know about interruptions to connections.
+                    // Silence these because it gets very spammy otherwise.
+                    if (SentryLogger.IsLocalUserConnectivityException(exception))
                         return;
-                    }
 
                     if (exception.GetHubExceptionMessage() is string message)
                     {
