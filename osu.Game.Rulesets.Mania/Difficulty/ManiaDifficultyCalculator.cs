@@ -89,7 +89,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             for (int i = 1; i < sortedObjects.Length; i++)
             {
-                var currentObject = new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1], clockRate, objects, headObjects, tailObjects, perColumnHeadObjects, perColumnTailObjects, objects.Count);
+                var currentObject = new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1], clockRate,
+                    objects, headObjects, tailObjects, perColumnHeadObjects, perColumnTailObjects, objects.Count);
+
                 objects.Add(currentObject);
 
                 if (currentObject.BaseObject is not TailNote)

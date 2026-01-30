@@ -120,11 +120,17 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         public ManiaDifficultyHitObject? PrevTail(int backwardsIndex) => getNoteByIndex(tailObjects, tailObjectIndex - (backwardsIndex + 1));
         public ManiaDifficultyHitObject? NextTail(int forwardsIndex) => getNoteByIndex(tailObjects, tailObjectIndex + forwardsIndex + 1);
 
-        public ManiaDifficultyHitObject? PrevHeadInColumn(int backwardsIndex, int? column = null, bool inclusive = false) => getRelative(perColumnHeadObjects, column, columnHeadIndex, -backwardsIndex - 1, inclusive, true);
-        public ManiaDifficultyHitObject? NextHeadInColumn(int forwardsIndex, int? column = null, bool inclusive = false) => getRelative(perColumnHeadObjects, column, columnHeadIndex, forwardsIndex + 1, inclusive, false);
+        public ManiaDifficultyHitObject? PrevHeadInColumn(int backwardsIndex, int? column = null, bool inclusive = false) =>
+            getRelative(perColumnHeadObjects, column, columnHeadIndex, -backwardsIndex - 1, inclusive, true);
 
-        public ManiaDifficultyHitObject? PrevTailInColumn(int backwardsIndex, int? column = null, bool inclusive = false) => getRelative(perColumnTailObjects, column, columnTailIndex, -backwardsIndex - 1, inclusive, true);
-        public ManiaDifficultyHitObject? NextTailInColumn(int forwardsIndex, int? column = null, bool inclusive = false) => getRelative(perColumnTailObjects, column, columnTailIndex, forwardsIndex + 1, inclusive, false);
+        public ManiaDifficultyHitObject? NextHeadInColumn(int forwardsIndex, int? column = null, bool inclusive = false) =>
+            getRelative(perColumnHeadObjects, column, columnHeadIndex, forwardsIndex + 1, inclusive, false);
+
+        public ManiaDifficultyHitObject? PrevTailInColumn(int backwardsIndex, int? column = null, bool inclusive = false) =>
+            getRelative(perColumnTailObjects, column, columnTailIndex, -backwardsIndex - 1, inclusive, true);
+
+        public ManiaDifficultyHitObject? NextTailInColumn(int forwardsIndex, int? column = null, bool inclusive = false) =>
+            getRelative(perColumnTailObjects, column, columnTailIndex, forwardsIndex + 1, inclusive, false);
 
         private ManiaDifficultyHitObject? getRelative(List<ManiaDifficultyHitObject>[] perColumnLists, int? column, int currIndex, int offset, bool inclusive, bool backward)
         {
@@ -147,16 +153,16 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             // We don't add 1 to the offsets here, since it returns the index of the prev object already
             if (backward)
             {
-                int baseIndex = (inclusive && foundIndex < list.Count && list[foundIndex].StartTime == StartTime) ? foundIndex : foundIndex - 1;
+                int baseIndex = inclusive && foundIndex < list.Count && list[foundIndex].StartTime == StartTime ? foundIndex : foundIndex - 1;
                 return getNoteByIndex(list, baseIndex + offset);
             }
             else
             {
-                int baseIndex = (!inclusive && foundIndex < list.Count && list[foundIndex].StartTime == StartTime) ? foundIndex + 1 : foundIndex;
+                int baseIndex = !inclusive && foundIndex < list.Count && list[foundIndex].StartTime == StartTime ? foundIndex + 1 : foundIndex;
                 return getNoteByIndex(list, baseIndex + offset);
             }
         }
 
-        private ManiaDifficultyHitObject? getNoteByIndex(List<ManiaDifficultyHitObject> list, int index) => (index >= 0 && index < list.Count) ? list[index] : null;
+        private ManiaDifficultyHitObject? getNoteByIndex(List<ManiaDifficultyHitObject> list, int index) => index >= 0 && index < list.Count ? list[index] : null;
     }
 }
