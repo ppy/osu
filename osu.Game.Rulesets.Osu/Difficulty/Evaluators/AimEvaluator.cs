@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double baseFactor = 1 - 0.15 * calcAcuteAngleBonus(lastAngle) * angleDif;
 
                 // Penalize angle repetition.
-                angleRepetitionNerf = Math.Pow(baseFactor + (1 - baseFactor) * 0.95 * vectorRepetition * stackFactor, 2);
+                angleRepetitionNerf = Math.Pow(baseFactor + (1 - baseFactor) * 0.9 * vectorRepetition * stackFactor, 2);
 
                 if (Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) < 1.25 * Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) // If rhythms are the same.
                 {
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                     if (distance < 1)
                     {
-                        wideAngleBonus *= 1 - 0.9 * (1 - distance);
+                        wideAngleBonus *= 1 - 0.55 * (1 - distance);
                     }
                 }
             }
@@ -172,7 +172,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             aimStrain += velocityChangeBonus * velocity_change_multiplier;
 
             // Add in acute angle bonus or wide angle bonus, whichever is larger.
-            aimStrain += Math.Max(acuteAngleBonus * 2.8, wideAngleBonus * 1.2);
+            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * 1.2);
 
             // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)
@@ -226,6 +226,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         private static double calcWideAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(60), double.DegreesToRadians(110));
 
-        private static double calcAcuteAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(110), double.DegreesToRadians(60));
+        private static double calcAcuteAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(140), double.DegreesToRadians(40));
     }
 }
