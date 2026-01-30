@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -26,7 +26,6 @@ namespace osu.Game.Overlays.Settings
 {
     public partial class SkinDropdown : FormDropdown<Live<SkinInfo>>
     {
-
         protected override LocalisableString GenerateItemText(Live<SkinInfo> item) => item.ToString() ?? string.Empty;
 
         protected override DropdownMenu CreateMenu() => new SkinDropdownMenu();
@@ -37,37 +36,6 @@ namespace osu.Game.Overlays.Settings
             private void load()
             {
                 MaxHeight = 200;
-
-                StateChanged += s =>
-                {
-                    if (s == MenuState.Closed)
-                        commitFavouriteChanges();
-                };
-            }
-
-            [Resolved]
-            private RealmAccess realm { get; set; } = null!;
-
-            private readonly Dictionary<Guid, bool> pendingFavouriteChanges = new Dictionary<Guid, bool>();
-
-            private void trackFavouriteChange(Guid skinID, bool isFavourite)
-            {
-                pendingFavouriteChanges[skinID] = isFavourite;
-            }
-
-            private void commitFavouriteChanges()
-            {
-                realm.Write(r =>
-                {
-                    foreach ((Guid skinId, bool isFavourite) in pendingFavouriteChanges)
-                    {
-                        var skin = r.All<SkinInfo>().FirstOrDefault(s => s.ID == skinId);
-                        if (skin != null)
-                            skin.IsFavourite = isFavourite;
-                    }
-                });
-
-                pendingFavouriteChanges.Clear();
             }
 
             protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item)
@@ -105,15 +73,13 @@ namespace osu.Game.Overlays.Settings
 
                 private float dragDelta;
 
-                private Content? content;
+                private Content content = null!;
 
-                public SkinInfo? SkinData;
+                public SkinInfo SkinData = null!;
 
-                private Sample? sampleShow;
+                private Sample sampleShow = null!;
 
-                private Sample? sampleHide;
-
-                private SkinDropdownMenu? menu;
+                private Sample sampleHide = null!;
 
                 private readonly Box starBackground;
 
@@ -124,6 +90,9 @@ namespace osu.Game.Overlays.Settings
                 private readonly ClickableContainer starContainer;
 
                 public override bool ChangeFocusOnClick => false;
+
+                [Resolved]
+                private RealmAccess realm { get; set; } = null!;
 
                 public DrawableSkinDropdownMenuItem(MenuItem item)
                     : base(item)
@@ -166,11 +135,7 @@ namespace osu.Game.Overlays.Settings
 
                     if (item is DropdownMenuItem<Live<SkinInfo>> skinItem)
                     {
-                        skinItem.Value.PerformRead(skin =>
-                        {
-                            if (Foreground.Children.FirstOrDefault() is Content)
-                                SkinData = skin;
-                        });
+                        skinItem.Value.PerformRead(skin => SkinData = skin);
                     }
                 }
 
@@ -193,7 +158,7 @@ namespace osu.Game.Overlays.Settings
                         {
                             starContainer.FadeTo(1, 100, Easing.OutQuint);
                             if (isFavourite)
-                                favouriteIndicatorAnimateOut();
+                                content.AnimateFavouriteOut();
                         }
 
                         return mostlyHorizontal;
@@ -234,7 +199,7 @@ namespace osu.Game.Overlays.Settings
                     Foreground.MoveToX(offset, duration, easing);
                     starContainer.FadeTo(0, duration, easing).ResizeWidthTo(offset, duration, easing);
                     if (isFavourite)
-                        favouriteIndicatorAnimateIn();
+                        content.AnimateFavouriteIn();
 
                     stateChanged = false;
                     dragDelta = 0;
@@ -245,7 +210,7 @@ namespace osu.Game.Overlays.Settings
                 protected override bool OnHover(HoverEvent e)
                 {
                     if (!isFavourite && e.CurrentState.Mouse.LastSource is not ISourcedFromTouch)
-                        favouriteIndicatorAnimateIn();
+                        content.AnimateFavouriteIn();
 
                     return base.OnHover(e);
                 }
@@ -257,19 +222,13 @@ namespace osu.Game.Overlays.Settings
                         // Do nothing
                     }
                     else if (!isFavourite)
-                        favouriteIndicatorAnimateOut();
+                        content.AnimateFavouriteOut();
 
                     base.OnHoverLost(e);
                 }
 
                 protected override bool OnMouseDown(MouseDownEvent e)
                 {
-                    if (e.CurrentState.Mouse.LastSource is ISourcedFromTouch)
-                    {
-                        favouriteIndicatorAnimateIn();
-                        return triggerFavouriteChange();
-                    }
-
                     if (e.Button == MouseButton.Right)
                         return triggerFavouriteChange();
 
@@ -279,20 +238,23 @@ namespace osu.Game.Overlays.Settings
                 private bool triggerFavouriteChange()
                 {
                     if (isFavourite)
-                        sampleHide?.Play();
+                        sampleHide.Play();
                     else
-                        sampleShow?.Play();
+                        sampleShow.Play();
 
                     isFavourite = !isFavourite;
                     updateIcon();
 
-                    content?.FavouriteIndicator.ChangeFavouriteIndicatorState();
+                    content.ChangeFavourite();
                     starButtonFlash();
 
-                    if (SkinData != null)
+                    realm.Write(r =>
                     {
-                        menu?.trackFavouriteChange(SkinData.ID, isFavourite);
-                    }
+                        var skin = r.All<SkinInfo>().FirstOrDefault(s => s.ID == SkinData.ID);
+
+                        if (skin.IsNotNull())
+                            skin.IsFavourite = isFavourite;
+                    });
 
                     return true;
                 }
@@ -317,16 +279,6 @@ namespace osu.Game.Overlays.Settings
                         .ScaleTo(1.0f, 250, Easing.OutQuint);
                 }
 
-                private void favouriteIndicatorAnimateIn()
-                {
-                    content?.FavouriteIndicator.ShowFavouriteIndicator(true);
-                }
-
-                private void favouriteIndicatorAnimateOut()
-                {
-                    content?.FavouriteIndicator.ShowFavouriteIndicator(false, 100, 350);
-                }
-
                 public partial class FavouriteIndicator : SpriteIcon
                 {
                     private readonly DrawableSkinDropdownMenuItem skinItem;
@@ -345,8 +297,6 @@ namespace osu.Game.Overlays.Settings
                     [BackgroundDependencyLoader(true)]
                     private void load(RealmAccess realm)
                     {
-                        if (skinItem.SkinData == null) return;
-
                         Alpha = skinItem.isFavourite ? 1 : 0;
 
                         var skin = realm.Run(r => r.All<SkinInfo>().FirstOrDefault(s => s.ID == skinItem.SkinData.ID));
@@ -354,14 +304,9 @@ namespace osu.Game.Overlays.Settings
                         if (skin != null)
                         {
                             skinItem.isFavourite = skin.IsFavourite;
-                            ShowFavouriteIndicator(skinItem.isFavourite);
+                            if (skinItem.isFavourite)
+                                ShowFavouriteIndicator(true);
                         }
-                    }
-
-                    protected override void LoadComplete()
-                    {
-                        skinItem.menu = this.FindClosestParent<SkinDropdownMenu>();
-                        base.LoadComplete();
                     }
 
                     protected override bool OnClick(ClickEvent e)
@@ -434,6 +379,12 @@ namespace osu.Game.Overlays.Settings
                     public readonly OsuSpriteText Label;
 
                     public readonly FavouriteIndicator FavouriteIndicator;
+
+                    public void AnimateFavouriteIn() => FavouriteIndicator.ShowFavouriteIndicator(true);
+
+                    public void AnimateFavouriteOut() => FavouriteIndicator.ShowFavouriteIndicator(false, 100, 350);
+
+                    public void ChangeFavourite() => FavouriteIndicator.ChangeFavouriteIndicatorState();
 
                     public Content(DrawableSkinDropdownMenuItem skinItem)
                     {
