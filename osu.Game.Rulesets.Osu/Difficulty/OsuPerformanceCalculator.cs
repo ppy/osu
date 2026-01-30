@@ -517,6 +517,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double lowARSliderVisibilityFactor = Math.Pow(sliderFactor, 3);
             double highCSSliderVisibilityFactor = Math.Pow(Math.Min(-0.2 * circleSize + 2.2, 1), 1.8);
 
+            // Nerf low CS sliders at low AR less due to density increase from fully bright slider borders
+            double lowCSSliderVisibilityFactor = 0;
+            if (circleSize < 2.5)
+                lowCSSliderVisibilityFactor += Math.Min(-0.5 * circleSize + 1.25, 1);
+
+            lowARSliderVisibilityFactor = 1 - ((1 - lowARSliderVisibilityFactor) * (1 - (lowCSSliderVisibilityFactor / 2)));
+
             // Start from normal curve, rewarding lower AR up to AR7
             double traceableBonus = 0.025 * (12.0 - Math.Max(approachRate, 7)) * highARSliderVisibilityFactor * Math.Max(highCSSliderVisibilityFactor, highARSliderVisibilityFactor);
 
@@ -530,7 +537,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // AR8+ and especially AR10.3+ TC increases difficulty due to increased circle location uncertainty
             if (approachRate > 8)
-                traceableBonus += 0.004 * Math.Pow(approachRate - 8, 2) * highARSliderVisibilityFactor * 1.05 * Math.Max(highCSSliderVisibilityFactor, highARSliderVisibilityFactor);
+                traceableBonus += ((0.004 * Math.Pow(approachRate - 8, 2)) + (0.005 * (approachRate - 8))) * highARSliderVisibilityFactor * Math.Max(highCSSliderVisibilityFactor, highARSliderVisibilityFactor);
 
             return traceableBonus;
         }
