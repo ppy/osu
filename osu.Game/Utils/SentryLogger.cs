@@ -239,6 +239,9 @@ namespace osu.Game.Utils
 
         private bool shouldSubmitException(Exception exception)
         {
+            if (IsLocalUserConnectivityException(exception))
+                return false;
+
             switch (exception)
             {
                 // disk I/O failures, invalid formats, etc.
@@ -253,33 +256,32 @@ namespace osu.Game.Utils
                 case SharpCompress.Common.InvalidFormatException:
                     return false;
 
-                // connectivity failures
-
-                case TimeoutException te:
-                    return !te.Message.Contains(@"elapsed without receiving a message from the server");
-
-                case WebException we:
-                    switch (we.Status)
-                    {
-                        // more statuses may need to be blocked as we come across them.
-                        case WebExceptionStatus.Timeout:
-                            return false;
-                    }
-
-                    break;
-
-                case WebSocketException:
-                case SocketException:
-                    return false;
-
                 // stuff that should really never make it to sentry
-
                 case APIAccess.WebRequestFlushedException:
                 case TaskCanceledException:
                     return false;
             }
 
             return true;
+        }
+
+        public static bool IsLocalUserConnectivityException(Exception exception)
+        {
+            switch (exception)
+            {
+                case TimeoutException te:
+                    return te.Message.Contains(@"elapsed without receiving a message from the server");
+
+                case WebException we:
+                    // more statuses may need to be blocked as we come across them.
+                    return we.Status == WebExceptionStatus.Timeout;
+
+                case WebSocketException:
+                case SocketException:
+                    return true;
+            }
+
+            return false;
         }
 
         #region Disposal
