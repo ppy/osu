@@ -15,9 +15,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         public ManiaDifficultyHitObject? Tail { get; private set; }
         public bool IsHold => Tail is not null;
 
-        public new readonly double StartTime;
-        public new readonly double EndTime;
         public readonly double ActualTime;
+        public new double StartTime { get; }
+        public new double EndTime { get; private set; }
 
         public int? HeadIndex => Head?.headObjectIndex;
         public int? TailIndex => Tail?.headObjectIndex;
@@ -65,6 +65,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             columnTailIndex = perColumnTailObjects[Column].Count;
             PreviousHeadObjects = new ManiaDifficultyHitObject[totalColumns];
 
+            // Actual time is when the nested hit object takes place
+            ActualTime = base.StartTime;
+
             // Add a reference to the related head/tail for long notes.
             if (BaseObject is TailNote)
             {
@@ -76,6 +79,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
                 if (Head is not null)
                 {
                     Head.Tail = this;
+                    Head.EndTime = Tail.ActualTime;
                 }
             }
             else
@@ -83,10 +87,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
                 Head = this;
             }
 
-            // Actual time is when the nested hit object takes place
-            ActualTime = base.StartTime;
             StartTime = Head?.ActualTime ?? ActualTime;
-            EndTime = Tail?.ActualTime ?? ActualTime;
+            EndTime = ActualTime; // For LNs, we go back and populate this when we process the tail.
 
             HeadDeltaTime = StartTime - PrevHead(0)?.StartTime ?? StartTime;
             ColumnHeadStrainTime = StartTime - PrevHeadInColumn(0)?.StartTime ?? StartTime;
