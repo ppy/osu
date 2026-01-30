@@ -27,6 +27,8 @@ namespace osu.Game.Screens.SelectV2
             public Bindable<BeatmapInfo?> Beatmap { get; } = new Bindable<BeatmapInfo?>();
             public Bindable<StarDifficulty> StarDifficulty { get; } = new Bindable<StarDifficulty>();
 
+            protected override Colour4 DimColour => Colour4.White;
+
             private readonly Bindable<BeatmapSetInfo?> scopedBeatmapSet = new Bindable<BeatmapSetInfo?>();
             private readonly Bindable<bool> showConvertedBeatmaps = new Bindable<bool>();
 
@@ -50,6 +52,12 @@ namespace osu.Game.Screens.SelectV2
                 AutoSizeAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
                 Content.CornerRadius = 5;
+
+                Action = () =>
+                {
+                    if (Beatmap.Value != null)
+                        scopedBeatmapSet.Value = Beatmap.Value.BeatmapSet!;
+                };
             }
 
             [BackgroundDependencyLoader]
@@ -212,8 +220,6 @@ namespace osu.Game.Screens.SelectV2
                         dot.Alpha = (1 + 4 * (float)(succeeding.Count - i) / succeeding.Count) / 5;
                     }
                 }
-
-                Action = () => scopedBeatmapSet.Value = Beatmap.Value.BeatmapSet!;
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)

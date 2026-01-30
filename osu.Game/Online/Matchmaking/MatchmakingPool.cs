@@ -23,6 +23,9 @@ namespace osu.Game.Online.Matchmaking
         [Key(3)]
         public string Name { get; set; } = string.Empty;
 
+        [Key(4)]
+        public MatchmakingPoolType Type { get; set; } = MatchmakingPoolType.QuickPlay;
+
         public bool Equals(MatchmakingPool? other)
             => other != null
                && Id == other.Id

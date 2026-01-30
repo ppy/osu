@@ -151,7 +151,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             List<SkinBlueprint> blueprints = new List<SkinBlueprint>();
 
-            AddStep("clear list", () => blueprints.Clear());
+            AddStep("clear list", blueprints.Clear);
 
             for (int i = 0; i < 3; i++)
             {

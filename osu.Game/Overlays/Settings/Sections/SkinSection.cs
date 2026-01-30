@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Settings.Sections
 {
     public partial class SkinSection : SettingsSection
     {
-        private SkinSettingsDropdown skinDropdown;
+        private SkinDropdown skinDropdown;
 
         public override LocalisableString Header => SkinSettingsStrings.SkinSectionHeader;
 
@@ -41,6 +41,8 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             Icon = OsuIcon.SkinB
         };
+
+        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "skins" });
 
         private static readonly Live<SkinInfo> random_skin_info = new SkinInfo
         {
@@ -63,30 +65,28 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             Children = new Drawable[]
             {
-                skinDropdown = new SkinSettingsDropdown
+                new SettingsItemV2(skinDropdown = new SkinDropdown
                 {
                     AlwaysShowSearchBar = true,
                     AllowNonContiguousMatching = true,
-                    LabelText = SkinSettingsStrings.CurrentSkin,
+                    Caption = SkinSettingsStrings.CurrentSkin,
                     Current = skins.CurrentSkinInfo,
-                    Keywords = new[] { @"skins" },
-                },
+                }),
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(5, 0),
-                    Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS },
+                    Padding = SettingsPanel.CONTENT_PADDING,
                     Children = new Drawable[]
                     {
                         // This is all super-temporary until we move skin settings to their own panel / overlay.
-                        new RenameSkinButton { Padding = new MarginPadding(), RelativeSizeAxes = Axes.None, Width = 120 },
-                        new ExportSkinButton { Padding = new MarginPadding(), RelativeSizeAxes = Axes.None, Width = 120 },
-                        new DeleteSkinButton { Padding = new MarginPadding(), RelativeSizeAxes = Axes.None, Width = 110 },
+                        new RenameSkinButton { Padding = new MarginPadding { Right = 2.5f }, RelativeSizeAxes = Axes.X, Width = 1 / 3f },
+                        new ExportSkinButton { Padding = new MarginPadding { Horizontal = 2.5f }, RelativeSizeAxes = Axes.X, Width = 1 / 3f },
+                        new DeleteSkinButton { Padding = new MarginPadding { Left = 2.5f }, RelativeSizeAxes = Axes.X, Width = 1 / 3f },
                     }
                 },
-                new SettingsButton
+                new SettingsButtonV2
                 {
                     Text = SkinSettingsStrings.SkinLayoutEditor,
                     Action = () => skinEditor?.ToggleVisibility(),
@@ -147,17 +147,12 @@ namespace osu.Game.Overlays.Settings.Sections
             realmSubscription?.Dispose();
         }
 
-        private partial class SkinSettingsDropdown : SettingsDropdown<Live<SkinInfo>>
+        private partial class SkinDropdown : FormDropdown<Live<SkinInfo>>
         {
-            protected override OsuDropdown<Live<SkinInfo>> CreateDropdown() => new SkinDropdownControl();
-
-            private partial class SkinDropdownControl : DropdownControl
-            {
-                protected override LocalisableString GenerateItemText(Live<SkinInfo> item) => item.ToString();
-            }
+            protected override LocalisableString GenerateItemText(Live<SkinInfo> item) => item.ToString();
         }
 
-        public partial class RenameSkinButton : SettingsButton, IHasPopover
+        public partial class RenameSkinButton : SettingsButtonV2, IHasPopover
         {
             [Resolved]
             private SkinManager skins { get; set; }
@@ -188,7 +183,7 @@ namespace osu.Game.Overlays.Settings.Sections
             }
         }
 
-        public partial class ExportSkinButton : SettingsButton
+        public partial class ExportSkinButton : SettingsButtonV2
         {
             [Resolved]
             private SkinManager skins { get; set; }
@@ -226,7 +221,7 @@ namespace osu.Game.Overlays.Settings.Sections
             }
         }
 
-        public partial class DeleteSkinButton : DangerousSettingsButton
+        public partial class DeleteSkinButton : DangerousSettingsButtonV2
         {
             [Resolved]
             private SkinManager skins { get; set; }

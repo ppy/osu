@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -13,6 +14,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -24,6 +26,8 @@ namespace osu.Game.Screens.SelectV2
             where T : struct, Enum
         {
             private Circle strip = null!;
+
+            private Bindable<Language> currentLanguage = null!;
 
             protected override Dropdown<T>? CreateDropdown() => null;
 
@@ -37,7 +41,7 @@ namespace osu.Game.Screens.SelectV2
             }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
+            private void load(OverlayColourProvider colourProvider, OsuGameBase game)
             {
                 AddInternal(strip = new Circle
                 {
@@ -49,6 +53,8 @@ namespace osu.Game.Screens.SelectV2
 
                 foreach (var type in Enum.GetValues<T>())
                     AddItem(type);
+
+                currentLanguage = game.CurrentLanguage.GetBoundCopy();
             }
 
             protected override void LoadComplete()
@@ -57,11 +63,14 @@ namespace osu.Game.Screens.SelectV2
 
                 Current.BindValueChanged(_ => updateDisplay());
 
-                ScheduleAfterChildren(() =>
+                currentLanguage.BindValueChanged(_ =>
                 {
-                    updateDisplay();
-                    FinishTransforms(true);
-                });
+                    ScheduleAfterChildren(() =>
+                    {
+                        updateDisplay();
+                        FinishTransforms(true);
+                    });
+                }, true);
             }
 
             private void updateDisplay()

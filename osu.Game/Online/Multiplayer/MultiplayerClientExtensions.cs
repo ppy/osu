@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using osu.Framework.Extensions.ExceptionExtensions;
@@ -20,13 +21,23 @@ namespace osu.Game.Online.Multiplayer
                     Debug.Assert(t.Exception != null);
                     Exception exception = t.Exception.AsSingular();
 
+                    onError?.Invoke(exception);
+
+                    if (exception is WebSocketException wse && wse.Message == @"The remote party closed the WebSocket connection without completing the close handshake.")
+                    {
+                        // OnlineStatusNotifier is already letting users know about interruptions to connections.
+                        // Silence these because it gets very spammy otherwise.
+                        return;
+                    }
+
                     if (exception.GetHubExceptionMessage() is string message)
+                    {
                         // Hub exceptions generally contain something we can show the user directly.
                         Logger.Log(message, level: LogLevel.Important);
-                    else
-                        Logger.Error(exception, $"Unobserved exception occurred via {nameof(FireAndForget)} call: {exception.Message}");
+                        return;
+                    }
 
-                    onError?.Invoke(exception);
+                    Logger.Error(exception, $"Unobserved exception occurred via {nameof(FireAndForget)} call: {exception.Message}");
                 }
                 else
                 {

@@ -46,6 +46,9 @@ namespace osu.Game.Utils
         {
             this.game = game;
 
+            if (Environment.GetEnvironmentVariable("OSU_DISABLE_ERROR_REPORTING") == "1")
+                return;
+
             if (!game.IsDeployedBuild || !game.CreateEndpoints().WebsiteUrl.EndsWith(@".ppy.sh", StringComparison.Ordinal))
                 return;
 
@@ -176,6 +179,7 @@ namespace osu.Game.Utils
                     scope.SetTag(@"beatmap", $"{beatmap.OnlineID}");
                     scope.SetTag(@"ruleset", ruleset.ShortName);
                     scope.SetTag(@"os", $"{RuntimeInfo.OS} ({Environment.OSVersion})");
+                    scope.SetTag(@"version hash", game.VersionHash);
                     scope.SetTag(@"processor count", Environment.ProcessorCount.ToString());
                 });
             }
