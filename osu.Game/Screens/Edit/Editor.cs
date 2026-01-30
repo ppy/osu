@@ -424,7 +424,7 @@ namespace osu.Game.Screens.Edit
                                             },
                                             new OsuMenuItemSpacer(),
                                             new BackgroundDimMenuItem(editorBackgroundDim),
-                                            new ToggleMenuItem("Show storyboard")
+                                            new ToggleMenuItem(EditorStrings.ShowStoryboard)
                                             {
                                                 State = { BindTarget = editorShowStoryboard },
                                             },

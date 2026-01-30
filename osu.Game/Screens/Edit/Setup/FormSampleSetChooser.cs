@@ -13,6 +13,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -22,7 +23,7 @@ namespace osu.Game.Screens.Edit.Setup
 
         public FormSampleSetChooser()
         {
-            Caption = "Custom sample sets";
+            Caption = EditorSetupStrings.CustomSampleSets;
         }
 
         [BackgroundDependencyLoader]
