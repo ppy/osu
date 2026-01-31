@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Skills
@@ -32,48 +33,27 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         }
 
         /// <summary>
-        /// Returns the strain value at <see cref="DifficultyHitObject"/>. This value is calculated with or without respect to previous objects.
-        /// </summary>
-        protected abstract double StrainValueAt(DifficultyHitObject current);
-
-        /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
         /// </summary>
         protected sealed override double ProcessInternal(DifficultyHitObject current)
         {
+            ManiaDifficultyHitObject maniaCurrent = (ManiaDifficultyHitObject)current;
+
             // The first object doesn't generate a strain, so we begin with an incremented section end
             if (current.Index == 0)
-                currentSectionEnd = Math.Ceiling(current.StartTime / SectionLength) * SectionLength;
+                currentSectionEnd = Math.Ceiling(maniaCurrent.ActualTime / SectionLength) * SectionLength;
 
-            while (current.StartTime > currentSectionEnd)
+            while (maniaCurrent.ActualTime > currentSectionEnd)
             {
                 saveCurrentPeak();
-                startNewSectionFrom(currentSectionEnd, current);
+                startNewSectionFrom(currentSectionEnd, maniaCurrent);
                 currentSectionEnd += SectionLength;
             }
 
-            double strain = StrainValueAt(current);
+            double strain = StrainValueAt(maniaCurrent);
             currentSectionPeak = Math.Max(strain, currentSectionPeak);
 
             return strain;
-        }
-
-        /// <summary>
-        /// Calculates the number of strains weighted against the top strain.
-        /// The result is scaled by clock rate as it affects the total number of strains.
-        /// </summary>
-        public virtual double CountTopWeightedStrains(double difficultyValue)
-        {
-            if (ObjectDifficulties.Count == 0)
-                return 0.0;
-
-            double consistentTopStrain = difficultyValue * (1 - DecayWeight); // What would the top strain be if all strain values were identical
-
-            if (consistentTopStrain == 0)
-                return ObjectDifficulties.Count;
-
-            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return ObjectDifficulties.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
         }
 
         /// <summary>
@@ -89,20 +69,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         /// </summary>
         /// <param name="time">The beginning of the new section in milliseconds.</param>
         /// <param name="current">The current hit object.</param>
-        private void startNewSectionFrom(double time, DifficultyHitObject current)
+        private void startNewSectionFrom(double time, ManiaDifficultyHitObject current)
         {
             // The maximum strain of the new section is not zero by default
             // This means we need to capture the strain level at the beginning of the new section, and use that as the initial peak level.
-            currentSectionPeak = CalculateInitialStrain(time, current);
+            currentSectionPeak = ReadonlyStrainValueAt(time, current);
         }
-
-        /// <summary>
-        /// Retrieves the peak strain at a point in time.
-        /// </summary>
-        /// <param name="time">The time to retrieve the peak strain at.</param>
-        /// <param name="current">The current hit object.</param>
-        /// <returns>The peak strain.</returns>
-        protected abstract double CalculateInitialStrain(double time, DifficultyHitObject current);
 
         /// <summary>
         /// Returns a live enumerable of the peak strains for each <see cref="SectionLength"/> section of the beatmap,

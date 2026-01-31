@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mania.Difficulty.Evaluators;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
@@ -40,16 +39,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             chordStrain += chordDifficulty;
         }
 
-        protected override double StrainValueAt(DifficultyHitObject current)
+        protected override double StrainValueAt(ManiaDifficultyHitObject current)
         {
-            ManiaDifficultyHitObject maniaCurrent = (ManiaDifficultyHitObject)current;
+            double individualDelta = Math.Max(current.ActualTime - PreviousColumnTimes[current.Column], 25);
 
-            double individualDelta = Math.Max(maniaCurrent.ActualTime - PreviousColumnTimes[maniaCurrent.Column], 25);
+            individualStrains[current.Column] = applyDecay(individualStrains[current.Column], individualDelta, individual_decay_base);
+            individualStrains[current.Column] += IndividualStrainEvaluator.EvaluateDifficultyOf(current);
 
-            individualStrains[maniaCurrent.Column] = applyDecay(individualStrains[maniaCurrent.Column], individualDelta, individual_decay_base);
-            individualStrains[maniaCurrent.Column] += IndividualStrainEvaluator.EvaluateDifficultyOf(maniaCurrent);
-
-            maxIndividualStrain = Math.Max(maxIndividualStrain, individualStrains[maniaCurrent.Column]);
+            maxIndividualStrain = Math.Max(maxIndividualStrain, individualStrains[current.Column]);
 
             return maxIndividualStrain + chordStrain;
         }
@@ -60,9 +57,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             maxIndividualStrain = 0;
         }
 
-        protected override double CalculateInitialStrain(double offset, DifficultyHitObject current) =>
-            applyDecay(maxIndividualStrain, offset - ((ManiaDifficultyHitObject)current).PrevHead(0)?.StartTime ?? 0, individual_decay_base)
-            + applyDecay(chordStrain, offset - ((ManiaDifficultyHitObject)current).PrevHead(0)?.StartTime ?? 0, chord_decay_base);
+        protected override double ReadonlyStrainValueAt(double offset, ManiaDifficultyHitObject current) =>
+            applyDecay(maxIndividualStrain, offset - PreviousChordTime, individual_decay_base)
+            + applyDecay(chordStrain, offset - PreviousChordTime, chord_decay_base);
 
         private double applyDecay(double value, double deltaTime, double decayBase)
             => value * Math.Pow(decayBase, deltaTime / 1000);
