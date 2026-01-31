@@ -350,15 +350,15 @@ namespace osu.Game.Database
             {
                 foreach (var score in r.All<ScoreInfo>().Where(s => !s.BackgroundReprocessingFailed))
                 {
-                    if (score.BeatmapInfo == null)
-                        continue;
-
                     // Optimization: Check if MaximumStatistics are already populated
                     if (!string.IsNullOrEmpty(score.MaximumStatisticsJson) && score.MaximumStatisticsJson != "{}")
                         continue;
 
                     // Optimization: Check if Statistics are empty
                     if (string.IsNullOrEmpty(score.StatisticsJson) || score.StatisticsJson == "{}")
+                        continue;
+
+                    if (score.BeatmapInfo == null)
                         continue;
 
                     if (score.Statistics.Sum(kvp => kvp.Value) > 0)

@@ -24,13 +24,13 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestFooterButtonsOnScreenTransitions()
         {
             PushAndConfirm(() => new TestScreenOne());
-            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
+            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().FirstOrDefault()?.Text.ToString(), () => Is.EqualTo("Button One"));
 
             PushAndConfirm(() => new TestScreenTwo());
-            AddUntilStep("button two shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button Two"));
+            AddUntilStep("button two shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().FirstOrDefault()?.Text.ToString(), () => Is.EqualTo("Button Two"));
 
             AddStep("exit screen", () => Game.ScreenStack.Exit());
-            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
+            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().FirstOrDefault()?.Text.ToString(), () => Is.EqualTo("Button One"));
         }
 
         [Test]
@@ -70,13 +70,13 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("old back button shown", () => Game.BackButton.State.Value, () => Is.EqualTo(Visibility.Visible));
 
             pushSubScreenAndConfirm(() => screen, () => new TestScreenOne());
-            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
+            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().FirstOrDefault()?.Text.ToString(), () => Is.EqualTo("Button One"));
 
             pushSubScreenAndConfirm(() => screen, () => new TestScreenTwo());
-            AddUntilStep("button two shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button Two"));
+            AddUntilStep("button two shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().FirstOrDefault()?.Text.ToString(), () => Is.EqualTo("Button Two"));
 
             AddStep("exit sub screen", () => screen.ExitSubScreen());
-            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
+            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().FirstOrDefault()?.Text.ToString(), () => Is.EqualTo("Button One"));
 
             AddStep("exit sub screen", () => screen.ExitSubScreen());
             AddAssert("footer hidden", () => screenFooter.State.Value, () => Is.EqualTo(Visibility.Hidden));
@@ -93,13 +93,13 @@ namespace osu.Game.Tests.Visual.Navigation
 
             PushAndConfirm(() => screen = new TestScreenWithSubScreen());
             pushSubScreenAndConfirm(() => screen, () => new TestScreenOne());
-            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
+            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().FirstOrDefault()?.Text.ToString(), () => Is.EqualTo("Button One"));
 
             PushAndConfirm(() => new TestScreenTwo());
-            AddUntilStep("button two shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button Two"));
+            AddUntilStep("button two shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().FirstOrDefault()?.Text.ToString(), () => Is.EqualTo("Button Two"));
 
             AddStep("exit parent screen", () => Game.ScreenStack.Exit());
-            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
+            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().FirstOrDefault()?.Text.ToString(), () => Is.EqualTo("Button One"));
         }
 
         /// <summary>
@@ -112,18 +112,18 @@ namespace osu.Game.Tests.Visual.Navigation
 
             PushAndConfirm(() => screen = new TestScreenWithSubScreen());
             pushSubScreenAndConfirm(() => screen, () => new TestScreenOne());
-            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
+            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().FirstOrDefault()?.Text.ToString(), () => Is.EqualTo("Button One"));
 
             PushAndConfirm(() => new TestScreenOne());
-            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
+            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().FirstOrDefault()?.Text.ToString(), () => Is.EqualTo("Button One"));
 
             // Can't use the helper method because the screen never loads
             AddStep("Push new sub screen", () => screen.PushSubScreen(new TestScreenTwo()));
             AddWaitStep("wait for potential screen load", 5);
-            AddUntilStep("button one still shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
+            AddUntilStep("button one still shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().FirstOrDefault()?.Text.ToString(), () => Is.EqualTo("Button One"));
 
             AddStep("exit parent screen", () => Game.ScreenStack.Exit());
-            AddUntilStep("button two shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button Two"));
+            AddUntilStep("button two shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().FirstOrDefault()?.Text.ToString(), () => Is.EqualTo("Button Two"));
         }
 
         private void pushSubScreenAndConfirm(Func<TestScreenWithSubScreen> target, Func<Screen> newScreen)
