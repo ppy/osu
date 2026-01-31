@@ -268,6 +268,11 @@ namespace osu.Game.Tests.Database
         {
             protected override int TimeToSleepDuringGameplay => 10;
 
+            protected override void backpopulateUserTags()
+            {
+                // no-op to avoid online/local metadata source dependencies in tests.
+            }
+
             public bool Completed => ProcessingTask.IsCompleted;
         }
     }

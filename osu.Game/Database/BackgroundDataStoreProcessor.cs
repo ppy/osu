@@ -641,7 +641,7 @@ namespace osu.Game.Database
             completeNotification(notification, processedCount, beatmapSetIds.Count, failedCount);
         }
 
-        private void backpopulateUserTags()
+        protected virtual void backpopulateUserTags()
         {
             if (!localMetadataSource.Available || !localMetadataSource.IsAtLeastVersion(3))
             {
