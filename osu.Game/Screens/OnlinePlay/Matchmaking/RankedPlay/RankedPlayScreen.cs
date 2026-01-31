@@ -18,6 +18,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -115,27 +116,31 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 new PopoverContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Child = new OsuContextMenuContainer
                     {
-                        screenContainer = new Container<RankedPlaySubScreen>
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        chat = new MatchmakingChatDisplay(new Room(room))
-                        {
-                            Anchor = Anchor.BottomRight,
-                            Origin = Anchor.BottomRight,
-                            Size = new Vector2(320, 160),
-                            Margin = new MarginPadding
+                            screenContainer = new Container<RankedPlaySubScreen>
                             {
-                                Bottom = 10,
-                                Right = 10
+                                RelativeSizeAxes = Axes.Both,
                             },
-                            Alpha = 0,
-                        },
-                        new HamburgerMenu
-                        {
-                            Size = new Vector2(56),
+                            chat = new MatchmakingChatDisplay(new Room(room))
+                            {
+                                Anchor = Anchor.BottomRight,
+                                Origin = Anchor.BottomRight,
+                                Size = new Vector2(320, 160),
+                                Margin = new MarginPadding
+                                {
+                                    Bottom = 10,
+                                    Right = 10
+                                },
+                                Alpha = 0,
+                            },
+                            new HamburgerMenu
+                            {
+                                Size = new Vector2(56),
+                            }
                         }
                     }
                 },
