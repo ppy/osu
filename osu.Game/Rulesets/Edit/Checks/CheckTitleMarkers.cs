@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateIncorrectMarker(this),
         };
 
-        private static readonly IEnumerable<MarkerCheck> markerChecks =
+        private static readonly IEnumerable<MarkerCheck> marker_checks =
         [
             new MarkerCheck(@"(TV Size)", @"(?i)(tv (size|ver))"),
             new MarkerCheck(@"(Game Ver.)", @"(?i)(game (size|ver))"),
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             string romanisedTitle = context.CurrentDifficulty.Playable.Metadata.Title;
             string unicodeTitle = context.CurrentDifficulty.Playable.Metadata.TitleUnicode;
 
-            foreach (var check in markerChecks)
+            foreach (var check in marker_checks)
             {
                 bool hasRomanisedTitle = unicodeTitle != romanisedTitle;
 
