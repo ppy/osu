@@ -191,9 +191,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double doubletappability = DifficultyCalculationUtils.Smoothstep(osuLast0Obj.LazyJumpDistance, diameter, 0)
                                        * DifficultyCalculationUtils.Smoothstep(osuLast2Obj.LazyJumpDistance, diameter, 0);
 
-            // Don't nerf stream maps
-            doubletappability *= DifficultyCalculationUtils.Smoothstep(osuLast1Obj.LazyJumpDistance, 0, diameter);
-
             // Start from hitwindow
             double doubletapHitWindow = osuCurrObj.HitWindowGreat;
 
