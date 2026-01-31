@@ -176,7 +176,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         private static double calcAimDoubletapMultiplier(DifficultyHitObject current)
         {
-            // Use 4 objects to be sure that only many doubletaps in a row would be nerfed
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLast0Obj = (OsuDifficultyHitObject)current.Previous(0);
             var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
