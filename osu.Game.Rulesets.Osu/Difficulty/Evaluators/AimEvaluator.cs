@@ -82,12 +82,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Rewarding angles, take the smaller velocity as base.
                 double angleBonus = Math.Min(currVelocity, prevVelocity);
 
-                double angleDifference = Math.Cos(2 * Math.Min(Math.PI / 4, Math.Abs(currAngle - lastAngle)));
+                double angleDifferenceAdjusted = Math.Cos(2 * Math.Min(double.DegreesToRadians(45), Math.Abs(currAngle - lastAngle)));
                 double vectorRepetition = angleVectorRepetition(osuCurrObj);
 
                 double stackFactor = DifficultyCalculationUtils.Smootherstep(osuLastObj.LazyJumpDistance, 0, diameter);
 
-                double baseFactor = 1 - 0.15 * calcAcuteAngleBonus(lastAngle) * angleDifference;
+                double baseFactor = 1 - 0.15 * calcAcuteAngleBonus(lastAngle) * angleDifferenceAdjusted;
 
                 // Penalize angle repetition.
                 angleRepetitionNerf = Math.Pow(baseFactor + (1 - baseFactor) * 0.9 * vectorRepetition * stackFactor, 2);
@@ -209,7 +209,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 if (loopObj.NormalisedVectorAngle.IsNotNull() && current.NormalisedVectorAngle.IsNotNull())
                 {
                     double angleDifference = Math.Abs(current.NormalisedVectorAngle.Value - loopObj.NormalisedVectorAngle.Value);
-                    constantAngleCount += Math.Cos(8 * Math.Min(Math.PI / 16, angleDifference));
+                    constantAngleCount += Math.Cos(8 * Math.Min(double.DegreesToRadians(11.25), angleDifference));
                 }
 
                 notesProcessed++;
