@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -10,9 +10,11 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -39,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private List<OsuReplayFrame> replayFrames = null!;
 
-        private int currentFrame = -1;
+        private int currentFrame;
 
         public void Update(Playfield playfield)
         {
@@ -47,14 +49,62 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             double time = playfield.Clock.CurrentTime;
 
-            // Very naive implementation of autopilot based on proximity to replay frames.
+            // Interpolate the cursor position using the replay frames.
             // Special case for the first frame is required to ensure the mouse is in a sane position until the actual time of the first frame is hit.
-            // TODO: this needs to be based on user interactions to better match stable (pausing until judgement is registered).
-            if (currentFrame < 0 || Math.Abs(replayFrames[currentFrame + 1].Time - time) <= Math.Abs(replayFrames[currentFrame].Time - time))
+            while (currentFrame > 0 && Math.Abs(replayFrames[currentFrame - 1].Time - time) <= Math.Abs(replayFrames[currentFrame].Time - time))
+            {
+                currentFrame--;
+            }
+
+            while (currentFrame < replayFrames.Count - 1 && Math.Abs(replayFrames[currentFrame + 1].Time - time) <= Math.Abs(replayFrames[currentFrame].Time - time))
             {
                 currentFrame++;
-                new MousePositionAbsoluteInput { Position = playfield.ToScreenSpace(replayFrames[currentFrame].Position) }.Apply(inputManager.CurrentState, inputManager);
             }
+
+            Vector2 newPosition = playfield.ToScreenSpace(replayFrames[currentFrame].Position);
+
+            var osuPlayfield = (OsuPlayfield)playfield;
+
+            var nextObject = osuPlayfield.HitObjectContainer.AliveObjects
+                                         .OfType<DrawableOsuHitObject>()
+                                         .OrderBy(h => h.HitObject.StartTime)
+                                         .FirstOrDefault(h => !h.Result.HasResult);
+
+            if (nextObject != null)
+            {
+                // If we are currently "on" an object (in terms of time), we should check if it has been judged.
+                // If it hasn't been judged, and we are still within the valid hit window, maybe we should clamp the cursor position to that object's position, effectively "pausing" the cursor movement along the path until the user clicks or it's too late.
+
+                bool shouldStay = false;
+                Vector2 stayPosition = Vector2.Zero;
+
+                if (nextObject is DrawableSlider slider)
+                {
+                    if (!slider.HeadCircle.Result.HasResult)
+                    {
+                        if (time >= slider.HitObject.StartTime)
+                        {
+                            shouldStay = true;
+                            stayPosition = slider.HitObject.StackedPosition;
+                        }
+                    }
+                }
+                else if (nextObject is DrawableHitCircle hitCircle)
+                {
+                    if (time >= hitCircle.HitObject.StartTime)
+                    {
+                        shouldStay = true;
+                        stayPosition = hitCircle.HitObject.StackedPosition;
+                    }
+                }
+
+                if (shouldStay)
+                {
+                    newPosition = playfield.ToScreenSpace(stayPosition);
+                }
+            }
+
+            new MousePositionAbsoluteInput { Position = newPosition }.Apply(inputManager.CurrentState, inputManager);
 
             // TODO: Implement the functionality to automatically spin spinners
         }
