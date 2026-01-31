@@ -437,7 +437,7 @@ namespace osu.Game.Database
             int processedCount = 0;
             int failedCount = 0;
 
-            foreach (var id in scoreIds)
+            foreach (var chunk in scoreIds.Chunk(100))
             {
                 if (notification?.State == ProgressNotificationState.Cancelled)
                     break;
@@ -446,28 +446,72 @@ namespace osu.Game.Database
 
                 sleepIfRequired();
 
-                try
-                {
-                    // Can't use async overload because we're not on the update thread.
-                    // ReSharper disable once MethodHasAsyncOverload
-                    realmAccess.Write(r =>
-                    {
-                        ScoreInfo s = r.Find<ScoreInfo>(id)!;
-                        StandardisedScoreMigrationTools.UpdateFromLegacy(s, beatmapManager.GetWorkingBeatmap(s.BeatmapInfo));
-                        s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
-                    });
+                var updates = new List<(Guid id, long totalScore, long totalScoreWithoutMods, double accuracy, ScoreRank rank)>();
+                var failedIds = new List<Guid>();
 
-                    ++processedCount;
-                }
-                catch (ObjectDisposedException)
+                realmAccess.Run(r =>
                 {
-                    throw;
-                }
-                catch (Exception e)
+                    foreach (var id in chunk)
+                    {
+                        var score = r.Find<ScoreInfo>(id);
+
+                        if (score == null)
+                            continue;
+
+                        var detachedScore = score.Detach();
+
+                        try
+                        {
+                            StandardisedScoreMigrationTools.UpdateFromLegacy(detachedScore, beatmapManager.GetWorkingBeatmap(detachedScore.BeatmapInfo));
+                            updates.Add((detachedScore.ID, detachedScore.TotalScore, detachedScore.TotalScoreWithoutMods, detachedScore.Accuracy, detachedScore.Rank));
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Log($"Failed to convert total score for {id}: {e}");
+                            failedIds.Add(id);
+                        }
+                    }
+                });
+
+                if (updates.Count > 0 || failedIds.Count > 0)
                 {
-                    Logger.Log($"Failed to convert total score for {id}: {e}");
-                    realmAccess.Write(r => r.Find<ScoreInfo>(id)!.BackgroundReprocessingFailed = true);
-                    ++failedCount;
+                    try
+                    {
+                        // Can't use async overload because we're not on the update thread.
+                        // ReSharper disable once MethodHasAsyncOverload
+                        realmAccess.Write(r =>
+                        {
+                            foreach (var update in updates)
+                            {
+                                var s = r.Find<ScoreInfo>(update.id);
+                                if (s == null) continue;
+
+                                s.TotalScore = update.totalScore;
+                                s.TotalScoreWithoutMods = update.totalScoreWithoutMods;
+                                s.Accuracy = update.accuracy;
+                                s.Rank = update.rank;
+                                s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+                            }
+
+                            foreach (var id in failedIds)
+                            {
+                                var s = r.Find<ScoreInfo>(id);
+                                if (s != null)
+                                    s.BackgroundReprocessingFailed = true;
+                            }
+                        });
+
+                        processedCount += updates.Count;
+                        failedCount += failedIds.Count;
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        throw;
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Log($"Fatal error writing batch in score conversion: {e}");
+                    }
                 }
             }
 
