@@ -3,14 +3,14 @@
 
 using System;
 using System.Linq;
+using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mania.Difficulty.Evaluators;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
-    public class Strain : ManiaSkill
+    public class Strain : ManiaStrainSkill
     {
         private const double chord_decay_base = 0.30;
         private const double individual_decay_base = 0.125;
@@ -40,17 +40,16 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             chordStrain += chordDifficulty;
         }
 
-        protected override double StrainValueAt(ManiaDifficultyHitObject current)
+        protected override double StrainValueAt(DifficultyHitObject current)
         {
-            if (current.BaseObject is TailNote)
-                return 0;
+            ManiaDifficultyHitObject maniaCurrent = (ManiaDifficultyHitObject)current;
 
-            double individualDelta = current.ActualTime - PreviousColumnTimes[current.Column];
+            double individualDelta = Math.Max(maniaCurrent.ActualTime - PreviousColumnTimes[maniaCurrent.Column], 25);
 
-            individualStrains[current.Column] = applyDecay(individualStrains[current.Column], individualDelta, individual_decay_base);
-            individualStrains[current.Column] += IndividualStrainEvaluator.EvaluateDifficultyOf(current);
+            individualStrains[maniaCurrent.Column] = applyDecay(individualStrains[maniaCurrent.Column], individualDelta, individual_decay_base);
+            individualStrains[maniaCurrent.Column] += IndividualStrainEvaluator.EvaluateDifficultyOf(maniaCurrent);
 
-            return individualStrains[current.Column] + chordStrain;
+            return individualStrains[maniaCurrent.Column] + chordStrain;
         }
 
         protected override void ResetChord()
@@ -58,16 +57,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             chordDifficulty = 0;
         }
 
-        // protected override double CalculateInitialStrain(double offset, DifficultyHitObject current) =>
-        //     applyDecay(highestIndividualStrain, offset - current.Previous(0).StartTime, individual_decay_base)
-        //     + applyDecay(chordStrain, offset - current.Previous(0).StartTime, overall_decay_base);
+        protected override double CalculateInitialStrain(double offset, DifficultyHitObject current) =>
+            applyDecay(individualStrains.Max(), offset - ((ManiaDifficultyHitObject)current).PrevHead(0)?.StartTime ?? 0, individual_decay_base)
+            + applyDecay(chordStrain, offset - ((ManiaDifficultyHitObject)current).PrevHead(0)?.StartTime ?? 0, chord_decay_base);
 
         private double applyDecay(double value, double deltaTime, double decayBase)
             => value * Math.Pow(decayBase, deltaTime / 1000);
-
-        public override double DifficultyValue()
-        {
-            return ObjectDifficulties.Count > 0 ? ObjectDifficulties.Average() : 0;
-        }
     }
 }

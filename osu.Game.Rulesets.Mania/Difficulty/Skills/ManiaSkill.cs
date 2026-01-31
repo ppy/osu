@@ -40,10 +40,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             this.lnProcessingMode = lnProcessingMode;
         }
 
-        protected override double ProcessInternal(DifficultyHitObject current)
+        public override void Process(DifficultyHitObject current)
         {
             if (!shouldProcess(current))
-                return 0;
+                return;
 
             ManiaDifficultyHitObject maniaCurrent = (ManiaDifficultyHitObject)current;
 
@@ -70,15 +70,15 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
                 chordPreprocessed = true;
             }
 
-            double strainValue = StrainValueAt(maniaCurrent);
+            FinalizeChord();
 
-            return strainValue;
+            double strainValue = ProcessInternal(maniaCurrent);
+
+            ObjectDifficulties.Add(strainValue);
         }
 
         protected abstract void PreprocessChordNote(ManiaDifficultyHitObject current);
         protected abstract void FinalizeChord();
-
-        protected abstract double StrainValueAt(ManiaDifficultyHitObject current);
 
         private void startNewChord(double newChordTime)
         {

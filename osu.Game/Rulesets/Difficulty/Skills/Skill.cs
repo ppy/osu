@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Process a <see cref="DifficultyHitObject"/>.
         /// </summary>
         /// <param name="current">The <see cref="DifficultyHitObject"/> to process.</param>
-        public void Process(DifficultyHitObject current)
+        public virtual void Process(DifficultyHitObject current)
         {
             double difficultyValue = ProcessInternal(current);
             ObjectDifficulties.Add(difficultyValue);
