@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -50,13 +50,20 @@ namespace osu.Game.Rulesets.Osu.Mods
             // Very naive implementation of autopilot based on proximity to replay frames.
             // Special case for the first frame is required to ensure the mouse is in a sane position until the actual time of the first frame is hit.
             // TODO: this needs to be based on user interactions to better match stable (pausing until judgement is registered).
-            if (currentFrame < 0 || Math.Abs(replayFrames[currentFrame + 1].Time - time) <= Math.Abs(replayFrames[currentFrame].Time - time))
+            while (currentFrame < replayFrames.Count - 1)
             {
-                currentFrame++;
-                new MousePositionAbsoluteInput { Position = playfield.ToScreenSpace(replayFrames[currentFrame].Position) }.Apply(inputManager.CurrentState, inputManager);
+                if (currentFrame < 0 || Math.Abs(replayFrames[currentFrame + 1].Time - time) <= Math.Abs(replayFrames[currentFrame].Time - time))
+                {
+                    currentFrame++;
+                }
+                else
+                {
+                    break;
+                }
             }
 
-            // TODO: Implement the functionality to automatically spin spinners
+            if (currentFrame >= 0)
+                new MousePositionAbsoluteInput { Position = playfield.ToScreenSpace(replayFrames[currentFrame].Position) }.Apply(inputManager.CurrentState, inputManager);
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
