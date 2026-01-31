@@ -194,10 +194,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Don't nerf stream maps
             doubletappability *= DifficultyCalculationUtils.Smoothstep(osuLast1Obj.LazyJumpDistance, 0, diameter);
 
-            // This part is not great, but it keeps alt maps with doubles from being too nerfed
-            doubletappability *= 0.5 + 0.5 * DifficultyCalculationUtils.ReverseLerp(osuCurrObj.LazyJumpDistance, diameter * 1.5, diameter * 3)
-                                 * DifficultyCalculationUtils.ReverseLerp(osuLast1Obj.LazyJumpDistance, diameter * 1.5, diameter * 3);
-
             // Start from hitwindow
             double doubletapHitWindow = osuCurrObj.HitWindowGreat;
 
