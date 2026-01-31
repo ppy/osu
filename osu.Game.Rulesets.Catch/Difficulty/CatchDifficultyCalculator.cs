@@ -60,7 +60,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     continue;
 
                 if (lastObject != null)
-                    objects.Add(new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatcherWidth, objects, objects.Count));
+                {
+                    double objectClockRate = 1;
+
+                    foreach (var mod in Mods.OfType<IApplicableToRate>())
+                        objectClockRate = mod.ApplyToRate(hitObject.StartTime, objectClockRate);
+
+                    objects.Add(new CatchDifficultyHitObject(hitObject, lastObject, objectClockRate, halfCatcherWidth, objects, objects.Count));
+                }
 
                 lastObject = hitObject;
             }
@@ -77,7 +84,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             return new Skill[]
             {
-                new Movement(mods, halfCatcherWidth, clockRate),
+                new Movement(mods, halfCatcherWidth),
             };
         }
 
