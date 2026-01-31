@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mania.Difficulty.Evaluators;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
@@ -19,6 +18,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         private double chordStrain;
 
         private readonly double[] individualStrains;
+        private double maxIndividualStrain;
 
         public Strain(Mod[] mods, int totalColumns)
             : base(mods, totalColumns)
@@ -49,16 +49,19 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             individualStrains[maniaCurrent.Column] = applyDecay(individualStrains[maniaCurrent.Column], individualDelta, individual_decay_base);
             individualStrains[maniaCurrent.Column] += IndividualStrainEvaluator.EvaluateDifficultyOf(maniaCurrent);
 
-            return individualStrains[maniaCurrent.Column] + chordStrain;
+            maxIndividualStrain = Math.Max(maxIndividualStrain, individualStrains[maniaCurrent.Column]);
+
+            return maxIndividualStrain + chordStrain;
         }
 
         protected override void ResetChord()
         {
             chordDifficulty = 0;
+            maxIndividualStrain = 0;
         }
 
         protected override double CalculateInitialStrain(double offset, DifficultyHitObject current) =>
-            applyDecay(individualStrains.Max(), offset - ((ManiaDifficultyHitObject)current).PrevHead(0)?.StartTime ?? 0, individual_decay_base)
+            applyDecay(maxIndividualStrain, offset - ((ManiaDifficultyHitObject)current).PrevHead(0)?.StartTime ?? 0, individual_decay_base)
             + applyDecay(chordStrain, offset - ((ManiaDifficultyHitObject)current).PrevHead(0)?.StartTime ?? 0, chord_decay_base);
 
         private double applyDecay(double value, double deltaTime, double decayBase)
