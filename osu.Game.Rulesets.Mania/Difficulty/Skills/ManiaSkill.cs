@@ -67,10 +67,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
                     chordNote = getNext(chordNote);
                 }
 
+                FinalizeChord();
+
                 chordPreprocessed = true;
             }
-
-            FinalizeChord();
 
             double strainValue = ProcessInternal(maniaCurrent);
 
@@ -83,14 +83,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         private void startNewChord(double newChordTime)
         {
             // Reset skill specific chord implementations
-            ResetChord();
-
             PreviousChordTime = CurrentChordTime;
             CurrentChordTime = newChordTime;
             ChordNoteCount = 0;
 
             for (int column = 0; column < currentColumnTimes.Length; column++)
                 PreviousColumnTimes[column] = currentColumnTimes[column];
+
+            ResetChord();
         }
 
         protected abstract void ResetChord();
