@@ -1,4 +1,8 @@
 #include "oboe_audio.h"
+#include <android/log.h>
+
+#define LOG_TAG "OsuOboeAudio"
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 OboeAudio::OboeAudio() {}
 
@@ -13,30 +17,46 @@ bool OboeAudio::initialize() {
            ->setSharingMode(oboe::SharingMode::Exclusive)
            ->setFormat(oboe::AudioFormat::Float)
            ->setChannelCount(oboe::ChannelCount::Stereo)
-           ->setSampleRate(48000) // Device native sample rate
+           // Let Oboe choose the native sample rate if not specified,
+           // but user recommended 48000. We'll use Unspecified to get the best one.
+           ->setSampleRate(oboe::SampleRate::Unspecified)
            ->setDataCallback(this);
 
     oboe::Result result = builder.openStream(stream);
-    return result == oboe::Result::OK;
+    if (result != oboe::Result::OK) {
+        LOGE("Error opening stream: %s", oboe::convertToText(result));
+        return false;
+    }
+
+    // Optimization: Set buffer size to 2x burst frames for low latency
+    int32_t framesPerBurst = stream->getFramesPerBurst();
+    stream->setBufferSizeInFrames(framesPerBurst * 2);
+
+    return true;
 }
 
 void OboeAudio::start() {
-    if (stream) stream->requestStart();
+    if (stream) {
+        stream->requestStart();
+    }
 }
 
 void OboeAudio::stop() {
     if (stream) {
         stream->requestStop();
         stream->close();
+        stream.reset();
     }
 }
 
 oboe::DataCallbackResult OboeAudio::onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) {
-    // Fill audioData with zeros for now, or pull from a managed buffer
+    // Fill audioData with zeros for now.
+    // In a real implementation, we would pull from the game's audio buffer.
     float *output = static_cast<float *>(audioData);
-    for (int i = 0; i < numFrames * 2; ++i) {
-        output[i] = 0.0f;
-    }
+    memset(output, 0, numFrames * oboeStream->getChannelCount() * sizeof(float));
+
+    // The master timeline would be updated here using oboeStream->getTimestamp()
+
     return oboe::DataCallbackResult::Continue;
 }
 

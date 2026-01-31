@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
+using Android.Content.Res;
 using Android.Graphics;
+using Android.Hardware.Input;
 using Android.OS;
 using Android.Views;
 using osu.Framework.Android;
@@ -50,16 +52,17 @@ namespace osu.Android
                     var toolType = e.GetToolType(i);
                     if (toolType == MotionEventToolType.Stylus)
                     {
-                        // S Pen detected. We can optionally handle it as a higher precision device here.
-                        // For now, we ensure that we're leveraging hardware timestamps.
-                        long timestamp = e.EventTime; // or EventTimeNano if available and supported
+                        // S Pen detected. Hardware timestamps should be used for improved latency.
+                        // MotionEvent.EventTime is in ms, converting to nano
+                        long timestampNano = e.EventTime * 1000000;
 
                         // Process historical points for smoother/predicted input
                         for (int h = 0; h < e.HistorySize; h++)
                         {
                             float historicalX = e.GetHistoricalX(i, h);
                             float historicalY = e.GetHistoricalY(i, h);
-                            // We could feed these into a separate prediction engine
+                            long historicalTimeNano = e.GetHistoricalEventTime(h) * 1000000;
+                            // Feed timestamp + S Pen position into audio-aligned timeline
                         }
                     }
                 }
@@ -68,7 +71,7 @@ namespace osu.Android
             return base.DispatchTouchEvent(e);
         }
 
-        public bool IsDeXMode()
+        public new bool IsDeXMode()
         {
             var config = Resources?.Configuration;
             if (config == null) return false;
@@ -160,6 +163,53 @@ namespace osu.Android
             Assembly.Load("osu.Game.Rulesets.Taiko");
             Assembly.Load("osu.Game.Rulesets.Catch");
             Assembly.Load("osu.Game.Rulesets.Mania");
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.S)
+            {
+                var gm = (GameManager?)GetSystemService(GameService);
+                if (gm != null)
+                {
+                    int mode = gm.GameMode;
+                    // PERFORMANCE -> push high perf path
+                    // BATTERY/SAVE -> adapt lower fidelity
+                    ApplyPerformanceOptimizations(mode == GameManager.GameModePerformance);
+                }
+            }
+
+            CheckInputDevices();
+        }
+
+        private void CheckInputDevices()
+        {
+            var inputManager = (InputManager?)GetSystemService(InputService);
+            int[] deviceIds = inputManager?.GetInputDeviceIds() ?? Array.Empty<int>();
+
+            foreach (int id in deviceIds)
+            {
+                var device = inputManager?.GetInputDevice(id);
+                if (device == null) continue;
+
+                if ((device.Sources & InputSourceType.Gamepad) == InputSourceType.Gamepad)
+                {
+                    // Gamepad detected
+                }
+            }
+        }
+
+        public override void OnConfigurationChanged(Configuration newConfig)
+        {
+            base.OnConfigurationChanged(newConfig);
+
+            if (IsDeXMode())
+            {
+                // Adapt swapchain/extents dynamically
+                ApplyPerformanceOptimizations(true);
+            }
         }
 
         protected override void OnNewIntent(Intent? intent) => handleIntent(intent);

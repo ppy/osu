@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -7,10 +7,12 @@ using Android.App;
 using Android.Content.PM;
 using Microsoft.Maui.Devices;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Platform;
 using osu.Game;
+using osu.Game.Configuration;
 using osu.Game.Screens;
 using osu.Game.Updater;
 using osu.Game.Utils;
