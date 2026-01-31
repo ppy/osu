@@ -71,6 +71,14 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     Keywords = new[] { @"android", @"vulkan", @"low latency" },
                 },
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = "Use ANGLE (GLES to Vulkan)",
+                    Current = osuConfig.GetBindable<bool>(OsuSetting.UseAngle),
+                })
+                {
+                    Keywords = new[] { @"android", @"vulkan", @"angle" },
+                },
             };
 
             renderer.BindValueChanged(r =>

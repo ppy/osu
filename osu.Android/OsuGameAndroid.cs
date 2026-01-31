@@ -53,15 +53,19 @@ namespace osu.Android
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.PerformanceMode, PerformanceMode);
+            config.BindWith(OsuSetting.UseAngle, UseAngle);
         }
 
         public readonly Bindable<bool> PerformanceMode = new Bindable<bool>();
+
+        public readonly Bindable<bool> UseAngle = new Bindable<bool>();
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             UserPlayingState.BindValueChanged(_ => updateOrientation());
             PerformanceMode.BindValueChanged(enabled => gameActivity.ApplyPerformanceOptimizations(enabled.NewValue), true);
+            UseAngle.BindValueChanged(enabled => gameActivity.ApplyAngleOptimizations(enabled.NewValue), true);
         }
 
         protected override void ScreenChanged(IOsuScreen? current, IOsuScreen? newScreen)

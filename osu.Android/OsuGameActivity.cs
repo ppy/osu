@@ -100,6 +100,13 @@ namespace osu.Android
             }
         }
 
+        public void ApplyAngleOptimizations(bool enabled)
+        {
+            // ANGLE (GLES to Vulkan) translation logic.
+            // On modern Android, this can sometimes be requested via system properties or specific OEM APIs.
+            // For now, this serves as a placeholder for where the ANGLE loader configuration would go.
+        }
+
         private static readonly string[] osu_url_schemes = { "osu", "osump" };
 
         /// <summary>
