@@ -52,6 +52,8 @@ namespace osu.Game.Tests.Visual.Settings
         {
             AddStep("reset storage", () =>
             {
+                realmSubscription?.Dispose();
+
                 realm.Write(r =>
                 {
                     r.RemoveAll<SkinInfo>();
@@ -321,21 +323,32 @@ namespace osu.Game.Tests.Visual.Settings
             // For simplicity repopulate the full list.
             // In the future we should change this to properly handle ChangeSet events.
             dropdownItems.Clear();
-
-            dropdownItems.Add(sender.Single(s => s.ID == protected_skin_1.ID).ToLive(realm));
-            dropdownItems.Add(sender.Single(s => s.ID == protected_skin_2.ID).ToLive(realm));
-
-            foreach (var skin in sender.Where(s => !s.Protected && s.IsFavourite))
-            {
-                dropdownItems.Add(skin.ToLive(realm));
-            }
-
-            foreach (var skin in sender.Where(s => !s.Protected && !s.IsFavourite))
-            {
-                dropdownItems.Add(skin.ToLive(realm));
-            }
+            dropdownItems.AddRange(GetAllUsableSkins());
 
             Schedule(() => skinDropdown.Items = dropdownItems);
+        }
+
+        public IList<Live<SkinInfo>> GetAllUsableSkins()
+        {
+            var usableSkins = new List<Live<SkinInfo>>();
+
+            realm.Run(r =>
+            {
+                usableSkins.Add(r.Find<SkinInfo>(protected_skin_1.ID).ToLive(realm));
+                usableSkins.Add(r.Find<SkinInfo>(protected_skin_2.ID).ToLive(realm));
+
+                var userSkins = r.All<SkinInfo>()
+                                 .Where(s => !s.DeletePending && !s.Protected)
+                                 .OrderByDescending(s => s.IsFavourite)
+                                 .ThenBy(s => s.Name, StringComparer.OrdinalIgnoreCase)
+                                 .AsEnumerable()
+                                 .Select(s => s.ToLive(realm));
+
+                foreach (var s in userSkins.Where(s => !s.Value.Protected))
+                    usableSkins.Add(s);
+            });
+
+            return usableSkins;
         }
 
         private bool getStarIcon()
