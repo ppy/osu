@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,6 +13,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Play;
@@ -211,6 +214,54 @@ namespace osu.Game.Tests.Database
 
             AddAssert("Score not marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.False);
             AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(30000001));
+        }
+
+        [Test]
+        public void TestScoreStatisticsProcessing()
+        {
+            ScoreInfo scoreToProcess = null!;
+            ScoreInfo scoreAlreadyProcessed = null!;
+
+            AddStep("Add scores", () =>
+            {
+                Realm.Write(r =>
+                {
+                    var ruleset = r.All<RulesetInfo>().First();
+                    var beatmap = r.Find<BeatmapSetInfo>(importedSet.ID)!.Beatmaps.First();
+
+                    // Score needing processing
+                    scoreToProcess = new ScoreInfo(ruleset: ruleset, beatmap: beatmap)
+                    {
+                        StatisticsJson = JsonConvert.SerializeObject(new Dictionary<HitResult, int> { { HitResult.Great, 50 } }),
+                        // MaximumStatisticsJson is empty by default
+                    };
+                    r.Add(scoreToProcess);
+
+                    // Score already processed
+                    scoreAlreadyProcessed = new ScoreInfo(ruleset: ruleset, beatmap: beatmap)
+                    {
+                        StatisticsJson = JsonConvert.SerializeObject(new Dictionary<HitResult, int> { { HitResult.Great, 100 } }),
+                        MaximumStatisticsJson = JsonConvert.SerializeObject(new Dictionary<HitResult, int> { { HitResult.Great, 100 } }),
+                    };
+                    r.Add(scoreAlreadyProcessed);
+                });
+            });
+
+            TestBackgroundDataStoreProcessor processor = null!;
+            AddStep("Run background processor", () => Add(processor = new TestBackgroundDataStoreProcessor()));
+            AddUntilStep("Wait for completion", () => processor.Completed);
+
+            AddAssert("Score to process has max stats", () =>
+            {
+                var s = Realm.Run(r => r.Find<ScoreInfo>(scoreToProcess.ID));
+                return !string.IsNullOrEmpty(s?.MaximumStatisticsJson) && s.MaximumStatisticsJson != "{}";
+            });
+
+            AddAssert("Score already processed untouched", () =>
+            {
+                var s = Realm.Run(r => r.Find<ScoreInfo>(scoreAlreadyProcessed.ID));
+                return !string.IsNullOrEmpty(s?.MaximumStatisticsJson);
+            });
         }
 
         public partial class TestBackgroundDataStoreProcessor : BackgroundDataStoreProcessor
