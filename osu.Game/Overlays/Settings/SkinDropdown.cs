@@ -178,7 +178,7 @@ namespace osu.Game.Overlays.Settings
                     if (dragDelta >= favourite_drag_end_threshold && !stateChanged)
                     {
                         stateChanged = true;
-                        triggerFavouriteChange();
+                        triggerFavouriteChange(false);
                     }
 
                     dragDelta = Math.Clamp(dragDelta, 0, 100);
@@ -198,6 +198,18 @@ namespace osu.Game.Overlays.Settings
                     Background.MoveToX(offset, duration, easing);
                     Foreground.MoveToX(offset, duration, easing);
                     starContainer.FadeTo(0, duration, easing).ResizeWidthTo(offset, duration, easing);
+
+                    if (stateChanged)
+                    {
+                        realm.Write(r =>
+                        {
+                            var skin = r.All<SkinInfo>().FirstOrDefault(s => s.ID == SkinData.ID);
+
+                            if (skin.IsNotNull())
+                                skin.IsFavourite = isFavourite;
+                        });
+                    }
+
                     if (isFavourite)
                         content.AnimateFavouriteIn();
 
@@ -235,7 +247,7 @@ namespace osu.Game.Overlays.Settings
                     return base.OnMouseDown(e);
                 }
 
-                private bool triggerFavouriteChange()
+                private bool triggerFavouriteChange(bool writeToRealm = true)
                 {
                     if (isFavourite)
                         sampleHide.Play();
@@ -248,13 +260,16 @@ namespace osu.Game.Overlays.Settings
                     content.ChangeFavourite();
                     starButtonFlash();
 
-                    realm.Write(r =>
+                    if (writeToRealm)
                     {
-                        var skin = r.All<SkinInfo>().FirstOrDefault(s => s.ID == SkinData.ID);
+                        realm.Write(r =>
+                        {
+                            var skin = r.All<SkinInfo>().FirstOrDefault(s => s.ID == SkinData.ID);
 
-                        if (skin.IsNotNull())
-                            skin.IsFavourite = isFavourite;
-                    });
+                            if (skin.IsNotNull())
+                                skin.IsFavourite = isFavourite;
+                        });
+                    }
 
                     return true;
                 }
