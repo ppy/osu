@@ -181,19 +181,56 @@ namespace osu.Game.Database
                 return ruleset;
             }
 
+            var pendingUpdates = new List<(Guid id, double starRating, BeatmapInfo beatmap)>();
+            const int batch_size = 10;
+
+            void flushPendingUpdates()
+            {
+                if (pendingUpdates.Count == 0)
+                    return;
+
+                try
+                {
+                    realmAccess.Write(r =>
+                    {
+                        foreach (var (id, starRating, _) in pendingUpdates)
+                        {
+                            if (r.Find<BeatmapInfo>(id) is BeatmapInfo liveBeatmapInfo)
+                                liveBeatmapInfo.StarRating = starRating;
+                        }
+                    });
+
+                    foreach (var (_, _, beatmap) in pendingUpdates)
+                        ((IWorkingBeatmapCache)beatmapManager).Invalidate(beatmap);
+
+                    processedCount += pendingUpdates.Count;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Background processing failed on batch: {e}");
+                    failedCount += pendingUpdates.Count;
+                }
+                finally
+                {
+                    pendingUpdates.Clear();
+                }
+            }
+
             foreach (Guid id in beatmapIds)
             {
                 if (notification?.State == ProgressNotificationState.Cancelled)
                     break;
 
-                updateNotificationProgress(notification, processedCount, beatmapIds.Count);
+                // Update progress using the count of already processed items (including flushed ones).
+                // We also include pending updates to show smooth progress, although they aren't written yet.
+                updateNotificationProgress(notification, processedCount + pendingUpdates.Count, beatmapIds.Count);
 
                 sleepIfRequired();
 
                 var beatmap = realmAccess.Run(r => r.Find<BeatmapInfo>(id)?.Detach());
 
                 if (beatmap == null)
-                    return;
+                    continue;
 
                 try
                 {
@@ -205,13 +242,10 @@ namespace osu.Game.Database
                     var calculator = ruleset.CreateDifficultyCalculator(working);
 
                     double starRating = calculator.Calculate().StarRating;
-                    realmAccess.Write(r =>
-                    {
-                        if (r.Find<BeatmapInfo>(id) is BeatmapInfo liveBeatmapInfo)
-                            liveBeatmapInfo.StarRating = starRating;
-                    });
-                    ((IWorkingBeatmapCache)beatmapManager).Invalidate(beatmap);
-                    ++processedCount;
+                    pendingUpdates.Add((id, starRating, beatmap));
+
+                    if (pendingUpdates.Count >= batch_size)
+                        flushPendingUpdates();
                 }
                 catch (Exception e)
                 {
@@ -219,6 +253,8 @@ namespace osu.Game.Database
                     ++failedCount;
                 }
             }
+
+            flushPendingUpdates();
 
             completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
         }
