@@ -179,15 +179,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Use 4 objects to be sure that only many doubletaps in a row would be nerfed
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLast0Obj = (OsuDifficultyHitObject)current.Previous(0);
-            var osuLast1Obj = (OsuDifficultyHitObject)current.Previous(1);
             var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
 
-            if (osuLast0Obj == null || osuLast1Obj == null || osuLast2Obj == null)
+            if (osuLast0Obj == null || osuLast2Obj == null)
                 return 1.0;
 
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
-            // Two doubletaps in a row
+            // Check for two doubletaps
             double doubletappability = DifficultyCalculationUtils.Smoothstep(osuLast0Obj.LazyJumpDistance, diameter, 0)
                                        * DifficultyCalculationUtils.Smoothstep(osuLast2Obj.LazyJumpDistance, diameter, 0);
 
