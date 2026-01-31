@@ -230,7 +230,7 @@ namespace osu.Game.Database
                 var beatmap = realmAccess.Run(r => r.Find<BeatmapInfo>(id)?.Detach());
 
                 if (beatmap == null)
-                    continue;
+                    return;
 
                 try
                 {
