@@ -17,6 +17,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateIncorrectMarker(this),
         };
 
+        // Static to avoid re-compilation of Regexes on every instantiation.
         private static readonly IEnumerable<MarkerCheck> marker_checks =
         [
             new MarkerCheck(@"(TV Size)", @"(?i)(tv (size|ver))"),
