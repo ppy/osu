@@ -275,9 +275,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 MinimumJumpDistance = Math.Max(0, Math.Min(LazyJumpDistance - (maximum_slider_radius - assumed_slider_radius), tailJumpDistance - maximum_slider_radius));
             }
 
-            Vector2 v = BaseObject.StackedPosition - lastCursorPosition;
-            NormalisedVectorAngle = Math.Atan2(Math.Abs(v.Y), Math.Abs(v.X));
-
             if (lastLastDifficultyObject != null && lastLastDifficultyObject.BaseObject is not Spinner)
             {
                 if (lastDifficultyObject!.BaseObject is Slider prevSlider && lastDifficultyObject.TravelDistance > 0)
@@ -287,6 +284,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                 double angle = calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition);
                 double sliderAngle = calculateSliderAngle(lastDifficultyObject!, lastLastCursorPosition);
+
+                Vector2 v = BaseObject.StackedPosition - lastCursorPosition;
+                NormalisedVectorAngle = Math.Atan2(Math.Abs(v.Y), Math.Abs(v.X));
 
                 Angle = Math.Min(angle, sliderAngle);
             }
