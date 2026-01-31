@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateIncorrectMarker(this),
         };
 
-        private readonly IEnumerable<MarkerCheck> markerChecks =
+        private static readonly IEnumerable<MarkerCheck> markerChecks =
         [
             new MarkerCheck(@"(TV Size)", @"(?i)(tv (size|ver))"),
             new MarkerCheck(@"(Game Ver.)", @"(?i)(game (size|ver))"),
