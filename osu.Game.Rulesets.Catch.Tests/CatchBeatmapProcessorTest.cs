@@ -39,8 +39,10 @@ namespace osu.Game.Rulesets.Catch.Tests
                 }
             };
 
-            var processor = new CatchBeatmapProcessor(beatmap);
-            processor.HardRockOffsets = true;
+            var processor = new CatchBeatmapProcessor(beatmap)
+            {
+                HardRockOffsets = true
+            };
 
             processor.ApplyPositionOffsets(beatmap);
 
