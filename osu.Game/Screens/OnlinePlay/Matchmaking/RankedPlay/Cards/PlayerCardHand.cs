@@ -178,7 +178,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding(-10),
+                        Padding = new MarginPadding(-10)
+                        {
+                            // card moves upwards on hover which can produce jitter if the hitbox doesn't extend all the way to the bottom of the screen
+                            Bottom = -50
+                        },
                         Child = cardInputArea = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
