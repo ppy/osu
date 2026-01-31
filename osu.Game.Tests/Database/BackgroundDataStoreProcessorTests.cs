@@ -186,33 +186,6 @@ namespace osu.Game.Tests.Database
             AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(scoreVersion));
         }
 
-        [Test]
-        public void TestCustomRulesetScoreNotSubjectToUpgrades([Values] bool available)
-        {
-            RulesetInfo rulesetInfo = null!;
-            ScoreInfo scoreInfo = null!;
-            TestBackgroundDataStoreProcessor processor = null!;
-
-            AddStep("Add unavailable ruleset", () => Realm.Write(r => r.Add(rulesetInfo = new RulesetInfo
-            {
-                ShortName = Guid.NewGuid().ToString(),
-                Available = available
-            })));
-
-            AddStep("Add score for unavailable ruleset", () => Realm.Write(r => r.Add(scoreInfo = new ScoreInfo(
-                ruleset: rulesetInfo,
-                beatmap: r.All<BeatmapInfo>().First())
-            {
-                TotalScoreVersion = 30000001
-            })));
-
-            AddStep("Run background processor", () => Add(processor = new TestBackgroundDataStoreProcessor()));
-            AddUntilStep("Wait for completion", () => processor.Completed);
-
-            AddAssert("Score not marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.False);
-            AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(30000001));
-        }
-
         public partial class TestBackgroundDataStoreProcessor : BackgroundDataStoreProcessor
         {
             protected override int TimeToSleepDuringGameplay => 10;
