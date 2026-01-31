@@ -172,6 +172,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return aimStrain;
         }
 
+        // We decrease strain for distances <radius to fix cases where doubles with no aim requirement
+        // have their strain buffed incredibly high due to the delta time.
+        // These objects do not require any movement, so it does not make sense to award them.
         private static double highBpmBonus(double ms, double distance) => 1 / (1 - Math.Pow(0.15, ms / 1000))
                                                                           * DifficultyCalculationUtils.Smootherstep(distance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
 
