@@ -56,7 +56,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
 
                         d.NewParagraph();
                         d.AddText("mapped by ", static s => s.Font = OsuFont.GetFont(size: 9, weight: FontWeight.SemiBold));
-                        d.AddUserLink(beatmap.Metadata.Author, static s => s.Font = OsuFont.GetFont(size: 9, weight: FontWeight.SemiBold));
+                        d.AddText(beatmap.Metadata.Author.Username, s =>
+                        {
+                            s.Font = OsuFont.GetFont(size: 9, weight: FontWeight.SemiBold);
+                            s.Colour = colours.OnBackground;
+                        });
                     }),
                 ];
             }
