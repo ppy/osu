@@ -89,7 +89,7 @@ namespace osu.Android
             if ((enabled || dexMode) && Build.VERSION.SdkInt >= BuildVersionCodes.M)
             {
 #pragma warning disable CA1422
-                var preferredMode = WindowManager?.DefaultDisplay?.GetModes()?.OrderByDescending(m => m.RefreshRate).FirstOrDefault();
+                var preferredMode = WindowManager?.DefaultDisplay?.GetSupportedModes()?.OrderByDescending(m => m.RefreshRate).FirstOrDefault();
                 if (preferredMode != null && Window != null)
                 {
                     var layoutParams = Window.Attributes;
@@ -181,10 +181,10 @@ namespace osu.Android
                 var gm = (GameManager?)GetSystemService(GameService);
                 if (gm != null)
                 {
-                    int mode = gm.GameMode;
+                    var mode = gm.GameMode;
                     // PERFORMANCE -> push high perf path
                     // BATTERY/SAVE -> adapt lower fidelity
-                    ApplyPerformanceOptimizations(mode == GameManager.GameModePerformance);
+                    ApplyPerformanceOptimizations(mode == GameMode.Performance);
                 }
             }
 
