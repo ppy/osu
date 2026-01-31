@@ -15,6 +15,7 @@ bool OboeAudio::initialize() {
     builder.setDirection(oboe::Direction::Output)
            ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
            ->setSharingMode(oboe::SharingMode::Exclusive)
+           ->setUsage(oboe::Usage::Game)
            ->setFormat(oboe::AudioFormat::Float)
            ->setChannelCount(oboe::ChannelCount::Stereo)
            // Let Oboe choose the native sample rate if not specified,
@@ -62,20 +63,20 @@ oboe::DataCallbackResult OboeAudio::onAudioReady(oboe::AudioStream *oboeStream, 
 
 // Native bindings
 extern "C" {
-    JNIEXPORT jlong JNICALL nCreate() {
+    JNIEXPORT jlong JNICALL nOboeCreate() {
         return reinterpret_cast<jlong>(new OboeAudio());
     }
 
-    JNIEXPORT void JNICALL nDestroy(jlong ptr) {
+    JNIEXPORT void JNICALL nOboeDestroy(jlong ptr) {
         delete reinterpret_cast<OboeAudio*>(ptr);
     }
 
     // JNI fallback
     JNIEXPORT jlong JNICALL Java_osu_Android_Native_OboeAudio_nCreate(JNIEnv* env, jobject thiz) {
-        return nCreate();
+        return nOboeCreate();
     }
 
     JNIEXPORT void JNICALL Java_osu_Android_Native_OboeAudio_nDestroy(JNIEnv* env, jobject thiz, jlong ptr) {
-        nDestroy(ptr);
+        nOboeDestroy(ptr);
     }
 }

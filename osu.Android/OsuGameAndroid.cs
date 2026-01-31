@@ -20,6 +20,11 @@ using osuTK;
 
 namespace osu.Android
 {
+        public void HandleStylusInput(float x, float y, long timestampNano)
+        {
+            // Late-input sampling and reprojection into audio timeline would happen here.
+        }
+
     public partial class OsuGameAndroid : OsuGame
     {
         [Cached]

@@ -19,4 +19,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Maui.Essentials" Version="8.0.3" />
   </ItemGroup>
+  <ItemGroup>
+    <AndroidNativeLibrary Include="Native\CMakeLists.txt" />
+    <None Include="Native\vulkan_renderer.h" />
+    <None Include="Native\oboe_audio.h" />
+  </ItemGroup>
 </Project>

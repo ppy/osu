@@ -5,11 +5,13 @@ namespace osu.Android.Native
 {
     public class VulkanRenderer : IDisposable
     {
+        public bool Initialize(IntPtr window) => nVulkanInitialize(nativePtr, window);
+    {
         private long nativePtr;
 
         public VulkanRenderer()
         {
-            nativePtr = nCreate();
+            nativePtr = nVulkanCreate();
         }
 
         public void Dispose()
@@ -22,7 +24,7 @@ namespace osu.Android.Native
         {
             if (nativePtr != 0)
             {
-                nDestroy(nativePtr);
+                nVulkanDestroy(nativePtr);
                 nativePtr = 0;
             }
         }
@@ -33,9 +35,12 @@ namespace osu.Android.Native
         }
 
         [DllImport("osu.Android.Native")]
-        private static extern long nCreate();
+        private static extern long nVulkanCreate();
 
         [DllImport("osu.Android.Native")]
-        private static extern void nDestroy(long ptr);
+        private static extern void nVulkanDestroy(long ptr);
+
+        [DllImport("osu.Android.Native")]
+        private static extern bool nVulkanInitialize(long ptr, IntPtr window);
     }
 }

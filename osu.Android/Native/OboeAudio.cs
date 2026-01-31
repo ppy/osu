@@ -9,7 +9,7 @@ namespace osu.Android.Native
 
         public OboeAudio()
         {
-            nativePtr = nCreate();
+            nativePtr = nOboeCreate();
         }
 
         public void Dispose()
@@ -22,7 +22,7 @@ namespace osu.Android.Native
         {
             if (nativePtr != 0)
             {
-                nDestroy(nativePtr);
+                nOboeDestroy(nativePtr);
                 nativePtr = 0;
             }
         }
@@ -33,9 +33,9 @@ namespace osu.Android.Native
         }
 
         [DllImport("osu.Android.Native")]
-        private static extern long nCreate();
+        private static extern long nOboeCreate();
 
         [DllImport("osu.Android.Native")]
-        private static extern void nDestroy(long ptr);
+        private static extern void nOboeDestroy(long ptr);
     }
 }

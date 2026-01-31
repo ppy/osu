@@ -319,16 +319,24 @@ void VulkanRenderer::cleanup() {
 
 // Native bindings
 extern "C" {
-    JNIEXPORT jlong JNICALL nCreate() {
+    JNIEXPORT jlong JNICALL nVulkanCreate() {
         return reinterpret_cast<jlong>(new VulkanRenderer());
     }
-    JNIEXPORT void JNICALL nDestroy(jlong ptr) {
+    JNIEXPORT void JNICALL nVulkanDestroy(jlong ptr) {
         delete reinterpret_cast<VulkanRenderer*>(ptr);
     }
-    JNIEXPORT jlong JNICALL Java_osu_Android_Native_VulkanRenderer_nCreate(JNIEnv* env, jobject thiz) {
-        return nCreate();
+    JNIEXPORT jboolean JNICALL nVulkanInitialize(jlong ptr, JNIEnv* env, jobject window) {
+        ANativeWindow* nativeWindow = ANativeWindow_fromSurface(env, window);
+        return reinterpret_cast<VulkanRenderer*>(ptr)->initialize(nativeWindow);
     }
-    JNIEXPORT void JNICALL Java_osu_Android_Native_VulkanRenderer_nDestroy(JNIEnv* env, jobject thiz, jlong ptr) {
-        nDestroy(ptr);
+
+    JNIEXPORT jlong JNICALL Java_osu_Android_Native_VulkanRenderer_nVulkanCreate(JNIEnv* env, jobject thiz) {
+        return nVulkanCreate();
+    }
+    JNIEXPORT void JNICALL Java_osu_Android_Native_VulkanRenderer_nVulkanDestroy(JNIEnv* env, jobject thiz, jlong ptr) {
+        nVulkanDestroy(ptr);
+    }
+    JNIEXPORT jboolean JNICALL Java_osu_Android_Native_VulkanRenderer_nVulkanInitialize(JNIEnv* env, jobject thiz, jlong ptr, jobject window) {
+        return nVulkanInitialize(ptr, env, window);
     }
 }

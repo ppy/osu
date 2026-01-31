@@ -54,15 +54,15 @@ namespace osu.Android
                     {
                         // S Pen detected. Hardware timestamps should be used for improved latency.
                         // MotionEvent.EventTime is in ms, converting to nano
-                        long timestampNano = e.EventTime * 1000000;
+                        long timestampNano = Build.VERSION.SdkInt >= BuildVersionCodes.Q ? e.EventTimeNano : e.EventTime * 1000000;
 
                         // Process historical points for smoother/predicted input
                         for (int h = 0; h < e.HistorySize; h++)
                         {
                             float historicalX = e.GetHistoricalX(i, h);
                             float historicalY = e.GetHistoricalY(i, h);
-                            long historicalTimeNano = e.GetHistoricalEventTime(h) * 1000000;
-                            // Feed timestamp + S Pen position into audio-aligned timeline
+                            long historicalTimeNano = Build.VERSION.SdkInt >= BuildVersionCodes.Q ? e.GetHistoricalEventTimeNano(h) : e.GetHistoricalEventTime(h) * 1000000;
+                            game.HandleStylusInput(historicalX, historicalY, historicalTimeNano);
                         }
                     }
                 }
