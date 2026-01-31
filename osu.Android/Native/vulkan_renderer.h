@@ -4,10 +4,15 @@
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_android.h>
 #include <jni.h>
+#include <android/native_window.h>
 #include <vector>
 
 class VulkanRenderer {
 public:
+    struct ShaderConstants {
+        float resolutionScale = 1.0f;
+    };
+
     VulkanRenderer();
     ~VulkanRenderer();
 

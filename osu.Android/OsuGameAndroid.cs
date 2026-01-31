@@ -20,11 +20,6 @@ using osuTK;
 
 namespace osu.Android
 {
-        public void HandleStylusInput(float x, float y, long timestampNano)
-        {
-            // Late-input sampling and reprojection into audio timeline would happen here.
-        }
-
     public partial class OsuGameAndroid : OsuGame
     {
         [Cached]
@@ -39,6 +34,11 @@ namespace osu.Android
         {
             gameActivity = activity;
             packageInfo = Application.Context.ApplicationContext!.PackageManager!.GetPackageInfo(Application.Context.ApplicationContext.PackageName!, 0).AsNonNull();
+        }
+
+        public void HandleStylusInput(float x, float y, long timestampNano)
+        {
+            // Late-input sampling and reprojection into audio timeline would happen here.
         }
 
         public override string Version

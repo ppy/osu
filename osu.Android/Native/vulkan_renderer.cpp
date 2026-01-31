@@ -1,3 +1,4 @@
+#include <android/native_window_jni.h>
 #include "vulkan_renderer.h"
 #include <vector>
 #include <algorithm>
@@ -164,6 +165,12 @@ void VulkanRenderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     vkBeginCommandBuffer(commandBuffer, &beginInfo);
     // Render pass execution skeleton
+    // Use fine-grained pipeline barriers for mobile GPUs:
+    // VkImageMemoryBarrier barrier{};
+    // barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    // barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    // ...
+
     vkEndCommandBuffer(commandBuffer);
 }
 
@@ -195,7 +202,7 @@ void VulkanRenderer::createRenderPass() {
     colorAttachment.format = VK_FORMAT_B8G8R8A8_UNORM;
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE; // Use DONT_CARE if this is a transient attachment
     colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -204,6 +211,7 @@ void VulkanRenderer::createRenderPass() {
     colorAttachmentRef.attachment = 0;
     colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
     VkSubpassDescription subpass{};
+    // Use subpasses to keep data in tile memory
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpass.colorAttachmentCount = 1;
     subpass.pColorAttachments = &colorAttachmentRef;
@@ -217,6 +225,10 @@ void VulkanRenderer::createRenderPass() {
 }
 
 void VulkanRenderer::createPipelineLayout() {
+    // Descriptor Set Strategy:
+    // Reuse descriptor sets instead of reallocating per frame.
+    // Use a small number of descriptor set layouts.
+
     VkPushConstantRange pushConstantRange{};
     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
     pushConstantRange.offset = 0;
@@ -229,6 +241,10 @@ void VulkanRenderer::createPipelineLayout() {
 }
 
 void VulkanRenderer::createPipelineCache() {
+    // Shader Optimization:
+    // Specialize shaders at pipeline creation using specialization constants.
+    // Strip unused shader variants.
+
     VkPipelineCacheCreateInfo cacheCreateInfo{};
     cacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
     vkCreatePipelineCache(device, &cacheCreateInfo, nullptr, &pipelineCache);
@@ -319,17 +335,18 @@ void VulkanRenderer::cleanup() {
 
 // Native bindings
 extern "C" {
+    // Standard C exports for DllImport
     JNIEXPORT jlong JNICALL nVulkanCreate() {
         return reinterpret_cast<jlong>(new VulkanRenderer());
     }
     JNIEXPORT void JNICALL nVulkanDestroy(jlong ptr) {
         delete reinterpret_cast<VulkanRenderer*>(ptr);
     }
-    JNIEXPORT jboolean JNICALL nVulkanInitialize(jlong ptr, JNIEnv* env, jobject window) {
-        ANativeWindow* nativeWindow = ANativeWindow_fromSurface(env, window);
-        return reinterpret_cast<VulkanRenderer*>(ptr)->initialize(nativeWindow);
+    JNIEXPORT jboolean JNICALL nVulkanInitialize(jlong ptr, void* window) {
+        return reinterpret_cast<VulkanRenderer*>(ptr)->initialize(static_cast<ANativeWindow*>(window));
     }
 
+    // JNI exports for potential Java usage
     JNIEXPORT jlong JNICALL Java_osu_Android_Native_VulkanRenderer_nVulkanCreate(JNIEnv* env, jobject thiz) {
         return nVulkanCreate();
     }
@@ -337,6 +354,7 @@ extern "C" {
         nVulkanDestroy(ptr);
     }
     JNIEXPORT jboolean JNICALL Java_osu_Android_Native_VulkanRenderer_nVulkanInitialize(JNIEnv* env, jobject thiz, jlong ptr, jobject window) {
-        return nVulkanInitialize(ptr, env, window);
+        ANativeWindow* nativeWindow = ANativeWindow_fromSurface(env, window);
+        return nVulkanInitialize(ptr, nativeWindow);
     }
 }

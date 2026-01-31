@@ -63,20 +63,19 @@ oboe::DataCallbackResult OboeAudio::onAudioReady(oboe::AudioStream *oboeStream, 
 
 // Native bindings
 extern "C" {
+    // Standard C exports for DllImport
     JNIEXPORT jlong JNICALL nOboeCreate() {
         return reinterpret_cast<jlong>(new OboeAudio());
     }
-
     JNIEXPORT void JNICALL nOboeDestroy(jlong ptr) {
         delete reinterpret_cast<OboeAudio*>(ptr);
     }
 
-    // JNI fallback
-    JNIEXPORT jlong JNICALL Java_osu_Android_Native_OboeAudio_nCreate(JNIEnv* env, jobject thiz) {
+    // JNI exports
+    JNIEXPORT jlong JNICALL Java_osu_Android_Native_OboeAudio_nOboeCreate(JNIEnv* env, jobject thiz) {
         return nOboeCreate();
     }
-
-    JNIEXPORT void JNICALL Java_osu_Android_Native_OboeAudio_nDestroy(JNIEnv* env, jobject thiz, jlong ptr) {
+    JNIEXPORT void JNICALL Java_osu_Android_Native_OboeAudio_nOboeDestroy(JNIEnv* env, jobject thiz, jlong ptr) {
         nOboeDestroy(ptr);
     }
 }

@@ -135,6 +135,13 @@ namespace osu.Android
             game = new OsuGameAndroid(this);
         }
 
+
+        protected override void OnStart()
+        {
+            base.OnStart();
+            Window?.DecorView?.RequestUnbufferedDispatch(MotionEventActions.Move, InputSourceType.Touchscreen);
+        }
+
         protected override void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);

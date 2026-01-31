@@ -5,14 +5,14 @@ namespace osu.Android.Native
 {
     public class VulkanRenderer : IDisposable
     {
-        public bool Initialize(IntPtr window) => nVulkanInitialize(nativePtr, window);
-    {
         private long nativePtr;
 
         public VulkanRenderer()
         {
             nativePtr = nVulkanCreate();
         }
+
+        public bool Initialize(IntPtr window) => nVulkanInitialize(nativePtr, window);
 
         public void Dispose()
         {

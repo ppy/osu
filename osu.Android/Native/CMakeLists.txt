@@ -1,6 +1,16 @@
 cmake_minimum_required(VERSION 3.10.2)
 project(osu.Android.Native)
 
+include(FetchContent)
+
+FetchContent_Declare(
+    oboe
+    GIT_REPOSITORY https://github.com/google/oboe
+    GIT_TAG v1.8.0
+)
+
+FetchContent_MakeAvailable(oboe)
+
 add_library(osu.Android.Native SHARED
             vulkan_renderer.cpp
             oboe_audio.cpp)
@@ -9,13 +19,10 @@ find_library(log-lib log)
 find_library(android-lib android)
 find_library(vulkan-lib vulkan)
 
-# Oboe needs to be added as a dependency.
-# In a real project, you'd use FetchContent or a prebuilt version.
-# For now, we assume Oboe is available in the include path.
-
 target_include_directories(osu.Android.Native PRIVATE .)
 
 target_link_libraries(osu.Android.Native
+                      oboe
                       ${log-lib}
                       ${android-lib}
                       ${vulkan-lib})
