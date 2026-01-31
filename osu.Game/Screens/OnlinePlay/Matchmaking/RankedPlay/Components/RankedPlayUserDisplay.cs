@@ -244,6 +244,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                     {
                         RelativeSizeAxes = Axes.Both,
                         Shear = -OsuGame.SHEAR,
+                        BackgroundColour = Color4.White.Opacity(0), // workaround for non-premultiplied alpha blending of white content on transparent background
                         Child = new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.Both,
