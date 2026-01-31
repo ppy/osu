@@ -42,13 +42,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
         public override void Process(DifficultyHitObject current)
         {
-            if (!shouldProcess(current))
-                return;
-
             ManiaDifficultyHitObject maniaCurrent = (ManiaDifficultyHitObject)current;
 
             // If this is a new time stamp, reset state for the next chord.
-            if (maniaCurrent.StartTime > CurrentChordTime)
+            if (maniaCurrent.StartTime > CurrentChordTime && ShouldProcess(maniaCurrent))
             {
                 startNewChord(maniaCurrent.StartTime);
                 chordPreprocessed = false;
@@ -61,9 +58,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
                 // Look ahead and process all notes sharing this StartTime.
                 while (chordNote != null && chordNote.StartTime == CurrentChordTime)
                 {
-                    PreprocessChordNote(chordNote);
-                    currentColumnTimes[chordNote.Column] = chordNote.ActualTime;
-                    ChordNoteCount++;
+                    if (ShouldProcess(chordNote))
+                    {
+                        PreprocessChordNote(chordNote);
+                        currentColumnTimes[chordNote.Column] = chordNote.ActualTime;
+                        ChordNoteCount++;
+                    }
+
                     chordNote = getNext(chordNote);
                 }
 
@@ -72,13 +73,16 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
                 chordPreprocessed = true;
             }
 
-            double strainValue = ProcessInternal(maniaCurrent);
+            double strainValue = ShouldProcess(maniaCurrent) ? ProcessInternal(maniaCurrent) : ReadonlyStrainValueAt(maniaCurrent.ActualTime, maniaCurrent);
 
             ObjectDifficulties.Add(strainValue);
         }
 
         protected abstract void PreprocessChordNote(ManiaDifficultyHitObject current);
         protected abstract void FinalizeChord();
+        protected abstract double StrainValueAt(ManiaDifficultyHitObject current);
+        protected abstract void ResetChord();
+        protected abstract double ReadonlyStrainValueAt(double time, ManiaDifficultyHitObject current);
 
         private void startNewChord(double newChordTime)
         {
@@ -93,9 +97,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             ResetChord();
         }
 
-        protected abstract void ResetChord();
-
-        private bool shouldProcess(DifficultyHitObject current)
+        protected bool ShouldProcess(DifficultyHitObject current)
         {
             return current.BaseObject switch
             {
