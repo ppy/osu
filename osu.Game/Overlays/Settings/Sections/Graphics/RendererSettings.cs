@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Current = renderer,
                     Items = host.GetPreferredRenderersForCurrentPlatform().Order()
 #pragma warning disable CS0612 // Type or member is obsolete
-                                .Where(t => t != RendererType.Vulkan && t != RendererType.OpenGLLegacy),
+                                .Where(t => t != RendererType.OpenGLLegacy),
 #pragma warning restore CS0612 // Type or member is obsolete
                 })
                 {
@@ -62,6 +62,14 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 })
                 {
                     Keywords = new[] { @"framerate", @"counter" },
+                },
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = "Performance Mode",
+                    Current = osuConfig.GetBindable<bool>(OsuSetting.PerformanceMode),
+                })
+                {
+                    Keywords = new[] { @"android", @"vulkan", @"low latency" },
                 },
             };
 
@@ -103,6 +111,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             protected override LocalisableString GenerateItemText(RendererType item)
             {
+                if (item == RendererType.Vulkan)
+                    return "Vulkan (Experimental)";
+
                 if (item == RendererType.Automatic && automaticRendererInUse)
                     return LocalisableString.Interpolate($"{base.GenerateItemText(item)} ({hostResolvedRenderer.GetDescription()})");
 

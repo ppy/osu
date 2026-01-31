@@ -47,10 +47,19 @@ namespace osu.Android
 
         public override Version AssemblyVersion => new Version(packageInfo.VersionName.AsNonNull().Split('-').First());
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.PerformanceMode, PerformanceMode);
+        }
+
+        public readonly Bindable<bool> PerformanceMode = new Bindable<bool>();
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
             UserPlayingState.BindValueChanged(_ => updateOrientation());
+            PerformanceMode.BindValueChanged(enabled => gameActivity.ApplyPerformanceOptimizations(enabled.NewValue), true);
         }
 
         protected override void ScreenChanged(IOsuScreen? current, IOsuScreen? newScreen)
