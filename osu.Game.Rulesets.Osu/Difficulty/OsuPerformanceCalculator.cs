@@ -517,18 +517,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double lowApproachRateSliderVisibilityFactor = Math.Pow(sliderFactor, 3);
             double highCircleSizeSliderVisibilityFactor = Math.Pow(Math.Min(-0.2 * circleSize + 2.2, 1), 1.8);
 
-            // Nerf low CS sliders at low AR less due to density increase from fully bright slider borders
+            // Reduce low CS slider nerf at low AR slightly less due to density increase from fully visible slider borders
             double lowCircleSizeVisibilityFactor = 0;
-            if (circleSize < 1)
-                lowCircleSizeVisibilityFactor += 1;
-            else if (circleSize < 2.5)
-                lowCircleSizeVisibilityFactor += -0.3 * circleSize + 1.3;
-            else if (circleSize < 5)
-                lowCircleSizeVisibilityFactor += -0.0352 * Math.Pow(circleSize - 5, 3);
+            lowCircleSizeVisibilityFactor += Math.Clamp(-0.3 * circleSize + 0.75, 0, 0.45);
+            if (circleSize < 5)
+                lowCircleSizeVisibilityFactor += Math.Min(-0.0352 * Math.Pow(circleSize - 5, 3), 0.55);
 
             lowApproachRateSliderVisibilityFactor = 1 - ((1 - lowApproachRateSliderVisibilityFactor) * (1 - (lowCircleSizeVisibilityFactor / 3)));
 
-            // Calculate the time when the approach circle is 2 osu px larger than the hit circle to as a bonus, scaled by CS
+            // Calculate the time when the approach circle is 2 osu px larger than the hit circle to use as a bonus, scaled by CS
             double preemptTime = 0;
             if (approachRate < 5)
                 preemptTime += 1200 + (120 * (5 - approachRate));
@@ -550,7 +547,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // AR8+ and especially AR10.3+ TC increases difficulty due to increased circle location uncertainty
             if (approachRate > 8)
-                traceableBonus += ((0.002 * Math.Pow(approachRate - 8, 2)) + (0.0025 * (approachRate - 8))) * highApproachRateSliderVisibilityFactor * Math.Max(highCircleSizeSliderVisibilityFactor, highApproachRateSliderVisibilityFactor);
+                traceableBonus += ((0.002 * Math.Pow(approachRate - 8, 2)) + (0.005 * (approachRate - 8))) * highApproachRateSliderVisibilityFactor * Math.Max(highCircleSizeSliderVisibilityFactor, highApproachRateSliderVisibilityFactor);
 
             traceableBonus *= lowCircleSizeLowApproachRateVisibilityFactor;
             return traceableBonus;
