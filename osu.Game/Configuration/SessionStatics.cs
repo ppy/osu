@@ -33,6 +33,7 @@ namespace osu.Game.Configuration
             SetDefault<ScoreInfo?>(Static.LastLocalUserScore, null);
             SetDefault<ScoreInfo?>(Static.LastAppliedOffsetScore, null);
             SetDefault<UserActivity?>(Static.UserOnlineActivity, null);
+            SetDefault<string?>(Static.GameStateServerUrl, null);
             SetDefault<APITag[]?>(Static.AllBeatmapTags, null);
         }
 
@@ -107,6 +108,12 @@ namespace osu.Game.Configuration
         /// The activity for the current user to broadcast to other players.
         /// </summary>
         UserOnlineActivity,
+
+        /// <summary>
+        /// The URL at which the game state integration server is present,
+        /// or <c>null</c> if the server is not running.
+        /// </summary>
+        GameStateServerUrl,
 
         AllBeatmapTags,
     }

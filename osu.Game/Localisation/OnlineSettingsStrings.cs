@@ -50,6 +50,21 @@ namespace osu.Game.Localisation
         public static LocalisableString DiscordRichPresence => new TranslatableString(getKey(@"discord_rich_presence"), @"Discord Rich Presence");
 
         /// <summary>
+        /// "Expose game state to external applications"
+        /// </summary>
+        public static LocalisableString GameStateIntegration => new TranslatableString(getKey(@"game_state_integration"), @"Expose game state to external applications");
+
+        /// <summary>
+        /// "This will allow external applications (eg. score/PP overlays) to read the current state of the game."
+        /// </summary>
+        public static LocalisableString GameStateIntegrationTooltip => new TranslatableString(getKey(@"game_state_integration_tooltip"), @"This will allow external applications (eg. score/PP overlays) to read the current state of the game.");
+
+        /// <summary>
+        /// "The game state server is running at {0}."
+        /// </summary>
+        public static LocalisableString GameStateIntegrationCurrentServer(string serverUrl) => new TranslatableString(getKey(@"game_state_integration_current_server"), @"The game state server is running at {0}.", serverUrl);
+
+        /// <summary>
         /// "Web"
         /// </summary>
         public static LocalisableString WebHeader => new TranslatableString(getKey(@"web_header"), @"Web");

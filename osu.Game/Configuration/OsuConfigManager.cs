@@ -196,6 +196,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.SeasonalBackgroundMode, SeasonalBackgroundMode.Sometimes);
 
             SetDefault(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
+            SetDefault(OsuSetting.GameStateIntegration, false);
 
             SetDefault(OsuSetting.EditorDim, 0.25f, 0f, 0.75f, 0.25f);
             SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f, 0f, 1f, 0.25f);
@@ -440,6 +441,7 @@ namespace osu.Game.Configuration
         EditorShowHitMarkers,
         EditorAutoSeekOnPlacement,
         DiscordRichPresence,
+        GameStateIntegration,
 
         ShowOnlineExplicitContent,
         LastProcessedMetadataId,

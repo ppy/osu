@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Microsoft.Win32;
+using osu.Desktop.GameState;
 using osu.Desktop.Performance;
 using osu.Desktop.Security;
 using osu.Framework.Platform;
@@ -132,6 +133,7 @@ namespace osu.Desktop
             base.LoadComplete();
 
             LoadComponentAsync(new DiscordRichPresence(), Add);
+            LoadComponentAsync(new GameStateIntegration(), Add);
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
                 LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
