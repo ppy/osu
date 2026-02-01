@@ -15,8 +15,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const int history_time_max = 5 * 1000; // 5 seconds
         private const int history_objects_max = 32;
-        private const double rhythm_overall_multiplier = 1.0;
-        private const double rhythm_ratio_multiplier = 28.0;
+        private const double rhythm_overall_multiplier = 0.9;
+        private const double rhythm_ratio_multiplier = 30.0;
 
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                         // bpm change was from a slider, this is easier typically than circle -> circle
                         // unintentional side effect is that bursts with kicksliders at the ends might have lower difficulty than bursts without sliders
                         if (prevObj.BaseObject is Slider)
-                            effectiveRatio *= 0.3;
+                            effectiveRatio *= 0.5;
 
                         // repeated island polarity (2 -> 4, 3 -> 5)
                         if (island.IsSimilarPolarity(previousIsland))
@@ -226,9 +226,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 if (DeltaCount <= 1 || other.DeltaCount <= 1)
                     return false;
 
-                // TODO: consider islands to be of similar polarity only if they're having the same average delta (we don't want to consider 3 singletaps similar to a triple)
-                //       naively adding delta check here breaks _a lot_ of maps because of the flawed ratio calculation
-                return DeltaCount % 2 == other.DeltaCount % 2;
+                return Math.Abs(Delta - other.Delta) < deltaDifferenceEpsilon &&
+                       DeltaCount % 2 == other.DeltaCount % 2;
             }
 
             public bool Equals(Island? other)
