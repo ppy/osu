@@ -154,6 +154,14 @@ namespace osu.Game.Tests.Visual.Ranking
 
                         getScoresRequest.TriggerSuccess(new APIScoresCollection { Scores = scores });
                         return true;
+
+                    case GetBeatmapSetRequest getBeatmapSetRequest:
+                        getBeatmapSetRequest.TriggerSuccess(new APIBeatmapSet
+                        {
+                            OnlineID = importedBeatmap.BeatmapSet?.OnlineID ?? 0,
+                            Status = BeatmapOnlineStatus.Ranked,
+                        });
+                        return true;
                 }
 
                 return false;
