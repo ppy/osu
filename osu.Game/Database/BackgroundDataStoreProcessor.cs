@@ -207,7 +207,7 @@ namespace osu.Game.Database
 
                     // Sleep to prevent starvation of the update thread during heavy batch processing.
                     // This is especially important for tests which may be sensitive to timing or resource contention.
-                    Thread.Sleep(10);
+                    Thread.Sleep(1);
                 }
                 catch (Exception e)
                 {
