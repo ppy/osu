@@ -183,22 +183,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuLast0Obj == null || osuLast2Obj == null)
                 return 1.0;
 
-            const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
+            // Start from hitwindow. Divide by 2 because only half of hitwindow is used to abuse consecutive jumps.
+            double doubletapHitWindow = osuCurrObj.HitWindowGreat / 2;
 
             // Check for two doubletaps
-            double doubletappability = DifficultyCalculationUtils.Smoothstep(osuLast0Obj.LazyJumpDistance, diameter, 0)
-                                       * DifficultyCalculationUtils.Smoothstep(osuLast2Obj.LazyJumpDistance, diameter, 0);
-
-            // Start from hitwindow
-            double doubletapHitWindow = osuCurrObj.HitWindowGreat;
+            doubletapHitWindow *= DifficultyCalculationUtils.Smoothstep(osuLast0Obj.LazyJumpDistance, OsuDifficultyHitObject.NORMALISED_DIAMETER, 0)
+                                       * DifficultyCalculationUtils.Smoothstep(osuLast2Obj.LazyJumpDistance, OsuDifficultyHitObject.NORMALISED_DIAMETER, 0);
 
             // If strain time is too high for this hitwindow - don't punish it
-            doubletapHitWindow *= DifficultyCalculationUtils.Smoothstep(doubletapHitWindow, osuCurrObj.AdjustedDeltaTime / 2, osuCurrObj.AdjustedDeltaTime);
+            doubletapHitWindow *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.HitWindowGreat, osuCurrObj.AdjustedDeltaTime / 2, osuCurrObj.AdjustedDeltaTime);
 
-            // Divide by 2 because only half of hitwindow is used to abuse consecutive jumps
-            double strainTimeAdjust = doubletappability * doubletapHitWindow / 2;
-
-            return osuCurrObj.AdjustedDeltaTime / (osuCurrObj.AdjustedDeltaTime + strainTimeAdjust);
+            return osuCurrObj.AdjustedDeltaTime / (osuCurrObj.AdjustedDeltaTime + doubletapHitWindow);
         }
 
         // We decrease strain for distances <radius to fix cases where doubles with no aim requirement
