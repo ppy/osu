@@ -417,10 +417,7 @@ namespace osu.Game.Database
 
             HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(
                 r.All<ScoreInfo>()
-                 .Where(s => !s.BackgroundReprocessingFailed
-                             && s.BeatmapInfo != null
-                             && s.IsLegacyScore
-                             && s.TotalScoreVersion < LegacyScoreEncoder.LATEST_VERSION)
+                 .Filter($"{nameof(ScoreInfo.BackgroundReprocessingFailed)} == false && {nameof(ScoreInfo.BeatmapInfo)} != null && {nameof(ScoreInfo.IsLegacyScore)} == true && {nameof(ScoreInfo.TotalScoreVersion)} < $0", LegacyScoreEncoder.LATEST_VERSION)
                  .AsEnumerable()
                  // must be done after materialisation, as realm doesn't want to support
                  // nested property predicates
@@ -437,7 +434,7 @@ namespace osu.Game.Database
             int processedCount = 0;
             int failedCount = 0;
 
-            foreach (var id in scoreIds)
+            foreach (var chunk in scoreIds.Chunk(100))
             {
                 if (notification?.State == ProgressNotificationState.Cancelled)
                     break;
@@ -446,28 +443,77 @@ namespace osu.Game.Database
 
                 sleepIfRequired();
 
-                try
-                {
-                    // Can't use async overload because we're not on the update thread.
-                    // ReSharper disable once MethodHasAsyncOverload
-                    realmAccess.Write(r =>
-                    {
-                        ScoreInfo s = r.Find<ScoreInfo>(id)!;
-                        StandardisedScoreMigrationTools.UpdateFromLegacy(s, beatmapManager.GetWorkingBeatmap(s.BeatmapInfo));
-                        s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
-                    });
+                var updates = new List<(Guid id, long totalScore, long totalScoreWithoutMods, double accuracy, ScoreRank rank)>();
+                var failedIds = new List<Guid>();
 
-                    ++processedCount;
-                }
-                catch (ObjectDisposedException)
+                var detachedScores = realmAccess.Run(r =>
                 {
-                    throw;
-                }
-                catch (Exception e)
+                    var scores = new List<ScoreInfo>();
+
+                    foreach (var id in chunk)
+                    {
+                        var score = r.Find<ScoreInfo>(id);
+
+                        if (score != null)
+                            scores.Add(score.Detach());
+                    }
+
+                    return scores;
+                });
+
+                foreach (var detachedScore in detachedScores)
                 {
-                    Logger.Log($"Failed to convert total score for {id}: {e}");
-                    realmAccess.Write(r => r.Find<ScoreInfo>(id)!.BackgroundReprocessingFailed = true);
-                    ++failedCount;
+                    try
+                    {
+                        StandardisedScoreMigrationTools.UpdateFromLegacy(detachedScore, beatmapManager.GetWorkingBeatmap(detachedScore.BeatmapInfo));
+                        updates.Add((detachedScore.ID, detachedScore.TotalScore, detachedScore.TotalScoreWithoutMods, detachedScore.Accuracy, detachedScore.Rank));
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Log($"Failed to convert total score for {detachedScore.ID}: {e}");
+                        failedIds.Add(detachedScore.ID);
+                    }
+                }
+
+                if (updates.Count > 0 || failedIds.Count > 0)
+                {
+                    try
+                    {
+                        // Can't use async overload because we're not on the update thread.
+                        // ReSharper disable once MethodHasAsyncOverload
+                        realmAccess.Write(r =>
+                        {
+                            foreach (var update in updates)
+                            {
+                                var s = r.Find<ScoreInfo>(update.id);
+                                if (s == null) continue;
+
+                                s.TotalScore = update.totalScore;
+                                s.TotalScoreWithoutMods = update.totalScoreWithoutMods;
+                                s.Accuracy = update.accuracy;
+                                s.Rank = update.rank;
+                                s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+                            }
+
+                            foreach (var id in failedIds)
+                            {
+                                var s = r.Find<ScoreInfo>(id);
+                                if (s != null)
+                                    s.BackgroundReprocessingFailed = true;
+                            }
+                        });
+
+                        processedCount += updates.Count;
+                        failedCount += failedIds.Count;
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        throw;
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Log($"Fatal error writing batch in score conversion: {e}");
+                    }
                 }
             }
 
@@ -634,6 +680,9 @@ namespace osu.Game.Database
 
         private void backpopulateUserTags()
         {
+            if (api is DummyAPIAccess)
+                return;
+
             if (!localMetadataSource.Available || !localMetadataSource.IsAtLeastVersion(3))
             {
                 Logger.Log(@"Local metadata cache has too low version to backpopulate user tags, attempting refetch...");
