@@ -9,6 +9,11 @@ jobs:
   build-android:
     name: Build Android
     runs-on: windows-latest
+    env:
+      ANDROID_KEYSTORE_FILE: ${{ secrets.ANDROID_KEYSTORE_FILE }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,27 +30,27 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Install Android Workload
-        run: dotnet workload install android
+        run: dotnet workload install android wasi-experimental
 
       - name: Decode Keystore
-        if: ${{ secrets.ANDROID_KEYSTORE_FILE != '' }}
+        if: env.ANDROID_KEYSTORE_FILE != ''
         run: |
-          $bytes = [System.Convert]::FromBase64String("${{ secrets.ANDROID_KEYSTORE_FILE }}")
+          $bytes = [System.Convert]::FromBase64String($env:ANDROID_KEYSTORE_FILE)
           [System.IO.File]::WriteAllBytes("keystore.jks", $bytes)
         shell: pwsh
 
       - name: Build Android (Signed)
-        if: ${{ secrets.ANDROID_KEYSTORE_FILE != '' }}
+        if: env.ANDROID_KEYSTORE_FILE != ''
         run: >
           dotnet publish -c Release -f net8.0-android osu.Android/osu.Android.csproj
           -p:AndroidKeyStore=true
           -p:AndroidSigningKeyStore=keystore.jks
-          -p:AndroidSigningStorePass="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
-          -p:AndroidSigningKeyAlias="${{ secrets.ANDROID_KEY_ALIAS }}"
-          -p:AndroidSigningKeyPass="${{ secrets.ANDROID_KEY_PASSWORD }}"
+          -p:AndroidSigningStorePass="$env:ANDROID_KEYSTORE_PASSWORD"
+          -p:AndroidSigningKeyAlias="$env:ANDROID_KEY_ALIAS"
+          -p:AndroidSigningKeyPass="$env:ANDROID_KEY_PASSWORD"
 
       - name: Build Android (Unsigned)
-        if: ${{ secrets.ANDROID_KEYSTORE_FILE == '' }}
+        if: env.ANDROID_KEYSTORE_FILE == ''
         run: dotnet publish -c Release -f net8.0-android osu.Android/osu.Android.csproj
 
       - name: Upload Artifact
