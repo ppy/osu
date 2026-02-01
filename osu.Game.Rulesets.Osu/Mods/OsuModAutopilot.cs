@@ -41,11 +41,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private List<OsuReplayFrame> replayFrames = null!;
 
-        private int currentFrame;
+        private int currentFrame = -1;
 
         public void Update(Playfield playfield)
         {
-            if (currentFrame == replayFrames.Count - 1) return;
+            if (replayFrames.Count == 0 || currentFrame == replayFrames.Count - 1) return;
 
             double time = playfield.Clock.CurrentTime;
 
@@ -56,19 +56,30 @@ namespace osu.Game.Rulesets.Osu.Mods
                 currentFrame--;
             }
 
-            while (currentFrame < replayFrames.Count - 1 && Math.Abs(replayFrames[currentFrame + 1].Time - time) <= Math.Abs(replayFrames[currentFrame].Time - time))
+            while (currentFrame < replayFrames.Count - 1 && Math.Abs(replayFrames[currentFrame + 1].Time - time) <= Math.Abs(replayFrames[currentFrame < 0 ? 0 : currentFrame].Time - time))
             {
                 currentFrame++;
             }
+
+            if (currentFrame < 0)
+                return;
 
             Vector2 newPosition = playfield.ToScreenSpace(replayFrames[currentFrame].Position);
 
             var osuPlayfield = (OsuPlayfield)playfield;
 
-            var nextObject = osuPlayfield.HitObjectContainer.AliveObjects
-                                         .OfType<DrawableOsuHitObject>()
-                                         .OrderBy(h => h.HitObject.StartTime)
-                                         .FirstOrDefault(h => !h.Result.HasResult);
+            DrawableOsuHitObject? nextObject = null;
+
+            foreach (var h in osuPlayfield.HitObjectContainer.AliveObjects)
+            {
+                if (h is not DrawableOsuHitObject osuHitObject || osuHitObject.Result.HasResult)
+                    continue;
+
+                if (nextObject == null || osuHitObject.HitObject.StartTime < nextObject.HitObject.StartTime)
+                {
+                    nextObject = osuHitObject;
+                }
+            }
 
             if (nextObject != null)
             {
