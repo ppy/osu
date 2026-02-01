@@ -2,6 +2,7 @@
 #define OBOE_AUDIO_H
 
 #include <oboe/Oboe.h>
+#include <jni.h>
 
 class OboeAudio : public oboe::AudioStreamDataCallback {
 public:
@@ -11,6 +12,7 @@ public:
     bool initialize();
     void start();
     void stop();
+    double getTimestamp();
 
     oboe::DataCallbackResult onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) override;
 

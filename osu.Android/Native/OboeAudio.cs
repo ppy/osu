@@ -5,14 +5,14 @@ namespace osu.Android.Native
 {
     public class OboeAudio : IDisposable
     {
-        public double GetTimestamp() => nGetTimestamp(nativePtr);
-    {
         private long nativePtr;
 
         public OboeAudio()
         {
             nativePtr = nOboeCreate();
         }
+
+        public double GetTimestamp() => nGetTimestamp(nativePtr);
 
         public void Dispose()
         {
