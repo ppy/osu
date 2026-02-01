@@ -96,7 +96,7 @@ namespace osu.Game.Database
                 convertLegacyTotalScoreToStandardised();
                 upgradeScoreRanks();
                 backpopulateMissingSubmissionAndRankDates();
-                backpopulateUserTags();
+                BackpopulateUserTags();
             }, TaskCreationOptions.LongRunning).ContinueWith(t =>
             {
                 if (t.Exception?.InnerException is ObjectDisposedException)
