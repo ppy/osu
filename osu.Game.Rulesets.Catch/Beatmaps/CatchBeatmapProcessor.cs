@@ -132,8 +132,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
             float positionDiff = offsetPosition - lastPosition.Value;
 
-            // Todo: BUG!! Stable calculated time deltas as ints, which affects randomisation. This should be changed to a double.
-            int timeDiff = (int)(startTime - lastStartTime);
+            // Stable calculated time deltas as ints, which affects randomisation. This has been changed to a double to fix the issue.
+            double timeDiff = startTime - lastStartTime;
 
             if (timeDiff > 1000)
             {

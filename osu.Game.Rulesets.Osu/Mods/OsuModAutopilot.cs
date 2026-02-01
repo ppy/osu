@@ -118,6 +118,21 @@ namespace osu.Game.Rulesets.Osu.Mods
             new MousePositionAbsoluteInput { Position = newPosition }.Apply(inputManager.CurrentState, inputManager);
 
             // TODO: Implement the functionality to automatically spin spinners
+            // TODO: this needs to be based on user interactions to better match stable (pausing until judgement is registered).
+            while (currentFrame < replayFrames.Count - 1)
+            {
+                if (currentFrame < 0 || Math.Abs(replayFrames[currentFrame + 1].Time - time) <= Math.Abs(replayFrames[currentFrame].Time - time))
+                {
+                    currentFrame++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if (currentFrame >= 0)
+                new MousePositionAbsoluteInput { Position = playfield.ToScreenSpace(replayFrames[currentFrame].Position) }.Apply(inputManager.CurrentState, inputManager);
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)

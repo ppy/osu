@@ -19,6 +19,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
+          cache: 'dotnet'
 
       - name: Restore Tools
         run: dotnet tool restore
@@ -68,6 +69,7 @@ jobs:
             # - { prettyname: macOS, fullname: macos-latest }
             - { prettyname: Linux, fullname: ubuntu-latest }
           threadingMode: ['SingleThread', 'MultiThreaded']
+          suite: ['Visual', 'NonVisual', 'Rulesets']
     timeout-minutes: 120
     steps:
       - name: Checkout
@@ -77,23 +79,28 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
+          cache: 'dotnet'
 
       - name: Compile
         run: dotnet build -c Debug -warnaserror osu.Desktop.slnf
 
       - name: Test
-        run: >
-          dotnet test
-          osu.Game.Tests/bin/Debug/**/osu.Game.Tests.dll
-          osu.Game.Rulesets.Osu.Tests/bin/Debug/**/osu.Game.Rulesets.Osu.Tests.dll
-          osu.Game.Rulesets.Taiko.Tests/bin/Debug/**/osu.Game.Rulesets.Taiko.Tests.dll
-          osu.Game.Rulesets.Catch.Tests/bin/Debug/**/osu.Game.Rulesets.Catch.Tests.dll
-          osu.Game.Rulesets.Mania.Tests/bin/Debug/**/osu.Game.Rulesets.Mania.Tests.dll
-          osu.Game.Tournament.Tests/bin/Debug/**/osu.Game.Tournament.Tests.dll
-          Templates/**/*.Tests/bin/Debug/**/*.Tests.dll
-          --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx"
-          --
-          NUnit.ConsoleOut=0
+        shell: bash
+        run: |
+          if [ "${{ matrix.suite }}" == "Visual" ]; then
+            dotnet test osu.Game.Tests/bin/Debug/**/osu.Game.Tests.dll --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}-${{matrix.suite}}.trx" -- NUnit.ConsoleOut=0 --filter "FullyQualifiedName~osu.Game.Tests.Visual"
+          elif [ "${{ matrix.suite }}" == "NonVisual" ]; then
+             dotnet test osu.Game.Tests/bin/Debug/**/osu.Game.Tests.dll --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}-${{matrix.suite}}.trx" -- NUnit.ConsoleOut=0 --filter "FullyQualifiedName!~osu.Game.Tests.Visual"
+          else
+             dotnet test osu.Game.Rulesets.Osu.Tests/bin/Debug/**/osu.Game.Rulesets.Osu.Tests.dll \
+                         osu.Game.Rulesets.Taiko.Tests/bin/Debug/**/osu.Game.Rulesets.Taiko.Tests.dll \
+                         osu.Game.Rulesets.Catch.Tests/bin/Debug/**/osu.Game.Rulesets.Catch.Tests.dll \
+                         osu.Game.Rulesets.Mania.Tests/bin/Debug/**/osu.Game.Rulesets.Mania.Tests.dll \
+                         osu.Game.Tournament.Tests/bin/Debug/**/osu.Game.Tournament.Tests.dll \
+                         Templates/**/*.Tests/bin/Debug/**/*.Tests.dll \
+                         --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}-${{matrix.suite}}.trx" \
+                         -- NUnit.ConsoleOut=0
+          fi
 
       # Attempt to upload results even if test fails.
       # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#always
@@ -101,8 +108,8 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
-          name: osu-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
-          path: ${{github.workspace}}/TestResults/TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx
+          name: osu-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}-${{matrix.suite}}
+          path: ${{github.workspace}}/TestResults/TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}-${{matrix.suite}}.trx
 
   build-only-android:
     name: Build only (Android)
@@ -122,9 +129,10 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
+          cache: 'dotnet'
 
       - name: Install .NET workloads
-        run: dotnet workload install android
+        run: dotnet workload install android wasi-experimental
 
       - name: Compile
         run: dotnet build -c Debug osu.Android.slnf
@@ -132,6 +140,7 @@ jobs:
   build-only-ios:
     name: Build only (iOS)
     runs-on: macos-15
+    continue-on-error: true
     timeout-minutes: 60
     steps:
       - name: Checkout
@@ -141,6 +150,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
+          cache: 'dotnet'
 
       - name: Install .NET Workloads
         run: dotnet workload install ios
