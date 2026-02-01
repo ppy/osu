@@ -518,7 +518,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double highCircleSizeSliderVisibilityFactor = Math.Pow(Math.Min(-0.2 * circleSize + 2.2, 1), 1.8);
 
             // Nerf low CS sliders at low AR less due to density increase from fully bright slider borders
-            // Buff low CS and low AR more
             double lowCircleSizeVisibilityFactor = 0;
             if (circleSize < 1)
                 lowCircleSizeVisibilityFactor += 1;
@@ -526,6 +525,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 lowCircleSizeVisibilityFactor += -0.3 * circleSize + 1.3;
             else if (circleSize < 5)
                 lowCircleSizeVisibilityFactor += -0.0352 * Math.Pow(circleSize - 5, 3);
+
+            lowApproachRateSliderVisibilityFactor = 1 - ((1 - lowApproachRateSliderVisibilityFactor) * (1 - (lowCircleSizeVisibilityFactor / 3)));
+
+            // Calculate the time when the approach circle is 2 osu px larger than the hit circle to as a bonus, scaled by CS
             double preemptTime = 0;
             if (approachRate < 5)
                 preemptTime += 1200 + (120 * (5 - approachRate));
@@ -534,10 +537,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double osuPixelCircleSize = (54.4 - (circleSize * 4.48)) * 1.00041;
             double lowCircleSizeLowApproachRateVisibilityFactor = 1 + (lowCircleSizeVisibilityFactor * Math.Log(preemptTime - (preemptTime * (1 - (2 / (3 * osuPixelCircleSize))))) / 10);
 
-            lowApproachRateSliderVisibilityFactor = 1 - ((1 - lowApproachRateSliderVisibilityFactor) * (1 - (lowCircleSizeVisibilityFactor / 3)));
-
             // Start from normal curve, rewarding lower AR up to AR7
-            double traceableBonus = 0.025 * (12.0 - Math.Max(approachRate, 7)) * highApproachRateSliderVisibilityFactor * Math.Max(highCircleSizeSliderVisibilityFactor, highApproachRateSliderVisibilityFactor);
+            double traceableBonus = 0.025 * (12.0 - Math.Max(approachRate, 7)) * highApproachRateSliderVisibilityFactor * Math.Max(highCircleSizeSliderVisibilityFactor, highApproachRateSliderVisibilityFactor) * lowCircleSizeLowApproachRateVisibilityFactor;
 
             // For AR up to 0 - reduce reward for very low ARs when object is visible
             if (approachRate < 7)
