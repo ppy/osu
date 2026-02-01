@@ -449,29 +449,34 @@ namespace osu.Game.Database
                 var updates = new List<(Guid id, long totalScore, long totalScoreWithoutMods, double accuracy, ScoreRank rank)>();
                 var failedIds = new List<Guid>();
 
-                realmAccess.Run(r =>
+                var detachedScores = realmAccess.Run(r =>
                 {
+                    var scores = new List<ScoreInfo>();
+
                     foreach (var id in chunk)
                     {
                         var score = r.Find<ScoreInfo>(id);
 
-                        if (score == null)
-                            continue;
-
-                        var detachedScore = score.Detach();
-
-                        try
-                        {
-                            StandardisedScoreMigrationTools.UpdateFromLegacy(detachedScore, beatmapManager.GetWorkingBeatmap(detachedScore.BeatmapInfo));
-                            updates.Add((detachedScore.ID, detachedScore.TotalScore, detachedScore.TotalScoreWithoutMods, detachedScore.Accuracy, detachedScore.Rank));
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Log($"Failed to convert total score for {id}: {e}");
-                            failedIds.Add(id);
-                        }
+                        if (score != null)
+                            scores.Add(score.Detach());
                     }
+
+                    return scores;
                 });
+
+                foreach (var detachedScore in detachedScores)
+                {
+                    try
+                    {
+                        StandardisedScoreMigrationTools.UpdateFromLegacy(detachedScore, beatmapManager.GetWorkingBeatmap(detachedScore.BeatmapInfo));
+                        updates.Add((detachedScore.ID, detachedScore.TotalScore, detachedScore.TotalScoreWithoutMods, detachedScore.Accuracy, detachedScore.Rank));
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Log($"Failed to convert total score for {detachedScore.ID}: {e}");
+                        failedIds.Add(detachedScore.ID);
+                    }
+                }
 
                 if (updates.Count > 0 || failedIds.Count > 0)
                 {
