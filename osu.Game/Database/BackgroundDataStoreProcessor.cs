@@ -537,6 +537,8 @@ namespace osu.Game.Database
 
         private void backpopulateMissingSubmissionAndRankDates()
         {
+            if (DebugUtils.IsNUnitRunning) return;
+
             if (!localMetadataSource.Available)
             {
                 Logger.Log("Cannot backpopulate missing submission/rank dates because the local metadata cache is missing.");
