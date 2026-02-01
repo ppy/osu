@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private bool spinnerBlink;
 
-        public Drawable? SpinnerBackground => background;
+        public Drawable SpinnerBackground => background;
 
         private const float final_metre_height = 692 * SPRITE_SCALE;
 

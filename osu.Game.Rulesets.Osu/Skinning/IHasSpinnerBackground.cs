@@ -7,6 +7,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
 {
     public interface IHasSpinnerBackground
     {
-        Drawable? SpinnerBackground { get; }
+        Drawable SpinnerBackground { get; }
     }
 }

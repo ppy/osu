@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         private DefaultSpinnerDisc disc = null!;
 
-        public Drawable? SpinnerBackground => disc.SpinnerBackground;
+        public Drawable SpinnerBackground => disc.SpinnerBackground;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
