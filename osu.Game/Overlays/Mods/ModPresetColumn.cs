@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Mods
 
                 panels.Add(new ModPresetPanel(preset.ToLive(realm))
                 {
-                    Index = i <= 10 ? (i + 1) % 10 : null,
+                    Index = i < 10 ? (i + 1) % 10 : null,
                     Shear = Vector2.Zero
                 });
             }
