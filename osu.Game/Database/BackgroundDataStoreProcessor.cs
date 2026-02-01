@@ -417,10 +417,7 @@ namespace osu.Game.Database
 
             HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(
                 r.All<ScoreInfo>()
-                 .Where(s => !s.BackgroundReprocessingFailed
-                             && s.BeatmapInfo != null
-                             && s.IsLegacyScore
-                             && s.TotalScoreVersion < LegacyScoreEncoder.LATEST_VERSION)
+                 .Filter($"{nameof(ScoreInfo.BackgroundReprocessingFailed)} == false && {nameof(ScoreInfo.BeatmapInfo)} != null && {nameof(ScoreInfo.IsLegacyScore)} == true && {nameof(ScoreInfo.TotalScoreVersion)} < $0", LegacyScoreEncoder.LATEST_VERSION)
                  .AsEnumerable()
                  // must be done after materialisation, as realm doesn't want to support
                  // nested property predicates
@@ -683,6 +680,9 @@ namespace osu.Game.Database
 
         private void backpopulateUserTags()
         {
+            if (api is DummyAPIAccess)
+                return;
+
             if (!localMetadataSource.Available || !localMetadataSource.IsAtLeastVersion(3))
             {
                 Logger.Log(@"Local metadata cache has too low version to backpopulate user tags, attempting refetch...");
