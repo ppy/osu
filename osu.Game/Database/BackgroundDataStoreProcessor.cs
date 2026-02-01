@@ -95,7 +95,7 @@ namespace osu.Game.Database
                 convertLegacyTotalScoreToStandardised();
                 upgradeScoreRanks();
                 backpopulateMissingSubmissionAndRankDates();
-                backpopulateUserTags();
+                BackpopulateUserTags();
             }, TaskCreationOptions.LongRunning).ContinueWith(t =>
             {
                 if (t.Exception?.InnerException is ObjectDisposedException)
@@ -641,8 +641,10 @@ namespace osu.Game.Database
             completeNotification(notification, processedCount, beatmapSetIds.Count, failedCount);
         }
 
-        protected virtual void backpopulateUserTags()
+        protected virtual void BackpopulateUserTags()
         {
+            sleepIfRequired();
+
             if (!localMetadataSource.Available || !localMetadataSource.IsAtLeastVersion(3))
             {
                 Logger.Log(@"Local metadata cache has too low version to backpopulate user tags, attempting refetch...");

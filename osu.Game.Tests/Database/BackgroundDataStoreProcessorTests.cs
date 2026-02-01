@@ -268,7 +268,7 @@ namespace osu.Game.Tests.Database
         {
             protected override int TimeToSleepDuringGameplay => 10;
 
-            protected override void backpopulateUserTags()
+            protected override void BackpopulateUserTags()
             {
                 // no-op to avoid online/local metadata source dependencies in tests.
             }
