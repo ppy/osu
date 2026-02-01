@@ -360,12 +360,12 @@ namespace osu.Game.Scoring
                 : string.Empty;
         }
 
-        private static readonly ConcurrentDictionary<string, (HitResult result, LocalisableString displayName)[]> rulesetHitResultsCache =
+        private static readonly ConcurrentDictionary<string, (HitResult result, LocalisableString displayName)[]> ruleset_hit_results_cache =
             new ConcurrentDictionary<string, (HitResult result, LocalisableString displayName)[]>();
 
         public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()
         {
-            var rulesetHitResults = rulesetHitResultsCache.GetOrAdd(Ruleset.InstantiationInfo, _ => Ruleset.CreateInstance().GetHitResults().ToArray());
+            var rulesetHitResults = ruleset_hit_results_cache.GetOrAdd(Ruleset.InstantiationInfo, _ => Ruleset.CreateInstance().GetHitResults().ToArray());
 
             foreach (var r in rulesetHitResults)
             {
