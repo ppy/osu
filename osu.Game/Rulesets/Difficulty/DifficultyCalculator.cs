@@ -33,6 +33,8 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         protected readonly IWorkingBeatmap WorkingBeatmap;
 
+        protected IReadOnlyList<Mod> Mods => playableMods ?? Array.Empty<Mod>();
+
         private Mod[] playableMods;
         private double clockRate;
 
