@@ -193,8 +193,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double doubletapHitWindow = osuCurrObj.HitWindowGreat;
 
             // If strain time is too high for this hitwindow - don't punish it
-            double relevantStrainTime = Math.Max(osuLast0Obj.AdjustedDeltaTime, osuLast2Obj.AdjustedDeltaTime);
-            doubletapHitWindow *= DifficultyCalculationUtils.Smoothstep(doubletapHitWindow, relevantStrainTime / 2, relevantStrainTime);
+            doubletapHitWindow *= DifficultyCalculationUtils.Smoothstep(doubletapHitWindow, osuCurrObj.AdjustedDeltaTime / 2, osuCurrObj.AdjustedDeltaTime);
 
             // Divide by 2 because only half of hitwindow is used to abuse consecutive jumps
             double strainTimeAdjust = doubletappability * doubletapHitWindow / 2;
