@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double readingValue = computeReadingValue(osuAttributes);
             double flashlightValue = computeFlashlightValue(score, osuAttributes);
-            double cognitionValue = DifficultyCalculationUtils.Norm(2, readingValue, flashlightValue);
+            double cognitionValue = OsuDifficultyCalculator.SumCognitionDifficulty(readingValue, flashlightValue);
 
             double totalValue = DifficultyCalculationUtils.Norm(PERFORMANCE_NORM_EXPONENT, aimValue, speedValue, accuracyValue, cognitionValue) * multiplier;
 
@@ -256,8 +256,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             speedValue *= speedHighDeviationMultiplier;
 
             // An effective hit window is created based on the speed SR. The higher the speed difficulty, the shorter the hit window.
-            // For example, a speed SR of 3.0 leads to an effective hit window of 20ms, which is OD 10.
-            double effectiveHitWindow = Math.Sqrt(30 * 60 / attributes.SpeedDifficulty);
+            // For example, a speed SR of 4.0 leads to an effective hit window of 20ms, which is OD 10.
+            double effectiveHitWindow = 20 * Math.Pow(4 / attributes.SpeedDifficulty, 0.35);
 
             // Find the proportion of 300s on speed notes assuming the hit window was the effective hit window.
             double effectiveAccuracy = DifficultyCalculationUtils.Erf(effectiveHitWindow / (double)speedDeviation);
