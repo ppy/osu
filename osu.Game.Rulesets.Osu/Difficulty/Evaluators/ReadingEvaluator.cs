@@ -239,13 +239,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                         weight *= DifficultyCalculationUtils.ReverseLerp(Math.Max(loopObj.Angle.Value, loopObjPrev0.Angle.Value), 0.4 * Math.PI, 0.65 * Math.PI);
 
                         // Also be sure that spacings are also alternating
-                        weight *= DifficultyCalculationUtils.ReverseLerp(loopObj.LazyJumpDistance, loopObjPrev0.LazyJumpDistance * 0.6 + 1, loopObjPrev1.LazyJumpDistance * 0.8 + 1);
-                        weight *= DifficultyCalculationUtils.ReverseLerp(loopObj.LazyJumpDistance, loopObjPrev0.LazyJumpDistance * 1.4 + 1, loopObjPrev1.LazyJumpDistance * 1.2 + 1);
-                        weight *= DifficultyCalculationUtils.ReverseLerp(loopObjPrev1.LazyJumpDistance, loopObjPrev2.LazyJumpDistance * 0.6 + 1, loopObjPrev2.LazyJumpDistance * 0.8 + 1);
-                        weight *= DifficultyCalculationUtils.ReverseLerp(loopObjPrev1.LazyJumpDistance, loopObjPrev2.LazyJumpDistance * 1.4 + 1, loopObjPrev2.LazyJumpDistance * 1.2 + 1);
+                        weight *= DifficultyCalculationUtils.ReverseLerp(loopObj.JumpDistance, loopObjPrev0.JumpDistance * 0.6 + 1, loopObjPrev1.JumpDistance * 0.8 + 1);
+                        weight *= DifficultyCalculationUtils.ReverseLerp(loopObj.JumpDistance, loopObjPrev0.JumpDistance * 1.4 + 1, loopObjPrev1.JumpDistance * 1.2 + 1);
+                        weight *= DifficultyCalculationUtils.ReverseLerp(loopObjPrev1.JumpDistance, loopObjPrev2.JumpDistance * 0.6 + 1, loopObjPrev2.JumpDistance * 0.8 + 1);
+                        weight *= DifficultyCalculationUtils.ReverseLerp(loopObjPrev1.JumpDistance, loopObjPrev2.JumpDistance * 1.4 + 1, loopObjPrev2.JumpDistance * 1.2 + 1);
 
                         // Don't nerf extremely low spaced patterns
-                        weight *= DifficultyCalculationUtils.ReverseLerp(Math.Max(loopObj.LazyJumpDistance, loopObjPrev0.LazyJumpDistance), OsuDifficultyHitObject.NORMALISED_RADIUS, OsuDifficultyHitObject.NORMALISED_RADIUS * 3);
+                        weight *= DifficultyCalculationUtils.ReverseLerp(Math.Max(loopObj.JumpDistance, loopObjPrev0.JumpDistance), OsuDifficultyHitObject.NORMALISED_RADIUS, OsuDifficultyHitObject.NORMALISED_RADIUS * 3);
 
                         // Lerp between max angle difference and rescaled alternating difference, with more harsh scaling compared to normal difference
                         angleDifferenceAlternating = double.Lerp(Math.PI, 0.1 * angleDifferenceAlternating, weight);
