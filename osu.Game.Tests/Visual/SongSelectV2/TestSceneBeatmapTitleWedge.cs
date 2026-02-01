@@ -185,10 +185,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                             });
                             return true;
 
-                        case GetBeatmapSetRequest getSet:
-                            getSet.TriggerSuccess(new APIBeatmapSet());
-                            return true;
-
                         default:
                             return false;
                     }
@@ -236,10 +232,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                                 resetEvent.Wait(10000);
                                 favourite.TriggerFailure(new APIException("You have too many favourited beatmaps! Please unfavourite some before trying again.", null));
                             });
-                            return true;
-
-                        case GetBeatmapSetRequest getSet:
-                            getSet.TriggerSuccess(new APIBeatmapSet());
                             return true;
 
                         default:

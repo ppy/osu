@@ -181,53 +181,12 @@ namespace osu.Game.Database
                 return ruleset;
             }
 
-            var pendingUpdates = new List<(Guid id, double starRating, BeatmapInfo beatmap)>();
-            const int batch_size = 10;
-
-            void flushPendingUpdates()
-            {
-                if (pendingUpdates.Count == 0)
-                    return;
-
-                try
-                {
-                    realmAccess.Write(r =>
-                    {
-                        foreach (var (id, starRating, _) in pendingUpdates)
-                        {
-                            if (r.Find<BeatmapInfo>(id) is BeatmapInfo liveBeatmapInfo)
-                                liveBeatmapInfo.StarRating = starRating;
-                        }
-                    });
-
-                    foreach (var (_, _, beatmap) in pendingUpdates)
-                        ((IWorkingBeatmapCache)beatmapManager).Invalidate(beatmap);
-
-                    processedCount += pendingUpdates.Count;
-
-                    // Sleep to prevent starvation of the update thread during heavy batch processing.
-                    // This is especially important for tests which may be sensitive to timing or resource contention.
-                    Thread.Sleep(1);
-                }
-                catch (Exception e)
-                {
-                    Logger.Log($"Background processing failed on batch: {e}");
-                    failedCount += pendingUpdates.Count;
-                }
-                finally
-                {
-                    pendingUpdates.Clear();
-                }
-            }
-
             foreach (Guid id in beatmapIds)
             {
                 if (notification?.State == ProgressNotificationState.Cancelled)
                     break;
 
-                // Update progress using the count of already processed items (including flushed ones).
-                // We also include pending updates to show smooth progress, although they aren't written yet.
-                updateNotificationProgress(notification, processedCount + pendingUpdates.Count, beatmapIds.Count);
+                updateNotificationProgress(notification, processedCount, beatmapIds.Count);
 
                 sleepIfRequired();
 
@@ -246,10 +205,13 @@ namespace osu.Game.Database
                     var calculator = ruleset.CreateDifficultyCalculator(working);
 
                     double starRating = calculator.Calculate().StarRating;
-                    pendingUpdates.Add((id, starRating, beatmap));
-
-                    if (pendingUpdates.Count >= batch_size)
-                        flushPendingUpdates();
+                    realmAccess.Write(r =>
+                    {
+                        if (r.Find<BeatmapInfo>(id) is BeatmapInfo liveBeatmapInfo)
+                            liveBeatmapInfo.StarRating = starRating;
+                    });
+                    ((IWorkingBeatmapCache)beatmapManager).Invalidate(beatmap);
+                    ++processedCount;
                 }
                 catch (Exception e)
                 {
@@ -257,8 +219,6 @@ namespace osu.Game.Database
                     ++failedCount;
                 }
             }
-
-            flushPendingUpdates();
 
             completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
         }
@@ -466,7 +426,10 @@ namespace osu.Game.Database
 
             HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(
                 r.All<ScoreInfo>()
-                 .Filter($"{nameof(ScoreInfo.BackgroundReprocessingFailed)} == false && {nameof(ScoreInfo.BeatmapInfo)} != null && {nameof(ScoreInfo.IsLegacyScore)} == true && {nameof(ScoreInfo.TotalScoreVersion)} < $0", LegacyScoreEncoder.LATEST_VERSION)
+                 .Where(s => !s.BackgroundReprocessingFailed
+                             && s.BeatmapInfo != null
+                             && s.IsLegacyScore
+                             && s.TotalScoreVersion < LegacyScoreEncoder.LATEST_VERSION)
                  .AsEnumerable()
                  // must be done after materialisation, as realm doesn't want to support
                  // nested property predicates
@@ -483,7 +446,7 @@ namespace osu.Game.Database
             int processedCount = 0;
             int failedCount = 0;
 
-            foreach (var chunk in scoreIds.Chunk(100))
+            foreach (var id in scoreIds)
             {
                 if (notification?.State == ProgressNotificationState.Cancelled)
                     break;
@@ -492,77 +455,28 @@ namespace osu.Game.Database
 
                 sleepIfRequired();
 
-                var updates = new List<(Guid id, long totalScore, long totalScoreWithoutMods, double accuracy, ScoreRank rank)>();
-                var failedIds = new List<Guid>();
-
-                var detachedScores = realmAccess.Run(r =>
+                try
                 {
-                    var scores = new List<ScoreInfo>();
-
-                    foreach (var id in chunk)
+                    // Can't use async overload because we're not on the update thread.
+                    // ReSharper disable once MethodHasAsyncOverload
+                    realmAccess.Write(r =>
                     {
-                        var score = r.Find<ScoreInfo>(id);
+                        ScoreInfo s = r.Find<ScoreInfo>(id)!;
+                        StandardisedScoreMigrationTools.UpdateFromLegacy(s, beatmapManager.GetWorkingBeatmap(s.BeatmapInfo));
+                        s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+                    });
 
-                        if (score != null)
-                            scores.Add(score.Detach());
-                    }
-
-                    return scores;
-                });
-
-                foreach (var detachedScore in detachedScores)
-                {
-                    try
-                    {
-                        StandardisedScoreMigrationTools.UpdateFromLegacy(detachedScore, beatmapManager.GetWorkingBeatmap(detachedScore.BeatmapInfo));
-                        updates.Add((detachedScore.ID, detachedScore.TotalScore, detachedScore.TotalScoreWithoutMods, detachedScore.Accuracy, detachedScore.Rank));
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Log($"Failed to convert total score for {detachedScore.ID}: {e}");
-                        failedIds.Add(detachedScore.ID);
-                    }
+                    ++processedCount;
                 }
-
-                if (updates.Count > 0 || failedIds.Count > 0)
+                catch (ObjectDisposedException)
                 {
-                    try
-                    {
-                        // Can't use async overload because we're not on the update thread.
-                        // ReSharper disable once MethodHasAsyncOverload
-                        realmAccess.Write(r =>
-                        {
-                            foreach (var update in updates)
-                            {
-                                var s = r.Find<ScoreInfo>(update.id);
-                                if (s == null) continue;
-
-                                s.TotalScore = update.totalScore;
-                                s.TotalScoreWithoutMods = update.totalScoreWithoutMods;
-                                s.Accuracy = update.accuracy;
-                                s.Rank = update.rank;
-                                s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
-                            }
-
-                            foreach (var id in failedIds)
-                            {
-                                var s = r.Find<ScoreInfo>(id);
-                                if (s != null)
-                                    s.BackgroundReprocessingFailed = true;
-                            }
-                        });
-
-                        processedCount += updates.Count;
-                        failedCount += failedIds.Count;
-                    }
-                    catch (ObjectDisposedException)
-                    {
-                        throw;
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Log($"Fatal error writing batch in score conversion: {e}");
-                    }
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Failed to convert total score for {id}: {e}");
+                    realmAccess.Write(r => r.Find<ScoreInfo>(id)!.BackgroundReprocessingFailed = true);
+                    ++failedCount;
                 }
             }
 

@@ -29,6 +29,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
 using osuTK;
@@ -46,6 +47,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private Container mainContent = null!;
 
+        private MatchmakingScreenState state;
         private CloudVisualisation cloud = null!;
 
         [Resolved]
@@ -59,6 +61,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
+
+        [Resolved]
+        private IDialogOverlay dialogOverlay { get; set; } = null!;
 
         [Resolved]
         private QueueController controller { get; set; } = null!;
@@ -210,6 +215,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             client.MatchmakingLeaveLobby().FireAndForget();
         }
 
+        private bool exitConfirmed;
+        private bool isBackgrounded;
+
         public override bool OnExiting(ScreenExitEvent e)
         {
             if (base.OnExiting(e))
@@ -217,24 +225,31 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             client.MatchmakingLeaveLobby().FireAndForget();
 
-            switch (currentState.Value)
+            if (isBackgrounded)
+                return false;
+
+            if (exitConfirmed)
             {
-                default:
-                    return false;
-
-                case MatchmakingScreenState.Queueing:
-                    controller.SearchInBackground();
-                    return false;
-
-                case MatchmakingScreenState.PendingAccept:
-                case MatchmakingScreenState.AcceptedWaitingForRoom:
-                    client.MatchmakingLeaveQueue().FireAndForget();
-                    return true;
-
-                case MatchmakingScreenState.InRoom:
-                    // Block exit until it's initiated from inside the matchmaking screen.
-                    return true;
+                client.MatchmakingLeaveQueue().FireAndForget();
+                return false;
             }
+
+            if (currentState.Value == MatchmakingScreenState.Idle)
+                return false;
+
+            if (dialogOverlay.CurrentDialog is ConfirmDialog confirmDialog)
+                confirmDialog.PerformOkAction();
+            else
+            {
+                dialogOverlay.Push(new ConfirmDialog("Are you sure you want to leave the matchmaking queue?", () =>
+                {
+                    exitConfirmed = true;
+                    if (this.IsCurrentScreen())
+                        this.Exit();
+                }));
+            }
+
+            return true;
         }
 
         public APIUser[] Users
@@ -244,6 +259,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         public void SetState(MatchmakingScreenState newState)
         {
+            state = newState;
+
             mainContent.FadeInFromZero(500, Easing.OutQuint);
             mainContent.Clear();
 
@@ -288,6 +305,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     break;
 
                 case MatchmakingScreenState.Queueing:
+                    ShearedButton sendToBackgroundButton;
+
                     mainContent.Child = new FillFlowContainer
                     {
                         Anchor = Anchor.Centre,
@@ -308,17 +327,33 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                             {
                                 State = { Value = Visibility.Visible },
                             },
-                            new ShearedButton(200)
+                            sendToBackgroundButton = new ShearedButton(200)
                             {
-                                DarkerColour = colours.Red3,
-                                LighterColour = colours.Red4,
+                                DarkerColour = colours.Orange3,
+                                LighterColour = colours.Orange4,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Text = "Stop queueing",
-                                Action = () => client.MatchmakingLeaveQueue().FireAndForget()
+                                Text = "Queue in background",
+                                Action = () =>
+                                {
+                                    controller.SearchInBackground();
+                                    isBackgrounded = true;
+                                    this.Exit();
+                                },
+                                Enabled = { Value = false },
+                                TooltipText = "Wait 5 seconds for this option to become available."
                             }
                         }
                     };
+
+                    Scheduler.AddDelayed(() =>
+                    {
+                        if (state != newState)
+                            return;
+
+                        sendToBackgroundButton.Enabled.Value = true;
+                        sendToBackgroundButton.TooltipText = "You will receive a notification when your game is ready. Make sure to watch out for it!";
+                    }, 5000);
 
                     enqueueSample?.Play();
                     startLoopPlaybackDelegate = Scheduler.AddDelayed(startWaitingLoopPlayback, 2000);

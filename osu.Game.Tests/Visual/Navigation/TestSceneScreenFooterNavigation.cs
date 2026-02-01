@@ -106,7 +106,6 @@ namespace osu.Game.Tests.Visual.Navigation
         /// Tests pushing a new subscreen after a new parenting screen has been pushed.
         /// </summary>
         [Test]
-        [FlakyTest]
         public void TestPushSubScreenWhileNotCurrent()
         {
             TestScreenWithSubScreen screen = null!;

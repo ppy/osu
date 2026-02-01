@@ -30,7 +30,7 @@ namespace osu.Game.Utils
         public static string GetNextBestName(IEnumerable<string> existingNames, string desiredName)
         {
             string pattern = $@"^{getBaselineNameDetectingPattern(desiredName)}$";
-            var regex = new Regex(pattern);
+            var regex = new Regex(pattern, RegexOptions.Compiled);
 
             int bestNumber = findBestNumber(existingNames, regex);
 
@@ -49,7 +49,7 @@ namespace osu.Game.Utils
             string extension = Path.GetExtension(desiredFilename);
 
             string pattern = $@"^{getBaselineNameDetectingPattern(name)}(?i){Regex.Escape(extension)}(?-i)$";
-            var regex = new Regex(pattern);
+            var regex = new Regex(pattern, RegexOptions.Compiled);
 
             int bestNumber = findBestNumber(existingFilenames, regex);
 

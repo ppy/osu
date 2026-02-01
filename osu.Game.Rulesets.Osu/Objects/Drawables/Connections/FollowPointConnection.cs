@@ -16,6 +16,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     /// </summary>
     public partial class FollowPointConnection : PoolableDrawableWithLifetime<FollowPointLifetimeEntry>
     {
+        // Todo: These shouldn't be constants
+        public const int SPACING = 32;
+        public const double PREEMPT = 800;
+
         public DrawablePool<FollowPoint>? Pool { private get; set; }
 
         protected override void OnApply(FollowPointLifetimeEntry entry)
@@ -62,13 +66,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
             double finalTransformEndTime = startTime;
 
-            for (int d = (int)(entry.Spacing * 1.5); d < distance - entry.Spacing; d += entry.Spacing)
+            for (int d = (int)(SPACING * 1.5); d < distance - SPACING; d += SPACING)
             {
                 float fraction = (float)d / distance;
                 Vector2 pointStartPosition = startPosition + (fraction - 0.1f) * distanceVector;
                 Vector2 pointEndPosition = startPosition + fraction * distanceVector;
 
-                GetFadeTimes(start, end, (float)d / distance, entry.Preempt, out double fadeInTime, out double fadeOutTime);
+                GetFadeTimes(start, end, (float)d / distance, out double fadeInTime, out double fadeOutTime);
 
                 FollowPoint fp;
 
@@ -102,10 +106,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         /// <param name="start">The first <see cref="OsuHitObject"/>, where follow points should originate from.</param>
         /// <param name="end">The second <see cref="OsuHitObject"/>, which follow points should target.</param>
         /// <param name="fraction">The fractional distance along <paramref name="start"/> and <paramref name="end"/> at which the follow point is to be located.</param>
-        /// <param name="effectPreempt">The preempt time for the follow point connection.</param>
         /// <param name="fadeInTime">The fade-in time of the follow point/</param>
         /// <param name="fadeOutTime">The fade-out time of the follow point.</param>
-        public static void GetFadeTimes(OsuHitObject start, OsuHitObject end, float fraction, double effectPreempt, out double fadeInTime, out double fadeOutTime)
+        public static void GetFadeTimes(OsuHitObject start, OsuHitObject end, float fraction, out double fadeInTime, out double fadeOutTime)
         {
             double startTime = start.GetEndTime();
             double duration = end.StartTime - startTime;
@@ -113,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             // Preempt time can go below 800ms. Normally, this is achieved via the DT mod which uniformly speeds up all animations game wide regardless of AR.
             // This uniform speedup is hard to match 1:1, however we can at least make AR>10 (via mods) feel good by extending the upper linear preempt function (see: OsuHitObject).
             // Note that this doesn't exactly match the AR>10 visuals as they're classically known, but it feels good.
-            double preempt = effectPreempt * Math.Min(1, start.TimePreempt / OsuHitObject.PREEMPT_MIN);
+            double preempt = PREEMPT * Math.Min(1, start.TimePreempt / OsuHitObject.PREEMPT_MIN);
 
             fadeOutTime = startTime + fraction * duration;
             fadeInTime = fadeOutTime - preempt;

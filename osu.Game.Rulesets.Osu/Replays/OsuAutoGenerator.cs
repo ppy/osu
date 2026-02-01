@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
@@ -150,6 +150,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
             // The startPosition for the slider should not be its .Position, but the point on the circle whose tangent crosses the current cursor position
             // We also modify spinnerDirection so it spins in the direction it enters the spin circle, to make a smooth transition.
+            // TODO: Shouldn't the spinner always spin in the same direction?
             if (h is Spinner spinner)
             {
                 // spinners with 0 spins required will auto-complete - don't bother
@@ -194,10 +195,14 @@ namespace osu.Game.Rulesets.Osu.Replays
                 // Angle between centre offset and tangent point offset.
                 float angle = MathF.Asin(SPIN_RADIUS / distFromCentre);
 
-                spinnerDirection = 1;
-
-                // We want to rotate in the opposite direction (negative angle) to ensure the tangent is correct for clockwise spinning.
-                angle = -angle;
+                if (angle > 0)
+                {
+                    spinnerDirection = -1;
+                }
+                else
+                {
+                    spinnerDirection = 1;
+                }
 
                 // Rotate by angle so it's parallel to tangent line
                 spinCentreOffset.X = spinCentreOffset.X * MathF.Cos(angle) - spinCentreOffset.Y * MathF.Sin(angle);

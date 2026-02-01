@@ -124,7 +124,7 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Install .NET workloads
-        run: dotnet workload install android wasi-experimental
+        run: dotnet workload install android
 
       - name: Compile
         run: dotnet build -c Debug osu.Android.slnf
@@ -132,7 +132,6 @@ jobs:
   build-only-ios:
     name: Build only (iOS)
     runs-on: macos-15
-    continue-on-error: true
     timeout-minutes: 60
     steps:
       - name: Checkout
