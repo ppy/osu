@@ -15,17 +15,22 @@ namespace osu.Game.Rulesets.Catch.UI
     public partial class CatcherTrail : PoolableDrawableWithLifetime<CatcherTrailEntry>
     {
         private readonly SkinnableCatcher body;
+        private readonly ManualClock manualClock;
+        private readonly FramedClock framedClock;
 
         public CatcherTrail()
         {
             Size = new Vector2(Catcher.BASE_SIZE);
             Origin = Anchor.TopCentre;
             Blending = BlendingParameters.Additive;
+
+            manualClock = new ManualClock();
+            framedClock = new FramedClock(manualClock);
+
             InternalChild = body = new SkinnableCatcher
             {
                 // Using a frozen clock because trails should not be animated when the skin has an animated catcher.
-                // TODO: The animation should be frozen at the animation frame at the time of the trail generation.
-                Clock = new FramedClock(new ManualClock()),
+                Clock = framedClock,
             };
         }
 
@@ -35,6 +40,9 @@ namespace osu.Game.Rulesets.Catch.UI
             Scale = entry.Scale;
 
             body.AnimationState.Value = entry.CatcherState;
+
+            manualClock.CurrentTime = entry.LifetimeStart;
+            framedClock.ProcessFrame();
 
             using (BeginAbsoluteSequence(entry.LifetimeStart, false))
                 applyTransforms(entry.Animation);
