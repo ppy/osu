@@ -332,10 +332,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 current.BeatmapInfo.StarRating = 2.5; // Default if not set
 
             var otherVerified = new List<BeatmapVerifierContext.VerifiedBeatmap>();
-            foreach (var starRating in otherStarRatings)
+
+            foreach (double starRating in otherStarRatings)
             {
-                var otherMap = new Beatmap<HitObject>();
-                otherMap.BeatmapInfo.StarRating = starRating;
+                var otherMap = new Beatmap<HitObject>
+                {
+                    BeatmapInfo = { StarRating = starRating }
+                };
+
                 var otherWorking = new TestWorkingBeatmap(otherMap);
                 otherVerified.Add(new BeatmapVerifierContext.VerifiedBeatmap(otherWorking, otherMap));
             }
