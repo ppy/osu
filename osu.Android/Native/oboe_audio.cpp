@@ -70,6 +70,9 @@ extern "C" {
     JNIEXPORT void JNICALL nOboeDestroy(jlong ptr) {
         delete reinterpret_cast<OboeAudio*>(ptr);
     }
+    JNIEXPORT double JNICALL nGetTimestamp(jlong ptr) {
+        return reinterpret_cast<OboeAudio*>(ptr)->getTimestamp();
+    }
 
     // JNI exports
     JNIEXPORT jlong JNICALL Java_osu_Android_Native_OboeAudio_nOboeCreate(JNIEnv* env, jobject thiz) {
@@ -78,4 +81,16 @@ extern "C" {
     JNIEXPORT void JNICALL Java_osu_Android_Native_OboeAudio_nOboeDestroy(JNIEnv* env, jobject thiz, jlong ptr) {
         nOboeDestroy(ptr);
     }
+    JNIEXPORT double JNICALL Java_osu_Android_Native_OboeAudio_nGetTimestamp(JNIEnv* env, jobject thiz, jlong ptr) {
+        return nGetTimestamp(ptr);
+    }
+}
+
+double OboeAudio::getTimestamp() {
+    if (!stream) return 0.0;
+    auto result = stream->getTimestamp(CLOCK_MONOTONIC);
+    if (result) {
+        return result.value().position / (double)stream->getSampleRate();
+    }
+    return 0.0;
 }

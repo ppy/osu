@@ -139,7 +139,7 @@ namespace osu.Android
         protected override void OnStart()
         {
             base.OnStart();
-            Window?.DecorView?.RequestUnbufferedDispatch(MotionEventActions.Move, InputSourceType.Touchscreen);
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.R) Window?.DecorView?.RequestUnbufferedDispatch(MotionEventActions.Move, InputSourceType.Touchscreen);
         }
 
         protected override void OnCreate(Bundle? savedInstanceState)
