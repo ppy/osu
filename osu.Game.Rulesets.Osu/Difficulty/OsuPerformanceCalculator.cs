@@ -532,7 +532,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else
                 preemptTime += 1200 - (150 * (approachRate - 5));
             double osuPixelCircleSize = (54.4 - (circleSize * 4.48)) * 1.00041;
-            double lowCircleSizeLowApproachRateVisibilityFactor = 1 + (Math.Log(preemptTime - (preemptTime * (1 - (2 / (3 * osuPixelCircleSize))))) / 10);
+            double lowCircleSizeLowApproachRateVisibilityFactor = 1 + (lowCircleSizeVisibilityFactor * Math.Log(preemptTime - (preemptTime * (1 - (2 / (3 * osuPixelCircleSize))))) / 10);
 
             lowApproachRateSliderVisibilityFactor = 1 - ((1 - lowApproachRateSliderVisibilityFactor) * (1 - (lowCircleSizeVisibilityFactor / 3)));
 
