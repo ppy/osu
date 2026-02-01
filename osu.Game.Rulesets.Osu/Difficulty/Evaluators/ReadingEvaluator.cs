@@ -117,15 +117,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private static double calculateHiddenDifficulty(OsuDifficultyHitObject currObj, double pastObjectDifficultyInfluence, double currentVisibleObjectDensity, double velocity,
                                                         double constantAngleNerfFactor)
         {
-            double timeSpentInvisible = currObj.DurationSpentInvisible() / currObj.ClockRate;
-
-            // Value time spent invisible exponentially
-            double timeSpentInvisibleFactor = Math.Pow(timeSpentInvisible, 2.2) * 0.022;
+            // Higher preempt means that time spent invisible is higher too, we want to reward that
+            double preemptFactor = Math.Pow(currObj.Preempt, 2.2) * 0.01;
 
             // Account for both past and current densities
             double densityFactor = Math.Pow(currentVisibleObjectDensity + pastObjectDifficultyInfluence, 3.3) * 3;
 
-            double hiddenDifficulty = (timeSpentInvisibleFactor + densityFactor) * constantAngleNerfFactor * velocity * 0.01;
+            double hiddenDifficulty = (preemptFactor + densityFactor) * constantAngleNerfFactor * velocity * 0.01;
 
             // Apply a soft cap to general HD reading to account for partial memorization
             hiddenDifficulty = Math.Pow(hiddenDifficulty, 0.4) * hidden_multiplier;
