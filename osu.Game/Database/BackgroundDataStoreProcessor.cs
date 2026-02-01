@@ -95,7 +95,7 @@ namespace osu.Game.Database
                 convertLegacyTotalScoreToStandardised();
                 upgradeScoreRanks();
                 backpopulateMissingSubmissionAndRankDates();
-                backpopulateUserTags();
+                BackpopulateUserTags();
             }, TaskCreationOptions.LongRunning).ContinueWith(t =>
             {
                 if (t.Exception?.InnerException is ObjectDisposedException)
@@ -632,7 +632,7 @@ namespace osu.Game.Database
             completeNotification(notification, processedCount, beatmapSetIds.Count, failedCount);
         }
 
-        private void backpopulateUserTags()
+        protected virtual void BackpopulateUserTags()
         {
             if (!localMetadataSource.Available || !localMetadataSource.IsAtLeastVersion(3))
             {
