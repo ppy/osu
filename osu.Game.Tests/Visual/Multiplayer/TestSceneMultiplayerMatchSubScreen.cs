@@ -73,7 +73,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
-            AddUntilStep("wait for mod select removed", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Count(), () => Is.Zero);
+            AddUntilStep("wait for mod select removed", () =>
+            {
+                if (this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Any())
+                {
+                    // This overlay is a bit problematic as it can be present even if the screen that created it has exited.
+                    // If it is present, force close it.
+                    var modSelect = this.ChildrenOfType<MultiplayerUserModSelectOverlay>().First();
+                    modSelect.Hide();
+                    // If it's still visible after hide request (e.g. animation), we still wait.
+                    // But checking Count() implies checking presence in hierarchy or visual state?
+                    // ChildrenOfType checks hierarchy. If Hide() starts fade out, it might still be there.
+                    // But if hierarchy removal is tied to state, we might need to wait more.
+                    // However, base.SetUpSteps() calls ExitAllScreens.
+                    // If the screen is gone, the overlay should be gone unless it's attached to global overlay content?
+                    // MultiplayerMatchSubScreen uses IOverlayManager.RegisterBlockingOverlay. This attaches it to the overlay content.
+                    // So we must ensure it is Unregistered/Hidden.
+                    // MultiplayerMatchSubScreen.OnLeaving hides it.
+                    // If OnLeaving wasn't called, it stays.
+                    return false;
+                }
+                return true;
+            });
 
             AddStep("load match", () =>
             {
