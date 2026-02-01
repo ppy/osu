@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
-          cache: 'dotnet'
+          cache: true
 
       - name: Restore Tools
         run: dotnet tool restore
@@ -34,7 +34,7 @@ jobs:
           key: inspectcode-${{ hashFiles('.config/dotnet-tools.json', '.github/workflows/ci.yml', 'osu.sln*', 'osu*.slnf', '.editorconfig', '.globalconfig', 'CodeAnalysis/*', '**/*.csproj', '**/*.props') }}
 
       - name: Dotnet code style
-        run: dotnet build -c Debug -warnaserror osu.Desktop.slnf -p:EnforceCodeStyleInBuild=true
+        run: dotnet build -c Debug -warnaserror osu.Desktop.slnf -p:EnforceCodeStyleInBuild=true --no-restore
 
       - name: CodeFileSanity
         run: |
@@ -79,7 +79,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
-          cache: 'dotnet'
+          cache: true
 
       - name: Compile
         run: dotnet build -c Debug -warnaserror osu.Desktop.slnf
@@ -129,7 +129,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
-          cache: 'dotnet'
+          cache: true
 
       - name: Install .NET workloads
         run: dotnet workload install android wasi-experimental
@@ -150,7 +150,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
-          cache: 'dotnet'
+          cache: true
 
       - name: Install .NET Workloads
         run: dotnet workload install ios
