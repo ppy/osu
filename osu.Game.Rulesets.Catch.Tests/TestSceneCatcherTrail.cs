@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Catch.Tests
     public partial class TestSceneCatcherTrail : OsuTestScene
     {
         [Test]
-        public void TestCatcherTrailClock()
+        public void TestCatcherTrailClockFreeze()
         {
             TestCatcherTrail trail = null!;
 
