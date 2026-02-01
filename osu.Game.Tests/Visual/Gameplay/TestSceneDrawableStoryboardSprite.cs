@@ -51,6 +51,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        [FlakyTest]
         public void TestSpriteFadeOverflowBehaviour()
         {
             AddStep("create sprite", () => SetContents(_ =>

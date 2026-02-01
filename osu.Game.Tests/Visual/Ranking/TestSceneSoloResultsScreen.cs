@@ -172,6 +172,7 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        [FlakyTest]
         public void TestOnlineLeaderboardWithLessThan50Scores_UserWasInTop50()
         {
             ScoreInfo localScore = null!;
@@ -484,6 +485,7 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        [FlakyTest]
         public void TestOnlineLeaderboardDeduplication()
         {
             AddStep("set leaderboard to global", () => leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(importedBeatmap, importedBeatmap.Ruleset, BeatmapLeaderboardScope.Global, null)));

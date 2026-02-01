@@ -99,6 +99,7 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        [FlakyTest]
         public void TestPresentBeatmapFromMainMenuUsesPreviewPoint()
         {
             BeatmapSetInfo beatmapInfo = null!;

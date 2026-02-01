@@ -15,6 +15,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         public event Action? Invalidated;
         public readonly OsuHitObject Start;
 
+        /// <summary>
+        /// The spacing between follow points.
+        /// </summary>
+        public int Spacing = 32;
+
+        /// <summary>
+        /// The preempt time for the follow point connection.
+        /// </summary>
+        public double Preempt = 800;
+
         public FollowPointLifetimeEntry(OsuHitObject start)
         {
             Start = start;
@@ -90,8 +100,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             Vector2 distanceVector = endPosition - startPosition;
 
             // The lifetime start will match the fade-in time of the first follow point.
-            float fraction = (int)(FollowPointConnection.SPACING * 1.5) / distanceVector.Length;
-            FollowPointConnection.GetFadeTimes(Start, End, fraction, out double fadeInTime, out _);
+            float fraction = (int)(Spacing * 1.5) / distanceVector.Length;
+            FollowPointConnection.GetFadeTimes(Start, End, fraction, Preempt, out double fadeInTime, out _);
 
             LifetimeStart = fadeInTime;
             LifetimeEnd = double.MaxValue; // This will be set by the connection.
