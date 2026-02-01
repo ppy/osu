@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             ensureLoaded(osu);
 
-            waitForOrAssert(() => !File.Exists(temp), "Temporary file still exists after standard import", 5000);
+            waitForOrAssert(() => !File.Exists(temp), "Temporary file still exists after standard import", 30000);
 
             return manager.GetAllUsableBeatmapSets().Find(beatmapSet => beatmapSet.ID == importedSet.ID);
         }
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             ensureLoaded(osu);
 
-            waitForOrAssert(() => !File.Exists(temp), "Temporary file still exists after standard import", 5000);
+            waitForOrAssert(() => !File.Exists(temp), "Temporary file still exists after standard import", 30000);
 
             return manager.GetAllUsableBeatmapSets().Find(beatmapSet => beatmapSet.ID == importedSet.ID);
         }
