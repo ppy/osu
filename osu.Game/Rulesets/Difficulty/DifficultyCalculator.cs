@@ -115,6 +115,16 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns>The enumerated <see cref="TimedDifficultyAttributes"/>.</returns>
         public IEnumerable<TimedDifficultyAttributes> CalculateTimed([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
         {
+            using var timedCancellationSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+            if (!cancellationToken.CanBeCanceled)
+                cancellationToken = timedCancellationSource.Token;
+
+            cancellationToken.ThrowIfCancellationRequested();
+            // ReSharper disable once PossiblyMistakenUseOfCancellationToken
+            preProcess(mods, cancellationToken);
+            return enumerateTimed();
+
             IEnumerable<TimedDifficultyAttributes> enumerateTimed()
             {
                 if (!Beatmap.HitObjects.Any())
@@ -143,16 +153,6 @@ namespace osu.Game.Rulesets.Difficulty
                     yield return new TimedDifficultyAttributes(obj.GetEndTime(), CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate));
                 }
             }
-
-            using var timedCancellationSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-
-            if (!cancellationToken.CanBeCanceled)
-                cancellationToken = timedCancellationSource.Token;
-
-            cancellationToken.ThrowIfCancellationRequested();
-            // ReSharper disable once PossiblyMistakenUseOfCancellationToken
-            preProcess(mods, cancellationToken);
-            return enumerateTimed();
         }
 
         /// <summary>
