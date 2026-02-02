@@ -69,7 +69,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
-
         public override void SetUpSteps()
         {
             base.SetUpSteps();
@@ -94,6 +93,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     // If OnLeaving wasn't called, it stays.
                     return false;
                 }
+
                 return true;
             });
 
