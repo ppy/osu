@@ -135,7 +135,7 @@ namespace osu.Android
         protected override void OnStart()
         {
             base.OnStart();
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.R) Window?.DecorView?.RequestUnbufferedDispatch(MotionEventActions.Move, InputSourceType.Touchscreen);
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.R) Window?.DecorView?.RequestUnbufferedDispatch(InputSourceType.Touchscreen);
         }
 
         protected override void OnCreate(Bundle? savedInstanceState)
@@ -209,7 +209,7 @@ namespace osu.Android
             }
         }
 
-        public override void OnConfigurationChanged(Configuration newConfig)
+        public override void OnConfigurationChanged(Android.Content.Res.Configuration newConfig)
         {
             base.OnConfigurationChanged(newConfig);
 
