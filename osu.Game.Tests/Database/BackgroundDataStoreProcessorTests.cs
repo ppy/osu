@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -10,6 +13,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Play;
@@ -185,13 +189,88 @@ namespace osu.Game.Tests.Database
             AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(scoreVersion));
         }
 
+        [Test]
+        public void TestCustomRulesetScoreNotSubjectToUpgrades([Values] bool available)
+        {
+            RulesetInfo rulesetInfo = null!;
+            ScoreInfo scoreInfo = null!;
+            TestBackgroundDataStoreProcessor processor = null!;
+
+            AddStep("Add unavailable ruleset", () => Realm.Write(r => r.Add(rulesetInfo = new RulesetInfo
+            {
+                ShortName = Guid.NewGuid().ToString(),
+                Available = available
+            })));
+
+            AddStep("Add score for unavailable ruleset", () => Realm.Write(r => r.Add(scoreInfo = new ScoreInfo(
+                ruleset: rulesetInfo,
+                beatmap: r.All<BeatmapInfo>().First())
+            {
+                TotalScoreVersion = 30000001
+            })));
+
+            AddStep("Run background processor", () => Add(processor = new TestBackgroundDataStoreProcessor()));
+            AddUntilStep("Wait for completion", () => processor.Completed);
+
+            AddAssert("Score not marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.False);
+            AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(30000001));
+        }
+
+        [Test]
+        public void TestScoreStatisticsProcessing()
+        {
+            ScoreInfo scoreToProcess = null!;
+            ScoreInfo scoreAlreadyProcessed = null!;
+
+            AddStep("Add scores", () =>
+            {
+                Realm.Write(r =>
+                {
+                    var ruleset = r.All<RulesetInfo>().First();
+                    var beatmap = r.Find<BeatmapSetInfo>(importedSet.ID)!.Beatmaps.First();
+
+                    // Score needing processing
+                    scoreToProcess = new ScoreInfo(ruleset: ruleset, beatmap: beatmap)
+                    {
+                        StatisticsJson = JsonConvert.SerializeObject(new Dictionary<HitResult, int> { { HitResult.Great, 50 } }),
+                        // MaximumStatisticsJson is empty by default
+                    };
+                    r.Add(scoreToProcess);
+
+                    // Score already processed
+                    scoreAlreadyProcessed = new ScoreInfo(ruleset: ruleset, beatmap: beatmap)
+                    {
+                        StatisticsJson = JsonConvert.SerializeObject(new Dictionary<HitResult, int> { { HitResult.Great, 100 } }),
+                        MaximumStatisticsJson = JsonConvert.SerializeObject(new Dictionary<HitResult, int> { { HitResult.Great, 100 } }),
+                    };
+                    r.Add(scoreAlreadyProcessed);
+                });
+            });
+
+            TestBackgroundDataStoreProcessor processor = null!;
+            AddStep("Run background processor", () => Add(processor = new TestBackgroundDataStoreProcessor()));
+            AddUntilStep("Wait for completion", () => processor.Completed);
+
+            AddAssert("Score to process has max stats", () =>
+            {
+                var s = Realm.Run(r => r.Find<ScoreInfo>(scoreToProcess.ID));
+                return !string.IsNullOrEmpty(s?.MaximumStatisticsJson) && s.MaximumStatisticsJson != "{}";
+            });
+
+            AddAssert("Score already processed untouched", () =>
+            {
+                var s = Realm.Run(r => r.Find<ScoreInfo>(scoreAlreadyProcessed.ID));
+                return !string.IsNullOrEmpty(s?.MaximumStatisticsJson);
+            });
+        }
+
         public partial class TestBackgroundDataStoreProcessor : BackgroundDataStoreProcessor
         {
             protected override int TimeToSleepDuringGameplay => 10;
 
             protected override void BackpopulateUserTags()
             {
-                // no-op
+                // no-op to avoid online/local metadata source dependencies in tests.
             }
 
             public bool Completed => ProcessingTask.IsCompleted;
