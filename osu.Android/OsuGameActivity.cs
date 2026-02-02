@@ -75,28 +75,31 @@ namespace osu.Android
             var config = Resources?.Configuration;
             if (config == null) return false;
 
-            return config.UiMode.HasFlag(UiMode.TypeDesk);
+            return (config.UiMode & UiMode.TypeMask) == UiMode.TypeDesk;
         }
 
         public void ApplyPerformanceOptimizations(bool enabled)
         {
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.N)
-                Window?.SetSustainedPerformanceMode(enabled);
-
-            bool dexMode = IsDeXMode();
-
-            if ((enabled || dexMode) && Build.VERSION.SdkInt >= BuildVersionCodes.M)
+            RunOnUiThread(() =>
             {
-#pragma warning disable CA1422
-                var preferredMode = WindowManager?.DefaultDisplay?.SupportedModes?.OrderByDescending(m => m.RefreshRate).FirstOrDefault();
-                if (preferredMode != null && Window != null)
+                if (Build.VERSION.SdkInt >= BuildVersionCodes.N)
+                    Window?.SetSustainedPerformanceMode(enabled);
+
+                bool dexMode = IsDeXMode();
+
+                if ((enabled || dexMode) && Build.VERSION.SdkInt >= BuildVersionCodes.M)
                 {
-                    var layoutParams = Window.Attributes;
-                    layoutParams.PreferredDisplayModeId = preferredMode.ModeId;
-                    Window.Attributes = layoutParams;
-                }
+#pragma warning disable CA1422
+                    var preferredMode = WindowManager?.DefaultDisplay?.SupportedModes?.OrderByDescending(m => m.RefreshRate).FirstOrDefault();
+                    if (preferredMode != null && Window != null)
+                    {
+                        var layoutParams = Window.Attributes;
+                        layoutParams.PreferredDisplayModeId = preferredMode.ModeId;
+                        Window.Attributes = layoutParams;
+                    }
 #pragma warning restore CA1422
-            }
+                }
+            });
         }
 
         public void ApplyAngleOptimizations(bool enabled)

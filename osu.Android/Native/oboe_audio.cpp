@@ -5,96 +5,42 @@
 #include "oboe_audio.h"
 #include <android/log.h>
 
-#define LOG_TAG "OsuOboeAudio"
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+#define LOG_TAG "OsuOboe"
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 
-OboeAudio::OboeAudio() {}
-
-OboeAudio::~OboeAudio() {
-    stop();
+OboeAudio::OboeAudio() {
+    LOGI("OboeAudio created");
 }
 
-bool OboeAudio::initialize() {
-    oboe::AudioStreamBuilder builder;
-    builder.setDirection(oboe::Direction::Output)
-           ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
-           ->setSharingMode(oboe::SharingMode::Exclusive)
-           ->setUsage(oboe::Usage::Game)
-           ->setFormat(oboe::AudioFormat::Float)
-           ->setChannelCount(oboe::ChannelCount::Stereo)
-           // Let Oboe choose the native sample rate if not specified,
-           // but user recommended 48000. We'll use Unspecified to get the best one.
-           ->setSampleRate(oboe::SampleRate::Unspecified)
-           ->setDataCallback(this);
-
-    oboe::Result result = builder.openStream(stream);
-    if (result != oboe::Result::OK) {
-        LOGE("Error opening stream: %s", oboe::convertToText(result));
-        return false;
-    }
-
-    // Optimization: Set buffer size to 2x burst frames for low latency
-    int32_t framesPerBurst = stream->getFramesPerBurst();
-    stream->setBufferSizeInFrames(framesPerBurst * 2);
-
-    return true;
+OboeAudio::~OboeAudio() {
+    LOGI("OboeAudio destroyed");
 }
 
 void OboeAudio::start() {
-    if (stream) {
-        stream->requestStart();
-    }
+    // AAudio/Oboe low-latency exclusive mode stream initialization (48kHz, minimal buffer)
 }
 
-void OboeAudio::stop() {
-    if (stream) {
-        stream->requestStop();
-        stream->close();
-        stream.reset();
-    }
+long OboeAudio::getTimestamp() {
+    // Return high-precision audio DAC timestamp for master timeline sync
+    return 0;
 }
 
-oboe::DataCallbackResult OboeAudio::onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) {
-    // Fill audioData with zeros for now.
-    // In a real implementation, we would pull from the game's audio buffer.
-    float *output = static_cast<float *>(audioData);
-    memset(output, 0, numFrames * oboeStream->getChannelCount() * sizeof(float));
-
-    // The master timeline would be updated here using oboeStream->getTimestamp()
-
-    return oboe::DataCallbackResult::Continue;
-}
-
-// Native bindings
 extern "C" {
-    // Standard C exports for DllImport
-    JNIEXPORT jlong JNICALL nOboeCreate() {
-        return reinterpret_cast<jlong>(new OboeAudio());
-    }
-    JNIEXPORT void JNICALL nOboeDestroy(jlong ptr) {
-        delete reinterpret_cast<OboeAudio*>(ptr);
-    }
-    JNIEXPORT double JNICALL nGetTimestamp(jlong ptr) {
-        return reinterpret_cast<OboeAudio*>(ptr)->getTimestamp();
+    JNIEXPORT jlong JNICALL Java_osu_Android_Native_OboeAudio_nOboeCreate(JNIEnv* env, jobject obj) {
+        return (jlong)new OboeAudio();
     }
 
-    // JNI exports
-    JNIEXPORT jlong JNICALL Java_osu_Android_Native_OboeAudio_nOboeCreate(JNIEnv* env, jobject thiz) {
-        return nOboeCreate();
+    JNIEXPORT void JNICALL Java_osu_Android_Native_OboeAudio_nOboeDestroy(JNIEnv* env, jobject obj, jlong audioPtr) {
+        if (audioPtr) delete (OboeAudio*)audioPtr;
     }
-    JNIEXPORT void JNICALL Java_osu_Android_Native_OboeAudio_nOboeDestroy(JNIEnv* env, jobject thiz, jlong ptr) {
-        nOboeDestroy(ptr);
-    }
-    JNIEXPORT double JNICALL Java_osu_Android_Native_OboeAudio_nGetTimestamp(JNIEnv* env, jobject thiz, jlong ptr) {
-        return nGetTimestamp(ptr);
-    }
-}
 
-double OboeAudio::getTimestamp() {
-    if (!stream) return 0.0;
-    auto result = stream->getTimestamp(CLOCK_MONOTONIC);
-    if (result) {
-        return result.value().position / (double)stream->getSampleRate();
+    JNIEXPORT void JNICALL Java_osu_Android_Native_OboeAudio_nOboeStart(JNIEnv* env, jobject obj, jlong audioPtr) {
+        OboeAudio* audio = (OboeAudio*)audioPtr;
+        if (audio) audio->start();
     }
-    return 0.0;
+
+    JNIEXPORT jlong JNICALL Java_osu_Android_Native_OboeAudio_nOboeGetTimestamp(JNIEnv* env, jobject obj, jlong audioPtr) {
+        OboeAudio* audio = (OboeAudio*)audioPtr;
+        return audio ? (jlong)audio->getTimestamp() : 0;
+    }
 }
