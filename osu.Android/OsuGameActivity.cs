@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -9,9 +9,7 @@ using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
-using Android.Content.Res;
 using Android.Graphics;
-using Android.Hardware.Input;
 using Android.OS;
 using Android.Views;
 using osu.Framework.Android;
@@ -43,70 +41,6 @@ namespace osu.Android
     [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryBrowsable, Intent.CategoryDefault }, DataSchemes = new[] { "osu", "osump" })]
     public class OsuGameActivity : AndroidGameActivity
     {
-        public override bool DispatchTouchEvent(MotionEvent? e)
-        {
-            if (e != null)
-            {
-                for (int i = 0; i < e.PointerCount; i++)
-                {
-                    var toolType = e.GetToolType(i);
-                    if (toolType == MotionEventToolType.Stylus)
-                    {
-                        // S Pen detected. Hardware timestamps should be used for improved latency.
-                        // MotionEvent.EventTime is in ms, converting to nano
-                        long timestampNano = Build.VERSION.SdkInt >= BuildVersionCodes.Q ? e.EventTimeNano : e.EventTime * 1000000;
-
-                        // Process historical points for smoother/predicted input
-                        for (int h = 0; h < e.HistorySize; h++)
-                        {
-                            float historicalX = e.GetHistoricalX(i, h);
-                            float historicalY = e.GetHistoricalY(i, h);
-                            long historicalTimeNano = Build.VERSION.SdkInt >= BuildVersionCodes.Q ? e.GetHistoricalEventTimeNano(h) : e.GetHistoricalEventTime(h) * 1000000;
-                            game.HandleStylusInput(historicalX, historicalY, historicalTimeNano);
-                        }
-                    }
-                }
-            }
-
-            return base.DispatchTouchEvent(e);
-        }
-
-        public new bool IsDeXMode()
-        {
-            var config = Resources?.Configuration;
-            if (config == null) return false;
-
-            return config.UiMode.HasFlag(UiMode.TypeDesk);
-        }
-
-        public void ApplyPerformanceOptimizations(bool enabled)
-        {
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.N)
-                Window?.SetSustainedPerformanceMode(enabled);
-
-            bool dexMode = IsDeXMode();
-
-            if ((enabled || dexMode) && Build.VERSION.SdkInt >= BuildVersionCodes.M)
-            {
-#pragma warning disable CA1422
-                var preferredMode = WindowManager?.DefaultDisplay?.SupportedModes?.OrderByDescending(m => m.RefreshRate).FirstOrDefault();
-                if (preferredMode != null && Window != null)
-                {
-                    var layoutParams = Window.Attributes;
-                    layoutParams.PreferredDisplayModeId = preferredMode.ModeId;
-                    Window.Attributes = layoutParams;
-                }
-#pragma warning restore CA1422
-            }
-        }
-
-        public void ApplyAngleOptimizations(bool enabled)
-        {
-            // ANGLE (GLES to Vulkan) translation logic.
-            // On modern Android, this can sometimes be requested via system properties or specific OEM APIs.
-            // For now, this serves as a placeholder for where the ANGLE loader configuration would go.
-        }
-
         private static readonly string[] osu_url_schemes = { "osu", "osump" };
 
         /// <summary>
@@ -133,13 +67,6 @@ namespace osu.Android
         public OsuGameActivity()
         {
             game = new OsuGameAndroid(this);
-        }
-
-
-        protected override void OnStart()
-        {
-            base.OnStart();
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.R) Window?.DecorView?.RequestUnbufferedDispatch(MotionEventActions.Move, InputSourceType.Touchscreen);
         }
 
         protected override void OnCreate(Bundle? savedInstanceState)
@@ -177,53 +104,6 @@ namespace osu.Android
             Assembly.Load("osu.Game.Rulesets.Taiko");
             Assembly.Load("osu.Game.Rulesets.Catch");
             Assembly.Load("osu.Game.Rulesets.Mania");
-        }
-
-        protected override void OnResume()
-        {
-            base.OnResume();
-
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.S)
-            {
-                var gm = (GameManager?)GetSystemService(GameService);
-                if (gm != null)
-                {
-                    int mode = gm.GameMode;
-                    // PERFORMANCE -> push high perf path
-                    // BATTERY/SAVE -> adapt lower fidelity
-                    ApplyPerformanceOptimizations(mode == (int)GameMode.Performance);
-                }
-            }
-
-            CheckInputDevices();
-        }
-
-        private void CheckInputDevices()
-        {
-            var inputManager = (InputManager?)GetSystemService(InputService);
-            int[] deviceIds = inputManager?.GetInputDeviceIds() ?? Array.Empty<int>();
-
-            foreach (int id in deviceIds)
-            {
-                var device = inputManager?.GetInputDevice(id);
-                if (device == null) continue;
-
-                if ((device.Sources & InputSourceType.Gamepad) == InputSourceType.Gamepad)
-                {
-                    // Gamepad detected
-                }
-            }
-        }
-
-        public override void OnConfigurationChanged(Configuration newConfig)
-        {
-            base.OnConfigurationChanged(newConfig);
-
-            if (IsDeXMode())
-            {
-                // Adapt swapchain/extents dynamically
-                ApplyPerformanceOptimizations(true);
-            }
         }
 
         protected override void OnNewIntent(Intent? intent) => handleIntent(intent);

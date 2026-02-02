@@ -110,10 +110,6 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.AutomaticallyAdjustBeatmapOffset, false);
 
-            SetDefault(OsuSetting.PerformanceMode, false);
-
-            SetDefault(OsuSetting.UseAngle, false);
-
             // Input
             SetDefault(OsuSetting.MenuCursorSize, 1.0f, 0.5f, 2f, 0.01f);
             SetDefault(OsuSetting.GameplayCursorSize, 1.0f, 0.1f, 2f, 0.01f);
@@ -449,6 +445,9 @@ namespace osu.Game.Configuration
         LastProcessedMetadataId,
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
+        PerformanceMode,
+        UseAngle,
+
         ProfileCoverExpanded,
         EditorLimitedDistanceSnap,
         ReplaySettingsOverlay,
@@ -490,15 +489,5 @@ namespace osu.Game.Configuration
         LastOnlineTagsPopulation,
 
         AutomaticallyAdjustBeatmapOffset,
-
-        /// <summary>
-        /// Enables various performance optimizations on Android.
-        /// </summary>
-        PerformanceMode,
-
-        /// <summary>
-        /// Whether to use ANGLE as the graphics backend (translates GLES to Vulkan).
-        /// </summary>
-        UseAngle,
     }
 }

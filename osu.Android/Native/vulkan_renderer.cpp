@@ -283,6 +283,13 @@ void VulkanRenderer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, V
 }
 
 void VulkanRenderer::render() {
+    // Late-submit strategy:
+    // 1. Wait for previous frame fence (ensure 1-frame-in-flight)
+    // 2. Poll input & Update (done in C#)
+    // 3. Process potential Dynamic Resolution scaling based on previous frame GPU timestamps
+    // 4. Record command buffer (Keep this fast, minimal subpasses)
+    // 5. Submit to queue
+    // 6. Present
     if (vkGetFenceStatus(device, inFlightFences[currentFrame]) == VK_NOT_READY) return;
     vkResetFences(device, 1, &inFlightFences[currentFrame]);
     uint32_t imageIndex;

@@ -1,5 +1,5 @@
-#include "oboe_audio.h"
 #include <cstring>
+#include "oboe_audio.h"
 #include <android/log.h>
 
 #define LOG_TAG "OsuOboeAudio"

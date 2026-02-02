@@ -5,11 +5,7 @@
 				 android:supportsRtl="true"
 				 android:label="osu!"
 				 android:icon="@mipmap/ic_launcher"
-				 android:roundIcon="@mipmap/ic_launcher"
-				 android:appCategory="game">
-		<meta-data android:name="android.game_mode_config"
-				   android:resource="@xml/game_mode_config" />
-	</application>
+				 android:roundIcon="@mipmap/ic_launcher" />
 	<!-- for editor usage -->
 	<uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 	<uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />

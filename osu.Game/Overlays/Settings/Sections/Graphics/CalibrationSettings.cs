@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
@@ -20,11 +21,10 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             {
                 new SettingsSlider<double, AudioOffsetSlider>
                 {
-                    LabelText = osu.Game.Localisation.AudioSettingsStrings.AudioOffset,
+                    LabelText = AudioSettingsStrings.AudioOffset,
                     Current = config.GetBindable<double>(OsuSetting.AudioOffset),
                     KeyboardStep = 1,
                 },
-                // Add more calibration items here if needed
             };
         }
 
