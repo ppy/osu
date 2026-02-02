@@ -18,29 +18,48 @@ OboeAudio::~OboeAudio() {
 
 void OboeAudio::start() {
     // AAudio/Oboe low-latency exclusive mode stream initialization (48kHz, minimal buffer)
+    LOGI("OboeAudio started");
 }
 
-long OboeAudio::getTimestamp() {
+double OboeAudio::getTimestamp() {
     // Return high-precision audio DAC timestamp for master timeline sync
-    return 0;
+    return 0.0;
 }
 
 extern "C" {
-    JNIEXPORT jlong JNICALL Java_osu_Android_Native_OboeAudio_nOboeCreate(JNIEnv* env, jobject obj) {
-        return (jlong)new OboeAudio();
+    // Flat C exports for DllImport
+    long nOboeCreate() {
+        return (long)new OboeAudio();
     }
 
-    JNIEXPORT void JNICALL Java_osu_Android_Native_OboeAudio_nOboeDestroy(JNIEnv* env, jobject obj, jlong audioPtr) {
+    void nOboeDestroy(long audioPtr) {
         if (audioPtr) delete (OboeAudio*)audioPtr;
     }
 
-    JNIEXPORT void JNICALL Java_osu_Android_Native_OboeAudio_nOboeStart(JNIEnv* env, jobject obj, jlong audioPtr) {
+    void nOboeStart(long audioPtr) {
         OboeAudio* audio = (OboeAudio*)audioPtr;
         if (audio) audio->start();
     }
 
-    JNIEXPORT jlong JNICALL Java_osu_Android_Native_OboeAudio_nOboeGetTimestamp(JNIEnv* env, jobject obj, jlong audioPtr) {
+    double nGetTimestamp(long audioPtr) {
         OboeAudio* audio = (OboeAudio*)audioPtr;
-        return audio ? (jlong)audio->getTimestamp() : 0;
+        return audio ? audio->getTimestamp() : 0.0;
+    }
+
+    // JNI exports (matching package osu.Android.Native)
+    JNIEXPORT jlong JNICALL Java_osu_Android_Native_OboeAudio_nOboeCreate(JNIEnv* env, jobject obj) {
+        return (jlong)nOboeCreate();
+    }
+
+    JNIEXPORT void JNICALL Java_osu_Android_Native_OboeAudio_nOboeDestroy(JNIEnv* env, jobject obj, jlong audioPtr) {
+        nOboeDestroy((long)audioPtr);
+    }
+
+    JNIEXPORT void JNICALL Java_osu_Android_Native_OboeAudio_nOboeStart(JNIEnv* env, jobject obj, jlong audioPtr) {
+        nOboeStart((long)audioPtr);
+    }
+
+    JNIEXPORT jdouble JNICALL Java_osu_Android_Native_OboeAudio_nOboeGetTimestamp(JNIEnv* env, jobject obj, jlong audioPtr) {
+        return (jdouble)nGetTimestamp((long)audioPtr);
     }
 }

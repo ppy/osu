@@ -70,7 +70,7 @@ namespace osu.Android
             return base.DispatchTouchEvent(e);
         }
 
-        public bool IsDeXMode()
+        public new bool IsDeXMode()
         {
             var config = Resources?.Configuration;
             if (config == null) return false;
@@ -121,7 +121,7 @@ namespace osu.Android
 
         private bool gameCreated;
 
-        protected override Framework.Game CreateGame()
+        protected override global::osu.Framework.Game CreateGame()
         {
             if (gameCreated)
                 throw new InvalidOperationException("Framework tried to create a game twice.");
@@ -212,7 +212,7 @@ namespace osu.Android
             }
         }
 
-        public override void OnConfigurationChanged(Android.Content.Res.Configuration newConfig)
+        public override void OnConfigurationChanged(global::Android.Content.Res.Configuration newConfig)
         {
             base.OnConfigurationChanged(newConfig);
 

@@ -31,12 +31,34 @@ void VulkanRenderer::render() {
 }
 
 extern "C" {
+    // Flat C exports for DllImport
+    long nVulkanCreate() {
+        return (long)new VulkanRenderer();
+    }
+
+    void nVulkanDestroy(long rendererPtr) {
+        if (rendererPtr) delete (VulkanRenderer*)rendererPtr;
+    }
+
+    bool nVulkanInitialize(long rendererPtr, void* window) {
+        VulkanRenderer* renderer = (VulkanRenderer*)rendererPtr;
+        if (!renderer || !window) return false;
+        renderer->init((ANativeWindow*)window);
+        return true;
+    }
+
+    void nVulkanRender(long rendererPtr) {
+        VulkanRenderer* renderer = (VulkanRenderer*)rendererPtr;
+        if (renderer) renderer->render();
+    }
+
+    // JNI exports (matching package osu.Android.Native)
     JNIEXPORT jlong JNICALL Java_osu_Android_Native_VulkanRenderer_nVulkanCreate(JNIEnv* env, jobject obj) {
-        return (jlong)new VulkanRenderer();
+        return (jlong)nVulkanCreate();
     }
 
     JNIEXPORT void JNICALL Java_osu_Android_Native_VulkanRenderer_nVulkanDestroy(JNIEnv* env, jobject obj, jlong rendererPtr) {
-        if (rendererPtr) delete (VulkanRenderer*)rendererPtr;
+        nVulkanDestroy((long)rendererPtr);
     }
 
     JNIEXPORT void JNICALL Java_osu_Android_Native_VulkanRenderer_nVulkanInit(JNIEnv* env, jobject obj, jlong rendererPtr, jobject surface) {
@@ -47,7 +69,6 @@ extern "C" {
     }
 
     JNIEXPORT void JNICALL Java_osu_Android_Native_VulkanRenderer_nVulkanRender(JNIEnv* env, jobject obj, jlong rendererPtr) {
-        VulkanRenderer* renderer = (VulkanRenderer*)rendererPtr;
-        if (renderer) renderer->render();
+        nVulkanRender((long)rendererPtr);
     }
 }

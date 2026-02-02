@@ -26,6 +26,9 @@ namespace osu.Android
         [Cached]
         private readonly OsuGameActivity gameActivity;
 
+        private Native.VulkanRenderer? vulkanRenderer;
+        private Native.OboeAudio? oboeAudio;
+
         private readonly PackageInfo packageInfo;
 
         public override Vector2 ScalingContainerTargetDrawSize => new Vector2(1024, 1024 * DrawHeight / DrawWidth);
@@ -36,6 +39,7 @@ namespace osu.Android
             gameActivity = activity;
             packageInfo = Application.Context.ApplicationContext!.PackageManager!.GetPackageInfo(Application.Context.ApplicationContext.PackageName!, 0).AsNonNull();
         }
+
         public void HandleStylusInput(float x, float y, long timestampNano)
         {
             // Late-input sampling and reprojection into audio timeline would happen here.
@@ -44,9 +48,6 @@ namespace osu.Android
             _ = timestampNano;
             Debug.WriteLine($"Stylus: {x}, {y}, {timestampNano}");
         }
-
-
-
 
         public override string Version
         {
@@ -76,7 +77,23 @@ namespace osu.Android
         {
             base.LoadComplete();
             UserPlayingState.BindValueChanged(_ => updateOrientation());
-            PerformanceMode.BindValueChanged(enabled => gameActivity.ApplyPerformanceOptimizations(enabled.NewValue), true);
+            PerformanceMode.BindValueChanged(enabled =>
+            {
+                gameActivity.ApplyPerformanceOptimizations(enabled.NewValue);
+
+                if (enabled.NewValue)
+                {
+                    try
+                    {
+                        vulkanRenderer ??= new Native.VulkanRenderer();
+                        oboeAudio ??= new Native.OboeAudio();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Failed to initialize native components: {ex}");
+                    }
+                }
+            }, true);
             UseAngle.BindValueChanged(enabled => gameActivity.ApplyAngleOptimizations(enabled.NewValue), true);
         }
 
@@ -117,6 +134,13 @@ namespace osu.Android
         protected override UpdateManager CreateUpdateManager() => new MobileUpdateNotifier();
 
         protected override BatteryInfo CreateBatteryInfo() => new AndroidBatteryInfo();
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            vulkanRenderer?.Dispose();
+            oboeAudio?.Dispose();
+        }
 
         private class AndroidBatteryInfo : BatteryInfo
         {
