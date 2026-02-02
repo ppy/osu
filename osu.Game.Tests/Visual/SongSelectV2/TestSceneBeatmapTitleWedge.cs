@@ -241,8 +241,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
             AddStep("reset event", resetEvent.Reset);
             AddStep("click favourite button", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single().TriggerClick());
-            AddAssert("spinner visible", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single()
-                                                   .ChildrenOfType<LoadingSpinner>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
+            AddUntilStep("spinner visible", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single()
+                                                   .ChildrenOfType<LoadingSpinner>().Single().State.Value == Visibility.Visible);
             AddStep("allow request to complete", resetEvent.Set);
             AddUntilStep("spinner hidden", () => this.ChildrenOfType<BeatmapTitleWedge.FavouriteButton>().Single()
                                                    .ChildrenOfType<LoadingSpinner>().Single().State.Value == Visibility.Hidden);

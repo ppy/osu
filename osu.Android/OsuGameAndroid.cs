@@ -4,8 +4,8 @@
 using System;
 using System.Linq;
 using System.Diagnostics;
-using Android.App;
-using Android.Content.PM;
+using AndroidApp = global::Android.App;
+using AndroidPM = global::Android.Content.PM;
 using Microsoft.Maui.Devices;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -29,7 +29,7 @@ namespace osu.Android
         private Native.VulkanRenderer? vulkanRenderer;
         private Native.OboeAudio? oboeAudio;
 
-        private readonly PackageInfo packageInfo;
+        private readonly AndroidPM.PackageInfo packageInfo;
 
         public override Vector2 ScalingContainerTargetDrawSize => new Vector2(1024, 1024 * DrawHeight / DrawWidth);
 
@@ -37,7 +37,7 @@ namespace osu.Android
             : base(null)
         {
             gameActivity = activity;
-            packageInfo = Application.Context.ApplicationContext!.PackageManager!.GetPackageInfo(Application.Context.ApplicationContext.PackageName!, 0).AsNonNull();
+            packageInfo = AndroidApp.Application.Context.ApplicationContext!.PackageManager!.GetPackageInfo(AndroidApp.Application.Context.ApplicationContext.PackageName!, 0).AsNonNull();
         }
 
         public void HandleStylusInput(float x, float y, long timestampNano)
@@ -112,11 +112,11 @@ namespace osu.Android
             switch (orientation)
             {
                 case MobileUtils.Orientation.Locked:
-                    gameActivity.RequestedOrientation = ScreenOrientation.Locked;
+                    gameActivity.RequestedOrientation = AndroidPM.ScreenOrientation.Locked;
                     break;
 
                 case MobileUtils.Orientation.Portrait:
-                    gameActivity.RequestedOrientation = ScreenOrientation.Portrait;
+                    gameActivity.RequestedOrientation = AndroidPM.ScreenOrientation.Portrait;
                     break;
 
                 case MobileUtils.Orientation.Default:

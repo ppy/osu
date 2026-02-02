@@ -38,7 +38,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for slider sliding then seek", () =>
             {
-                if (slider?.Tracking.Value != true)
+                if (slider == null || !slider.IsPresent)
+                    return false;
+
+                if (slider.Tracking.Value != true)
                     return false;
 
                 if (!samples.Any(s => s.Playing))

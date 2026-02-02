@@ -6,29 +6,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Android.App;
-using Android.Content;
-using Android.Content.PM;
-using Android.Content.Res;
-using Android.Graphics;
-using Android.Hardware.Input;
-using Android.OS;
-using Android.Views;
+using AndroidApp = global::Android.App;
+using AndroidContent = global::Android.Content;
+using AndroidPM = global::Android.Content.PM;
+using AndroidRes = global::Android.Content.Res;
+using AndroidGraphics = global::Android.Graphics;
+using AndroidInput = global::Android.Hardware.Input;
+using AndroidOS = global::Android.OS;
+using AndroidViews = global::Android.Views;
 using osu.Framework.Android;
 using osu.Game.Database;
 using Debug = System.Diagnostics.Debug;
-using Uri = Android.Net.Uri;
+using Uri = global::Android.Net.Uri;
 
 namespace osu.Android
 {
-    [Activity(ConfigurationChanges = DEFAULT_CONFIG_CHANGES, Exported = true, LaunchMode = DEFAULT_LAUNCH_MODE, MainLauncher = true)]
-    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osz", DataHost = "*", DataMimeType = "*/*")]
-    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osk", DataHost = "*", DataMimeType = "*/*")]
-    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osr", DataHost = "*", DataMimeType = "*/*")]
-    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-beatmap-archive")]
-    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-skin-archive")]
-    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-replay")]
-    [IntentFilter(new[] { Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault }, DataMimeTypes = new[]
+    [AndroidApp.Activity(ConfigurationChanges = DEFAULT_CONFIG_CHANGES, Exported = true, LaunchMode = DEFAULT_LAUNCH_MODE, MainLauncher = true)]
+    [AndroidContent.IntentFilter(new[] { AndroidContent.Intent.ActionView }, Categories = new[] { AndroidContent.Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osz", DataHost = "*", DataMimeType = "*/*")]
+    [AndroidContent.IntentFilter(new[] { AndroidContent.Intent.ActionView }, Categories = new[] { AndroidContent.Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osk", DataHost = "*", DataMimeType = "*/*")]
+    [AndroidContent.IntentFilter(new[] { AndroidContent.Intent.ActionView }, Categories = new[] { AndroidContent.Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osr", DataHost = "*", DataMimeType = "*/*")]
+    [AndroidContent.IntentFilter(new[] { AndroidContent.Intent.ActionView }, Categories = new[] { AndroidContent.Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-beatmap-archive")]
+    [AndroidContent.IntentFilter(new[] { AndroidContent.Intent.ActionView }, Categories = new[] { AndroidContent.Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-skin-archive")]
+    [AndroidContent.IntentFilter(new[] { AndroidContent.Intent.ActionView }, Categories = new[] { AndroidContent.Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-replay")]
+    [AndroidContent.IntentFilter(new[] { AndroidContent.Intent.ActionSend, AndroidContent.Intent.ActionSendMultiple }, Categories = new[] { AndroidContent.Intent.CategoryDefault }, DataMimeTypes = new[]
     {
         "application/zip",
         "application/octet-stream",
@@ -40,27 +40,27 @@ namespace osu.Android
         "application/x-osu-skin-archive",
         "application/x-osu-replay",
     })]
-    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryBrowsable, Intent.CategoryDefault }, DataSchemes = new[] { "osu", "osump" })]
+    [AndroidContent.IntentFilter(new[] { AndroidContent.Intent.ActionView }, Categories = new[] { AndroidContent.Intent.CategoryBrowsable, AndroidContent.Intent.CategoryDefault }, DataSchemes = new[] { "osu", "osump" })]
     public class OsuGameActivity : AndroidGameActivity
     {
-        public override bool DispatchTouchEvent(MotionEvent? e)
+        public override bool DispatchTouchEvent(AndroidViews.MotionEvent? e)
         {
             if (e != null)
             {
                 for (int i = 0; i < e.PointerCount; i++)
                 {
                     var toolType = e.GetToolType(i);
-                    if (toolType == MotionEventToolType.Stylus)
+                    if (toolType == AndroidViews.MotionEventToolType.Stylus)
                     {
                         // S Pen detected. Hardware timestamps should be used for improved latency.
-                        long timestampNano = Build.VERSION.SdkInt >= BuildVersionCodes.Q ? e.EventTimeNano : e.EventTime * 1000000;
+                        long timestampNano = AndroidOS.Build.VERSION.SdkInt >= AndroidOS.BuildVersionCodes.Q ? e.EventTimeNano : e.EventTime * 1000000;
 
                         // Process historical points for smoother/predicted input
                         for (int h = 0; h < e.HistorySize; h++)
                         {
                             float historicalX = e.GetHistoricalX(i, h);
                             float historicalY = e.GetHistoricalY(i, h);
-                            long historicalTimeNano = Build.VERSION.SdkInt >= BuildVersionCodes.Q ? e.GetHistoricalEventTimeNano(h) : e.GetHistoricalEventTime(h) * 1000000;
+                            long historicalTimeNano = AndroidOS.Build.VERSION.SdkInt >= AndroidOS.BuildVersionCodes.Q ? e.GetHistoricalEventTimeNano(h) : e.GetHistoricalEventTime(h) * 1000000;
                             game.HandleStylusInput(historicalX, historicalY, historicalTimeNano);
                         }
                     }
@@ -75,19 +75,19 @@ namespace osu.Android
             var config = Resources?.Configuration;
             if (config == null) return false;
 
-            return (config.UiMode & UiMode.TypeMask) == UiMode.TypeDesk;
+            return (config.UiMode & AndroidRes.UiMode.TypeMask) == AndroidRes.UiMode.TypeDesk;
         }
 
         public void ApplyPerformanceOptimizations(bool enabled)
         {
             RunOnUiThread(() =>
             {
-                if (Build.VERSION.SdkInt >= BuildVersionCodes.N)
+                if (AndroidOS.Build.VERSION.SdkInt >= AndroidOS.BuildVersionCodes.N)
                     Window?.SetSustainedPerformanceMode(enabled);
 
                 bool dexMode = IsDeXMode();
 
-                if ((enabled || dexMode) && Build.VERSION.SdkInt >= BuildVersionCodes.M)
+                if ((enabled || dexMode) && AndroidOS.Build.VERSION.SdkInt >= AndroidOS.BuildVersionCodes.M)
                 {
 #pragma warning disable CA1422
                     var preferredMode = WindowManager?.DefaultDisplay?.SupportedModes?.OrderByDescending(m => m.RefreshRate).FirstOrDefault();
@@ -113,7 +113,7 @@ namespace osu.Android
         /// The default screen orientation.
         /// </summary>
         /// <remarks>Adjusted on startup to match expected UX for the current device type (phone/tablet).</remarks>
-        public ScreenOrientation DefaultOrientation = ScreenOrientation.Unspecified;
+        public AndroidPM.ScreenOrientation DefaultOrientation = AndroidPM.ScreenOrientation.Unspecified;
 
         public new bool IsTablet { get; private set; }
 
@@ -138,10 +138,10 @@ namespace osu.Android
         protected override void OnStart()
         {
             base.OnStart();
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.R) Window?.DecorView?.RequestUnbufferedDispatch((int)InputSourceType.Touchscreen);
+            if (AndroidOS.Build.VERSION.SdkInt >= AndroidOS.BuildVersionCodes.R) Window?.DecorView?.RequestUnbufferedDispatch((int)AndroidViews.InputSourceType.Touchscreen);
         }
 
-        protected override void OnCreate(Bundle? savedInstanceState)
+        protected override void OnCreate(AndroidOS.Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
@@ -152,20 +152,20 @@ namespace osu.Android
 
             Debug.Assert(Window != null);
 
-            Window.AddFlags(WindowManagerFlags.Fullscreen);
-            Window.AddFlags(WindowManagerFlags.KeepScreenOn);
+            Window.AddFlags(AndroidViews.WindowManagerFlags.Fullscreen);
+            Window.AddFlags(AndroidViews.WindowManagerFlags.KeepScreenOn);
 
             Debug.Assert(WindowManager?.DefaultDisplay != null);
             Debug.Assert(Resources?.DisplayMetrics != null);
 
-            Point displaySize = new Point();
+            AndroidGraphics.Point displaySize = new AndroidGraphics.Point();
 #pragma warning disable CA1422 // GetSize is deprecated
             WindowManager.DefaultDisplay.GetSize(displaySize);
 #pragma warning restore CA1422
             float smallestWidthDp = Math.Min(displaySize.X, displaySize.Y) / Resources.DisplayMetrics.Density;
             IsTablet = smallestWidthDp >= 600f;
 
-            RequestedOrientation = DefaultOrientation = IsTablet ? ScreenOrientation.FullUser : ScreenOrientation.SensorLandscape;
+            RequestedOrientation = DefaultOrientation = IsTablet ? AndroidPM.ScreenOrientation.FullUser : AndroidPM.ScreenOrientation.SensorLandscape;
 
             // Currently (SDK 6.0.200), BundleAssemblies is not runnable for net6-android.
             // The assembly files are not available as files either after native AOT.
@@ -182,13 +182,13 @@ namespace osu.Android
         {
             base.OnResume();
 
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.S)
+            if (AndroidOS.Build.VERSION.SdkInt >= AndroidOS.BuildVersionCodes.S)
             {
-                var gm = (GameManager?)GetSystemService(GameService);
+                var gm = (AndroidApp.GameManager?)GetSystemService(GameService);
                 if (gm != null)
                 {
                     int mode = gm.GameMode;
-                    ApplyPerformanceOptimizations(mode == (int)GameMode.Performance);
+                    ApplyPerformanceOptimizations(mode == (int)AndroidApp.GameMode.Performance);
                 }
             }
 
@@ -197,7 +197,7 @@ namespace osu.Android
 
         private void CheckInputDevices()
         {
-            var inputManager = (InputManager?)GetSystemService(InputService);
+            var inputManager = (AndroidInput.InputManager?)GetSystemService(InputService);
             int[] deviceIds = inputManager?.GetInputDeviceIds() ?? Array.Empty<int>();
 
             foreach (int id in deviceIds)
@@ -205,14 +205,14 @@ namespace osu.Android
                 var device = inputManager?.GetInputDevice(id);
                 if (device == null) continue;
 
-                if ((device.Sources & InputSourceType.Gamepad) == InputSourceType.Gamepad)
+                if ((device.Sources & AndroidViews.InputSourceType.Gamepad) == AndroidViews.InputSourceType.Gamepad)
                 {
                     // Gamepad detected
                 }
             }
         }
 
-        public override void OnConfigurationChanged(global::Android.Content.Res.Configuration newConfig)
+        public override void OnConfigurationChanged(AndroidRes.Configuration newConfig)
         {
             base.OnConfigurationChanged(newConfig);
 
@@ -222,17 +222,17 @@ namespace osu.Android
             }
         }
 
-        protected override void OnNewIntent(Intent? intent) => handleIntent(intent);
+        protected override void OnNewIntent(AndroidContent.Intent? intent) => handleIntent(intent);
 
-        private void handleIntent(Intent? intent)
+        private void handleIntent(AndroidContent.Intent? intent)
         {
             if (intent == null)
                 return;
 
             switch (intent.Action)
             {
-                case Intent.ActionDefault:
-                    if (intent.Scheme == ContentResolver.SchemeContent)
+                case AndroidContent.Intent.ActionDefault:
+                    if (intent.Scheme == AndroidContent.ContentResolver.SchemeContent)
                     {
                         if (intent.Data != null)
                             handleImportFromUris(intent.Data);
@@ -245,8 +245,8 @@ namespace osu.Android
 
                     break;
 
-                case Intent.ActionSend:
-                case Intent.ActionSendMultiple:
+                case AndroidContent.Intent.ActionSend:
+                case AndroidContent.Intent.ActionSendMultiple:
                 {
                     if (intent.ClipData == null)
                         break;
