@@ -19,16 +19,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
     /// <summary>
     /// Legacy skinned spinner with one main spinning layer and a background layer.
     /// </summary>
-    public partial class LegacyOldStyleSpinner : LegacySpinner, IHasSpinnerBackground
+    public partial class LegacyOldStyleSpinner : LegacySpinner
     {
         private Sprite disc = null!;
         private Sprite metreSprite = null!;
         private Container metre = null!;
-        private Sprite background = null!;
 
         private bool spinnerBlink;
-
-        public Drawable SpinnerBackground => background;
 
         private const float final_metre_height = 692 * SPRITE_SCALE;
 
@@ -39,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             AddRangeInternal(new[]
             {
-                background = new Sprite
+                new Sprite
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.Centre,

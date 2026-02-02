@@ -48,43 +48,19 @@ namespace osu.Game.Tests.Visual.Ranking
                             {
                                 Tags =
                                 [
+                                    new APITag { Id = 0, Name = "uncategorised tag", Description = "This probably isn't real but could be and should be handled.", },
+                                    new APITag { Id = 1, Name = "song representation/simple", Description = "Accessible and straightforward map design.", },
                                     new APITag
                                     {
-                                        Id = 0,
-                                        Name = "uncategorised tag",
-                                        Description = "This probably isn't real but could be and should be handled.",
-                                    },
-                                    new APITag
-                                    {
-                                        Id = 1,
-                                        Name = "song representation/simple",
-                                        Description = "Accessible and straightforward map design.",
-                                    },
-                                    new APITag
-                                    {
-                                        Id = 2,
-                                        Name = "style/clean",
+                                        Id = 2, Name = "style/clean",
                                         Description = "Visually uncluttered and organised patterns, often involving few overlaps and equal visual spacing between objects.",
                                     },
                                     new APITag
                                     {
-                                        Id = 3,
-                                        Name = "aim/aim control",
-                                        Description = "Patterns with velocity or direction changes which strongly go against a player's natural movement pattern.",
+                                        Id = 3, Name = "aim/aim control", Description = "Patterns with velocity or direction changes which strongly go against a player's natural movement pattern.",
                                     },
-                                    new APITag
-                                    {
-                                        Id = 4,
-                                        Name = "tap/bursts",
-                                        Description = "Patterns requiring continuous movement and alternating, typically 9 notes or less.",
-                                    },
-                                    new APITag
-                                    {
-                                        Id = 5,
-                                        Name = "style/mono-heavy",
-                                        Description = "Features monos used in large amounts.",
-                                        RulesetId = 1,
-                                    },
+                                    new APITag { Id = 4, Name = "tap/bursts", Description = "Patterns requiring continuous movement and alternating, typically 9 notes or less.", },
+                                    new APITag { Id = 5, Name = "style/mono-heavy", Description = "Features monos used in large amounts.", RulesetId = 1, },
                                 ]
                             }), 500);
                             return true;

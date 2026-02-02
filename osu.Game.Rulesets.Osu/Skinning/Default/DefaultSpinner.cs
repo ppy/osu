@@ -14,7 +14,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public partial class DefaultSpinner : CompositeDrawable, IHasSpinnerBackground
+    public partial class DefaultSpinner : CompositeDrawable
     {
         private DrawableSpinner drawableSpinner = null!;
 
@@ -22,10 +22,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         private Container spmContainer = null!;
         private OsuSpriteText spmCounter = null!;
-
-        private DefaultSpinnerDisc disc = null!;
-
-        public Drawable SpinnerBackground => disc.SpinnerBackground;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -44,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             AddRangeInternal(new Drawable[]
             {
-                disc = new DefaultSpinnerDisc
+                new DefaultSpinnerDisc
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,

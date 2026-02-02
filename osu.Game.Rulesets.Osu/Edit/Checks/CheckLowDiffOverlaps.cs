@@ -33,23 +33,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            if (context.InterpretedDifficulty > DifficultyRating.Normal)
+            // TODO: This should also apply to *lowest difficulty* Normals - they are skipped for now.
+            if (context.InterpretedDifficulty > DifficultyRating.Easy)
                 yield break;
-
-            if (context.InterpretedDifficulty == DifficultyRating.Normal)
-            {
-                foreach (var other in context.OtherDifficulties)
-                {
-                    double otherStars = other.Playable.BeatmapInfo.StarRating;
-                    var otherRating = StarDifficulty.GetDifficultyRating(otherStars);
-
-                    if (otherRating < DifficultyRating.Normal)
-                        yield break;
-
-                    if (otherRating == DifficultyRating.Normal && otherStars < context.CurrentDifficulty.Playable.BeatmapInfo.StarRating)
-                        yield break;
-                }
-            }
 
             var hitObjects = context.CurrentDifficulty.Playable.HitObjects;
 

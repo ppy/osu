@@ -26,23 +26,23 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 List<BeatmapCollection> collections =
                 [
                     new BeatmapCollection("collection one", [
-                        .. BeatmapSets[0].Beatmaps.Select(b => b.MD5Hash),
-                        .. BeatmapSets[1].Beatmaps.Select(b => b.MD5Hash),
-                        .. BeatmapSets[2].Beatmaps.Select(b => b.MD5Hash),
+                        ..BeatmapSets[0].Beatmaps.Select(b => b.MD5Hash),
+                        ..BeatmapSets[1].Beatmaps.Select(b => b.MD5Hash),
+                        ..BeatmapSets[2].Beatmaps.Select(b => b.MD5Hash),
                         BeatmapSets[5].Beatmaps[1].MD5Hash,
                         BeatmapSets[8].Beatmaps[0].MD5Hash,
                     ]),
                     new BeatmapCollection("collection two", [
                         BeatmapSets[0].Beatmaps[0].MD5Hash,
-                        .. BeatmapSets[1].Beatmaps.Select(b => b.MD5Hash),
-                        .. BeatmapSets[2].Beatmaps.Select(b => b.MD5Hash),
+                        ..BeatmapSets[1].Beatmaps.Select(b => b.MD5Hash),
+                        ..BeatmapSets[2].Beatmaps.Select(b => b.MD5Hash),
                         BeatmapSets[6].Beatmaps[2].MD5Hash,
                         BeatmapSets[8].Beatmaps[2].MD5Hash,
                     ]),
                     new BeatmapCollection("collection one copy", [
-                        .. BeatmapSets[0].Beatmaps.Select(b => b.MD5Hash),
-                        .. BeatmapSets[1].Beatmaps.Select(b => b.MD5Hash),
-                        .. BeatmapSets[2].Beatmaps.Select(b => b.MD5Hash),
+                        ..BeatmapSets[0].Beatmaps.Select(b => b.MD5Hash),
+                        ..BeatmapSets[1].Beatmaps.Select(b => b.MD5Hash),
+                        ..BeatmapSets[2].Beatmaps.Select(b => b.MD5Hash),
                         BeatmapSets[5].Beatmaps[1].MD5Hash,
                         BeatmapSets[8].Beatmaps[0].MD5Hash,
                     ]),

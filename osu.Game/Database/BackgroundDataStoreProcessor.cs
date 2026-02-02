@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
@@ -546,8 +545,6 @@ namespace osu.Game.Database
 
         private void backpopulateMissingSubmissionAndRankDates()
         {
-            if (DebugUtils.IsNUnitRunning) return;
-
             if (!localMetadataSource.Available)
             {
                 Logger.Log("Cannot backpopulate missing submission/rank dates because the local metadata cache is missing.");
@@ -650,8 +647,6 @@ namespace osu.Game.Database
 
             if (!localMetadataSource.Available || !localMetadataSource.IsAtLeastVersion(3))
             {
-                if (DebugUtils.IsNUnitRunning) return;
-
                 Logger.Log(@"Local metadata cache has too low version to backpopulate user tags, attempting refetch...");
                 localMetadataSource.FetchCache().WaitSafely();
 

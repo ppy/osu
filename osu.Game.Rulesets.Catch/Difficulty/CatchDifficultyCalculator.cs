@@ -52,9 +52,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
 
-            // Get applicable rate mods upfront to avoid iterating and filtering Mods for every object.
-            var rateMods = Mods.OfType<IApplicableToRate>().ToList();
-
             // In 2B beatmaps, it is possible that a normal Fruit is placed in the middle of a JuiceStream.
             foreach (var hitObject in CatchBeatmap.GetPalpableObjects(beatmap.HitObjects))
             {
@@ -63,14 +60,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     continue;
 
                 if (lastObject != null)
-                {
-                    double objectClockRate = 1;
-
-                    foreach (var mod in rateMods)
-                        objectClockRate = mod.ApplyToRate(hitObject.StartTime, objectClockRate);
-
-                    objects.Add(new CatchDifficultyHitObject(hitObject, lastObject, objectClockRate, halfCatcherWidth, objects, objects.Count));
-                }
+                    objects.Add(new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatcherWidth, objects, objects.Count));
 
                 lastObject = hitObject;
             }
@@ -87,7 +77,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             return new Skill[]
             {
-                new Movement(mods, halfCatcherWidth),
+                new Movement(mods, halfCatcherWidth, clockRate),
             };
         }
 
