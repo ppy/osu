@@ -53,14 +53,14 @@ namespace osu.Android
                     if (toolType == AndroidViews.MotionEventToolType.Stylus)
                     {
                         // S Pen detected. Hardware timestamps should be used for improved latency.
-                        long timestampNano = AndroidOS.Build.VERSION.SdkInt >= AndroidOS.BuildVersionCodes.Q ? e.EventTimeNano : e.EventTime * 1000000;
+                        long timestampNano = e.EventTime * 1000000;
 
                         // Process historical points for smoother/predicted input
                         for (int h = 0; h < e.HistorySize; h++)
                         {
                             float historicalX = e.GetHistoricalX(i, h);
                             float historicalY = e.GetHistoricalY(i, h);
-                            long historicalTimeNano = AndroidOS.Build.VERSION.SdkInt >= AndroidOS.BuildVersionCodes.Q ? e.GetHistoricalEventTimeNano(h) : e.GetHistoricalEventTime(h) * 1000000;
+                            long historicalTimeNano = e.GetHistoricalEventTime(h) * 1000000;
                             game.HandleStylusInput(historicalX, historicalY, historicalTimeNano);
                         }
                     }
@@ -87,15 +87,23 @@ namespace osu.Android
 
                 bool dexMode = IsDeXMode();
 
-                if ((enabled || dexMode) && AndroidOS.Build.VERSION.SdkInt >= AndroidOS.BuildVersionCodes.M)
+                var display = WindowManager?.DefaultDisplay;
+
+                if ((enabled || dexMode) && AndroidOS.Build.VERSION.SdkInt >= AndroidOS.BuildVersionCodes.M && display != null)
                 {
 #pragma warning disable CA1422
-                    var preferredMode = WindowManager?.DefaultDisplay?.SupportedModes?.OrderByDescending(m => m.RefreshRate).FirstOrDefault();
+                    var modes = display.GetSupportedModes();
+                    var preferredMode = modes?.OrderByDescending(m => m.RefreshRate).FirstOrDefault();
+
                     if (preferredMode != null && Window != null)
                     {
                         var layoutParams = Window.Attributes;
-                        layoutParams.PreferredDisplayModeId = preferredMode.ModeId;
-                        Window.Attributes = layoutParams;
+
+                        if (layoutParams != null)
+                        {
+                            layoutParams.PreferredDisplayModeId = preferredMode.ModeId;
+                            Window.Attributes = layoutParams;
+                        }
                     }
 #pragma warning restore CA1422
                 }
