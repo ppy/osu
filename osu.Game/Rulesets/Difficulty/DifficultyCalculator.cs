@@ -123,17 +123,17 @@ namespace osu.Game.Rulesets.Difficulty
             cancellationToken.ThrowIfCancellationRequested();
             // ReSharper disable once PossiblyMistakenUseOfCancellationToken
             preProcess(mods, cancellationToken);
+
+            if (!Beatmap.HitObjects.Any())
+                return [];
+
+            var skills = CreateSkills(Beatmap, playableMods, clockRate);
+            var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
+            var difficultyObjects = getDifficultyHitObjects().ToArray();
             return enumerateTimed();
 
             IEnumerable<TimedDifficultyAttributes> enumerateTimed()
             {
-                if (!Beatmap.HitObjects.Any())
-                    yield break;
-
-                var skills = CreateSkills(Beatmap, playableMods, clockRate);
-                var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
-                var difficultyObjects = getDifficultyHitObjects().ToArray();
-
                 int currentIndex = 0;
 
                 foreach (var obj in Beatmap.HitObjects)
