@@ -152,6 +152,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.KeyOverlay, false);
             SetDefault(OsuSetting.ReplaySettingsOverlay, true);
             SetDefault(OsuSetting.ReplayPlaybackControlsExpanded, true);
+            SetDefault(OsuSetting.PerformanceMode, false);
+            SetDefault(OsuSetting.UseAngle, false);
             SetDefault(OsuSetting.GameplayLeaderboard, true);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
@@ -445,13 +447,12 @@ namespace osu.Game.Configuration
         LastProcessedMetadataId,
         SafeAreaConsiderations,
         ComboColourNormalisationAmount,
-        PerformanceMode,
-        UseAngle,
-
         ProfileCoverExpanded,
         EditorLimitedDistanceSnap,
         ReplaySettingsOverlay,
         ReplayPlaybackControlsExpanded,
+        PerformanceMode,
+        UseAngle,
         AutomaticallyDownloadMissingBeatmaps,
         EditorShowSpeedChanges,
         TouchDisableGameplayTaps,

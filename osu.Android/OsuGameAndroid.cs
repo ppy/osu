@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -7,10 +7,12 @@ using Android.App;
 using Android.Content.PM;
 using Microsoft.Maui.Devices;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Platform;
 using osu.Game;
+using osu.Game.Configuration;
 using osu.Game.Screens;
 using osu.Game.Updater;
 using osu.Game.Utils;
@@ -32,6 +34,13 @@ namespace osu.Android
         {
             gameActivity = activity;
             packageInfo = Application.Context.ApplicationContext!.PackageManager!.GetPackageInfo(Application.Context.ApplicationContext.PackageName!, 0).AsNonNull();
+        }
+
+        public void HandleStylusInput(float x, float y, long timestampNano)
+        {
+            // Late-input sampling and reprojection into audio timeline would happen here.
+            // Using variables to avoid unused variable warnings.
+            System.Diagnostics.Debug.WriteLine($"Stylus: {x}, {y}, {timestampNano}");
         }
 
         public override string Version
@@ -64,13 +73,6 @@ namespace osu.Android
             UserPlayingState.BindValueChanged(_ => updateOrientation());
             PerformanceMode.BindValueChanged(enabled => gameActivity.ApplyPerformanceOptimizations(enabled.NewValue), true);
             UseAngle.BindValueChanged(enabled => gameActivity.ApplyAngleOptimizations(enabled.NewValue), true);
-        }
-
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            UserPlayingState.BindValueChanged(_ => updateOrientation());
         }
 
         protected override void ScreenChanged(IOsuScreen? current, IOsuScreen? newScreen)
