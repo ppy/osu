@@ -1327,7 +1327,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("nothing selected", () => Game.Beatmap.IsDefault);
             AddStep("present deleted beatmap", () => Game.PresentBeatmap(beatmap));
-            AddAssert("still nothing selected", () => Game.Beatmap.IsDefault);
+            AddUntilStep("still nothing selected", () => Game.Beatmap.IsDefault);
         }
 
         [Test]
