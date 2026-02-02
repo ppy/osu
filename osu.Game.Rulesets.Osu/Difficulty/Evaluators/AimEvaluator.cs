@@ -64,6 +64,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 prevVelocity = Math.Max(prevVelocity, movementVelocity + travelVelocity);
             }
 
+            // As above, do the same for the previous hitobject.
+            double prev1Distance = withSliderTravelDistance ? osuLastLastObj.LazyJumpDistance : osuLastLastObj.JumpDistance;
+            double prev1Velocity = prev1Distance / osuLastLastObj.AdjustedDeltaTime;
+
+            if (osuLast2Obj?.BaseObject is Slider && withSliderTravelDistance)
+            {
+                double travelVelocity = osuLast2Obj.TravelDistance / osuLast2Obj.TravelTime;
+                double movementVelocity = osuLastLastObj.MinimumJumpDistance / osuLastLastObj.MinimumJumpTime;
+
+                prev1Velocity = Math.Max(prev1Velocity, movementVelocity + travelVelocity);
+            }
+
             double wideAngleBonus = 0;
             double acuteAngleBonus = 0;
             double sliderBonus = 0;
@@ -72,13 +84,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double aimStrain = currVelocity; // Start strain with regular velocity.
 
-            if (osuCurrObj.Angle != null && osuLastObj.Angle != null)
+            if (osuCurrObj.Angle != null && osuLastObj.Angle != null && osuLastLastObj.Angle != null)
             {
                 double currAngle = osuCurrObj.Angle.Value;
                 double lastAngle = osuLastObj.Angle.Value;
 
                 // Rewarding angles, take the smaller velocity as base.
                 double angleBonus = Math.Min(currVelocity, prevVelocity);
+                double prevAngleBonus = Math.Min(prevVelocity, prev1Velocity);
 
                 if (Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) < 1.25 * Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) // If rhythms are the same.
                 {
@@ -95,11 +108,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 wideAngleBonus = calcWideAngleBonus(currAngle);
 
-                // Penalize angle repetition.
-                wideAngleBonus *= 1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3));
+                // Apply full wide angle bonus for distances above streaming range
+                wideAngleBonus *= angleBonus * Math.Pow(DifficultyCalculationUtils.ReverseLerp(currDistance, 0, SpeedAimEvaluator.SINGLE_SPACING_THRESHOLD), SpeedAimEvaluator.DISTANCE_EXPONENT);
 
-                // Apply full wide angle bonus for distance more than one diameter
-                wideAngleBonus *= angleBonus * DifficultyCalculationUtils.Smootherstep(currDistance, 0, diameter);
+                // Do same as above for previous wide angle bonus
+                double prevWideAngleBonus = calcWideAngleBonus(lastAngle);
+                prevWideAngleBonus *= prevAngleBonus * Math.Pow(DifficultyCalculationUtils.ReverseLerp(prevDistance, 0, SpeedAimEvaluator.SINGLE_SPACING_THRESHOLD), SpeedAimEvaluator.DISTANCE_EXPONENT);
+
+                double bonusRatio;
+
+                if (Math.Min(wideAngleBonus, prevWideAngleBonus) == 0) bonusRatio = 1;
+                else bonusRatio = Math.Min(wideAngleBonus, prevWideAngleBonus) / Math.Max(wideAngleBonus, prevWideAngleBonus);
+
+                // Penalize angle repetition, but only if the last angle had a big bonus.
+                // Omitting this check leads to me getting "Value was either too large or too small for a Decimal" errors
+                if (bonusRatio > 0.01)
+                    wideAngleBonus *= 1 - Math.Pow(bonusRatio, 1.0 / 4.0) * Math.Min(calcWideAngleBonus(currAngle), Math.Pow(calcWideAngleBonus(lastAngle), 3));
 
                 // Apply wiggle bonus for jumps that are [radius, 3*diameter] in distance, with < 110 angle
                 // https://www.desmos.com/calculator/dp0v0nvowc
