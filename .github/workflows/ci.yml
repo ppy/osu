@@ -19,6 +19,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
+          cache: false
 
       - name: Restore Tools
         run: dotnet tool restore
@@ -77,6 +78,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
+          cache: false
 
       - name: Compile
         run: dotnet build -c Debug -warnaserror osu.Desktop.slnf
@@ -122,6 +124,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
+          cache: false
 
       - name: Install .NET workloads
         run: dotnet workload install android
@@ -141,6 +144,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
+          cache: false
 
       - name: Install .NET Workloads
         run: dotnet workload install ios
