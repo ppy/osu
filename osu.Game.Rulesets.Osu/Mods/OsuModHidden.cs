@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -77,8 +77,14 @@ namespace osu.Game.Rulesets.Osu.Mods
                 }
                 else if (drawableObject is DrawableSpinner spinner)
                 {
-                    spinner.Body.OnSkinChanged += () => hideSpinnerApproachCircle(spinner);
+                    spinner.Body.OnSkinChanged += () =>
+                    {
+                        hideSpinnerApproachCircle(spinner);
+                        hideSpinnerBackground(spinner);
+                    };
+
                     hideSpinnerApproachCircle(spinner);
+                    hideSpinnerBackground(spinner);
                 }
             }
 
@@ -130,8 +136,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 case DrawableSpinner spinner:
                     // hide elements we don't care about.
-                    // todo: hide background
-
                     using (spinner.BeginAbsoluteSequence(fadeStartTime))
                         spinner.FadeOut(fadeDuration);
 
@@ -191,6 +195,16 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             using (spinner.BeginAbsoluteSequence(spinner.HitObject.StartTime - spinner.HitObject.TimePreempt))
                 approachCircle.Hide();
+        }
+
+        private static void hideSpinnerBackground(DrawableSpinner spinner)
+        {
+            var spinnerBackground = (spinner.Body.Drawable as IHasSpinnerBackground)?.SpinnerBackground;
+            if (spinnerBackground == null)
+                return;
+
+            using (spinner.BeginAbsoluteSequence(spinner.HitObject.StartTime - spinner.HitObject.TimePreempt))
+                spinnerBackground.Hide();
         }
     }
 }

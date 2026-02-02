@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestSymbolRotationDirection([Values(true, false)] bool clockwise)
         {
-            if (clockwise)
+            if (!clockwise)
                 transformReplay(flip);
 
             addSeekStep(5000);

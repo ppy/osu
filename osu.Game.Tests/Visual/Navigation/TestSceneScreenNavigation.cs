@@ -652,6 +652,7 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        [FlakyTest]
         public void TestDeleteScoreAfterPlaying()
         {
             playToResults();

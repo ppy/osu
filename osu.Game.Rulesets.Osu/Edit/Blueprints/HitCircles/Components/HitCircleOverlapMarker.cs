@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning.Default;
@@ -59,14 +60,30 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
         private void load(OsuConfigManager config)
         {
             showHitMarkers = config.GetBindable<bool>(OsuSetting.EditorShowHitMarkers);
+            skin.SourceChanged += updateColour;
         }
 
         [Resolved]
         private ISkinSource skin { get; set; }
 
+        private HitCircle hitObject;
+
         public override void UpdateFrom(HitCircle hitObject)
         {
             base.UpdateFrom(hitObject);
+
+            if (this.hitObject != hitObject)
+            {
+                if (this.hitObject != null)
+                    this.hitObject.DefaultsApplied -= onDefaultsApplied;
+
+                this.hitObject = hitObject;
+
+                if (this.hitObject != null)
+                    this.hitObject.DefaultsApplied += onDefaultsApplied;
+
+                updateColour();
+            }
 
             Scale = new Vector2(hitObject.Scale);
 
@@ -81,13 +98,28 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 
                 ring.Scale = new Vector2(1 + 0.1f * ringScale);
                 content.Alpha = 0.9f * (1 - alpha);
-
-                // TODO: should only update colour on skin/combo/object change.
-                if (hitObject is IHasComboInformation combo && content.Alpha > 0)
-                    ring.BorderColour = combo.GetComboColour(skin);
             }
             else
                 content.Alpha = 0;
+        }
+
+        private void onDefaultsApplied(HitObject _) => updateColour();
+
+        private void updateColour()
+        {
+            if (hitObject is IHasComboInformation combo)
+                ring.BorderColour = combo.GetComboColour(skin);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (skin != null)
+                skin.SourceChanged -= updateColour;
+
+            if (hitObject != null)
+                hitObject.DefaultsApplied -= onDefaultsApplied;
         }
 
         public override void Show()

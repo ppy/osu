@@ -39,6 +39,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         private SpinnerCentreLayer centre = null!;
         private SpinnerBackgroundLayer background = null!;
 
+        public Drawable SpinnerBackground => background;
+
         public DefaultSpinnerDisc()
         {
             // we are slightly bigger than our parent, to clip the top and bottom of the circle

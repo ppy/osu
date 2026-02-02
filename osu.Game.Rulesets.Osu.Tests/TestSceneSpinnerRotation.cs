@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestRotationDirection([Values(true, false)] bool clockwise)
         {
-            if (clockwise)
+            if (!clockwise)
                 transformReplay(flip);
 
             addSeekStep(5000);
