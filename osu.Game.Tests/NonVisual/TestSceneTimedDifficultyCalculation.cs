@@ -38,7 +38,7 @@ namespace osu.Game.Tests.NonVisual
                 }
             };
 
-            List<TimedDifficultyAttributes> attribs = new TestDifficultyCalculator(new TestWorkingBeatmap(beatmap)).CalculateTimed();
+            List<TimedDifficultyAttributes> attribs = [.. new TestDifficultyCalculator(new TestWorkingBeatmap(beatmap)).CalculateTimed()];
 
             Assert.That(attribs.Count, Is.EqualTo(3));
             assertEquals(attribs[0], beatmap.HitObjects[0]);
@@ -69,7 +69,7 @@ namespace osu.Game.Tests.NonVisual
                 }
             };
 
-            List<TimedDifficultyAttributes> attribs = new TestDifficultyCalculator(new TestWorkingBeatmap(beatmap)).CalculateTimed();
+            List<TimedDifficultyAttributes> attribs = [.. new TestDifficultyCalculator(new TestWorkingBeatmap(beatmap)).CalculateTimed()];
 
             Assert.That(attribs.Count, Is.EqualTo(3));
             assertEquals(attribs[0], beatmap.HitObjects[0]);
@@ -99,7 +99,7 @@ namespace osu.Game.Tests.NonVisual
                 }
             };
 
-            List<TimedDifficultyAttributes> attribs = new TestDifficultyCalculator(new TestWorkingBeatmap(beatmap)).CalculateTimed();
+            List<TimedDifficultyAttributes> attribs = [.. new TestDifficultyCalculator(new TestWorkingBeatmap(beatmap)).CalculateTimed()];
 
             Assert.That(attribs.Count, Is.EqualTo(3));
             assertEquals(attribs[0], beatmap.HitObjects[0]);
