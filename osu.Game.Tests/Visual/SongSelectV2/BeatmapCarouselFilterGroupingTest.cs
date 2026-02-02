@@ -35,10 +35,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             BeatmapInfo[] allBeatmaps =
             [
-                ..beatmap1.Beatmaps,
-                ..beatmap2.Beatmaps,
-                ..beatmap3.Beatmaps,
-                ..beatmap4.Beatmaps
+                .. beatmap1.Beatmaps,
+                .. beatmap2.Beatmaps,
+                .. beatmap3.Beatmaps,
+                .. beatmap4.Beatmaps
             ];
 
             var results = await runGrouping(GroupMode.None, beatmapSets);

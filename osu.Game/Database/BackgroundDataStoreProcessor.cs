@@ -721,7 +721,7 @@ namespace osu.Game.Database
             completeNotification(notification, processedCount, beatmapSetIds.Count, failedCount);
         }
 
-        protected virtual void backpopulateUserTags()
+        protected virtual void BackpopulateUserTags()
         {
             if (api is DummyAPIAccess)
                 return;

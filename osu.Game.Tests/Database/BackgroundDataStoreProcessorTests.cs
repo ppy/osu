@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#pragma warning disable IDE0005
-using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -191,7 +189,7 @@ namespace osu.Game.Tests.Database
         {
             protected override int TimeToSleepDuringGameplay => 10;
 
-            protected override void backpopulateUserTags()
+            protected override void BackpopulateUserTags()
             {
                 // no-op
             }
