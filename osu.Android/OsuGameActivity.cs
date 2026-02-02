@@ -70,7 +70,7 @@ namespace osu.Android
             return base.DispatchTouchEvent(e);
         }
 
-        public new bool IsDeXMode()
+        public bool IsDeXMode()
         {
             var config = Resources?.Configuration;
             if (config == null) return false;
@@ -135,7 +135,7 @@ namespace osu.Android
         protected override void OnStart()
         {
             base.OnStart();
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.R) Window?.DecorView?.RequestUnbufferedDispatch(InputSourceType.Touchscreen);
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.R) Window?.DecorView?.RequestUnbufferedDispatch((int)InputSourceType.Touchscreen);
         }
 
         protected override void OnCreate(Bundle? savedInstanceState)

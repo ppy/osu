@@ -1,3 +1,6 @@
+# Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+# See the LICENCE file in the repository root for full licence text.
+
 cmake_minimum_required(VERSION 3.10.2)
 project(osu.Android.Native)
 

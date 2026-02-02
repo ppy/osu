@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Diagnostics;
 using Android.App;
 using Android.Content.PM;
 using Microsoft.Maui.Devices;
@@ -35,13 +36,17 @@ namespace osu.Android
             gameActivity = activity;
             packageInfo = Application.Context.ApplicationContext!.PackageManager!.GetPackageInfo(Application.Context.ApplicationContext.PackageName!, 0).AsNonNull();
         }
-
         public void HandleStylusInput(float x, float y, long timestampNano)
         {
             // Late-input sampling and reprojection into audio timeline would happen here.
-            // Using variables to avoid unused variable warnings.
-            System.Diagnostics.Debug.WriteLine($"Stylus: {x}, {y}, {timestampNano}");
+            _ = x;
+            _ = y;
+            _ = timestampNano;
+            Debug.WriteLine($"Stylus: {x}, {y}, {timestampNano}");
         }
+
+
+
 
         public override string Version
         {
