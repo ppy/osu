@@ -69,6 +69,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
+
         public override void SetUpSteps()
         {
             base.SetUpSteps();
