@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.Configuration;
@@ -26,6 +27,7 @@ namespace osu.Android
 
         private Native.VulkanRenderer? vulkanRenderer;
         private Native.OboeAudio? oboeAudio;
+        private VulkanHook? vulkanHook;
 
         private readonly global::Android.Content.PM.PackageInfo packageInfo;
 
@@ -91,19 +93,20 @@ namespace osu.Android
                         {
                             vulkanRenderer = new Native.VulkanRenderer();
                             vulkanRenderer.Initialize(gameActivity.Window!.Handle);
+
+                            vulkanHook = new VulkanHook(() => vulkanRenderer?.Render());
+                            Add(vulkanHook);
                         }
                         catch (Exception ex)
                         {
                             Debug.WriteLine($"Failed to initialize Vulkan: {ex}");
-                            vulkanRenderer?.Dispose();
-                            vulkanRenderer = null;
+                            cleanupVulkan();
                         }
                     }
                 }
                 else
                 {
-                    vulkanRenderer?.Dispose();
-                    vulkanRenderer = null;
+                    cleanupVulkan();
                 }
             }, true);
 
@@ -134,6 +137,18 @@ namespace osu.Android
             }, true);
 
             UseAngle.BindValueChanged(enabled => gameActivity.ApplyAngleOptimizations(enabled.NewValue), true);
+        }
+
+        private void cleanupVulkan()
+        {
+            if (vulkanHook != null)
+            {
+                Remove(vulkanHook);
+                vulkanHook.Dispose();
+                vulkanHook = null;
+            }
+            vulkanRenderer?.Dispose();
+            vulkanRenderer = null;
         }
 
         protected override void ScreenChanged(IOsuScreen? current, IOsuScreen? newScreen)
@@ -174,16 +189,10 @@ namespace osu.Android
 
         protected override BatteryInfo CreateBatteryInfo() => new AndroidBatteryInfo();
 
-        protected override void Draw(osu.Framework.Graphics.Rendering.IRenderer renderer)
-        {
-            base.Draw(renderer);
-            vulkanRenderer?.Render();
-        }
-
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            vulkanRenderer?.Dispose();
+            cleanupVulkan();
             oboeAudio?.Dispose();
         }
 
@@ -192,6 +201,23 @@ namespace osu.Android
             public override double? ChargeLevel => Battery.ChargeLevel;
 
             public override bool OnBattery => Battery.PowerSource == BatteryPowerSource.Battery;
+        }
+
+        private partial class VulkanHook : Drawable
+        {
+            private readonly Action renderAction;
+
+            public VulkanHook(Action renderAction)
+            {
+                this.renderAction = renderAction;
+                AlwaysPresent = true;
+            }
+
+            protected override void Draw(osu.Framework.Graphics.Rendering.IRenderer renderer)
+            {
+                base.Draw(renderer);
+                renderAction?.Invoke();
+            }
         }
     }
 }
