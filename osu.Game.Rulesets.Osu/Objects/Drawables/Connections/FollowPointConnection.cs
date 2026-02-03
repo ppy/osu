@@ -18,6 +18,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     {
         public DrawablePool<FollowPoint>? Pool { private get; set; }
 
+        public FollowPointConnection()
+        {
+            refreshDelegate = refresh;
+        }
+
         protected override void OnApply(FollowPointLifetimeEntry entry)
         {
             base.OnApply(entry);
@@ -38,7 +43,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             ClearInternal(false);
         }
 
-        private void scheduleRefresh() => Scheduler.AddOnce(() =>
+        private readonly Action refreshDelegate;
+
+        private void scheduleRefresh() => Scheduler.AddOnce(refreshDelegate);
+
+        private void refresh()
         {
             Debug.Assert(Pool != null);
 
@@ -94,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             }
 
             entry.LifetimeEnd = finalTransformEndTime;
-        });
+        }
 
         /// <summary>
         /// Computes the fade time of follow point positioned between two hitobjects.

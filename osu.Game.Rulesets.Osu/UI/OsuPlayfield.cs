@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
             var osuBeatmap = (OsuBeatmap?)beatmap;
 
-            RegisterPool<HitCircle, DrawableHitCircle>(20, 100);
+            RegisterPool<HitCircle, DrawableHitCircle>(50, 200);
 
             // handle edge cases where a beatmap has a slider with many repeats.
             int maxRepeatsOnOneSlider = 0;
@@ -153,9 +153,9 @@ namespace osu.Game.Rulesets.Osu.UI
                 }
             }
 
-            RegisterPool<Slider, DrawableSlider>(20, 100);
-            RegisterPool<SliderHeadCircle, DrawableSliderHead>(20, 100);
-            RegisterPool<SliderTailCircle, DrawableSliderTail>(20, 100);
+            RegisterPool<Slider, DrawableSlider>(50, 200);
+            RegisterPool<SliderHeadCircle, DrawableSliderHead>(50, 200);
+            RegisterPool<SliderTailCircle, DrawableSliderTail>(50, 200);
             RegisterPool<SliderTick, DrawableSliderTick>(Math.Max(maxTicksOnOneSlider, 20), Math.Max(maxTicksOnOneSlider, 200));
             RegisterPool<SliderRepeat, DrawableSliderRepeat>(Math.Max(maxRepeatsOnOneSlider, 20), Math.Max(maxRepeatsOnOneSlider, 200));
 
