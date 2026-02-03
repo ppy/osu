@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\osu.Android.props" />
   <PropertyGroup>
     <TargetFramework>net8.0-android</TargetFramework>
@@ -18,5 +18,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Maui.Essentials" Version="8.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Native/CMakeLists.txt" />
+    <None Include="Native/vulkan_renderer.h" />
+    <None Include="Native/oboe_audio.h" />
   </ItemGroup>
 </Project>
