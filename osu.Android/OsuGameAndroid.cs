@@ -224,7 +224,7 @@ namespace osu.Android
                 {
                 }
 
-                public override void Draw(IRenderer renderer)
+                protected override void Draw(IRenderer renderer)
                 {
                     base.Draw(renderer);
                     Source.renderAction?.Invoke();
