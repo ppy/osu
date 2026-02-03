@@ -249,5 +249,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public bool IsDisabled => current.Disabled;
 
         public IEnumerable<LocalisableString> FilterTerms => Caption.Yield();
+
+        public float MainDrawHeight => DrawHeight;
     }
 }
