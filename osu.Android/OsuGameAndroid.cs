@@ -144,7 +144,7 @@ namespace osu.Android
         {
             if (vulkanHook != null)
             {
-                Remove(vulkanHook);
+                Remove(vulkanHook, true);
                 vulkanHook.Dispose();
                 vulkanHook = null;
             }
