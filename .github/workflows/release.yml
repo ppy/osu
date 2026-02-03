@@ -72,7 +72,7 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Build Windows
-        run: dotnet publish -c Release -r win-x64 --self-contained osu.Desktop/osu.Desktop.csproj -o publish/win-x64
+        run: dotnet publish -c Release -r win-x64 --self-contained osu.Desktop/osu.Desktop.csproj -o publish/win-x64 -p:PublishReadyToRun=true
 
       - name: Compress Windows Build
         run: Compress-Archive -Path publish/win-x64/* -DestinationPath osu-win-x64.zip
@@ -96,7 +96,7 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Build Linux
-        run: dotnet publish -c Release -r linux-x64 --self-contained osu.Desktop/osu.Desktop.csproj -o publish/linux-x64
+        run: dotnet publish -c Release -r linux-x64 --self-contained osu.Desktop/osu.Desktop.csproj -o publish/linux-x64 -p:PublishReadyToRun=true
 
       - name: Compress Linux Build
         run: zip -r osu-linux-x64.zip publish/linux-x64
