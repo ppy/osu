@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.Configuration;
@@ -213,7 +214,7 @@ namespace osu.Android
                 AlwaysPresent = true;
             }
 
-            protected override void Draw(osu.Framework.Graphics.Rendering.IRenderer renderer)
+            protected override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
                 renderAction?.Invoke();
