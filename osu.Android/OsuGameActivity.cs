@@ -6,29 +6,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using AndroidApp = global::Android.App;
-using AndroidContent = global::Android.Content;
-using AndroidPM = global::Android.Content.PM;
-using AndroidRes = global::Android.Content.Res;
-using AndroidGraphics = global::Android.Graphics;
-using AndroidInput = global::Android.Hardware.Input;
-using AndroidOS = global::Android.OS;
-using AndroidViews = global::Android.Views;
 using osu.Framework.Android;
 using osu.Game.Database;
 using Debug = System.Diagnostics.Debug;
-using Uri = global::Android.Net.Uri;
 
 namespace osu.Android
 {
-    [AndroidApp.Activity(ConfigurationChanges = DEFAULT_CONFIG_CHANGES, Exported = true, LaunchMode = DEFAULT_LAUNCH_MODE, MainLauncher = true)]
-    [AndroidContent.IntentFilter(new[] { AndroidContent.Intent.ActionView }, Categories = new[] { AndroidContent.Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osz", DataHost = "*", DataMimeType = "*/*")]
-    [AndroidContent.IntentFilter(new[] { AndroidContent.Intent.ActionView }, Categories = new[] { AndroidContent.Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osk", DataHost = "*", DataMimeType = "*/*")]
-    [AndroidContent.IntentFilter(new[] { AndroidContent.Intent.ActionView }, Categories = new[] { AndroidContent.Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osr", DataHost = "*", DataMimeType = "*/*")]
-    [AndroidContent.IntentFilter(new[] { AndroidContent.Intent.ActionView }, Categories = new[] { AndroidContent.Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-beatmap-archive")]
-    [AndroidContent.IntentFilter(new[] { AndroidContent.Intent.ActionView }, Categories = new[] { AndroidContent.Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-skin-archive")]
-    [AndroidContent.IntentFilter(new[] { AndroidContent.Intent.ActionView }, Categories = new[] { AndroidContent.Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-replay")]
-    [AndroidContent.IntentFilter(new[] { AndroidContent.Intent.ActionSend, AndroidContent.Intent.ActionSendMultiple }, Categories = new[] { AndroidContent.Intent.CategoryDefault }, DataMimeTypes = new[]
+    [global::Android.App.ActivityAttribute(ConfigurationChanges = DEFAULT_CONFIG_CHANGES, Exported = true, LaunchMode = DEFAULT_LAUNCH_MODE, MainLauncher = true)]
+    [global::Android.Content.IntentFilterAttribute(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osz", DataHost = "*", DataMimeType = "*/*")]
+    [global::Android.Content.IntentFilterAttribute(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osk", DataHost = "*", DataMimeType = "*/*")]
+    [global::Android.Content.IntentFilterAttribute(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osr", DataHost = "*", DataMimeType = "*/*")]
+    [global::Android.Content.IntentFilterAttribute(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-beatmap-archive")]
+    [global::Android.Content.IntentFilterAttribute(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-skin-archive")]
+    [global::Android.Content.IntentFilterAttribute(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-replay")]
+    [global::Android.Content.IntentFilterAttribute(new[] { global::Android.Content.Intent.ActionSend, global::Android.Content.Intent.ActionSendMultiple }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataMimeTypes = new[]
     {
         "application/zip",
         "application/octet-stream",
@@ -40,19 +31,20 @@ namespace osu.Android
         "application/x-osu-skin-archive",
         "application/x-osu-replay",
     })]
-    [AndroidContent.IntentFilter(new[] { AndroidContent.Intent.ActionView }, Categories = new[] { AndroidContent.Intent.CategoryBrowsable, AndroidContent.Intent.CategoryDefault }, DataSchemes = new[] { "osu", "osump" })]
+    [global::Android.Content.IntentFilterAttribute(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryBrowsable, global::Android.Content.Intent.CategoryDefault }, DataSchemes = new[] { "osu", "osump" })]
     public class OsuGameActivity : AndroidGameActivity
     {
-        public override bool DispatchTouchEvent(AndroidViews.MotionEvent? e)
+        public override bool DispatchTouchEvent(global::Android.Views.MotionEvent? e)
         {
             if (e != null)
             {
                 for (int i = 0; i < e.PointerCount; i++)
                 {
                     var toolType = e.GetToolType(i);
-                    if (toolType == AndroidViews.MotionEventToolType.Stylus)
+                    if (toolType == global::Android.Views.MotionEventToolType.Stylus)
                     {
                         // S Pen detected. Hardware timestamps should be used for improved latency.
+                        // Using EventTime * 1000000 for maximum SDK compatibility as EventTimeNano is sometimes unavailable at compile-time.
                         long timestampNano = e.EventTime * 1000000;
 
                         // Process historical points for smoother/predicted input
@@ -75,34 +67,34 @@ namespace osu.Android
             var config = Resources?.Configuration;
             if (config == null) return false;
 
-            return (config.UiMode & AndroidRes.UiMode.TypeMask) == AndroidRes.UiMode.TypeDesk;
+            return (config.UiMode & global::Android.Content.Res.UiMode.TypeMask) == global::Android.Content.Res.UiMode.TypeDesk;
         }
 
         public void ApplyPerformanceOptimizations(bool enabled)
         {
             RunOnUiThread(() =>
             {
-                if (AndroidOS.Build.VERSION.SdkInt >= AndroidOS.BuildVersionCodes.N)
-                    Window?.SetSustainedPerformanceMode(enabled);
+                var window = Window;
+                if (window != null && global::Android.OS.Build.VERSION.SdkInt >= global::Android.OS.BuildVersionCodes.N)
+                    window.SetSustainedPerformanceMode(enabled);
 
                 bool dexMode = IsDeXMode();
-
                 var display = WindowManager?.DefaultDisplay;
 
-                if ((enabled || dexMode) && AndroidOS.Build.VERSION.SdkInt >= AndroidOS.BuildVersionCodes.M && display != null)
+                if ((enabled || dexMode) && global::Android.OS.Build.VERSION.SdkInt >= global::Android.OS.BuildVersionCodes.M && display != null)
                 {
 #pragma warning disable CA1422
                     var modes = display.GetSupportedModes();
                     var preferredMode = modes?.OrderByDescending(m => m.RefreshRate).FirstOrDefault();
 
-                    if (preferredMode != null && Window != null)
+                    if (preferredMode != null && window != null)
                     {
-                        var layoutParams = Window.Attributes;
+                        var layoutParams = window.Attributes;
 
                         if (layoutParams != null)
                         {
                             layoutParams.PreferredDisplayModeId = preferredMode.ModeId;
-                            Window.Attributes = layoutParams;
+                            window.Attributes = layoutParams;
                         }
                     }
 #pragma warning restore CA1422
@@ -121,7 +113,7 @@ namespace osu.Android
         /// The default screen orientation.
         /// </summary>
         /// <remarks>Adjusted on startup to match expected UX for the current device type (phone/tablet).</remarks>
-        public AndroidPM.ScreenOrientation DefaultOrientation = AndroidPM.ScreenOrientation.Unspecified;
+        public global::Android.Content.PM.ScreenOrientation DefaultOrientation = global::Android.Content.PM.ScreenOrientation.Unspecified;
 
         public new bool IsTablet { get; private set; }
 
@@ -146,10 +138,10 @@ namespace osu.Android
         protected override void OnStart()
         {
             base.OnStart();
-            if (AndroidOS.Build.VERSION.SdkInt >= AndroidOS.BuildVersionCodes.R) Window?.DecorView?.RequestUnbufferedDispatch((int)AndroidViews.InputSourceType.Touchscreen);
+            if (global::Android.OS.Build.VERSION.SdkInt >= global::Android.OS.BuildVersionCodes.R) Window?.DecorView?.RequestUnbufferedDispatch((int)global::Android.Views.InputSourceType.Touchscreen);
         }
 
-        protected override void OnCreate(AndroidOS.Bundle? savedInstanceState)
+        protected override void OnCreate(global::Android.OS.Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
@@ -160,20 +152,20 @@ namespace osu.Android
 
             Debug.Assert(Window != null);
 
-            Window.AddFlags(AndroidViews.WindowManagerFlags.Fullscreen);
-            Window.AddFlags(AndroidViews.WindowManagerFlags.KeepScreenOn);
+            Window.AddFlags(global::Android.Views.WindowManagerFlags.Fullscreen);
+            Window.AddFlags(global::Android.Views.WindowManagerFlags.KeepScreenOn);
 
             Debug.Assert(WindowManager?.DefaultDisplay != null);
             Debug.Assert(Resources?.DisplayMetrics != null);
 
-            AndroidGraphics.Point displaySize = new AndroidGraphics.Point();
+            global::Android.Graphics.Point displaySize = new global::Android.Graphics.Point();
 #pragma warning disable CA1422 // GetSize is deprecated
             WindowManager.DefaultDisplay.GetSize(displaySize);
 #pragma warning restore CA1422
             float smallestWidthDp = Math.Min(displaySize.X, displaySize.Y) / Resources.DisplayMetrics.Density;
             IsTablet = smallestWidthDp >= 600f;
 
-            RequestedOrientation = DefaultOrientation = IsTablet ? AndroidPM.ScreenOrientation.FullUser : AndroidPM.ScreenOrientation.SensorLandscape;
+            RequestedOrientation = DefaultOrientation = IsTablet ? global::Android.Content.PM.ScreenOrientation.FullUser : global::Android.Content.PM.ScreenOrientation.SensorLandscape;
 
             // Currently (SDK 6.0.200), BundleAssemblies is not runnable for net6-android.
             // The assembly files are not available as files either after native AOT.
@@ -190,13 +182,13 @@ namespace osu.Android
         {
             base.OnResume();
 
-            if (AndroidOS.Build.VERSION.SdkInt >= AndroidOS.BuildVersionCodes.S)
+            if (global::Android.OS.Build.VERSION.SdkInt >= global::Android.OS.BuildVersionCodes.S)
             {
-                var gm = (AndroidApp.GameManager?)GetSystemService(GameService);
+                var gm = (global::Android.App.GameManager?)GetSystemService(GameService);
                 if (gm != null)
                 {
-                    int mode = gm.GameMode;
-                    ApplyPerformanceOptimizations(mode == (int)AndroidApp.GameMode.Performance);
+                    int mode = (int)gm.GameMode;
+                    ApplyPerformanceOptimizations(mode == (int)global::Android.App.GameMode.Performance);
                 }
             }
 
@@ -205,7 +197,7 @@ namespace osu.Android
 
         private void CheckInputDevices()
         {
-            var inputManager = (AndroidInput.InputManager?)GetSystemService(InputService);
+            var inputManager = (global::Android.Hardware.Input.InputManager?)GetSystemService(InputService);
             int[] deviceIds = inputManager?.GetInputDeviceIds() ?? Array.Empty<int>();
 
             foreach (int id in deviceIds)
@@ -213,14 +205,14 @@ namespace osu.Android
                 var device = inputManager?.GetInputDevice(id);
                 if (device == null) continue;
 
-                if ((device.Sources & AndroidViews.InputSourceType.Gamepad) == AndroidViews.InputSourceType.Gamepad)
+                if ((device.Sources & global::Android.Views.InputSourceType.Gamepad) == global::Android.Views.InputSourceType.Gamepad)
                 {
                     // Gamepad detected
                 }
             }
         }
 
-        public override void OnConfigurationChanged(AndroidRes.Configuration newConfig)
+        public override void OnConfigurationChanged(global::Android.Content.Res.Configuration newConfig)
         {
             base.OnConfigurationChanged(newConfig);
 
@@ -230,17 +222,17 @@ namespace osu.Android
             }
         }
 
-        protected override void OnNewIntent(AndroidContent.Intent? intent) => handleIntent(intent);
+        protected override void OnNewIntent(global::Android.Content.Intent? intent) => handleIntent(intent);
 
-        private void handleIntent(AndroidContent.Intent? intent)
+        private void handleIntent(global::Android.Content.Intent? intent)
         {
             if (intent == null)
                 return;
 
             switch (intent.Action)
             {
-                case AndroidContent.Intent.ActionDefault:
-                    if (intent.Scheme == AndroidContent.ContentResolver.SchemeContent)
+                case global::Android.Content.Intent.ActionDefault:
+                    if (intent.Scheme == global::Android.Content.ContentResolver.SchemeContent)
                     {
                         if (intent.Data != null)
                             handleImportFromUris(intent.Data);
@@ -253,13 +245,13 @@ namespace osu.Android
 
                     break;
 
-                case AndroidContent.Intent.ActionSend:
-                case AndroidContent.Intent.ActionSendMultiple:
+                case global::Android.Content.Intent.ActionSend:
+                case global::Android.Content.Intent.ActionSendMultiple:
                 {
                     if (intent.ClipData == null)
                         break;
 
-                    var uris = new List<Uri>();
+                    var uris = new List<global::Android.Net.Uri>();
 
                     for (int i = 0; i < intent.ClipData.ItemCount; i++)
                     {
@@ -274,7 +266,7 @@ namespace osu.Android
             }
         }
 
-        private void handleImportFromUris(params Uri[] uris) => Task.Factory.StartNew(async () =>
+        private void handleImportFromUris(params global::Android.Net.Uri[] uris) => Task.Factory.StartNew(async () =>
         {
             var tasks = new List<ImportTask>();
 
