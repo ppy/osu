@@ -1,6 +1,7 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -28,7 +29,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             var renderer = config.GetBindable<RendererType>(FrameworkSetting.Renderer);
             automaticRendererInUse = renderer.Value == RendererType.Automatic;
 
-            Children = new Drawable[]
+            var children = new List<Drawable>
             {
                 new SettingsItemV2(new RendererDropdown
                 {
@@ -56,19 +57,11 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Caption = GraphicsSettingsStrings.ThreadingMode,
                     Current = config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode)
                 }),
-                new SettingsItemV2(new FormCheckBox
-                {
-                    Caption = "Performance Mode",
-                    Current = osuConfig.GetBindable<bool>(OsuSetting.PerformanceMode),
-                })
-                {
-                    Keywords = new[] { @"android", @"vulkan", @"low latency" },
-                },
             };
 
             if (RuntimeInfo.IsMobile)
             {
-                Add(new SettingsItemV2(new FormCheckBox
+                children.Add(new SettingsItemV2(new FormCheckBox
                 {
                     Caption = "Use Vulkan Renderer (Experimental)",
                     Current = osuConfig.GetBindable<bool>(OsuSetting.VulkanRenderer),
@@ -76,27 +69,36 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     Keywords = new[] { @"android", @"vulkan", @"graphics" },
                 });
-            }
 
-            Children = Children.Concat(new Drawable[]
-            {
-                new SettingsItemV2(new FormCheckBox
+                children.Add(new SettingsItemV2(new FormCheckBox
                 {
                     Caption = "Use ANGLE (GLES to Vulkan)",
                     Current = osuConfig.GetBindable<bool>(OsuSetting.UseAngle),
                 })
                 {
                     Keywords = new[] { @"android", @"vulkan", @"angle" },
-                },
-                new SettingsItemV2(new FormCheckBox
+                });
+
+                children.Add(new SettingsItemV2(new FormCheckBox
                 {
-                    Caption = GraphicsSettingsStrings.ShowFPS,
-                    Current = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay),
+                    Caption = "Performance Mode",
+                    Current = osuConfig.GetBindable<bool>(OsuSetting.PerformanceMode),
                 })
                 {
-                    Keywords = new[] { @"framerate", @"counter" },
-                },
-            }).ToArray();
+                    Keywords = new[] { @"android", @"vulkan", @"low latency" },
+                });
+            }
+
+            children.Add(new SettingsItemV2(new FormCheckBox
+            {
+                Caption = GraphicsSettingsStrings.ShowFPS,
+                Current = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay),
+            })
+            {
+                Keywords = new[] { @"framerate", @"counter" },
+            });
+
+            Children = children.ToArray();
 
             renderer.BindValueChanged(r =>
             {
