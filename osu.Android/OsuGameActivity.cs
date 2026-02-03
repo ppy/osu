@@ -12,26 +12,23 @@ using Debug = System.Diagnostics.Debug;
 
 namespace osu.Android
 {
-    [global::Android.App.ActivityAttribute(ConfigurationChanges = DEFAULT_CONFIG_CHANGES, Exported = true, LaunchMode = DEFAULT_LAUNCH_MODE, MainLauncher = true)]
-    [global::Android.Content.IntentFilterAttribute(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osz", DataHost = "*", DataMimeType = "*/*")]
-    [global::Android.Content.IntentFilterAttribute(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osk", DataHost = "*", DataMimeType = "*/*")]
-    [global::Android.Content.IntentFilterAttribute(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osr", DataHost = "*", DataMimeType = "*/*")]
-    [global::Android.Content.IntentFilterAttribute(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-beatmap-archive")]
-    [global::Android.Content.IntentFilterAttribute(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-skin-archive")]
-    [global::Android.Content.IntentFilterAttribute(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-replay")]
-    [global::Android.Content.IntentFilterAttribute(new[] { global::Android.Content.Intent.ActionSend, global::Android.Content.Intent.ActionSendMultiple }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataMimeTypes = new[]
-    {
-        "application/zip",
-        "application/octet-stream",
-        "application/download",
-        "application/x-zip",
-        "application/x-zip-compressed",
-        // newer official mime types (see https://osu.ppy.sh/wiki/en/osu%21_File_Formats).
-        "application/x-osu-beatmap-archive",
-        "application/x-osu-skin-archive",
-        "application/x-osu-replay",
-    })]
-    [global::Android.Content.IntentFilterAttribute(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryBrowsable, global::Android.Content.Intent.CategoryDefault }, DataSchemes = new[] { "osu", "osump" })]
+    [global::Android.App.Activity(ConfigurationChanges = DEFAULT_CONFIG_CHANGES, Exported = true, LaunchMode = DEFAULT_LAUNCH_MODE, MainLauncher = true)]
+    [global::Android.App.IntentFilter(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osz", DataHost = "*", DataMimeType = "*/*")]
+    [global::Android.App.IntentFilter(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osk", DataHost = "*", DataMimeType = "*/*")]
+    [global::Android.App.IntentFilter(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osr", DataHost = "*", DataMimeType = "*/*")]
+    [global::Android.App.IntentFilter(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-beatmap-archive")]
+    [global::Android.App.IntentFilter(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-skin-archive")]
+    [global::Android.App.IntentFilter(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-replay")]
+    [global::Android.App.IntentFilter(new[] { global::Android.Content.Intent.ActionSend, global::Android.Content.Intent.ActionSendMultiple }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataMimeType = "application/zip")]
+    [global::Android.App.IntentFilter(new[] { global::Android.Content.Intent.ActionSend, global::Android.Content.Intent.ActionSendMultiple }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataMimeType = "application/octet-stream")]
+    [global::Android.App.IntentFilter(new[] { global::Android.Content.Intent.ActionSend, global::Android.Content.Intent.ActionSendMultiple }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataMimeType = "application/download")]
+    [global::Android.App.IntentFilter(new[] { global::Android.Content.Intent.ActionSend, global::Android.Content.Intent.ActionSendMultiple }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataMimeType = "application/x-zip")]
+    [global::Android.App.IntentFilter(new[] { global::Android.Content.Intent.ActionSend, global::Android.Content.Intent.ActionSendMultiple }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataMimeType = "application/x-zip-compressed")]
+    [global::Android.App.IntentFilter(new[] { global::Android.Content.Intent.ActionSend, global::Android.Content.Intent.ActionSendMultiple }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataMimeType = "application/x-osu-beatmap-archive")]
+    [global::Android.App.IntentFilter(new[] { global::Android.Content.Intent.ActionSend, global::Android.Content.Intent.ActionSendMultiple }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataMimeType = "application/x-osu-skin-archive")]
+    [global::Android.App.IntentFilter(new[] { global::Android.Content.Intent.ActionSend, global::Android.Content.Intent.ActionSendMultiple }, Categories = new[] { global::Android.Content.Intent.CategoryDefault }, DataMimeType = "application/x-osu-replay")]
+    [global::Android.App.IntentFilter(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryBrowsable, global::Android.Content.Intent.CategoryDefault }, DataScheme = "osu")]
+    [global::Android.App.IntentFilter(new[] { global::Android.Content.Intent.ActionView }, Categories = new[] { global::Android.Content.Intent.CategoryBrowsable, global::Android.Content.Intent.CategoryDefault }, DataScheme = "osump")]
     public class OsuGameActivity : AndroidGameActivity
     {
         public override bool DispatchTouchEvent(global::Android.Views.MotionEvent? e)
