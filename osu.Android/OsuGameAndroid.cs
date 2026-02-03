@@ -9,6 +9,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.Configuration;
@@ -26,6 +28,7 @@ namespace osu.Android
 
         private Native.VulkanRenderer? vulkanRenderer;
         private Native.OboeAudio? oboeAudio;
+        private VulkanHook? vulkanHook;
 
         private readonly global::Android.Content.PM.PackageInfo packageInfo;
 
@@ -64,10 +67,14 @@ namespace osu.Android
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.PerformanceMode, PerformanceMode);
+            config.BindWith(OsuSetting.VulkanRenderer, UseVulkanRenderer);
+            config.BindWith(OsuSetting.OboeAudio, UseOboeAudio);
             config.BindWith(OsuSetting.UseAngle, UseAngle);
         }
 
         public readonly Bindable<bool> PerformanceMode = new Bindable<bool>();
+        public readonly Bindable<bool> UseVulkanRenderer = new Bindable<bool>();
+        public readonly Bindable<bool> UseOboeAudio = new Bindable<bool>();
 
         public readonly Bindable<bool> UseAngle = new Bindable<bool>();
 
@@ -75,24 +82,74 @@ namespace osu.Android
         {
             base.LoadComplete();
             UserPlayingState.BindValueChanged(_ => updateOrientation());
-            PerformanceMode.BindValueChanged(enabled =>
-            {
-                gameActivity.ApplyPerformanceOptimizations(enabled.NewValue);
+            PerformanceMode.BindValueChanged(enabled => gameActivity.ApplyPerformanceOptimizations(enabled.NewValue), true);
 
+            UseVulkanRenderer.BindValueChanged(enabled =>
+            {
                 if (enabled.NewValue)
                 {
-                    try
+                    if (vulkanRenderer == null)
                     {
-                        vulkanRenderer ??= new Native.VulkanRenderer();
-                        oboeAudio ??= new Native.OboeAudio();
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine($"Failed to initialize native components: {ex}");
+                        try
+                        {
+                            vulkanRenderer = new Native.VulkanRenderer();
+                            vulkanRenderer.Initialize(gameActivity.Window!.Handle);
+
+                            vulkanHook = new VulkanHook(() => vulkanRenderer?.Render());
+                            Add(vulkanHook);
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Failed to initialize Vulkan: {ex}");
+                            cleanupVulkan();
+                        }
                     }
                 }
+                else
+                {
+                    cleanupVulkan();
+                }
             }, true);
+
+            UseOboeAudio.BindValueChanged(enabled =>
+            {
+                if (enabled.NewValue)
+                {
+                    if (oboeAudio == null)
+                    {
+                        try
+                        {
+                            oboeAudio = new Native.OboeAudio();
+                            oboeAudio.Start();
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Failed to initialize Oboe: {ex}");
+                            oboeAudio?.Dispose();
+                            oboeAudio = null;
+                        }
+                    }
+                }
+                else
+                {
+                    oboeAudio?.Dispose();
+                    oboeAudio = null;
+                }
+            }, true);
+
             UseAngle.BindValueChanged(enabled => gameActivity.ApplyAngleOptimizations(enabled.NewValue), true);
+        }
+
+        private void cleanupVulkan()
+        {
+            if (vulkanHook != null)
+            {
+                Remove(vulkanHook, true);
+                vulkanHook.Dispose();
+                vulkanHook = null;
+            }
+            vulkanRenderer?.Dispose();
+            vulkanRenderer = null;
         }
 
         protected override void ScreenChanged(IOsuScreen? current, IOsuScreen? newScreen)
@@ -136,7 +193,7 @@ namespace osu.Android
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            vulkanRenderer?.Dispose();
+            cleanupVulkan();
             oboeAudio?.Dispose();
         }
 
@@ -145,6 +202,34 @@ namespace osu.Android
             public override double? ChargeLevel => Battery.ChargeLevel;
 
             public override bool OnBattery => Battery.PowerSource == BatteryPowerSource.Battery;
+        }
+
+        private partial class VulkanHook : Drawable
+        {
+            private readonly Action renderAction;
+
+            public VulkanHook(Action renderAction)
+            {
+                this.renderAction = renderAction;
+                AlwaysPresent = true;
+            }
+
+            protected override DrawNode CreateDrawNode() => new VulkanHookDrawNode(this);
+
+            private class VulkanHookDrawNode : DrawNode
+            {
+                protected new VulkanHook Source => (VulkanHook)base.Source;
+
+                public VulkanHookDrawNode(VulkanHook source) : base(source)
+                {
+                }
+
+                protected override void Draw(IRenderer renderer)
+                {
+                    base.Draw(renderer);
+                    Source.renderAction?.Invoke();
+                }
+            }
         }
     }
 }

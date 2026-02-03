@@ -17,6 +17,8 @@ namespace osu.Android.Native
 
         public double GetTimestamp() => nGetTimestamp(nativePtr);
 
+        public void Start() => nOboeStart(nativePtr);
+
         public void Dispose()
         {
             Dispose(true);
@@ -45,5 +47,8 @@ namespace osu.Android.Native
 
         [DllImport("osu.Android.Native")]
         private static extern double nGetTimestamp(long ptr);
+
+        [DllImport("osu.Android.Native")]
+        private static extern void nOboeStart(long ptr);
     }
 }

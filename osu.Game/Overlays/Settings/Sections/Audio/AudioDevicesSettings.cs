@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -10,6 +10,7 @@ using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 
@@ -29,7 +30,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         private readonly Bindable<SettingsNote.Data?> wasapiExperimentalNote = new Bindable<SettingsNote.Data?>();
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager osuConfig)
         {
             Children = new Drawable[]
             {
@@ -41,6 +42,18 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     Keywords = new[] { "speaker", "headphone", "output" }
                 },
             };
+
+            if (RuntimeInfo.IsMobile)
+            {
+                Add(new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = "Use Oboe Audio (Low Latency)",
+                    Current = osuConfig.GetBindable<bool>(OsuSetting.OboeAudio),
+                })
+                {
+                    Keywords = new[] { @"android", @"oboe", @"audio", @"latency" },
+                });
+            }
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
             {
