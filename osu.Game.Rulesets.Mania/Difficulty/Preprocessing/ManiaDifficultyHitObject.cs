@@ -27,10 +27,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         public new ManiaHitObject BaseObject => (ManiaHitObject)base.BaseObject;
 
         public readonly int Column;
-        private readonly int headObjectIndex;
-        private readonly int tailObjectIndex;
-        private readonly int columnHeadIndex;
-        private readonly int columnTailIndex;
+
+        // Indices of the next notes
+        private readonly int nextHeadObjectIndex;
+        private readonly int nextTailObjectIndex;
+        private readonly int columnNextHeadIndex;
+        private readonly int columnNextTailIndex;
+
+        // Indices of the previous notes
+        private readonly int prevHeadObjectIndex;
+        private readonly int prevTailObjectIndex;
+        private readonly int columnPrevHeadIndex;
+        private readonly int columnPrevTailIndex;
 
         // Lists of head and tail objects to make object-type specific traversal easier.
         private readonly List<ManiaDifficultyHitObject> headObjects;
@@ -56,14 +64,20 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             this.perColumnHeadObjects = perColumnHeadObjects;
             this.perColumnTailObjects = perColumnTailObjects;
             Column = BaseObject.Column;
-            headObjectIndex = headObjects.Count;
-            tailObjectIndex = tailObjects.Count;
-            columnHeadIndex = perColumnHeadObjects[Column].Count;
-            columnTailIndex = perColumnTailObjects[Column].Count;
             PreviousHeadObjects = new ManiaDifficultyHitObject[totalColumns];
 
             // Actual time is when the nested hit object takes place
             ActualTime = base.StartTime;
+
+            int headObjectIndex = headObjects.Count;
+            int tailObjectIndex = tailObjects.Count;
+            int columnHeadIndex = perColumnHeadObjects[Column].Count;
+            int columnTailIndex = perColumnTailObjects[Column].Count;
+
+            prevHeadObjectIndex = headObjectIndex - 1;
+            prevTailObjectIndex = tailObjectIndex - 1;
+            columnPrevHeadIndex = columnHeadIndex - 1;
+            columnPrevTailIndex = columnTailIndex - 1;
 
             // Add a reference to the related head/tail for long notes.
             if (BaseObject is TailNote)
@@ -78,10 +92,22 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
                     Head.Tail = this;
                     Head.EndTime = Tail.ActualTime;
                 }
+
+                // We need to separate behaviour for future note indexing for heads and tails, since a tail's head index points to the next head, not itself.
+                nextHeadObjectIndex = headObjectIndex;
+                nextTailObjectIndex = tailObjectIndex + 1;
+                columnNextHeadIndex = columnHeadIndex;
+                columnNextTailIndex = columnTailIndex + 1;
             }
             else
             {
                 Head = this;
+
+                // Same for heads
+                nextHeadObjectIndex = headObjectIndex + 1;
+                nextTailObjectIndex = tailObjectIndex;
+                columnNextHeadIndex = columnHeadIndex + 1;
+                columnNextTailIndex = columnTailIndex;
             }
 
             StartTime = Head?.ActualTime ?? ActualTime;
@@ -113,52 +139,75 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             }
         }
 
-        public ManiaDifficultyHitObject? PrevHead(int backwardsIndex) => getNoteByIndex(headObjects, headObjectIndex - (backwardsIndex + 1));
-        public ManiaDifficultyHitObject? NextHead(int forwardsIndex) => getNoteByIndex(headObjects, headObjectIndex + forwardsIndex + 1);
+        public ManiaDifficultyHitObject? PrevHead(int backwardsIndex) => getNoteByIndex(headObjects, prevHeadObjectIndex - backwardsIndex);
+        public ManiaDifficultyHitObject? NextHead(int forwardsIndex) => getNoteByIndex(headObjects, nextHeadObjectIndex + forwardsIndex);
 
-        public ManiaDifficultyHitObject? PrevTail(int backwardsIndex) => getNoteByIndex(tailObjects, tailObjectIndex - (backwardsIndex + 1));
-        public ManiaDifficultyHitObject? NextTail(int forwardsIndex) => getNoteByIndex(tailObjects, tailObjectIndex + forwardsIndex + 1);
+        public ManiaDifficultyHitObject? PrevTail(int backwardsIndex) => getNoteByIndex(tailObjects, prevTailObjectIndex - backwardsIndex);
+        public ManiaDifficultyHitObject? NextTail(int forwardsIndex) => getNoteByIndex(tailObjects, nextTailObjectIndex + forwardsIndex);
 
-        public ManiaDifficultyHitObject? PrevHeadInColumn(int backwardsIndex, int? column = null, bool inclusive = false) =>
-            getRelative(perColumnHeadObjects, column, columnHeadIndex, -backwardsIndex - 1, inclusive, true);
-
-        public ManiaDifficultyHitObject? NextHeadInColumn(int forwardsIndex, int? column = null, bool inclusive = false) =>
-            getRelative(perColumnHeadObjects, column, columnHeadIndex, forwardsIndex + 1, inclusive, false);
-
-        public ManiaDifficultyHitObject? PrevTailInColumn(int backwardsIndex, int? column = null, bool inclusive = false) =>
-            getRelative(perColumnTailObjects, column, columnTailIndex, -backwardsIndex - 1, inclusive, true);
-
-        public ManiaDifficultyHitObject? NextTailInColumn(int forwardsIndex, int? column = null, bool inclusive = false) =>
-            getRelative(perColumnTailObjects, column, columnTailIndex, forwardsIndex + 1, inclusive, false);
-
-        private ManiaDifficultyHitObject? getRelative(List<ManiaDifficultyHitObject>[] perColumnLists, int? column, int currIndex, int offset, bool inclusive, bool backward)
+        public ManiaDifficultyHitObject? PrevHeadInColumn(int backwardsIndex, int? column = null, bool inclusive = false)
         {
-            int targetColumn = column ?? Column;
-            if (targetColumn < 0 || targetColumn >= perColumnLists.Length) return null;
+            if (column is null || column == Column)
+            {
+                return getNoteByIndex(perColumnHeadObjects[Column], columnPrevHeadIndex - backwardsIndex);
+            }
 
-            var list = perColumnLists[targetColumn];
+            return getNoteInColumn(perColumnHeadObjects, column.Value, backwardsIndex, inclusive, true);
+        }
 
-            // If we're in the same column, we know our column index already
-            if (targetColumn == Column)
-                return getNoteByIndex(list, currIndex + offset);
+        public ManiaDifficultyHitObject? NextHeadInColumn(int forwardsIndex, int? column = null, bool inclusive = false)
+        {
+            if (column is null || column == Column)
+            {
+                return getNoteByIndex(perColumnHeadObjects[Column], columnNextHeadIndex + forwardsIndex);
+            }
 
-            // If we're looking in a different column, find the starting point via binary search
-            int foundIndex = list.BinarySearch(this, Comparer<ManiaDifficultyHitObject>.Create((x, y) => x.StartTime.CompareTo(y.StartTime)));
+            return getNoteInColumn(perColumnHeadObjects, column.Value, forwardsIndex, inclusive, false);
+        }
 
-            // If not found, BinarySearch returns the bitwise complement of the next larger element
+        public ManiaDifficultyHitObject? PrevTailInColumn(int backwardsIndex, int? column = null, bool inclusive = false)
+        {
+            if (column is null || column == Column)
+            {
+                return getNoteByIndex(perColumnTailObjects[Column], columnPrevTailIndex - backwardsIndex);
+            }
+
+            return getNoteInColumn(perColumnTailObjects, column.Value, backwardsIndex, inclusive, true);
+        }
+
+        public ManiaDifficultyHitObject? NextTailInColumn(int forwardsIndex, int? column = null, bool inclusive = false)
+        {
+            if (column is null || column == Column)
+            {
+                return getNoteByIndex(perColumnTailObjects[Column], columnNextTailIndex + forwardsIndex);
+            }
+
+            return getNoteInColumn(perColumnTailObjects, column.Value, forwardsIndex, inclusive, false);
+        }
+
+        private ManiaDifficultyHitObject? getNoteInColumn(List<ManiaDifficultyHitObject>[] columnLists, int column, int offset, bool inclusive, bool backward)
+        {
+            if (column < 0 || column >= columnLists.Length)
+                return null;
+
+            List<ManiaDifficultyHitObject> columnList = columnLists[column];
+
+            // The lists are ordered by ActualTime, so we can use binary search here.
+            int foundIndex = columnList.BinarySearch(this, Comparer<ManiaDifficultyHitObject>.Create((x, y) => x.ActualTime.CompareTo(y.ActualTime)));
+
             if (foundIndex < 0) foundIndex = ~foundIndex;
 
-            // If inclusive and we found an exact match, start there. Otherwise, start before
-            // We don't add 1 to the offsets here, since it returns the index of the prev object already
             if (backward)
             {
-                int baseIndex = inclusive && foundIndex < list.Count && list[foundIndex].StartTime == StartTime ? foundIndex : foundIndex - 1;
-                return getNoteByIndex(list, baseIndex + offset);
+                // Binary search index is always either the same or greater, so we subtract 1 if not inclusive.
+                int baseIndex = inclusive && foundIndex < columnList.Count && columnList[foundIndex].ActualTime == ActualTime ? foundIndex : foundIndex - 1;
+                return getNoteByIndex(columnList, baseIndex - offset);
             }
             else
             {
-                int baseIndex = !inclusive && foundIndex < list.Count && list[foundIndex].StartTime == StartTime ? foundIndex + 1 : foundIndex;
-                return getNoteByIndex(list, baseIndex + offset);
+                // Binary search index is always either the same or greater, so we only add 1 if not inclusive but there is a note at the same time.
+                int baseIndex = !inclusive && foundIndex < columnList.Count && columnList[foundIndex].ActualTime == ActualTime ? foundIndex + 1 : foundIndex;
+                return getNoteByIndex(columnList, baseIndex + offset);
             }
         }
 
