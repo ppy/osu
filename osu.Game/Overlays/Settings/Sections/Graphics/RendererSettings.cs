@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions;
@@ -63,6 +64,22 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     Keywords = new[] { @"android", @"vulkan", @"low latency" },
                 },
+            };
+
+            if (RuntimeInfo.IsMobile)
+            {
+                Add(new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = "Use Vulkan Renderer (Experimental)",
+                    Current = osuConfig.GetBindable<bool>(OsuSetting.VulkanRenderer),
+                })
+                {
+                    Keywords = new[] { @"android", @"vulkan", @"graphics" },
+                });
+            }
+
+            Children = Children.Concat(new Drawable[]
+            {
                 new SettingsItemV2(new FormCheckBox
                 {
                     Caption = "Use ANGLE (GLES to Vulkan)",
@@ -79,7 +96,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     Keywords = new[] { @"framerate", @"counter" },
                 },
-            };
+            }).ToArray();
 
             renderer.BindValueChanged(r =>
             {

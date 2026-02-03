@@ -17,6 +17,8 @@ namespace osu.Android.Native
 
         public bool Initialize(IntPtr window) => nVulkanInitialize(nativePtr, window);
 
+        public void Render() => nVulkanRender(nativePtr);
+
         public void Dispose()
         {
             Dispose(true);
@@ -45,5 +47,8 @@ namespace osu.Android.Native
 
         [DllImport("osu.Android.Native")]
         private static extern bool nVulkanInitialize(long ptr, IntPtr window);
+
+        [DllImport("osu.Android.Native")]
+        private static extern void nVulkanRender(long ptr);
     }
 }
