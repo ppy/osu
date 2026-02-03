@@ -214,10 +214,21 @@ namespace osu.Android
                 AlwaysPresent = true;
             }
 
-            protected override void Draw(IRenderer renderer)
+            protected override DrawNode CreateDrawNode() => new VulkanHookDrawNode(this);
+
+            private class VulkanHookDrawNode : DrawNode
             {
-                base.Draw(renderer);
-                renderAction?.Invoke();
+                protected new VulkanHook Source => (VulkanHook)base.Source;
+
+                public VulkanHookDrawNode(VulkanHook source) : base(source)
+                {
+                }
+
+                public override void Draw(IRenderer renderer)
+                {
+                    base.Draw(renderer);
+                    Source.renderAction?.Invoke();
+                }
             }
         }
     }
