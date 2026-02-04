@@ -464,8 +464,8 @@ namespace osu.Game.Rulesets.Scoring
 
             score.Statistics.Clear();
 
-            foreach (var result in ScoreResultCounts)
-                score.Statistics[result.Key] = result.Value;
+            foreach (var result in HitResultExtensions.ALL_TYPES)
+                score.Statistics[result] = ScoreResultCounts.GetValueOrDefault(result);
 
             if (score.MaximumStatistics.Count == 0)
             {

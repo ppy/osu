@@ -212,8 +212,8 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeTickMiss, true)]
         [TestCase(HitResult.LargeTickHit, true)]
         [TestCase(HitResult.SliderTailHit, true)]
-        [TestCase(HitResult.SmallBonus, true)]
-        [TestCase(HitResult.LargeBonus, true)]
+        [TestCase(HitResult.SmallBonus, false)]
+        [TestCase(HitResult.LargeBonus, false)]
         public void TestAffectsAccuracy(HitResult hitResult, bool expectedReturnValue)
         {
             Assert.AreEqual(expectedReturnValue, hitResult.AffectsAccuracy());
@@ -500,6 +500,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
             scoreProcessor.PopulateScore(score);
             Assert.That(score.Statistics[HitResult.Great], Is.EqualTo(1));
+            Assert.That(score.Statistics[HitResult.Miss], Is.EqualTo(0)); // Ensure missing keys are present
             Assert.That(score.MaximumStatistics, Is.Not.Empty);
 
             // Check that subsequent calls don't clear MaximumStatistics
