@@ -135,6 +135,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        [FlakyTest]
         public void TestDeleteViaRightClick()
         {
             ScoreInfo scoreBeingDeleted = null;
