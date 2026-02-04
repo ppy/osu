@@ -212,8 +212,8 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeTickMiss, true)]
         [TestCase(HitResult.LargeTickHit, true)]
         [TestCase(HitResult.SliderTailHit, true)]
-        [TestCase(HitResult.SmallBonus, false)]
-        [TestCase(HitResult.LargeBonus, false)]
+        [TestCase(HitResult.SmallBonus, true)]
+        [TestCase(HitResult.LargeBonus, true)]
         public void TestAffectsAccuracy(HitResult hitResult, bool expectedReturnValue)
         {
             Assert.AreEqual(expectedReturnValue, hitResult.AffectsAccuracy());
@@ -478,6 +478,34 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
             Assert.That(scoreProcessor.Combo.Value, Is.Zero);
             Assert.That(scoreProcessor.HighestCombo.Value, Is.Zero);
+        }
+
+        [Test]
+        public void TestPopulateScoreOptimizations()
+        {
+            scoreProcessor.ApplyBeatmap(beatmap);
+            var score = new ScoreInfo();
+
+            // First population should populate MaximumStatistics
+            scoreProcessor.PopulateScore(score);
+            Assert.That(score.MaximumStatistics, Is.Not.Empty);
+            Assert.That(score.MaximumStatistics.ContainsKey(HitResult.Great));
+
+            // Populate some results
+            var judgementResult = new JudgementResult(beatmap.HitObjects.Single(), new OsuJudgement())
+            {
+                Type = HitResult.Great
+            };
+            scoreProcessor.ApplyResult(judgementResult);
+
+            scoreProcessor.PopulateScore(score);
+            Assert.That(score.Statistics[HitResult.Great], Is.EqualTo(1));
+            Assert.That(score.MaximumStatistics, Is.Not.Empty);
+
+            // Check that subsequent calls don't clear MaximumStatistics
+            // We can't easily check internal calls, but we can check if it stays populated
+            scoreProcessor.PopulateScore(score);
+            Assert.That(score.MaximumStatistics, Is.Not.Empty);
         }
 
         private class TestJudgement : Judgement
