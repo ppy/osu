@@ -49,6 +49,10 @@ jobs:
       - name: Install Android Workload
         run: dotnet workload install android wasi-experimental
 
+      - name: Build Android Native Libraries
+        run: osu.Android/Native/build_native.ps1
+        shell: pwsh
+
       - name: Decode Keystore
         if: env.ANDROID_KEYSTORE_FILE != ''
         run: |

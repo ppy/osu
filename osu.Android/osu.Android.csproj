@@ -29,4 +29,18 @@
     <None Include="Native/vulkan_renderer.h" />
     <None Include="Native/oboe_audio.h" />
   </ItemGroup>
+  <ItemGroup>
+    <AndroidNativeLibrary Include="Native/lib/arm64-v8a/libosu.Android.Native.so" Condition="Exists('Native/lib/arm64-v8a/libosu.Android.Native.so')">
+      <Abi>arm64-v8a</Abi>
+    </AndroidNativeLibrary>
+    <AndroidNativeLibrary Include="Native/lib/armeabi-v7a/libosu.Android.Native.so" Condition="Exists('Native/lib/armeabi-v7a/libosu.Android.Native.so')">
+      <Abi>armeabi-v7a</Abi>
+    </AndroidNativeLibrary>
+    <AndroidNativeLibrary Include="Native/lib/x86/libosu.Android.Native.so" Condition="Exists('Native/lib/x86/libosu.Android.Native.so')">
+      <Abi>x86</Abi>
+    </AndroidNativeLibrary>
+    <AndroidNativeLibrary Include="Native/lib/x86_64/libosu.Android.Native.so" Condition="Exists('Native/lib/x86_64/libosu.Android.Native.so')">
+      <Abi>x86_64</Abi>
+    </AndroidNativeLibrary>
+  </ItemGroup>
 </Project>

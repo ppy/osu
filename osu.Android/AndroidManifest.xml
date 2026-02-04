@@ -5,7 +5,8 @@
 				 android:supportsRtl="true"
 				 android:label="osu!"
 				 android:icon="@mipmap/ic_launcher"
-				 android:roundIcon="@mipmap/ic_launcher" />
+				 android:roundIcon="@mipmap/ic_launcher"
+				 android:largeHeap="true" />
 	<!-- for editor usage -->
 	<uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 	<uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
