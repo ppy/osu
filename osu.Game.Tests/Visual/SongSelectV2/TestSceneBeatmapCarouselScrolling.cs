@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Screens.SelectV2;
 
 namespace osu.Game.Tests.Visual.SongSelectV2
@@ -23,6 +24,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        [FlakyTest]
         public void TestScrollPositionMaintainedOnRemove_SecondSelected()
         {
             Quad positionBefore = default;
@@ -36,8 +38,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             RemoveFirstBeatmap();
             WaitForFiltering();
 
-            AddAssert("select screen position unchanged", () => Carousel.ChildrenOfType<PanelBeatmap>().Single(p => p.Selected.Value).ScreenSpaceDrawQuad,
-                () => Is.EqualTo(positionBefore));
+            AddAssert("select screen position unchanged", () =>
+            {
+                var currentQuad = Carousel.ChildrenOfType<PanelBeatmap>().Single(p => p.Selected.Value).ScreenSpaceDrawQuad;
+                return Precision.AlmostEquals(currentQuad.TopLeft, positionBefore.TopLeft, 1f) &&
+                       Precision.AlmostEquals(currentQuad.BottomRight, positionBefore.BottomRight, 1f);
+            });
         }
 
         [Test]

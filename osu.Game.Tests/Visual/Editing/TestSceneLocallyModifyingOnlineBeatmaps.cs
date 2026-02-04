@@ -24,7 +24,6 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        [FlakyTest] // https://github.com/ppy/osu/issues/26978
         public void TestLocallyModifyingOnlineBeatmap()
         {
             string initialHash = string.Empty;

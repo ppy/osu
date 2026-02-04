@@ -80,8 +80,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public bool IsDisabled => Current.Disabled;
 
-        public float MainDrawHeight => header.DrawHeight;
-
         protected override DropdownHeader CreateHeader() => header = new FormDropdownHeader
         {
             Dropdown = this,

@@ -30,6 +30,7 @@ namespace osu.Game.Overlays.Settings
 
         public SettingsRevertToDefaultButton()
         {
+            RelativeSizeAxes = Axes.Y;
             Width = WIDTH;
         }
 
