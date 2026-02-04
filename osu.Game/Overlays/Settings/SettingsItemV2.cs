@@ -85,12 +85,6 @@ namespace osu.Game.Overlays.Settings
             controlDefault.BindValueChanged(_ => updateDefaultState());
             controlEnabled.BindValueChanged(_ => updateDefaultState(), true);
             FinishTransforms(true);
-
-            ScheduleAfterChildren(() =>
-            {
-                revertButton.RelativeSizeAxes = Axes.None;
-                revertButton.Height = ((Drawable)Control).DrawHeight;
-            });
         }
 
         private void updateDefaultState()
@@ -108,6 +102,8 @@ namespace osu.Game.Overlays.Settings
             base.Update();
             controlDefault.Value = Control.IsDefault;
             controlEnabled.Value = !Control.IsDisabled;
+
+            revertButton.Height = Control.MainDrawHeight;
         }
 
         #region ISettingsItem
