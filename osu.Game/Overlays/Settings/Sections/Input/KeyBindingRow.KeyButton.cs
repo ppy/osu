@@ -143,10 +143,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             public void UpdateKeyCombination(KeyCombination fullState, InputKey triggerKey)
             {
                 var keys = fullState.Keys
-                    .Where(KeyCombination.IsModifierKey)
-                    .Append(triggerKey)
-                    .Distinct()
-                    .ToArray();
+                                    .Where(KeyCombination.IsModifierKey)
+                                    .Append(triggerKey)
+                                    .Distinct()
+                                    .ToArray();
 
                 var combination = keys.Length > 1
                     ? keys.Select(k => k.GetVirtualKey() ?? k).ToArray()
