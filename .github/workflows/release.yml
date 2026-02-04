@@ -44,6 +44,7 @@ jobs:
         with:
           dotnet-version: '8.0.x'
           cache: true
+          cache-dependency-path: '**/packages.lock.json'
 
       - name: Install Android Workload
         run: dotnet workload install android wasi-experimental
@@ -89,6 +90,7 @@ jobs:
         with:
           dotnet-version: '8.0.x'
           cache: true
+          cache-dependency-path: '**/packages.lock.json'
 
       - name: Build Windows
         run: dotnet publish -c Release -r win-x64 --self-contained osu.Desktop/osu.Desktop.csproj -o publish/win-x64 -p:PublishReadyToRun=true -p:Version=${{ needs.prepare-release.outputs.version }}
@@ -115,6 +117,7 @@ jobs:
         with:
           dotnet-version: '8.0.x'
           cache: true
+          cache-dependency-path: '**/packages.lock.json'
 
       - name: Build Linux
         run: dotnet publish -c Release -r linux-x64 --self-contained osu.Desktop/osu.Desktop.csproj -o publish/linux-x64 -p:PublishReadyToRun=true -p:Version=${{ needs.prepare-release.outputs.version }}
@@ -141,6 +144,7 @@ jobs:
         with:
           dotnet-version: '8.0.x'
           cache: true
+          cache-dependency-path: '**/packages.lock.json'
 
       - name: Install iOS Workload
         run: dotnet workload install ios
