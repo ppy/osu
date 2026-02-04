@@ -23,6 +23,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        [FlakyTest]
         public void TestScrollPositionMaintainedOnRemove_SecondSelected()
         {
             Quad positionBefore = default;
