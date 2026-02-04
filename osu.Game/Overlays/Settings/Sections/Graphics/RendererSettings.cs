@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -28,16 +29,18 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             var renderer = config.GetBindable<RendererType>(FrameworkSetting.Renderer);
             automaticRendererInUse = renderer.Value == RendererType.Automatic;
 
+            IEnumerable<RendererType> renderers = host.GetPreferredRenderersForCurrentPlatform().Order();
+#pragma warning disable CS0612 // Type or member is obsolete
+            renderers = renderers.Where(t => t != RendererType.OpenGLLegacy);
+#pragma warning restore CS0612 // Type or member is obsolete
+
             Children = new Drawable[]
             {
                 new SettingsItemV2(new RendererDropdown
                 {
                     Caption = GraphicsSettingsStrings.Renderer,
                     Current = renderer,
-                    Items = host.GetPreferredRenderersForCurrentPlatform().Order()
-#pragma warning disable CS0612 // Type or member is obsolete
-                        .Where(t => t != RendererType.OpenGLLegacy),
-#pragma warning restore CS0612 // Type or member is obsolete
+                    Items = renderers
                 })
                 {
                     Keywords = new[] { @"compatibility", @"directx" },
