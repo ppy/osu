@@ -266,6 +266,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
 
             AddAssert("still has selection", () => Beatmap.IsDefault, () => Is.False);
+
+            AddStep("reset star difficulty filter", () => Config.SetValue(OsuSetting.DisplayStarsMinimum, 0.0));
         }
 
         [Test]
