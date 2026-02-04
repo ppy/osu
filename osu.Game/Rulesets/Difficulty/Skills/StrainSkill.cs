@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Lists;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 
@@ -126,13 +127,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             double difficulty = 0;
             double weight = 1;
 
-            // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
-            // These sections will not contribute to the difficulty.
-            var peaks = GetCurrentStrainPeaks().Where(p => p > 0);
-
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
-            foreach (double strain in peaks.OrderDescending())
+            foreach (double strain in GetCurrentStrainsSorted())
             {
                 difficulty += strain * weight;
                 weight *= DecayWeight;
@@ -140,5 +137,37 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             return difficulty;
         }
+
+        /// <summary>
+        /// Amount of strains that will be saved in the sorted strains list.
+        /// Use value = 0 in case you want all strains to be saved.
+        /// </summary>
+        protected virtual int MaxStrainCount => 200;
+
+        protected SortedList<double> GetCurrentStrainsSorted()
+        {
+            int newStrainsToAdd = strainPeaks.Count - amountOfStrainsAddedSinceSave;
+
+            var peaks = strainPeaks.TakeLast(newStrainsToAdd).Where(s => s > 0);
+            savedSortedStrains.AddRange(peaks);
+            amountOfStrainsAddedSinceSave = strainPeaks.Count;
+
+            // We're saving only the largest 200 strains
+            int excessStrainsCount = savedSortedStrains.Count - MaxStrainCount;
+
+            if (MaxStrainCount > 0 && excessStrainsCount > 0)
+            {
+                savedSortedStrains.RemoveRange(savedSortedStrains.Count - excessStrainsCount, excessStrainsCount);
+            }
+
+            var strainsWithCurrent = new SortedList<double>((a, b) => a < b ? 1 : (a > b ? -1 : 0));
+            strainsWithCurrent.AddRange(savedSortedStrains);
+            strainsWithCurrent.Add(currentSectionPeak);
+
+            return strainsWithCurrent;
+        }
+
+        private readonly SortedList<double> savedSortedStrains = new SortedList<double>((a, b) => a < b ? 1 : (a > b ? -1 : 0));
+        private int amountOfStrainsAddedSinceSave;
     }
 }
