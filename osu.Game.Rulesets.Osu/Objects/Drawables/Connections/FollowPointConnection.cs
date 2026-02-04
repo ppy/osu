@@ -119,7 +119,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             ClearInternal(false);
 
             foreach (var fp in points)
-                Pool.Return(fp);
+            {
+                if (fp.IsInUse)
+                    Pool.Return(fp);
+            }
         }
 
         /// <summary>
