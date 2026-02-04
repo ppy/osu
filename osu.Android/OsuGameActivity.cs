@@ -42,48 +42,17 @@ namespace osu.Android
                     var toolType = e.GetToolType(i);
                     if (toolType == global::Android.Views.MotionEventToolType.Stylus)
                     {
-                        // S Pen detected.
-                        // We want to treat this as mouse input so that it doesn't trigger touch controls.
-                        // To do this, we copy the event and change the source and tool type to mouse.
+                        // S Pen detected. Hardware timestamps should be used for improved latency.
+                        // Using EventTime * 1000000 for maximum SDK compatibility as EventTimeNano is sometimes unavailable at compile-time.
+                        long timestampNano = e.EventTime * 1000000;
 
-                        int pointerCount = e.PointerCount;
-                        var pointerProps = new global::Android.Views.MotionEvent.PointerProperties[pointerCount];
-                        var pointerCoords = new global::Android.Views.MotionEvent.PointerCoords[pointerCount];
-
-                        for (int j = 0; j < pointerCount; j++)
+                        // Process historical points for smoother/predicted input
+                        for (int h = 0; h < e.HistorySize; h++)
                         {
-                            pointerProps[j] = new global::Android.Views.MotionEvent.PointerProperties();
-                            e.GetPointerProperties(j, pointerProps[j]);
-
-                            pointerCoords[j] = new global::Android.Views.MotionEvent.PointerCoords();
-                            e.GetPointerCoords(j, pointerCoords[j]);
-
-                            // Change tool type to mouse for stylus pointers.
-                            if (pointerProps[j].ToolType == global::Android.Views.MotionEventToolType.Stylus)
-                                pointerProps[j].ToolType = global::Android.Views.MotionEventToolType.Mouse;
-                        }
-
-                        var newEvent = global::Android.Views.MotionEvent.Obtain(
-                            e.DownTime,
-                            e.EventTime,
-                            e.Action,
-                            pointerCount,
-                            pointerProps,
-                            pointerCoords,
-                            e.MetaState,
-                            e.ButtonState,
-                            e.XPrecision,
-                            e.YPrecision,
-                            e.DeviceId,
-                            e.EdgeFlags,
-                            global::Android.Views.InputSourceType.Mouse,
-                            e.Flags);
-
-                        if (newEvent != null)
-                        {
-                            base.DispatchTouchEvent(newEvent);
-                            newEvent.Recycle();
-                            return true;
+                            float historicalX = e.GetHistoricalX(i, h);
+                            float historicalY = e.GetHistoricalY(i, h);
+                            long historicalTimeNano = e.GetHistoricalEventTime(h) * 1000000;
+                            game.HandleStylusInput(historicalX, historicalY, historicalTimeNano);
                         }
                     }
                 }

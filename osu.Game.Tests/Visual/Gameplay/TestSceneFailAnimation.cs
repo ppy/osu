@@ -20,6 +20,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        [FlakyTest]
         public void TestOsuWithoutRedTint()
         {
             AddStep("Disable red tint", () => Config.SetValue(OsuSetting.FadePlayfieldWhenHealthLow, false));

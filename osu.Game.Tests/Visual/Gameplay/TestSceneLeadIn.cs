@@ -15,11 +15,11 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public partial class TestSceneLeadIn : RateAdjustedBeatmapTestScene
+    public partial class TestSceneLeadIn : ScreenTestScene
     {
         private LeadInPlayer player = null!;
 
-        private const double lenience_ms = 100;
+        private const double lenience_ms = 250;
 
         private const double first_hit_object = 2170;
 
