@@ -6,23 +6,8 @@ on:
     types: [published]
 
 jobs:
-  prepare-release:
-    name: Prepare Release
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.get_version.outputs.version }}
-      tag: ${{ steps.get_version.outputs.tag }}
-    steps:
-      - name: Get Version
-        id: get_version
-        run: |
-          DATE=$(date +'%Y.%-m%d.0')
-          echo "version=$DATE" >> $GITHUB_OUTPUT
-          echo "tag=$DATE" >> $GITHUB_OUTPUT
-
   build-android:
     name: Build Android
-    needs: prepare-release
     runs-on: windows-latest
     env:
       ANDROID_KEYSTORE_FILE: ${{ secrets.ANDROID_KEYSTORE_FILE }}
@@ -43,8 +28,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-          cache: true
-          cache-dependency-path: '**/packages.lock.json'
 
       - name: Install Android Workload
         run: dotnet workload install android wasi-experimental
@@ -65,11 +48,10 @@ jobs:
           -p:AndroidSigningStorePass="$env:ANDROID_KEYSTORE_PASSWORD"
           -p:AndroidSigningKeyAlias="$env:ANDROID_KEY_ALIAS"
           -p:AndroidSigningKeyPass="$env:ANDROID_KEY_PASSWORD"
-          -p:Version=${{ needs.prepare-release.outputs.version }}
 
       - name: Build Android (Unsigned)
         if: env.ANDROID_KEYSTORE_FILE == ''
-        run: dotnet publish -c Release -f net8.0-android osu.Android/osu.Android.csproj -p:Version=${{ needs.prepare-release.outputs.version }}
+        run: dotnet publish -c Release -f net8.0-android osu.Android/osu.Android.csproj
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -79,7 +61,6 @@ jobs:
 
   build-windows:
     name: Build Windows
-    needs: prepare-release
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -89,11 +70,9 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-          cache: true
-          cache-dependency-path: '**/packages.lock.json'
 
       - name: Build Windows
-        run: dotnet publish -c Release -r win-x64 --self-contained osu.Desktop/osu.Desktop.csproj -o publish/win-x64 -p:PublishReadyToRun=true -p:Version=${{ needs.prepare-release.outputs.version }}
+        run: dotnet publish -c Release -r win-x64 --self-contained osu.Desktop/osu.Desktop.csproj -o publish/win-x64 -p:PublishReadyToRun=true
 
       - name: Compress Windows Build
         run: Compress-Archive -Path publish/win-x64/* -DestinationPath osu-win-x64.zip
@@ -106,7 +85,6 @@ jobs:
 
   build-linux:
     name: Build Linux
-    needs: prepare-release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -116,11 +94,9 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-          cache: true
-          cache-dependency-path: '**/packages.lock.json'
 
       - name: Build Linux
-        run: dotnet publish -c Release -r linux-x64 --self-contained osu.Desktop/osu.Desktop.csproj -o publish/linux-x64 -p:PublishReadyToRun=true -p:Version=${{ needs.prepare-release.outputs.version }}
+        run: dotnet publish -c Release -r linux-x64 --self-contained osu.Desktop/osu.Desktop.csproj -o publish/linux-x64 -p:PublishReadyToRun=true
 
       - name: Compress Linux Build
         run: zip -r osu-linux-x64.zip publish/linux-x64
@@ -133,8 +109,8 @@ jobs:
 
   build-ios:
     name: Build iOS
-    needs: prepare-release
-    runs-on: macos-14
+    runs-on: macos-15
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -143,14 +119,16 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-          cache: true
-          cache-dependency-path: '**/packages.lock.json'
 
       - name: Install iOS Workload
         run: dotnet workload install ios
 
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode_16.4.app
+
       - name: Build iOS
-        run: dotnet publish -c Release -r ios-arm64 osu.iOS/osu.iOS.csproj -p:ArchiveOnBuild=true -p:Version=${{ needs.prepare-release.outputs.version }}
+        run: dotnet publish -c Release -r ios-arm64 osu.iOS/osu.iOS.csproj /p:ArchiveOnBuild=true
+        continue-on-error: true
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -162,8 +140,8 @@ jobs:
 
   release:
     name: Upload Release Assets
-    needs: [prepare-release, build-android, build-windows, build-linux, build-ios]
-    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+    needs: [build-android, build-windows, build-linux, build-ios]
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
@@ -177,8 +155,6 @@ jobs:
       - name: Upload to Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.event_name == 'workflow_dispatch' && needs.prepare-release.outputs.tag || github.ref_name }}
-          generate_release_notes: true
           files: |
             artifacts/osu-android/*.apk
             artifacts/osu-win-x64/*.zip
