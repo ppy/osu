@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -360,8 +359,8 @@ namespace osu.Game.Scoring
                 : string.Empty;
         }
 
-        private static readonly ConcurrentDictionary<string, (HitResult result, LocalisableString displayName)[]> ruleset_hit_results_cache =
-            new ConcurrentDictionary<string, (HitResult result, LocalisableString displayName)[]>();
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (HitResult result, LocalisableString displayName)[]> ruleset_hit_results_cache =
+            new System.Collections.Concurrent.ConcurrentDictionary<string, (HitResult result, LocalisableString displayName)[]>();
 
         public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()
         {
