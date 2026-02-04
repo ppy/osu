@@ -29,7 +29,7 @@ namespace osu.Game.Overlays
 
         protected override bool AddEnumEntriesAutomatically => false;
 
-        public OverlayPanelDisplayStyleControl()
+        public OverlayPanelDisplayStyleControl(bool supportsBrickMode)
         {
             AutoSizeAxes = Axes.Both;
 
@@ -41,10 +41,14 @@ namespace osu.Game.Overlays
             {
                 Icon = FontAwesome.Solid.Bars
             });
-            AddTabItem(new PanelDisplayTabItem(OverlayPanelDisplayStyle.Brick)
+
+            if (supportsBrickMode)
             {
-                Icon = FontAwesome.Solid.Th
-            });
+                AddTabItem(new PanelDisplayTabItem(OverlayPanelDisplayStyle.Brick)
+                {
+                    Icon = FontAwesome.Solid.Th
+                });
+            }
         }
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
