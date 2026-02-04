@@ -3,18 +3,16 @@
 
 using System;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
-using osu.Game.Database;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Dashboard;
-using osu.Game.Screens.OnlinePlay.Match.Components;
+using osu.Game.Overlays.Dashboard.CurrentlyOnline;
 using osu.Game.Tests.Visual.Metadata;
 using osu.Game.Tests.Visual.Spectator;
 using osu.Game.Users;
@@ -23,6 +21,26 @@ namespace osu.Game.Tests.Visual.Online
 {
     public partial class TestSceneCurrentlyOnlineDisplay : OsuTestScene
     {
+        private static readonly string[] usernames =
+        {
+            "fieryrage",
+            "Kerensa",
+            "MillhioreF",
+            "Player01",
+            "smoogipoo",
+            "Ephemeral",
+            "BTMC",
+            "Cilvery",
+            "m980",
+            "HappyStick",
+            "LittleEndu",
+            "frenzibyte",
+            "Zallius",
+            "BanchoBot",
+            "rocketminer210",
+            "pishifat"
+        };
+
         private readonly APIUser streamingUser = new APIUser { Id = 2, Username = "Test user" };
 
         private TestSpectatorClient spectatorClient = null!;
@@ -36,11 +54,34 @@ namespace osu.Game.Tests.Visual.Online
             {
                 spectatorClient = new TestSpectatorClient();
                 metadataClient = new TestMetadataClient();
-                var lookupCache = new TestUserLookupCache();
+
+                ((DummyAPIAccess)API).HandleRequest = req =>
+                {
+                    switch (req)
+                    {
+                        case LookupUsersRequest lookupUsersRequest:
+                            var users = lookupUsersRequest.UserIds.Select(id =>
+                            {
+                                // tests against failed lookups
+                                if (id == 13)
+                                    return null;
+
+                                return new APIUser
+                                {
+                                    Id = id,
+                                    Username = usernames[id % usernames.Length],
+                                };
+                            }).ToList();
+                            lookupUsersRequest.TriggerSuccess(new GetUsersResponse { Users = users });
+                            return true;
+
+                        default:
+                            return false;
+                    }
+                };
 
                 Children = new Drawable[]
                 {
-                    lookupCache,
                     spectatorClient,
                     metadataClient,
                     new DependencyProvidingContainer
@@ -50,13 +91,9 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             (typeof(SpectatorClient), spectatorClient),
                             (typeof(MetadataClient), metadataClient),
-                            (typeof(UserLookupCache), lookupCache),
                             (typeof(OverlayColourProvider), new OverlayColourProvider(OverlayColourScheme.Purple)),
                         },
-                        Child = currentlyOnline = new CurrentlyOnlineDisplay
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        }
+                        Child = currentlyOnline = new CurrentlyOnlineDisplay()
                     },
                 };
             });
@@ -69,17 +106,18 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("Begin watching user presence", () => token = metadataClient.BeginWatchingUserPresence());
             AddStep("Add online user", () => metadataClient.UserPresenceUpdated(streamingUser.Id, new UserPresence { Status = UserStatus.Online, Activity = new UserActivity.ChoosingBeatmap() }));
-            AddUntilStep("Panel loaded", () => currentlyOnline.ChildrenOfType<UserGridPanel>().FirstOrDefault()?.User.Id == 2);
-            AddAssert("Spectate button disabled", () => currentlyOnline.ChildrenOfType<PurpleRoundedButton>().First().Enabled.Value, () => Is.False);
+            AddUntilStep("Panel loaded", () => currentlyOnline.ChildrenOfType<OnlineUserPanel>().FirstOrDefault()?.User.Id == 2);
+            AddAssert("Spectate button disabled", () => currentlyOnline.ChildrenOfType<OnlineUserPanel>().First().CanSpectate.Value, () => Is.False);
 
             AddStep("User began playing", () => metadataClient.UserPresenceUpdated(streamingUser.Id, new UserPresence { Status = UserStatus.Online, Activity = new UserActivity.InSoloGame() }));
-            AddAssert("Spectate button enabled", () => currentlyOnline.ChildrenOfType<PurpleRoundedButton>().First().Enabled.Value, () => Is.True);
+            AddAssert("Spectate button enabled", () => currentlyOnline.ChildrenOfType<OnlineUserPanel>().First().CanSpectate.Value, () => Is.True);
 
-            AddStep("User finished playing", () => metadataClient.UserPresenceUpdated(streamingUser.Id, new UserPresence { Status = UserStatus.Online, Activity = new UserActivity.ChoosingBeatmap() }));
-            AddAssert("Spectate button disabled", () => currentlyOnline.ChildrenOfType<PurpleRoundedButton>().First().Enabled.Value, () => Is.False);
+            AddStep("User finished playing",
+                () => metadataClient.UserPresenceUpdated(streamingUser.Id, new UserPresence { Status = UserStatus.Online, Activity = new UserActivity.ChoosingBeatmap() }));
+            AddAssert("Spectate button disabled", () => currentlyOnline.ChildrenOfType<OnlineUserPanel>().First().CanSpectate.Value, () => Is.False);
 
             AddStep("Remove playing user", () => metadataClient.UserPresenceUpdated(streamingUser.Id, null));
-            AddUntilStep("Panel no longer present", () => !currentlyOnline.ChildrenOfType<UserGridPanel>().Any());
+            AddUntilStep("Panel no longer present", () => !currentlyOnline.ChildrenOfType<OnlineUserPanel>().Any());
             AddStep("End watching user presence", () => token.Dispose());
         }
 
@@ -90,49 +128,14 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("Begin watching user presence", () => token = metadataClient.BeginWatchingUserPresence());
             AddStep("Add online user", () => metadataClient.UserPresenceUpdated(streamingUser.Id, new UserPresence { Status = UserStatus.Online, Activity = new UserActivity.InSoloGame() }));
-            AddUntilStep("Panel loaded", () => currentlyOnline.ChildrenOfType<UserGridPanel>().FirstOrDefault()?.User.Id == streamingUser.Id);
-            AddAssert("Spectate button enabled", () => currentlyOnline.ChildrenOfType<PurpleRoundedButton>().First().Enabled.Value, () => Is.True);
+            AddUntilStep("Panel loaded", () => currentlyOnline.ChildrenOfType<OnlineUserPanel>().FirstOrDefault()?.User.Id == streamingUser.Id);
+            AddAssert("Spectate button enabled", () => currentlyOnline.ChildrenOfType<OnlineUserPanel>().First().CanSpectate.Value, () => Is.True);
 
-            AddStep("User finished playing", () => metadataClient.UserPresenceUpdated(streamingUser.Id, new UserPresence { Status = UserStatus.Online, Activity = new UserActivity.ChoosingBeatmap() }));
-            AddAssert("Spectate button disabled", () => currentlyOnline.ChildrenOfType<PurpleRoundedButton>().First().Enabled.Value, () => Is.False);
+            AddStep("User finished playing",
+                () => metadataClient.UserPresenceUpdated(streamingUser.Id, new UserPresence { Status = UserStatus.Online, Activity = new UserActivity.ChoosingBeatmap() }));
+            AddAssert("Spectate button disabled", () => currentlyOnline.ChildrenOfType<OnlineUserPanel>().First().CanSpectate.Value, () => Is.False);
             AddStep("Remove playing user", () => metadataClient.UserPresenceUpdated(streamingUser.Id, null));
             AddStep("End watching user presence", () => token.Dispose());
-        }
-
-        internal partial class TestUserLookupCache : UserLookupCache
-        {
-            private static readonly string[] usernames =
-            {
-                "fieryrage",
-                "Kerensa",
-                "MillhioreF",
-                "Player01",
-                "smoogipoo",
-                "Ephemeral",
-                "BTMC",
-                "Cilvery",
-                "m980",
-                "HappyStick",
-                "LittleEndu",
-                "frenzibyte",
-                "Zallius",
-                "BanchoBot",
-                "rocketminer210",
-                "pishifat"
-            };
-
-            protected override Task<APIUser?> ComputeValueAsync(int lookup, CancellationToken token = default)
-            {
-                // tests against failed lookups
-                if (lookup == 13)
-                    return Task.FromResult<APIUser?>(null);
-
-                return Task.FromResult<APIUser?>(new APIUser
-                {
-                    Id = lookup,
-                    Username = usernames[lookup % usernames.Length],
-                });
-            }
         }
     }
 }
