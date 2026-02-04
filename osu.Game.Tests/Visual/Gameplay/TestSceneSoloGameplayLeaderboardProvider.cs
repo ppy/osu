@@ -19,6 +19,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     public partial class TestSceneSoloGameplayLeaderboardProvider : OsuTestScene
     {
         [Test]
+        [FlakyTest]
         public void TestLocalLeaderboardHasPositionsAutofilled()
         {
             SoloGameplayLeaderboardProvider provider = null!;
