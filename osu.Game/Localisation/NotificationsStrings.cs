@@ -146,14 +146,9 @@ Click to see what's new!", version);
         public static LocalisableString FriendOffline(string info) => new TranslatableString(getKey(@"friend_offline"), @"Offline: {0}", info);
 
         /// <summary>
-        /// "Connection to API was lost. Can't continue with online play."
+        /// "Connection to online services was interrupted. osu! will be operating with limited functionality."
         /// </summary>
-        public static LocalisableString APIDisconnect => new TranslatableString(getKey(@"api_disconnect"), @"Connection to API was lost. Can't continue with online play.");
-
-        /// <summary>
-        /// "Connection to the multiplayer server was lost. Exiting multiplayer."
-        /// </summary>
-        public static LocalisableString MultiplayerDisconnect => new TranslatableString(getKey(@"multiplayer_disconnect"), @"Connection to the multiplayer server was lost. Exiting multiplayer.");
+        public static LocalisableString APIConnectionInterrupted => new TranslatableString(getKey(@"api_connection_interrupted"), @"Connection to online services was interrupted. osu! will be operating with limited functionality.");
 
         /// <summary>
         /// "You have been logged out on this device due to a login to your account on another device."
@@ -189,6 +184,81 @@ Click to see what's new!", version);
         /// "Imported {0} of {1} collections"
         /// </summary>
         public static LocalisableString CollectionsImportProgressTotal(int count, int totalCount) => new TranslatableString(getKey(@"collections_import_progress_total"), @"Imported {0} of {1} collections", count, totalCount);
+
+        /// <summary>
+        /// "This error has been automatically reported to the dev team."
+        /// </summary>
+        public static LocalisableString ErrorAutomaticallyReported => new TranslatableString(getKey(@"error_automatically_reported"), @"This error has been automatically reported to the dev team.");
+
+        /// <summary>
+        /// "A newer release of osu! has been found ({0} → {1})."
+        /// </summary>
+        public static LocalisableString UpdateAvailable(string oldVersion, string newVersion) => new TranslatableString(getKey(@"update_available"), @"A newer release of osu! has been found ({0} → {1}).", oldVersion, newVersion);
+
+        /// <summary>
+        /// "Click here to download the new version, which can be installed over the top of your existing installation."
+        /// </summary>
+        public static LocalisableString UpdateAvailableManualInstall => new TranslatableString(getKey(@"update_available_manual_install"), @"Click here to download the new version, which can be installed over the top of your existing installation.");
+
+        /// <summary>
+        /// "Check with your package manager / provider to bring osu! up-to-date!"
+        /// </summary>
+        public static LocalisableString UpdateAvailablePackageManaged => new TranslatableString(getKey(@"update_available_package_managed"), @"Check with your package manager / provider to bring osu! up-to-date!");
+
+        /// <summary>
+        /// "An action was interrupted due to a dialog being displayed."
+        /// </summary>
+        public static LocalisableString ActionInterruptedByDialog => new TranslatableString(getKey(@"action_interrupted_by_dialog"), @"An action was interrupted due to a dialog being displayed.");
+
+        /// <summary>
+        /// "Exporting {0}..."
+        /// </summary>
+        public static LocalisableString FileExportOngoing(string filename) => new TranslatableString(getKey(@"file_export_ongoing"), @"Exporting {0}...", filename);
+
+        /// <summary>
+        /// "Exported {0}! Click to view."
+        /// </summary>
+        public static LocalisableString FileExportFinished(string filename) => new TranslatableString(getKey(@"file_export_finished"), @"Exported {0}! Click to view.", filename);
+
+        /// <summary>
+        /// "Exporting logs..."
+        /// </summary>
+        public static LocalisableString LogsExportOngoing => new TranslatableString(getKey(@"logs_export_ongoing"), @"Exporting logs...");
+
+        /// <summary>
+        /// "Exported logs! Click to view."
+        /// </summary>
+        public static LocalisableString LogsExportFinished => new TranslatableString(getKey(@"logs_export_finished"), @"Exported logs! Click to view.");
+
+        /// <summary>
+        /// "Running osu! as {0} does not improve performance, may break integrations and poses a security risk. Please run the game as a normal user."
+        /// </summary>
+        public static LocalisableString ElevatedPrivileges(LocalisableString user) => new TranslatableString(getKey(@"elevated_privileges"), @"Running osu! as {0} does not improve performance, may break integrations and poses a security risk. Please run the game as a normal user.", user);
+
+        /// <summary>
+        /// "Screenshot {0} saved!"
+        /// </summary>
+        public static LocalisableString ScreenshotSaved(string filename) => new TranslatableString(getKey(@"screenshot_saved"), @"Screenshot {0} saved!", filename);
+
+        /// <summary>
+        /// "The multiplayer server will be right back..."
+        /// </summary>
+        public static LocalisableString MultiplayerServerShuttingDownImmediately => new TranslatableString(getKey(@"multiplayer_server_shutting_down_immediately"), @"The multiplayer server will be right back...");
+
+        /// <summary>
+        /// "The multiplayer server is restarting in {0}."
+        /// </summary>
+        public static LocalisableString MultiplayerServerShuttingDownRemaining(string remainingTime) => new TranslatableString(getKey(@"multiplayer_server_shutting_down_remaining"), @"The multiplayer server is restarting in {0}.", remainingTime);
+
+        /// <summary>
+        /// "Created new collection &quot;{0}&quot; with {1} beatmaps."
+        /// </summary>
+        public static LocalisableString CollectionCreated(string name, int beatmapsCount) => new TranslatableString(getKey(@"collection_created"), @"Created new collection ""{0}"" with {1} beatmaps.", name, beatmapsCount);
+
+        /// <summary>
+        /// "Added {0} beatmaps to collection &quot;{1}&quot;."
+        /// </summary>
+        public static LocalisableString CollectionBeatmapsAdded(string name, int beatmapsCount) => new TranslatableString(getKey(@"collection_beatmaps_added"), @"Added {0} beatmaps to collection ""{1}"".", beatmapsCount, name);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

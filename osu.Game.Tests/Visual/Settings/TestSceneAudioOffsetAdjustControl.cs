@@ -11,6 +11,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Settings.Sections.Audio;
 using osu.Game.Scoring;
 using osu.Game.Tests.Visual.Ranking;
@@ -24,6 +25,9 @@ namespace osu.Game.Tests.Visual.Settings
 
         [Cached]
         private SessionAverageHitErrorTracker tracker = new SessionAverageHitErrorTracker();
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         private Container content = null!;
         protected override Container Content => content;

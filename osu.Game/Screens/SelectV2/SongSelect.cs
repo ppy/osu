@@ -63,8 +63,7 @@ namespace osu.Game.Screens.SelectV2
     /// This screen is intended to house all components introduced in the new song select design to add transitions and examine the overall look.
     /// This will be gradually built upon and ultimately replace <see cref="Select.SongSelect"/> once everything is in place.
     /// </summary>
-    [Cached(typeof(ISongSelect))]
-    public abstract partial class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, ISongSelect, IHandlePresentBeatmap
+    public abstract partial class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, ISongSelect, IHandlePresentBeatmap, IProvideCursor
     {
         /// <summary>
         /// A debounce that governs how long after a panel is selected before the rest of song select (and the game at large)
@@ -94,13 +93,14 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         protected bool ControlGlobalMusic { get; init; } = true;
 
-        // Colour scheme for mod overlay is left as default (green) to match mods button.
-        // Not sure about this, but we'll iterate based on feedback.
-        private readonly ModSelectOverlay modSelectOverlay = new UserModSelectOverlay
-        {
-            ShowPresets = true,
-        };
+        /// <summary>
+        /// Whether the osu! logo should be shown at the bottom-right of the screen.
+        /// </summary>
+        protected bool ShowOsuLogo { get; init; } = true;
 
+        protected MarginPadding LeftPadding { get; init; }
+
+        private ModSelectOverlay modSelectOverlay = null!;
         private ModSpeedHotkeyHandler modSpeedHotkeyHandler = null!;
 
         // Blue is the most neutral choice, so I'm using that for now.
@@ -118,6 +118,8 @@ namespace osu.Game.Screens.SelectV2
         private Box rightGradientBackground = null!;
         private Container mainContent = null!;
         private SkinnableContainer skinnableContent = null!;
+
+        private GridContainer mainGridContainer = null!;
 
         private NoResultsPlaceholder noResultsPlaceholder = null!;
 
@@ -151,12 +153,17 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
+        [Resolved]
+        private IOverlayManager? overlayManager { get; set; }
+
         private InputManager inputManager = null!;
 
         private readonly RealmPopulatingOnlineLookupSource onlineLookupSource = new RealmPopulatingOnlineLookupSource();
 
         private Bindable<bool> configBackgroundBlur = null!;
         private Bindable<bool> showConvertedBeatmaps = null!;
+
+        private IDisposable? modSelectOverlayRegistration;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)
@@ -224,6 +231,7 @@ namespace osu.Game.Screens.SelectV2
                                                         RelativeSizeAxes = Axes.Both,
                                                         Spacing = new Vector2(0f, 4f),
                                                         Direction = FillDirection.Vertical,
+                                                        Padding = LeftPadding,
                                                         Children = new Drawable[]
                                                         {
                                                             new ShearAligningWrapper(titleWedge = new BeatmapTitleWedge()),
@@ -292,9 +300,10 @@ namespace osu.Game.Screens.SelectV2
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                 },
-                modSpeedHotkeyHandler = new ModSpeedHotkeyHandler(),
-                modSelectOverlay,
+                modSpeedHotkeyHandler = new ModSpeedHotkeyHandler()
             });
+
+            LoadComponent(modSelectOverlay = CreateModSelectOverlay());
 
             configBackgroundBlur = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur);
             configBackgroundBlur.BindValueChanged(e =>
@@ -307,6 +316,13 @@ namespace osu.Game.Screens.SelectV2
 
             showConvertedBeatmaps = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
         }
+
+        // Colour scheme for mod overlay is left as default (green) to match mods button.
+        // Not sure about this, but we'll iterate based on feedback.
+        protected virtual ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay
+        {
+            ShowPresets = true,
+        };
 
         private void requestRecommendedSelection(IEnumerable<GroupedBeatmap> groupedBeatmaps)
         {
@@ -358,6 +374,8 @@ namespace osu.Game.Screens.SelectV2
         {
             base.LoadComplete();
 
+            modSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(modSelectOverlay);
+
             inputManager = GetContainingInputManager()!;
 
             filterControl.CriteriaChanged += criteriaChanged;
@@ -367,7 +385,8 @@ namespace osu.Game.Screens.SelectV2
                 if (!this.IsCurrentScreen())
                     return;
 
-                logo?.FadeTo(v.NewValue == Visibility.Visible ? 0f : 1f, 200, Easing.OutQuint);
+                if (ShowOsuLogo)
+                    logo?.FadeTo(v.NewValue == Visibility.Visible ? 0f : 1f, 200, Easing.OutQuint);
             });
 
             Beatmap.BindValueChanged(_ =>
@@ -388,7 +407,7 @@ namespace osu.Game.Screens.SelectV2
         {
             base.Update();
 
-            detailsArea.Height = wedgesContainer.DrawHeight - titleWedge.LayoutSize.Y - 4;
+            detailsArea.Height = wedgesContainer.ChildSize.Y - titleWedge.LayoutSize.Y - 4;
 
             float widescreenBonusWidth = Math.Max(0, DrawWidth / DrawHeight - 2f);
 
@@ -742,6 +761,9 @@ namespace osu.Game.Screens.SelectV2
         {
             base.LogoArriving(logo, resuming);
 
+            if (!ShowOsuLogo)
+                return;
+
             if (logo.Alpha > 0.8f && resuming)
                 Footer?.StartTrackingLogo(logo, 400, Easing.OutQuint);
             else
@@ -765,12 +787,19 @@ namespace osu.Game.Screens.SelectV2
         protected override void LogoSuspending(OsuLogo logo)
         {
             base.LogoSuspending(logo);
+
+            if (!ShowOsuLogo)
+                return;
+
             Footer?.StopTrackingLogo();
         }
 
         protected override void LogoExiting(OsuLogo logo)
         {
             base.LogoExiting(logo);
+
+            if (!ShowOsuLogo)
+                return;
 
             Footer?.StopTrackingLogo();
 
@@ -812,7 +841,7 @@ namespace osu.Game.Screens.SelectV2
             // Probably needs more thought because this needs to be in every `ApplyToBackground` currently to restore sane defaults.
             backgroundModeBeatmap.FadeColour(Color4.White, 250);
 
-            bool backgroundRevealActive = revealingBackground?.State == ScheduledDelegate.RunState.Running || revealingBackground?.State == ScheduledDelegate.RunState.Complete;
+            bool backgroundRevealActive = revealBackgroundDelegate?.State == ScheduledDelegate.RunState.Running || revealBackgroundDelegate?.State == ScheduledDelegate.RunState.Complete;
             backgroundModeBeatmap.BlurAmount.Value = configBackgroundBlur.Value && !backgroundRevealActive ? 20 : 0f;
         });
 
@@ -908,11 +937,14 @@ namespace osu.Game.Screens.SelectV2
 
         #endregion
 
-        #region Input
+        #region Background reveal
 
-        private ScheduledDelegate? revealingBackground;
+        private ScheduledDelegate? revealBackgroundDelegate;
 
-        private GridContainer mainGridContainer = null!;
+        public CursorContainer? Cursor => null;
+        bool IProvideCursor.ProvidingUserCursor => revealBackgroundDelegate?.Completed == true;
+
+        protected override bool OnHover(HoverEvent e) => true;
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
@@ -927,13 +959,13 @@ namespace osu.Game.Screens.SelectV2
             // For simplicity, disable this functionality on mobile.
             bool isTouchInput = e.CurrentState.Mouse.LastSource is ISourcedFromTouch;
 
-            if (!carousel.AbsoluteScrolling && !isTouchInput && mouseDownPriority && revealingBackground == null)
+            if (!carousel.AbsoluteScrolling && !isTouchInput && mouseDownPriority && revealBackgroundDelegate == null)
             {
-                revealingBackground = Scheduler.AddDelayed(() =>
+                revealBackgroundDelegate = Scheduler.AddDelayed(() =>
                 {
                     if (containingInputManager.DraggedDrawable != null)
                     {
-                        revealingBackground = null;
+                        revealBackgroundDelegate = null;
                         return;
                     }
 
@@ -962,10 +994,10 @@ namespace osu.Game.Screens.SelectV2
 
         private void restoreBackground()
         {
-            if (revealingBackground == null)
+            if (revealBackgroundDelegate == null)
                 return;
 
-            if (revealingBackground.State == ScheduledDelegate.RunState.Complete)
+            if (revealBackgroundDelegate.State == ScheduledDelegate.RunState.Complete)
             {
                 mainContent.ResizeWidthTo(1f, 500, Easing.OutQuint);
                 mainContent.ScaleTo(1, 500, Easing.OutQuint);
@@ -978,11 +1010,15 @@ namespace osu.Game.Screens.SelectV2
                 Footer?.Show();
             }
 
-            revealingBackground.Cancel();
-            revealingBackground = null;
+            revealBackgroundDelegate.Cancel();
+            revealBackgroundDelegate = null;
 
             updateBackgroundDim();
         }
+
+        #endregion
+
+        #region Input
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
@@ -1209,5 +1245,11 @@ namespace osu.Game.Screens.SelectV2
         public Bindable<BeatmapSetInfo?> ScopedBeatmapSet => filterControl.ScopedBeatmapSet;
 
         #endregion
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            modSelectOverlayRegistration?.Dispose();
+        }
     }
 }

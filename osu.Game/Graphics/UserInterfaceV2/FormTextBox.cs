@@ -19,6 +19,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -76,7 +77,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public LocalisableString PlaceholderText { get; init; }
 
-        private Box background = null!;
+        private FormControlBackground background = null!;
         private Box flashLayer = null!;
         private InnerTextBox textBox = null!;
         private FormFieldCaption caption = null!;
@@ -89,28 +90,22 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private void load(OsuColour colours)
         {
             RelativeSizeAxes = Axes.X;
-            Height = 50;
-
-            Masking = true;
-            CornerRadius = 5;
-            CornerExponent = 2.5f;
+            AutoSizeAxes = Axes.Y;
 
             InternalChildren = new Drawable[]
             {
-                background = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
-                },
+                background = new FormControlBackground(),
                 flashLayer = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Colour4.Transparent,
                 },
-                new Container
+                new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding(9),
+                    Spacing = new Vector2(0, 4),
                     Children = new Drawable[]
                     {
                         caption = new FormFieldCaption
@@ -122,8 +117,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         },
                         textBox = CreateTextBox().With(t =>
                         {
-                            t.Anchor = Anchor.BottomRight;
-                            t.Origin = Anchor.BottomRight;
                             t.RelativeSizeAxes = Axes.X;
                             t.Width = 1;
                             t.PlaceholderText = PlaceholderText;
@@ -192,19 +185,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
             caption.Colour = disabled ? colourProvider.Background1 : colourProvider.Content2;
             textBox.Colour = disabled ? colourProvider.Foreground1 : colourProvider.Content1;
 
-            BorderThickness = IsHovered || textBox.Focused.Value ? 2 : 0;
-
-            if (disabled)
-                BorderColour = colourProvider.Dark1;
-            else
-                BorderColour = textBox.Focused.Value ? colourProvider.Highlight1 : colourProvider.Light4;
-
-            if (textBox.Focused.Value)
-                background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
+            if (Current.Disabled)
+                background.VisualStyle = VisualStyle.Disabled;
+            else if (textBox.Focused.Value)
+                background.VisualStyle = VisualStyle.Focused;
             else if (IsHovered)
-                background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
+                background.VisualStyle = VisualStyle.Hovered;
             else
-                background.Colour = colourProvider.Background5;
+                background.VisualStyle = VisualStyle.Normal;
         }
 
         internal partial class InnerTextBox : OsuTextBox
@@ -215,12 +203,16 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             protected override float LeftRightPadding => 0;
 
+            public InnerTextBox()
+            {
+                DrawBorder = false;
+            }
+
             [BackgroundDependencyLoader]
             private void load()
             {
                 Height = 16;
                 TextContainer.Height = 1;
-                Masking = false;
                 BackgroundUnfocused = BackgroundFocused = BackgroundCommit = Colour4.Transparent;
             }
 

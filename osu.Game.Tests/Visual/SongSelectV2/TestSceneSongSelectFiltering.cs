@@ -389,6 +389,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             SortBy(SortMode.Artist);
             checkMatchedBeatmaps(6);
 
+            AddUntilStep("wait for spread indicator", () => this.ChildrenOfType<PanelBeatmapSet.SpreadDisplay>().Any(d => d.Enabled.Value));
             AddStep("click spread indicator", () => this.ChildrenOfType<PanelBeatmapSet.SpreadDisplay>().Single(d => d.Enabled.Value).TriggerClick());
             WaitForFiltering();
             checkMatchedBeatmaps(3);
@@ -412,6 +413,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             WaitForFiltering();
             checkMatchedBeatmaps(3);
 
+            AddUntilStep("wait for spread indicator", () => this.ChildrenOfType<PanelBeatmapSet.SpreadDisplay>().Any(d => d.Enabled.Value));
             AddStep("click spread indicator", () => this.ChildrenOfType<PanelBeatmapSet.SpreadDisplay>().Single(d => d.Enabled.Value).TriggerClick());
             WaitForFiltering();
             checkMatchedBeatmaps(3);

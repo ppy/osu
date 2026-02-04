@@ -8,6 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ExceptionExtensions;
+using osu.Framework.Logging;
 using osu.Game.Online.API;
 
 namespace osu.Game.Database
@@ -163,6 +165,14 @@ namespace osu.Game.Database
             }
         }
 
-        private void createNewTask() => pendingRequestTask = Task.Run(performLookup);
+        private void createNewTask()
+        {
+            var nextTask = Task.Run(performLookup);
+            nextTask.ContinueWith(t =>
+            {
+                Logger.Error(t.Exception.AsSingular(), $"{nameof(OnlineLookupCache<TLookup, TValue, TRequest>)} lookup request failed!");
+            }, TaskContinuationOptions.OnlyOnFaulted);
+            pendingRequestTask = nextTask;
+        }
     }
 }

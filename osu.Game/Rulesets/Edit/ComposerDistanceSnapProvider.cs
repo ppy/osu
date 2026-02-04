@@ -308,7 +308,7 @@ namespace osu.Game.Rulesets.Edit
             private readonly ValueChangedEvent<double> change;
 
             public DistanceSpacingToast(LocalisableString value, ValueChangedEvent<double> change)
-                : base(getAction(change).GetLocalisableDescription(), value, string.Empty)
+                : base(getAction(change).GetLocalisableDescription(), value)
             {
                 this.change = change;
             }
@@ -316,7 +316,7 @@ namespace osu.Game.Rulesets.Edit
             [BackgroundDependencyLoader]
             private void load(RealmKeyBindingStore keyBindingStore)
             {
-                ShortcutText.Text = keyBindingStore.GetBindingsStringFor(getAction(change)).ToUpper();
+                ExtraText = keyBindingStore.GetBindingsStringFor(getAction(change));
             }
 
             private static GlobalAction getAction(ValueChangedEvent<double> change) => change.NewValue - change.OldValue > 0

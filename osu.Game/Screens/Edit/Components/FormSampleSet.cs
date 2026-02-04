@@ -15,7 +15,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -42,13 +41,13 @@ namespace osu.Game.Screens.Edit.Components
             set => current.Current = value;
         }
 
-        public Func<FileInfo, string>? SampleAddRequested { get; init; }
+        public Func<FileInfo, string, string>? SampleAddRequested { get; init; }
         public Action<string>? SampleRemoveRequested { get; init; }
 
         private readonly BindableWithCurrent<EditorBeatmapSkin.SampleSet?> current = new BindableWithCurrent<EditorBeatmapSkin.SampleSet?>();
         private readonly Dictionary<(string name, string bank), SampleButton> buttons = new Dictionary<(string, string), SampleButton>();
 
-        private Box background = null!;
+        private FormControlBackground background = null!;
         private FormFieldCaption caption = null!;
 
         [Resolved]
@@ -62,13 +61,13 @@ namespace osu.Game.Screens.Edit.Components
 
             Masking = true;
             CornerRadius = 5;
+            CornerExponent = 2.5f;
 
             InternalChildren = new Drawable[]
             {
-                background = new Box
+                background = new FormControlBackground
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
                 },
                 new FillFlowContainer
                 {
@@ -167,13 +166,9 @@ namespace osu.Game.Screens.Edit.Components
 
         private void updateState()
         {
-            background.Colour = colourProvider.Background5;
             caption.Colour = colourProvider.Content2;
 
-            BorderThickness = IsHovered ? 2 : 0;
-
-            if (IsHovered)
-                BorderColour = colourProvider.Light4;
+            background.VisualStyle = IsHovered ? VisualStyle.Hovered : VisualStyle.Normal;
         }
 
         public partial class SampleButton : OsuButton, IHasPopover, IHasContextMenu
@@ -194,7 +189,7 @@ namespace osu.Game.Screens.Edit.Components
             /// <summary>
             /// Invoked when a new sample is selected via this button.
             /// </summary>
-            public Func<FileInfo, string>? SampleAddRequested { get; init; }
+            public Func<FileInfo, string, string>? SampleAddRequested { get; init; }
 
             /// <summary>
             /// Invoked when a sample removal is selected via this button.
@@ -284,7 +279,7 @@ namespace osu.Game.Screens.Edit.Components
                 triangles.Colour = ColourInfo.GradientVertical(triangleGradientSecondColour.Value, BackgroundColour);
             }
 
-            private void recycleSamples()
+            private void recycleSamples() => Schedule(() =>
             {
                 if (hoverSounds?.Parent == this)
                 {
@@ -294,8 +289,8 @@ namespace osu.Game.Screens.Edit.Components
 
                 AddInternal(hoverSounds = (ActualFilename.Value == null ? new HoverClickSounds(HoverSampleSet.Button) : new HoverSounds(HoverSampleSet.Button)));
 
-                sample = ActualFilename.Value == null ? null : editorBeatmap?.BeatmapSkin?.Skin.Samples?.Get(ActualFilename.Value);
-            }
+                sample = ActualFilename.Value != null ? editorBeatmap?.BeatmapSkin?.Skin.Samples?.Get(ActualFilename.Value) : null;
+            });
 
             protected override bool OnHover(HoverEvent e)
             {
@@ -317,7 +312,7 @@ namespace osu.Game.Screens.Edit.Components
                     return;
 
                 this.HidePopover();
-                ActualFilename.Value = SampleAddRequested?.Invoke(selectedFile.Value) ?? selectedFile.Value.ToString();
+                ActualFilename.Value = SampleAddRequested?.Invoke(selectedFile.Value, ExpectedFilename.Value) ?? selectedFile.Value.ToString();
             }
 
             private void deleteSample()
