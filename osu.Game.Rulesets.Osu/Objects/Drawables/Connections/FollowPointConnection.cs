@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
@@ -17,6 +18,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     public partial class FollowPointConnection : PoolableDrawableWithLifetime<FollowPointLifetimeEntry>
     {
         public DrawablePool<FollowPoint>? Pool { private get; set; }
+
+        public FollowPointConnection()
+        {
+            refreshDelegate = refresh;
+        }
 
         protected override void OnApply(FollowPointLifetimeEntry entry)
         {
@@ -34,19 +40,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             base.OnFree(entry);
 
             entry.Invalidated -= scheduleRefresh;
-            // Return points to the pool.
-            ClearInternal(false);
+            returnPointsToPool();
         }
 
-        private void scheduleRefresh() => Scheduler.AddOnce(() =>
+        private readonly Action refreshDelegate;
+
+        private void scheduleRefresh() => Scheduler.AddOnce(refreshDelegate);
+
+        private void refresh()
         {
-            Debug.Assert(Pool != null);
-
-            ClearInternal(false);
-
             var entry = Entry;
 
             if (entry?.End == null) return;
+
+            Debug.Assert(Pool != null);
+
+            returnPointsToPool();
 
             OsuHitObject start = entry.Start;
             OsuHitObject end = entry.End;
@@ -94,7 +103,28 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             }
 
             entry.LifetimeEnd = finalTransformEndTime;
-        });
+        }
+
+        private void returnPointsToPool()
+        {
+            if (Pool == null) return;
+
+            var points = new List<FollowPoint>();
+
+            foreach (var child in InternalChildren)
+            {
+                if (child is FollowPoint fp)
+                    points.Add(fp);
+            }
+
+            ClearInternal(false);
+
+            foreach (var fp in points)
+            {
+                if (fp.IsInUse)
+                    Pool.Return(fp);
+            }
+        }
 
         /// <summary>
         /// Computes the fade time of follow point positioned between two hitobjects.
