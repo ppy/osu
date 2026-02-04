@@ -124,7 +124,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                                     PlaceholderText = HomeStrings.SearchPlaceholder,
                                                 },
                                                 Empty(),
-                                                userListToolbar = new UserListToolbar
+                                                userListToolbar = new UserListToolbar(true)
                                                 {
                                                     Anchor = Anchor.CentreRight,
                                                     Origin = Anchor.CentreRight,
