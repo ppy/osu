@@ -29,7 +29,7 @@ foreach ($abi in $abis) {
 
     Push-Location $buildDir
 
-    cmake -G "Ninja" -DCMAKE_TOOLCHAIN_FILE="$cmakeToolchain" -DANDROID_ABI=$abi -DANDROID_PLATFORM=android-24 -DCMAKE_BUILD_TYPE=Release $ScriptRoot
+    cmake -G "Ninja" -DCMAKE_TOOLCHAIN_FILE="$cmakeToolchain" -DANDROID_ABI=$abi -DANDROID_PLATFORM=android-31 -DCMAKE_BUILD_TYPE=Release $ScriptRoot
 
     if ($LASTEXITCODE -ne 0) {
         Write-Error "CMake configuration failed for $abi"
