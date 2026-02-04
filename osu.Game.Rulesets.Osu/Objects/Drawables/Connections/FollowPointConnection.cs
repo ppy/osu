@@ -110,6 +110,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             if (Pool == null) return;
 
             var points = new List<FollowPoint>();
+
             foreach (var child in InternalChildren)
             {
                 if (child is FollowPoint fp)
