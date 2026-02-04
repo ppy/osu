@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -461,14 +461,17 @@ namespace osu.Game.Rulesets.Scoring
             score.Accuracy = Accuracy.Value;
             score.Rank = Rank.Value;
             score.HitEvents = hitEvents;
+
             score.Statistics.Clear();
-            score.MaximumStatistics.Clear();
 
             foreach (var result in HitResultExtensions.ALL_TYPES)
                 score.Statistics[result] = ScoreResultCounts.GetValueOrDefault(result);
 
-            foreach (var result in HitResultExtensions.ALL_TYPES)
-                score.MaximumStatistics[result] = MaximumResultCounts.GetValueOrDefault(result);
+            if (score.MaximumStatistics.Count == 0)
+            {
+                foreach (var result in MaximumResultCounts)
+                    score.MaximumStatistics[result.Key] = result.Value;
+            }
 
             // Populate total score after everything else.
             score.TotalScoreWithoutMods = TotalScoreWithoutMods.Value;
