@@ -29,27 +29,39 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             var renderer = config.GetBindable<RendererType>(FrameworkSetting.Renderer);
             automaticRendererInUse = renderer.Value == RendererType.Automatic;
 
-            IEnumerable<RendererType> renderers = host.GetPreferredRenderersForCurrentPlatform().Order();
-#pragma warning disable CS0612 // Type or member is obsolete
-            renderers = renderers.Where(t => t != RendererType.OpenGLLegacy);
-#pragma warning restore CS0612 // Type or member is obsolete
-
-            Children = new Drawable[]
+            var children = new List<Drawable>
             {
                 new SettingsItemV2(new RendererDropdown
                 {
                     Caption = GraphicsSettingsStrings.Renderer,
                     Current = renderer,
-                    Items = renderers
+                    Items = host.GetPreferredRenderersForCurrentPlatform().Order()
+#pragma warning disable CS0612 // Type or member is obsolete
+                                .Where(t => t != RendererType.OpenGLLegacy),
+#pragma warning restore CS0612 // Type or member is obsolete
                 })
                 {
                     Keywords = new[] { @"compatibility", @"directx" },
-                }
+                },
+                // TODO: this needs to be a custom dropdown at some point
+                new SettingsItemV2(new FormEnumDropdown<FrameSync>
+                {
+                    Caption = GraphicsSettingsStrings.FrameLimiter,
+                    Current = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync),
+                })
+                {
+                    Keywords = new[] { @"fps", @"framerate" },
+                },
+                new SettingsItemV2(new FormEnumDropdown<ExecutionMode>
+                {
+                    Caption = GraphicsSettingsStrings.ThreadingMode,
+                    Current = config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode)
+                }),
             };
 
             if (RuntimeInfo.IsMobile)
             {
-                Add(new SettingsItemV2(new FormCheckBox
+                children.Add(new SettingsItemV2(new FormCheckBox
                 {
                     Caption = "Use Vulkan Renderer (Experimental)",
                     Current = osuConfig.GetBindable<bool>(OsuSetting.VulkanRenderer),
@@ -58,7 +70,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Keywords = new[] { @"android", @"vulkan", @"graphics" },
                 });
 
-                Add(new SettingsItemV2(new FormCheckBox
+                children.Add(new SettingsItemV2(new FormCheckBox
                 {
                     Caption = "Use ANGLE (GLES to Vulkan)",
                     Current = osuConfig.GetBindable<bool>(OsuSetting.UseAngle),
@@ -66,26 +78,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     Keywords = new[] { @"android", @"vulkan", @"angle" },
                 });
-            }
 
-            Add(new SettingsItemV2(new FormEnumDropdown<FrameSync>
-            {
-                Caption = GraphicsSettingsStrings.FrameLimiter,
-                Current = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync),
-            })
-            {
-                Keywords = new[] { @"fps", @"framerate" },
-            });
-
-            Add(new SettingsItemV2(new FormEnumDropdown<ExecutionMode>
-            {
-                Caption = GraphicsSettingsStrings.ThreadingMode,
-                Current = config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode)
-            }));
-
-            if (RuntimeInfo.IsMobile)
-            {
-                Add(new SettingsItemV2(new FormCheckBox
+                children.Add(new SettingsItemV2(new FormCheckBox
                 {
                     Caption = "Performance Mode",
                     Current = osuConfig.GetBindable<bool>(OsuSetting.PerformanceMode),
@@ -95,7 +89,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 });
             }
 
-            Add(new SettingsItemV2(new FormCheckBox
+            children.Add(new SettingsItemV2(new FormCheckBox
             {
                 Caption = GraphicsSettingsStrings.ShowFPS,
                 Current = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay),
@@ -103,6 +97,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             {
                 Keywords = new[] { @"framerate", @"counter" },
             });
+
+            Children = children.ToArray();
 
             renderer.BindValueChanged(r =>
             {
