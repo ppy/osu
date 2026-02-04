@@ -190,17 +190,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         }
 
         /// <summary>
-        /// Returns the amount of time a note spends invisible with the hidden mod at the current approach rate.
-        /// </summary>
-        public double DurationSpentInvisible()
-        {
-            double fadeOutStartTime = BaseObject.StartTime - BaseObject.TimePreempt + BaseObject.TimeFadeIn;
-            double fadeOutDuration = BaseObject.TimePreempt * OsuModHidden.FADE_OUT_DURATION_MULTIPLIER;
-
-            return (fadeOutStartTime + fadeOutDuration) - (BaseObject.StartTime - BaseObject.TimePreempt);
-        }
-
-        /// <summary>
         /// Returns how possible is it to doubletap this object together with the next one and get perfect judgement in range from 0 to 1
         /// </summary>
         public double GetDoubletapness(OsuDifficultyHitObject? osuNextObj)
@@ -230,6 +219,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 TravelTime = Math.Max(LazyTravelTime / clockRate, MIN_DELTA_TIME);
             }
 
+            MinimumJumpTime = AdjustedDeltaTime;
+
             // We don't need to calculate either angle or distance when one of the last->curr objects is a spinner
             if (BaseObject is Spinner || LastObject is Spinner)
                 return;
@@ -241,7 +232,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             JumpDistance = (LastObject.StackedPosition - BaseObject.StackedPosition).Length * scalingFactor;
             LazyJumpDistance = (BaseObject.StackedPosition - lastCursorPosition).Length * scalingFactor;
-            MinimumJumpTime = AdjustedDeltaTime;
             MinimumJumpDistance = LazyJumpDistance;
 
             if (LastObject is Slider lastSlider && lastDifficultyObject != null)
