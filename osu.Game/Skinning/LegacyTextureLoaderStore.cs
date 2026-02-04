@@ -73,14 +73,14 @@ namespace osu.Game.Skinning
 
         private TextureUpload convertToGrayscale(TextureUpload textureUpload)
         {
-            var image = Image.LoadPixelData(textureUpload.Data, textureUpload.Width, textureUpload.Height);
+            var image = Image.LoadPixelData(textureUpload.PremultipliedData, textureUpload.Width, textureUpload.Height);
 
             // stable uses `0.299 * r + 0.587 * g + 0.114 * b`
             // (https://github.com/peppy/osu-stable-reference/blob/013c3010a9d495e3471a9c59518de17006f9ad89/osu!/Graphics/Textures/pTexture.cs#L138-L153)
             // which matches mode BT.601 (https://en.wikipedia.org/wiki/Grayscale#Luma_coding_in_video_systems)
             image.Mutate(i => i.Grayscale(GrayscaleMode.Bt601));
 
-            return new TextureUpload(image);
+            return new TextureUpload(PremultipliedImage.FromStraight(image));
         }
 
         public Stream? GetStream(string name) => wrappedStore?.GetStream(name);
