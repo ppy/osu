@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public partial class TestSceneLeadIn : RateAdjustedBeatmapTestScene
+    public partial class TestSceneLeadIn : ScreenTestScene
     {
         private LeadInPlayer player = null!;
 
