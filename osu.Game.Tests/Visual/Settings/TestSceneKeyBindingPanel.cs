@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.Settings
             scrollToAndStartBinding("Increase volume");
             AddStep("press shift", () => InputManager.PressKey(Key.ShiftLeft));
             AddStep("release shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
-            checkBinding("Increase volume", "Shift");
+            checkBinding("Increase volume", "LShift");
         }
 
         [Test]
