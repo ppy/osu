@@ -48,9 +48,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
                         return;
 
                     if (tracking.NewValue)
-                        transformQueue.Add((clampTime(Time.Current), OnSliderPress));
+                        transformQueue.Add((clampSliderHeadTime(Time.Current), OnSliderPress));
                     else
-                        transformQueue.Add((clampTime(Time.Current), OnSliderRelease));
+                        transformQueue.Add((Time.Current, OnSliderRelease));
 
                     applyQueuedTransforms();
                 }, true);
@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             // Immediately play out any pending transforms from press/release
             FinishTransforms(true);
 
-            queueTransformsFromState();
+            repopulateTransformsFromState();
             applyQueuedTransforms();
         }
 
@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             transformQueue.Clear();
         }
 
-        private void queueTransformsFromState()
+        private void repopulateTransformsFromState()
         {
             Debug.Assert(DrawableObject != null);
 
@@ -157,9 +157,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     continue;
 
                 if (trackingChange.tracking)
-                    transformQueue.Add((clampTime(trackingChange.time), OnSliderPress));
+                    transformQueue.Add((clampSliderHeadTime(trackingChange.time), OnSliderPress));
                 else
-                    transformQueue.Add((clampTime(trackingChange.time), OnSliderRelease));
+                    transformQueue.Add((trackingChange.time, OnSliderRelease));
             }
 
             foreach (var nested in DrawableObject.NestedHitObjects.Where(d => d is DrawableSliderTick or DrawableSliderRepeat))
@@ -170,7 +170,14 @@ namespace osu.Game.Rulesets.Osu.Skinning
             queueStateTransforms(DrawableObject.TailCircle, DrawableObject.TailCircle.State.Value);
         }
 
-        private double clampTime(double time) => Math.Max(time, DrawableObject?.HitObject?.StartTime ?? 0);
+        /// <summary>
+        /// Clamps provided time to the start time of the slider head circle.
+        /// This prevents the slider press transform from starting before the start time
+        /// if it was hit early.
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        private double clampSliderHeadTime(double time) => Math.Max(time, DrawableObject?.HitObject?.StartTime ?? 0);
 
         protected override void Dispose(bool isDisposing)
         {

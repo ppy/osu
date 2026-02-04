@@ -28,11 +28,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private bool autoplay;
 
-        // protected override bool HasCustomSteps => true;
-        //
-        // protected override bool AllowBackwardsSeeks => true;
-
-        [Test]
         public void TestAuto()
         {
             AddStep("enable autoplay", () => autoplay = true);
