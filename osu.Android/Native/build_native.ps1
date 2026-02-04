@@ -7,6 +7,7 @@ if (-not $NdkPath) {
     exit 1
 }
 
+$ScriptRoot = $PSScriptRoot
 $abis = @("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
 $cmakeToolchain = Join-Path $NdkPath "build/cmake/android.toolchain.cmake"
 
@@ -14,8 +15,8 @@ Write-Host "Building Android Native Libraries..."
 Write-Host "NDK Path: $NdkPath"
 
 foreach ($abi in $abis) {
-    $buildDir = "build/$abi"
-    $outputDir = "lib/$abi"
+    $buildDir = Join-Path $ScriptRoot "build/$abi"
+    $outputDir = Join-Path $ScriptRoot "lib/$abi"
 
     Write-Host "Building for $abi..."
 
@@ -28,7 +29,7 @@ foreach ($abi in $abis) {
 
     Push-Location $buildDir
 
-    cmake -G "Ninja" -DCMAKE_TOOLCHAIN_FILE="$cmakeToolchain" -DANDROID_ABI=$abi -DANDROID_PLATFORM=android-21 -DCMAKE_BUILD_TYPE=Release ../..
+    cmake -G "Ninja" -DCMAKE_TOOLCHAIN_FILE="$cmakeToolchain" -DANDROID_ABI=$abi -DANDROID_PLATFORM=android-24 -DCMAKE_BUILD_TYPE=Release $ScriptRoot
 
     if ($LASTEXITCODE -ne 0) {
         Write-Error "CMake configuration failed for $abi"
