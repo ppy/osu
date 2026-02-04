@@ -222,8 +222,8 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                             return panels.OrderByDescending(panel => panel.User.LastVisit).ThenBy(panel => panel.User.Id);
 
                         case UserSortCriteria.Rank:
-                            // Todo: Statistics are not currently updated according to realtime user statistics, but it's also not currently displayed in the panels.
-                            return panels.OrderByDescending(panel => panel.User.Statistics.GlobalRank.HasValue).ThenBy(panel => panel.User.Statistics.GlobalRank ?? 0);
+                            // Todo: Rank is not currently displayed in the panels. Additionally the sort mode kind of breaks if you change ruleset with this overlay open.
+                            return panels.OrderByDescending(panel => panel.User.Rank?.Rank != null).ThenBy(panel => panel.User.Rank?.Rank ?? 0);
 
                         case UserSortCriteria.Username:
                             return panels.OrderBy(panel => panel.User.Username);
