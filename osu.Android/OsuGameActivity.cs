@@ -74,6 +74,7 @@ namespace osu.Android
             RunOnUiThread(() =>
             {
                 var window = Window;
+#pragma warning disable CA1416
                 if (window != null && global::Android.OS.Build.VERSION.SdkInt >= global::Android.OS.BuildVersionCodes.N)
                     window.SetSustainedPerformanceMode(enabled);
 
@@ -98,6 +99,7 @@ namespace osu.Android
                     }
 #pragma warning restore CA1422
                 }
+#pragma warning restore CA1416
             });
         }
 
@@ -137,7 +139,9 @@ namespace osu.Android
         protected override void OnStart()
         {
             base.OnStart();
+#pragma warning disable CA1416
             if (global::Android.OS.Build.VERSION.SdkInt >= global::Android.OS.BuildVersionCodes.R) Window?.DecorView?.RequestUnbufferedDispatch((int)global::Android.Views.InputSourceType.Touchscreen);
+#pragma warning restore CA1416
         }
 
         protected override void OnCreate(global::Android.OS.Bundle? savedInstanceState)
@@ -183,12 +187,14 @@ namespace osu.Android
 
             if (global::Android.OS.Build.VERSION.SdkInt >= global::Android.OS.BuildVersionCodes.S)
             {
+#pragma warning disable CA1416
                 var gm = (global::Android.App.GameManager?)GetSystemService(GameService);
                 if (gm != null)
                 {
                     int mode = (int)gm.GameMode;
                     ApplyPerformanceOptimizations(mode == (int)global::Android.App.GameMode.Performance);
                 }
+#pragma warning restore CA1416
             }
 
             CheckInputDevices();
