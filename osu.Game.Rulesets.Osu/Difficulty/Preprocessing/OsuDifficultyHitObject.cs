@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -129,7 +130,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private readonly OsuDifficultyHitObject? lastLastDifficultyObject;
         private readonly OsuDifficultyHitObject? lastDifficultyObject;
 
-        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index)
+        private readonly Mod[] mods;
+
+        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index, Mod[] mods)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
             lastLastDifficultyObject = index > 1 ? (OsuDifficultyHitObject)objects[index - 2] : null;
@@ -382,6 +385,110 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 if (i == nestedObjects.Count - 1)
                     LazyEndPosition = currCursorPosition;
             }
+
+            if (mods.OfType<OsuModStrictTracking>().Any())
+            {
+                double strictPath = calculateStrictSliderPath(slider);
+
+                double normalVelocity = LazyTravelTime > 0 ? LazyTravelDistance / LazyTravelTime : 0;
+                double strictVelocity = LazyTravelTime > 0 ? strictPath / LazyTravelTime : 0;
+
+                if (strictVelocity > normalVelocity)
+                {
+                    double deltaVelocity = strictVelocity - normalVelocity;
+
+                    // This addiional velocity would require more complex movement so buff it
+                    deltaVelocity *= 1.5;
+
+                    double multiplier = (normalVelocity + deltaVelocity) / strictVelocity;
+
+                    LazyTravelDistance = (float)(strictPath * multiplier);
+                }
+            }
+        }
+
+        private static Vector2 positionWithRepeats(double relativeTime, Slider slider, int repeat)
+        {
+            relativeTime -= slider.SpanDuration * repeat;
+
+            double progress = relativeTime / slider.SpanDuration;
+            if (repeat % 2 == 1)
+                progress = 1 - progress; // revert if odd number of repeats
+            return slider.Path.PositionAt(progress);
+        }
+
+        private double calculateStrictSliderPath(Slider slider)
+        {
+            // WARNING, this is lazer-correct implementation because stable doesn't have Strict Tracking mod
+            // This means that path of this function can be lower than normal path
+            double lazyEndTime = Math.Max(
+                slider.StartTime + slider.Duration + SliderEventGenerator.TAIL_LENIENCY,
+                slider.NestedHitObjects.LastOrDefault(n => n is not SliderTailCircle)?.StartTime ?? double.MinValue
+            );
+
+            double startTime = slider.HeadCircle.StartTime;
+            double totalTrackingTime = lazyEndTime - startTime;
+
+            if (totalTrackingTime == 0)
+                return 0;
+
+            double numberOfUpdates = Math.Ceiling(slider.Path.Distance * (slider.RepeatCount + 1) / NORMALISED_RADIUS);
+
+            double currentTime;
+            Vector2 currentCursorPosition = new Vector2();
+
+            double totalPath = 0;
+
+            double deltaT = totalTrackingTime / numberOfUpdates;
+            double currentUpdateTime = deltaT;
+
+            double getNestedObjectStartTime(int index) => slider.NestedHitObjects[index].StartTime - startTime;
+            int currentNestedObjectIndex = 1;
+            double nestedObjectTime = getNestedObjectStartTime(1);
+
+            currentTime = Math.Min(currentUpdateTime, nestedObjectTime);
+
+            float scalingFactor = (float)(NORMALISED_RADIUS / slider.Radius);
+
+            // Adjust to be sure that there would be no floating point error
+            double adjustedEndTime = totalTrackingTime + deltaT / 2;
+            while (currentTime <= adjustedEndTime)
+            {
+                currentTime = Math.Min(currentUpdateTime, nestedObjectTime);
+                if (currentTime > adjustedEndTime || currentTime >= slider.TailCircle.StartTime)
+                    break;
+
+                float currentRadius = assumed_slider_radius;
+
+                // Handle the scenario where we're doing normal update
+                if (currentUpdateTime < nestedObjectTime)
+                {
+                    currentUpdateTime += deltaT;
+                }
+                // Handle the scenario where we're updating for nested object
+                else
+                {
+                    // Repeats require more accurate movement
+                    currentRadius = slider.NestedHitObjects[currentNestedObjectIndex] is SliderRepeat ? NORMALISED_RADIUS : assumed_slider_radius;
+
+                    currentNestedObjectIndex++;
+                    nestedObjectTime = currentNestedObjectIndex < slider.NestedHitObjects.Count ? getNestedObjectStartTime(currentNestedObjectIndex) : double.PositiveInfinity;
+                }
+
+                int currentRepeat = (int)(currentTime / slider.SpanDuration);
+
+                Vector2 ballPosition = positionWithRepeats(currentTime, slider, currentRepeat);
+                float distanceToCursor = Vector2.Distance(ballPosition, currentCursorPosition) * scalingFactor;
+
+                if (distanceToCursor <= currentRadius)
+                    continue;
+
+                float neededMovement = distanceToCursor - currentRadius;
+                currentCursorPosition = Vector2.Lerp(currentCursorPosition, ballPosition, neededMovement / distanceToCursor);
+                totalPath += neededMovement;
+            }
+
+            return totalPath;
         }
 
         private double calculateSliderAngle(OsuDifficultyHitObject lastDifficultyObject, Vector2 lastLastCursorPosition)
