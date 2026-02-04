@@ -189,22 +189,10 @@ namespace osu.Game.Beatmaps
 
         public Task<List<TimedDifficultyAttributes>> GetTimedDifficultyAttributesAsync(IWorkingBeatmap beatmap, Ruleset ruleset, Mod[] mods, CancellationToken cancellationToken = default)
         {
-            return Task.Factory.StartNew(() =>
-                {
-                    List<TimedDifficultyAttributes> list = [];
-
-                    foreach (var timedAttr in ruleset.CreateDifficultyCalculator(beatmap).CalculateTimed(mods))
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        list.Add(timedAttr);
-                    }
-
-                    return list;
-                },
+            return Task.Factory.StartNew(() => ruleset.CreateDifficultyCalculator(beatmap).CalculateTimed(mods),
                 cancellationToken,
                 TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously,
-                updateScheduler
-            );
+                updateScheduler);
         }
 
         /// <summary>

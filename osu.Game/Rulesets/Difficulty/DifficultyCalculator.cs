@@ -92,16 +92,31 @@ namespace osu.Game.Rulesets.Difficulty
         }
 
         /// <summary>
-        /// Lazily calculates the difficulty of the beatmap on-demand with no mods applied and yields <see cref="TimedDifficultyAttributes"/> representing the difficulty until every relevant time value in the beatmap.
+        /// Calculates the difficulty of the beatmap with no mods applied and returns a set of <see cref="TimedDifficultyAttributes"/> representing the difficulty at every relevant time value in the beatmap.
         /// </summary>
-        /// <remarks>
-        /// 1. Preprocessing will be done before this method returns.<br />
-        /// 2. <see cref="CancellationToken"/> is not effective on returned enumerator.
-        /// </remarks>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>The enumerated <see cref="TimedDifficultyAttributes"/>.</returns>
-        public IEnumerable<TimedDifficultyAttributes> CalculateTimed(CancellationToken cancellationToken = default)
+        /// <returns>The set of <see cref="TimedDifficultyAttributes"/>.</returns>
+        public List<TimedDifficultyAttributes> CalculateTimed(CancellationToken cancellationToken = default)
             => CalculateTimed(Array.Empty<Mod>(), cancellationToken);
+
+        /// <summary>
+        /// Calculates the difficulty of the beatmap using a specific mod combination and returns a set of <see cref="TimedDifficultyAttributes"/> representing the difficulty at every relevant time value in the beatmap.
+        /// </summary>
+        /// <param name="mods">The mods that should be applied to the beatmap.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The set of <see cref="TimedDifficultyAttributes"/>.</returns>
+        public List<TimedDifficultyAttributes> CalculateTimed([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
+        {
+            List<TimedDifficultyAttributes> list = [];
+
+            foreach (var timedAttr in CalculateTimedLazy(mods, cancellationToken))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                list.Add(timedAttr);
+            }
+
+            return list;
+        }
 
         /// <summary>
         /// Lazily calculates the difficulty of the beatmap on-demand using a specific mod combination and yields <see cref="TimedDifficultyAttributes"/> representing the difficulty until every relevant time value in the beatmap.
@@ -113,7 +128,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="mods">The mods that should be applied to the beatmap.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The enumerated <see cref="TimedDifficultyAttributes"/>.</returns>
-        public IEnumerable<TimedDifficultyAttributes> CalculateTimed([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
+        public IEnumerable<TimedDifficultyAttributes> CalculateTimedLazy([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
         {
             using var timedCancellationSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
