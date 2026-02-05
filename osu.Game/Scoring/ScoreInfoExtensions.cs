@@ -25,7 +25,8 @@ namespace osu.Game.Scoring
         /// </summary>
         /// <param name="scores">The array of <see cref="ScoreInfo"/>s to reorder.</param>
         /// <returns>The given <paramref name="scores"/> ordered by decreasing total score.</returns>
-        public static IEnumerable<ScoreInfo> OrderByTotalScore(this IEnumerable<ScoreInfo> scores)
+        public static IEnumerable<T> OrderByTotalScore<T>(this IEnumerable<T> scores)
+            where T : IScoreInfo
             => scores.OrderByDescending(s => s.TotalScore)
                      .ThenBy(s => s.OnlineID)
                      // Local scores may not have an online ID. Fall back to date in these cases.
