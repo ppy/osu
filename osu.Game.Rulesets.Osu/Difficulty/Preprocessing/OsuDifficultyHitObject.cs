@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public readonly double AdjustedDeltaTime;
 
         /// <summary>
-        /// Amount of time elapsed between <see cref="DifficultyHitObject.EndTime"/> and <see cref="DifficultyHitObject.StartTime"/> capped to a minimum of <see cref="MIN_DELTA_TIME"/>ms.
+        /// Amount of time elapsed between lastDifficultyObject's <see cref="DifficultyHitObject.EndTime"/> and <see cref="DifficultyHitObject.StartTime"/> capped to a minimum of <see cref="MIN_DELTA_TIME"/>ms.
         /// </summary>
         public double LastObjectEndDeltaTime { get; private set; }
 
@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
             AdjustedDeltaTime = Math.Max(DeltaTime, MIN_DELTA_TIME);
-            LastObjectEndDeltaTime = Math.Max(EndTime - StartTime, MIN_DELTA_TIME);
+            LastObjectEndDeltaTime = lastDifficultyObject != null ? Math.Max(StartTime - lastDifficultyObject.EndTime, MIN_DELTA_TIME) : AdjustedDeltaTime;
 
             SmallCircleBonus = Math.Max(1.0, 1.0 + (30 - BaseObject.Radius) / 40);
 
