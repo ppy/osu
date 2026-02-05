@@ -85,9 +85,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // for example a slider-circle-circle pattern should be evaluated as a regular triple and not as a single->double
                 if (prevObj.BaseObject is Slider)
                 {
-                    double sliderEndDelta = currObj.MinimumJumpTime;
-                    double sliderDeltaDifference = Math.Max(sliderEndDelta, currDelta) / Math.Min(sliderEndDelta, currDelta);
-                    double sliderEffectiveRatio = getEffectiveRatio(sliderDeltaDifference);
+                    double sliderLazyEndDelta = currObj.MinimumJumpTime;
+                    double sliderLazyDeltaDifference = Math.Max(sliderLazyEndDelta, currDelta) / Math.Min(sliderLazyEndDelta, currDelta);
+
+                    double sliderRealEndDelta = currObj.LastObjectEndDeltaTime;
+                    double sliderRealDeltaDifference = Math.Max(sliderRealEndDelta, currDelta) / Math.Min(sliderRealEndDelta, currDelta);
+
+                    double sliderEffectiveRatio = Math.Min(getEffectiveRatio(sliderLazyDeltaDifference), getEffectiveRatio(sliderRealDeltaDifference));
                     effectiveRatio = Math.Min(sliderEffectiveRatio, effectiveRatio);
                 }
 
@@ -102,11 +106,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     {
                         // bpm change is into slider, this is easy acc window
                         if (currObj.BaseObject is Slider)
-                            effectiveRatio *= 0.125;
-
-                        // bpm change was from a slider, this is easier typically than circle -> circle
-                        // unintentional side effect is that bursts with kicksliders at the ends might have lower difficulty than bursts without sliders
-                        if (prevObj.BaseObject is Slider)
                             effectiveRatio *= 0.5;
 
                         // repeated island polarity (2 -> 4, 3 -> 5)
