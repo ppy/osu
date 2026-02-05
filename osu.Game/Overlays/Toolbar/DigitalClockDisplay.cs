@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Toolbar
                     {
                         new OsuSpriteText
                         {
-                            Text = ToolbarStrings.Running,
+                            Text = ToolbarStrings.TimeRunning,
                             Font = OsuFont.Default.With(size: 10, weight: FontWeight.SemiBold),
                         },
                         gameTime = new OsuSpriteText
