@@ -51,7 +51,7 @@ jobs:
       - name: Setup NDK
         uses: android-actions/setup-ndk@v1
         with:
-          ndk-version: r26d
+          ndk-version: r28
 
       - name: Install Ninja
         run: choco install ninja
