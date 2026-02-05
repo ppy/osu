@@ -28,6 +28,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private bool autoplay;
 
+        [Test]
         public void TestAuto()
         {
             AddStep("enable autoplay", () => autoplay = true);
