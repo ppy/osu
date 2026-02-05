@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osuTK;
 
 namespace osu.Game.Overlays.Toolbar
@@ -76,7 +77,7 @@ namespace osu.Game.Overlays.Toolbar
                     {
                         new OsuSpriteText
                         {
-                            Text = "running",
+                            Text = ToolbarStrings.TimeRunning,
                             Font = OsuFont.Default.With(size: 10, weight: FontWeight.SemiBold),
                         },
                         gameTime = new OsuSpriteText
