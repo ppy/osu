@@ -16,14 +16,26 @@ OboeAudio::~OboeAudio() {
     LOGI("OboeAudio destroyed");
 }
 
+bool OboeAudio::initialize() {
+    return true;
+}
+
 void OboeAudio::start() {
     // AAudio/Oboe low-latency exclusive mode stream initialization (48kHz, minimal buffer)
     LOGI("OboeAudio started");
 }
 
+void OboeAudio::stop() {
+    LOGI("OboeAudio stopped");
+}
+
 double OboeAudio::getTimestamp() {
     // Return high-precision audio DAC timestamp for master timeline sync
     return 0.0;
+}
+
+oboe::DataCallbackResult OboeAudio::onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) {
+    return oboe::DataCallbackResult::Continue;
 }
 
 extern "C" {
