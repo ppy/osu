@@ -11,10 +11,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefaultItemExcludes>$(DefaultItemExcludes);Native/build/**</DefaultItemExcludes>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
-    <AndroidEnableMarshalMethods>true</AndroidEnableMarshalMethods>
-  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj" />
