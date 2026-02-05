@@ -47,6 +47,21 @@ namespace osu.Game.Screens.SelectV2
         public required Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> GetLocalUserTopRanks { get; init; }
         public required Func<HashSet<int>> GetFavouriteBeatmapSets { get; init; }
 
+        private static readonly GroupDefinition[] key_count_groups =
+        {
+            new GroupDefinition(0, "Other"),
+            new GroupDefinition(1, "1K"),
+            new GroupDefinition(2, "2K"),
+            new GroupDefinition(3, "3K"),
+            new GroupDefinition(4, "4K"),
+            new GroupDefinition(5, "5K"),
+            new GroupDefinition(6, "6K"),
+            new GroupDefinition(7, "7K"),
+            new GroupDefinition(8, "8K"),
+            new GroupDefinition(9, "9K"),
+            new GroupDefinition(10, "10K"),
+        };
+
         public async Task<List<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken)
         {
             return await Task.Run(() =>
@@ -232,7 +247,8 @@ namespace osu.Game.Screens.SelectV2
                     var favouriteBeatmapSets = GetFavouriteBeatmapSets();
                     return getGroupsBy(b => defineGroupByFavourites(b, favouriteBeatmapSets), items);
                 }
-
+                case GroupMode.KeysCount:
+                    return getGroupsBy(b => defineGroupByKeysCount(b), items);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -480,7 +496,18 @@ namespace osu.Game.Screens.SelectV2
 
             return [];
         }
+        private IEnumerable<GroupDefinition> defineGroupByKeysCount(BeatmapInfo beatmap)
+        {
+            if (beatmap.Ruleset.ShortName != "mania")
+                return [];
 
+            int keyCount = (int)Math.Round(beatmap.Difficulty.CircleSize);
+
+            if (keyCount >= 1 && keyCount <= 10)
+                return key_count_groups[keyCount].Yield();
+
+            return key_count_groups[0].Yield();
+        }
         private record GroupMapping(GroupDefinition? Group, List<CarouselItem> ItemsInGroup);
     }
 }

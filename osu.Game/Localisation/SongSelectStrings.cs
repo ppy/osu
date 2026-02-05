@@ -264,6 +264,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString TemporarilyShowingAllBeatmapsIn => new TranslatableString(getKey(@"temporarily_showing_all_beatmaps_in"), @"Temporarily showing all beatmaps in");
 
+        /// <summary>
+        /// "Keys Count"
+        /// </summary>
+        public static LocalisableString KeysCount => new TranslatableString(getKey(@"keys_count"), @"Keys Count");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
