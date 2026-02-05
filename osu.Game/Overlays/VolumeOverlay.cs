@@ -15,6 +15,7 @@ using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Volume;
 using osuTK;
 using osuTK.Graphics;
@@ -67,9 +68,9 @@ namespace osu.Game.Overlays
                             Spacing = new Vector2(0, offset),
                             Children = new[]
                             {
-                                volumeMeterEffect = new VolumeMeter("EFFECTS", 125, colours.BlueDarker),
-                                volumeMeterMaster = new MasterVolumeMeter("MASTER", 150, colours.PinkDarker) { IsMuted = { BindTarget = IsMuted }, },
-                                volumeMeterMusic = new VolumeMeter("MUSIC", 125, colours.BlueDarker),
+                                volumeMeterEffect = new VolumeMeter(AudioSettingsStrings.EffectVolume.ToString(), 125, colours.BlueDarker),
+                                volumeMeterMaster = new MasterVolumeMeter(AudioSettingsStrings.MasterVolume.ToString(), 150, colours.PinkDarker) { IsMuted = { BindTarget = IsMuted }, },
+                                volumeMeterMusic = new VolumeMeter(AudioSettingsStrings.MusicVolume.ToString(), 125, colours.BlueDarker),
                             }
                         },
                     },
