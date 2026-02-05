@@ -11,6 +11,28 @@ $ScriptRoot = $PSScriptRoot
 $abis = @("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
 $cmakeToolchain = Join-Path $NdkPath "build/cmake/android.toolchain.cmake"
 
+# Ensure Ninja is in PATH
+if (-not (Get-Command "ninja" -ErrorAction SilentlyContinue)) {
+    Write-Host "Ninja not found in PATH. Checking Chocolatey install locations..."
+    $chocoBin = Join-Path $env:ProgramData "chocolatey/bin"
+    if ($env:ChocolateyInstall) {
+        $chocoBin = Join-Path $env:ChocolateyInstall "bin"
+    }
+
+    $ninjaExe = Join-Path $chocoBin "ninja.exe"
+    if (Test-Path $ninjaExe) {
+        Write-Host "Ninja found at $ninjaExe. Adding to PATH."
+        $env:PATH = "$chocoBin;$env:PATH"
+    } else {
+        Write-Error "Ninja not found. Please ensure Ninja is installed and in your PATH."
+        exit 1
+    }
+}
+
+# Print versions for debugging
+cmake --version
+ninja --version
+
 Write-Host "Building Android Native Libraries..."
 Write-Host "NDK Path: $NdkPath"
 
@@ -29,7 +51,18 @@ foreach ($abi in $abis) {
 
     Push-Location $buildDir
 
-    cmake -G "Ninja" -DCMAKE_TOOLCHAIN_FILE="$cmakeToolchain" -DANDROID_ABI=$abi -DANDROID_PLATFORM=android-31 -DCMAKE_BUILD_TYPE=Release $ScriptRoot
+    # Use splatting to safely pass arguments
+    $cmakeArgs = @(
+        "-G", "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=$cmakeToolchain",
+        "-DANDROID_ABI=$abi",
+        "-DANDROID_PLATFORM=android-31",
+        "-DCMAKE_BUILD_TYPE=Release",
+        $ScriptRoot
+    )
+
+    Write-Host "Running CMake with args: $cmakeArgs"
+    cmake @cmakeArgs
 
     if ($LASTEXITCODE -ne 0) {
         Write-Error "CMake configuration failed for $abi"
