@@ -74,14 +74,13 @@ namespace osu.Android
             RunOnUiThread(() =>
             {
                 var window = Window;
-#pragma warning disable CA1416
-                if (window != null && global::Android.OS.Build.VERSION.SdkInt >= global::Android.OS.BuildVersionCodes.N)
+                if (window != null)
                     window.SetSustainedPerformanceMode(enabled);
 
                 bool dexMode = IsDeXMode();
                 var display = WindowManager?.DefaultDisplay;
 
-                if ((enabled || dexMode) && global::Android.OS.Build.VERSION.SdkInt >= global::Android.OS.BuildVersionCodes.M && display != null)
+                if ((enabled || dexMode) && display != null)
                 {
 #pragma warning disable CA1422
                     var modes = display.GetSupportedModes();
@@ -99,7 +98,6 @@ namespace osu.Android
                     }
 #pragma warning restore CA1422
                 }
-#pragma warning restore CA1416
             });
         }
 
@@ -139,9 +137,7 @@ namespace osu.Android
         protected override void OnStart()
         {
             base.OnStart();
-#pragma warning disable CA1416
-            if (global::Android.OS.Build.VERSION.SdkInt >= global::Android.OS.BuildVersionCodes.R) Window?.DecorView?.RequestUnbufferedDispatch((int)global::Android.Views.InputSourceType.Touchscreen);
-#pragma warning restore CA1416
+            Window?.DecorView?.RequestUnbufferedDispatch((int)global::Android.Views.InputSourceType.Touchscreen);
         }
 
         protected override void OnCreate(global::Android.OS.Bundle? savedInstanceState)
@@ -185,16 +181,11 @@ namespace osu.Android
         {
             base.OnResume();
 
-            if (global::Android.OS.Build.VERSION.SdkInt >= global::Android.OS.BuildVersionCodes.S)
+            var gm = (global::Android.App.GameManager?)GetSystemService(GameService);
+            if (gm != null)
             {
-#pragma warning disable CA1416
-                var gm = (global::Android.App.GameManager?)GetSystemService(GameService);
-                if (gm != null)
-                {
-                    int mode = (int)gm.GameMode;
-                    ApplyPerformanceOptimizations(mode == (int)global::Android.App.GameMode.Performance);
-                }
-#pragma warning restore CA1416
+                int mode = (int)gm.GameMode;
+                ApplyPerformanceOptimizations(mode == (int)global::Android.App.GameMode.Performance);
             }
 
             CheckInputDevices();

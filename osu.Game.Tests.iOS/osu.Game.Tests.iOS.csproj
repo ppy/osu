@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0-ios</TargetFramework>
-    <SupportedOSPlatformVersion>13.4</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
     <RootNamespace>osu.Game.Tests</RootNamespace>
     <AssemblyName>osu.Game.Tests.iOS</AssemblyName>
   </PropertyGroup>

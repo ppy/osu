@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -173,7 +173,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             listLoadCancellation?.Cancel();
             var cancellationSource = listLoadCancellation = new CancellationTokenSource();
 
-            FriendsList? currentList = listContainer.SingleOrDefault();
+            FriendsList? currentList = listContainer.LastOrDefault();
             FriendsList newList = new FriendsList(userListToolbar.DisplayStyle.Value, apiFriends.Select(f => f.TargetUser!).ToArray())
             {
                 OnlineStream = { BindTarget = streamControl.Current },

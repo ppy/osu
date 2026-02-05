@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0-ios</TargetFramework>
-    <SupportedOSPlatformVersion>13.4</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
     <RootNamespace>osu.Game.Rulesets.Taiko.Tests</RootNamespace>
     <AssemblyName>osu.Game.Rulesets.Taiko.Tests.iOS</AssemblyName>
   </PropertyGroup>
