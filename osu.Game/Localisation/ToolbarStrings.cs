@@ -30,6 +30,11 @@ namespace osu.Game.Localisation
         public static LocalisableString HomeHeaderTitle => new TranslatableString(getKey(@"home_header_title"), @"home");
 
         /// <summary>
+        /// "running"
+        /// </summary>
+        public static LocalisableString Running => new TranslatableString(getKey(@"running"), @"running");
+
+        /// <summary>
         /// "return to the main menu"
         /// </summary>
         public static LocalisableString HomeHeaderDescription => new TranslatableString(getKey(@"home_header_description"), @"return to the main menu");
