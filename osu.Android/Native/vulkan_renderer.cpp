@@ -19,9 +19,14 @@ VulkanRenderer::~VulkanRenderer() {
     LOGI("VulkanRenderer destroyed");
 }
 
-void VulkanRenderer::init(ANativeWindow* window) {
+bool VulkanRenderer::initialize(ANativeWindow* window) {
     // Vulkan initialization: Instance, Surface, Physical Device, Logical Device, Swapchain (2 images, MAILBOX)
     LOGI("Vulkan initialized with window %p", window);
+    return true;
+}
+
+void VulkanRenderer::cleanup() {
+    LOGI("VulkanRenderer cleanup");
 }
 
 void VulkanRenderer::render() {
@@ -43,8 +48,7 @@ extern "C" {
     bool nVulkanInitialize(long rendererPtr, void* window) {
         VulkanRenderer* renderer = (VulkanRenderer*)rendererPtr;
         if (!renderer || !window) return false;
-        renderer->init((ANativeWindow*)window);
-        return true;
+        return renderer->initialize((ANativeWindow*)window);
     }
 
     void nVulkanRender(long rendererPtr) {
@@ -65,7 +69,7 @@ extern "C" {
         VulkanRenderer* renderer = (VulkanRenderer*)rendererPtr;
         if (!renderer || !surface) return;
         ANativeWindow* window = ANativeWindow_fromSurface(env, surface);
-        renderer->init(window);
+        renderer->initialize(window);
     }
 
     JNIEXPORT void JNICALL Java_osu_Android_Native_VulkanRenderer_nVulkanRender(JNIEnv* env, jobject obj, jlong rendererPtr) {
