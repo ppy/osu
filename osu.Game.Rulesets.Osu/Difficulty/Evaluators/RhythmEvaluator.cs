@@ -108,11 +108,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                         if (currObj.BaseObject is Slider)
                             effectiveRatio *= 0.125;
 
-                        // bpm change was from a slider, this is easier typically than circle -> circle
-                        // unintentional side effect is that bursts with kicksliders at the ends might have lower difficulty than bursts without sliders
-                        //if (prevObj.BaseObject is Slider)
-                        //    effectiveRatio *= 0.5;
-
                         // repeated island polarity (2 -> 4, 3 -> 5)
                         if (island.IsSimilarPolarity(previousIsland))
                             effectiveRatio *= 0.5;
