@@ -68,9 +68,9 @@ namespace osu.Game.Overlays
                             Spacing = new Vector2(0, offset),
                             Children = new[]
                             {
-                                volumeMeterEffect = new VolumeMeter(AudioSettingsStrings.EffectVolume.ToString(), 125, colours.BlueDarker),
-                                volumeMeterMaster = new MasterVolumeMeter(AudioSettingsStrings.MasterVolume.ToString(), 150, colours.PinkDarker) { IsMuted = { BindTarget = IsMuted }, },
-                                volumeMeterMusic = new VolumeMeter(AudioSettingsStrings.MusicVolume.ToString(), 125, colours.BlueDarker),
+                                volumeMeterEffect = new VolumeMeter(AudioSettingsStrings.EffectVolume, 125, colours.BlueDarker),
+                                volumeMeterMaster = new MasterVolumeMeter(AudioSettingsStrings.MasterVolume, 150, colours.PinkDarker) { IsMuted = { BindTarget = IsMuted }, },
+                                volumeMeterMusic = new VolumeMeter(AudioSettingsStrings.MusicVolume, 125, colours.BlueDarker),
                             }
                         },
                     },
