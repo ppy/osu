@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -196,22 +197,30 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// Returns how possible is it to doubletap this object together with the next one and get perfect judgement in range from 0 to 1
         /// </summary>
-        public double GetDoubletapness(OsuDifficultyHitObject? osuNextObj)
+        public double GetDoubletapness(OsuDifficultyHitObject? osuPrevObj, OsuDifficultyHitObject? osuNextObj)
         {
-            if (osuNextObj != null)
+            if (osuPrevObj == null || osuNextObj == null)
+                return 0;
+
+            double getSpeedRatio(OsuDifficultyHitObject other)
             {
-                double currDeltaTime = Math.Max(1, DeltaTime);
-                double nextDeltaTime = Math.Max(1, osuNextObj.DeltaTime);
-
-                double deltaDifference = Math.Abs(nextDeltaTime - currDeltaTime);
-
-                double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
-                double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / HitWindowGreat), 5);
-
-                return 1.0 - Math.Pow(speedRatio, 1 - windowRatio);
+                double deltaDifference = Math.Abs(DeltaTime - other.DeltaTime);
+                return DeltaTime / Math.Max(Math.Max(DeltaTime, deltaDifference), 1);
             }
 
-            return 0;
+            // Get max between next and prev ratio to avoid nerfing triples
+            double speedRatio = Math.Max(getSpeedRatio(osuPrevObj), getSpeedRatio(osuNextObj));
+
+            // Can't doubletap if circles don't intersect
+            double distanceFactor = Math.Pow(DifficultyCalculationUtils.ReverseLerp(LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS), 2);
+
+            // Use HitWindowGreat * 2, because even if you can't get 300 with doubletapping - you still can gallop
+            double windowRatio = Math.Min(DeltaTime / (HitWindowGreat * 2), 1);
+
+            // Nerf even more if you can straight up doubletap
+            windowRatio *= Math.Min(Math.Pow(DeltaTime / HitWindowGreat, 2), 1);
+
+            return 1 - Math.Pow(speedRatio, distanceFactor * (1 - windowRatio));
         }
 
         private void setDistances(double clockRate)
