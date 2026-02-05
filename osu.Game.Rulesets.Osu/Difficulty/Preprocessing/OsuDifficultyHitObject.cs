@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public readonly double AdjustedDeltaTime;
 
         /// <summary>
-        /// Amount of time elapsed between <see cref="EndTime"/> and <see cref="StartTime"/> capped to a minimum of <see cref="MIN_DELTA_TIME"/>ms.
+        /// Amount of time elapsed between <see cref="DifficultyHitObject.EndTime"/> and <see cref="DifficultyHitObject.StartTime"/> capped to a minimum of <see cref="MIN_DELTA_TIME"/>ms.
         /// </summary>
         public double LastObjectEndDeltaTime { get; private set; }
 
