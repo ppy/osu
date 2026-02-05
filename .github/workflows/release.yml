@@ -43,11 +43,18 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-          cache: true
-          cache-dependency-path: '**/packages.lock.json'
+          cache: false
 
       - name: Install Android Workload
         run: dotnet workload install android wasi-experimental
+
+      - name: Setup NDK
+        uses: android-actions/setup-ndk@v1
+        with:
+          ndk-version: r28
+
+      - name: Install Ninja
+        run: choco install ninja
 
       - name: Build Android Native Libraries
         run: osu.Android/Native/build_native.ps1
