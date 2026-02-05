@@ -19,6 +19,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
+using osu.Framework.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -109,8 +110,7 @@ namespace osu.Game.Graphics.UserInterface
             // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
             protected override void UpdateSize(Vector2 newSize)
             {
-                // TODO: should probably fix this at a framework level (this method is running every frame which can spam transforms)
-                if (newSize == targetSize)
+                if (targetSize.HasValue && Precision.AlmostEquals(newSize, targetSize.Value))
                     return;
 
                 targetSize = newSize;
