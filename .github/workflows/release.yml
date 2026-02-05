@@ -49,7 +49,7 @@ jobs:
         run: dotnet workload install android wasi-experimental
 
       - name: Setup NDK
-        uses: android-actions/setup-ndk@v1
+        uses: nttld/setup-ndk@v1
         with:
           ndk-version: r28
 
