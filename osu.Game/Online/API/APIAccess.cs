@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -38,6 +38,7 @@ namespace osu.Game.Online.API
         private readonly OAuth authentication;
 
         private readonly Queue<APIRequest> queue = new Queue<APIRequest>();
+        private readonly AutoResetEvent updateEvent = new AutoResetEvent(true);
 
         public EndpointConfiguration Endpoints { get; }
 
@@ -70,6 +71,7 @@ namespace osu.Game.Online.API
 
         private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
         private readonly Logger log;
+        private readonly WaitHandle[] waitHandles;
 
         public APIAccess(OsuGameBase game, OsuConfigManager config, EndpointConfiguration endpoints, string versionHash)
         {
@@ -98,6 +100,7 @@ namespace osu.Game.Online.API
 
             authentication.TokenString = config.Get<string>(OsuSetting.Token);
             authentication.Token.ValueChanged += onTokenChanged;
+            authentication.Token.BindValueChanged(_ => updateEvent.Set());
 
             AddInternal(localUserState = new LocalUserState(this, config));
 
@@ -109,6 +112,9 @@ namespace osu.Game.Online.API
                 // This is required so that Queue() requests during startup sequence don't fail due to "not logged in".
                 state.Value = APIState.Connecting;
             }
+
+            waitHandles = new WaitHandle[] { updateEvent, cancellationToken.Token.WaitHandle };
+            state.BindValueChanged(_ => updateEvent.Set());
 
             var thread = new Thread(run)
             {
@@ -168,7 +174,7 @@ namespace osu.Game.Online.API
                     // To recover from a failing state, falling through and running the full reconnection process seems safest for now.
                     // This could probably be replaced with a ping-style request if we want to avoid the reconnection overheads.
                     log.Add($@"{nameof(APIAccess)} is in a failing state, waiting a bit before we try again...");
-                    Thread.Sleep(5000);
+                    WaitHandle.WaitAny(waitHandles, 5000);
                 }
 
                 // Ensure that we have valid credentials.
@@ -176,7 +182,7 @@ namespace osu.Game.Online.API
                 if (!HasLogin)
                 {
                     state.Value = APIState.Offline;
-                    Thread.Sleep(50);
+                    WaitHandle.WaitAny(waitHandles);
                     continue;
                 }
 
@@ -189,7 +195,7 @@ namespace osu.Game.Online.API
 
                     if (state.Value != APIState.Online)
                     {
-                        Thread.Sleep(50);
+                        WaitHandle.WaitAny(waitHandles);
                         continue;
                     }
                 }
@@ -202,7 +208,7 @@ namespace osu.Game.Online.API
                 }
 
                 processQueuedRequests();
-                Thread.Sleep(50);
+                WaitHandle.WaitAny(waitHandles);
             }
         }
 
@@ -384,6 +390,7 @@ namespace osu.Game.Online.API
 
             ProvidedUsername = username;
             this.password = password;
+            updateEvent.Set();
         }
 
         public void AuthenticateSecondFactor(string code)
@@ -391,6 +398,7 @@ namespace osu.Game.Online.API
             Debug.Assert(State.Value == APIState.RequiresSecondFactorAuth);
 
             SecondFactorCode = code;
+            updateEvent.Set();
         }
 
         public IHubClientConnector GetHubConnector(string clientName, string endpoint) =>
@@ -564,6 +572,7 @@ namespace osu.Game.Online.API
                 }
 
                 queue.Enqueue(request);
+                updateEvent.Set();
             }
         }
 
@@ -580,6 +589,8 @@ namespace osu.Game.Online.API
                     foreach (var req in oldQueueRequests)
                         req.Fail(new WebRequestFlushedException(state.Value));
                 }
+
+                updateEvent.Set();
             }
         }
 
