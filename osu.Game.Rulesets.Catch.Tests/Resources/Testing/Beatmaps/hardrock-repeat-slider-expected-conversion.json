@@ -1,186 +1,189 @@
 {
-    "Mappings": [{
-        "StartTime": 369,
-        "Objects": [{
-                "StartTime": 369,
-                "Position": 177,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 450,
-                "Position": 216.539276,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 532,
-                "Position": 256.5667,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 614,
-                "Position": 296.594116,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 696,
-                "Position": 336.621521,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 778,
-                "Position": 376.99762,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 860,
-                "Position": 337.318878,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 942,
-                "Position": 297.291443,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1024,
-                "Position": 257.264038,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1106,
-                "Position": 217.2366,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1188,
-                "Position": 177,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1270,
-                "Position": 216.818192,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1352,
-                "Position": 256.8456,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1434,
-                "Position": 296.873047,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1516,
-                "Position": 336.900452,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1598,
-                "Position": 376.99762,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1680,
-                "Position": 337.039948,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1762,
-                "Position": 297.0125,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1844,
-                "Position": 256.9851,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1926,
-                "Position": 216.957672,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 2008,
-                "Position": 177,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 2090,
-                "Position": 217.097137,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 2172,
-                "Position": 257.124573,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 2254,
-                "Position": 297.152,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 2336,
-                "Position": 337.179443,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 2418,
-                "Position": 376.99762,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 2500,
-                "Position": 336.760956,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 2582,
-                "Position": 296.733643,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 2664,
-                "Position": 256.7062,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 2746,
-                "Position": 216.678772,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 2828,
-                "Position": 177,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 2909,
-                "Position": 216.887909,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 2991,
-                "Position": 256.915344,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 3073,
-                "Position": 296.942749,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 3155,
-                "Position": 336.970184,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 3237,
-                "Position": 376.99762,
-                "HyperDash": false
-            }
-        ]
-    }]
+  "Mappings": [
+    {
+      "StartTime": 369.0,
+      "Objects": [
+        {
+          "StartTime": 369.0,
+          "Position": 177.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 450.96721311475403,
+          "Position": 216.99953,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 532.9344262295081,
+          "Position": 256.99905,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 614.901639344262,
+          "Position": 296.99857,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 696.8688524590161,
+          "Position": 336.9981,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 778.83606557377,
+          "Position": 376.99762,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 860.8032786885241,
+          "Position": 336.9981,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 942.7704918032781,
+          "Position": 296.99857,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1024.737704918032,
+          "Position": 256.99905,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1106.704918032786,
+          "Position": 216.99953,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1188.67213114754,
+          "Position": 177.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1270.6393442622941,
+          "Position": 216.99953,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1352.6065573770481,
+          "Position": 256.99905,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1434.5737704918022,
+          "Position": 296.99857,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1516.5409836065562,
+          "Position": 336.9981,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1598.50819672131,
+          "Position": 376.99762,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1680.475409836064,
+          "Position": 336.9981,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1762.442622950818,
+          "Position": 296.99857,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1844.409836065572,
+          "Position": 256.99905,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1926.3770491803261,
+          "Position": 216.99953,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2008.3442622950802,
+          "Position": 177.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2090.311475409834,
+          "Position": 216.99953,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2172.2786885245882,
+          "Position": 256.99905,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2254.2459016393423,
+          "Position": 296.99857,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2336.2131147540963,
+          "Position": 336.9981,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2418.1803278688503,
+          "Position": 376.99762,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2500.1475409836044,
+          "Position": 336.9981,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2582.1147540983584,
+          "Position": 296.99857,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2664.0819672131124,
+          "Position": 256.99905,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2746.0491803278665,
+          "Position": 216.99953,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2828.0163934426205,
+          "Position": 177.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2909.983606557374,
+          "Position": 216.99953,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2991.950819672128,
+          "Position": 256.99905,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 3073.918032786882,
+          "Position": 296.99857,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 3155.885245901636,
+          "Position": 336.9981,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 3237.85245901639,
+          "Position": 376.99762,
+          "HyperDash": false
+        }
+      ]
+    }
+  ]
 }

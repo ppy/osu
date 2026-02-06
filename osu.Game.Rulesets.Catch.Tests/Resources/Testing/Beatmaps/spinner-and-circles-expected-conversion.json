@@ -1,75 +1,84 @@
 {
-    "Mappings": [{
-            "StartTime": 2589,
-            "Objects": [{
-                "StartTime": 2589,
-                "Position": 256,
-                "HyperDash": false
-            }]
-        },
+  "Mappings": [
+    {
+      "StartTime": 2589.0,
+      "Objects": [
         {
-            "StartTime": 2915,
-            "Objects": [{
-                    "StartTime": 2915,
-                    "Position": 65,
-                    "HyperDash": false
-                },
-                {
-                    "StartTime": 2916,
-                    "Position": 482,
-                    "HyperDash": false
-                }
-            ]
-        },
-        {
-            "StartTime": 3078,
-            "Objects": [{
-                    "StartTime": 3078,
-                    "Position": 164,
-                    "HyperDash": false
-                },
-                {
-                    "StartTime": 3079,
-                    "Position": 315,
-                    "HyperDash": false
-                }
-            ]
-        },
-        {
-            "StartTime": 3241,
-            "Objects": [{
-                    "StartTime": 3241,
-                    "Position": 145,
-                    "HyperDash": false
-                },
-                {
-                    "StartTime": 3242,
-                    "Position": 159,
-                    "HyperDash": false
-                }
-            ]
-        },
-        {
-            "StartTime": 3404,
-            "Objects": [{
-                    "StartTime": 3404,
-                    "Position": 310,
-                    "HyperDash": false
-                },
-                {
-                    "StartTime": 3405,
-                    "Position": 441,
-                    "HyperDash": false
-                }
-            ]
-        },
-        {
-            "StartTime": 5197,
-            "Objects": [{
-                "StartTime": 5197,
-                "Position": 256,
-                "HyperDash": false
-            }]
+          "StartTime": 2589.0,
+          "Position": 256.0,
+          "HyperDash": false
         }
-    ]
+      ]
+    },
+    {
+      "StartTime": 2915.0,
+      "Objects": [
+        {
+          "StartTime": 2915.0,
+          "Position": 65.55122,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2916.0,
+          "Position": 482.88156,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 3078.0,
+      "Objects": [
+        {
+          "StartTime": 3078.0,
+          "Position": 164.77008,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 3079.0,
+          "Position": 315.21667,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 3241.0,
+      "Objects": [
+        {
+          "StartTime": 3241.0,
+          "Position": 145.71701,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 3242.0,
+          "Position": 159.17236,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 3404.0,
+      "Objects": [
+        {
+          "StartTime": 3404.0,
+          "Position": 310.30988,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 3405.0,
+          "Position": 441.51633,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 5197.0,
+      "Objects": [
+        {
+          "StartTime": 5197.0,
+          "Position": 256.0,
+          "HyperDash": false
+        }
+      ]
+    }
+  ]
 }

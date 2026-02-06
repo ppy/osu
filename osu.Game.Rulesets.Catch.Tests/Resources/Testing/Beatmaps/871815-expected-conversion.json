@@ -1,1 +1,2364 @@
-{"Mappings":[{"StartTime":1459.0,"Objects":[{"StartTime":1459.0,"Position":150.0,"HyperDash":false}]},{"StartTime":1809.0,"Objects":[{"StartTime":1809.0,"Position":150.0,"HyperDash":false},{"StartTime":1896.0,"Position":172.185562,"HyperDash":false},{"StartTime":1984.0,"Position":224.798538,"HyperDash":false},{"StartTime":2072.0,"Position":262.41153,"HyperDash":false}]},{"StartTime":2160.0,"Objects":[{"StartTime":2160.0,"Position":281.0,"HyperDash":false},{"StartTime":2229.0,"Position":285.0371,"HyperDash":false},{"StartTime":2335.0,"Position":285.094574,"HyperDash":false}]},{"StartTime":2511.0,"Objects":[{"StartTime":2511.0,"Position":272.0,"HyperDash":false}]},{"StartTime":2687.0,"Objects":[{"StartTime":2687.0,"Position":367.0,"HyperDash":false},{"StartTime":2774.0,"Position":395.071045,"HyperDash":false},{"StartTime":2862.0,"Position":385.323761,"HyperDash":false},{"StartTime":2931.0,"Position":384.634644,"HyperDash":false},{"StartTime":3037.0,"Position":371.162445,"HyperDash":false}]},{"StartTime":3213.0,"Objects":[{"StartTime":3213.0,"Position":278.0,"HyperDash":false}]},{"StartTime":3388.0,"Objects":[{"StartTime":3388.0,"Position":113.0,"HyperDash":false}]},{"StartTime":3476.0,"Objects":[{"StartTime":3476.0,"Position":116.0,"HyperDash":false}]},{"StartTime":3564.0,"Objects":[{"StartTime":3564.0,"Position":121.0,"HyperDash":false},{"StartTime":3607.0,"Position":121.720619,"HyperDash":false},{"StartTime":3651.0,"Position":121.0,"HyperDash":false},{"StartTime":3695.0,"Position":121.720619,"HyperDash":false},{"StartTime":3739.0,"Position":121.0,"HyperDash":false},{"StartTime":3783.0,"Position":121.720619,"HyperDash":false},{"StartTime":3827.0,"Position":121.0,"HyperDash":false},{"StartTime":3871.0,"Position":121.720619,"HyperDash":false},{"StartTime":3914.0,"Position":121.0,"HyperDash":false}]},{"StartTime":4266.0,"Objects":[{"StartTime":4266.0,"Position":368.0,"HyperDash":false},{"StartTime":4353.0,"Position":394.044952,"HyperDash":false},{"StartTime":4441.0,"Position":430.602478,"HyperDash":false},{"StartTime":4510.0,"Position":451.933838,"HyperDash":false},{"StartTime":4616.0,"Position":498.848267,"HyperDash":false}]},{"StartTime":4792.0,"Objects":[{"StartTime":4792.0,"Position":440.0,"HyperDash":false}]},{"StartTime":4967.0,"Objects":[{"StartTime":4967.0,"Position":289.0,"HyperDash":false},{"StartTime":5036.0,"Position":249.229553,"HyperDash":false},{"StartTime":5142.0,"Position":216.522751,"HyperDash":false}]},{"StartTime":5318.0,"Objects":[{"StartTime":5318.0,"Position":105.0,"HyperDash":false}]},{"StartTime":5494.0,"Objects":[{"StartTime":5494.0,"Position":119.0,"HyperDash":false},{"StartTime":5581.0,"Position":96.97381,"HyperDash":false},{"StartTime":5669.0,"Position":97.10305,"HyperDash":false},{"StartTime":5738.0,"Position":108.834061,"HyperDash":false},{"StartTime":5844.0,"Position":132.852325,"HyperDash":false}]},{"StartTime":6020.0,"Objects":[{"StartTime":6020.0,"Position":192.0,"HyperDash":true}]},{"StartTime":6195.0,"Objects":[{"StartTime":6195.0,"Position":451.0,"HyperDash":false},{"StartTime":6282.0,"Position":417.845947,"HyperDash":false},{"StartTime":6370.0,"Position":392.282257,"HyperDash":false},{"StartTime":6439.0,"Position":343.915466,"HyperDash":false},{"StartTime":6545.0,"Position":323.918671,"HyperDash":false}]},{"StartTime":6722.0,"Objects":[{"StartTime":6722.0,"Position":380.0,"HyperDash":false}]},{"StartTime":6897.0,"Objects":[{"StartTime":6897.0,"Position":334.0,"HyperDash":false}]},{"StartTime":6985.0,"Objects":[{"StartTime":6985.0,"Position":334.0,"HyperDash":false}]},{"StartTime":7073.0,"Objects":[{"StartTime":7073.0,"Position":334.0,"HyperDash":false},{"StartTime":7160.0,"Position":336.334045,"HyperDash":false},{"StartTime":7248.0,"Position":347.94342,"HyperDash":false},{"StartTime":7317.0,"Position":360.6226,"HyperDash":false},{"StartTime":7423.0,"Position":326.399445,"HyperDash":false}]},{"StartTime":7599.0,"Objects":[{"StartTime":7599.0,"Position":281.0,"HyperDash":false}]},{"StartTime":7774.0,"Objects":[{"StartTime":7774.0,"Position":140.0,"HyperDash":false}]},{"StartTime":7950.0,"Objects":[{"StartTime":7950.0,"Position":274.0,"HyperDash":false}]},{"StartTime":8125.0,"Objects":[{"StartTime":8125.0,"Position":138.0,"HyperDash":false}]},{"StartTime":8301.0,"Objects":[{"StartTime":8301.0,"Position":266.0,"HyperDash":false},{"StartTime":8388.0,"Position":316.25592,"HyperDash":false},{"StartTime":8476.0,"Position":340.940063,"HyperDash":false},{"StartTime":8545.0,"Position":353.487854,"HyperDash":false},{"StartTime":8651.0,"Position":415.880127,"HyperDash":false}]},{"StartTime":8827.0,"Objects":[{"StartTime":8827.0,"Position":512.0,"HyperDash":false}]},{"StartTime":9002.0,"Objects":[{"StartTime":9002.0,"Position":490.0,"HyperDash":false},{"StartTime":9089.0,"Position":482.986267,"HyperDash":false},{"StartTime":9177.0,"Position":439.110077,"HyperDash":false},{"StartTime":9246.0,"Position":414.503052,"HyperDash":false},{"StartTime":9352.0,"Position":366.139923,"HyperDash":false}]},{"StartTime":9529.0,"Objects":[{"StartTime":9529.0,"Position":260.0,"HyperDash":false},{"StartTime":9598.0,"Position":239.881287,"HyperDash":false},{"StartTime":9704.0,"Position":261.6383,"HyperDash":false}]},{"StartTime":9792.0,"Objects":[{"StartTime":9792.0,"Position":267.0,"HyperDash":false}]},{"StartTime":9880.0,"Objects":[{"StartTime":9880.0,"Position":267.0,"HyperDash":false},{"StartTime":9967.0,"Position":234.350662,"HyperDash":false},{"StartTime":10055.0,"Position":203.079025,"HyperDash":false},{"StartTime":10124.0,"Position":187.624725,"HyperDash":false},{"StartTime":10230.0,"Position":130.615417,"HyperDash":false}]},{"StartTime":10406.0,"Objects":[{"StartTime":10406.0,"Position":185.0,"HyperDash":false}]},{"StartTime":10581.0,"Objects":[{"StartTime":10581.0,"Position":177.0,"HyperDash":false},{"StartTime":10650.0,"Position":191.354156,"HyperDash":false},{"StartTime":10756.0,"Position":249.516769,"HyperDash":false}]},{"StartTime":10932.0,"Objects":[{"StartTime":10932.0,"Position":352.0,"HyperDash":false}]},{"StartTime":11108.0,"Objects":[{"StartTime":11108.0,"Position":436.0,"HyperDash":false},{"StartTime":11177.0,"Position":446.0463,"HyperDash":false},{"StartTime":11283.0,"Position":509.668152,"HyperDash":false}]},{"StartTime":11458.0,"Objects":[{"StartTime":11458.0,"Position":368.0,"HyperDash":false},{"StartTime":11527.0,"Position":322.9537,"HyperDash":false},{"StartTime":11633.0,"Position":294.331848,"HyperDash":false}]},{"StartTime":11809.0,"Objects":[{"StartTime":11809.0,"Position":181.0,"HyperDash":false},{"StartTime":11878.0,"Position":187.9666,"HyperDash":false},{"StartTime":11984.0,"Position":184.937943,"HyperDash":false}]},{"StartTime":12160.0,"Objects":[{"StartTime":12160.0,"Position":221.0,"HyperDash":false}]},{"StartTime":12248.0,"Objects":[{"StartTime":12248.0,"Position":221.0,"HyperDash":false}]},{"StartTime":12336.0,"Objects":[{"StartTime":12336.0,"Position":221.0,"HyperDash":false},{"StartTime":12405.0,"Position":266.95636,"HyperDash":false},{"StartTime":12511.0,"Position":293.24704,"HyperDash":false}]},{"StartTime":12687.0,"Objects":[{"StartTime":12687.0,"Position":440.0,"HyperDash":false},{"StartTime":12774.0,"Position":402.903931,"HyperDash":false},{"StartTime":12862.0,"Position":366.3639,"HyperDash":false},{"StartTime":12931.0,"Position":335.8872,"HyperDash":false},{"StartTime":13037.0,"Position":292.814026,"HyperDash":false}]},{"StartTime":13213.0,"Objects":[{"StartTime":13213.0,"Position":330.0,"HyperDash":false}]},{"StartTime":13301.0,"Objects":[{"StartTime":13301.0,"Position":330.0,"HyperDash":false}]},{"StartTime":13388.0,"Objects":[{"StartTime":13388.0,"Position":330.0,"HyperDash":false},{"StartTime":13457.0,"Position":378.510529,"HyperDash":false},{"StartTime":13563.0,"Position":404.689636,"HyperDash":false}]},{"StartTime":13739.0,"Objects":[{"StartTime":13739.0,"Position":494.0,"HyperDash":false}]},{"StartTime":13915.0,"Objects":[{"StartTime":13915.0,"Position":321.0,"HyperDash":false}]},{"StartTime":14002.0,"Objects":[{"StartTime":14002.0,"Position":321.0,"HyperDash":false}]},{"StartTime":14090.0,"Objects":[{"StartTime":14090.0,"Position":321.0,"HyperDash":false},{"StartTime":14159.0,"Position":343.727631,"HyperDash":false},{"StartTime":14265.0,"Position":391.072754,"HyperDash":false}]},{"StartTime":14441.0,"Objects":[{"StartTime":14441.0,"Position":231.0,"HyperDash":false}]},{"StartTime":14616.0,"Objects":[{"StartTime":14616.0,"Position":188.0,"HyperDash":false},{"StartTime":14703.0,"Position":182.992142,"HyperDash":false},{"StartTime":14791.0,"Position":176.795868,"HyperDash":false},{"StartTime":14860.0,"Position":189.954117,"HyperDash":false},{"StartTime":14966.0,"Position":188.0,"HyperDash":false}]},{"StartTime":15143.0,"Objects":[{"StartTime":15143.0,"Position":125.0,"HyperDash":false},{"StartTime":15230.0,"Position":105.420952,"HyperDash":false},{"StartTime":15318.0,"Position":59.72222,"HyperDash":false},{"StartTime":15406.0,"Position":22.9492321,"HyperDash":false}]},{"StartTime":15494.0,"Objects":[{"StartTime":15494.0,"Position":17.0,"HyperDash":false},{"StartTime":15563.0,"Position":33.37393,"HyperDash":false},{"StartTime":15669.0,"Position":20.4846058,"HyperDash":false}]},{"StartTime":15844.0,"Objects":[{"StartTime":15844.0,"Position":29.0,"HyperDash":false}]},{"StartTime":16020.0,"Objects":[{"StartTime":16020.0,"Position":130.0,"HyperDash":false}]},{"StartTime":16108.0,"Objects":[{"StartTime":16108.0,"Position":130.0,"HyperDash":false}]},{"StartTime":16195.0,"Objects":[{"StartTime":16195.0,"Position":130.0,"HyperDash":false},{"StartTime":16264.0,"Position":176.33783,"HyperDash":false},{"StartTime":16370.0,"Position":203.709747,"HyperDash":false}]},{"StartTime":16546.0,"Objects":[{"StartTime":16546.0,"Position":287.0,"HyperDash":false}]},{"StartTime":16722.0,"Objects":[{"StartTime":16722.0,"Position":402.0,"HyperDash":false},{"StartTime":16791.0,"Position":440.382324,"HyperDash":false},{"StartTime":16897.0,"Position":476.5204,"HyperDash":false}]},{"StartTime":17073.0,"Objects":[{"StartTime":17073.0,"Position":326.0,"HyperDash":false},{"StartTime":17142.0,"Position":279.617676,"HyperDash":false},{"StartTime":17248.0,"Position":251.479614,"HyperDash":false}]},{"StartTime":17423.0,"Objects":[{"StartTime":17423.0,"Position":125.0,"HyperDash":false},{"StartTime":17492.0,"Position":122.322762,"HyperDash":false},{"StartTime":17598.0,"Position":119.049225,"HyperDash":false}]},{"StartTime":17774.0,"Objects":[{"StartTime":17774.0,"Position":125.0,"HyperDash":false}]},{"StartTime":17862.0,"Objects":[{"StartTime":17862.0,"Position":125.0,"HyperDash":false}]},{"StartTime":17950.0,"Objects":[{"StartTime":17950.0,"Position":125.0,"HyperDash":false},{"StartTime":18019.0,"Position":142.158081,"HyperDash":false},{"StartTime":18125.0,"Position":198.3747,"HyperDash":false}]},{"StartTime":18301.0,"Objects":[{"StartTime":18301.0,"Position":245.0,"HyperDash":false},{"StartTime":18388.0,"Position":193.484589,"HyperDash":false},{"StartTime":18476.0,"Position":170.83812,"HyperDash":false},{"StartTime":18545.0,"Position":133.486023,"HyperDash":false},{"StartTime":18651.0,"Position":97.91507,"HyperDash":false}]},{"StartTime":18827.0,"Objects":[{"StartTime":18827.0,"Position":15.0,"HyperDash":false}]},{"StartTime":18915.0,"Objects":[{"StartTime":18915.0,"Position":15.0,"HyperDash":false}]},{"StartTime":19002.0,"Objects":[{"StartTime":19002.0,"Position":15.0,"HyperDash":false},{"StartTime":19071.0,"Position":21.7103615,"HyperDash":false},{"StartTime":19177.0,"Position":4.26349068,"HyperDash":false}]},{"StartTime":19353.0,"Objects":[{"StartTime":19353.0,"Position":0.0,"HyperDash":false}]},{"StartTime":19529.0,"Objects":[{"StartTime":19529.0,"Position":137.0,"HyperDash":false},{"StartTime":19598.0,"Position":169.483047,"HyperDash":false},{"StartTime":19704.0,"Position":210.398544,"HyperDash":false}]},{"StartTime":19880.0,"Objects":[{"StartTime":19880.0,"Position":328.0,"HyperDash":false},{"StartTime":19949.0,"Position":319.217133,"HyperDash":false},{"StartTime":20055.0,"Position":318.546051,"HyperDash":false}]},{"StartTime":20230.0,"Objects":[{"StartTime":20230.0,"Position":264.0,"HyperDash":false}]},{"StartTime":20318.0,"Objects":[{"StartTime":20318.0,"Position":264.0,"HyperDash":false}]},{"StartTime":20406.0,"Objects":[{"StartTime":20406.0,"Position":264.0,"HyperDash":false},{"StartTime":20493.0,"Position":295.147522,"HyperDash":false},{"StartTime":20581.0,"Position":330.866455,"HyperDash":false},{"StartTime":20650.0,"Position":359.710419,"HyperDash":false},{"StartTime":20756.0,"Position":396.14447,"HyperDash":false}]},{"StartTime":21108.0,"Objects":[{"StartTime":21108.0,"Position":412.0,"HyperDash":false},{"StartTime":21195.0,"Position":395.0836,"HyperDash":false},{"StartTime":21283.0,"Position":414.179626,"HyperDash":false},{"StartTime":21370.0,"Position":423.2632,"HyperDash":false},{"StartTime":21458.0,"Position":416.359283,"HyperDash":false},{"StartTime":21528.0,"Position":397.23114,"HyperDash":false},{"StartTime":21634.0,"Position":418.551361,"HyperDash":false}]},{"StartTime":21809.0,"Objects":[{"StartTime":21809.0,"Position":496.0,"HyperDash":false},{"StartTime":21896.0,"Position":491.214264,"HyperDash":false},{"StartTime":21984.0,"Position":496.431,"HyperDash":false},{"StartTime":22053.0,"Position":504.600922,"HyperDash":false},{"StartTime":22159.0,"Position":496.862,"HyperDash":false}]},{"StartTime":22336.0,"Objects":[{"StartTime":22336.0,"Position":499.0,"HyperDash":false}]},{"StartTime":22511.0,"Objects":[{"StartTime":22511.0,"Position":379.0,"HyperDash":false},{"StartTime":22598.0,"Position":360.8092,"HyperDash":false},{"StartTime":22686.0,"Position":345.0908,"HyperDash":false},{"StartTime":22773.0,"Position":309.7649,"HyperDash":false},{"StartTime":22861.0,"Position":307.9739,"HyperDash":false},{"StartTime":22931.0,"Position":312.241852,"HyperDash":false},{"StartTime":23037.0,"Position":271.985718,"HyperDash":false}]},{"StartTime":23213.0,"Objects":[{"StartTime":23213.0,"Position":322.0,"HyperDash":false},{"StartTime":23300.0,"Position":336.858,"HyperDash":false},{"StartTime":23388.0,"Position":327.7828,"HyperDash":false},{"StartTime":23457.0,"Position":329.661743,"HyperDash":false},{"StartTime":23563.0,"Position":317.734131,"HyperDash":false}]},{"StartTime":23739.0,"Objects":[{"StartTime":23739.0,"Position":240.0,"HyperDash":false}]},{"StartTime":23915.0,"Objects":[{"StartTime":23915.0,"Position":345.0,"HyperDash":false},{"StartTime":23984.0,"Position":381.55426,"HyperDash":false},{"StartTime":24090.0,"Position":419.956451,"HyperDash":false}]},{"StartTime":24266.0,"Objects":[{"StartTime":24266.0,"Position":283.0,"HyperDash":false}]},{"StartTime":24441.0,"Objects":[{"StartTime":24441.0,"Position":111.0,"HyperDash":false},{"StartTime":24510.0,"Position":97.44574,"HyperDash":false},{"StartTime":24616.0,"Position":36.04355,"HyperDash":false}]},{"StartTime":24792.0,"Objects":[{"StartTime":24792.0,"Position":173.0,"HyperDash":false}]},{"StartTime":24967.0,"Objects":[{"StartTime":24967.0,"Position":263.0,"HyperDash":false}]},{"StartTime":25055.0,"Objects":[{"StartTime":25055.0,"Position":280.0,"HyperDash":false}]},{"StartTime":25143.0,"Objects":[{"StartTime":25143.0,"Position":297.0,"HyperDash":false}]},{"StartTime":25230.0,"Objects":[{"StartTime":25230.0,"Position":314.0,"HyperDash":false}]},{"StartTime":25318.0,"Objects":[{"StartTime":25318.0,"Position":337.0,"HyperDash":false},{"StartTime":25376.0,"Position":334.666473,"HyperDash":false},{"StartTime":25434.0,"Position":337.0,"HyperDash":false},{"StartTime":25493.0,"Position":334.666473,"HyperDash":false},{"StartTime":25551.0,"Position":337.0,"HyperDash":false},{"StartTime":25610.0,"Position":334.666473,"HyperDash":false},{"StartTime":25668.0,"Position":337.0,"HyperDash":false}]},{"StartTime":25844.0,"Objects":[{"StartTime":25844.0,"Position":447.0,"HyperDash":false}]},{"StartTime":26020.0,"Objects":[{"StartTime":26020.0,"Position":436.0,"HyperDash":false}]},{"StartTime":26195.0,"Objects":[{"StartTime":26195.0,"Position":297.0,"HyperDash":false}]},{"StartTime":26546.0,"Objects":[{"StartTime":26546.0,"Position":297.0,"HyperDash":false},{"StartTime":26633.0,"Position":249.353119,"HyperDash":false},{"StartTime":26721.0,"Position":227.527557,"HyperDash":false},{"StartTime":26790.0,"Position":188.1133,"HyperDash":false},{"StartTime":26896.0,"Position":156.074387,"HyperDash":false}]},{"StartTime":27072.0,"Objects":[{"StartTime":27072.0,"Position":51.0,"HyperDash":false}]},{"StartTime":27247.0,"Objects":[{"StartTime":27247.0,"Position":185.0,"HyperDash":false},{"StartTime":27316.0,"Position":218.59346,"HyperDash":false},{"StartTime":27422.0,"Position":258.538177,"HyperDash":false}]},{"StartTime":27598.0,"Objects":[{"StartTime":27598.0,"Position":436.0,"HyperDash":false},{"StartTime":27667.0,"Position":416.406555,"HyperDash":false},{"StartTime":27773.0,"Position":362.461823,"HyperDash":false}]},{"StartTime":27949.0,"Objects":[{"StartTime":27949.0,"Position":151.0,"HyperDash":false},{"StartTime":28036.0,"Position":189.972488,"HyperDash":false},{"StartTime":28124.0,"Position":223.203812,"HyperDash":false},{"StartTime":28193.0,"Position":242.7229,"HyperDash":false},{"StartTime":28299.0,"Position":296.7707,"HyperDash":false}]},{"StartTime":28475.0,"Objects":[{"StartTime":28475.0,"Position":223.0,"HyperDash":false}]},{"StartTime":28651.0,"Objects":[{"StartTime":28651.0,"Position":296.0,"HyperDash":false},{"StartTime":28738.0,"Position":337.803925,"HyperDash":false},{"StartTime":28826.0,"Position":368.138336,"HyperDash":false},{"StartTime":28895.0,"Position":404.540863,"HyperDash":false},{"StartTime":29001.0,"Position":440.327179,"HyperDash":false}]},{"StartTime":29177.0,"Objects":[{"StartTime":29177.0,"Position":486.0,"HyperDash":false}]},{"StartTime":29353.0,"Objects":[{"StartTime":29353.0,"Position":366.0,"HyperDash":false},{"StartTime":29422.0,"Position":350.499329,"HyperDash":false},{"StartTime":29528.0,"Position":293.446533,"HyperDash":false}]},{"StartTime":29703.0,"Objects":[{"StartTime":29703.0,"Position":169.0,"HyperDash":false}]},{"StartTime":29879.0,"Objects":[{"StartTime":29879.0,"Position":245.0,"HyperDash":false}]},{"StartTime":30054.0,"Objects":[{"StartTime":30054.0,"Position":126.0,"HyperDash":false},{"StartTime":30123.0,"Position":155.500671,"HyperDash":false},{"StartTime":30229.0,"Position":198.553482,"HyperDash":false}]},{"StartTime":30404.0,"Objects":[{"StartTime":30404.0,"Position":323.0,"HyperDash":false}]},{"StartTime":30580.0,"Objects":[{"StartTime":30580.0,"Position":247.0,"HyperDash":false}]},{"StartTime":30756.0,"Objects":[{"StartTime":30756.0,"Position":349.0,"HyperDash":false},{"StartTime":30843.0,"Position":365.629761,"HyperDash":false},{"StartTime":30931.0,"Position":422.0551,"HyperDash":false},{"StartTime":31000.0,"Position":454.551147,"HyperDash":false},{"StartTime":31106.0,"Position":495.5697,"HyperDash":false}]},{"StartTime":31282.0,"Objects":[{"StartTime":31282.0,"Position":423.0,"HyperDash":false}]},{"StartTime":31458.0,"Objects":[{"StartTime":31458.0,"Position":323.0,"HyperDash":false},{"StartTime":31545.0,"Position":295.370239,"HyperDash":false},{"StartTime":31633.0,"Position":249.944885,"HyperDash":false},{"StartTime":31702.0,"Position":223.448853,"HyperDash":false},{"StartTime":31808.0,"Position":176.4303,"HyperDash":false}]},{"StartTime":31984.0,"Objects":[{"StartTime":31984.0,"Position":247.0,"HyperDash":false}]},{"StartTime":32160.0,"Objects":[{"StartTime":32160.0,"Position":99.0,"HyperDash":false},{"StartTime":32247.0,"Position":84.41518,"HyperDash":false},{"StartTime":32335.0,"Position":83.6537247,"HyperDash":false},{"StartTime":32404.0,"Position":71.69304,"HyperDash":false},{"StartTime":32510.0,"Position":108.235535,"HyperDash":false}]},{"StartTime":32686.0,"Objects":[{"StartTime":32686.0,"Position":164.0,"HyperDash":false}]},{"StartTime":32861.0,"Objects":[{"StartTime":32861.0,"Position":323.0,"HyperDash":false},{"StartTime":32930.0,"Position":362.799,"HyperDash":false},{"StartTime":33036.0,"Position":396.638153,"HyperDash":false}]},{"StartTime":33212.0,"Objects":[{"StartTime":33212.0,"Position":164.0,"HyperDash":false},{"StartTime":33281.0,"Position":116.200989,"HyperDash":false},{"StartTime":33387.0,"Position":90.36186,"HyperDash":false}]},{"StartTime":33563.0,"Objects":[{"StartTime":33563.0,"Position":323.0,"HyperDash":false},{"StartTime":33632.0,"Position":336.507568,"HyperDash":false},{"StartTime":33738.0,"Position":323.911469,"HyperDash":true}]},{"StartTime":33914.0,"Objects":[{"StartTime":33914.0,"Position":78.0,"HyperDash":false},{"StartTime":33983.0,"Position":82.492424,"HyperDash":false},{"StartTime":34089.0,"Position":77.08854,"HyperDash":false}]},{"StartTime":34265.0,"Objects":[{"StartTime":34265.0,"Position":234.0,"HyperDash":false},{"StartTime":34352.0,"Position":191.5233,"HyperDash":false},{"StartTime":34440.0,"Position":164.09671,"HyperDash":false},{"StartTime":34509.0,"Position":134.647873,"HyperDash":false},{"StartTime":34615.0,"Position":89.6628342,"HyperDash":false}]},{"StartTime":34791.0,"Objects":[{"StartTime":34791.0,"Position":148.0,"HyperDash":false}]},{"StartTime":34967.0,"Objects":[{"StartTime":34967.0,"Position":175.0,"HyperDash":false},{"StartTime":35054.0,"Position":199.913467,"HyperDash":false},{"StartTime":35142.0,"Position":201.876785,"HyperDash":false},{"StartTime":35211.0,"Position":207.491714,"HyperDash":false},{"StartTime":35317.0,"Position":181.816238,"HyperDash":false}]},{"StartTime":35493.0,"Objects":[{"StartTime":35493.0,"Position":94.0,"HyperDash":false}]},{"StartTime":35668.0,"Objects":[{"StartTime":35668.0,"Position":95.0,"HyperDash":false},{"StartTime":35755.0,"Position":137.9405,"HyperDash":false},{"StartTime":35843.0,"Position":163.627121,"HyperDash":false},{"StartTime":35912.0,"Position":197.017715,"HyperDash":false},{"StartTime":36018.0,"Position":234.539215,"HyperDash":false}]},{"StartTime":36195.0,"Objects":[{"StartTime":36195.0,"Position":319.0,"HyperDash":false}]},{"StartTime":36370.0,"Objects":[{"StartTime":36370.0,"Position":251.0,"HyperDash":false},{"StartTime":36457.0,"Position":231.0595,"HyperDash":false},{"StartTime":36545.0,"Position":182.372879,"HyperDash":false},{"StartTime":36614.0,"Position":153.982285,"HyperDash":false},{"StartTime":36720.0,"Position":111.460777,"HyperDash":false}]},{"StartTime":36896.0,"Objects":[{"StartTime":36896.0,"Position":175.0,"HyperDash":false}]},{"StartTime":37072.0,"Objects":[{"StartTime":37072.0,"Position":229.0,"HyperDash":false}]},{"StartTime":37160.0,"Objects":[{"StartTime":37160.0,"Position":245.0,"HyperDash":false}]},{"StartTime":37247.0,"Objects":[{"StartTime":37247.0,"Position":261.0,"HyperDash":false}]},{"StartTime":37335.0,"Objects":[{"StartTime":37335.0,"Position":277.0,"HyperDash":false}]},{"StartTime":37423.0,"Objects":[{"StartTime":37423.0,"Position":292.0,"HyperDash":false},{"StartTime":37492.0,"Position":308.471649,"HyperDash":false},{"StartTime":37598.0,"Position":366.746948,"HyperDash":false}]},{"StartTime":37774.0,"Objects":[{"StartTime":37774.0,"Position":491.0,"HyperDash":false}]},{"StartTime":38124.0,"Objects":[{"StartTime":38124.0,"Position":491.0,"HyperDash":false}]},{"StartTime":38300.0,"Objects":[{"StartTime":38300.0,"Position":422.0,"HyperDash":false}]},{"StartTime":38475.0,"Objects":[{"StartTime":38475.0,"Position":388.0,"HyperDash":false}]},{"StartTime":38826.0,"Objects":[{"StartTime":38826.0,"Position":388.0,"HyperDash":false}]},{"StartTime":39002.0,"Objects":[{"StartTime":39002.0,"Position":270.0,"HyperDash":false}]},{"StartTime":39177.0,"Objects":[{"StartTime":39177.0,"Position":305.0,"HyperDash":false},{"StartTime":39264.0,"Position":31.0,"HyperDash":false},{"StartTime":39352.0,"Position":421.0,"HyperDash":false},{"StartTime":39440.0,"Position":145.0,"HyperDash":false},{"StartTime":39528.0,"Position":318.0,"HyperDash":false},{"StartTime":39615.0,"Position":249.0,"HyperDash":false},{"StartTime":39703.0,"Position":147.0,"HyperDash":false},{"StartTime":39791.0,"Position":302.0,"HyperDash":false},{"StartTime":39879.0,"Position":212.0,"HyperDash":false},{"StartTime":39966.0,"Position":427.0,"HyperDash":false},{"StartTime":40054.0,"Position":116.0,"HyperDash":false},{"StartTime":40142.0,"Position":508.0,"HyperDash":false},{"StartTime":40230.0,"Position":417.0,"HyperDash":false},{"StartTime":40317.0,"Position":302.0,"HyperDash":false},{"StartTime":40405.0,"Position":132.0,"HyperDash":false},{"StartTime":40493.0,"Position":352.0,"HyperDash":false},{"StartTime":40581.0,"Position":174.0,"HyperDash":false}]}]}
+{
+  "Mappings": [
+    {
+      "StartTime": 1459.0,
+      "Objects": [
+        {
+          "StartTime": 1459.0,
+          "Position": 150.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 1809.0,
+      "Objects": [
+        {
+          "StartTime": 1809.0,
+          "Position": 150.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1896.5,
+          "Position": 173.47052,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1984.438596491228,
+          "Position": 224.94102,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2072.157894736842,
+          "Position": 262.41153,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 2160.0,
+      "Objects": [
+        {
+          "StartTime": 2160.0,
+          "Position": 281.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2229.5,
+          "Position": 286.0597,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2335.438596491228,
+          "Position": 285.14685,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 2511.0,
+      "Objects": [
+        {
+          "StartTime": 2511.0,
+          "Position": 272.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 2687.0,
+      "Objects": [
+        {
+          "StartTime": 2687.0,
+          "Position": 367.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2774.5,
+          "Position": 395.16608,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2862.438596491228,
+          "Position": 385.35294,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 2931.938596491228,
+          "Position": 384.50586,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 3037.877192982456,
+          "Position": 371.18475,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 3213.0,
+      "Objects": [
+        {
+          "StartTime": 3213.0,
+          "Position": 278.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 3388.0,
+      "Objects": [
+        {
+          "StartTime": 3388.0,
+          "Position": 113.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 3476.0,
+      "Objects": [
+        {
+          "StartTime": 3476.0,
+          "Position": 116.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 3564.0,
+      "Objects": [
+        {
+          "StartTime": 3564.0,
+          "Position": 121.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 3607.859649122807,
+          "Position": 121.72062,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 3651.7192982456136,
+          "Position": 121.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 3695.578947368421,
+          "Position": 121.72062,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 3739.4385964912276,
+          "Position": 121.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 3783.298245614035,
+          "Position": 121.72062,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 3827.1578947368416,
+          "Position": 121.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 3871.017543859649,
+          "Position": 121.72062,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 3914.877192982456,
+          "Position": 121.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 4266.0,
+      "Objects": [
+        {
+          "StartTime": 4266.0,
+          "Position": 368.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 4353.5,
+          "Position": 395.23666,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 4441.438596491228,
+          "Position": 430.60608,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 4510.938596491228,
+          "Position": 453.1407,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 4616.877192982456,
+          "Position": 498.8474,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 4792.0,
+      "Objects": [
+        {
+          "StartTime": 4792.0,
+          "Position": 440.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 4967.0,
+      "Objects": [
+        {
+          "StartTime": 4967.0,
+          "Position": 289.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 5036.5,
+          "Position": 249.99872,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 5142.438596491228,
+          "Position": 216.52997,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 5318.0,
+      "Objects": [
+        {
+          "StartTime": 5318.0,
+          "Position": 105.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 5494.0,
+      "Objects": [
+        {
+          "StartTime": 5494.0,
+          "Position": 119.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 5581.5,
+          "Position": 97.90795,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 5669.438596491228,
+          "Position": 97.15589,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 5738.938596491228,
+          "Position": 108.898254,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 5844.877192982456,
+          "Position": 132.87062,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 6020.0,
+      "Objects": [
+        {
+          "StartTime": 6020.0,
+          "Position": 192.0,
+          "HyperDash": true
+        }
+      ]
+    },
+    {
+      "StartTime": 6195.0,
+      "Objects": [
+        {
+          "StartTime": 6195.0,
+          "Position": 451.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 6282.5,
+          "Position": 418.67276,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 6370.438596491228,
+          "Position": 392.28226,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 6439.938596491228,
+          "Position": 344.68658,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 6545.877192982456,
+          "Position": 323.91867,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 6722.0,
+      "Objects": [
+        {
+          "StartTime": 6722.0,
+          "Position": 380.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 6897.0,
+      "Objects": [
+        {
+          "StartTime": 6897.0,
+          "Position": 334.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 6985.0,
+      "Objects": [
+        {
+          "StartTime": 6985.0,
+          "Position": 334.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 7073.0,
+      "Objects": [
+        {
+          "StartTime": 7073.0,
+          "Position": 334.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 7160.5,
+          "Position": 337.3466,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 7248.438596491228,
+          "Position": 347.8767,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 7317.938596491228,
+          "Position": 360.55264,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 7423.877192982456,
+          "Position": 326.42657,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 7599.0,
+      "Objects": [
+        {
+          "StartTime": 7599.0,
+          "Position": 281.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 7774.0,
+      "Objects": [
+        {
+          "StartTime": 7774.0,
+          "Position": 140.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 7950.0,
+      "Objects": [
+        {
+          "StartTime": 7950.0,
+          "Position": 274.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 8125.0,
+      "Objects": [
+        {
+          "StartTime": 8125.0,
+          "Position": 138.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 8301.0,
+      "Objects": [
+        {
+          "StartTime": 8301.0,
+          "Position": 266.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 8388.5,
+          "Position": 316.47003,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 8476.438596491227,
+          "Position": 340.94006,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 8545.938596491227,
+          "Position": 354.72125,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 8651.877192982456,
+          "Position": 415.88013,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 8827.0,
+      "Objects": [
+        {
+          "StartTime": 8827.0,
+          "Position": 512.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 9002.0,
+      "Objects": [
+        {
+          "StartTime": 9002.0,
+          "Position": 490.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 9089.5,
+          "Position": 482.8625,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 9177.438596491227,
+          "Position": 439.08896,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 9246.938596491227,
+          "Position": 414.2601,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 9352.877192982456,
+          "Position": 366.1419,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 9529.0,
+      "Objects": [
+        {
+          "StartTime": 9529.0,
+          "Position": 260.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 9598.5,
+          "Position": 240.81621,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 9704.438596491227,
+          "Position": 261.72003,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 9792.0,
+      "Objects": [
+        {
+          "StartTime": 9792.0,
+          "Position": 267.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 9880.0,
+      "Objects": [
+        {
+          "StartTime": 9880.0,
+          "Position": 267.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 9967.5,
+          "Position": 235.18703,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 10055.438596491227,
+          "Position": 203.0757,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 10124.938596491227,
+          "Position": 187.38449,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 10230.877192982456,
+          "Position": 130.59961,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 10406.0,
+      "Objects": [
+        {
+          "StartTime": 10406.0,
+          "Position": 185.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 10581.0,
+      "Objects": [
+        {
+          "StartTime": 10581.0,
+          "Position": 177.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 10650.5,
+          "Position": 192.59297,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 10756.438596491227,
+          "Position": 249.52145,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 10932.0,
+      "Objects": [
+        {
+          "StartTime": 10932.0,
+          "Position": 352.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 11108.0,
+      "Objects": [
+        {
+          "StartTime": 11108.0,
+          "Position": 436.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 11177.5,
+          "Position": 447.27573,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 11283.438596491227,
+          "Position": 509.66815,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 11458.0,
+      "Objects": [
+        {
+          "StartTime": 11458.0,
+          "Position": 368.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 11527.5,
+          "Position": 323.72427,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 11633.438596491227,
+          "Position": 294.33185,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 11809.0,
+      "Objects": [
+        {
+          "StartTime": 11809.0,
+          "Position": 181.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 11878.5,
+          "Position": 187.95796,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 11984.438596491227,
+          "Position": 184.93793,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 12160.0,
+      "Objects": [
+        {
+          "StartTime": 12160.0,
+          "Position": 221.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 12248.0,
+      "Objects": [
+        {
+          "StartTime": 12248.0,
+          "Position": 221.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 12336.0,
+      "Objects": [
+        {
+          "StartTime": 12336.0,
+          "Position": 221.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 12405.5,
+          "Position": 267.18994,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 12511.438596491227,
+          "Position": 293.24704,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 12687.0,
+      "Objects": [
+        {
+          "StartTime": 12687.0,
+          "Position": 440.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 12774.5,
+          "Position": 403.67584,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 12862.438596491227,
+          "Position": 366.35614,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 12931.938596491227,
+          "Position": 336.65372,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 13037.877192982456,
+          "Position": 292.8259,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 13213.0,
+      "Objects": [
+        {
+          "StartTime": 13213.0,
+          "Position": 330.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 13301.0,
+      "Objects": [
+        {
+          "StartTime": 13301.0,
+          "Position": 330.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 13388.0,
+      "Objects": [
+        {
+          "StartTime": 13388.0,
+          "Position": 330.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 13457.5,
+          "Position": 378.74652,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 13563.438596491227,
+          "Position": 404.69293,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 13739.0,
+      "Objects": [
+        {
+          "StartTime": 13739.0,
+          "Position": 494.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 13915.0,
+      "Objects": [
+        {
+          "StartTime": 13915.0,
+          "Position": 321.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 14002.0,
+      "Objects": [
+        {
+          "StartTime": 14002.0,
+          "Position": 321.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 14090.0,
+      "Objects": [
+        {
+          "StartTime": 14090.0,
+          "Position": 321.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 14159.5,
+          "Position": 344.93787,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 14265.438596491227,
+          "Position": 391.07343,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 14441.0,
+      "Objects": [
+        {
+          "StartTime": 14441.0,
+          "Position": 231.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 14616.0,
+      "Objects": [
+        {
+          "StartTime": 14616.0,
+          "Position": 188.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 14703.5,
+          "Position": 182.95427,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 14791.438596491227,
+          "Position": 176.83264,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 14860.938596491227,
+          "Position": 190.06429,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 14966.877192982456,
+          "Position": 188.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 15143.0,
+      "Objects": [
+        {
+          "StartTime": 15143.0,
+          "Position": 125.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 15230.5,
+          "Position": 105.14162,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 15318.438596491227,
+          "Position": 59.582436,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 15406.157894736842,
+          "Position": 22.949234,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 15494.0,
+      "Objects": [
+        {
+          "StartTime": 15494.0,
+          "Position": 17.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 15563.5,
+          "Position": 33.38478,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 15669.438596491227,
+          "Position": 20.484606,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 15844.0,
+      "Objects": [
+        {
+          "StartTime": 15844.0,
+          "Position": 29.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 16020.0,
+      "Objects": [
+        {
+          "StartTime": 16020.0,
+          "Position": 130.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 16108.0,
+      "Objects": [
+        {
+          "StartTime": 16108.0,
+          "Position": 130.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 16195.0,
+      "Objects": [
+        {
+          "StartTime": 16195.0,
+          "Position": 130.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 16264.5,
+          "Position": 176.57608,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 16370.438596491227,
+          "Position": 203.70331,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 16546.0,
+      "Objects": [
+        {
+          "StartTime": 16546.0,
+          "Position": 287.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 16722.0,
+      "Objects": [
+        {
+          "StartTime": 16722.0,
+          "Position": 402.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 16791.5,
+          "Position": 440.6144,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 16897.43859649123,
+          "Position": 476.5204,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 17073.0,
+      "Objects": [
+        {
+          "StartTime": 17073.0,
+          "Position": 326.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 17142.5,
+          "Position": 280.3856,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 17248.43859649123,
+          "Position": 251.47961,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 17423.0,
+      "Objects": [
+        {
+          "StartTime": 17423.0,
+          "Position": 125.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 17492.5,
+          "Position": 122.252205,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 17598.43859649123,
+          "Position": 119.13002,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 17774.0,
+      "Objects": [
+        {
+          "StartTime": 17774.0,
+          "Position": 125.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 17862.0,
+      "Objects": [
+        {
+          "StartTime": 17862.0,
+          "Position": 125.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 17950.0,
+      "Objects": [
+        {
+          "StartTime": 17950.0,
+          "Position": 125.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 18019.5,
+          "Position": 143.39525,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 18125.43859649123,
+          "Position": 198.36084,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 18301.0,
+      "Objects": [
+        {
+          "StartTime": 18301.0,
+          "Position": 245.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 18388.5,
+          "Position": 194.26259,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 18476.43859649123,
+          "Position": 170.835,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 18545.93859649123,
+          "Position": 134.25737,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 18651.877192982454,
+          "Position": 97.8943,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 18827.0,
+      "Objects": [
+        {
+          "StartTime": 18827.0,
+          "Position": 15.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 18915.0,
+      "Objects": [
+        {
+          "StartTime": 18915.0,
+          "Position": 15.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 19002.0,
+      "Objects": [
+        {
+          "StartTime": 19002.0,
+          "Position": 15.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 19071.5,
+          "Position": 21.707783,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 19177.43859649123,
+          "Position": 4.309924,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 19353.0,
+      "Objects": [
+        {
+          "StartTime": 19353.0,
+          "Position": 0.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 19529.0,
+      "Objects": [
+        {
+          "StartTime": 19529.0,
+          "Position": 137.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 19598.5,
+          "Position": 169.71786,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 19704.43859649123,
+          "Position": 210.39275,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 19880.0,
+      "Objects": [
+        {
+          "StartTime": 19880.0,
+          "Position": 328.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 19949.5,
+          "Position": 320.15897,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 20055.43859649123,
+          "Position": 318.50848,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 20230.0,
+      "Objects": [
+        {
+          "StartTime": 20230.0,
+          "Position": 264.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 20318.0,
+      "Objects": [
+        {
+          "StartTime": 20318.0,
+          "Position": 264.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 20406.0,
+      "Objects": [
+        {
+          "StartTime": 20406.0,
+          "Position": 264.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 20493.5,
+          "Position": 295.3398,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 20581.43859649123,
+          "Position": 330.86734,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 20650.93859649123,
+          "Position": 359.95764,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 20756.877192982454,
+          "Position": 396.13123,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 21108.0,
+      "Objects": [
+        {
+          "StartTime": 21108.0,
+          "Position": 412.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 21195.5,
+          "Position": 396.0919,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 21283.43859649123,
+          "Position": 414.18378,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 21370.93859649123,
+          "Position": 423.2757,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 21458.877192982454,
+          "Position": 416.36758,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 21528.877192982454,
+          "Position": 398.2354,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 21634.315789473683,
+          "Position": 418.55136,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 21809.0,
+      "Objects": [
+        {
+          "StartTime": 21809.0,
+          "Position": 496.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 21896.5,
+          "Position": 492.2155,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 21984.43859649123,
+          "Position": 496.431,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 22053.93859649123,
+          "Position": 504.6023,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 22159.877192982454,
+          "Position": 496.862,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 22336.0,
+      "Objects": [
+        {
+          "StartTime": 22336.0,
+          "Position": 499.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 22511.0,
+      "Objects": [
+        {
+          "StartTime": 22511.0,
+          "Position": 379.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 22598.5,
+          "Position": 361.70126,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 22686.43859649123,
+          "Position": 345.03217,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 22773.93859649123,
+          "Position": 310.54642,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 22861.877192982454,
+          "Position": 307.82315,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 22931.877192982454,
+          "Position": 312.1711,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 23037.315789473683,
+          "Position": 271.9992,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 23213.0,
+      "Objects": [
+        {
+          "StartTime": 23213.0,
+          "Position": 322.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 23300.5,
+          "Position": 336.94174,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 23388.43859649123,
+          "Position": 327.8646,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 23457.93859649123,
+          "Position": 329.60526,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 23563.877192982454,
+          "Position": 317.73434,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 23739.0,
+      "Objects": [
+        {
+          "StartTime": 23739.0,
+          "Position": 240.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 23915.0,
+      "Objects": [
+        {
+          "StartTime": 23915.0,
+          "Position": 345.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 23984.5,
+          "Position": 381.7877,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 24090.43859649123,
+          "Position": 419.95645,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 24266.0,
+      "Objects": [
+        {
+          "StartTime": 24266.0,
+          "Position": 283.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 24441.0,
+      "Objects": [
+        {
+          "StartTime": 24441.0,
+          "Position": 111.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 24510.5,
+          "Position": 97.21231,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 24616.43859649123,
+          "Position": 36.04355,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 24792.0,
+      "Objects": [
+        {
+          "StartTime": 24792.0,
+          "Position": 173.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 24967.0,
+      "Objects": [
+        {
+          "StartTime": 24967.0,
+          "Position": 263.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 25055.0,
+      "Objects": [
+        {
+          "StartTime": 25055.0,
+          "Position": 280.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 25143.0,
+      "Objects": [
+        {
+          "StartTime": 25143.0,
+          "Position": 297.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 25230.0,
+      "Objects": [
+        {
+          "StartTime": 25230.0,
+          "Position": 314.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 25318.0,
+      "Objects": [
+        {
+          "StartTime": 25318.0,
+          "Position": 337.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 25376.479532163743,
+          "Position": 334.66647,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 25434.959064327486,
+          "Position": 337.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 25493.43859649123,
+          "Position": 334.66647,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 25551.918128654972,
+          "Position": 337.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 25610.397660818715,
+          "Position": 334.66647,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 25668.877192982454,
+          "Position": 337.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 25844.0,
+      "Objects": [
+        {
+          "StartTime": 25844.0,
+          "Position": 447.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 26020.0,
+      "Objects": [
+        {
+          "StartTime": 26020.0,
+          "Position": 436.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 26195.0,
+      "Objects": [
+        {
+          "StartTime": 26195.0,
+          "Position": 297.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 26546.0,
+      "Objects": [
+        {
+          "StartTime": 26546.0,
+          "Position": 297.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 26633.5,
+          "Position": 250.13602,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 26721.43859649123,
+          "Position": 227.51764,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 26790.93859649123,
+          "Position": 188.86887,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 26896.877192982454,
+          "Position": 156.10947,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 27072.0,
+      "Objects": [
+        {
+          "StartTime": 27072.0,
+          "Position": 51.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 27247.0,
+      "Objects": [
+        {
+          "StartTime": 27247.0,
+          "Position": 185.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 27316.5,
+          "Position": 218.82233,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 27422.43859649123,
+          "Position": 258.53796,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 27598.0,
+      "Objects": [
+        {
+          "StartTime": 27598.0,
+          "Position": 436.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 27667.5,
+          "Position": 416.17767,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 27773.43859649123,
+          "Position": 362.46204,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 27949.0,
+      "Objects": [
+        {
+          "StartTime": 27949.0,
+          "Position": 151.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 28036.5,
+          "Position": 190.17355,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 28124.43859649123,
+          "Position": 223.21202,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 28193.93859649123,
+          "Position": 243.95952,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 28299.877192982454,
+          "Position": 296.78406,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 28475.0,
+      "Objects": [
+        {
+          "StartTime": 28475.0,
+          "Position": 223.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 28651.0,
+      "Objects": [
+        {
+          "StartTime": 28651.0,
+          "Position": 296.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 28738.5,
+          "Position": 338.02545,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 28826.43859649123,
+          "Position": 368.14728,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 28895.93859649123,
+          "Position": 404.7656,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 29001.877192982454,
+          "Position": 440.3157,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 29177.0,
+      "Objects": [
+        {
+          "StartTime": 29177.0,
+          "Position": 486.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 29353.0,
+      "Objects": [
+        {
+          "StartTime": 29353.0,
+          "Position": 366.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 29422.5,
+          "Position": 350.27914,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 29528.43859649123,
+          "Position": 293.44696,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 29703.0,
+      "Objects": [
+        {
+          "StartTime": 29703.0,
+          "Position": 169.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 29879.0,
+      "Objects": [
+        {
+          "StartTime": 29879.0,
+          "Position": 245.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 30054.0,
+      "Objects": [
+        {
+          "StartTime": 30054.0,
+          "Position": 126.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 30123.5,
+          "Position": 155.72087,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 30229.43859649123,
+          "Position": 198.55304,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 30404.0,
+      "Objects": [
+        {
+          "StartTime": 30404.0,
+          "Position": 323.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 30580.0,
+      "Objects": [
+        {
+          "StartTime": 30580.0,
+          "Position": 247.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 30756.0,
+      "Objects": [
+        {
+          "StartTime": 30756.0,
+          "Position": 349.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 30843.5,
+          "Position": 366.84543,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 30931.43859649123,
+          "Position": 422.06512,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 31000.93859649123,
+          "Position": 454.79724,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 31106.877192982454,
+          "Position": 495.5561,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 31282.0,
+      "Objects": [
+        {
+          "StartTime": 31282.0,
+          "Position": 423.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 31458.0,
+      "Objects": [
+        {
+          "StartTime": 31458.0,
+          "Position": 323.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 31545.5,
+          "Position": 295.15457,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 31633.43859649123,
+          "Position": 249.93488,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 31702.93859649123,
+          "Position": 223.20276,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 31808.877192982454,
+          "Position": 176.44391,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 31984.0,
+      "Objects": [
+        {
+          "StartTime": 31984.0,
+          "Position": 247.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 32160.0,
+      "Objects": [
+        {
+          "StartTime": 32160.0,
+          "Position": 99.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 32247.5,
+          "Position": 85.414154,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 32335.43859649123,
+          "Position": 83.62852,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 32404.93859649123,
+          "Position": 72.79054,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 32510.877192982454,
+          "Position": 108.225136,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 32686.0,
+      "Objects": [
+        {
+          "StartTime": 32686.0,
+          "Position": 164.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 32861.0,
+      "Objects": [
+        {
+          "StartTime": 32861.0,
+          "Position": 323.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 32930.5,
+          "Position": 363.0276,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 33036.43859649123,
+          "Position": 396.63647,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 33212.0,
+      "Objects": [
+        {
+          "StartTime": 33212.0,
+          "Position": 164.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 33281.5,
+          "Position": 116.97241,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 33387.43859649123,
+          "Position": 90.363525,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 33563.0,
+      "Objects": [
+        {
+          "StartTime": 33563.0,
+          "Position": 323.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 33632.5,
+          "Position": 336.5562,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 33738.43859649123,
+          "Position": 323.95444,
+          "HyperDash": true
+        }
+      ]
+    },
+    {
+      "StartTime": 33914.0,
+      "Objects": [
+        {
+          "StartTime": 33914.0,
+          "Position": 78.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 33983.5,
+          "Position": 82.44378,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 34089.43859649123,
+          "Position": 77.04557,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 34265.0,
+      "Objects": [
+        {
+          "StartTime": 34265.0,
+          "Position": 234.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 34352.5,
+          "Position": 192.32622,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 34440.43859649123,
+          "Position": 164.09048,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 34509.93859649123,
+          "Position": 134.40361,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 34615.87719298246,
+          "Position": 89.65602,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 34791.0,
+      "Objects": [
+        {
+          "StartTime": 34791.0,
+          "Position": 148.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 34967.0,
+      "Objects": [
+        {
+          "StartTime": 34967.0,
+          "Position": 175.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 35054.5,
+          "Position": 200.012,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 35142.43859649123,
+          "Position": 201.80096,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 35211.93859649123,
+          "Position": 207.4338,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 35317.87719298246,
+          "Position": 181.74908,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 35493.0,
+      "Objects": [
+        {
+          "StartTime": 35493.0,
+          "Position": 94.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 35668.0,
+      "Objects": [
+        {
+          "StartTime": 35668.0,
+          "Position": 95.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 35755.5,
+          "Position": 138.13641,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 35843.43859649123,
+          "Position": 163.63821,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 35912.93859649123,
+          "Position": 197.25366,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 36018.87719298246,
+          "Position": 234.50798,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 36195.0,
+      "Objects": [
+        {
+          "StartTime": 36195.0,
+          "Position": 319.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 36370.0,
+      "Objects": [
+        {
+          "StartTime": 36370.0,
+          "Position": 251.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 36457.5,
+          "Position": 230.86359,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 36545.43859649123,
+          "Position": 182.36179,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 36614.93859649123,
+          "Position": 153.74634,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 36720.87719298246,
+          "Position": 111.49202,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 36896.0,
+      "Objects": [
+        {
+          "StartTime": 36896.0,
+          "Position": 175.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 37072.0,
+      "Objects": [
+        {
+          "StartTime": 37072.0,
+          "Position": 229.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 37160.0,
+      "Objects": [
+        {
+          "StartTime": 37160.0,
+          "Position": 245.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 37247.0,
+      "Objects": [
+        {
+          "StartTime": 37247.0,
+          "Position": 261.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 37335.0,
+      "Objects": [
+        {
+          "StartTime": 37335.0,
+          "Position": 277.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 37423.0,
+      "Objects": [
+        {
+          "StartTime": 37423.0,
+          "Position": 292.0,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 37492.5,
+          "Position": 309.70444,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 37598.43859649123,
+          "Position": 366.74695,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 37774.0,
+      "Objects": [
+        {
+          "StartTime": 37774.0,
+          "Position": 491.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 38124.0,
+      "Objects": [
+        {
+          "StartTime": 38124.0,
+          "Position": 491.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 38300.0,
+      "Objects": [
+        {
+          "StartTime": 38300.0,
+          "Position": 422.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 38475.0,
+      "Objects": [
+        {
+          "StartTime": 38475.0,
+          "Position": 388.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 38826.0,
+      "Objects": [
+        {
+          "StartTime": 38826.0,
+          "Position": 388.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 39002.0,
+      "Objects": [
+        {
+          "StartTime": 39002.0,
+          "Position": 270.0,
+          "HyperDash": false
+        }
+      ]
+    },
+    {
+      "StartTime": 39177.0,
+      "Objects": [
+        {
+          "StartTime": 39177.0,
+          "Position": 305.7685,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 39264.75,
+          "Position": 31.80076,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 39352.5,
+          "Position": 421.8655,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 39440.25,
+          "Position": 145.97983,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 39528.0,
+          "Position": 318.71332,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 39615.75,
+          "Position": 249.84927,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 39703.5,
+          "Position": 147.25017,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 39791.25,
+          "Position": 302.46097,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 39879.0,
+          "Position": 212.06068,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 39966.75,
+          "Position": 427.1585,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 40054.5,
+          "Position": 116.00614,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 40142.25,
+          "Position": 508.63263,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 40230.0,
+          "Position": 417.0632,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 40317.75,
+          "Position": 302.75296,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 40405.5,
+          "Position": 132.57492,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 40493.25,
+          "Position": 352.68268,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 40581.0,
+          "Position": 174.54832,
+          "HyperDash": false
+        }
+      ]
+    }
+  ]
+}

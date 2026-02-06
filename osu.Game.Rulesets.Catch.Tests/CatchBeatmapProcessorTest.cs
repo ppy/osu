@@ -4,8 +4,10 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
@@ -53,6 +55,65 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             Assert.That(secondObj.XOffset, Is.Not.EqualTo(0).Within(0.001));
             Assert.That(secondObj.XOffset, Is.EqualTo(33.2f).Within(0.001));
+        }
+
+        [Test]
+        public void TestHardRockJuiceStreamTimeOffset()
+        {
+            var beatmap = new Beatmap<CatchHitObject>
+            {
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Difficulty = new BeatmapDifficulty { SliderMultiplier = 1, SliderTickRate = 1 }
+                },
+                HitObjects = new List<CatchHitObject>
+                {
+                    new JuiceStream
+                    {
+                        StartTime = 1000,
+                        Path = new SliderPath(new[]
+                        {
+                            new PathControlPoint(osuTK.Vector2.Zero),
+                            new PathControlPoint(new osuTK.Vector2(0, 100))
+                        }, 100),
+                        X = 100
+                    },
+                    new Fruit
+                    {
+                        StartTime = 2200,
+                        X = 110
+                    }
+                }
+            };
+
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 });
+
+            foreach (var obj in beatmap.HitObjects)
+                obj.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.Difficulty);
+
+            // Confirm calculated duration
+            var juiceStream = (JuiceStream)beatmap.HitObjects[0];
+            Assert.That(juiceStream.EndTime, Is.EqualTo(2000));
+
+            var processor = new CatchBeatmapProcessor(beatmap)
+            {
+                HardRockOffsets = true
+            };
+
+            processor.ApplyPositionOffsets(beatmap);
+
+            var fruit = beatmap.HitObjects[1];
+
+            // If start time (1000) is used: diff = 2200 - 1000 = 1200 > 1000 -> Reset -> XOffset = 0.
+            // If end time (2000) is used: diff = 2200 - 2000 = 200 < 1000 -> Offset applied -> XOffset != 0.
+            // Position difference is 110 - 100 = 10.
+            // 10 < 200 / 3 (66.6) is True.
+            // ApplyOffset adds 10 to offsetPosition (starts at 110). New offsetPosition = 120.
+            // XOffset = 120 - 110 = 10.
+
+            // We expect the fix to result in offset being applied.
+            Assert.That(fruit.XOffset, Is.Not.Zero, "Fruit should have HardRock offset applied if correct time is used.");
+            Assert.That(fruit.XOffset, Is.EqualTo(10), "Fruit offset amount incorrect.");
         }
     }
 }

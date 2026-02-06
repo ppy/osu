@@ -1,91 +1,94 @@
 {
-    "Mappings": [{
-        "StartTime": 369,
-        "Objects": [{
-                "StartTime": 369,
-                "Position": 65,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 450,
-                "Position": 482,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 532,
-                "Position": 164,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 614,
-                "Position": 315,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 696,
-                "Position": 145,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 778,
-                "Position": 159,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 860,
-                "Position": 310,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 942,
-                "Position": 441,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1024,
-                "Position": 428,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1106,
-                "Position": 243,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1188,
-                "Position": 422,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1270,
-                "Position": 481,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1352,
-                "Position": 104,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1434,
-                "Position": 473,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1516,
-                "Position": 135,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1598,
-                "Position": 360,
-                "HyperDash": false
-            },
-            {
-                "StartTime": 1680,
-                "Position": 123,
-                "HyperDash": false
-            }
-        ]
-    }]
+  "Mappings": [
+    {
+      "StartTime": 369.0,
+      "Objects": [
+        {
+          "StartTime": 369.0,
+          "Position": 65.55122,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 450.9375,
+          "Position": 482.88156,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 532.875,
+          "Position": 164.77008,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 614.8125,
+          "Position": 315.21667,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 696.75,
+          "Position": 145.71701,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 778.6875,
+          "Position": 159.17236,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 860.625,
+          "Position": 310.30988,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 942.5625,
+          "Position": 441.51633,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1024.5,
+          "Position": 428.4978,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1106.4375,
+          "Position": 243.26352,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1188.375,
+          "Position": 422.69315,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1270.3125,
+          "Position": 481.3454,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1352.25,
+          "Position": 104.397484,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1434.1875,
+          "Position": 473.5371,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1516.125,
+          "Position": 135.23026,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1598.0625,
+          "Position": 360.97977,
+          "HyperDash": false
+        },
+        {
+          "StartTime": 1680.0,
+          "Position": 123.46462,
+          "HyperDash": false
+        }
+      ]
+    }
+  ]
 }
