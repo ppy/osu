@@ -1,14 +1,14 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.IO;
 using osu.Game.Rulesets;
-using Realms;
 
 namespace osu.Game.Tests.Database
 {
