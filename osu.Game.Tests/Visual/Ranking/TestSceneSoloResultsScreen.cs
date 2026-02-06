@@ -278,7 +278,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
             AddStep("show results", () => LoadScreen(new SoloResultsScreen(scores[0])));
             AddUntilStep("wait for loaded", () => ((Drawable)Stack.CurrentScreen).IsLoaded);
-            AddAssert("local user best shown", () => this.ChildrenOfType<ScorePanel>().Any(p => p.Score.UserID == API.LocalUser.Value.Id));
+            AddUntilStep("local user best shown", () => this.ChildrenOfType<ScorePanel>().Any(p => p.Score.UserID == API.LocalUser.Value.Id));
         }
 
         [Test]
