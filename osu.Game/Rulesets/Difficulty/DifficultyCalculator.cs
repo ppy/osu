@@ -107,12 +107,15 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns>The set of <see cref="TimedDifficultyAttributes"/>.</returns>
         public List<TimedDifficultyAttributes> CalculateTimed([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
         {
-            using var timedCancellationSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            List<TimedDifficultyAttributes> list = [];
 
-            if (!cancellationToken.CanBeCanceled)
-                cancellationToken = timedCancellationSource.Token;
+            foreach (var timedAttr in CalculateTimedLazy(mods, cancellationToken))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                list.Add(timedAttr);
+            }
 
-            return CalculateTimedLazy(mods, cancellationToken).ToList();
+            return list;
         }
 
         /// <summary>
@@ -127,6 +130,11 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns>The enumerated <see cref="TimedDifficultyAttributes"/>.</returns>
         public IEnumerable<TimedDifficultyAttributes> CalculateTimedLazy([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
         {
+            using var timedCancellationSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+            if (!cancellationToken.CanBeCanceled)
+                cancellationToken = timedCancellationSource.Token;
+
             cancellationToken.ThrowIfCancellationRequested();
             // ReSharper disable once PossiblyMistakenUseOfCancellationToken
             preProcess(mods, cancellationToken);
@@ -151,7 +159,6 @@ namespace osu.Game.Rulesets.Difficulty
                     {
                         foreach (var skill in skills)
                         {
-                            cancellationToken.ThrowIfCancellationRequested();
                             skill.Process(difficultyObjects[currentIndex]);
                         }
 
