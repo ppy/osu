@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -277,13 +277,18 @@ namespace osu.Game.Tests.Visual.Ranking
             ScorePanel expandedPanel = null;
             ScorePanel contractedPanel = null;
 
+            AddUntilStep("wait for panels", () =>
+            {
+                expandedPanel = this.ChildrenOfType<ScorePanel>().SingleOrDefault(p => p.State == PanelState.Expanded);
+                contractedPanel = this.ChildrenOfType<ScorePanel>().FirstOrDefault(p => p.State == PanelState.Contracted && p.ScreenSpaceDrawQuad.TopLeft.X > screen.ScreenSpaceDrawQuad.TopLeft.X);
+                return expandedPanel != null && contractedPanel != null;
+            });
+
             AddStep("click expanded panel then contracted panel", () =>
             {
-                expandedPanel = this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded);
                 InputManager.MoveMouseTo(expandedPanel);
                 InputManager.Click(MouseButton.Left);
 
-                contractedPanel = this.ChildrenOfType<ScorePanel>().First(p => p.State == PanelState.Contracted && p.ScreenSpaceDrawQuad.TopLeft.X > screen.ScreenSpaceDrawQuad.TopLeft.X);
                 InputManager.MoveMouseTo(contractedPanel);
                 InputManager.Click(MouseButton.Left);
             });
