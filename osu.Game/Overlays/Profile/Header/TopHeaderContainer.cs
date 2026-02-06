@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Profile.Header
         [Resolved]
         private RankingsOverlay? rankingsOverlay { get; set; }
 
-        private UserCoverBackground cover = null!;
+        private CoverBackground cover = null!;
         private SupporterIcon supporterTag = null!;
         private UpdateableAvatar avatar = null!;
         private OsuSpriteText usernameText = null!;
@@ -242,7 +242,7 @@ namespace osu.Game.Overlays.Profile.Header
         {
             var user = data?.User;
 
-            cover.User = user;
+            cover.Item = user;
             avatar.User = user;
             usernameText.Text = user?.Username ?? string.Empty;
             openUserExternally.Link = $@"{api.Endpoints.WebsiteUrl}/users/{user?.Id ?? 0}";
@@ -278,7 +278,7 @@ namespace osu.Game.Overlays.Profile.Header
             flow.TransformTo(nameof(flow.Spacing), new Vector2(expanded ? 20f : 10f), transition_duration, Easing.OutQuint);
         }
 
-        private partial class ProfileCoverBackground : UserCoverBackground
+        private partial class ProfileCoverBackground : CoverBackground
         {
             protected override double LoadDelay => 0;
 

@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Set cover to expanded", () => configManager.SetValue(OsuSetting.ProfileCoverExpanded, true));
             AddStep("Show example user", () => header.User.Value = new UserProfileData(TestSceneUserProfileOverlay.TEST_USER, new OsuRuleset().RulesetInfo));
-            AddUntilStep("Cover is expanded", () => header.ChildrenOfType<UserCoverBackground>().Single().Height, () => Is.GreaterThan(0));
+            AddUntilStep("Cover is expanded", () => header.ChildrenOfType<CoverBackground>().Single().Height, () => Is.GreaterThan(0));
         }
 
         [Test]
@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Set cover to collapsed", () => configManager.SetValue(OsuSetting.ProfileCoverExpanded, false));
             AddStep("Show example user", () => header.User.Value = new UserProfileData(TestSceneUserProfileOverlay.TEST_USER, new OsuRuleset().RulesetInfo));
-            AddUntilStep("Cover is collapsed", () => header.ChildrenOfType<UserCoverBackground>().Single().Height, () => Is.EqualTo(0));
+            AddUntilStep("Cover is collapsed", () => header.ChildrenOfType<CoverBackground>().Single().Height, () => Is.EqualTo(0));
         }
 
         [Test]
