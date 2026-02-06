@@ -142,10 +142,15 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             /// <param name="triggerKey">The key which triggered this update, and should be used as the binding.</param>
             public void UpdateKeyCombination(KeyCombination fullState, InputKey triggerKey)
             {
-                var combination = fullState.Keys.Where(KeyCombination.IsModifierKey)
-                                           .Append(triggerKey)
-                                           .Select(k => k.GetVirtualKey() ?? k)
-                                           .ToArray();
+                var keys = fullState.Keys
+                                    .Where(KeyCombination.IsModifierKey)
+                                    .Append(triggerKey)
+                                    .ToArray();
+
+                var combination = KeyBinding.Value.RulesetName == null
+                    ? keys.Select(k => k.GetVirtualKey() ?? k).ToArray()
+                    : keys;
+
                 UpdateKeyCombination(new KeyCombination(combination));
             }
 
