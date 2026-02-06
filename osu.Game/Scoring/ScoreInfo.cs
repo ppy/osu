@@ -114,6 +114,11 @@ namespace osu.Game.Scoring
         [Ignored]
         public bool HasOnlineReplay { get; set; }
 
+        /// <summary>
+        /// Whether a replay is available locally for this score.
+        /// </summary>
+        public bool? HasLocalReplay { get; set; }
+
         public DateTimeOffset Date { get; set; }
 
         public double? PP { get; set; }
