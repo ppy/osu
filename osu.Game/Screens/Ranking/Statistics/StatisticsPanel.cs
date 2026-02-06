@@ -258,6 +258,9 @@ namespace osu.Game.Screens.Ranking.Statistics
                     preventTaggingReason = "Play the beatmap in its original ruleset to contribute to beatmap tags!";
                 else if (localUserScore.Rank < ScoreRank.C)
                     preventTaggingReason = "Set a better score to contribute to beatmap tags!";
+                else if (newScore.Ruleset.OnlineID == 0 && newScore.APIMods.Any(m => m.Acronym == "TP"))
+                    // Target Practice completely changes the gameplay, so it makes no sense to be able to add gameplay tags about the map
+                    preventTaggingReason = "Play without Target Practice to contribute to beatmap tags!";
 
                 if (preventTaggingReason == null)
                 {
