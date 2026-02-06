@@ -76,7 +76,10 @@ namespace osu.Game.Beatmaps
             currentMods.BindValueChanged(mods =>
             {
                 // A change in bindable here doesn't guarantee that mods have actually changed.
-                if (mods.OldValue.SequenceEqual(mods.NewValue))
+                // However, we *do* want to make sure that the mod *references* are the same;
+                // `SequenceEqual()` without a comparer would fall back to `IEquatable`.
+                // Failing to ensure reference equality can cause setting change tracking to fail later.
+                if (mods.OldValue.SequenceEqual(mods.NewValue, ReferenceEqualityComparer.Instance))
                     return;
 
                 modSettingChangeTracker?.Dispose();
