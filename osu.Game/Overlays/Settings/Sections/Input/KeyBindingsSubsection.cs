@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
     }
 
-    public partial class ResetButton : DangerousSettingsButton
+    public partial class ResetButton : DangerousSettingsButtonV2
     {
         [BackgroundDependencyLoader]
         private void load()

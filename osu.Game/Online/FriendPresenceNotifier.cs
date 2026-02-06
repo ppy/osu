@@ -45,14 +45,24 @@ namespace osu.Game.Online
         private readonly HashSet<APIUser> onlineAlertQueue = new HashSet<APIUser>();
         private readonly HashSet<APIUser> offlineAlertQueue = new HashSet<APIUser>();
 
-        private double? lastOnlineAlertTime;
-        private double? lastOfflineAlertTime;
+        private double? nextOnlineAlertTime;
+        private double? nextOfflineAlertTime;
+
+        private const double debounce_time_before_notification = 1000;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             config.BindWith(OsuSetting.NotifyOnFriendPresenceChange, notifyOnFriendPresenceChange);
+            notifyOnFriendPresenceChange.BindValueChanged(_ =>
+            {
+                onlineAlertQueue.Clear();
+                offlineAlertQueue.Clear();
+
+                nextOfflineAlertTime = null;
+                nextOnlineAlertTime = null;
+            });
 
             friends.BindTo(api.LocalUserState.Friends);
             friends.BindCollectionChanged(onFriendsChanged, true);
@@ -65,8 +75,11 @@ namespace osu.Game.Online
         {
             base.Update();
 
-            alertOnlineUsers();
-            alertOfflineUsers();
+            if (notifyOnFriendPresenceChange.Value)
+            {
+                alertOnlineUsers();
+                alertOfflineUsers();
+            }
         }
 
         private void onFriendsChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -132,7 +145,7 @@ namespace osu.Game.Online
             if (!offlineAlertQueue.Remove(user))
             {
                 onlineAlertQueue.Add(user);
-                lastOnlineAlertTime ??= Time.Current;
+                nextOnlineAlertTime ??= Time.Current + debounce_time_before_notification;
             }
         }
 
@@ -141,57 +154,45 @@ namespace osu.Game.Online
             if (!onlineAlertQueue.Remove(user))
             {
                 offlineAlertQueue.Add(user);
-                lastOfflineAlertTime ??= Time.Current;
+                nextOfflineAlertTime ??= Time.Current + debounce_time_before_notification;
             }
         }
 
         private void alertOnlineUsers()
         {
-            if (onlineAlertQueue.Count == 0)
+            if (nextOnlineAlertTime == null || Time.Current < nextOnlineAlertTime)
                 return;
 
-            if (lastOnlineAlertTime == null || Time.Current - lastOnlineAlertTime < 1000)
-                return;
-
-            if (!notifyOnFriendPresenceChange.Value)
-            {
-                lastOnlineAlertTime = null;
-                return;
-            }
+            // If a user quickly switches online-offline, we might reach here without actually having a notification
+            // to fire. Importantly, we should still reset the next alert time in such a scenario.
 
             if (onlineAlertQueue.Count == 1)
                 notifications.Post(new SingleFriendOnlineNotification(onlineAlertQueue.Single()));
-            else
+            else if (onlineAlertQueue.Count > 1)
                 notifications.Post(new MultipleFriendsOnlineNotification(onlineAlertQueue.ToArray()));
 
             onlineAlertQueue.Clear();
-            lastOnlineAlertTime = null;
+            nextOnlineAlertTime = null;
         }
 
         private void alertOfflineUsers()
         {
-            if (offlineAlertQueue.Count == 0)
+            if (nextOfflineAlertTime == null || Time.Current < nextOfflineAlertTime)
                 return;
 
-            if (lastOfflineAlertTime == null || Time.Current - lastOfflineAlertTime < 1000)
-                return;
-
-            if (!notifyOnFriendPresenceChange.Value)
-            {
-                lastOfflineAlertTime = null;
-                return;
-            }
+            // If a user quickly switches offline-online, we might reach here without actually having a notification
+            // to fire. Importantly, we should still reset the next alert time in such a scenario.
 
             if (offlineAlertQueue.Count == 1)
                 notifications.Post(new SingleFriendOfflineNotification(offlineAlertQueue.Single()));
-            else
+            else if (offlineAlertQueue.Count > 1)
                 notifications.Post(new MultipleFriendsOfflineNotification(offlineAlertQueue.ToArray()));
 
             offlineAlertQueue.Clear();
-            lastOfflineAlertTime = null;
+            nextOfflineAlertTime = null;
         }
 
-        public partial class SingleFriendOnlineNotification : UserAvatarNotification
+        private partial class SingleFriendOnlineNotification : UserAvatarNotification
         {
             public SingleFriendOnlineNotification(APIUser user)
                 : base(user)
@@ -216,7 +217,7 @@ namespace osu.Game.Online
             public override string PopInSampleName => "UI/notification-friend-online";
         }
 
-        public partial class MultipleFriendsOnlineNotification : SimpleNotification
+        private partial class MultipleFriendsOnlineNotification : SimpleNotification
         {
             public MultipleFriendsOnlineNotification(ICollection<APIUser> users)
             {
@@ -233,7 +234,7 @@ namespace osu.Game.Online
             public override string PopInSampleName => "UI/notification-friend-online";
         }
 
-        public partial class SingleFriendOfflineNotification : UserAvatarNotification
+        private partial class SingleFriendOfflineNotification : UserAvatarNotification
         {
             public SingleFriendOfflineNotification(APIUser user)
                 : base(user)
@@ -253,7 +254,7 @@ namespace osu.Game.Online
             public override string PopInSampleName => "UI/notification-friend-offline";
         }
 
-        public partial class MultipleFriendsOfflineNotification : SimpleNotification
+        private partial class MultipleFriendsOfflineNotification : SimpleNotification
         {
             public MultipleFriendsOfflineNotification(ICollection<APIUser> users)
             {

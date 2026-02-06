@@ -10,6 +10,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -69,10 +70,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     countAfter = c.BeatmapMD5Hashes.Count;
                 }).ContinueWith(_ => Schedule(() =>
                 {
+                    LocalisableString message;
+
                     if (countBefore == 0)
-                        notifications?.Post(new SimpleNotification { Text = $"Created new collection \"{room.Name}\" with {countAfter} beatmaps." });
+                        message = NotificationsStrings.CollectionCreated(room.Name, countAfter);
                     else
-                        notifications?.Post(new SimpleNotification { Text = $"Added {countAfter - countBefore} beatmaps to collection \"{room.Name}\"." });
+                        message = NotificationsStrings.CollectionBeatmapsAdded(room.Name, countAfter - countBefore);
+
+                    notifications?.Post(new SimpleNotification { Text = message });
                 }));
             };
         }

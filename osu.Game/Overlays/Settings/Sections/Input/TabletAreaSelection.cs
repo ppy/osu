@@ -41,71 +41,92 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private Box usableFill;
         private OsuSpriteText usableAreaText;
 
+        [Resolved]
+        private OsuColour colour { get; set; }
+
         public TabletAreaSelection(ITabletHandler handler)
         {
             this.handler = handler;
 
-            Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS };
+            Padding = SettingsPanel.CONTENT_PADDING;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
-            InternalChild = tabletContainer = new Container
+            InternalChildren = new Drawable[]
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Masking = true,
-                CornerRadius = 5,
-                BorderThickness = 2,
-                BorderColour = colour.Gray3,
-                Children = new Drawable[]
+                new Container
                 {
-                    new Box
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    CornerRadius = 5,
+                    CornerExponent = 2.5f,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colour.Gray1,
-                    },
-                    usableAreaContainer = new UsableAreaContainer(handler)
-                    {
-                        Origin = Anchor.Centre,
-                        Children = new Drawable[]
+                        new Box
                         {
-                            usableFill = new Box
+                            Colour = colourProvider.Background5,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        tabletContainer = new Container
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Masking = true,
+                            CornerRadius = 5,
+                            BorderThickness = 2,
+                            BorderColour = colourProvider.Background3,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Alpha = 0.6f,
-                            },
-                            new Box
-                            {
-                                Colour = Color4.White,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Height = 5,
-                            },
-                            new Box
-                            {
-                                Colour = Color4.White,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Width = 5,
-                            },
-                            usableAreaText = new OsuSpriteText
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Colour = Color4.White,
-                                Font = OsuFont.Default.With(size: 12),
-                                Y = 10
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = colourProvider.Background4,
+                                },
+                                usableAreaContainer = new UsableAreaContainer(handler)
+                                {
+                                    Origin = Anchor.Centre,
+                                    Children = new Drawable[]
+                                    {
+                                        usableFill = new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Alpha = 0.6f,
+                                        },
+                                        new Box
+                                        {
+                                            Colour = Color4.White,
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Height = 5,
+                                        },
+                                        new Box
+                                        {
+                                            Colour = Color4.White,
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Width = 5,
+                                        },
+                                        usableAreaText = new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Colour = Color4.White,
+                                            Font = OsuFont.Default.With(size: 12),
+                                            Y = 10
+                                        }
+                                    }
+                                },
+                                tabletName = new OsuSpriteText
+                                {
+                                    Padding = new MarginPadding(3),
+                                    Font = OsuFont.Default.With(size: 8)
+                                },
                             }
                         }
-                    },
-                    tabletName = new OsuSpriteText
-                    {
-                        Padding = new MarginPadding(3),
-                        Font = OsuFont.Default.With(size: 8)
-                    },
-                }
+                    }
+                },
             };
         }
 
@@ -168,9 +189,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             return a;
         }
-
-        [Resolved]
-        private OsuColour colour { get; set; }
 
         private void checkBounds()
         {

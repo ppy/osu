@@ -27,8 +27,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override LocalisableString Description => "Burn the notes into your memory.";
 
-        //Alters the transforms of the approach circles, breaking the effects of these mods.
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModApproachDifferent), typeof(OsuModTransform), typeof(OsuModDepth) }).ToArray();
+        /// <remarks>
+        /// Incompatible with all mods that directly modify or indirectly depend on <see cref="OsuHitObject.TimePreempt"/>, or alter the behaviour of approach circles.
+        /// </remarks>
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModApproachDifferent), typeof(OsuModTransform), typeof(OsuModDepth), typeof(OsuModHidden) }).ToArray();
 
         public override ModType Type => ModType.Fun;
 
@@ -57,7 +59,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             void applyFadeInAdjustment(OsuHitObject osuObject)
             {
-                osuObject.TimePreempt += osuObject.StartTime - lastNewComboTime;
+                if (osuObject is not Spinner)
+                    osuObject.TimePreempt += osuObject.StartTime - lastNewComboTime;
 
                 foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
                 {

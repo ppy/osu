@@ -36,7 +36,8 @@ namespace osu.Game.Screens.SelectV2
     {
         public Action? RequestDeselectAllMods { get; init; }
 
-        private const float bar_height = 30f;
+        public const float BAR_HEIGHT = 30f;
+
         private const float mod_display_portion = 0.65f;
 
         private readonly BindableWithCurrent<IReadOnlyList<Mod>> current = new BindableWithCurrent<IReadOnlyList<Mod>>(Array.Empty<Mod>());
@@ -65,6 +66,11 @@ namespace osu.Game.Screens.SelectV2
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        [Resolved]
+        private OsuGameBase game { get; set; } = null!;
+
+        private IBindable<Language> currentLanguage = null!;
+
         public FooterButtonMods(ModSelectOverlay overlay)
             : base(overlay)
         {
@@ -80,14 +86,14 @@ namespace osu.Game.Screens.SelectV2
             AddRange(new[]
             {
                 unrankedBadge = new UnrankedBadge(),
-                modDisplayBar = new Container
+                modDisplayBar = new InputBlockingContainer
                 {
                     Y = -5f,
                     Depth = float.MaxValue,
                     Origin = Anchor.BottomLeft,
                     Shear = OsuGame.SHEAR,
                     CornerRadius = CORNER_RADIUS,
-                    Size = new Vector2(BUTTON_WIDTH, bar_height),
+                    Size = new Vector2(BUTTON_WIDTH, BAR_HEIGHT),
                     Masking = true,
                     EdgeEffect = new EdgeEffectParameters
                     {
@@ -155,6 +161,9 @@ namespace osu.Game.Screens.SelectV2
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            currentLanguage = game.CurrentLanguage.GetBoundCopy();
+            currentLanguage.BindValueChanged(_ => ScheduleAfterChildren(updateDisplay));
 
             Current.BindValueChanged(m =>
             {
@@ -249,9 +258,25 @@ namespace osu.Game.Screens.SelectV2
                 overflowModCountDisplay.Hide();
         }
 
-        private partial class ModCountText : CompositeDrawable, IHasCustomTooltip<IReadOnlyList<Mod>>
+        public partial class ModCountText : VisibilityContainer, IHasCustomTooltip<IReadOnlyList<Mod>>
         {
             public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>();
+
+            private LocalisableString? customText;
+
+            /// <summary>
+            /// When set, this will be shown instead of a mod count.
+            /// </summary>
+            public LocalisableString? CustomText
+            {
+                get => customText;
+                set
+                {
+                    customText = value;
+                    if (IsLoaded)
+                        updateText();
+                }
+            }
 
             private OsuSpriteText text = null!;
 
@@ -281,16 +306,27 @@ namespace osu.Game.Screens.SelectV2
                     }
                 };
 
-                Mods.BindValueChanged(v => text.Text = ModSelectOverlayStrings.Mods(v.NewValue.Count).ToUpper(), true);
+                Mods.BindValueChanged(_ => updateText(), true);
             }
 
             public ITooltip<IReadOnlyList<Mod>> GetCustomTooltip() => new ModOverflowTooltip(colourProvider);
 
             public IReadOnlyList<Mod>? TooltipContent => Mods.Value;
 
+            protected override void PopIn() => this.FadeIn(300, Easing.OutExpo);
+            protected override void PopOut() => this.FadeOut(300, Easing.OutExpo);
+
+            private void updateText()
+            {
+                if (CustomText != null)
+                    text.Text = CustomText.Value;
+                else
+                    text.Text = ModSelectOverlayStrings.Mods(Mods.Value.Count).ToUpper();
+            }
+
             public partial class ModOverflowTooltip : VisibilityContainer, ITooltip<IReadOnlyList<Mod>>
             {
-                private ModDisplay extendedModDisplay = null!;
+                private ModFlowDisplay extendedModDisplay = null!;
 
                 [Cached]
                 private OverlayColourProvider colourProvider;
@@ -314,11 +350,12 @@ namespace osu.Game.Screens.SelectV2
                             RelativeSizeAxes = Axes.Both,
                             Colour = colourProvider.Background5,
                         },
-                        extendedModDisplay = new ModDisplay
+                        extendedModDisplay = new ModFlowDisplay
                         {
+                            AutoSizeAxes = Axes.Both,
+                            MaximumSize = new Vector2(400, 0),
                             Margin = new MarginPadding { Vertical = 2f, Horizontal = 10f },
                             Scale = new Vector2(0.6f),
-                            ExpansionMode = ExpansionMode.AlwaysExpanded,
                         },
                     };
                 }
@@ -335,7 +372,7 @@ namespace osu.Game.Screens.SelectV2
             }
         }
 
-        internal partial class UnrankedBadge : CompositeDrawable, IHasTooltip
+        internal partial class UnrankedBadge : InputBlockingContainer, IHasTooltip
         {
             public LocalisableString TooltipText { get; }
 
@@ -348,7 +385,7 @@ namespace osu.Game.Screens.SelectV2
                 Shear = OsuGame.SHEAR;
                 CornerRadius = CORNER_RADIUS;
                 AutoSizeAxes = Axes.X;
-                Height = bar_height;
+                Height = BAR_HEIGHT;
                 Masking = true;
                 BorderColour = Color4.White;
                 BorderThickness = 2f;

@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Tests.Beatmaps.IO;
 using osu.Game.Tests.Visual;
@@ -33,6 +35,12 @@ namespace osu.Game.Tests.Beatmaps
         private TestBeatmapDifficultyCache difficultyCache;
 
         private IBindable<StarDifficulty> starDifficultyBindable;
+
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; }
+
+        [Resolved]
+        private BeatmapDifficultyCache actualDifficultyCache { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osu)
@@ -56,6 +64,36 @@ namespace osu.Game.Tests.Beatmaps
         }
 
         [Test]
+        public void TestInvalidationFlow()
+        {
+            BeatmapInfo postEditBeatmapInfo = null;
+            BeatmapInfo preEditBeatmapInfo = null;
+
+            IBindable<StarDifficulty> bindableDifficulty = null;
+
+            AddStep("get bindable stars", () =>
+            {
+                preEditBeatmapInfo = importedSet.Beatmaps.First();
+                bindableDifficulty = actualDifficultyCache.GetBindableDifficulty(preEditBeatmapInfo);
+            });
+
+            AddUntilStep("wait for stars retrieved", () => bindableDifficulty.Value.Stars, () => Is.GreaterThan(0));
+
+            AddStep("remove all hitobjects", () =>
+            {
+                var working = beatmapManager.GetWorkingBeatmap(preEditBeatmapInfo);
+
+                ((IList<HitObject>)working.Beatmap.HitObjects).Clear();
+
+                beatmapManager.Save(working.BeatmapInfo, working.Beatmap);
+                postEditBeatmapInfo = working.BeatmapInfo;
+            });
+
+            AddAssert("stars is now zero", () => actualDifficultyCache.GetDifficultyAsync(postEditBeatmapInfo).GetResultSafely()!.Value.Stars, () => Is.Zero);
+            AddUntilStep("bindable stars is now zero", () => bindableDifficulty.Value.Stars, () => Is.Zero);
+        }
+
+        [Test]
         public void TestStarDifficultyChangesOnModSettings()
         {
             OsuModDoubleTime dt = null;
@@ -74,6 +112,30 @@ namespace osu.Game.Tests.Beatmaps
 
             AddStep("change selected mod to NC", () => SelectedMods.Value = new[] { new OsuModNightcore { SpeedChange = { Value = 1.75 } } });
             AddUntilStep($"star difficulty -> {BASE_STARS + 1.75}", () => starDifficultyBindable.Value.Stars == BASE_STARS + 1.75);
+        }
+
+        [Test]
+        public void TestStarDifficultyChangesOnModSettingsCorrectlyTrackAcrossReferenceChanges()
+        {
+            OsuModDoubleTime dt = null;
+
+            AddStep("set computation function", () => difficultyCache.ComputeDifficulty = lookup =>
+            {
+                var modRateAdjust = (ModRateAdjust)lookup.OrderedMods.SingleOrDefault(mod => mod is ModRateAdjust);
+                return new StarDifficulty(BASE_STARS + modRateAdjust?.SpeedChange.Value ?? 0, 0);
+            });
+
+            AddStep("change selected mod to DT", () => SelectedMods.Value = new[] { dt = new OsuModDoubleTime { SpeedChange = { Value = 1.5 } } });
+            AddUntilStep($"star difficulty -> {BASE_STARS + 1.5}", () => starDifficultyBindable.Value.Stars == BASE_STARS + 1.5);
+
+            AddStep("change DT speed to 1.25", () => dt.SpeedChange.Value = 1.25);
+            AddUntilStep($"star difficulty -> {BASE_STARS + 1.25}", () => starDifficultyBindable.Value.Stars == BASE_STARS + 1.25);
+
+            AddStep("reconstruct DT mod with same settings", () => SelectedMods.Value = new[] { dt = (OsuModDoubleTime)dt.DeepClone() });
+            AddUntilStep($"star difficulty -> {BASE_STARS + 1.25}", () => starDifficultyBindable.Value.Stars == BASE_STARS + 1.25);
+
+            AddStep("change DT speed to 1.25", () => dt.SpeedChange.Value = 2);
+            AddUntilStep($"star difficulty -> {BASE_STARS + 2}", () => starDifficultyBindable.Value.Stars == BASE_STARS + 2);
         }
 
         [Test]
@@ -122,8 +184,10 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestKeyDoesntEqualWithDifferentModSettings()
         {
-            var key1 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = guid }, new RulesetInfo { OnlineID = 0 }, new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 1.1 } } });
-            var key2 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = guid }, new RulesetInfo { OnlineID = 0 }, new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 1.9 } } });
+            var key1 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = guid }, new RulesetInfo { OnlineID = 0 },
+                new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 1.1 } } });
+            var key2 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = guid }, new RulesetInfo { OnlineID = 0 },
+                new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 1.9 } } });
 
             Assert.That(key1, Is.Not.EqualTo(key2));
             Assert.That(key1.GetHashCode(), Is.Not.EqualTo(key2.GetHashCode()));
@@ -132,8 +196,10 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestKeyEqualWithMatchingModSettings()
         {
-            var key1 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = guid }, new RulesetInfo { OnlineID = 0 }, new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 1.25 } } });
-            var key2 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = guid }, new RulesetInfo { OnlineID = 0 }, new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 1.25 } } });
+            var key1 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = guid }, new RulesetInfo { OnlineID = 0 },
+                new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 1.25 } } });
+            var key2 = new BeatmapDifficultyCache.DifficultyCacheLookup(new BeatmapInfo { ID = guid }, new RulesetInfo { OnlineID = 0 },
+                new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 1.25 } } });
 
             Assert.That(key1, Is.EqualTo(key2));
             Assert.That(key1.GetHashCode(), Is.EqualTo(key2.GetHashCode()));

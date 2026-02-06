@@ -62,10 +62,23 @@ namespace osu.Game.Rulesets.Mods
                 ComboBasedAlpha = Math.Max(MIN_ALPHA, 1 - (float)combo.NewValue / HiddenComboCount.Value);
             }, true);
         }
+
+        protected override LocalisableString GetSettingTooltipText(IBindable bindable)
+        {
+            if (ReferenceEquals(bindable, HiddenComboCount))
+                return HiddenComboSlider.FormatHiddenComboValue(HiddenComboCount.Value);
+
+            return base.GetSettingTooltipText(bindable);
+        }
     }
 
     public partial class HiddenComboSlider : RoundedSliderBar<int>
     {
-        public override LocalisableString TooltipText => Current.Value == 0 ? "always hidden" : base.TooltipText;
+        public override LocalisableString TooltipText => FormatHiddenComboValue(Current.Value);
+
+        public static LocalisableString FormatHiddenComboValue(int value)
+        {
+            return value == 0 ? "always hidden" : value.ToString();
+        }
     }
 }
