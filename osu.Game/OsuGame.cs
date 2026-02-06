@@ -74,6 +74,7 @@ using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Seasonal;
 using osu.Game.Skinning;
+using osu.Game.Teams;
 using osu.Game.Updater;
 using osu.Game.Users;
 using osu.Game.Utils;
@@ -133,6 +134,8 @@ namespace osu.Game
         private NewsOverlay news;
 
         private UserProfileOverlay userProfile;
+
+        private TeamProfileOverlay teamProfileOverlay;
 
         private BeatmapSetOverlay beatmapSetOverlay;
 
@@ -590,6 +593,12 @@ namespace osu.Game
         /// </summary>
         /// <param name="user">The user to display.</param>
         public void ShowUser(IUser user) => waitForReady(() => userProfile, _ => userProfile.ShowUser(user));
+
+        /// <summary>
+        /// Show a team's profile as an overlay.
+        /// </summary>
+        /// <param name="team">The team to display.</param>
+        public void ShowTeam(ITeam team) => waitForReady(() => teamProfileOverlay, _ => teamProfileOverlay.ShowTeam(team));
 
         /// <summary>
         /// Show a beatmap's set as an overlay, displaying the given beatmap.
@@ -1241,6 +1250,7 @@ namespace osu.Game
             loadComponentSingleFile(Settings = new SettingsOverlay(), leftFloatingOverlayContent.Add, true);
             loadComponentSingleFile(changelogOverlay = new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(teamProfileOverlay = new TeamProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(skinEditor = new SkinEditorOverlay(ScreenContainer), overlayContent.Add, true);
@@ -1284,7 +1294,7 @@ namespace osu.Game
             }
 
             // eventually informational overlays should be displayed in a stack, but for now let's only allow one to stay open at a time.
-            var informationalOverlays = new OverlayContainer[] { beatmapSetOverlay, userProfile };
+            var informationalOverlays = new OverlayContainer[] { beatmapSetOverlay, userProfile, teamProfileOverlay };
 
             foreach (var overlay in informationalOverlays)
             {
