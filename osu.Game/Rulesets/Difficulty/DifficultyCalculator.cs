@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         /// <remarks>
         /// 1. Preprocessing is done before this method returns.<br />
-        /// 2. <see cref="CancellationToken"/> is still valid in returned enumerator.
+        /// 2. <see cref="CancellationToken"/> is not effective on returned enumerator.
         /// </remarks>
         /// <param name="mods">The mods that should be applied to the beatmap.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
