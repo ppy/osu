@@ -526,7 +526,7 @@ namespace osu.Game.Screens.SelectV2
 
         private void attemptRevertToBeforeScopedSelection()
         {
-            if (CurrentSelection is not GroupedBeatmap selection || grouping.ItemMap.ContainsKey(selection))
+            if (CurrentSelection is not GroupedBeatmap selection)
                 return;
 
             if (grouping.ItemMap.ContainsKey(selection))
