@@ -174,7 +174,14 @@ namespace osu.Game.Online.API
                     // To recover from a failing state, falling through and running the full reconnection process seems safest for now.
                     // This could probably be replaced with a ping-style request if we want to avoid the reconnection overheads.
                     log.Add($@"{nameof(APIAccess)} is in a failing state, waiting a bit before we try again...");
-                    WaitHandle.WaitAny(waitHandles, 5000);
+
+                    try
+                    {
+                        WaitHandle.WaitAny(waitHandles, 5000);
+                    }
+                    catch (Exception)
+                    {
+                    }
                 }
 
                 // Ensure that we have valid credentials.
@@ -182,7 +189,15 @@ namespace osu.Game.Online.API
                 if (!HasLogin)
                 {
                     state.Value = APIState.Offline;
-                    WaitHandle.WaitAny(waitHandles);
+
+                    try
+                    {
+                        WaitHandle.WaitAny(waitHandles);
+                    }
+                    catch (Exception)
+                    {
+                    }
+
                     continue;
                 }
 
@@ -195,7 +210,14 @@ namespace osu.Game.Online.API
 
                     if (state.Value != APIState.Online)
                     {
-                        WaitHandle.WaitAny(waitHandles);
+                        try
+                        {
+                            WaitHandle.WaitAny(waitHandles);
+                        }
+                        catch (Exception)
+                        {
+                        }
+
                         continue;
                     }
                 }
@@ -208,7 +230,14 @@ namespace osu.Game.Online.API
                 }
 
                 processQueuedRequests();
-                WaitHandle.WaitAny(waitHandles);
+
+                try
+                {
+                    WaitHandle.WaitAny(waitHandles);
+                }
+                catch (Exception)
+                {
+                }
             }
         }
 
