@@ -5,11 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Aggregation;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
-using osu.Game.Rulesets.Difficulty.Utils;
+using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Utils;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
@@ -27,10 +29,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             IncludeSliders = includeSliders;
         }
 
-        private double currentStrain;
+        private double currentAimStrain;
+        private double currentSpeedStrain;
 
-        private double skillMultiplier => 130;
-        private double strainDecayBase => 0.15;
+        private double skillMultiplierAim => 130.0;
+        private double skillMultiplierSpeed => 6.5;
+        private double skillMultiplierTotal => 1.01;
+        private double meanExponent => 1.2;
 
         private readonly List<double> sliderStrains = new List<double>();
 
@@ -42,17 +47,35 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return DifficultyCalculationUtils.Erf(skill / (Math.Sqrt(2) * difficulty));
         }
 
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
+        private double strainDecayAim(double ms) => Math.Pow(0.15, ms / 1000);
+        private double strainDecaySpeed(double ms) => Math.Pow(0.3, ms / 1000);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplier;
+            double decayAim = strainDecayAim(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
+            double decaySpeed = strainDecaySpeed(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
+
+            double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders);
+            double speedDifficulty = SpeedAimEvaluator.EvaluateDifficultyOf(current);
+
+            if (Mods.Any(m => m is OsuModTouchDevice))
+            {
+                aimDifficulty = Math.Pow(aimDifficulty, 0.8);
+                speedDifficulty = Math.Pow(speedDifficulty, 0.95);
+            }
+
+            currentAimStrain *= decayAim;
+            currentAimStrain += aimDifficulty * (1 - decayAim) * skillMultiplierAim;
+
+            currentSpeedStrain *= decaySpeed;
+            currentSpeedStrain += speedDifficulty * (1 - decaySpeed) * skillMultiplierSpeed;
+
+            double totalStrain = DifficultyCalculationUtils.Norm(meanExponent, currentAimStrain, currentSpeedStrain);
 
             if (current.BaseObject is Slider)
-                sliderStrains.Add(currentStrain);
+                sliderStrains.Add(totalStrain);
 
-            return currentStrain;
+            return totalStrain * skillMultiplierTotal;
         }
 
         public double GetDifficultSliders()
