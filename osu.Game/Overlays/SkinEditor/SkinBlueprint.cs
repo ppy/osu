@@ -202,6 +202,9 @@ namespace osu.Game.Overlays.SkinEditor
         {
             base.Update();
 
+            if (anchorBox == null || originBox == null || anchorLine == null)
+                return;
+
             if (drawable.Parent == null)
                 return;
 
