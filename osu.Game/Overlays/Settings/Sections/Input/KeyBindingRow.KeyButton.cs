@@ -145,10 +145,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 var keys = fullState.Keys
                                     .Where(KeyCombination.IsModifierKey)
                                     .Append(triggerKey)
-                                    .Distinct()
                                     .ToArray();
 
-                var combination = keys.Length > 1
+                var combination = KeyBinding.Value.RulesetName == null
                     ? keys.Select(k => k.GetVirtualKey() ?? k).ToArray()
                     : keys;
 
