@@ -368,9 +368,9 @@ namespace osu.Game.Screens.SelectV2
                 scoresScroll.TransformTo(nameof(scoresScroll.Padding), new MarginPadding { Bottom = personal_best_height }, 300, Easing.OutQuint);
 
                 if (totalCount != null && userScore.Position != null)
-                    personalBestText.Text = $"Personal Best (#{userScore.Position:N0} of {totalCount.Value:N0})";
+                    personalBestText.Text = BeatmapLeaderboardWedgeStrings.PersonalBestWithPosition(userScore.Position.Value, totalCount.Value);
                 else
-                    personalBestText.Text = "Personal Best";
+                    personalBestText.Text = BeatmapLeaderboardWedgeStrings.PersonalBest;
             }
         }
 

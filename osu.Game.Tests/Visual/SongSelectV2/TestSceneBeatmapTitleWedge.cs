@@ -295,7 +295,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddUntilStep($"displayed bpm is {target}", () =>
             {
                 var label = titleWedge.ChildrenOfType<BeatmapTitleWedge.Statistic>().Single(l => l.TooltipText == BeatmapsetsStrings.ShowStatsBpm);
-                return label.Text == target;
+                return label.Text.ToString() == target;
             });
         }
 
