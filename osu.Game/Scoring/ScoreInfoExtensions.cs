@@ -32,6 +32,18 @@ namespace osu.Game.Scoring
                      .ThenBy(s => s.Date);
 
         /// <summary>
+        /// Orders an array of <see cref="IScoreInfo"/>s by total score.
+        /// </summary>
+        /// <param name="scores">The array of <see cref="IScoreInfo"/>s to reorder.</param>
+        /// <returns>The given <paramref name="scores"/> ordered by decreasing total score.</returns>
+        public static IEnumerable<T> OrderByTotalScore<T>(this IEnumerable<T> scores)
+            where T : IScoreInfo
+            => scores.OrderByDescending(s => s.TotalScore)
+                     .ThenBy(s => s.OnlineID)
+                     // Local scores may not have an online ID. Fall back to date in these cases.
+                     .ThenBy(s => s.Date);
+
+        /// <summary>
         /// Orders an array of <see cref="ScoreInfo"/>s by the selected <see cref="LeaderboardSortMode"/>.
         /// </summary>
         /// <param name="scores">The array of <see cref="ScoreInfo"/>s to reorder.</param>

@@ -181,7 +181,7 @@ namespace osu.Game.Online.API.Requests.Responses
         /// <param name="rulesets">A ruleset store, used to populate a ruleset instance in the returned score.</param>
         /// <param name="beatmap">An optional beatmap, copied into the returned score (for cases where the API does not populate the beatmap).</param>
         /// <returns></returns>
-        public ScoreInfo ToScoreInfo(RulesetStore rulesets, BeatmapInfo? beatmap = null)
+        public ScoreInfo ToScoreInfo(RulesetStore rulesets, IBeatmapInfo? beatmap = null)
         {
             var ruleset = rulesets.GetRuleset(RulesetID) ?? throw new InvalidOperationException($"Ruleset with ID of {RulesetID} not found locally");
 
@@ -241,6 +241,17 @@ namespace osu.Game.Online.API.Requests.Responses
                 score.BeatmapInfo.Ruleset.OnlineID = beatmap.Ruleset.OnlineID;
                 score.BeatmapInfo.Ruleset.Name = beatmap.Ruleset.Name;
                 score.BeatmapInfo.Ruleset.ShortName = beatmap.Ruleset.ShortName;
+                score.BeatmapInfo.MD5Hash = beatmap.MD5Hash;
+
+                if (beatmap is IBeatmapOnlineInfo onlineInfo)
+                {
+#pragma warning disable 618
+                    score.BeatmapInfo.MaxCombo = onlineInfo.MaxCombo;
+#pragma warning restore 618
+                }
+
+                if (beatmap is APIBeatmap apiBeatmap)
+                    score.BeatmapInfo.Status = apiBeatmap.Status;
             }
 
             return score;

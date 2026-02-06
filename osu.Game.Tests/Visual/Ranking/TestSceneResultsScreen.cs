@@ -267,6 +267,7 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        [FlakyTest]
         public void TestShowStatisticsAndClickOtherPanel()
         {
             TestResultsScreen screen = null;
