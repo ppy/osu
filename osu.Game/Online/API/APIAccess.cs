@@ -113,7 +113,7 @@ namespace osu.Game.Online.API
                 state.Value = APIState.Connecting;
             }
 
-            waitHandles = new WaitHandle[] { updateEvent, cancellationToken.Token.WaitHandle };
+            waitHandles = new[] { updateEvent, cancellationToken.Token.WaitHandle };
             state.BindValueChanged(_ => updateEvent.Set());
 
             var thread = new Thread(run)
