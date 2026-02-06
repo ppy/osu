@@ -20,6 +20,7 @@ using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
@@ -278,7 +279,7 @@ namespace osu.Game.Screens.SelectV2
 
                     bpmStatistic.Text = bpmMin == bpmMax
                         ? $"{bpmMin}"
-                        : $"{bpmMin}-{bpmMax} (mostly {mostCommonBPM})";
+                        : LocalisableString.Interpolate($"{bpmMin}-{bpmMax} ({SongSelectStrings.MostlyBPM(mostCommonBPM)})");
                 });
             }, token);
         }

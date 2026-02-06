@@ -261,7 +261,7 @@ namespace osu.Game.Overlays.Settings.Sections
                     {
                         textBox = new FocusedTextBox
                         {
-                            PlaceholderText = @"Skin name",
+                            PlaceholderText = SkinSettingsStrings.SkinName,
                             FontSize = OsuFont.DEFAULT_FONT_SIZE,
                             RelativeSizeAxes = Axes.X,
                             SelectAllOnFocus = true,
