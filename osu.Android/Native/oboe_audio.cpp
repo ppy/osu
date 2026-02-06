@@ -8,24 +8,46 @@
 #define LOG_TAG "OsuOboe"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 
-OboeAudio::OboeAudio() {
+OboeAudio::OboeAudio() : stream(nullptr) {
     LOGI("OboeAudio created");
 }
 
 OboeAudio::~OboeAudio() {
+    stop();
     LOGI("OboeAudio destroyed");
 }
 
 bool OboeAudio::initialize() {
+    oboe::AudioStreamBuilder builder;
+    builder.setDirection(oboe::Direction::Output);
+    builder.setPerformanceMode(oboe::PerformanceMode::LowLatency);
+    builder.setSharingMode(oboe::SharingMode::Exclusive);
+    builder.setFormat(oboe::AudioFormat::Float);
+    builder.setChannelCount(oboe::ChannelCount::Stereo);
+    builder.setSampleRate(48000);
+    builder.setCallback(this);
+
+    oboe::Result result = builder.openStream(&stream);
+    if (result != oboe::Result::OK) {
+        LOGI("Failed to create Oboe stream: %s", oboe::convertToText(result));
+        return false;
+    }
     return true;
 }
 
 void OboeAudio::start() {
-    // AAudio/Oboe low-latency exclusive mode stream initialization (48kHz, minimal buffer)
+    if (stream && stream->requestStart() != oboe::Result::OK) {
+        LOGI("Failed to start Oboe stream");
+    }
     LOGI("OboeAudio started");
 }
 
 void OboeAudio::stop() {
+    if (stream) {
+        stream->stop();
+        stream->close();
+        stream = nullptr;
+    }
     LOGI("OboeAudio stopped");
 }
 
@@ -35,13 +57,20 @@ double OboeAudio::getTimestamp() {
 }
 
 oboe::DataCallbackResult OboeAudio::onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) {
+    // We are not providing any audio data yet
+    memset(audioData, 0, numFrames * sizeof(float) * 2);
     return oboe::DataCallbackResult::Continue;
 }
 
 extern "C" {
     // Flat C exports for DllImport
     long nOboeCreate() {
-        return (long)new OboeAudio();
+        OboeAudio* audio = new OboeAudio();
+        if (!audio->initialize()) {
+            delete audio;
+            return 0;
+        }
+        return (long)audio;
     }
 
     void nOboeDestroy(long audioPtr) {

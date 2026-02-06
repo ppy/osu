@@ -9,13 +9,10 @@
 #include <jni.h>
 #include <android/native_window.h>
 #include <vector>
+#include <optional>
 
 class VulkanRenderer {
 public:
-    struct ShaderConstants {
-        float resolutionScale = 1.0f;
-    };
-
     VulkanRenderer();
     ~VulkanRenderer();
 
@@ -24,46 +21,48 @@ public:
     void cleanup();
 
 private:
+    ANativeWindow* window;
     VkInstance instance;
     VkSurfaceKHR surface;
     VkPhysicalDevice physicalDevice;
     VkDevice device;
-    VkQueue deviceQueue;
+    VkQueue graphicsQueue;
     VkSwapchainKHR swapchain;
-    VkRenderPass renderPass;
-    VkPipelineLayout pipelineLayout;
-    VkPipelineCache pipelineCache;
-    VkCommandPool commandPool;
-    std::vector<VkCommandBuffer> commandBuffers;
+    std::vector<VkImage> swapchainImages;
+    VkFormat swapchainImageFormat;
+    VkExtent2D swapchainExtent;
+    std::vector<VkImageView> swapchainImageViews;
+    int currentFrame;
 
-    // Synchronization
-    std::vector<VkSemaphore> imageAvailableSemaphores;
-    std::vector<VkSemaphore> renderFinishedSemaphores;
-    std::vector<VkFence> inFlightFences;
-    uint32_t currentFrame;
-    const int MAX_FRAMES_IN_FLIGHT = 1;
+    struct QueueFamilyIndices {
+        std::optional<uint32_t> graphicsFamily;
+        std::optional<uint32_t> presentFamily;
 
-    // Feature Flags
-    uint32_t apiVersion;
-    bool hasVulkan14;
-    bool hasVulkan13;
-    bool hasTimelineSemaphores;
-    bool hasDynamicRendering;
-    bool has16BitStorage;
-    bool hasHostQueryReset;
-    bool hasLowLatency2;
+        bool isComplete() {
+            return graphicsFamily.has_value() && presentFamily.has_value();
+        }
+    };
 
-    uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-    void createRenderPass();
-    void createPipelineLayout();
-    void createPipelineCache();
-    void createSyncObjects();
-    void createCommandPool();
-    void createCommandBuffers();
-    void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
-    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-    void queryFeatures();
-    bool checkDeviceExtensionSupport(VkPhysicalDevice device, const char* extensionName);
+    struct SwapchainSupportDetails {
+        VkSurfaceCapabilitiesKHR capabilities;
+        std::vector<VkSurfaceFormatKHR> formats;
+        std::vector<VkPresentModeKHR> presentModes;
+    };
+
+    bool createInstance();
+    bool createSurface();
+    bool pickPhysicalDevice();
+    bool createLogicalDevice();
+    bool createSwapchain();
+    void createImageViews();
+
+    bool checkValidationLayerSupport(const std::vector<const char*>& validationLayers);
+    bool isDeviceSuitable(VkPhysicalDevice device);
+    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+    SwapchainSupportDetails querySwapchainSupport(VkPhysicalDevice device);
+    VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+    VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+    VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 };
 
 #endif // VULKAN_RENDERER_H

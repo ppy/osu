@@ -19,6 +19,8 @@ namespace osu.Android.Native
 
         public void Start() => nOboeStart(nativePtr);
 
+        public void Stop() => nOboeStop(nativePtr);
+
         public void Dispose()
         {
             Dispose(true);
@@ -50,5 +52,8 @@ namespace osu.Android.Native
 
         [DllImport("osu.Android.Native")]
         private static extern void nOboeStart(long ptr);
+
+        [DllImport("osu.Android.Native")]
+        private static extern void nOboeStop(long ptr);
     }
 }

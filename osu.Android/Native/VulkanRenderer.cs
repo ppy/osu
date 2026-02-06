@@ -3,6 +3,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using Android.Views;
 
 namespace osu.Android.Native
 {
@@ -15,7 +16,7 @@ namespace osu.Android.Native
             nativePtr = nVulkanCreate();
         }
 
-        public bool Initialize(IntPtr window) => nVulkanInitialize(nativePtr, window);
+        public void Initialize(Surface surface) => nVulkanInit(nativePtr, surface);
 
         public void Render() => nVulkanRender(nativePtr);
 
@@ -46,7 +47,7 @@ namespace osu.Android.Native
         private static extern void nVulkanDestroy(long ptr);
 
         [DllImport("osu.Android.Native")]
-        private static extern bool nVulkanInitialize(long ptr, IntPtr window);
+        private static extern void nVulkanInit(long ptr, Surface surface);
 
         [DllImport("osu.Android.Native")]
         private static extern void nVulkanRender(long ptr);

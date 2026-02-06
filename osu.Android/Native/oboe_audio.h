@@ -7,7 +7,7 @@
 #include <oboe/Oboe.h>
 #include <jni.h>
 
-class OboeAudio : public oboe::AudioStreamDataCallback {
+class OboeAudio : public oboe::AudioStreamCallback {
 public:
     OboeAudio();
     ~OboeAudio();
@@ -20,7 +20,7 @@ public:
     oboe::DataCallbackResult onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) override;
 
 private:
-    std::shared_ptr<oboe::AudioStream> stream;
+    oboe::AudioStream *stream;
 };
 
 #endif // OBOE_AUDIO_H
