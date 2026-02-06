@@ -249,6 +249,9 @@ namespace osu.Game.Online.API.Requests.Responses
                     score.BeatmapInfo.MaxCombo = onlineInfo.MaxCombo;
 #pragma warning restore 618
                 }
+
+                if (beatmap is APIBeatmap apiBeatmap)
+                    score.BeatmapInfo.Status = apiBeatmap.Status;
             }
 
             return score;
