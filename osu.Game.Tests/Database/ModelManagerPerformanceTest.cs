@@ -21,12 +21,13 @@ namespace osu.Game.Tests.Database
             RunTestWithRealm((realm, storage) =>
             {
                 var manager = new TestModelManager(storage, realm);
-                int count = 1000;
+                const int count = 1000;
 
                 // Create items
                 realm.Write(r =>
                 {
                     var ruleset = new RulesetInfo("osu", "osu!", string.Empty, 0) { Available = true };
+
                     for (int i = 0; i < count; i++)
                     {
                         var set = CreateBeatmapSet(ruleset);
@@ -44,7 +45,7 @@ namespace osu.Game.Tests.Database
                 Console.WriteLine($"Deleting {count} items took {sw.ElapsedMilliseconds}ms");
 
                 // Verify deletion
-                var remaining = realm.Run(r => r.All<BeatmapSetInfo>().Count(s => !s.DeletePending));
+                int remaining = realm.Run(r => r.All<BeatmapSetInfo>().Count(s => !s.DeletePending));
                 Assert.AreEqual(0, remaining);
             });
         }
@@ -55,12 +56,13 @@ namespace osu.Game.Tests.Database
             RunTestWithRealm((realm, storage) =>
             {
                 var manager = new TestModelManager(storage, realm);
-                int count = 1000;
+                const int count = 1000;
 
                 // Create items and delete them
                 realm.Write(r =>
                 {
                     var ruleset = new RulesetInfo("osu", "osu!", string.Empty, 0) { Available = true };
+
                     for (int i = 0; i < count; i++)
                     {
                         var set = CreateBeatmapSet(ruleset);
@@ -79,7 +81,7 @@ namespace osu.Game.Tests.Database
                 Console.WriteLine($"Undeleting {count} items took {sw.ElapsedMilliseconds}ms");
 
                 // Verify undeletion
-                var remaining = realm.Run(r => r.All<BeatmapSetInfo>().Count(s => !s.DeletePending));
+                int remaining = realm.Run(r => r.All<BeatmapSetInfo>().Count(s => !s.DeletePending));
                 Assert.AreEqual(count, remaining);
             });
         }
