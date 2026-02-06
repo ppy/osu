@@ -156,10 +156,10 @@ namespace osu.Game.Overlays.SkinEditor
     {
         private readonly Drawable drawable;
 
-        private Drawable originBox = null!;
+        private Drawable? originBox;
 
-        private Drawable anchorBox = null!;
-        private Drawable anchorLine = null!;
+        private Drawable? anchorBox;
+        private Drawable? anchorLine;
 
         public AnchorOriginVisualiser(Drawable drawable)
         {
@@ -201,6 +201,9 @@ namespace osu.Game.Overlays.SkinEditor
         protected override void Update()
         {
             base.Update();
+
+            if (anchorBox == null || originBox == null || anchorLine == null)
+                return;
 
             if (drawable.Parent == null)
                 return;
