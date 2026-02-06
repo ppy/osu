@@ -115,6 +115,30 @@ namespace osu.Game.Tests.Beatmaps
         }
 
         [Test]
+        public void TestStarDifficultyChangesOnModSettingsCorrectlyTrackAcrossReferenceChanges()
+        {
+            OsuModDoubleTime dt = null;
+
+            AddStep("set computation function", () => difficultyCache.ComputeDifficulty = lookup =>
+            {
+                var modRateAdjust = (ModRateAdjust)lookup.OrderedMods.SingleOrDefault(mod => mod is ModRateAdjust);
+                return new StarDifficulty(BASE_STARS + modRateAdjust?.SpeedChange.Value ?? 0, 0);
+            });
+
+            AddStep("change selected mod to DT", () => SelectedMods.Value = new[] { dt = new OsuModDoubleTime { SpeedChange = { Value = 1.5 } } });
+            AddUntilStep($"star difficulty -> {BASE_STARS + 1.5}", () => starDifficultyBindable.Value.Stars == BASE_STARS + 1.5);
+
+            AddStep("change DT speed to 1.25", () => dt.SpeedChange.Value = 1.25);
+            AddUntilStep($"star difficulty -> {BASE_STARS + 1.25}", () => starDifficultyBindable.Value.Stars == BASE_STARS + 1.25);
+
+            AddStep("reconstruct DT mod with same settings", () => SelectedMods.Value = new[] { dt = (OsuModDoubleTime)dt.DeepClone() });
+            AddUntilStep($"star difficulty -> {BASE_STARS + 1.25}", () => starDifficultyBindable.Value.Stars == BASE_STARS + 1.25);
+
+            AddStep("change DT speed to 1.25", () => dt.SpeedChange.Value = 2);
+            AddUntilStep($"star difficulty -> {BASE_STARS + 2}", () => starDifficultyBindable.Value.Stars == BASE_STARS + 2);
+        }
+
+        [Test]
         public void TestStarDifficultyAdjustHashCodeConflict()
         {
             OsuModDifficultyAdjust difficultyAdjust = null;
