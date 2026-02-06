@@ -49,7 +49,7 @@ jobs:
           exit $exit_code
 
       - name: InspectCode
-        run: dotnet jb inspectcode $(pwd)/osu.Desktop.slnf --no-build --output="inspectcodereport.xml" --caches-home="inspectcode" --verbosity=WARN
+        run: dotnet jb inspectcode $(pwd)/osu.Desktop.slnf --no-build --output="inspectcodereport.xml" --caches-home="inspectcode" --verbosity=WARN --f="xml"
 
       - name: NVika
         run: dotnet nvika parsereport "${{github.workspace}}/inspectcodereport.xml" --treatwarningsaserrors
