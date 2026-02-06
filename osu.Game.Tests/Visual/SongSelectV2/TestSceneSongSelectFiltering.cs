@@ -266,6 +266,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
 
             AddAssert("still has selection", () => Beatmap.IsDefault, () => Is.False);
+
+            AddStep("reset star difficulty filter", () => Config.SetValue(OsuSetting.DisplayStarsMinimum, 0.0));
         }
 
         [Test]
@@ -422,6 +424,49 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             WaitForFiltering();
             checkMatchedBeatmaps(3);
             AddAssert("text filter not emptied", () => filterTextBox.Current.Value, () => Is.Not.Empty);
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestUnscopeWhenSelectedBeatmapHiddenByFilters(bool grouped)
+        {
+            ImportBeatmapForRuleset(0);
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+            SortBy(grouped ? SortMode.Title : SortMode.Difficulty);
+            checkMatchedBeatmaps(6);
+
+            AddStep("set star difficulty filter", () => Config.SetValue(OsuSetting.DisplayStarsMaximum, Beatmap.Value.BeatmapSetInfo.Beatmaps.ElementAt(1).StarRating + 0.1));
+            WaitForFiltering();
+
+            AddStep("select second difficulty", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmap.Value.BeatmapSetInfo.Beatmaps.ElementAt(1)));
+            AddUntilStep("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(Beatmap.Value.BeatmapSetInfo.Beatmaps.ElementAt(1)));
+            AddStep("click spread indicator", () =>
+            {
+                if (grouped)
+                    InputManager.MoveMouseTo(this.ChildrenOfType<PanelBeatmapSet.SpreadDisplay>().Single(d => d.Enabled.Value));
+                else
+                    InputManager.MoveMouseTo(this.ChildrenOfType<PanelBeatmapStandalone.SpreadDisplay>().Single(d => d.Enabled.Value));
+
+                InputManager.Click(MouseButton.Left);
+            });
+            WaitForFiltering();
+            checkMatchedBeatmaps(3);
+
+            AddStep("select last difficulty", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(Beatmap.Value.BeatmapSetInfo.Beatmaps.Last()));
+            AddUntilStep("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(Beatmap.Value.BeatmapSetInfo.Beatmaps.Last()));
+
+            AddStep("exit scoped view", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<FilterControl.ScopedBeatmapSetDisplay>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            WaitForFiltering();
+
+            AddAssert("second difficulty is selected", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(Beatmap.Value.BeatmapSetInfo.Beatmaps.ElementAt(1)));
+
+            AddStep("reset star difficulty filter", () => Config.SetValue(OsuSetting.DisplayStarsMaximum, 10.1));
         }
 
         private NoResultsPlaceholder? getPlaceholder() => SongSelect.ChildrenOfType<NoResultsPlaceholder>().FirstOrDefault();
