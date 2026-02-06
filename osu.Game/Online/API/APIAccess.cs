@@ -611,7 +611,10 @@ namespace osu.Game.Online.API
             base.Dispose(isDisposing);
 
             flushQueue();
+
             cancellationToken.Cancel();
+            cancellationToken.Dispose();
+            updateEvent.Dispose();
         }
 
         internal class WebRequestFlushedException : Exception
