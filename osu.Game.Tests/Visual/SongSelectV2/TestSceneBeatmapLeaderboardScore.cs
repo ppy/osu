@@ -337,7 +337,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 InputManager.Click(MouseButton.Right);
             });
 
-
             AddAssert("no delete menu item in context menu", () =>
                 ((IHasContextMenu)score).ContextMenuItems?.Any(item => item is OsuMenuItem osuItem && osuItem.Type == MenuItemType.Destructive) == false);
         }
