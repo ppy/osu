@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
@@ -312,7 +311,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     MaxCombo = 100,
                     TotalScore = 1_000_000,
                     MaximumStatistics = { { HitResult.Great, 100 } },
-                    Ruleset = new OsuRuleset().RulesetInfo,
+                    Ruleset = new TestSceneRulesetDependencies.TestRuleset().RulesetInfo,
                     User = new APIUser
                     {
                         // different from local user
@@ -332,8 +331,15 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 score.Show();
             });
 
+            AddStep("right click panel to open context menu", () =>
+            {
+                InputManager.MoveMouseTo(score);
+                InputManager.Click(MouseButton.Right);
+            });
+
+
             AddAssert("no delete menu item in context menu", () =>
-                !((IHasContextMenu)score).ContextMenuItems.Any(item => item is OsuMenuItem osuItem && osuItem.Type == MenuItemType.Destructive));
+                ((IHasContextMenu)score).ContextMenuItems?.Any(item => item is OsuMenuItem osuItem && osuItem.Type == MenuItemType.Destructive) == false);
         }
 
         public override void SetUpSteps()
