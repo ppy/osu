@@ -20,8 +20,6 @@ namespace osu.Game.Online.Spectator
 
         public override IBindable<bool> IsConnected { get; } = new BindableBool();
 
-        private HubConnection? connection => connector?.CurrentConnection;
-
         public OnlineSpectatorClient(EndpointConfiguration endpoints)
         {
             endpoint = endpoints.SpectatorUrl;
@@ -56,11 +54,11 @@ namespace osu.Game.Online.Spectator
             if (!IsConnected.Value)
                 return;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
             try
             {
-                await connection.InvokeAsync(nameof(ISpectatorServer.BeginPlaySession), scoreToken, state).ConfigureAwait(false);
+                await connector.InvokeAsync(nameof(ISpectatorServer.BeginPlaySession), [scoreToken, state]).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
@@ -82,9 +80,9 @@ namespace osu.Game.Online.Spectator
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.SendAsync(nameof(ISpectatorServer.SendFrameData), bundle);
+            return connector.SendAsync(nameof(ISpectatorServer.SendFrameData), [bundle]);
         }
 
         protected override Task EndPlayingInternal(SpectatorState state)
@@ -92,9 +90,9 @@ namespace osu.Game.Online.Spectator
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.InvokeAsync(nameof(ISpectatorServer.EndPlaySession), state);
+            return connector.InvokeAsync(nameof(ISpectatorServer.EndPlaySession), [state]);
         }
 
         protected override Task WatchUserInternal(int userId)
@@ -102,9 +100,9 @@ namespace osu.Game.Online.Spectator
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.InvokeAsync(nameof(ISpectatorServer.StartWatchingUser), userId);
+            return connector.InvokeAsync(nameof(ISpectatorServer.StartWatchingUser), [userId]);
         }
 
         protected override Task StopWatchingUserInternal(int userId)
@@ -112,9 +110,9 @@ namespace osu.Game.Online.Spectator
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.InvokeAsync(nameof(ISpectatorServer.EndWatchingUser), userId);
+            return connector.InvokeAsync(nameof(ISpectatorServer.EndWatchingUser), [userId]);
         }
 
         protected override async Task DisconnectInternal()

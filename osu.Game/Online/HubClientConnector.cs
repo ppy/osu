@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -74,6 +75,24 @@ namespace osu.Game.Online
             ConfigureConnection?.Invoke(newConnection);
 
             return Task.FromResult((PersistentEndpointClient)new HubClient(newConnection));
+        }
+
+        public Task InvokeAsync(string name, object?[]? args, CancellationToken cancellationToken = default)
+        {
+            Debug.Assert(CurrentConnection != null);
+            return CurrentConnection.InvokeCoreAsync(name, args ?? [], cancellationToken);
+        }
+
+        public Task<TResult> InvokeAsync<TResult>(string name, object?[]? args, CancellationToken cancellationToken = default)
+        {
+            Debug.Assert(CurrentConnection != null);
+            return CurrentConnection.InvokeCoreAsync<TResult>(name, args ?? [], cancellationToken);
+        }
+
+        public Task SendAsync(string name, object?[]? args, CancellationToken cancellationToken = default)
+        {
+            Debug.Assert(CurrentConnection != null);
+            return CurrentConnection.SendCoreAsync(name, args ?? [], cancellationToken);
         }
 
         async Task IHubClientConnector.Disconnect()
