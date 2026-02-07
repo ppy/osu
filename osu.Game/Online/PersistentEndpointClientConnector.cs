@@ -22,7 +22,7 @@ namespace osu.Game.Online
         /// <summary>
         /// The current connection opened by this connector.
         /// </summary>
-        public PersistentEndpointClient? CurrentConnection { get; private set; }
+        protected PersistentEndpointClient? CurrentConnection { get; private set; }
 
         protected readonly IAPIProvider API;
 

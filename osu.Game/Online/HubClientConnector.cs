@@ -31,7 +31,7 @@ namespace osu.Game.Online
         /// <summary>
         /// The current connection opened by this connector.
         /// </summary>
-        public new HubConnection? CurrentConnection => ((HubClient?)base.CurrentConnection)?.Connection;
+        private HubConnection? currentConnection => ((HubClient?)CurrentConnection)?.Connection;
 
         /// <summary>
         /// Constructs a new <see cref="HubClientConnector"/>.
@@ -79,20 +79,20 @@ namespace osu.Game.Online
 
         public Task InvokeAsync(string name, object?[]? args, CancellationToken cancellationToken = default)
         {
-            Debug.Assert(CurrentConnection != null);
-            return CurrentConnection.InvokeCoreAsync(name, args ?? [], cancellationToken);
+            Debug.Assert(currentConnection != null);
+            return currentConnection.InvokeCoreAsync(name, args ?? [], cancellationToken);
         }
 
         public Task<TResult> InvokeAsync<TResult>(string name, object?[]? args, CancellationToken cancellationToken = default)
         {
-            Debug.Assert(CurrentConnection != null);
-            return CurrentConnection.InvokeCoreAsync<TResult>(name, args ?? [], cancellationToken);
+            Debug.Assert(currentConnection != null);
+            return currentConnection.InvokeCoreAsync<TResult>(name, args ?? [], cancellationToken);
         }
 
         public Task SendAsync(string name, object?[]? args, CancellationToken cancellationToken = default)
         {
-            Debug.Assert(CurrentConnection != null);
-            return CurrentConnection.SendCoreAsync(name, args ?? [], cancellationToken);
+            Debug.Assert(currentConnection != null);
+            return currentConnection.SendCoreAsync(name, args ?? [], cancellationToken);
         }
 
         async Task IHubClientConnector.Disconnect()
