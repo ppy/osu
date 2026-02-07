@@ -17,7 +17,7 @@ namespace osu.Game.Online
     public interface IHubClientConnector : IDisposable
     {
         /// <summary>
-        /// Whether this is connected to the hub, use <see cref="CurrentConnection"/> to access the connection, if this is <c>true</c>.
+        /// Whether the user is connected.
         /// </summary>
         IBindable<bool> IsConnected { get; }
 
