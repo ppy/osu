@@ -288,6 +288,7 @@ namespace osu.Game.Screens.SelectV2
                                                                 Anchor = Anchor.CentreLeft,
                                                                 Origin = Anchor.CentreLeft,
                                                                 Size = new Vector2(30, 15),
+                                                                CornerRadius = 1.875f,
                                                             },
                                                             new DateLabel(Score.Date)
                                                             {
