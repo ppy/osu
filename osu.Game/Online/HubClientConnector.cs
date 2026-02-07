@@ -4,8 +4,10 @@
 using System;
 using System.Diagnostics;
 using System.Net.Http;
+using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using osu.Framework;
@@ -32,6 +34,8 @@ namespace osu.Game.Online
         /// The current connection opened by this connector.
         /// </summary>
         private HubConnection? currentConnection => ((HubClient?)CurrentConnection)?.Connection;
+
+        private int webSocketFailureCount;
 
         /// <summary>
         /// Constructs a new <see cref="HubClientConnector"/>.
@@ -63,6 +67,9 @@ namespace osu.Game.Online
                     options.AccessTokenProvider = () => Task.FromResult<string?>(API.AccessToken);
                     options.Headers.Add(VERSION_HASH_HEADER, versionHash);
                     options.Headers.Add(CLIENT_SESSION_ID_HEADER, API.SessionIdentifier.ToString());
+
+                    if (webSocketFailureCount >= 3)
+                        options.Transports &= ~HttpTransportType.WebSockets;
                 });
 
             builder.AddMessagePackProtocol(options =>
@@ -77,22 +84,57 @@ namespace osu.Game.Online
             return Task.FromResult((PersistentEndpointClient)new HubClient(newConnection));
         }
 
+        protected override Task HandleErrorAndDelay(Exception exception, CancellationToken cancellationToken)
+        {
+            if (exception is WebSocketException)
+                webSocketFailureCount++;
+
+            return base.HandleErrorAndDelay(exception, cancellationToken);
+        }
+
         public Task InvokeAsync(string name, object?[]? args, CancellationToken cancellationToken = default)
         {
             Debug.Assert(currentConnection != null);
-            return currentConnection.InvokeCoreAsync(name, args ?? [], cancellationToken);
+
+            try
+            {
+                return currentConnection.InvokeCoreAsync(name, args ?? [], cancellationToken);
+            }
+            catch (WebSocketException)
+            {
+                webSocketFailureCount++;
+                throw;
+            }
         }
 
         public Task<TResult> InvokeAsync<TResult>(string name, object?[]? args, CancellationToken cancellationToken = default)
         {
             Debug.Assert(currentConnection != null);
-            return currentConnection.InvokeCoreAsync<TResult>(name, args ?? [], cancellationToken);
+
+            try
+            {
+                return currentConnection.InvokeCoreAsync<TResult>(name, args ?? [], cancellationToken);
+            }
+            catch (WebSocketException)
+            {
+                webSocketFailureCount++;
+                throw;
+            }
         }
 
         public Task SendAsync(string name, object?[]? args, CancellationToken cancellationToken = default)
         {
             Debug.Assert(currentConnection != null);
-            return currentConnection.SendCoreAsync(name, args ?? [], cancellationToken);
+
+            try
+            {
+                return currentConnection.SendCoreAsync(name, args ?? [], cancellationToken);
+            }
+            catch (WebSocketException)
+            {
+                webSocketFailureCount++;
+                throw;
+            }
         }
 
         async Task IHubClientConnector.Disconnect()
