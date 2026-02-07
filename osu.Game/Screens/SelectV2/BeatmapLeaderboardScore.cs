@@ -633,7 +633,10 @@ namespace osu.Game.Screens.SelectV2
                     items.Add(new OsuMenuItem(CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(Score)));
                 }
 
-                items.Add(new OsuMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
+                if (Score.User.OnlineID == api.LocalUser.Value.Id || Score.Files.Count > 0)
+                {
+                    items.Add(new OsuMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
+                }
 
                 return items.ToArray();
             }

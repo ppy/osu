@@ -8,12 +8,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Mania;
@@ -239,7 +241,6 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     }
                 };
 
-                // create a score with a non-standard ruleset
                 var scoreInfo = new ScoreInfo
                 {
                     Position = 1,
@@ -251,7 +252,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                     Ruleset = new TestSceneRulesetDependencies.TestRuleset().RulesetInfo,
                     User = new APIUser
                     {
-                        Id = 1,
+                        Id = DummyAPIAccess.DUMMY_USER_ID,
                         Username = @"custom ruleset gamer",
                         CountryCode = CountryCode.US,
                     },
@@ -275,6 +276,64 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddAssert("delete menu item exists", () =>
                 this.ChildrenOfType<DrawableOsuMenuItem>().Any(item => ((OsuMenuItem)item.Item).Type == MenuItemType.Destructive));
+        }
+
+        [Test]
+        public void TestNoDeleteButtonOnOtherUserScore()
+        {
+            BeatmapLeaderboardScore score = null!;
+
+            AddStep("create content", () =>
+            {
+                Child = new PopoverContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
+                    {
+                        fillFlow = new FillFlowContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Spacing = new Vector2(0f, 2f),
+                            Shear = OsuGame.SHEAR,
+                        },
+                        drawWidthText = new OsuSpriteText(),
+                    }
+                };
+
+                var scoreInfo = new ScoreInfo
+                {
+                    Position = 1,
+                    Rank = ScoreRank.X,
+                    Accuracy = 1,
+                    MaxCombo = 100,
+                    TotalScore = 1_000_000,
+                    MaximumStatistics = { { HitResult.Great, 100 } },
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                    User = new APIUser
+                    {
+                        // different from local user
+                        Id = DummyAPIAccess.DUMMY_USER_ID + 1,
+                        Username = @"some other player",
+                        CountryCode = CountryCode.JP,
+                    },
+                    Date = DateTimeOffset.Now,
+                };
+
+                fillFlow.Add(score = new BeatmapLeaderboardScore(scoreInfo)
+                {
+                    Rank = scoreInfo.Position,
+                    Shear = Vector2.Zero,
+                });
+
+                score.Show();
+            });
+
+            AddAssert("no delete menu item in context menu", () =>
+                !((IHasContextMenu)score).ContextMenuItems.Any(item => item is OsuMenuItem osuItem && osuItem.Type == MenuItemType.Destructive));
         }
 
         public override void SetUpSteps()
