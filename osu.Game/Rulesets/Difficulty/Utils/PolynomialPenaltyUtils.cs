@@ -4,23 +4,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Rulesets.Difficulty.Utils;
 
-namespace osu.Game.Rulesets.Osu.Difficulty.Utils
+namespace osu.Game.Rulesets.Difficulty.Utils
 {
     /// <summary>
     /// Represents a polynomial fitted to a given set of points.
     /// </summary>
-    public struct Polynomial
+    public static class PolynomialPenaltyUtils
     {
         /// <summary>
         /// The proportions of skill that this polynomial will fit a curve to the miss counts of.
         /// If you want to change these, you need to recompute the <see cref="matrix"/> as it is precomputed to fit these specific values.
         /// </summary>
         public static readonly double[] SKILL_PROPORTIONS = [1, 0.95, 0.9, 0.8, 0.6, 0.3, 0];
-
-        // Stores the coefficients [a, b, c, d] of our polynomial ax^4 + bx^3 + cx^2 + dx
-        private double[]? coefficients;
 
         // Pre-calculated matrix used for curve fitting.
         // It's derived using least-squares regression to find the best-fit polynomial through our data points.
@@ -39,13 +35,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
         /// A dictionary of miss counts, with keys representing skill proportions and values representing the miss count a player would achieve at that skill proportion.
         /// See comment on <see cref="SKILL_PROPORTIONS"/> if you want to use custom skill proportions.
         /// </param>
-        public void Fit(Dictionary<double, double> missCounts)
+        public static double[] GetPenaltyCoefficients(Dictionary<double, double> missCounts)
         {
             double endPoint = missCounts.Values.Max();
 
             double[] sortedSkillProportions = missCounts.Keys.OrderByDescending(k => k).ToArray();
 
-            coefficients = new double[4];
+            double[] coefficients = new double[4];
 
             coefficients[3] = endPoint;
 
@@ -62,26 +58,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
 
                 coefficients[3] -= coefficients[row];
             }
+
+            return coefficients;
         }
 
         /// <summary>
         /// Calculates what percentage penalty the player should receive.
         /// </summary>
+        /// <param name="coefficients">The coefficients to achieve the penalty at</param>
         /// <param name="missCount">The number of misses the player got</param>
         /// <returns>A value between 0 and 1 representing the penalty percentage (0 = no penalty, 1 = full penalty)</returns>
-        public double GetPenaltyAt(double missCount)
+        public static double GetPenaltyAt(double[] coefficients, double missCount)
         {
-            if (coefficients is null)
-                return 1;
-
-            List<double> listCoefficients = coefficients.ToList();
-            listCoefficients.Add(-missCount);
+            // Our first coefficients are the ones derived from the skill proportion miss counts,
+            // and subtracting missCount for the last one sets our root to the corresponding penalty.
+            List<double> listCoefficients = [..coefficients, -missCount];
 
             List<double?> xVals = DifficultyCalculationUtils.SolvePolynomialRoots(listCoefficients);
 
             const double max_error = 1e-7;
 
-            // We find the largest value of x (corresponding to the penalty) found as a root of the function, with a fallback of a 100% penalty if no roots were found.
+            // This will never happen (it is physically impossible for there to not be a root),
+            // but in the interest of sanity we fall back to a 100% penalty if no roots were found.
             double largestValue = xVals.Where(x => x >= 0 - max_error && x <= 1 + max_error).OrderDescending().FirstOrDefault() ?? 1;
 
             return Math.Clamp(largestValue, 0, 1);

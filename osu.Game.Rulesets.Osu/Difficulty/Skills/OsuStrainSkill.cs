@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Mods;
 using System.Linq;
 using osu.Framework.Utils;
 
-namespace osu.Game.Rulesets.Osu.Difficulty.Aggregation
+namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public abstract class OsuStrainSkill : StrainSkill
     {

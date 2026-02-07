@@ -10,9 +10,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Skills;
-using osu.Game.Rulesets.Osu.Difficulty.Aggregation;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
-using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -207,7 +205,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 double relevantMissCount = Math.Min(effectiveMissCount + aimEstimatedSliderBreaks, totalImperfectHits + countSliderTickMiss);
 
-                aimValue *= calculateCurveFittedMissPenalty(relevantMissCount, attributes.AimMissPenaltyCurve);
+                double[] coefficients =
+                [
+                    attributes.AimMissPenaltyCoefficientA,
+                    attributes.AimMissPenaltyCoefficientB,
+                    attributes.AimMissPenaltyCoefficientC,
+                    // We can derive the 4th coefficient from the first third, since at x = 1 our polynomial is equal to the sum of the coefficients,
+                    // and the relevant miss count there is log(totalHits - 1) since our polynomial uses log miss counts.
+                    Math.Log(totalHits + 1) - attributes.AimMissPenaltyCoefficientA - attributes.AimMissPenaltyCoefficientB - attributes.AimMissPenaltyCoefficientC
+                ];
+
+                aimValue *= calculatePolynomialMissPenalty(relevantMissCount, coefficients);
             }
 
             // TC bonuses are excluded when blinds is present as the increased visual difficulty is unimportant when notes cannot be seen.
@@ -529,8 +537,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         // With the curve fitted miss penalty, we use a pre-computed curve of skill levels for each miss count, raised to the power of 1.5 as
         // the multiple of the exponents on star rating and PP. This power should be changed if either SR or PP begin to use a different exponent.
-        // As a result, this exponent is not subject to balance.
-        private double calculateCurveFittedMissPenalty(double missCount, Polynomial curve) => Math.Pow(1 - curve.GetPenaltyAt(Math.Log(missCount + 1)), 1.5);
+        private double calculatePolynomialMissPenalty(double missCount, double[] coefficients) => Math.Pow(1 - PolynomialPenaltyUtils.GetPenaltyAt(coefficients, Math.Log(missCount + 1)), 1.5);
 
         // With the strain count miss penalty, we use the amount of relatively difficult sections to adjust the miss penalty,
         // to make it more punishing on maps with lower amount of hard sections. This formula is subject to balance.

@@ -3,7 +3,7 @@
 
 using System;
 
-namespace osu.Game.Rulesets.Osu.Difficulty.Utils
+namespace osu.Game.Rulesets.Difficulty.Utils
 {
     public static class RootFinding
     {
