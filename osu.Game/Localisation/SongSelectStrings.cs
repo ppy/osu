@@ -269,6 +269,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString MostlyBPM(int mostCommonBPM) => new TranslatableString(getKey(@"mostly_bpm"), @"mostly {0}", mostCommonBPM);
 
+        /// <summary>
+        /// " mapped by "
+        /// </summary>
+        public static LocalisableString MappedBy => new TranslatableString(getKey(@"mapped_by"), @" mapped by ");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
