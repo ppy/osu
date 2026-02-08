@@ -96,6 +96,14 @@ namespace osu.Game.Rulesets.Mods
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
+
+        protected override LocalisableString GetSettingTooltipText(IBindable bindable)
+        {
+            if (ReferenceEquals(bindable, MuteComboCount))
+                return MuteComboSlider.FormatMuteComboValue(MuteComboCount.Value);
+
+            return base.GetSettingTooltipText(bindable);
+        }
     }
 
     public partial class MuteComboSlider : RoundedSliderBar<int>
@@ -105,6 +113,11 @@ namespace osu.Game.Rulesets.Mods
             KeyboardStep = 1;
         }
 
-        public override LocalisableString TooltipText => Current.Value == 0 ? "always muted" : base.TooltipText;
+        public override LocalisableString TooltipText => FormatMuteComboValue(Current.Value);
+
+        public static LocalisableString FormatMuteComboValue(int value)
+        {
+            return value == 0 ? "always muted" : value.ToString();
+        }
     }
 }

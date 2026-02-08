@@ -230,6 +230,16 @@ namespace osu.Game.Localisation
         public static LocalisableString RandomSkin => new TranslatableString(getKey(@"random_skin"), @"Random skin");
 
         /// <summary>
+        /// "Previous skin"
+        /// </summary>
+        public static LocalisableString PreviousSkin => new TranslatableString(getKey(@"previous_skin"), @"Previous skin");
+
+        /// <summary>
+        /// "Next skin"
+        /// </summary>
+        public static LocalisableString NextSkin => new TranslatableString(getKey(@"next_skin"), @"Next skin");
+
+        /// <summary>
         /// "Pause / resume replay"
         /// </summary>
         public static LocalisableString TogglePauseReplay => new TranslatableString(getKey(@"toggle_pause_replay"), @"Pause / resume replay");

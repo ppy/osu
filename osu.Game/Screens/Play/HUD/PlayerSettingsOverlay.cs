@@ -21,8 +21,6 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class PlayerSettingsOverlay : ExpandingContainer
     {
-        public VisualSettings VisualSettings { get; private set; }
-
         private const float padding = 10;
 
         public const float EXPANDED_WIDTH = player_settings_width + padding * 2;
@@ -66,11 +64,7 @@ namespace osu.Game.Screens.Play.HUD
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(0, 20),
                 Margin = new MarginPadding(padding),
-                Children = new PlayerSettingsGroup[]
-                {
-                    VisualSettings = new VisualSettings { Expanded = { Value = false } },
-                    new AudioSettings { Expanded = { Value = false } }
-                }
+                Children = new PlayerSettingsGroup[] { new VisualSettings(), new AudioSettings() }
             });
 
             // For future consideration, this icon should probably not exist.

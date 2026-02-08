@@ -150,7 +150,7 @@ namespace osu.Game.Tournament.Screens.Editors
                             new SettingsButton
                             {
                                 Text = "Add player",
-                                Action = () => playerEditor.CreateNew()
+                                Action = playerEditor.CreateNew
                             },
                             new Container
                             {
