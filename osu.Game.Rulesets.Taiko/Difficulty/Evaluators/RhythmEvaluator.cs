@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject hitObject, double hitWindow)
         {
-            if (hitObject.BaseObject is Swell or DrumRoll)
+            if (hitObject.BaseObject is not Hit)
                 return 0;
 
             TaikoRhythmData rhythmData = ((TaikoDifficultyHitObject)hitObject).RhythmData;
