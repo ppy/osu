@@ -278,6 +278,9 @@ namespace osu.Game.Localisation
         /// "{0} match"
         /// </summary>
         public static LocalisableString FilterMatch(int count) => new TranslatableString(getKey(@"match"), @"{0} match", count);
+        /// " mapped by "
+        /// </summary>
+        public static LocalisableString MappedBy => new TranslatableString(getKey(@"mapped_by"), @" mapped by ");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
