@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data;
+using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 {
@@ -18,6 +19,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject hitObject, double hitWindow)
         {
+            if (hitObject.BaseObject is not Hit)
+                return 0;
+
             TaikoRhythmData rhythmData = ((TaikoDifficultyHitObject)hitObject).RhythmData;
             double difficulty = 0.0d;
 
