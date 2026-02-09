@@ -376,7 +376,7 @@ namespace osu.Game.Rulesets
         /// <remarks>
         /// <see cref="HitResult.Miss"/> is implicitly included. Special types like <see cref="HitResult.IgnoreHit"/> are ignored even when specified.
         /// </remarks>
-        protected virtual IEnumerable<HitResult> GetValidHitResults() => EnumExtensions.GetValuesInOrder<HitResult>();
+        public virtual IEnumerable<HitResult> GetValidHitResults() => EnumExtensions.GetValuesInOrder<HitResult>();
 
         /// <summary>
         /// Get a display friendly name for the specified result type.
