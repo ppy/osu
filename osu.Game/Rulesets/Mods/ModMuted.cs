@@ -108,6 +108,11 @@ namespace osu.Game.Rulesets.Mods
 
     public partial class MuteComboSlider : RoundedSliderBar<int>
     {
+        public MuteComboSlider()
+        {
+            KeyboardStep = 1;
+        }
+
         public override LocalisableString TooltipText => FormatMuteComboValue(Current.Value);
 
         public static LocalisableString FormatMuteComboValue(int value)

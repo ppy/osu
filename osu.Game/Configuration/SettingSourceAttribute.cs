@@ -140,7 +140,7 @@ namespace osu.Game.Configuration
                             LabelText = attr.Label,
                             TooltipText = attr.Description,
                             Current = bNumber,
-                            KeyboardStep = 0.1f,
+                            KeyboardStep = bNumber.Precision,
                         };
 
                         break;
@@ -151,7 +151,7 @@ namespace osu.Game.Configuration
                             LabelText = attr.Label,
                             TooltipText = attr.Description,
                             Current = bNumber,
-                            KeyboardStep = 0.1f,
+                            KeyboardStep = (float)bNumber.Precision,
                         };
 
                         break;
@@ -161,7 +161,8 @@ namespace osu.Game.Configuration
                         {
                             LabelText = attr.Label,
                             TooltipText = attr.Description,
-                            Current = bNumber
+                            Current = bNumber,
+                            KeyboardStep = bNumber.Precision,
                         };
 
                         break;
