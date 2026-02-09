@@ -51,7 +51,7 @@ namespace osu.Game.Database
 
             var beatmap = new Beatmap();
 
-            HitResult maxRulesetJudgement = ruleset.GetHitResults().First().result;
+            HitResult maxRulesetJudgement = ruleset.GetHitResultsForDisplay().First().result;
 
             // This is a list of all results, ordered from best to worst.
             // We are constructing a "best possible" score from the statistics provided because it's the best we can do.
