@@ -181,10 +181,15 @@ namespace osu.Game.Rulesets.Catch
             return new[]
             {
                 HitResult.Great,
+                HitResult.Miss,
 
                 HitResult.LargeTickHit,
+                HitResult.LargeTickMiss,
                 HitResult.SmallTickHit,
+                HitResult.SmallTickMiss,
                 HitResult.LargeBonus,
+                HitResult.IgnoreHit,
+                HitResult.IgnoreMiss,
             };
         }
 

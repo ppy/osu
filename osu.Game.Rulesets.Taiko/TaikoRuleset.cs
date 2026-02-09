@@ -228,9 +228,12 @@ namespace osu.Game.Rulesets.Taiko
             {
                 HitResult.Great,
                 HitResult.Ok,
+                HitResult.Miss,
 
                 HitResult.SmallBonus,
                 HitResult.LargeBonus,
+                HitResult.IgnoreHit,
+                HitResult.IgnoreMiss,
             };
         }
 

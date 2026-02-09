@@ -284,12 +284,17 @@ namespace osu.Game.Rulesets.Osu
                 HitResult.Great,
                 HitResult.Ok,
                 HitResult.Meh,
+                HitResult.Miss,
 
                 HitResult.LargeTickHit,
+                HitResult.LargeTickMiss,
                 HitResult.SmallTickHit,
+                HitResult.SmallTickMiss,
                 HitResult.SliderTailHit,
                 HitResult.SmallBonus,
                 HitResult.LargeBonus,
+                HitResult.IgnoreHit,
+                HitResult.IgnoreMiss,
             };
         }
 
