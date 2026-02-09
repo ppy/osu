@@ -250,8 +250,8 @@ namespace osu.Game.Screens.SelectV2
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            beatmap.BindValueChanged(_ => updateDisplay());
-            onlineLookupResult.BindValueChanged(_ => updateDisplay());
+            beatmap.BindValueChanged(_ => Scheduler.AddOnce(updateDisplay));
+            onlineLookupResult.BindValueChanged(_ => Scheduler.AddOnce(updateDisplay));
 
             apiState = api.State.GetBoundCopy();
             apiState.BindValueChanged(_ => Scheduler.AddOnce(updateDisplay), true);
