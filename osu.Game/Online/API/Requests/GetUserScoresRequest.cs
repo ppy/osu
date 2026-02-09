@@ -12,29 +12,29 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetUserScoresRequest : PaginatedAPIRequest<List<SoloScoreInfo>>
     {
-        private readonly long userId;
-        private readonly ScoreType type;
-        private readonly RulesetInfo ruleset;
+        public readonly long UserId;
+        public readonly ScoreType Type;
+        public readonly RulesetInfo Ruleset;
 
         public GetUserScoresRequest(long userId, ScoreType type, PaginationParameters pagination, RulesetInfo ruleset = null)
             : base(pagination)
         {
-            this.userId = userId;
-            this.type = type;
-            this.ruleset = ruleset;
+            UserId = userId;
+            Type = type;
+            Ruleset = ruleset;
         }
 
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
 
-            if (ruleset != null)
-                req.AddParameter("mode", ruleset.ShortName);
+            if (Ruleset != null)
+                req.AddParameter("mode", Ruleset.ShortName);
 
             return req;
         }
 
-        protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLowerInvariant()}";
+        protected override string Target => $@"users/{UserId}/scores/{Type.ToString().ToLowerInvariant()}";
     }
 
     public enum ScoreType
