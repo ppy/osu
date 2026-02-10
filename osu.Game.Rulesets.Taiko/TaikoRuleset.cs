@@ -222,15 +222,18 @@ namespace osu.Game.Rulesets.Taiko
 
         public override RulesetSettingsSubsection CreateSettings() => new TaikoSettingsSubsection(this);
 
-        protected override IEnumerable<HitResult> GetValidHitResults()
+        public override IEnumerable<HitResult> GetValidHitResults()
         {
             return new[]
             {
                 HitResult.Great,
                 HitResult.Ok,
+                HitResult.Miss,
 
                 HitResult.SmallBonus,
                 HitResult.LargeBonus,
+                HitResult.IgnoreHit,
+                HitResult.IgnoreMiss,
             };
         }
 
