@@ -48,9 +48,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             const double reduced_difficulty_base_line = 0.0; // Assume the first seconds are completely memorised
 
-            if (difficulties.Length == 0)
-                return;
-
             int reducedNoteCount = calculateReducedNoteCount();
 
             for (int i = 0; i < Math.Min(difficulties.Length, reducedNoteCount); i++)
