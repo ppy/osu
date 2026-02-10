@@ -245,7 +245,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             userFlag.CountryCode = user?.CountryCode ?? default;
             teamFlagContainer.Child = new UpdateableTeamFlag(user?.Team)
             {
-                Size = new Vector2(40, 20)
+                Size = new Vector2(40, 20),
             };
             username.Text = user?.Username ?? string.Empty;
 
