@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.Rankings.Tables
                 TextAnchor = Anchor.CentreLeft
             };
             username.AddUserLink(item.User);
-            return [new UpdateableTeamFlag(item.User.Team) { Size = new Vector2(40, 20) }, username];
+            return [new UpdateableTeamFlag(item.User.Team) { Size = new Vector2(40, 20), CornerRadius = 2.5f }, username];
         }
 
         protected sealed override Drawable[] CreateAdditionalContent(UserStatistics item) => new[]

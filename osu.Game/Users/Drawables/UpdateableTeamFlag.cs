@@ -1,17 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
+using osu.Framework.Graphics.Effects;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Users.Drawables
@@ -31,10 +24,53 @@ namespace osu.Game.Users.Drawables
             }
         }
 
+        public new bool Masking
+        {
+            get => base.Masking;
+            set => base.Masking = value;
+        }
+
+        public new float CornerRadius
+        {
+            get => base.CornerRadius;
+            set => base.CornerRadius = value;
+        }
+
+        public new EdgeEffectParameters EdgeEffect
+        {
+            get => base.EdgeEffect;
+            set => base.EdgeEffect = value;
+        }
+
+        /// <summary>
+        /// Perform an action in addition to showing the team profile.
+        /// This should be used to perform auxiliary tasks and not as a primary action for clicking a flag (to maintain a consistent UX).
+        /// Ignored if `isInteractive` is false.
+        /// </summary>
+        public Action? Action;
+
         protected override double LoadDelay => 200;
 
-        public UpdateableTeamFlag(APITeam? team = null)
+        private readonly bool isInteractive;
+        private readonly bool hideOnNull;
+        private readonly bool showTooltipOnHover;
+
+        /// <summary>
+        /// Construct a new UpdateableTeamFlag.
+        /// </summary>
+        /// <param name="team">The initial team to display.</param>
+        /// <param name="isInteractive">If set to true, hover/click sounds will play and clicking the flag will open the team's profile.</param>
+        /// <param name="showTooltipOnHover">
+        /// If set to true, the team's name is displayed in the tooltip.
+        /// Only has an effect if <see cref="isInteractive"/> is true.
+        /// </param>
+        /// <param name="hideOnNull">Whether to hide the flag when the provided team is null.</param>
+        public UpdateableTeamFlag(APITeam? team = null, bool isInteractive = true, bool hideOnNull = true, bool showTooltipOnHover = true)
         {
+            this.isInteractive = isInteractive;
+            this.hideOnNull = hideOnNull;
+            this.showTooltipOnHover = showTooltipOnHover;
+
             Team = team;
 
             Masking = true;
@@ -42,69 +78,26 @@ namespace osu.Game.Users.Drawables
 
         protected override Drawable? CreateDrawable(APITeam? team)
         {
-            if (team == null)
+            if (team == null && hideOnNull)
                 return Empty();
 
-            return new TeamFlag(team) { RelativeSizeAxes = Axes.Both };
+            if (isInteractive)
+            {
+                return new ClickableTeamFlag(team, showTooltipOnHover)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Action = Action,
+                };
+            }
+
+            return new DrawableTeamFlag(team)
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
         }
 
         // Generally we just want team flags to disappear if the user doesn't have one.
         // This also handles fill flow cases and avoids spacing being added for non-displaying flags.
-        public override bool IsPresent => base.IsPresent && Team != null;
-
-        protected override void Update()
-        {
-            base.Update();
-
-            CornerRadius = DrawHeight / 8;
-        }
-
-        [LongRunningLoad]
-        public partial class TeamFlag : CompositeDrawable, IHasTooltip
-        {
-            private readonly APITeam team;
-
-            public LocalisableString TooltipText { get; }
-
-            [Resolved]
-            private OsuGame? game { get; set; }
-
-            [Resolved]
-            private IAPIProvider api { get; set; } = null!;
-
-            public TeamFlag(APITeam team)
-            {
-                this.team = team;
-                TooltipText = team.Name;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(LargeTextureStore textures)
-            {
-                InternalChildren = new Drawable[]
-                {
-                    new HoverClickSounds(),
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Colour4.FromHex("333"),
-                    },
-                    new Sprite
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Texture = textures.Get(team.FlagUrl),
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        FillMode = FillMode.Fit,
-                    }
-                };
-            }
-
-            protected override bool OnClick(ClickEvent e)
-            {
-                game?.OpenUrlExternally($"{api.Endpoints.WebsiteUrl}/teams/{team.Id}");
-                return true;
-            }
-        }
+        public override bool IsPresent => base.IsPresent && (Team != null || !hideOnNull);
     }
 }

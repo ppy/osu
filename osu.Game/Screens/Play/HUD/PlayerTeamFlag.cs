@@ -38,6 +38,7 @@ namespace osu.Game.Screens.Play.HUD
             InternalChild = flag = new UpdateableTeamFlag
             {
                 RelativeSizeAxes = Axes.Both,
+                CornerRadius = default_size / 16f,
             };
         }
 
