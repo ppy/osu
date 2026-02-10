@@ -428,10 +428,10 @@ namespace osu.Game.Online.API
                         // attempt to parse a non-form error message
                         var response = JObject.Parse(req.GetResponseString().AsNonNull());
 
-                        string redirect = (string)response.SelectToken(@"url", true);
+                        string redirect = (string)response.SelectToken(@"url", false);
                         string message = (string)response.SelectToken(@"error", false);
 
-                        if (!string.IsNullOrEmpty(redirect))
+                        if (!string.IsNullOrEmpty(redirect) || !string.IsNullOrEmpty(message))
                         {
                             return new RegistrationRequest.RegistrationRequestErrors
                             {
