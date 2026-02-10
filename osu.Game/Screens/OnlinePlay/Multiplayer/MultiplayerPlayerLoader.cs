@@ -3,6 +3,7 @@
 
 using System;
 using System.Threading.Tasks;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
@@ -48,7 +49,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.OnPlayerLoaded();
 
-            if (configManager != null && configManager.Get<bool>(OsuSetting.RequestFocusOnMultiplayerGameplayStart))
+            bool shouldRequestFocus = configManager?.Get<bool>(OsuSetting.RequestFocusOnMultiplayerGameplayStart) ?? false;
+
+            if (shouldRequestFocus && RuntimeInfo.IsDesktop)
                 game?.Window?.Raise();
             else
                 game?.Window?.Flash();
