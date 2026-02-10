@@ -10,7 +10,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
-    public class MultiplayerSettings : SettingsSubsection
+    public partial class MultiplayerSettings : SettingsSubsection
     {
         protected override LocalisableString Header => UserInterfaceStrings.MultiplayerHeader;
 
