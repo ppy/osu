@@ -146,6 +146,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         public static double SumCognitionDifficulty(double reading, double flashlight)
         {
+            if (reading <= 0)
+                return flashlight;
+
+            if (flashlight <= 0)
+                return reading;
+
             // Nerf flashlight value in cognition sum when reading is greater than flashlight
             return DifficultyCalculationUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, reading, flashlight * Math.Clamp(flashlight / reading, 0.25, 1.0));
         }
