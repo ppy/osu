@@ -150,10 +150,14 @@ namespace osu.Game.Rulesets.Difficulty
         }
 
         /// <summary>
-        /// Calculates the difficulty of the beatmap using a specific mod combination and returns enumerable <see cref="TimedDifficultyAttributes"/> representing the difficulty at every relevant time value in the beatmap.
+        /// Calculates the difficulty of the beatmap using a specific mod combination and returns
+        /// a lazy-evaluated enumerable of <see cref="TimedDifficultyAttributes"/> representing the difficulty at every relevant time value in the beatmap.
         /// </summary>
         /// <remarks>
-        /// The returned task represents the operations related to the initialization the difficulty calculation (pre-processing).<br />
+        /// The returned task represents the operations related to the initialisation of the difficulty calculation (pre-processing).
+        /// The pre-processing in question can be cancelled via <paramref name="cancellationToken"/>.
+        /// Once the pre-processing is done, the returned enumerable no longer respects the <paramref name="cancellationToken"/>.
+        /// Enumeration will be lazy and blocking; callers are expected to stop enumerating if they no longer wish to receive timed difficulty attributes.
         /// </remarks>
         /// <param name="mods">The mods that should be applied to the beatmap.</param>
         /// <param name="cancellationToken">The cancellation token for pre-processing.</param>
