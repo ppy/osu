@@ -353,14 +353,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 // If sliders in the map are hard - it's likely for player to drop sliderends
                 // If map has easy sliders - it's more likely for player to sliderbreak
-                double likelyMissedSliderendPortion = 0.04 + 0.06 * Math.Pow(Math.Min(attributes.AimTopWeightedSliderFactor, 1), 2);
+                double likelyMissedSliderendPortion = 0.05 + 0.06 * Math.Pow(Math.Min(1 - attributes.SliderFactor, 1), 2);
 
                 // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
                 // In classic scores we can't know the amount of dropped sliders so we estimate it
-                double fullComboThreshold = attributes.MaxCombo - Math.Min(4 + likelyMissedSliderendPortion * attributes.SliderCount, attributes.SliderCount);
+                double likelyMissedSliderends = Math.Min(2 + likelyMissedSliderendPortion * attributes.SliderCount, attributes.SliderCount);
+                double fullComboThreshold = attributes.MaxCombo - likelyMissedSliderends;
 
-                if (scoreMaxCombo < fullComboThreshold)
+                double leniencyBounds = likelyMissedSliderends * 0.5;
+
+                if (scoreMaxCombo < fullComboThreshold + leniencyBounds)
+                {
                     missCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
+
+                    // Apply a gradient to ensure combo threshold isn't all or nothing
+                    // Graph is skewed such that lower numbers of drops are treated more favorably
+                    // Constants are such that having scoreMaxCombo == fullComboThreshold produces ~0.5 misses
+                    missCount *= Math.Pow(DifficultyCalculationUtils.Smootherstep(scoreMaxCombo, fullComboThreshold + leniencyBounds, fullComboThreshold - leniencyBounds * 0.62641), 2);
+                }
 
                 // In classic scores there can't be more misses than a sum of all non-perfect judgements
                 missCount = Math.Min(missCount, totalImperfectHits);
@@ -530,7 +540,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         // Miss penalty assumes that a player will miss on the hardest parts of a map,
         // so we use the amount of relatively difficult sections to adjust miss penalty
         // to make it more punishing on maps with lower amount of hard sections.
-        private double calculateMissPenalty(double missCount, double difficultStrainCount) => 0.96 / ((missCount / (4 * Math.Pow(Math.Log(difficultStrainCount), 0.94))) + 1);
+        private double calculateMissPenalty(double missCount, double difficultStrainCount) => double.Lerp(1,
+            0.96 / ((missCount / (4 * Math.Pow(Math.Log(difficultStrainCount), 0.94))) + 1), // Actual miss penalty (for misses >= 1)
+            Math.Pow(DifficultyCalculationUtils.Smoothstep(missCount, 0, 1), 0.6) // Scales penalty for 0 < misses < 1
+        );
+
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
