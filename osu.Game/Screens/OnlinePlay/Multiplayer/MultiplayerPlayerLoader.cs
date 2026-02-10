@@ -22,7 +22,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private MultiplayerClient multiplayerClient { get; set; } = null!;
 
         [Resolved]
-        private OsuGame? game { get; set; }
+        private OsuGameBase? game { get; set; }
 
         [Resolved]
         private OsuConfigManager? configManager { get; set; }
