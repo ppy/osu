@@ -238,6 +238,8 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.DashboardSortMode, UserSortCriteria.LastVisit);
             SetDefault(OsuSetting.DashboardDisplayStyle, OverlayPanelDisplayStyle.Card);
+
+            SetDefault(OsuSetting.RequestFocusOnMultiplayerGameplayStart, true);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -493,5 +495,7 @@ namespace osu.Game.Configuration
 
         DashboardSortMode,
         DashboardDisplayStyle,
+
+        RequestFocusOnMultiplayerGameplayStart,
     }
 }

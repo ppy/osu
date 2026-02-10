@@ -25,7 +25,8 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 new GeneralSettings(),
                 new MainMenuSettings(),
-                new SongSelectSettings()
+                new SongSelectSettings(),
+                new MultiplayerSettings(),
             };
         }
     }
