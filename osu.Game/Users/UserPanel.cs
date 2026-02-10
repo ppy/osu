@@ -140,7 +140,6 @@ namespace osu.Game.Users
         protected Drawable CreateTeamLogo() => new UpdateableTeamFlag(User.Team)
         {
             Size = new Vector2(52, 26),
-            CornerRadius = 3.25f,
         };
 
         public MenuItem[] ContextMenuItems

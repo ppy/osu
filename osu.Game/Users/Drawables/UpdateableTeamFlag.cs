@@ -29,10 +29,16 @@ namespace osu.Game.Users.Drawables
             set => base.Masking = value;
         }
 
+        private bool useDefaultRadius = true;
+
         public new float CornerRadius
         {
             get => base.CornerRadius;
-            set => base.CornerRadius = value;
+            set
+            {
+                useDefaultRadius = false;
+                base.CornerRadius = value;
+            }
         }
 
         public new EdgeEffectParameters EdgeEffect
@@ -85,6 +91,14 @@ namespace osu.Game.Users.Drawables
             {
                 RelativeSizeAxes = Axes.Both,
             };
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (useDefaultRadius)
+                base.CornerRadius = DrawHeight / 8;
         }
 
         // Generally we just want team flags to disappear if the user doesn't have one.

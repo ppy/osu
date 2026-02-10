@@ -135,7 +135,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                         Size = new Vector2(28, 14),
-                                        CornerRadius = 1.75f,
                                         Margin = new MarginPadding { Top = 3 }, // makes spacing look more even
                                     },
                                 }

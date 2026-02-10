@@ -246,7 +246,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             teamFlagContainer.Child = new UpdateableTeamFlag(user?.Team)
             {
                 Size = new Vector2(40, 20),
-                CornerRadius = 2.5f,
             };
             username.Text = user?.Username ?? string.Empty;
 
