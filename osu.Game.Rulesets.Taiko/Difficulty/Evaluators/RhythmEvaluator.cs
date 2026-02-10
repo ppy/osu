@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             double samePattern = 0;
             double intervalPenalty = 0;
 
-            double hitWindow = hitObject.HitWindow(HitResult.Great) / 2.0; // this is practically incorrect, but kept as is for balancing
+            double hitWindow = hitObject.HitWindow(HitResult.Great);
 
             if (rhythmData.SameRhythmGroupedHitObjects?.FirstHitObject == hitObject) // Difficulty for SameRhythmGroupedHitObjects
             {
