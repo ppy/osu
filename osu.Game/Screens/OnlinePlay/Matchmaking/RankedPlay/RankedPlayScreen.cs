@@ -49,7 +49,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         public RankedPlaySubScreen? ActiveSubScreen { get; private set; }
 
-        protected override BackgroundScreen CreateBackground() => new MatchmakingBackgroundScreen(new OverlayColourProvider(OverlayColourScheme.Pink));
+        protected override BackgroundScreen CreateBackground() => new RankedPlayBackgroundScreen();
+
+        public override float BackgroundParallaxAmount => 0;
 
         [Cached(typeof(OnlinePlayBeatmapAvailabilityTracker))]
         private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new MultiplayerBeatmapAvailabilityTracker();
