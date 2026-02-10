@@ -22,7 +22,8 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 Current = config.GetBindable<bool>(OsuSetting.RequestFocusOnMultiplayerGameplayStart),
             })
             {
-                Keywords = new[] { "multiplayer", "match", "request", "focus", "window" }
+                Keywords = new[] { "multiplayer", "match", "request", "focus", "window" },
+                ShowRevertToDefaultButton = true,
             };
         }
     }
