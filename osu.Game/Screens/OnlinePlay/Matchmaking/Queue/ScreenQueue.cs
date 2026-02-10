@@ -29,6 +29,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
@@ -103,6 +104,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
+                    new GlobalScrollAdjustsVolume(),
                     cloud = new CloudVisualisation
                     {
                         Y = -100,
