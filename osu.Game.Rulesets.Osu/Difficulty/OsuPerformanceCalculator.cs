@@ -253,7 +253,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 // Increasing the speed value for Traceable also isn't ideal as speed distance bonus has been moved to aim.
                 // Minimal buff is given, and is strictly (and significantly) less than the aim bonus.
-                speedValue *= 1.0 + 0.04 * DifficultyCalculationUtils.ReverseLerp(approachRate, 12, 8);
+                speedValue *= 1.0 + 0.06 * DifficultyCalculationUtils.ReverseLerp(approachRate, 12, 8);
             }
 
             double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
@@ -550,7 +550,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // AR8+ and TC increases difficulty due to increased circle location uncertainty
             // Minimal buffs are given until approximately AR10
             if (approachRate > 8)
-                traceableBonus += ((0.001 * Math.Pow(approachRate - 8, 2)) + (0.0025 * (approachRate - 8))) * highApproachRateSliderVisibilityFactor * Math.Max(highCircleSizeSliderVisibilityFactor, highApproachRateSliderVisibilityFactor);
+                traceableBonus += ((0.001 * Math.Pow(approachRate - 8, 2)) + (0.005 * (approachRate - 8))) * highApproachRateSliderVisibilityFactor * Math.Max(highCircleSizeSliderVisibilityFactor, highApproachRateSliderVisibilityFactor);
 
             traceableBonus *= lowCircleSizeLowApproachRateVisibilityFactor;
             return traceableBonus;
