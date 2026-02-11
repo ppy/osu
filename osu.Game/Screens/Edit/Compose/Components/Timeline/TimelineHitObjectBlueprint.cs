@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -322,6 +323,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private Timeline timeline { get; set; } = null!;
 
             [Resolved]
+            private TimelineBlueprintContainer blueprintContainer { get; set; } = null!;
+
+            [Resolved]
             private IEditorChangeHandler? changeHandler { get; set; }
 
             private ScheduledDelegate? dragOperation;
@@ -456,8 +460,29 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 if (endTimeHitObject.EndTime == snappedTime)
                                     return;
 
-                                endTimeHitObject.Duration = snappedTime - hitObject.StartTime;
-                                beatmap.Update(hitObject);
+                                List<HitObject> objectsToAdjust = new List<HitObject>();
+
+                                foreach (var item in blueprintContainer.SelectionHandler.SelectedItems)
+                                {
+                                    if (item is IHasDuration durationItem &&
+                                        durationItem.Duration == endTimeHitObject.Duration &&
+                                        item.StartTime == hitObject.StartTime
+                                       )
+                                    {
+                                        objectsToAdjust.Add(item);
+                                    }
+                                }
+
+                                // If nothing is selected it means the user is just dragging a slider end
+                                if (objectsToAdjust.Count == 0)
+                                    objectsToAdjust.Add(hitObject);
+
+                                foreach (var obj in objectsToAdjust)
+                                {
+                                    (obj as IHasDuration).Duration = snappedTime - obj.StartTime;
+                                    beatmap.Update(obj);
+                                }
+
                                 break;
                         }
                     }
