@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing.Data;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
 
@@ -11,38 +12,21 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
     public class ManiaDifficultyHitObject : DifficultyHitObject
     {
         public new ManiaHitObject BaseObject => (ManiaHitObject)base.BaseObject;
-
-        private readonly List<DifficultyHitObject>[] perColumnObjects;
+        public int Column => BaseObject.Column;
+        public bool IsLong => EndTime > StartTime;
 
         private readonly int columnIndex;
+        public readonly List<DifficultyHitObject>[] PerColumnObjects;
 
-        public readonly int Column;
-
-        // The hit object earlier in time than this note in each column
-        public readonly ManiaDifficultyHitObject?[] PreviousHitObjects;
-
-        public readonly double ColumnStrainTime;
+        public ManiaDifficultyData DifficultyData;
+        public int StrainTimePointIndex;
 
         public ManiaDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, List<DifficultyHitObject>[] perColumnObjects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
-            int totalColumns = perColumnObjects.Length;
-            this.perColumnObjects = perColumnObjects;
-            Column = BaseObject.Column;
+            DifficultyData = new ManiaDifficultyData();
+            PerColumnObjects = perColumnObjects;
             columnIndex = perColumnObjects[Column].Count;
-            PreviousHitObjects = new ManiaDifficultyHitObject[totalColumns];
-            ColumnStrainTime = StartTime - PrevInColumn(0)?.StartTime ?? StartTime;
-
-            if (index > 0)
-            {
-                ManiaDifficultyHitObject prevNote = (ManiaDifficultyHitObject)objects[index - 1];
-
-                for (int i = 0; i < prevNote.PreviousHitObjects.Length; i++)
-                    PreviousHitObjects[i] = prevNote.PreviousHitObjects[i];
-
-                // intentionally depends on processing order to match live.
-                PreviousHitObjects[prevNote.Column] = prevNote;
-            }
         }
 
         /// <summary>
@@ -50,10 +34,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         /// </summary>
         /// <param name="backwardsIndex">The number of notes to go back.</param>
         /// <returns>The object in this column <paramref name="backwardsIndex"/> notes back, or null if this is the first note in the column.</returns>
-        public ManiaDifficultyHitObject? PrevInColumn(int backwardsIndex)
+        public ManiaDifficultyHitObject? PrevInColumn(int backwardsIndex = 0)
         {
             int index = columnIndex - (backwardsIndex + 1);
-            return index >= 0 && index < perColumnObjects[Column].Count ? (ManiaDifficultyHitObject)perColumnObjects[Column][index] : null;
+            return index >= 0 && index < PerColumnObjects[Column].Count ? (ManiaDifficultyHitObject)PerColumnObjects[Column][index] : null;
         }
 
         /// <summary>
@@ -61,10 +45,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
         /// </summary>
         /// <param name="forwardsIndex">The number of notes to go forward.</param>
         /// <returns>The object in this column <paramref name="forwardsIndex"/> notes forward, or null if this is the last note in the column.</returns>
-        public ManiaDifficultyHitObject? NextInColumn(int forwardsIndex)
+        public ManiaDifficultyHitObject? NextInColumn(int forwardsIndex = 0)
         {
             int index = columnIndex + (forwardsIndex + 1);
-            return index >= 0 && index < perColumnObjects[Column].Count ? (ManiaDifficultyHitObject)perColumnObjects[Column][index] : null;
+            return index >= 0 && index < PerColumnObjects[Column].Count ? (ManiaDifficultyHitObject)PerColumnObjects[Column][index] : null;
         }
     }
 }
