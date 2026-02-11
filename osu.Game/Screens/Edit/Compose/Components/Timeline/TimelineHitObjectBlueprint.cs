@@ -460,26 +460,25 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 if (endTimeHitObject.EndTime == snappedTime)
                                     return;
 
-                                List<HitObject> objectsToAdjust = new List<HitObject>();
+                                List<HitObject> objsToAdjust = new List<HitObject>();
 
                                 foreach (var item in blueprintContainer.SelectionHandler.SelectedItems)
                                 {
-                                    if (item is IHasDuration durationItem &&
-                                        durationItem.Duration == endTimeHitObject.Duration &&
-                                        item.StartTime == hitObject.StartTime
-                                       )
+                                    var durationItem = item as IHasDuration;
+
+                                    if (durationItem!.Duration == endTimeHitObject.Duration && item.StartTime == hitObject.StartTime)
                                     {
-                                        objectsToAdjust.Add(item);
+                                        objsToAdjust.Add(item);
                                     }
                                 }
 
-                                // If nothing is selected it means the user is just dragging a slider end
-                                if (objectsToAdjust.Count == 0)
-                                    objectsToAdjust.Add(hitObject);
+                                // If nothing has been added to the list, the user has not selected anything and is just performing a simple drag.
+                                if (objsToAdjust.Count == 0)
+                                    objsToAdjust.Add(hitObject);
 
-                                foreach (var obj in objectsToAdjust)
+                                foreach (var obj in objsToAdjust)
                                 {
-                                    (obj as IHasDuration).Duration = snappedTime - obj.StartTime;
+                                    (obj as IHasDuration)!.Duration = snappedTime - obj.StartTime;
                                     beatmap.Update(obj);
                                 }
 
