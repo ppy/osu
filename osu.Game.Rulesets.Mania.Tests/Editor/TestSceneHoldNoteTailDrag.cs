@@ -133,8 +133,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                 ]);
             });
 
-            AddStep("Start select", selectAllNotes);
-            AddStep("End select", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddStep("Select all", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects);
+            });
 
             AddStep("Drag tail", () =>
             {
@@ -164,8 +166,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                 ]);
             });
 
-            AddStep("Start select", selectAllNotes);
-            AddStep("End select", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddStep("Select all", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects);
+            });
 
             AddStep("Drag tail", () =>
             {
@@ -195,8 +199,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                 ]);
             });
 
-            AddStep("Start select", selectAllNotes);
-            AddStep("End select", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddStep("Select all", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects);
+            });
 
             AddStep("Drag tail", () =>
             {
@@ -212,13 +218,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                 var holdNote2 = EditorBeatmap.HitObjects.Last() as IHasDuration;
                 return holdNote2!.Duration < 937.5f && holdNote1!.Duration == 937.5f;
             });
-        }
-
-        private void selectAllNotes()
-        {
-            InputManager.MoveMouseTo(new Vector2(1100, 110));
-            InputManager.PressButton(MouseButton.Left);
-            InputManager.MoveMouseTo(new Vector2(-50, 110));
         }
 
         private void dragForward(DragArea dragArea)
