@@ -55,6 +55,12 @@ namespace osu.Game.Online.Multiplayer
         [Key(7)]
         public bool VotedToSkipIntro;
 
+        /// <summary>
+        /// The role of this user in the room.
+        /// </summary>
+        [Key(8)]
+        public MultiplayerRoomUserRole Role;
+
         [IgnoreMember]
         public APIUser? User { get; set; }
 
