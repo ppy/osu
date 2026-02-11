@@ -251,7 +251,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
             else if (score.Mods.Any(m => m is OsuModTraceable))
             {
-                speedValue *= 1.0 + calculateTraceableBonus();
+                // Increasing the speed value for Traceable also isn't ideal as speed distance bonus has been moved to aim.
+                // Minimal buff is given, and is strictly (and significantly) less than the aim bonus.
+                speedValue *= 1.0 + 0.04 * DifficultyCalculationUtils.ReverseLerp(approachRate, 12, 8);
             }
 
             double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
@@ -545,9 +547,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (approachRate < 0)
                 traceableBonus += 0.01 * (1 - Math.Pow(1.5, approachRate)) * Math.Pow(lowApproachRateSliderVisibilityFactor, 1.5) * Math.Max(highCircleSizeSliderVisibilityFactor, lowApproachRateSliderVisibilityFactor);
 
-            // AR8+ and especially AR10.3+ TC increases difficulty due to increased circle location uncertainty
+            // AR8+ and TC increases difficulty due to increased circle location uncertainty
+            // Minimal buffs are given until approximately AR10
             if (approachRate > 8)
-                traceableBonus += ((0.002 * Math.Pow(approachRate - 8, 2)) + (0.005 * (approachRate - 8))) * highApproachRateSliderVisibilityFactor * Math.Max(highCircleSizeSliderVisibilityFactor, highApproachRateSliderVisibilityFactor);
+                traceableBonus += ((0.001 * Math.Pow(approachRate - 8, 2)) + (0.0025 * (approachRate - 8))) * highApproachRateSliderVisibilityFactor * Math.Max(highCircleSizeSliderVisibilityFactor, highApproachRateSliderVisibilityFactor);
 
             traceableBonus *= lowCircleSizeLowApproachRateVisibilityFactor;
             return traceableBonus;
