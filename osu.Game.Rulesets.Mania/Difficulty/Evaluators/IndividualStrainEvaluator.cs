@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
             double holdFactor = 1.0; // Factor to all additional strains in case something else is held
 
             // We award a bonus if this note starts and ends before the end of another hold note.
-            foreach (var maniaPrevious in maniaCurrent.PreviousHitObjects)
+            foreach (var maniaPrevious in maniaCurrent.PreviousHeadObjects)
             {
                 if (maniaPrevious is null)
                     continue;
