@@ -5,7 +5,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Tests.Visual;
 using osuTK;
 using osuTK.Input;
@@ -17,12 +16,18 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
     {
         protected override Ruleset CreateEditorRuleset() => new ManiaRuleset();
 
+        [SetUpSteps]
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+            AddStep("Clear objects", () => EditorBeatmap.Clear());
+        }
+
         [Test]
         public void TestSimpleTailDragForward()
         {
             AddStep("Add hold note", () =>
             {
-                EditorBeatmap.Clear();
                 EditorBeatmap.Add(new HoldNote { StartTime = 2170, Duration = 937.5 });
             });
 
@@ -34,11 +39,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
             AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
 
-            AddAssert("Duration is higher", () =>
-            {
-                var holdNote = EditorBeatmap.HitObjects.First() as IHasDuration;
-                return holdNote!.Duration > 937.5f;
-            });
+            AddAssert("Duration is higher", () => ((HoldNote)EditorBeatmap.HitObjects.First())!.Duration > 937.5f);
         }
 
         [Test]
@@ -46,7 +47,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         {
             AddStep("Add hold note", () =>
             {
-                EditorBeatmap.Clear();
                 EditorBeatmap.Add(new HoldNote { StartTime = 2170, Duration = 937.5 });
             });
 
@@ -58,11 +58,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
             AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
 
-            AddAssert("Duration is lower", () =>
-            {
-                var holdNote = EditorBeatmap.HitObjects.First() as IHasDuration;
-                return holdNote!.Duration < 937.5f;
-            });
+            AddAssert("Duration is lower", () => ((HoldNote)EditorBeatmap.HitObjects[0]).Duration < 937.5f);
         }
 
         [Test]
@@ -70,7 +66,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         {
             AddStep("Add hold notes", () =>
             {
-                EditorBeatmap.Clear();
                 EditorBeatmap.AddRange([
                     new HoldNote { StartTime = 2170, Duration = 937.5, Column = 0 },
                     new HoldNote { StartTime = 2170, Duration = 937.5, Column = 1 }
@@ -85,12 +80,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
             AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
 
-            AddAssert("Duration is higher, and the other is unchanged", () =>
-            {
-                var holdNote1 = EditorBeatmap.HitObjects.First() as IHasDuration;
-                var holdNote2 = EditorBeatmap.HitObjects.Last() as IHasDuration;
-                return holdNote1!.Duration > 937.5f && holdNote2!.Duration == 937.5f;
-            });
+            AddAssert("Duration is higher, other is unchanged", () =>
+                ((HoldNote)EditorBeatmap.HitObjects[0]).Duration > 937.5f &&
+                ((HoldNote)EditorBeatmap.HitObjects[^1]).Duration == 937.5f
+            );
         }
 
         [Test]
@@ -98,7 +91,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         {
             AddStep("Add hold notes", () =>
             {
-                EditorBeatmap.Clear();
                 EditorBeatmap.AddRange([
                     new HoldNote { StartTime = 2170, Duration = 937.5, Column = 0 },
                     new HoldNote { StartTime = 2170, Duration = 937.5, Column = 1 }
@@ -113,12 +105,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
             AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
 
-            AddAssert("Duration is lower, and the other is unchanged", () =>
-            {
-                var holdNote1 = EditorBeatmap.HitObjects.First() as IHasDuration;
-                var holdNote2 = EditorBeatmap.HitObjects.Last() as IHasDuration;
-                return holdNote1!.Duration < 937.5f && holdNote2!.Duration == 937.5f;
-            });
+            AddAssert("Duration is lower, other is unchanged", () =>
+                ((HoldNote)EditorBeatmap.HitObjects[0]).Duration < 937.5f &&
+                ((HoldNote)EditorBeatmap.HitObjects[^1]).Duration == 937.5f
+            );
         }
 
         [Test]
@@ -126,7 +116,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         {
             AddStep("Add hold notes", () =>
             {
-                EditorBeatmap.Clear();
                 EditorBeatmap.AddRange([
                     new HoldNote { StartTime = 2170, Duration = 937.5, Column = 0 },
                     new HoldNote { StartTime = 2170, Duration = 937.5, Column = 1 }
@@ -147,11 +136,9 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
 
             AddAssert("Both durations are higher", () =>
-            {
-                var holdNote1 = EditorBeatmap.HitObjects.First() as IHasDuration;
-                var holdNote2 = EditorBeatmap.HitObjects.Last() as IHasDuration;
-                return holdNote1!.Duration > 937.5f && holdNote2!.Duration > 937.5f;
-            });
+                ((HoldNote)EditorBeatmap.HitObjects[0]).Duration > 937.5f &&
+                ((HoldNote)EditorBeatmap.HitObjects[^1]).Duration > 937.5f
+            );
         }
 
         [Test]
@@ -159,7 +146,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         {
             AddStep("Add hold notes", () =>
             {
-                EditorBeatmap.Clear();
                 EditorBeatmap.AddRange([
                     new HoldNote { StartTime = 2170, Duration = 937.5, Column = 0 },
                     new HoldNote { StartTime = 2170, Duration = 937.5, Column = 1 }
@@ -180,11 +166,9 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
 
             AddAssert("Both durations are lower", () =>
-            {
-                var holdNote1 = EditorBeatmap.HitObjects.First() as IHasDuration;
-                var holdNote2 = EditorBeatmap.HitObjects.Last() as IHasDuration;
-                return holdNote1!.Duration < 937.5f && holdNote2!.Duration < 937.5f;
-            });
+                ((HoldNote)EditorBeatmap.HitObjects[0]).Duration < 937.5f &&
+                ((HoldNote)EditorBeatmap.HitObjects[^1]).Duration < 937.5f
+            );
         }
 
         [Test]
@@ -192,7 +176,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         {
             AddStep("Add hold notes", () =>
             {
-                EditorBeatmap.Clear();
                 EditorBeatmap.AddRange([
                     new HoldNote { StartTime = 2170, Duration = 937.5, Column = 0 },
                     new HoldNote { StartTime = 2404, Duration = 937.5, Column = 1 }
@@ -212,12 +195,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
             AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
 
-            AddAssert("Duration is lower, and the other is unchanged", () =>
-            {
-                var holdNote1 = EditorBeatmap.HitObjects.First() as IHasDuration;
-                var holdNote2 = EditorBeatmap.HitObjects.Last() as IHasDuration;
-                return holdNote2!.Duration < 937.5f && holdNote1!.Duration == 937.5f;
-            });
+            AddAssert("Duration is unchanged, other is lower", () =>
+                ((HoldNote)EditorBeatmap.HitObjects[0]).Duration == 937.5f &&
+                ((HoldNote)EditorBeatmap.HitObjects[^1]).Duration < 937.5f
+            );
         }
 
         private void dragForward(DragArea dragArea)
