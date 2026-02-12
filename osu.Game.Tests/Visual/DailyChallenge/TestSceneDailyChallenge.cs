@@ -13,8 +13,10 @@ using osu.Game.Online.API;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual.Metadata;
@@ -58,6 +60,78 @@ namespace osu.Game.Tests.Visual.DailyChallenge
 
             AddStep("add room", () => API.Perform(new CreateRoomRequest(room)));
             AddStep("push screen", () => LoadScreen(new Screens.OnlinePlay.DailyChallenge.DailyChallenge(room)));
+        }
+
+        [Test]
+        public void TestModsButtonDisabledIfNoFreeMods()
+        {
+            var room = new Room
+            {
+                Name = "Daily Challenge: June 4, 2024",
+                Playlist =
+                [
+                    new PlaylistItem(TestResources.CreateTestBeatmapSetInfo().Beatmaps.First()),
+                ],
+                EndDate = DateTimeOffset.Now.AddHours(12),
+                Category = RoomCategory.DailyChallenge
+            };
+            AddStep("add room", () => API.Perform(new CreateRoomRequest(room)));
+
+            Screens.OnlinePlay.DailyChallenge.DailyChallenge screen = null!;
+            AddStep("push screen", () => LoadScreen(screen = new Screens.OnlinePlay.DailyChallenge.DailyChallenge(room)));
+            AddUntilStep("wait for pushed", () => screen.IsCurrentScreen());
+
+            AddAssert("mods button is not present", () => this.ChildrenOfType<FooterButtonMods>().Any(), () => Is.False);
+        }
+
+        [Test]
+        public void TestModsButtonDeselectOnlyClearsUserMods()
+        {
+            var room = new Room
+            {
+                Name = "Daily Challenge: June 4, 2024",
+                Playlist =
+                [
+                    new PlaylistItem(TestResources.CreateTestBeatmapSetInfo().Beatmaps.First())
+                    {
+                        RequiredMods = [new APIMod(new OsuModTraceable())],
+                        AllowedMods = [new APIMod(new OsuModDoubleTime())]
+                    }
+                ],
+                EndDate = DateTimeOffset.Now.AddHours(12),
+                Category = RoomCategory.DailyChallenge
+            };
+
+            AddStep("add room", () => API.Perform(new CreateRoomRequest(room)));
+
+            Screens.OnlinePlay.DailyChallenge.DailyChallenge screen = null!;
+            AddStep("push screen", () => LoadScreen(screen = new Screens.OnlinePlay.DailyChallenge.DailyChallenge(room)));
+            AddUntilStep("wait for pushed", () => screen.IsCurrentScreen());
+
+            AddStep("show mod overlay", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonMods>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("mod overlay shown", () => this.ChildrenOfType<RoomModSelectOverlay>().SingleOrDefault()?.IsPresent, () => Is.True);
+
+            AddStep("select mod", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<IncompatibilityDisplayingModPanel>().First(panel => panel.Mod.Acronym == "DT"));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("wait for mod to be applied", () => SelectedMods.Value, () => Has.Some.EqualTo(new OsuModDoubleTime()));
+
+            AddStep("close mod overlay", () => InputManager.Key(Key.Escape));
+            AddUntilStep("mod overlay not shown", () => this.ChildrenOfType<RoomModSelectOverlay>().SingleOrDefault()?.IsPresent, () => Is.False);
+
+            AddStep("clear mods", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonMods>().First());
+                InputManager.Click(MouseButton.Right);
+            });
+            AddUntilStep("DT is not enabled", () => SelectedMods.Value, () => Has.None.EqualTo(new OsuModDoubleTime()));
+            AddAssert("TC is enabled", () => SelectedMods.Value, () => Has.Some.EqualTo(new OsuModTraceable()));
         }
 
         [Test]

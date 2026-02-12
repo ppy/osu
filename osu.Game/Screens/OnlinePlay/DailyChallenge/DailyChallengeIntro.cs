@@ -30,6 +30,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 {
     public partial class DailyChallengeIntro : OsuScreen
     {
+        public override bool ShowFooter => true;
+
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         public override bool? ApplyModTrackAdjustments => true;

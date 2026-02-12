@@ -10,12 +10,16 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.DailyChallenge";
 
         /// <summary>
+        /// "Play!"
+        /// </summary>
+        public static LocalisableString Play => new TranslatableString(getKey(@"play"), @"Play!");
+
+        /// <summary>
         /// "Today&#39;s daily challenge has concluded – thanks for playing!
         ///
         /// Tomorrow&#39;s challenge is now being prepared and will appear soon."
         /// </summary>
-        public static LocalisableString ChallengeEndedNotification => new TranslatableString(getKey(@"todays_daily_challenge_has_concluded"),
-            @"Today's daily challenge has concluded – thanks for playing!
+        public static LocalisableString ChallengeEndedNotification => new TranslatableString(getKey(@"todays_daily_challenge_has_concluded"), @"Today's daily challenge has concluded – thanks for playing!
 
 Tomorrow's challenge is now being prepared and will appear soon.");
 
