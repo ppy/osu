@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -41,19 +40,18 @@ namespace osu.Game.Screens.Play
         private readonly RemainingTimeCounter remainingTimeCounter;
         private readonly BreakArrows breakArrows;
         private readonly ScoreProcessor scoreProcessor;
+        private readonly HealthProcessor? healthProcessor;
         private readonly BreakInfo info;
 
         private readonly BreakSectionDisplay passDisplay;
         private readonly BreakSectionDisplay failDisplay;
 
-        [Resolved]
-        private HealthProcessor healthProcessor { get; set; } = null!;
-
         private readonly IBindable<Period?> currentPeriod = new Bindable<Period?>();
 
-        public BreakOverlay(ScoreProcessor scoreProcessor)
+        public BreakOverlay(ScoreProcessor scoreProcessor, HealthProcessor? healthProcessor = null)
         {
             this.scoreProcessor = scoreProcessor;
+            this.healthProcessor = healthProcessor;
             RelativeSizeAxes = Axes.Both;
 
             Child = fadeContainer = new Container
@@ -181,7 +179,7 @@ namespace osu.Game.Screens.Play
                     {
                         Schedule(() =>
                         {
-                            bool isPass = healthProcessor.Health.Value >= 0.5;
+                            bool isPass = healthProcessor == null || healthProcessor?.Health.Value >= 0.5;
 
                             if (b.Duration >= 3000)
                             {

@@ -492,7 +492,7 @@ namespace osu.Game.Screens.Play
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     },
-                    BreakOverlay = new BreakOverlay(ScoreProcessor)
+                    BreakOverlay = new BreakOverlay(ScoreProcessor, HealthProcessor)
                     {
                         Clock = DrawableRuleset.FrameStableClock,
                         ProcessCustomClock = false,
