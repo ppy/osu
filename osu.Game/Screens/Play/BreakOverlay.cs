@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -41,6 +42,12 @@ namespace osu.Game.Screens.Play
         private readonly BreakArrows breakArrows;
         private readonly ScoreProcessor scoreProcessor;
         private readonly BreakInfo info;
+
+        private readonly BreakSectionDisplay passDisplay;
+        private readonly BreakSectionDisplay failDisplay;
+
+        [Resolved]
+        private HealthProcessor healthProcessor { get; set; } = null!;
 
         private readonly IBindable<Period?> currentPeriod = new Bindable<Period?>();
 
@@ -95,6 +102,19 @@ namespace osu.Game.Screens.Play
                             Masking = true,
                         }
                     },
+                    // Pass/Fail Indicators
+                    passDisplay = new BreakSectionDisplay(true)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Y = -150,
+                    },
+                    failDisplay = new BreakSectionDisplay(false)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Y = -150,
+                    },
                     remainingTimeCounter = new RemainingTimeCounter
                     {
                         Anchor = Anchor.Centre,
@@ -141,6 +161,8 @@ namespace osu.Game.Screens.Play
         private void updateDisplay(ValueChangedEvent<Period?> period)
         {
             Scheduler.CancelDelayedTasks();
+            passDisplay.Stop();
+            failDisplay.Stop();
 
             if (period.NewValue == null)
                 return;
@@ -151,6 +173,31 @@ namespace osu.Game.Screens.Play
             {
                 fadeContainer.FadeIn(BREAK_FADE_DURATION);
                 breakArrows.Show(BREAK_FADE_DURATION);
+
+                // Pass/Fail animation
+                if (b.Duration >= 1500) // Если перерыв больше или равен 1.5 сек
+                {
+                    using (BeginDelayedSequence(b.Duration / 2))
+                    {
+                        Schedule(() =>
+                        {
+                            bool isPass = healthProcessor.Health.Value >= 0.5;
+
+                            if (b.Duration >= 3000)
+                            {
+                                // Полная анимация со звуком (длина перерыва >= 3 секунды)
+                                if (isPass) passDisplay.PlayAnimation();
+                                else failDisplay.PlayAnimation();
+                            }
+                            else
+                            {
+                                // Быстрая анимация без звука (от 1.5 до 3 секунд)
+                                if (isPass) passDisplay.PlayQuickAnimation();
+                                else failDisplay.PlayQuickAnimation();
+                            }
+                        });
+                    }
+                }
 
                 remainingTimeAdjustmentBox
                     .ResizeWidthTo(remaining_time_container_max_size, BREAK_FADE_DURATION, Easing.OutQuint)
