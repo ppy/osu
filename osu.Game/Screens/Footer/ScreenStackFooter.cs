@@ -93,6 +93,7 @@ namespace osu.Game.Screens.Footer
                 ((BindableBool)backButtonVisibility).Value = true;
 
                 Footer.SetButtons([]);
+                Footer.SetPrimaryButton(null);
                 Footer.Hide();
                 return;
             }
@@ -111,6 +112,7 @@ namespace osu.Game.Screens.Footer
                 {
                     // ensure the current buttons are immediately disabled on screen change (so they can't be pressed).
                     Footer.SetButtons([]);
+                    Footer.SetPrimaryButton(null);
 
                     osuScreen.OnLoadComplete += _ => updateFooterButtons();
                 }
@@ -118,10 +120,15 @@ namespace osu.Game.Screens.Footer
                 void updateFooterButtons()
                 {
                     var buttons = osuScreen.CreateFooterButtons();
+                    var primary = osuScreen.CreateFooterPrimaryButton();
 
                     osuScreen.LoadComponentsAgainstScreenDependencies(buttons);
 
+                    if (primary != null)
+                        osuScreen.LoadComponentsAgainstScreenDependencies([primary]);
+
                     Footer.SetButtons(buttons);
+                    Footer.SetPrimaryButton(primary);
                     Footer.Show();
                 }
             }
@@ -130,6 +137,7 @@ namespace osu.Game.Screens.Footer
                 backButtonVisibility.BindTo(osuScreen.BackButtonVisibility);
 
                 Footer.SetButtons([]);
+                Footer.SetPrimaryButton(null);
                 Footer.Hide();
             }
         }

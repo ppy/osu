@@ -104,6 +104,13 @@ namespace osu.Game.Screens
         IReadOnlyList<ScreenFooterButton> CreateFooterButtons();
 
         /// <summary>
+        /// The primary button displayed on the right hand side of the game's footer toolbar.
+        /// Note that this is separate from the osu! logo, which is handled separately.
+        /// </summary>
+        /// <returns>The primary button drawable, or <c>null</c> if this screen doesn't have one.</returns>
+        FooterButton? CreateFooterPrimaryButton();
+
+        /// <summary>
         /// Whether mod track adjustments should be applied on entering this screen.
         /// A <see langword="null"/> value means that the parent screen's value of this setting will be used.
         /// </summary>

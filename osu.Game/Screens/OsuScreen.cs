@@ -321,6 +321,8 @@ namespace osu.Game.Screens
 
         public virtual IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => Array.Empty<ScreenFooterButton>();
 
+        public virtual FooterButton CreateFooterPrimaryButton() => null;
+
         public virtual bool OnBackButton() => false;
     }
 }

@@ -52,6 +52,7 @@ namespace osu.Game.Screens.Footer
         private FillFlowContainer<ScreenFooterButton> buttonsFlow = null!;
         private Container overlayContentContainer = null!;
         private Container<ScreenFooterButton> hiddenButtonsContainer = null!;
+        private Container<FooterButton> primaryButtonContainer = null!;
 
         private LogoTrackingContainer logoTrackingContainer = null!;
         private IDisposable? logoTracking;
@@ -134,6 +135,16 @@ namespace osu.Game.Screens.Footer
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     AutoSizeAxes = Axes.Both,
+                },
+                primaryButtonContainer = new Container<FooterButton>
+                {
+                    Name = "Primary button container",
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding
+                    {
+                        Bottom = OsuGame.SCREEN_EDGE_MARGIN,
+                        Right = OsuGame.SCREEN_EDGE_MARGIN * 2,
+                    },
                 },
                 (logoTrackingContainer = new LogoTrackingContainer
                 {
@@ -235,6 +246,24 @@ namespace osu.Game.Screens.Footer
             }
         }
 
+        public void SetPrimaryButton(FooterButton? button)
+        {
+            if (primaryButtonContainer.Count == 1)
+                primaryButtonContainer.Child.Disappear(true);
+
+            if (button == null)
+                return;
+
+            Debug.Assert(!button.IsLoaded);
+            primaryButtonContainer.Child = button.With(p =>
+            {
+                p.Anchor = Anchor.BottomRight;
+                p.Origin = Anchor.BottomRight;
+            });
+
+            button.OnLoadComplete += _ => button.Appear();
+        }
+
         public ShearedOverlayContainer? ActiveOverlay { get; private set; }
 
         private VisibilityContainer? activeOverlayContent;
@@ -267,6 +296,9 @@ namespace osu.Game.Screens.Footer
 
                 makeButtonDisappearToBottom(button, 0, 0, false);
             }
+
+            if (primaryButtonContainer.Count == 1)
+                primaryButtonContainer.Child.Disappear(false);
 
             updateColourScheme(overlay.ColourProvider.Hue);
 
@@ -312,6 +344,9 @@ namespace osu.Game.Screens.Footer
             }
 
             temporarilyHiddenButtons.Clear();
+
+            if (primaryButtonContainer.Count == 1)
+                primaryButtonContainer.Child.Appear();
 
             updateColourScheme(OverlayColourScheme.Aquamarine.GetHue());
 

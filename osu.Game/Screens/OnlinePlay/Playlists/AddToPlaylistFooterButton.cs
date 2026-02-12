@@ -3,15 +3,14 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Screens.Footer;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public partial class AddToPlaylistFooterButton : ShearedButton
+    public partial class AddToPlaylistFooterButton : FooterButton
     {
         public AddToPlaylistFooterButton()
             : base(width: 220)
@@ -46,24 +45,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     UseFullGlyphHeight = false,
                 },
             };
-        }
-
-        public void Appear()
-        {
-            FinishTransforms();
-
-            this.MoveToY(150f)
-                .FadeOut()
-                .MoveToY(0f, 240, Easing.OutCubic)
-                .FadeIn(240, Easing.OutCubic);
-        }
-
-        public TransformSequence<AddToPlaylistFooterButton> Disappear()
-        {
-            FinishTransforms();
-
-            return this.FadeOut(240, Easing.InOutCubic)
-                       .MoveToY(150f, 240, Easing.InOutCubic);
         }
     }
 }

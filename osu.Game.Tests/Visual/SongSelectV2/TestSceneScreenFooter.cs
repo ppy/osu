@@ -55,6 +55,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 new FooterButtonRandom(),
                 new FooterButtonOptions(),
             });
+
+            screenFooter.SetPrimaryButton(new FooterButton(240)
+            {
+                Text = "Primary",
+                Action = () => { },
+            });
         });
 
         [SetUpSteps]
@@ -116,10 +122,12 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddStep("show overlay", () => externalOverlay.Show());
             contentDisplayed();
             AddUntilStep("other buttons hidden", () => screenFooter.ChildrenOfType<ScreenFooterButton>().Skip(1).All(b => b.Child.Parent!.Y > 0));
+            AddAssert("primary button hidden", () => screenFooter.ChildrenOfType<FooterButton>().First().Y, () => Is.GreaterThan(0));
 
             AddStep("hide overlay", () => externalOverlay.Hide());
             contentHidden();
             AddUntilStep("other buttons returned", () => screenFooter.ChildrenOfType<ScreenFooterButton>().Skip(1).All(b => b.ChildrenOfType<Container>().First().Y == 0));
+            AddAssert("primary button returned", () => screenFooter.ChildrenOfType<FooterButton>().First().Y, () => Is.EqualTo(0));
         }
 
         [Test]

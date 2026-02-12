@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("appear", () => button.Appear());
             AddWaitStep("wait for animation", 3);
-            AddStep("disappear", () => button.Disappear());
+            AddStep("disappear", () => button.Disappear(false));
             AddWaitStep("wait for animation", 3);
             AddStep("appear", () => button.Appear());
         }

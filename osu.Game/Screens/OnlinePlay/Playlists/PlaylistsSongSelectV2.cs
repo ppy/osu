@@ -8,8 +8,6 @@ using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Screens;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
@@ -35,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [Resolved]
         private IOverlayManager? overlayManager { get; set; }
 
-        private readonly AddToPlaylistFooterButton addToPlaylistFooterButton;
+        private AddToPlaylistFooterButton addToPlaylistFooterButton = null!;
 
         private readonly Room room;
         private ModSelectOverlay modSelect = null!;
@@ -51,19 +49,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
             LeftPadding = new MarginPadding { Top = CORNER_RADIUS_HIDE_OFFSET + Header.HEIGHT };
-
-            addToPlaylistFooterButton = new AddToPlaylistFooterButton
-            {
-                Anchor = Anchor.BottomRight,
-                Origin = Anchor.BottomRight,
-                Margin = new MarginPadding
-                {
-                    Bottom = OsuGame.SCREEN_EDGE_MARGIN,
-                    Right = OsuGame.SCREEN_EDGE_MARGIN * 2
-                },
-                Alpha = 0,
-                Action = AddNewItem
-            };
         }
 
         [BackgroundDependencyLoader]
@@ -93,29 +78,16 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             modSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(freeModSelect);
 
-            modSelect.State.BindValueChanged(onModSelectStateChanged, true);
-            freeModSelect.State.BindValueChanged(onModSelectStateChanged, true);
-
             Mods.BindValueChanged(onGlobalModsChanged);
             Ruleset.BindValueChanged(onRulesetChanged);
             Freestyle.BindValueChanged(onFreestyleChanged);
 
             updateValidMods();
-
-            Footer?.Add(addToPlaylistFooterButton);
         }
 
         public void AddNewItem()
         {
             room.Playlist = room.Playlist.Append(createItem()).ToArray();
-        }
-
-        private void onModSelectStateChanged(ValueChangedEvent<Visibility> state)
-        {
-            if (state.NewValue == Visibility.Visible)
-                addToPlaylistFooterButton.Disappear();
-            else
-                addToPlaylistFooterButton.Appear();
         }
 
         private void onGlobalModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
@@ -173,36 +145,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             addToPlaylistFooterButton.TriggerClick();
         }
 
-        public override void OnEntering(ScreenTransitionEvent e)
-        {
-            base.OnEntering(e);
-
-            addToPlaylistFooterButton.Appear();
-        }
-
-        public override void OnResuming(ScreenTransitionEvent e)
-        {
-            base.OnResuming(e);
-
-            addToPlaylistFooterButton.Appear();
-        }
-
-        public override void OnSuspending(ScreenTransitionEvent e)
-        {
-            base.OnSuspending(e);
-
-            addToPlaylistFooterButton.Disappear();
-        }
-
-        public override bool OnExiting(ScreenExitEvent e)
-        {
-            if (base.OnExiting(e))
-                return true;
-
-            addToPlaylistFooterButton.Disappear().Expire();
-            return false;
-        }
-
         public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons()
         {
             var buttons = base.CreateFooterButtons().ToList();
@@ -224,6 +166,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             return buttons;
         }
+
+        public override FooterButton CreateFooterPrimaryButton() => addToPlaylistFooterButton = new AddToPlaylistFooterButton { Action = AddNewItem };
 
         protected override ModSelectOverlay CreateModSelectOverlay() => modSelect = new UserModSelectOverlay(OverlayColourScheme.Plum)
         {
