@@ -93,6 +93,12 @@ namespace osu.Game.Rulesets
                                 $"Ruleset API version is too old (was {instance.RulesetAPIVersionSupported}, expected {Ruleset.CURRENT_RULESET_API_VERSION})");
                         }
 
+                        if (r.OnlineID != instanceInfo.OnlineID)
+                            throw new InvalidOperationException($@"Online ID mismatch for ruleset {r.ShortName}: database has {r.OnlineID}, constructed instance has {instanceInfo.OnlineID}");
+
+                        if (r.OnlineID > 0 && rulesets.Any(otherRuleset => otherRuleset.ShortName != r.ShortName && otherRuleset.OnlineID == r.OnlineID))
+                            throw new InvalidOperationException($@"Ruleset {r.ShortName} shares online ID {r.OnlineID} with another ruleset");
+
                         // If a ruleset isn't up-to-date with the API, it could cause a crash at an arbitrary point of execution.
                         // To eagerly handle cases of missing implementations, enumerate all types here and mark as non-available on throw.
                         resolvedType.Assembly.GetTypes();

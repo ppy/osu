@@ -29,6 +29,26 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Cancel => new TranslatableString(getKey(@"cancel"), @"No! Abort mission");
 
+        /// <summary>
+        /// "Failed to automatically locate an osu!stable installation."
+        /// </summary>
+        public static LocalisableString StableDirectoryLocationHeaderText => new TranslatableString(getKey(@"stable_directory_location_header_text"), @"Failed to automatically locate an osu!stable installation.");
+
+        /// <summary>
+        /// "An existing install could not be located. If you know where it is, you can help locate it."
+        /// </summary>
+        public static LocalisableString StableDirectoryLocationBodyText => new TranslatableString(getKey(@"stable_directory_location_body_text"), @"An existing install could not be located. If you know where it is, you can help locate it.");
+
+        /// <summary>
+        /// "Sure! I know where it is located!"
+        /// </summary>
+        public static LocalisableString StableDirectoryLocationOkButton => new TranslatableString(getKey(@"stable_directory_location_ok_button"), @"Sure! I know where it is located!");
+
+        /// <summary>
+        /// "Actually I don't have osu!stable installed."
+        /// </summary>
+        public static LocalisableString StableDirectoryLocationCancelButton => new TranslatableString(getKey(@"stable_directory_location_cancel_button"), @"Actually I don't have osu!stable installed.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

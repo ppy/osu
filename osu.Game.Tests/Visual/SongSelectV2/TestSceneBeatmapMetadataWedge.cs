@@ -7,8 +7,10 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.SelectV2;
@@ -53,8 +55,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                 working.Metadata.Source = string.Empty;
 
-                onlineLookupResult.Value = online;
                 Beatmap.Value = working;
+                onlineLookupResult.Value = online;
             });
             AddStep("no success rate", () =>
             {
@@ -63,8 +65,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 online.Result!.Beatmaps.Single().PlayCount = 0;
                 online.Result!.Beatmaps.Single().PassCount = 0;
 
-                onlineLookupResult.Value = online;
                 Beatmap.Value = working;
+                onlineLookupResult.Value = online;
             });
             AddStep("no user ratings", () =>
             {
@@ -72,8 +74,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                 online.Result!.Ratings = Array.Empty<int>();
 
-                onlineLookupResult.Value = online;
                 Beatmap.Value = working;
+                onlineLookupResult.Value = online;
             });
             AddStep("no fail times", () =>
             {
@@ -81,8 +83,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                 online.Result!.Beatmaps.Single().FailTimes = null;
 
-                onlineLookupResult.Value = online;
                 Beatmap.Value = working;
+                onlineLookupResult.Value = online;
             });
             AddStep("no metrics", () =>
             {
@@ -91,8 +93,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 online.Result!.Ratings = Array.Empty<int>();
                 online.Result!.Beatmaps.Single().FailTimes = null;
 
-                onlineLookupResult.Value = online;
                 Beatmap.Value = working;
+                onlineLookupResult.Value = online;
             });
             AddStep("local beatmap", () =>
             {
@@ -100,8 +102,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                 working.BeatmapInfo.OnlineID = 0;
 
-                onlineLookupResult.Value = null;
                 Beatmap.Value = working;
+                onlineLookupResult.Value = Screens.SelectV2.SongSelect.BeatmapSetLookupResult.Completed(null);
             });
         }
 
@@ -119,8 +121,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 online.Result!.Language = new BeatmapSetOnlineLanguage { Id = 12, Name = "Verrrrryyyy llooonngggggg language" };
                 online.Result!.Beatmaps.Single().TopTags = Enumerable.Repeat(online.Result!.Beatmaps.Single().TopTags, 3).SelectMany(t => t!).ToArray();
 
-                onlineLookupResult.Value = online;
                 Beatmap.Value = working;
+                onlineLookupResult.Value = online;
             });
         }
 
@@ -137,20 +139,28 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                 working.BeatmapInfo.ResetOnlineInfo();
 
-                onlineLookupResult.Value = lookupResult;
                 Beatmap.Value = working;
+                onlineLookupResult.Value = lookupResult;
             });
             AddUntilStep("rating wedge hidden", () => !wedge.RatingsVisible);
             AddUntilStep("fail time wedge hidden", () => !wedge.FailRetryVisible);
+
+            // just check for text everywhere on the wedge as the classes are private and generic
+            AddAssert("genre is still visible", () => wedge.ChildrenOfType<OsuSpriteText>().Any(t => t.Text == "Pop"));
+            AddAssert("language is still visible", () => wedge.ChildrenOfType<OsuSpriteText>().Any(t => t.Text == "English"));
+
             AddStep("local beatmap", () =>
             {
                 var (working, _) = createTestBeatmap();
 
-                onlineLookupResult.Value = null;
                 Beatmap.Value = working;
+                onlineLookupResult.Value = Screens.SelectV2.SongSelect.BeatmapSetLookupResult.Completed(null);
             });
             AddAssert("rating wedge still hidden", () => !wedge.RatingsVisible);
             AddAssert("fail time wedge still hidden", () => !wedge.FailRetryVisible);
+
+            AddAssert("genre is cleared", () => wedge.ChildrenOfType<OsuSpriteText>().All(t => t.Text != "Pop"));
+            AddAssert("language is cleared", () => wedge.ChildrenOfType<OsuSpriteText>().All(t => t.Text != "English"));
         }
 
         [Test]
@@ -166,8 +176,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 online.Result!.RelatedTags = null;
                 working.BeatmapSetInfo.Beatmaps.Single().Metadata.UserTags.Clear();
 
-                onlineLookupResult.Value = online;
                 Beatmap.Value = working;
+                onlineLookupResult.Value = online;
             });
         }
 
@@ -178,9 +188,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             {
                 var (working, online) = createTestBeatmap();
 
+                Beatmap.Value = working;
                 onlineLookupResult.Value = Screens.SelectV2.SongSelect.BeatmapSetLookupResult.InProgress();
                 Scheduler.AddDelayed(() => onlineLookupResult.Value = online, 500);
-                Beatmap.Value = working;
             });
             AddWaitStep("wait", 5);
 
@@ -192,9 +202,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 online.Result!.RelatedTags[1].Name = "another/tag";
                 online.Result!.RelatedTags[2].Name = "some/tag";
 
+                Beatmap.Value = working;
                 onlineLookupResult.Value = Screens.SelectV2.SongSelect.BeatmapSetLookupResult.InProgress();
                 Scheduler.AddDelayed(() => onlineLookupResult.Value = online, 500);
-                Beatmap.Value = working;
             });
             AddWaitStep("wait", 5);
 
@@ -206,9 +216,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 online.Result!.RelatedTags = null;
                 working.BeatmapSetInfo.Beatmaps.Single().Metadata.UserTags.Clear();
 
+                Beatmap.Value = working;
                 onlineLookupResult.Value = Screens.SelectV2.SongSelect.BeatmapSetLookupResult.InProgress();
                 Scheduler.AddDelayed(() => onlineLookupResult.Value = online, 500);
-                Beatmap.Value = working;
             });
             AddWaitStep("wait", 5);
 
@@ -220,9 +230,9 @@ namespace osu.Game.Tests.Visual.SongSelectV2
                 online.Result!.RelatedTags = null;
                 working.BeatmapSetInfo.Beatmaps.Single().Metadata.UserTags.Clear();
 
+                Beatmap.Value = working;
                 onlineLookupResult.Value = Screens.SelectV2.SongSelect.BeatmapSetLookupResult.InProgress();
                 Scheduler.AddDelayed(() => onlineLookupResult.Value = online, 500);
-                Beatmap.Value = working;
             });
             AddWaitStep("wait", 5);
         }

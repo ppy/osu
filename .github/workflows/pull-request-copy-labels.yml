@@ -1,0 +1,19 @@
+name: Copy labels from linked issues
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  issues: write # to read the labels of any linked issue(s), and to put the found labels if any on the PR
+  # not granting any `pull_requests` permissions because in github's modeling pull requests are a subset of issues. it's confusing.
+
+jobs:
+  copy-labels:
+    runs-on: ubuntu-latest
+    name: Copy labels from linked issues
+    steps:
+      - name: Copy labels
+        uses: michalvankodev/copy-issue-labels@v1.3.0
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}

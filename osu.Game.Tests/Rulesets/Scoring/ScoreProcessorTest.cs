@@ -526,7 +526,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
             // ReSharper disable once MemberHidesStaticFromOuterClass
             private class TestRuleset : Ruleset
             {
-                protected override IEnumerable<HitResult> GetValidHitResults() => new[] { HitResult.Great };
+                public override IEnumerable<HitResult> GetValidHitResults() => new[] { HitResult.Great };
 
                 public override IEnumerable<Mod> GetModsFor(ModType type) => throw new NotImplementedException();
 
