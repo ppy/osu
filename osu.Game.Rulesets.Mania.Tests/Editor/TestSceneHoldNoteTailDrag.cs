@@ -201,6 +201,66 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             );
         }
 
+        [Test]
+        public void TestSelectedSameStartTimeDifferentDurations()
+        {
+            AddStep("Add hold notes", () =>
+            {
+                EditorBeatmap.AddRange([
+                    new HoldNote { StartTime = 2170, Duration = 937.5, Column = 0 },
+                    new HoldNote { StartTime = 2170, Duration = 1171.8, Column = 1 }
+                ]);
+            });
+
+            AddStep("Select all", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects);
+            });
+
+            AddStep("Drag tail", () =>
+            {
+                var blueprintDragArea = this.ChildrenOfType<DragArea>().First();
+                dragBackward(blueprintDragArea);
+            });
+
+            AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddAssert("Duration is unchanged, other is lower", () =>
+                ((HoldNote)EditorBeatmap.HitObjects[0]).Duration == 937.5f &&
+                ((HoldNote)EditorBeatmap.HitObjects[^1]).Duration < 937.5f
+            );
+        }
+
+        [Test]
+        public void TestSelectedSameDurationDifferentStartTimes()
+        {
+            AddStep("Add hold notes", () =>
+            {
+                EditorBeatmap.AddRange([
+                    new HoldNote { StartTime = 2170, Duration = 937.5, Column = 0 },
+                    new HoldNote { StartTime = 2638.7, Duration = 937.5, Column = 1 }
+                ]);
+            });
+
+            AddStep("Select all", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects);
+            });
+
+            AddStep("Drag tail", () =>
+            {
+                var blueprintDragArea = this.ChildrenOfType<DragArea>().First();
+                dragBackward(blueprintDragArea);
+            });
+
+            AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddAssert("Duration is unchanged, other is lower", () =>
+                ((HoldNote)EditorBeatmap.HitObjects[0]).Duration == 937.5f &&
+                ((HoldNote)EditorBeatmap.HitObjects[^1]).Duration < 937.5f
+            );
+        }
+
         private void dragForward(DragArea dragArea)
         {
             InputManager.MoveMouseTo(dragArea);
