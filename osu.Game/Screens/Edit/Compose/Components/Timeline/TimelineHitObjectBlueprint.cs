@@ -313,7 +313,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             private readonly HitObject? hitObject;
 
-            private List<HitObject> objsToAdjust = new List<HitObject>();
+            private readonly List<HitObject> objsToAdjust = new List<HitObject>();
 
             [Resolved]
             private EditorBeatmap beatmap { get; set; } = null!;
