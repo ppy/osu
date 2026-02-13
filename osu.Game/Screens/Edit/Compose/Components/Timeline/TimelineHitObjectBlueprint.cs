@@ -313,6 +313,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             private readonly HitObject? hitObject;
 
+            private List<HitObject> objsToAdjust = new List<HitObject>();
+
             [Resolved]
             private EditorBeatmap beatmap { get; set; } = null!;
 
@@ -408,6 +410,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             protected override bool OnDragStart(DragStartEvent e)
             {
                 changeHandler?.BeginChange();
+
+                foreach (var item in blueprintContainer.SelectionHandler.SelectedItems)
+                {
+                    if (item == hitObject) continue;
+
+                    var durationItem = item as IHasDuration;
+
+                    if (Precision.AlmostEquals(durationItem!.Duration, (hitObject as IHasDuration)!.Duration) &&
+                        Precision.AlmostEquals(item.StartTime, hitObject!.StartTime))
+                    {
+                        objsToAdjust.Add(item);
+                    }
+                }
+
                 return true;
             }
 
@@ -460,27 +476,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 if (endTimeHitObject.EndTime == snappedTime)
                                     return;
 
-                                List<HitObject> objsToAdjust = new List<HitObject>();
-                                var selectedObjects = blueprintContainer.SelectionHandler.SelectedItems;
-
-                                foreach (var item in selectedObjects)
-                                {
-                                    // If the dragged object is not in the selection we ignore the selected items
-                                    if (!selectedObjects.Contains(hitObject))
-                                        break;
-
-                                    var durationItem = item as IHasDuration;
-
-                                    if (Precision.AlmostEquals(durationItem!.Duration, endTimeHitObject.Duration) &&
-                                        Precision.AlmostEquals(item.StartTime, hitObject.StartTime))
-                                    {
-                                        objsToAdjust.Add(item);
-                                    }
-                                }
-
-                                // If nothing has been added to the list, the user has not selected anything and is just performing a simple drag.
-                                if (objsToAdjust.Count == 0)
-                                    objsToAdjust.Add(hitObject);
+                                objsToAdjust.Add(hitObject);
 
                                 foreach (var obj in objsToAdjust)
                                 {
@@ -503,6 +499,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 changeHandler?.EndChange();
                 OnDragHandled?.Invoke(null);
+                objsToAdjust.Clear();
             }
         }
 
