@@ -59,8 +59,6 @@ namespace osu.Game.Screens.SelectV2
 
         private readonly BeatmapCarouselFilterGrouping grouping;
 
-        private GroupedBeatmap? beforeScopedSelection;
-
         /// <summary>
         /// Total number of beatmap difficulties displayed with the filter.
         /// </summary>
@@ -481,7 +479,6 @@ namespace osu.Game.Screens.SelectV2
         {
             base.HandleFilterCompleted();
 
-            attemptRevertToBeforeScopedSelection();
             attemptSelectSingleFilteredResult();
 
             if (CurrentSelection is GroupedBeatmap selection)
@@ -502,10 +499,6 @@ namespace osu.Game.Screens.SelectV2
                 }
             }
 
-            // Clear before scoped selection when exiting scoped view.
-            if (Criteria!.SelectedBeatmapSet == null && beforeScopedSelection != null)
-                beforeScopedSelection = null;
-
             // Transfer the previous flag states across to the new models.
             if (ExpandedBeatmapSet != null) setExpandedSet(ExpandedBeatmapSet);
             if (ExpandedGroup != null) setExpandedGroup(ExpandedGroup);
@@ -522,18 +515,6 @@ namespace osu.Game.Screens.SelectV2
                 var beatmaps = items.Select(i => i.Model).OfType<GroupedBeatmap>();
                 RequestRecommendedSelection(beatmaps);
             }
-        }
-
-        private void attemptRevertToBeforeScopedSelection()
-        {
-            if (CurrentSelection is not GroupedBeatmap selection)
-                return;
-
-            if (grouping.ItemMap.ContainsKey(selection))
-                return;
-
-            if (Criteria!.SelectedBeatmapSet == null && beforeScopedSelection != null)
-                RequestSelection(beforeScopedSelection);
         }
 
         /// <summary>
@@ -802,10 +783,6 @@ namespace osu.Game.Screens.SelectV2
             bool resetDisplay = grouping.BeatmapSetsGroupedTogether != BeatmapCarouselFilterGrouping.ShouldGroupBeatmapsTogether(criteria);
 
             Criteria = criteria;
-
-            // If entering scoped view, save current selection to potentially bring it back after returning to unscoped view.
-            if (Criteria.SelectedBeatmapSet != null && CurrentSelection is GroupedBeatmap currentBeatmapSelection)
-                beforeScopedSelection = currentBeatmapSelection;
 
             loadingDebounce ??= Scheduler.AddDelayed(() =>
             {

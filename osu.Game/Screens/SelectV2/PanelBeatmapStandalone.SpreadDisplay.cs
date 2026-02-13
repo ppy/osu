@@ -35,6 +35,9 @@ namespace osu.Game.Screens.SelectV2
             private const double transition_duration = 200;
 
             [Resolved]
+            private ISongSelect? songSelect { get; set; }
+
+            [Resolved]
             private Bindable<RulesetInfo> ruleset { get; set; } = null!;
 
             [Resolved]
@@ -56,7 +59,7 @@ namespace osu.Game.Screens.SelectV2
                 Action = () =>
                 {
                     if (Beatmap.Value != null)
-                        scopedBeatmapSet.Value = Beatmap.Value.BeatmapSet!;
+                        songSelect?.ScopeToBeatmapSet(Beatmap.Value.BeatmapSet!);
                 };
             }
 

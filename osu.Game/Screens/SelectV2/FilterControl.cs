@@ -49,6 +49,9 @@ namespace osu.Game.Screens.SelectV2
         private CollectionDropdown collectionDropdown = null!;
 
         [Resolved]
+        private ISongSelect? songSelect { get; set; }
+
+        [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
@@ -298,7 +301,7 @@ namespace osu.Game.Screens.SelectV2
         {
             if (clearScopedSet && ScopedBeatmapSet.Value != null)
             {
-                ScopedBeatmapSet.Value = null;
+                songSelect?.UnscopeBeatmapSet();
                 // because `ScopedBeatmapSet` has a value change callback bound to it that calls `updateCriteria()` again,
                 // we can just do nothing other than clear it to avoid extra work and duplicated `CriteriaChanged` invocations
                 return;

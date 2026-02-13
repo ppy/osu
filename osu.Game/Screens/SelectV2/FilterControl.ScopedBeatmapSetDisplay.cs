@@ -44,7 +44,7 @@ namespace osu.Game.Screens.SelectV2
             }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
+            private void load(ISongSelect? songSelect, OverlayColourProvider colourProvider)
             {
                 Content.AutoSizeEasing = Easing.OutQuint;
                 Content.AutoSizeDuration = transition_duration;
@@ -97,7 +97,7 @@ namespace osu.Game.Screens.SelectV2
                         Alpha = 0,
                     },
                 });
-                Action = () => scopedBeatmapSet.Value = null;
+                Action = () => songSelect?.UnscopeBeatmapSet();
             }
 
             protected override void LoadComplete()
