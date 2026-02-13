@@ -34,6 +34,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString NotAvailable => new TranslatableString(getKey(@"not_available"), @"(not available)");
 
+        /// <summary>
+        /// "Classic scoring mode is always used for this statistic."
+        /// </summary>
+        public static LocalisableString ClassicScoringAlwaysUsed => new TranslatableString(getKey(@"classic_scoring_always_used"), @"Classic scoring mode is always used for this statistic.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
