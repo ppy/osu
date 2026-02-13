@@ -362,7 +362,7 @@ namespace osu.Game.Database
                     foreach (var filenames in getShortenedFilenames(archive))
                     {
                         using (Stream s = archive.GetStream(filenames.original))
-                            files.Add(new RealmNamedFileUsage(Files.Add(s, realm, false, parameters.PreferHardLinks), filenames.shortened));
+                            files.Add(new RealmNamedFileUsage(Files.Add(s, realm, false, parameters.PreferHardLinks, parameters.PreferCopyOnWrite), filenames.shortened));
                     }
                 }
 
