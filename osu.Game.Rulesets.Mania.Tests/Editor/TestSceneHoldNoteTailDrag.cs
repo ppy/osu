@@ -217,7 +217,16 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                 EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects);
             });
 
-            AddStep("Drag tail", () =>
+            AddStep("Drag until both match", () =>
+            {
+                var blueprintDragArea = this.ChildrenOfType<DragArea>().First();
+                InputManager.MoveMouseTo(blueprintDragArea);
+                InputManager.PressKey(Key.LShift);
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.MoveMouseTo(new Vector2(1000, 110));
+            });
+
+            AddStep("Continue the drag", () =>
             {
                 var blueprintDragArea = this.ChildrenOfType<DragArea>().First();
                 dragBackward(blueprintDragArea);
@@ -264,7 +273,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         private void dragForward(DragArea dragArea)
         {
             InputManager.MoveMouseTo(dragArea);
-            InputManager.PressKey(Key.LShift);
             InputManager.PressButton(MouseButton.Left);
             InputManager.MoveMouseTo(new Vector2(1100, 110));
         }
@@ -272,9 +280,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         private void dragBackward(DragArea dragArea)
         {
             InputManager.MoveMouseTo(dragArea);
-            InputManager.PressKey(Key.LShift);
             InputManager.PressButton(MouseButton.Left);
-            InputManager.MoveMouseTo(new Vector2(-200, 110));
+            InputManager.MoveMouseTo(new Vector2(700, 110));
         }
     }
 }
