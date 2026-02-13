@@ -194,6 +194,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ShowHidden => new TranslatableString(getKey(@"show_hidden"), @"Show hidden");
 
+        /// <summary>
+        /// "Multiplayer"
+        /// </summary>
+        public static LocalisableString MultiplayerHeader => new TranslatableString(getKey(@"multiplayer"), @"Multiplayer");
+
+        /// <summary>
+        /// "Request window focus when multiplayer match is about to start"
+        /// </summary>
+        public static LocalisableString RequestFocusOnMultiplayerGameplayStart => new TranslatableString(getKey(@"request_focus_on_multiplayer_gameplay_start"), @"Request window focus when multiplayer match is about to start");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
