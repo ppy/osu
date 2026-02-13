@@ -129,11 +129,6 @@ namespace osu.Game.Overlays.Settings.Sections
             realmSubscription?.Dispose();
         }
 
-        private partial class SkinDropdown : FormDropdown<Live<SkinInfo>>
-        {
-            protected override LocalisableString GenerateItemText(Live<SkinInfo> item) => item.ToString();
-        }
-
         public partial class RenameSkinButton : SettingsButtonV2, IHasPopover
         {
             [Resolved]
