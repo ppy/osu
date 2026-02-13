@@ -211,7 +211,6 @@ namespace osu.Game.Screens.Play
             score.ScoreInfo.Date = DateTimeOffset.Now;
 
             await submitScore(score).ConfigureAwait(false);
-            spectatorClient.EndPlaying(GameplayState);
             userStatisticsWatcher?.RegisterForStatisticsUpdateAfter(score.ScoreInfo);
         }
 
@@ -234,6 +233,16 @@ namespace osu.Game.Screens.Play
             spectatorClient.BeginPlaying(token, GameplayState, Score);
         }
 
+        protected override void ConcludeGameplay()
+        {
+            base.ConcludeGameplay();
+
+            spectatorClient.EndPlaying(GameplayState);
+
+            // compare: https://github.com/ppy/osu/blob/ccf1acce56798497edfaf92d3ece933469edcf0a/osu.Game/Screens/Play/Player.cs#L848-L851
+            submitScore(Score.DeepClone()).FireAndForget();
+        }
+
         public override bool Pause()
         {
             bool wasPaused = GameplayClockContainer.IsPaused.Value;
@@ -246,33 +255,11 @@ namespace osu.Game.Screens.Play
             return paused;
         }
 
-        protected override void ConcludeFailedScore(Score score)
-        {
-            base.ConcludeFailedScore(score);
-            submitFromFailOrQuit(score);
-        }
-
         public override bool OnExiting(ScreenExitEvent e)
         {
             bool exiting = base.OnExiting(e);
-            submitFromFailOrQuit(Score);
             statics.SetValue(Static.LastLocalUserScore, Score?.ScoreInfo.DeepClone());
             return exiting;
-        }
-
-        private void submitFromFailOrQuit(Score score)
-        {
-            if (LoadedBeatmapSuccessfully)
-            {
-                // compare: https://github.com/ppy/osu/blob/ccf1acce56798497edfaf92d3ece933469edcf0a/osu.Game/Screens/Play/Player.cs#L848-L851
-                var scoreCopy = score.DeepClone();
-
-                Task.Run(async () =>
-                {
-                    await submitScore(scoreCopy).ConfigureAwait(false);
-                    spectatorClient.EndPlaying(GameplayState);
-                }).FireAndForget();
-            }
         }
 
         /// <summary>
