@@ -419,6 +419,39 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
         [TestCase(false)]
         [TestCase(true)]
+        public void TestUnscopeRevertsToOriginalSelection(bool grouped)
+        {
+            ImportBeatmapForRuleset(0);
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+            SortBy(grouped ? SortMode.Title : SortMode.Difficulty);
+            checkMatchedBeatmaps(6);
+
+            AddStep("select normal difficulty", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(findBeatmap("Normal")));
+            AddUntilStep("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Normal")));
+
+            scopeBeatmap(grouped);
+            checkMatchedBeatmaps(3);
+
+            AddStep("select insane difficulty", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(findBeatmap("Insane")));
+            AddUntilStep("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Insane")));
+
+            AddStep("exit scoped view", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<FilterControl.ScopedBeatmapSetDisplay>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            WaitForFiltering();
+
+            checkMatchedBeatmaps(6);
+            AddAssert("normal difficulty is selected", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Normal")));
+
+            AddStep("reset star difficulty filter", () => Config.SetValue(OsuSetting.DisplayStarsMaximum, 10.1));
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
         public void TestUnscopeWhenSelectedBeatmapHiddenByFilters(bool grouped)
         {
             ImportBeatmapForRuleset(0);

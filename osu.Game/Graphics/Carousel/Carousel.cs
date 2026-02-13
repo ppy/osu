@@ -41,11 +41,6 @@ namespace osu.Game.Graphics.Carousel
         #region Properties and methods for external usage
 
         /// <summary>
-        /// Called after a filter operation has completed, but before the items on the carousel have changed.
-        /// </summary>
-        public Action? FilterCompleted { private get; init; }
-
-        /// <summary>
         /// Called after a filter operation or change in items results in the visible carousel items changing.
         /// </summary>
         public Action<IEnumerable<CarouselItem>>? NewItemsPresented { private get; init; }
@@ -412,7 +407,6 @@ namespace osu.Game.Graphics.Carousel
                     filterReusesPanels.Validate();
                 }
 
-                FilterCompleted?.Invoke();
                 HandleFilterCompleted();
 
                 refreshAfterSelection();

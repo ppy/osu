@@ -63,6 +63,6 @@ namespace osu.Game.Screens.SelectV2
         /// Cannot be used to change the value, any changes must be done through <see cref="ScopeToBeatmapSet"/>
         /// or <see cref="UnscopeBeatmapSet"/>.
         /// </summary>
-        Bindable<BeatmapSetInfo?> ScopedBeatmapSet { get; }
+        IBindable<BeatmapSetInfo?> ScopedBeatmapSet { get; }
     }
 }

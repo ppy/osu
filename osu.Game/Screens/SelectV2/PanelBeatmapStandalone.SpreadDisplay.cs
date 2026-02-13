@@ -29,7 +29,7 @@ namespace osu.Game.Screens.SelectV2
 
             protected override Colour4 DimColour => Colour4.White;
 
-            private readonly Bindable<BeatmapSetInfo?> scopedBeatmapSet = new Bindable<BeatmapSetInfo?>();
+            private readonly IBindable<BeatmapSetInfo?> scopedBeatmapSet = new Bindable<BeatmapSetInfo?>();
             private readonly Bindable<bool> showConvertedBeatmaps = new Bindable<bool>();
 
             private const double transition_duration = 200;
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.SelectV2
             }
 
             [BackgroundDependencyLoader]
-            private void load(ISongSelect? songSelect, OsuConfigManager configManager)
+            private void load(OsuConfigManager configManager)
             {
                 Add(new FillFlowContainer
                 {

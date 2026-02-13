@@ -271,7 +271,6 @@ namespace osu.Game.Screens.SelectV2
                                                                 RequestPresentBeatmap = b => SelectAndRun(b, OnStart),
                                                                 RequestSelection = queueBeatmapSelection,
                                                                 RequestRecommendedSelection = requestRecommendedSelection,
-                                                                FilterCompleted = filterCompleted,
                                                                 NewItemsPresented = newItemsPresented,
                                                             },
                                                             noResultsPlaceholder = new NoResultsPlaceholder
@@ -317,8 +316,6 @@ namespace osu.Game.Screens.SelectV2
             });
 
             showConvertedBeatmaps = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
-
-            leasedScopedBeatmapSet = ScopedBeatmapSet.BeginLease(false);
         }
 
         // Colour scheme for mod overlay is left as default (green) to match mods button.
@@ -1248,34 +1245,25 @@ namespace osu.Game.Screens.SelectV2
 
         private GroupedBeatmap? beforeScopedSelection;
 
-        private Bindable<BeatmapSetInfo?> leasedScopedBeatmapSet = null!;
-        public Bindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
+        private readonly Bindable<BeatmapSetInfo?> scopedBeatmapSet = new Bindable<BeatmapSetInfo?>();
+        public IBindable<BeatmapSetInfo?> ScopedBeatmapSet => scopedBeatmapSet;
 
         public void ScopeToBeatmapSet(BeatmapSetInfo beatmapSet)
         {
             beforeScopedSelection = carousel.CurrentGroupedBeatmap;
 
-            leasedScopedBeatmapSet.Value = beatmapSet;
+            scopedBeatmapSet.Value = beatmapSet;
         }
 
         public void UnscopeBeatmapSet()
         {
-            if (leasedScopedBeatmapSet.Value == null)
+            if (scopedBeatmapSet.Value == null)
                 return;
 
-            leasedScopedBeatmapSet.Value = null;
-        }
-
-        private void filterCompleted()
-        {
-            if (carousel.CurrentGroupedBeatmap == null)
-                return;
-
-            if (beforeScopedSelection == null)
-                return;
-
-            if (!carousel.GetCarouselItems()!.Any(i => i.Model is GroupedBeatmap g && g.Equals(carousel.CurrentGroupedBeatmap)))
+            if (beforeScopedSelection != null)
                 queueBeatmapSelection(beforeScopedSelection);
+
+            scopedBeatmapSet.Value = null;
         }
 
         #endregion
