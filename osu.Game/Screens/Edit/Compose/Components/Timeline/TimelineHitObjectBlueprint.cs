@@ -461,9 +461,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     return;
 
                                 List<HitObject> objsToAdjust = new List<HitObject>();
+                                var selectedObjects = blueprintContainer.SelectionHandler.SelectedItems;
 
-                                foreach (var item in blueprintContainer.SelectionHandler.SelectedItems)
+                                foreach (var item in selectedObjects)
                                 {
+                                    // If the dragged object is not in the selection we ignore the selected items
+                                    if (!selectedObjects.Contains(hitObject))
+                                        break;
+
                                     var durationItem = item as IHasDuration;
 
                                     if (Precision.AlmostEquals(durationItem!.Duration, endTimeHitObject.Duration) &&
