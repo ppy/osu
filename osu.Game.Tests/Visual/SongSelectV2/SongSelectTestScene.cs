@@ -115,6 +115,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
                 Config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Title);
                 Config.SetValue(OsuSetting.SongSelectGroupMode, GroupMode.None);
+                Config.SetValue(OsuSetting.ShowConvertedBeatmaps, false);
 
                 SongSelect = null!;
             });
