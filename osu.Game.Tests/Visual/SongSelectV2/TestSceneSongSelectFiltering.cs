@@ -489,6 +489,10 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         [TestCase(true)]
         public void TestUnscopeByChangingRuleset(bool grouped)
         {
+            bool showConverts = Config.Get<bool>(OsuSetting.ShowConvertedBeatmaps);
+
+            AddStep("hide converts", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
+
             ImportBeatmapForRuleset(0, 2);
 
             LoadSongSelect();
@@ -505,12 +509,18 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             WaitForFiltering();
 
             AddAssert("hard catch difficulty is selected", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Hard")));
+
+            AddStep("revert convert setting", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, showConverts));
         }
 
         [TestCase(false)]
         [TestCase(true)]
         public void TestUnscopeByShowingConverts(bool grouped)
         {
+            bool showConverts = Config.Get<bool>(OsuSetting.ShowConvertedBeatmaps);
+
+            AddStep("hide converts", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
+
             ImportBeatmapForRuleset(0);
             ImportBeatmapForRuleset(0);
 
@@ -535,6 +545,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
 
             AddAssert("hard difficulty is selected", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Hard")));
 
+            AddStep("revert convert setting", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, showConverts));
             AddStep("reset star difficulty filter", () => Config.SetValue(OsuSetting.DisplayStarsMaximum, 10.1));
         }
 
