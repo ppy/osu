@@ -34,6 +34,8 @@ namespace osu.Game.Screens.SelectV2
 
         protected const float DURATION = 400;
 
+        public override bool HandlePositionalInput => Item != null;
+
         protected float PanelXOffset { get; init; }
 
         private Container backgroundContainer = null!;
