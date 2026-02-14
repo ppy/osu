@@ -67,8 +67,8 @@ namespace osu.Game.Rulesets.Difficulty
         {
             using var timedCancellationSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-            if (!cancellationToken.CanBeCanceled)
-                cancellationToken = timedCancellationSource.Token;
+            //if (!cancellationToken.CanBeCanceled)
+            //    cancellationToken = timedCancellationSource.Token;
 
             cancellationToken.ThrowIfCancellationRequested();
             // ReSharper disable once PossiblyMistakenUseOfCancellationToken
