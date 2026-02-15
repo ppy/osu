@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace osu.Game.Rulesets.Osu.Difficulty.Utils
+namespace osu.Game.Rulesets.Difficulty.Utils
 {
     public struct Bin
     {
@@ -14,62 +14,79 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
         public double NoteCount;
 
         /// <summary>
-        /// Creates a 2D grid of bins using bilinear interpolation.
-        /// Notes are distributed across neighboring bins weighted by their fractional position.
+        /// Creates bins using 2D quantile-based binning.
+        /// First splits notes into time quantiles (equal note counts), then splits each time quantile into difficulty quantiles.
         /// </summary>
         public static List<Bin> CreateBins(List<double> difficulties, List<double> times, int difficultyDimensionLength, int timeDimensionLength)
         {
-            double maxDifficulty = difficulties.Max();
-            double endTime = times.Max();
+            if (difficulties.Count == 0 || times.Count == 0 || difficultyDimensionLength <= 0 || timeDimensionLength <= 0)
+                return new List<Bin>();
 
-            var binsArray = new Bin[timeDimensionLength * difficultyDimensionLength];
+            int n = difficulties.Count;
+            var bins = new List<Bin>();
 
-            for (int timeIndex = 0; timeIndex < timeDimensionLength; timeIndex++)
+            // Calculate how many notes per time quantile
+            int notesPerTimeQuantile = (int)Math.Ceiling((double)n / timeDimensionLength);
+
+            // Split into time quantiles
+            for (int timeQuantile = 0; timeQuantile < timeDimensionLength; timeQuantile++)
             {
-                double time = endTime * timeIndex / (timeDimensionLength - 1);
+                int startIdx = timeQuantile * notesPerTimeQuantile;
+                int endIdx = Math.Min(startIdx + notesPerTimeQuantile, n);
 
-                for (int diffIndex = 0; diffIndex < difficultyDimensionLength; diffIndex++)
+                if (startIdx >= n) break;
+
+                int quantileSize = endIdx - startIdx;
+
+                // Extract difficulties and times for this time quantile
+                var quantileDifficulties = new List<double>(quantileSize);
+                var quantileTimes = new List<double>(quantileSize);
+
+                for (int i = startIdx; i < endIdx; i++)
                 {
-                    int binIndex = difficultyDimensionLength * timeIndex + diffIndex;
+                    quantileDifficulties.Add(difficulties[i]);
+                    quantileTimes.Add(times[i]);
+                }
 
-                    binsArray[binIndex].Time = time;
+                // Sort by difficulty for this quantile
+                int[] sortedIndices = Enumerable.Range(0, quantileSize)
+                                                .OrderBy(i => quantileDifficulties[i])
+                                                .ToArray();
 
-                    // We don't create a 0 difficulty bin because 0 difficulty notes don't contribute to star rating.
-                    binsArray[binIndex].Difficulty = maxDifficulty * (diffIndex + 1) / difficultyDimensionLength;
+                // Calculate how many notes per difficulty quantile
+                int notesPerDiffQuantile = (int)Math.Ceiling((double)quantileSize / difficultyDimensionLength);
+
+                // Split this time quantile into difficulty quantiles
+                for (int diffQuantile = 0; diffQuantile < difficultyDimensionLength; diffQuantile++)
+                {
+                    int diffStartIdx = diffQuantile * notesPerDiffQuantile;
+                    int diffEndIdx = Math.Min(diffStartIdx + notesPerDiffQuantile, quantileSize);
+
+                    if (diffStartIdx >= quantileSize)
+                        break;
+
+                    double diffSum = 0;
+                    double timeSum = 0;
+                    int count = diffEndIdx - diffStartIdx;
+
+                    for (int i = diffStartIdx; i < diffEndIdx; i++)
+                    {
+                        int originalIdx = sortedIndices[i];
+                        diffSum += quantileDifficulties[originalIdx];
+                        timeSum += quantileTimes[originalIdx];
+                    }
+
+                    bins.Add(new Bin
+                    {
+                        Difficulty = diffSum / count,
+                        Time = timeSum / count,
+                        NoteCount = count
+                    });
                 }
             }
 
-            for (int noteIndex = 0; noteIndex < difficulties.Count; noteIndex++)
-            {
-                double timeBinIndex = timeDimensionLength * (times[noteIndex] / endTime);
-                double difficultyBinIndex = difficultyDimensionLength * (difficulties[noteIndex] / maxDifficulty) - 1;
-
-                int timeLower = Math.Min((int)timeBinIndex, timeDimensionLength - 1);
-                int timeUpper = Math.Min(timeLower + 1, timeDimensionLength - 1);
-                double timeWeight = timeBinIndex - timeLower;
-
-                int difficultyLower = fastFloor(difficultyBinIndex);
-                int difficultyUpper = Math.Min(difficultyLower + 1, difficultyDimensionLength - 1);
-                double difficultyWeight = difficultyBinIndex - difficultyLower;
-
-                // The lower bound of difficulty can be -1, corresponding to buckets with 0 difficulty.
-                // We don't store those since they don't contribute to star rating.
-                if (difficultyLower >= 0)
-                {
-                    binsArray[difficultyDimensionLength * timeLower + difficultyLower].NoteCount += (1 - timeWeight) * (1 - difficultyWeight);
-                    binsArray[difficultyDimensionLength * timeUpper + difficultyLower].NoteCount += timeWeight * (1 - difficultyWeight);
-                }
-
-                binsArray[difficultyDimensionLength * timeLower + difficultyUpper].NoteCount += (1 - timeWeight) * difficultyWeight;
-                binsArray[difficultyDimensionLength * timeUpper + difficultyUpper].NoteCount += timeWeight * difficultyWeight;
-            }
-
-            var binsList = binsArray.ToList();
-
-            return binsList;
+            // Sort by time
+            return bins.OrderBy(b => b.Time).ToList();
         }
-
-        // Faster implementation of the floor function to speed up binning times.
-        private static int fastFloor(double x) => x >= 0 || x == -1 ? (int)x : (int)(x - 1);
     }
 }

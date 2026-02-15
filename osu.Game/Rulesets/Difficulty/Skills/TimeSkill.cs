@@ -7,7 +7,6 @@ using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Difficulty.Skills
 {
@@ -25,7 +24,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private const double max_delta_time = 5000;
 
         // Bin specific constants
-        private const double bin_threshold_note_count = 64;
+        private const double bin_threshold_note_count = difficulty_bin_count * time_bin_count;
         private const int difficulty_bin_count = 8;
         private const int time_bin_count = 16;
 
@@ -74,18 +73,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             // We use bins, falling back to exact difficulty calculation if not available.
             if (binList is not null)
             {
-                for (int timeIndex = time_bin_count - 1; timeIndex >= 0; timeIndex--)
+                for (int n = binList.Count - 1; n >= 0; n--)
                 {
-                    double deltaTime = times.LastOrDefault() / time_bin_count;
+                    double deltaTime = n > 0 ? binList[n].Time - binList[n - 1].Time : binList[n].Time;
 
-                    for (int difficultyIndex = 0; difficultyIndex < difficulty_bin_count; difficultyIndex++)
-                    {
-                        Bin bin = binList[difficulty_bin_count * timeIndex + difficultyIndex];
-
-                        hitProbabilityProduct *= Math.Pow(HitProbability(skill, bin.Difficulty), bin.NoteCount);
-                    }
-
-                    timeSpentRetrying += deltaTime / hitProbabilityProduct - deltaTime;
+                    hitProbabilityProduct *= Math.Pow(HitProbability(skill, binList[n].Difficulty), binList[n].NoteCount);
+                    timeSpentRetrying += hitProbabilityProduct > 0 ? deltaTime / hitProbabilityProduct - deltaTime : double.PositiveInfinity;
                 }
             }
             else
@@ -95,7 +88,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                     double deltaTime = n > 0 ? times[n] - times[n - 1] : times[n];
 
                     hitProbabilityProduct *= HitProbability(skill, ObjectDifficulties[n]);
-                    timeSpentRetrying += deltaTime / hitProbabilityProduct - deltaTime;
+                    timeSpentRetrying += hitProbabilityProduct > 0 ? deltaTime / hitProbabilityProduct - deltaTime : double.PositiveInfinity;
                 }
             }
 
@@ -116,7 +109,13 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             double fcSkill = DifficultyValue();
 
-            var bins = Bin.CreateBins(ObjectDifficulties, times, difficulty_bin_count, time_bin_count);
+            // We only initialize bins if we have enough notes to use them.
+            List<Bin>? binList = null;
+
+            if (ObjectDifficulties.Count > bin_threshold_note_count)
+            {
+                binList = Bin.CreateBins(ObjectDifficulties, times, difficulty_bin_count, time_bin_count);
+            }
 
             foreach (double skillProportion in PolynomialPenaltyUtils.SKILL_PROPORTIONS)
             {
@@ -129,7 +128,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 double penalizedSkill = fcSkill * skillProportion;
 
                 // We take the log to squash miss counts, which have large absolute value differences, but low relative differences, into a straighter line for the polynomial.
-                missCounts[skillProportion] = Math.Log(getMissCountAtSkill(penalizedSkill, bins) + 1);
+                missCounts[skillProportion] = Math.Log(getMissCountAtSkill(penalizedSkill, binList) + 1);
             }
 
             return PolynomialPenaltyUtils.GetPenaltyCoefficients(missCounts);
@@ -138,10 +137,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Find the lowest misscount that a player with the provided <paramref name="skill"/> would likely achieve within 12 minutes of retrying.
         /// </summary>
-        private double getMissCountAtSkill(double skill, List<Bin> bins)
+        private double getMissCountAtSkill(double skill, List<Bin>? binList = null)
         {
             double maxDiff = ObjectDifficulties.Max();
-            double endTime = times.Max();
 
             if (maxDiff == 0)
                 return 0;
@@ -155,43 +153,41 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             double retryTimeRequiredToObtainMissCount(double missCount)
             {
                 poiBin.Reset();
-
                 double timeSpentRetrying = 0;
 
-                if (ObjectDifficulties.Count > time_bin_count * difficulty_bin_count)
+                if (binList is not null)
                 {
-                    double binTimeSteps = endTime / time_bin_count;
-
-                    for (int timeIndex = 0; timeIndex < time_bin_count; timeIndex++)
+                    for (int n = binList.Count - 1; n >= 0; n--)
                     {
-                        for (int difficultyIndex = 0; difficultyIndex < difficulty_bin_count; difficultyIndex++)
-                        {
-                            Bin bin = bins[timeIndex * difficulty_bin_count + difficultyIndex];
+                        double deltaTime = n > 0 ? binList[n].Time - binList[n - 1].Time : binList[n].Time;
+                        double missProbability = 1 - HitProbability(skill, binList[n].Difficulty);
 
-                            double missProb = 1 - HitProbability(skill, bin.Difficulty);
-                            poiBin.AddBinnedProbabilities(missProb, bin.NoteCount);
-                        }
+                        // Add this bin's probabilities to track cumulative miss distribution from here to end
+                        poiBin.AddBinnedProbabilities(missProbability, binList[n].NoteCount);
 
-                        timeSpentRetrying += binTimeSteps * poiBin.Cdf(missCount);
+                        // Probability of achieving less than this missCount from this point until map end
+                        double missCountProb = poiBin.Cdf(missCount);
+
+                        // deltaTime divided by missCountProb = expected total plays of this segment
+                        // Subtract deltaTime to get only the retry time (which excludes the success run)
+                        timeSpentRetrying += missCountProb > 0 ? deltaTime / missCountProb - deltaTime : double.PositiveInfinity;
                     }
                 }
                 else
                 {
-                    for (int i = 0; i < ObjectDifficulties.Count; i++)
+                    // Same calculation but for individual notes.
+                    for (int n = ObjectDifficulties.Count - 1; n >= 0; n--)
                     {
-                        double deltaTime = i > 0 ? times[i] - times[i - 1] : times[i];
+                        double deltaTime = n > 0 ? times[n] - times[n - 1] : times[n];
+                        double missProbability = 1 - HitProbability(skill, ObjectDifficulties[n]);
+                        poiBin.AddProbability(missProbability);
 
-                        double missProb = 1 - HitProbability(skill, ObjectDifficulties[i]);
-                        poiBin.AddProbability(missProb);
-
-                        timeSpentRetrying += deltaTime * poiBin.Cdf(missCount);
+                        double missCountProb = poiBin.Cdf(missCount);
+                        timeSpentRetrying += missCountProb > 0 ? deltaTime / missCountProb - deltaTime : double.PositiveInfinity;
                     }
                 }
 
-                if (poiBin.Cdf(missCount) < 1e-10)
-                    return double.PositiveInfinity;
-
-                return (timeSpentRetrying / poiBin.Cdf(missCount) - endTime) * ms_to_minutes;
+                return timeSpentRetrying * ms_to_minutes;
             }
         }
 

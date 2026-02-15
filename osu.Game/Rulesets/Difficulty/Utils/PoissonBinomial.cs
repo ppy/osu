@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Game.Rulesets.Osu.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Difficulty.Utils
 {
@@ -136,11 +135,25 @@ namespace osu.Game.Rulesets.Difficulty.Utils
             gamma += p * (1 - p) * (1 - 2 * p);
         }
 
+        public void RemoveProbability(double p)
+        {
+            mu -= p;
+            var -= p * (1 - p);
+            gamma -= p * (1 - p) * (1 - 2 * p);
+        }
+
         public void AddBinnedProbabilities(double p, double count)
         {
             mu += p * count;
             var += p * (1 - p) * count;
             gamma += p * (1 - p) * (1 - 2 * p) * count;
+        }
+
+        public void RemoveBinnedProbabilities(double p, double count)
+        {
+            mu -= p * count;
+            var -= p * (1 - p) * count;
+            gamma -= p * (1 - p) * (1 - 2 * p) * count;
         }
 
         public double Cdf(double count)
