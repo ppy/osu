@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double baseFactor = 1 - 0.15 * calcAcuteAngleBonus(lastAngle) * angleDifferenceAdjusted;
 
                 // Penalize angle repetition.
-                angleRepetitionNerf = Math.Pow(baseFactor + (1 - baseFactor) * 0.9 * vectorRepetition * stackFactor, 2);
+                angleRepetitionNerf = Math.Pow(baseFactor + (1 - baseFactor) * 0.75 * vectorRepetition * stackFactor, 2);
 
                 if (Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) < 1.25 * Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) // If rhythms are the same.
                 {
