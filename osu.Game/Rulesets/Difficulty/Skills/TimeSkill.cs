@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         // FC time specific constants
         private const double time_threshold_minutes = 24;
         private const double max_delta_time = 5000;
+        private const double retry_cooldown_time = 60000;
 
         // Bin specific constants
         private const double bin_threshold_note_count = difficulty_bin_count * time_bin_count;
@@ -39,7 +40,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         protected override double ProcessInternal(DifficultyHitObject current)
         {
-            times.Add(times.LastOrDefault() + Math.Min(current.DeltaTime, max_delta_time));
+            times.Add(current.Index == 0
+                ? retry_cooldown_time + Math.Min(current.DeltaTime, max_delta_time)
+                : times.Last() + Math.Min(current.DeltaTime, max_delta_time));
 
             return StrainValueAt(current);
         }
