@@ -16,7 +16,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double acute_angle_multiplier = 2.3;
         private const double slider_multiplier = 1.5;
         private const double velocity_change_multiplier = 0.75;
-        private const double wiggle_multiplier = 1.02; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
+
+        private const double
+            wiggle_multiplier = 1.02; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
@@ -82,10 +84,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Rewarding angles, take the smaller velocity as base.
                 double angleBonus = Math.Min(currVelocity, prevVelocity);
 
-                double angleDifferenceAdjusted = Math.Cos(2 * Math.Min(double.DegreesToRadians(45), Math.Abs(currAngle - lastAngle)));
-                double vectorRepetition = angleVectorRepetition(osuCurrObj);
-
                 double stackFactor = DifficultyCalculationUtils.Smootherstep(osuLastObj.LazyJumpDistance, 0, diameter);
+
+                double angleDifferenceAdjusted = Math.Cos(2 * Math.Min(double.DegreesToRadians(45), Math.Abs(currAngle - lastAngle) * stackFactor));
+                double vectorRepetition = angleVectorRepetition(osuCurrObj);
 
                 double baseFactor = 1 - 0.15 * calcAcuteAngleBonus(lastAngle) * angleDifferenceAdjusted;
 
