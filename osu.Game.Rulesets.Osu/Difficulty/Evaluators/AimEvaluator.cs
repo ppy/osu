@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 wideAngleBonus *= 1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3));
 
                 // Apply full wide angle bonus for distance more than SINGLE_SPACING_THRESHOLD
-                wideAngleBonus *= angleBonus * DifficultyCalculationUtils.Smootherstep(currDistance, 0, SpeedAimEvaluator.SINGLE_SPACING_THRESHOLD);
+                wideAngleBonus *= angleBonus * Math.Pow(DifficultyCalculationUtils.Smoothstep(currDistance, 0, SpeedAimEvaluator.SINGLE_SPACING_THRESHOLD), 3.0);
 
                 // Apply wiggle bonus for jumps that are [radius, 3*diameter] in distance, with < 110 angle
                 // https://www.desmos.com/calculator/dp0v0nvowc

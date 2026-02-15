@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
@@ -28,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double rhythmComplexitySum = 0;
 
-            double deltaDifferenceEpsilon = ((OsuDifficultyHitObject)current).HitWindowGreat * 0.3;
+            double deltaDifferenceEpsilon = ((OsuDifficultyHitObject)current).HitWindow(HitResult.Great) * 0.3;
 
             var island = new Island(deltaDifferenceEpsilon);
             var previousIsland = new Island(deltaDifferenceEpsilon);
