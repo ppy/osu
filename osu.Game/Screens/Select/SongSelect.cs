@@ -973,10 +973,18 @@ namespace osu.Game.Screens.Select
 
         private void updateVisibleBeatmapCount()
         {
-            // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
-            // but also in this case we want support for formatting a number within a string).
             int carouselCountDisplayed = Carousel.CountDisplayed;
-            FilterControl.InformationalText = carouselCountDisplayed != 1 ? $"{carouselCountDisplayed:#,0} matches" : $"{carouselCountDisplayed:#,0} match";
+
+            if (FilterControl.CurrentTextSearch.Value == string.Empty)
+            {
+                FilterControl.InformationalText = $"{carouselCountDisplayed} beatmaps available";
+            }
+            else
+            {
+                // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
+                // but also in this case we want support for formatting a number within a string).
+                FilterControl.InformationalText = carouselCountDisplayed != 1 ? $"{carouselCountDisplayed:#,0} matches" : $"{carouselCountDisplayed:#,0} match";
+            }
         }
 
         private bool boundLocalBindables;
