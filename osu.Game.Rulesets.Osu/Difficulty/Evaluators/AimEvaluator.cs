@@ -127,9 +127,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     }
                 }
 
-                double repetitionRatio = (lastAngle == double.DegreesToRadians(180)) ? 0 : Math.Pow(Math.Cos(currAngle / 2) / Math.Cos(lastAngle / 2), 2);
+                double repetitionRatio = (lastAngle == double.DegreesToRadians(180)) ? 0 : Math.Pow(Math.Cos(currAngle / 2) / Math.Cos(lastAngle / 2), 4);
                 repetitionRatio = repetitionRatio > 1 ? 1 / repetitionRatio : repetitionRatio;
-                angleRepetitionPenalty = 0.1 * repetitionRatio;
+                angleRepetitionPenalty = 0.2 * repetitionRatio;
             }
 
             if (Math.Max(prevVelocity, currVelocity) != 0)
