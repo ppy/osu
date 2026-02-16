@@ -12,6 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
+using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
@@ -266,6 +267,8 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             AddUntilStep("wait for placeholder visible", () => getPlaceholder()?.State.Value == Visibility.Visible);
 
             AddAssert("still has selection", () => Beatmap.IsDefault, () => Is.False);
+
+            AddStep("reset star difficulty filter", () => Config.SetValue(OsuSetting.DisplayStarsMinimum, 0.0));
         }
 
         [Test]
@@ -365,13 +368,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             SortBy(SortMode.Difficulty);
             checkMatchedBeatmaps(6);
 
-            AddUntilStep("wait for spread indicator", () => this.ChildrenOfType<PanelBeatmapStandalone.SpreadDisplay>().Any(d => d.Enabled.Value));
-            AddStep("click spread indicator", () =>
-            {
-                InputManager.MoveMouseTo(this.ChildrenOfType<PanelBeatmapStandalone.SpreadDisplay>().Single(d => d.Enabled.Value));
-                InputManager.Click(MouseButton.Left);
-            });
-            WaitForFiltering();
+            scopeBeatmap(false);
             checkMatchedBeatmaps(3);
 
             AddStep("press Escape", () => InputManager.Key(Key.Escape));
@@ -389,9 +386,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             SortBy(SortMode.Artist);
             checkMatchedBeatmaps(6);
 
-            AddUntilStep("wait for spread indicator", () => this.ChildrenOfType<PanelBeatmapSet.SpreadDisplay>().Any(d => d.Enabled.Value));
-            AddStep("click spread indicator", () => this.ChildrenOfType<PanelBeatmapSet.SpreadDisplay>().Single(d => d.Enabled.Value).TriggerClick());
-            WaitForFiltering();
+            scopeBeatmap(true);
             checkMatchedBeatmaps(3);
 
             AddStep("press Escape", () => InputManager.Key(Key.Escape));
@@ -413,9 +408,7 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             WaitForFiltering();
             checkMatchedBeatmaps(3);
 
-            AddUntilStep("wait for spread indicator", () => this.ChildrenOfType<PanelBeatmapSet.SpreadDisplay>().Any(d => d.Enabled.Value));
-            AddStep("click spread indicator", () => this.ChildrenOfType<PanelBeatmapSet.SpreadDisplay>().Single(d => d.Enabled.Value).TriggerClick());
-            WaitForFiltering();
+            scopeBeatmap(true);
             checkMatchedBeatmaps(3);
 
             AddStep("press Escape", () => InputManager.Key(Key.Escape));
@@ -423,6 +416,179 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             checkMatchedBeatmaps(3);
             AddAssert("text filter not emptied", () => filterTextBox.Current.Value, () => Is.Not.Empty);
         }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestUnscopeRevertsToOriginalSelection(bool grouped)
+        {
+            ImportBeatmapForRuleset(0);
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+            SortBy(grouped ? SortMode.Title : SortMode.Difficulty);
+            checkMatchedBeatmaps(6);
+
+            AddStep("select normal difficulty", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(findBeatmap("Normal")));
+            AddUntilStep("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Normal")));
+
+            scopeBeatmap(grouped);
+            checkMatchedBeatmaps(3);
+
+            AddStep("select insane difficulty", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(findBeatmap("Insane")));
+            AddUntilStep("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Insane")));
+
+            AddStep("exit scoped view", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<FilterControl.ScopedBeatmapSetDisplay>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            WaitForFiltering();
+
+            checkMatchedBeatmaps(6);
+            AddAssert("normal difficulty is selected", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Normal")));
+
+            AddStep("reset star difficulty filter", () => Config.SetValue(OsuSetting.DisplayStarsMaximum, 10.1));
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestUnscopeWhenSelectedBeatmapHiddenByFilters(bool grouped)
+        {
+            ImportBeatmapForRuleset(0);
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+            SortBy(grouped ? SortMode.Title : SortMode.Difficulty);
+            checkMatchedBeatmaps(6);
+
+            AddStep("set star difficulty filter", () => Config.SetValue(OsuSetting.DisplayStarsMaximum, findBeatmap("Hard").StarRating + 0.1));
+            WaitForFiltering();
+
+            AddStep("select hard difficulty", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(findBeatmap("Hard")));
+            AddUntilStep("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Hard")));
+
+            scopeBeatmap(grouped);
+            checkMatchedBeatmaps(3);
+
+            AddStep("select insane difficulty", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(findBeatmap("Insane")));
+            AddUntilStep("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Insane")));
+
+            AddStep("exit scoped view", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<FilterControl.ScopedBeatmapSetDisplay>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            WaitForFiltering();
+
+            AddAssert("hard difficulty is selected", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Hard")));
+
+            AddStep("reset star difficulty filter", () => Config.SetValue(OsuSetting.DisplayStarsMaximum, 10.1));
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestUnscopeByChangingRuleset(bool grouped)
+        {
+            bool showConverts = Config.Get<bool>(OsuSetting.ShowConvertedBeatmaps);
+
+            AddStep("hide converts", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
+
+            ImportBeatmapForRuleset(0, 2);
+
+            LoadSongSelect();
+            SortBy(grouped ? SortMode.Title : SortMode.Difficulty);
+            checkMatchedBeatmaps(2);
+
+            scopeBeatmap(grouped);
+            checkMatchedBeatmaps(2);
+
+            AddStep("select insane difficulty", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(findBeatmap("Insane")));
+            AddUntilStep("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Insane")));
+
+            AddStep("change ruleset", () => Ruleset.Value = new CatchRuleset().RulesetInfo);
+            WaitForFiltering();
+
+            AddAssert("hard catch difficulty is selected", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Hard")));
+
+            AddStep("revert convert setting", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, showConverts));
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestUnscopeByShowingConverts(bool grouped)
+        {
+            bool showConverts = Config.Get<bool>(OsuSetting.ShowConvertedBeatmaps);
+
+            AddStep("hide converts", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
+
+            ImportBeatmapForRuleset(0);
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+            SortBy(grouped ? SortMode.Title : SortMode.Difficulty);
+            checkMatchedBeatmaps(6);
+
+            AddStep("set star difficulty filter", () => Config.SetValue(OsuSetting.DisplayStarsMaximum, Beatmap.Value.BeatmapSetInfo.Beatmaps.ElementAt(1).StarRating + 0.1));
+            WaitForFiltering();
+
+            AddStep("select hard difficulty", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(findBeatmap("Hard")));
+            AddUntilStep("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Hard")));
+
+            scopeBeatmap(grouped);
+            checkMatchedBeatmaps(3);
+
+            AddStep("select insane difficulty", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(findBeatmap("Insane")));
+            AddUntilStep("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Insane")));
+
+            AddStep("show converts", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
+            WaitForFiltering();
+
+            AddAssert("hard difficulty is selected", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Hard")));
+
+            AddStep("revert convert setting", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, showConverts));
+            AddStep("reset star difficulty filter", () => Config.SetValue(OsuSetting.DisplayStarsMaximum, 10.1));
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestUnscopeByChangingFilterText(bool grouped)
+        {
+            ImportBeatmapForRuleset(0);
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+            SortBy(grouped ? SortMode.Title : SortMode.Difficulty);
+            checkMatchedBeatmaps(6);
+
+            AddStep("select hard difficulty", () => Beatmap.Value = Beatmaps.GetWorkingBeatmap(findBeatmap("Hard")));
+            AddUntilStep("selection changed", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Hard")));
+
+            scopeBeatmap(grouped);
+            checkMatchedBeatmaps(3);
+
+            AddStep("set filter text", () => filterTextBox.Current.Value = findBeatmap("Normal").DifficultyName);
+            WaitForFiltering();
+
+            AddAssert("normal difficulty is selected", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Normal")));
+        }
+
+        private void scopeBeatmap(bool grouped)
+        {
+            if (grouped)
+            {
+                AddUntilStep("wait for spread indicator", () => this.ChildrenOfType<PanelBeatmapSet.SpreadDisplay>().Any(d => d.Enabled.Value));
+                AddStep("click spread indicator", () => this.ChildrenOfType<PanelBeatmapSet.SpreadDisplay>().Single(d => d.Enabled.Value).TriggerClick());
+            }
+            else
+            {
+                AddUntilStep("wait for spread indicator", () => this.ChildrenOfType<PanelBeatmapStandalone.SpreadDisplay>().Any(d => d.Enabled.Value));
+                AddStep("click spread indicator", () => this.ChildrenOfType<PanelBeatmapStandalone.SpreadDisplay>().Single(d => d.Enabled.Value).TriggerClick());
+            }
+
+            WaitForFiltering();
+        }
+
+        private BeatmapInfo findBeatmap(string difficultySubstring) => Beatmap.Value.BeatmapSetInfo.Beatmaps.First(b => b.DifficultyName.Contains(difficultySubstring));
 
         private NoResultsPlaceholder? getPlaceholder() => SongSelect.ChildrenOfType<NoResultsPlaceholder>().FirstOrDefault();
 
