@@ -411,7 +411,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 changeHandler?.BeginChange();
 
-                foreach (var item in blueprintContainer.SelectionHandler.SelectedItems)
+                var selectionItems = blueprintContainer.SelectionHandler.SelectedItems;
+
+                if (!selectionItems.Contains(hitObject))
+                    return true;
+
+                foreach (var item in selectionItems)
                 {
                     if (item == hitObject) continue;
 
