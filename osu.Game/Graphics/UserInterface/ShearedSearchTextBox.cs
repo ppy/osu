@@ -22,6 +22,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private readonly Box background;
         protected readonly InnerSearchTextBox TextBox;
+        protected readonly Container BackgroundContent;
+        protected readonly Container RightInterface;
 
         public Bindable<string> Current
         {
@@ -62,6 +64,10 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     RelativeSizeAxes = Axes.Both
                 },
+                BackgroundContent = new Container
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -70,13 +76,19 @@ namespace osu.Game.Graphics.UserInterface
                         new Drawable[]
                         {
                             TextBox = CreateInnerTextBox(),
-                            new SpriteIcon
+                            RightInterface = new Container
                             {
-                                Icon = FontAwesome.Solid.Search,
-                                Origin = Anchor.Centre,
                                 Anchor = Anchor.Centre,
-                                Size = new Vector2(16),
-                                Shear = -Shear
+                                Origin = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Both,
+                                Child = new SpriteIcon
+                                {
+                                    Icon = FontAwesome.Solid.Search,
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.Centre,
+                                    Size = new Vector2(16),
+                                    Shear = -Shear
+                                }
                             }
                         }
                     },
