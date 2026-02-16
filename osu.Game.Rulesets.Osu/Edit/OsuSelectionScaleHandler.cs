@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Utils;
@@ -37,13 +38,16 @@ namespace osu.Game.Rulesets.Osu.Edit
         [Resolved]
         private IEditorChangeHandler? changeHandler { get; set; }
 
+        [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
+
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider? snapProvider { get; set; }
 
         private BindableList<HitObject> selectedItems { get; } = new BindableList<HitObject>();
 
         [BackgroundDependencyLoader]
-        private void load(EditorBeatmap editorBeatmap)
+        private void load()
         {
             selectedItems.BindTo(editorBeatmap.SelectedHitObjects);
         }
@@ -53,15 +57,22 @@ namespace osu.Game.Rulesets.Osu.Edit
             base.LoadComplete();
 
             selectedItems.CollectionChanged += (_, __) => updateState();
+            editorBeatmap.HitObjectUpdated += hitObjectUpdated;
             updateState();
+        }
+
+        private void hitObjectUpdated(HitObject hitObject)
+        {
+            if (selectedMovableObjects.Contains(hitObject))
+                updateState();
         }
 
         private void updateState()
         {
             var quad = GeometryUtils.GetSurroundingQuad(selectedMovableObjects);
 
-            CanScaleX.Value = quad.Width > 0;
-            CanScaleY.Value = quad.Height > 0;
+            CanScaleX.Value = Precision.DefinitelyBigger(quad.Width, 0);
+            CanScaleY.Value = Precision.DefinitelyBigger(quad.Height, 0);
             CanScaleDiagonally.Value = CanScaleX.Value && CanScaleY.Value;
             CanScaleFromPlayfieldOrigin.Value = selectedMovableObjects.Any();
             IsScalingSlider.Value = selectedMovableObjects.Count() == 1 && selectedMovableObjects.First() is Slider;
@@ -338,6 +349,14 @@ namespace osu.Game.Rulesets.Osu.Edit
                 PathControlPointPositions = (hitObject as IHasPath)?.Path.ControlPoints.Select(p => p.Position).ToArray();
                 PathControlPointTypes = (hitObject as IHasPath)?.Path.ControlPoints.Select(p => p.Type).ToArray();
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (editorBeatmap.IsNotNull())
+                editorBeatmap.HitObjectUpdated -= hitObjectUpdated;
         }
     }
 }
