@@ -4,6 +4,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Tests.Visual;
 using osuTK;
@@ -26,101 +27,75 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         [Test]
         public void TestSimpleTailDragForward()
         {
-            AddStep("Add hold note", () =>
-            {
-                EditorBeatmap.Add(new HoldNote { StartTime = 2170, Duration = 937.5 });
-            });
+            AddStep("Add hold note", () => EditorBeatmap.Add(getMatchingNotes()[0]));
 
             AddStep("Drag tail", () =>
             {
-                var blueprintDragArea = this.ChildrenOfType<DragArea>().Single();
-                dragForward(blueprintDragArea);
+                var noteDragArea = this.ChildrenOfType<DragArea>().Single();
+                dragForward(noteDragArea);
             });
 
             AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
 
-            AddAssert("Duration is higher", () => ((HoldNote)EditorBeatmap.HitObjects.First())!.Duration > 937.5f);
+            AddAssert("Duration is higher", () => getFirstNote().Duration > 937.5f);
         }
 
         [Test]
         public void TestSimpleTailDragBackwards()
         {
-            AddStep("Add hold note", () =>
-            {
-                EditorBeatmap.Add(new HoldNote { StartTime = 2170, Duration = 937.5 });
-            });
+            AddStep("Add hold note", () => EditorBeatmap.Add(getMatchingNotes()[0]));
 
             AddStep("Drag tail", () =>
             {
-                var blueprintDragArea = this.ChildrenOfType<DragArea>().Single();
-                dragBackward(blueprintDragArea);
+                var noteDragArea = this.ChildrenOfType<DragArea>().Single();
+                dragBackward(noteDragArea);
             });
 
             AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
 
-            AddAssert("Duration is lower", () => ((HoldNote)EditorBeatmap.HitObjects[0]).Duration < 937.5f);
+            AddAssert("Duration is lower", () => getFirstNote().Duration < 937.5f);
         }
 
         [Test]
         public void TestSamePositionButNotSelectedDragForward()
         {
-            AddStep("Add hold notes", () =>
-            {
-                EditorBeatmap.AddRange([
-                    new HoldNote { StartTime = 2170, Duration = 937.5, Column = 0 },
-                    new HoldNote { StartTime = 2170, Duration = 937.5, Column = 1 }
-                ]);
-            });
+            AddStep("Add hold notes", () => EditorBeatmap.AddRange(getMatchingNotes()));
 
             AddStep("Drag tail", () =>
             {
-                var blueprintDragArea = this.ChildrenOfType<DragArea>().First();
-                dragForward(blueprintDragArea);
+                var noteDragArea = this.ChildrenOfType<DragArea>().First();
+                dragForward(noteDragArea);
             });
 
             AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
 
             AddAssert("Duration is higher, other is unchanged", () =>
-                ((HoldNote)EditorBeatmap.HitObjects[0]).Duration > 937.5f &&
-                ((HoldNote)EditorBeatmap.HitObjects[^1]).Duration == 937.5f
+                getFirstNote().Duration > 937.5f && Precision.AlmostEquals(getLastNote().Duration, 937.5f)
             );
         }
 
         [Test]
         public void TestSamePositionButNotSelectedDragBackward()
         {
-            AddStep("Add hold notes", () =>
-            {
-                EditorBeatmap.AddRange([
-                    new HoldNote { StartTime = 2170, Duration = 937.5, Column = 0 },
-                    new HoldNote { StartTime = 2170, Duration = 937.5, Column = 1 }
-                ]);
-            });
+            AddStep("Add hold notes", () => EditorBeatmap.AddRange(getMatchingNotes()));
 
             AddStep("Drag tail", () =>
             {
-                var blueprintDragArea = this.ChildrenOfType<DragArea>().First();
-                dragBackward(blueprintDragArea);
+                var noteDragArea = this.ChildrenOfType<DragArea>().First();
+                dragBackward(noteDragArea);
             });
 
             AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
 
             AddAssert("Duration is lower, other is unchanged", () =>
-                ((HoldNote)EditorBeatmap.HitObjects[0]).Duration < 937.5f &&
-                ((HoldNote)EditorBeatmap.HitObjects[^1]).Duration == 937.5f
+                getFirstNote().Duration < 937.5f && Precision.AlmostEquals(getLastNote().Duration, 937.5f)
             );
         }
 
         [Test]
         public void TestSamePositionSelectedDragForward()
         {
-            AddStep("Add hold notes", () =>
-            {
-                EditorBeatmap.AddRange([
-                    new HoldNote { StartTime = 2170, Duration = 937.5, Column = 0 },
-                    new HoldNote { StartTime = 2170, Duration = 937.5, Column = 1 }
-                ]);
-            });
+            AddStep("Add hold notes", () => EditorBeatmap.AddRange(getMatchingNotes()));
 
             AddStep("Select all", () =>
             {
@@ -129,28 +104,21 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
             AddStep("Drag tail", () =>
             {
-                var blueprintDragArea = this.ChildrenOfType<DragArea>().First();
-                dragForward(blueprintDragArea);
+                var noteDragArea = this.ChildrenOfType<DragArea>().First();
+                dragForward(noteDragArea);
             });
 
             AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
 
             AddAssert("Both durations are higher", () =>
-                ((HoldNote)EditorBeatmap.HitObjects[0]).Duration > 937.5f &&
-                ((HoldNote)EditorBeatmap.HitObjects[^1]).Duration > 937.5f
+                getFirstNote().Duration > 937.5f && getLastNote().Duration > 937.5f
             );
         }
 
         [Test]
         public void TestSamePositionSelectedDragBackward()
         {
-            AddStep("Add hold notes", () =>
-            {
-                EditorBeatmap.AddRange([
-                    new HoldNote { StartTime = 2170, Duration = 937.5, Column = 0 },
-                    new HoldNote { StartTime = 2170, Duration = 937.5, Column = 1 }
-                ]);
-            });
+            AddStep("Add hold notes", () => EditorBeatmap.AddRange(getMatchingNotes()));
 
             AddStep("Select all", () =>
             {
@@ -159,15 +127,14 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
             AddStep("Drag tail", () =>
             {
-                var blueprintDragArea = this.ChildrenOfType<DragArea>().First();
-                dragBackward(blueprintDragArea);
+                var noteDragArea = this.ChildrenOfType<DragArea>().First();
+                dragBackward(noteDragArea);
             });
 
             AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
 
             AddAssert("Both durations are lower", () =>
-                ((HoldNote)EditorBeatmap.HitObjects[0]).Duration < 937.5f &&
-                ((HoldNote)EditorBeatmap.HitObjects[^1]).Duration < 937.5f
+                getFirstNote().Duration < 937.5f && getLastNote().Duration < 937.5f
             );
         }
 
@@ -176,10 +143,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         {
             AddStep("Add hold notes", () =>
             {
-                EditorBeatmap.AddRange([
-                    new HoldNote { StartTime = 2170, Duration = 937.5, Column = 0 },
-                    new HoldNote { StartTime = 2404, Duration = 937.5, Column = 1 }
-                ]);
+                var unmatchingNotes = getMatchingNotes();
+                unmatchingNotes[^1].StartTime = 2404;
+
+                EditorBeatmap.AddRange(unmatchingNotes);
             });
 
             AddStep("Select all", () =>
@@ -189,15 +156,14 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
             AddStep("Drag tail", () =>
             {
-                var blueprintDragArea = this.ChildrenOfType<DragArea>().First();
-                dragBackward(blueprintDragArea);
+                var noteDragArea = this.ChildrenOfType<DragArea>().First();
+                dragBackward(noteDragArea);
             });
 
             AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
 
             AddAssert("Duration is unchanged, other is lower", () =>
-                ((HoldNote)EditorBeatmap.HitObjects[0]).Duration == 937.5f &&
-                ((HoldNote)EditorBeatmap.HitObjects[^1]).Duration < 937.5f
+                Precision.AlmostEquals(getFirstNote().Duration, 937.5f) && getLastNote().Duration < 937.5f
             );
         }
 
@@ -206,10 +172,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         {
             AddStep("Add hold notes", () =>
             {
-                EditorBeatmap.AddRange([
-                    new HoldNote { StartTime = 2170, Duration = 937.5, Column = 0 },
-                    new HoldNote { StartTime = 2170, Duration = 1171.8, Column = 1 }
-                ]);
+                var unmatchingNotes = getMatchingNotes();
+                unmatchingNotes[^1].Duration = 1171.8;
+
+                EditorBeatmap.AddRange(unmatchingNotes);
             });
 
             AddStep("Select all", () =>
@@ -219,24 +185,22 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
             AddStep("Drag until both match", () =>
             {
-                var blueprintDragArea = this.ChildrenOfType<DragArea>().First();
-                InputManager.MoveMouseTo(blueprintDragArea);
-                InputManager.PressKey(Key.LShift);
+                var noteDragArea = this.ChildrenOfType<DragArea>().First();
+                InputManager.MoveMouseTo(noteDragArea);
                 InputManager.PressButton(MouseButton.Left);
                 InputManager.MoveMouseTo(new Vector2(1000, 110));
             });
 
             AddStep("Continue the drag", () =>
             {
-                var blueprintDragArea = this.ChildrenOfType<DragArea>().First();
-                dragBackward(blueprintDragArea);
+                var noteDragArea = this.ChildrenOfType<DragArea>().First();
+                dragBackward(noteDragArea);
             });
 
             AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
 
             AddAssert("Duration is unchanged, other is lower", () =>
-                ((HoldNote)EditorBeatmap.HitObjects[0]).Duration == 937.5f &&
-                ((HoldNote)EditorBeatmap.HitObjects[^1]).Duration < 937.5f
+                Precision.AlmostEquals(getFirstNote().Duration, 937.5f) && getLastNote().Duration < 937.5f
             );
         }
 
@@ -245,10 +209,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         {
             AddStep("Add hold notes", () =>
             {
-                EditorBeatmap.AddRange([
-                    new HoldNote { StartTime = 2170, Duration = 937.5, Column = 0 },
-                    new HoldNote { StartTime = 2638.7, Duration = 937.5, Column = 1 }
-                ]);
+                var unmatchingNotes = getMatchingNotes();
+                unmatchingNotes[^1].StartTime = 2638.7;
+
+                EditorBeatmap.AddRange(unmatchingNotes);
             });
 
             AddStep("Select all", () =>
@@ -258,28 +222,21 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
             AddStep("Drag tail", () =>
             {
-                var blueprintDragArea = this.ChildrenOfType<DragArea>().First();
-                dragBackward(blueprintDragArea);
+                var noteDragArea = this.ChildrenOfType<DragArea>().First();
+                dragBackward(noteDragArea);
             });
 
             AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
 
             AddAssert("Duration is unchanged, other is lower", () =>
-                ((HoldNote)EditorBeatmap.HitObjects[0]).Duration == 937.5f &&
-                ((HoldNote)EditorBeatmap.HitObjects[^1]).Duration < 937.5f
+                Precision.AlmostEquals(getFirstNote().Duration, 937.5f) && getLastNote().Duration < 937.5f
             );
         }
 
         [Test]
         public void TestDragNoteOutsideOfSelection()
         {
-            AddStep("Add hold notes", () =>
-            {
-                EditorBeatmap.AddRange([
-                    new HoldNote { StartTime = 2170, Duration = 937.5, Column = 0 },
-                    new HoldNote { StartTime = 2170, Duration = 937.5, Column = 1 }
-                ]);
-            });
+            AddStep("Add hold notes", () => EditorBeatmap.AddRange(getMatchingNotes()));
 
             AddStep("Select the back stack slider", () =>
             {
@@ -288,16 +245,34 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
             AddStep("Drag tail", () =>
             {
-                var blueprintDragArea = this.ChildrenOfType<DragArea>().First();
-                dragBackward(blueprintDragArea);
+                var noteDragArea = this.ChildrenOfType<DragArea>().First();
+                dragBackward(noteDragArea);
             });
 
             AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
 
             AddAssert("Duration is lower, other is unchanged", () =>
-                ((HoldNote)EditorBeatmap.HitObjects[0]).Duration < 937.5f &&
-                ((HoldNote)EditorBeatmap.HitObjects[^1]).Duration == 937.5f
+                getFirstNote().Duration < 937.5f && Precision.AlmostEquals(getLastNote().Duration, 937.5f)
             );
+        }
+
+        private HoldNote getFirstNote()
+        {
+            return (HoldNote)EditorBeatmap.HitObjects[0];
+        }
+
+        private HoldNote getLastNote()
+        {
+            return (HoldNote)EditorBeatmap.HitObjects[^1];
+        }
+
+        private HoldNote[] getMatchingNotes()
+        {
+            return
+            [
+                new HoldNote { StartTime = 2170, Duration = 937.5, Column = 0 },
+                new HoldNote { StartTime = 2170, Duration = 937.5, Column = 1 }
+            ];
         }
 
         private void dragForward(DragArea dragArea)
