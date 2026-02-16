@@ -40,9 +40,22 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 {
                     if (((ModEasyTestPlayer)Player).FailuresSuppressed > 0 && !reapplied)
                     {
-                        foreach (var mod in Player.GameplayState.Mods.OfType<IApplicableToDifficulty>())
-                            mod.ApplyToDifficulty(new BeatmapDifficulty());
-                        reapplied = true;
+                        try
+                        {
+                            foreach (var mod in Player.GameplayState.Mods.OfType<IApplicableToDifficulty>())
+                                mod.ApplyToDifficulty(new BeatmapDifficulty());
+
+                            foreach (var mod in Player.GameplayState.Mods.OfType<IApplicableToPlayer>())
+                                mod.ApplyToPlayer(Player);
+                        }
+                        catch
+                        {
+                            // don't care if this fails. in fact a failure here is probably better than the alternative.
+                        }
+                        finally
+                        {
+                            reapplied = true;
+                        }
                     }
 
                     return Player.GameplayState.HasFailed && ((ModEasyTestPlayer)Player).FailuresSuppressed <= 1;
