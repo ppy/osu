@@ -46,6 +46,7 @@ namespace osu.Game.Screens.Edit.Components
 
         private readonly BindableWithCurrent<EditorBeatmapSkin.SampleSet?> current = new BindableWithCurrent<EditorBeatmapSkin.SampleSet?>();
         private readonly Dictionary<(string name, string bank), SampleButton> buttons = new Dictionary<(string, string), SampleButton>();
+        private readonly Bindable<DirectoryInfo?> lastSelectedFileDirectory = new Bindable<DirectoryInfo?>();
 
         private FormControlBackground background = null!;
         private FormFieldCaption caption = null!;
@@ -125,6 +126,7 @@ namespace osu.Game.Screens.Edit.Components
             Margin = new MarginPadding(5),
             SampleAddRequested = SampleAddRequested,
             SampleRemoveRequested = SampleRemoveRequested,
+            LastSelectedFileDirectory = { BindTarget = lastSelectedFileDirectory },
         };
 
         protected override void LoadComplete()
@@ -197,6 +199,7 @@ namespace osu.Game.Screens.Edit.Components
             public Action<string>? SampleRemoveRequested { get; init; }
 
             private Bindable<FileInfo?> selectedFile { get; } = new Bindable<FileInfo?>();
+            public Bindable<DirectoryInfo?> LastSelectedFileDirectory { get; } = new Bindable<DirectoryInfo?>();
 
             private TrianglesV2? triangles { get; set; }
 
@@ -313,6 +316,7 @@ namespace osu.Game.Screens.Edit.Components
 
                 this.HidePopover();
                 ActualFilename.Value = SampleAddRequested?.Invoke(selectedFile.Value, ExpectedFilename.Value) ?? selectedFile.Value.ToString();
+                LastSelectedFileDirectory.Value = selectedFile.Value.Directory;
             }
 
             private void deleteSample()
@@ -324,7 +328,9 @@ namespace osu.Game.Screens.Edit.Components
                 ActualFilename.Value = null;
             }
 
-            public Popover? GetPopover() => ActualFilename.Value == null ? new FormFileSelector.FileChooserPopover(SupportedExtensions.AUDIO_EXTENSIONS, selectedFile, null) : null;
+            public Popover? GetPopover() => ActualFilename.Value == null
+                ? new FormFileSelector.FileChooserPopover(SupportedExtensions.AUDIO_EXTENSIONS, selectedFile, LastSelectedFileDirectory.Value?.FullName)
+                : null;
 
             public MenuItem[]? ContextMenuItems =>
                 ActualFilename.Value != null
