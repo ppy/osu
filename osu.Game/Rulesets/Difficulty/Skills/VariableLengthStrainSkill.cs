@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Stores previous strains so that, if a high difficulty hit object is followed by a lower
         /// difficulty hit object, the high difficulty hit object gets a full strain instead of being cut short.
         /// </summary>
-        private readonly LinkedList<StrainObject> queuedStrains = new LinkedList<StrainObject>();
+        private readonly List<StrainObject> queuedStrains = new List<StrainObject>();
 
         protected VariableLengthStrainSkill(Mod[] mods)
             : base(mods)
@@ -85,10 +85,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 currentSectionBegin = currentSectionEnd;
 
                 // If we have any strains queued, then we will use those until the object falls into the new section.
-                if (queuedStrains.First != null)
+                if (queuedStrains.Count > 0)
                 {
-                    StrainObject queuedStrain = queuedStrains.First.Value;
-                    queuedStrains.RemoveFirst();
+                    StrainObject queuedStrain = queuedStrains[0];
+                    queuedStrains.RemoveAt(0); // Could likely optimize this to remove all used strains at once
 
                     // We want the section to end `MaxSectionLength` after the strain we're using as an influence.
                     // This effectively means the queued strain will exist in its own section if the gap between the queued strain and current object is large enough.
@@ -124,10 +124,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             if (strain < currentSectionPeak)
             {
                 // Empty the queue of smaller elements as they won't be relevant to difficulty
-                while (queuedStrains.Last != null && queuedStrains.Last.Value.Value < strain)
-                    queuedStrains.RemoveLast();
+                while (queuedStrains.Count > 0 && queuedStrains[^1].Value < strain)
+                    queuedStrains.RemoveAt(queuedStrains.Count - 1);
 
-                queuedStrains.AddLast(new StrainObject(strain, current.StartTime));
+                queuedStrains.Add(new StrainObject(strain, current.StartTime));
             }
             else
             {
