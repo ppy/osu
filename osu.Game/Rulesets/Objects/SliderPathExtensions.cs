@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Edit;
@@ -61,7 +62,19 @@ namespace osu.Game.Rulesets.Objects
                 var circleArcPath = new List<Vector2>();
                 sliderPath.GetPathToProgress(circleArcPath, lastSegmentStart / lastSegmentEnd, 1);
 
-                controlPoints[^2].Position = circleArcPath[circleArcPath.Count / 2];
+                // If there is only 2 unique values in the path the slider is straight,
+                // and we can just use the last control point's position divided by 2 to center.
+                if (circleArcPath
+                    .Select(v => (
+                        (int)Math.Round(v.X / 0.1f),
+                        (int)Math.Round(v.Y / 0.1f)
+                    ))
+                    .Distinct()
+                    .Take(3)
+                    .Count() > 2)
+                    controlPoints[^2].Position = circleArcPath[circleArcPath.Count / 2];
+                else
+                    controlPoints[^2].Position = new Vector2(circleArcPath[^1].X / 2, circleArcPath[^1].Y / 2);
             }
 
             sliderPath.reverseControlPoints(out positionalOffset);
