@@ -284,6 +284,7 @@ namespace osu.Game.Screens.SelectV2
                                                         Anchor = Anchor.TopRight,
                                                         Origin = Anchor.TopRight,
                                                         RelativeSizeAxes = Axes.X,
+                                                        ScopedBeatmapSet = { BindTarget = ScopedBeatmapSet },
                                                     },
                                                 }
                                             },
@@ -1242,7 +1243,29 @@ namespace osu.Game.Screens.SelectV2
                 beatmaps.Restore(b);
         }
 
-        public Bindable<BeatmapSetInfo?> ScopedBeatmapSet => filterControl.ScopedBeatmapSet;
+        private GroupedBeatmap? beforeScopedSelection;
+
+        private readonly Bindable<BeatmapSetInfo?> scopedBeatmapSet = new Bindable<BeatmapSetInfo?>();
+        public IBindable<BeatmapSetInfo?> ScopedBeatmapSet => scopedBeatmapSet;
+
+        public void ScopeToBeatmapSet(BeatmapSetInfo beatmapSet)
+        {
+            beforeScopedSelection = carousel.CurrentGroupedBeatmap;
+
+            scopedBeatmapSet.Value = beatmapSet;
+        }
+
+        public void UnscopeBeatmapSet()
+        {
+            if (scopedBeatmapSet.Value == null)
+                return;
+
+            if (beforeScopedSelection != null)
+                queueBeatmapSelection(beforeScopedSelection);
+
+            scopedBeatmapSet.Value = null;
+            beforeScopedSelection = null;
+        }
 
         #endregion
 

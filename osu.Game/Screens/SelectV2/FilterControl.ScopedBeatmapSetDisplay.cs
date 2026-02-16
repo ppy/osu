@@ -22,13 +22,8 @@ namespace osu.Game.Screens.SelectV2
     {
         public partial class ScopedBeatmapSetDisplay : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
         {
-            public Bindable<BeatmapSetInfo?> ScopedBeatmapSet
-            {
-                get => scopedBeatmapSet.Current;
-                set => scopedBeatmapSet.Current = value;
-            }
+            public IBindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
 
-            private readonly BindableWithCurrent<BeatmapSetInfo?> scopedBeatmapSet = new BindableWithCurrent<BeatmapSetInfo?>();
             private Box flashLayer = null!;
             private Container content = null!;
             private OsuTextFlowContainer text = null!;
@@ -44,7 +39,7 @@ namespace osu.Game.Screens.SelectV2
             }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
+            private void load(ISongSelect? songSelect, OverlayColourProvider colourProvider)
             {
                 Content.AutoSizeEasing = Easing.OutQuint;
                 Content.AutoSizeDuration = transition_duration;
@@ -97,25 +92,25 @@ namespace osu.Game.Screens.SelectV2
                         Alpha = 0,
                     },
                 });
-                Action = () => scopedBeatmapSet.Value = null;
+                Action = () => songSelect?.UnscopeBeatmapSet();
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
-                scopedBeatmapSet.BindValueChanged(_ => updateState(), true);
+                ScopedBeatmapSet.BindValueChanged(_ => updateState(), true);
             }
 
             private void updateState()
             {
-                if (scopedBeatmapSet.Value != null)
+                if (ScopedBeatmapSet.Value != null)
                 {
                     content.BypassAutoSizeAxes = Axes.None;
                     text.Clear();
                     text.AddText(SongSelectStrings.TemporarilyShowingAllBeatmapsIn);
                     text.AddText(@" ");
-                    text.AddText(scopedBeatmapSet.Value.Metadata.GetDisplayTitleRomanisable(), t => t.Font = OsuFont.Style.Body.With(weight: FontWeight.Bold));
+                    text.AddText(ScopedBeatmapSet.Value.Metadata.GetDisplayTitleRomanisable(), t => t.Font = OsuFont.Style.Body.With(weight: FontWeight.Bold));
                 }
                 else
                 {
@@ -126,7 +121,7 @@ namespace osu.Game.Screens.SelectV2
 
             public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {
-                if (scopedBeatmapSet.Value != null && e.Action == GlobalAction.Back && !e.Repeat)
+                if (ScopedBeatmapSet.Value != null && e.Action == GlobalAction.Back && !e.Repeat)
                 {
                     TriggerClick();
                     return true;
