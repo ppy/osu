@@ -157,7 +157,7 @@ namespace osu.Game.Beatmaps
             var newBeatmap = new Beatmap
             {
                 BeatmapInfo = newBeatmapInfo,
-                Bookmarks = referenceWorkingBeatmap.Beatmap.Bookmarks
+                Bookmarks = referenceWorkingBeatmap.Beatmap.Bookmarks.ToArray()
             };
 
             foreach (var timingPoint in referenceWorkingBeatmap.Beatmap.ControlPointInfo.TimingPoints)
