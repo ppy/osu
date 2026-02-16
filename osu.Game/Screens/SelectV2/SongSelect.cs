@@ -1264,6 +1264,7 @@ namespace osu.Game.Screens.SelectV2
                 queueBeatmapSelection(beforeScopedSelection);
 
             scopedBeatmapSet.Value = null;
+            beforeScopedSelection = null;
         }
 
         #endregion
