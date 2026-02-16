@@ -72,6 +72,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             {
                 currentSectionBegin = current.StartTime;
                 currentSectionEnd = currentSectionBegin + MaxSectionLength;
+
+                // No work is required for first object after calculating difficulty
+                currentSectionPeak = StrainValueAt(current);
+                return currentSectionPeak;
             }
 
             // If the current object starts after the current section ends
@@ -112,13 +116,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             }
 
             double strain = StrainValueAt(current);
-
-            // If it's the first object, we don't want to end the section since it's always going to be the new peak.
-            if (current.Index == 0)
-            {
-                currentSectionPeak = strain;
-                return strain;
-            }
 
             // If the current strain is smaller than the current peak, add it to the queue
             if (strain < currentSectionPeak)
