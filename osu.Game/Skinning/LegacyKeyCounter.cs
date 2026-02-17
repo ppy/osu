@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Skinning
@@ -32,7 +31,7 @@ namespace osu.Game.Skinning
         }
 
         private readonly Container keyContainer;
-        private readonly OsuSpriteText overlayKeyText;
+        private readonly LegacySpriteText overlayKeyText;
         private readonly Sprite keySprite;
 
         public LegacyKeyCounter(InputTrigger trigger)
@@ -57,13 +56,12 @@ namespace osu.Game.Skinning
                         AutoSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Child = overlayKeyText = new OsuSpriteText
+                        Child = overlayKeyText = new LegacySpriteText(LegacyFont.ScoreEntry)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Text = trigger.Name,
                             Colour = textColour,
-                            Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
                         },
                     },
                 }
@@ -88,7 +86,6 @@ namespace osu.Game.Skinning
             keyContainer.ScaleTo(0.75f, transition_duration, Easing.Out);
             keySprite.Colour = ActiveColour;
             overlayKeyText.Text = CountPresses.Value.ToString();
-            overlayKeyText.Font = overlayKeyText.Font.With(weight: FontWeight.SemiBold);
         }
 
         protected override void Deactivate(bool forwardPlayback = true)
