@@ -62,19 +62,17 @@ namespace osu.Game.Rulesets.Objects
                 var circleArcPath = new List<Vector2>();
                 sliderPath.GetPathToProgress(circleArcPath, lastSegmentStart / lastSegmentEnd, 1);
 
-                // If there is only 2 unique values in the path the slider is straight,
-                // and we can just use the last control point's position divided by 2 to center.
-                if (circleArcPath
-                    .Select(v => (
-                        (int)Math.Round(v.X / 0.1f),
-                        (int)Math.Round(v.Y / 0.1f)
-                    ))
-                    .Distinct()
-                    .Take(3)
-                    .Count() > 2)
-                    controlPoints[^2].Position = circleArcPath[circleArcPath.Count / 2];
-                else
-                    controlPoints[^2].Position = Vector2.Divide(circleArcPath[^1], 2);
+                // If the arc path only contains 2 unique values the slider is not an arc
+                controlPoints[^2].Position = circleArcPath
+                                             .Select(v => (
+                                                 (int)Math.Round(v.X / 0.1f),
+                                                 (int)Math.Round(v.Y / 0.1f)
+                                             ))
+                                             .Distinct()
+                                             .Take(3)
+                                             .Count() > 2
+                    ? circleArcPath[circleArcPath.Count / 2]
+                    : Vector2.Divide(circleArcPath[^1], 2);
             }
 
             sliderPath.reverseControlPoints(out positionalOffset);
