@@ -107,8 +107,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 }, 2);
 
                 AddAssert("Middle control point is not at start or end", () =>
-                    Vector2.Distance(selectedSlider.Path.ControlPoints[^2].Position, oldStartPos) >= 1 &&
-                    Vector2.Distance(selectedSlider.Path.ControlPoints[^2].Position, oldEndPos) >= 1
+                    Vector2.Distance(selectedSlider.Path.ControlPoints[^2].Position, oldStartPos) > 1 &&
+                    Vector2.Distance(selectedSlider.Path.ControlPoints[^2].Position, oldEndPos) > 1
                 );
             }
 
