@@ -108,7 +108,7 @@ namespace osu.Game.Skinning
 
             overlayKeyText.Text = CountPresses.Value.ToString();
 
-            if (!activatedOnce)
+            if (forwardPlayback && !activatedOnce)
             {
                 activatedOnce = true;
                 initialNameText.FadeOut(transition_duration, Easing.Out);
@@ -121,6 +121,13 @@ namespace osu.Game.Skinning
             base.Deactivate(forwardPlayback);
             keyContainer.ScaleTo(1f, transition_duration, Easing.Out);
             keySprite.Colour = Colour4.White;
+
+            if (!forwardPlayback && activatedOnce && CountPresses.Value == 0)
+            {
+                activatedOnce = false;
+                initialNameText.FadeIn(transition_duration, Easing.Out);
+                overlayKeyText.FadeOut(transition_duration, Easing.Out);
+            }
         }
     }
 }
