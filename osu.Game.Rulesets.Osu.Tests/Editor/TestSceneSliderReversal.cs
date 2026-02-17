@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             createPathSegment(
                 PathType.PERFECT_CURVE,
                 new Vector2(100.009f, -50),
-                new Vector2(200, -100)
+                new Vector2(200.0089f, -100)
             )
         };
 
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [TestCase(1, 120)]
         [TestCase(1, 80)]
         [TestCase(2, 250)]
-        [TestCase(2, 200)]
+        [TestCase(2, 190)]
         public void TestSliderReversal(int pathIndex, double length)
         {
             var controlPoints = paths[pathIndex];
@@ -105,6 +105,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                     InputManager.Key(Key.G);
                     InputManager.ReleaseKey(Key.LControl);
                 }, 2);
+
+                AddAssert("Middle control point is not at start or end", () =>
+                    Vector2.Distance(selectedSlider.Path.ControlPoints[^2].Position, oldStartPos) >= 1 &&
+                    Vector2.Distance(selectedSlider.Path.ControlPoints[^2].Position, oldEndPos) >= 1
+                );
             }
 
             AddAssert("Slider has correct length", () =>
