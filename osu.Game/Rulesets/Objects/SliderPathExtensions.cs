@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Objects
                     .Count() > 2)
                     controlPoints[^2].Position = circleArcPath[circleArcPath.Count / 2];
                 else
-                    controlPoints[^2].Position = new Vector2(circleArcPath[^1].X / 2, circleArcPath[^1].Y / 2);
+                    controlPoints[^2].Position = Vector2.Divide(circleArcPath[^1], 2);
             }
 
             sliderPath.reverseControlPoints(out positionalOffset);
