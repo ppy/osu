@@ -168,7 +168,7 @@ namespace osu.Game.Skinning
             switch (font)
             {
                 case LegacyFont.ScoreEntry:
-                    return 0;
+                    return 1;
 
                 case LegacyFont.Score:
                     return source.GetConfig<LegacySetting, float>(LegacySetting.ScoreOverlap)?.Value ?? 0f;
