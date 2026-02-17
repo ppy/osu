@@ -111,7 +111,8 @@ namespace osu.Game.Screens.SelectV2
 
         private BeatmapCarousel carousel = null!;
 
-        private FilterControl filterControl = null!;
+        protected FilterControl FilterControl = null!;
+
         private BeatmapTitleWedge titleWedge = null!;
         private BeatmapDetailsArea detailsArea = null!;
         private FillFlowContainer wedgesContainer = null!;
@@ -275,11 +276,11 @@ namespace osu.Game.Screens.SelectV2
                                                             },
                                                             noResultsPlaceholder = new NoResultsPlaceholder
                                                             {
-                                                                RequestClearFilterText = () => filterControl.Search(string.Empty)
+                                                                RequestClearFilterText = () => FilterControl.Search(string.Empty)
                                                             }
                                                         }
                                                     },
-                                                    filterControl = new FilterControl
+                                                    FilterControl = new FilterControl
                                                     {
                                                         Anchor = Anchor.TopRight,
                                                         Origin = Anchor.TopRight,
@@ -379,7 +380,7 @@ namespace osu.Game.Screens.SelectV2
 
             inputManager = GetContainingInputManager()!;
 
-            filterControl.CriteriaChanged += criteriaChanged;
+            FilterControl.CriteriaChanged += criteriaChanged;
 
             modSelectOverlay.State.BindValueChanged(v =>
             {
@@ -821,13 +822,13 @@ namespace osu.Game.Screens.SelectV2
             {
                 titleWedge.Hide();
                 detailsArea.Hide();
-                filterControl.Hide();
+                FilterControl.Hide();
             }
             else
             {
                 titleWedge.Show();
                 detailsArea.Show();
-                filterControl.Show();
+                FilterControl.Show();
             }
         }
 
@@ -890,7 +891,7 @@ namespace osu.Game.Screens.SelectV2
 
             // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
             // but also in this case we want support for formatting a number within a string).
-            filterControl.StatusText = count != 1 ? $"{count:#,0} matches" : $"{count:#,0} match";
+            FilterControl.StatusText = count != 1 ? $"{count:#,0} matches" : $"{count:#,0} match";
 
             // If there's already a selection update in progress, let's not interrupt it.
             // Interrupting could cause the debounce interval to be reduced.
@@ -1148,7 +1149,7 @@ namespace osu.Game.Screens.SelectV2
 
         #region Implementation of ISongSelect
 
-        void ISongSelect.Search(string query) => filterControl.Search(query);
+        void ISongSelect.Search(string query) => FilterControl.Search(query);
 
         void ISongSelect.PresentScore(ScoreInfo score)
         {
