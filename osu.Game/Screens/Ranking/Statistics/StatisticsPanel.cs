@@ -21,6 +21,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics.User;
 using osuTK;
@@ -258,6 +259,8 @@ namespace osu.Game.Screens.Ranking.Statistics
                     preventTaggingReason = "Play the beatmap in its original ruleset to contribute to beatmap tags!";
                 else if (localUserScore.Rank < ScoreRank.C)
                     preventTaggingReason = "Set a better score to contribute to beatmap tags!";
+                else if (localUserScore.Mods.Any(m => (m.Type == ModType.Conversion) && !(m is ModClassic)))
+                    preventTaggingReason = "Play this beatmap without conversion mods to contribute to beatmap tags!";
 
                 if (preventTaggingReason == null)
                 {
