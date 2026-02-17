@@ -30,6 +30,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 PathType.LINEAR,
                 new Vector2(100, 0),
                 new Vector2(100, 100)
+            ),
+            createPathSegment(
+                PathType.PERFECT_CURVE,
+                new Vector2(100.009f, -50),
+                new Vector2(200, -100)
             )
         };
 
@@ -50,6 +55,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [TestCase(0, 200)]
         [TestCase(1, 120)]
         [TestCase(1, 80)]
+        [TestCase(2, 250)]
+        [TestCase(2, 200)]
         public void TestSliderReversal(int pathIndex, double length)
         {
             var controlPoints = paths[pathIndex];
@@ -89,6 +96,16 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 InputManager.Key(Key.G);
                 InputManager.ReleaseKey(Key.LControl);
             });
+
+            if (pathIndex == 2)
+            {
+                AddRepeatStep("Reverse slider again", () =>
+                {
+                    InputManager.PressKey(Key.LControl);
+                    InputManager.Key(Key.G);
+                    InputManager.ReleaseKey(Key.LControl);
+                }, 2);
+            }
 
             AddAssert("Slider has correct length", () =>
                 Precision.AlmostEquals(selectedSlider.Path.Distance, oldDistance));
