@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             ),
             createPathSegment(
                 PathType.PERFECT_CURVE,
-                new Vector2(100.009f, -50),
+                new Vector2(100.009f, -50.0009f),
                 new Vector2(200.0089f, -100)
             )
         };
