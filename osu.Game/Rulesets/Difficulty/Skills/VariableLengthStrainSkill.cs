@@ -73,6 +73,43 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 return currentSectionPeak;
             }
 
+            backfillPeaks(current);
+
+            double currentStrain = StrainValueAt(current);
+
+            // If the current strain is larger than the current peak, begin a new peak
+            // Otherwise, add the current strain to the queue
+            if (currentStrain > currentSectionPeak)
+            {
+                // Clear the queue since none of the strains inside of it will be contributing to the difficulty.
+                queuedStrains.Clear();
+
+                // End the current section with the new peak
+                saveCurrentPeak(current.StartTime - currentSectionBegin);
+
+                // Set up the new section to start at the current object with the current strain
+                currentSectionBegin = current.StartTime;
+                currentSectionEnd = currentSectionBegin + MaxSectionLength;
+                currentSectionPeak = currentStrain;
+            }
+            else
+            {
+                // Empty the queue of smaller elements as they won't be relevant to difficulty
+                while (queuedStrains.Count > 0 && queuedStrains[^1].Value < currentStrain)
+                    queuedStrains.RemoveAt(queuedStrains.Count - 1);
+
+                queuedStrains.Add(new StrainObject(currentStrain, current.StartTime));
+            }
+
+            return currentStrain;
+        }
+
+        /// <summary>
+        /// Fills the space between the end of the current section and the current object, if there is any.
+        /// </summary>
+        /// <param name="current"></param>
+        private void backfillPeaks(DifficultyHitObject current)
+        {
             // If the current object starts after the current section ends
             // then we want to start a new section without any harsh drop-off.
             // If we have previous strains that influence the current difficulty we will prioritise those first.
@@ -109,33 +146,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                     startNewSectionFrom(currentSectionBegin, current);
                 }
             }
-
-            double strain = StrainValueAt(current);
-
-            // If the current strain is smaller than the current peak, add it to the queue
-            if (strain < currentSectionPeak)
-            {
-                // Empty the queue of smaller elements as they won't be relevant to difficulty
-                while (queuedStrains.Count > 0 && queuedStrains[^1].Value < strain)
-                    queuedStrains.RemoveAt(queuedStrains.Count - 1);
-
-                queuedStrains.Add(new StrainObject(strain, current.StartTime));
-            }
-            else
-            {
-                // Clear the queue since none of the strains inside of it will be contributing to the difficulty.
-                queuedStrains.Clear();
-
-                // End the current section with the new peak
-                saveCurrentPeak(current.StartTime - currentSectionBegin);
-
-                // Set up the new section to start at the current object with the current strain
-                currentSectionBegin = current.StartTime;
-                currentSectionEnd = currentSectionBegin + MaxSectionLength;
-                currentSectionPeak = strain;
-            }
-
-            return strain;
         }
 
         /// <summary>
