@@ -84,6 +84,23 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         /// <summary>
+        /// Pressing the back button when a subscreen is present should exit on the subscreen stack, not the top-level stack.
+        /// </summary>
+        [Test]
+        public void TestExitSubScreenFromBackButton()
+        {
+            TestScreenWithSubScreen screen = null!;
+
+            PushAndConfirm(() => screen = new TestScreenWithSubScreen());
+            pushSubScreenAndConfirm(() => screen, () => new TestScreenOne());
+
+            AddStep("press back button", () => screenFooter.BackButton.TriggerClick());
+            AddUntilStep("current screen still correct", () => Game.ScreenStack.CurrentScreen, () => Is.EqualTo(screen));
+
+            AddUntilStep("subscreen stack empty", () => screen.SubScreenStack.CurrentScreen, () => Is.Null);
+        }
+
+        /// <summary>
         /// Tests pushing a new parenting screen while the footer is displayed from a subscreen.
         /// </summary>
         [Test]
