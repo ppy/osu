@@ -157,7 +157,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public static double SumMechanicalDifficulty(double aim, double speed)
         {
             // Decrease this to nerf maps that mix aim and speed
-            const double addition_portion = 0.55;
+            const double addition_portion = 0.57;
 
             // We take this min to max ratio as a basepoint to be not changed when addition_portion is changed
             const double balance_base_point = 0.2;
