@@ -45,6 +45,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return strain;
         }
 
-        private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.05, ms / 1000));
+        private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.01, ms / 1000));
     }
 }
