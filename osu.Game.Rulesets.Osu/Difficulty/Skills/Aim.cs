@@ -60,6 +60,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 speedDifficulty = Math.Pow(speedDifficulty, 0.95);
             }
 
+            if (Mods.Any(m => m is OsuModRelax))
+            {
+                speedDifficulty *= 0.0;
+            }
+
             currentAimStrain *= decayAim;
             currentAimStrain += aimDifficulty * (1 - decayAim) * skillMultiplierAim;
 
