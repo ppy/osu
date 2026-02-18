@@ -1324,9 +1324,21 @@ namespace osu.Game
             // TODO: this is SUPER SUPER bad.
             // It can potentially exit the wrong screen if screens are not loaded yet.
             // ScreenFooter / ScreenBackButton should be aware of which screen it is currently being handled by.
-            if (!(ScreenStack.CurrentScreen is IOsuScreen currentScreen)) return;
+            if (ScreenStack.CurrentScreen is not IOsuScreen currentScreen) return;
 
-            if (!((Drawable)currentScreen).IsLoaded || (currentScreen.AllowUserExit && !currentScreen.OnBackButton())) ScreenStack.Exit();
+            // We expect exists to always be performed on the innermost screen stack.
+            if (currentScreen is IHasSubScreenStack subScreen)
+            {
+                performExit((IOsuScreen)subScreen.SubScreenStack.CurrentScreen);
+                return;
+            }
+
+            performExit(currentScreen);
+
+            void performExit(IOsuScreen screen)
+            {
+                if (!((Drawable)screen).IsLoaded || (screen.AllowUserExit && !screen.OnBackButton())) screen.Exit();
+            }
         }
 
         private void handleStartupImport()
