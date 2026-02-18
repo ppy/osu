@@ -165,6 +165,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 AimEstimatedSliderBreaks = aimEstimatedSliderBreaks,
                 SpeedEstimatedSliderBreaks = speedEstimatedSliderBreaks,
                 SpeedDeviation = speedDeviation,
+                Snap = aimValue * Math.Pow(osuAttributes.SnapAimDifficulty / Math.Max(osuAttributes.AimDifficulty, 0.01), 3),
+                Flow = aimValue * Math.Pow(osuAttributes.FlowAimDifficulty / Math.Max(osuAttributes.AimDifficulty, 0.01), 3),
                 Total = totalValue
             };
         }
