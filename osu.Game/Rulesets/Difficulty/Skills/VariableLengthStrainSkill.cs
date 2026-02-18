@@ -34,6 +34,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         /// <summary>
         /// The number of `MaxSectionLength` sections calculated such that 99.999% of the difficulty value is preserved.
+        /// With DecayWeight = 0.9, cutOffTime = ~109.27
         /// </summary>
         private double cutOffTime => -5 * Math.Log(10) / Math.Log(DecayWeight);
 
