@@ -21,6 +21,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         public string ShortTitle => "style selection";
         public override string Title => ShortTitle.Humanize();
+        public bool ShowHeaderLine => false;
 
         protected abstract void StartAction();
 
