@@ -226,9 +226,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
                     Technically, the function below has been slightly modified from the equation above.
                     The real function would be (Math.Pow(DecayWeight, startTime) - Math.Pow(DecayWeight, endTime)) / Math.Log(1 / DecayWeight)
-
-                    This is an intentional change to ensure the relation between individual chunk values and difficulty value remains the same as StrainSkill.
                     E.g. for a DecayWeight of 0.9, we're multiplying by 10 instead of 9.49122...
+
+                    This change makes it so that a map composed solely of MaxSectionLength chunks will have the exact same value when summed in this class and StrainSkill.
+                    Doing this ensures the relationship between strain values and difficulty values remains the same between the two classes.
                 */
                 double startTime = time;
                 double endTime = time + strains[i].SectionLength / MaxSectionLength;
