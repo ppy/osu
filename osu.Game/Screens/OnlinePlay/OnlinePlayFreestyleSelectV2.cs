@@ -33,6 +33,8 @@ namespace osu.Game.Screens.OnlinePlay
             this.item = item;
 
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
+
+            SupportScoping = false;
         }
 
         [BackgroundDependencyLoader]
