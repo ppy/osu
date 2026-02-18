@@ -17,17 +17,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         protected override double SkillMultiplier => 1.0;
         protected override double StrainDecayBase => 0.4;
 
-        private readonly double greatHitWindow;
-
-        public Rhythm(Mod[] mods, double greatHitWindow)
+        public Rhythm(Mod[] mods)
             : base(mods)
         {
-            this.greatHitWindow = greatHitWindow;
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
-            double difficulty = RhythmEvaluator.EvaluateDifficultyOf(current, greatHitWindow);
+            double difficulty = RhythmEvaluator.EvaluateDifficultyOf(current);
 
             // To prevent abuse of exceedingly long intervals between awkward rhythms, we penalise its difficulty.
             double staminaDifficulty = StaminaEvaluator.EvaluateDifficultyOf(current) - 0.5; // Remove base strain

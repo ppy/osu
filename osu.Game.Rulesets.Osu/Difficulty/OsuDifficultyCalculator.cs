@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double baseSpeedPerformance = HarmonicSkill.DifficultyToPerformance(speedRating);
             double baseReadingPerformance = HarmonicSkill.DifficultyToPerformance(readingRating);
             double baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
-            double baseCognitionPerformance = DifficultyCalculationUtils.Norm(2, baseReadingPerformance, baseFlashlightPerformance);
+            double baseCognitionPerformance = SumCognitionDifficulty(baseReadingPerformance, baseFlashlightPerformance);
 
             double basePerformance = DifficultyCalculationUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, baseAimPerformance, baseSpeedPerformance, baseCognitionPerformance);
 
@@ -144,6 +144,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return attributes;
         }
 
+        public static double SumCognitionDifficulty(double reading, double flashlight)
+        {
+            if (reading <= 0)
+                return flashlight;
+
+            if (flashlight <= 0)
+                return reading;
+
+            // Nerf flashlight value in cognition sum when reading is greater than flashlight
+            return DifficultyCalculationUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, reading, flashlight * Math.Clamp(flashlight / reading, 0.25, 1.0));
+        }
+
         private double calculateStarRating(double basePerformance)
         {
             return Math.Cbrt(basePerformance * OsuPerformanceCalculator.PERFORMANCE_BASE_MULTIPLIER);
@@ -170,7 +182,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 new Aim(mods, true),
                 new Aim(mods, false),
                 new Speed(mods),
-                new Reading(beatmap, mods, clockRate)
+                new Reading(mods)
             };
 
             if (mods.Any(h => h is OsuModFlashlight))
