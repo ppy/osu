@@ -51,6 +51,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("reading_difficulty")]
         public double ReadingDifficulty { get; set; }
 
+        [JsonProperty("snap_aim")]
+        public double SnapAimDifficulty { get; set; }
+
+        [JsonProperty("flow_aim")]
+        public double FlowAimDifficulty { get; set; }
+
         /// <summary>
         /// Describes how much of <see cref="AimDifficulty"/> is contributed to by hitcircles or sliders.
         /// A value closer to 1.0 indicates most of <see cref="AimDifficulty"/> is contributed by hitcircles.
@@ -133,6 +139,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER, LegacyScoreBaseMultiplier);
             yield return (ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE, MaximumLegacyComboScore);
             yield return (ATTRIB_ID_READING_DIFFICULT_NOTE_COUNT, ReadingDifficultNoteCount);
+            yield return (ATTRIB_ID_SNAP_AIM_DIFFICULTY, SnapAimDifficulty);
+            yield return (ATTRIB_ID_FLOW_AIM_DIFFICULTY, FlowAimDifficulty);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
@@ -155,6 +163,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             LegacyScoreBaseMultiplier = values[ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER];
             MaximumLegacyComboScore = values[ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE];
             ReadingDifficultNoteCount = values[ATTRIB_ID_READING_DIFFICULT_NOTE_COUNT];
+            SnapAimDifficulty = values[ATTRIB_ID_SNAP_AIM_DIFFICULTY];
             HitCircleCount = onlineInfo.CircleCount;
             SliderCount = onlineInfo.SliderCount;
             SpinnerCount = onlineInfo.SpinnerCount;
