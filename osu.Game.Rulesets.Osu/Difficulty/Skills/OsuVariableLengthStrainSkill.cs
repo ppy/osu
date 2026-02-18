@@ -23,8 +23,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double ReducedStrainBaseline => 0.727;
 
-        protected virtual double DifficultyMultiplier => 1.0588;
-
         protected OsuVariableLengthStrainSkill(Mod[] mods)
             : base(mods)
         {
@@ -71,17 +69,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // Difficulty is a continuous weighted sum of the sorted strains
             foreach (StrainPeak strain in strains.OrderByDescending(s => s.Value))
             {
-                /* Weighting function:
-                        a+b
-                        ∫ 0.9^x dx
+                /* Weighting function can be thought of as:
+                        b
+                        ∫ DecayWeight^x dx
                         a
-                    where a = startTime and b = strain.SectionLength */
-                double weight = Math.Pow(DecayWeight, time) * (DecayWeightIntegral - DecayWeightIntegral * Math.Pow(DecayWeight, strain.SectionLength / MaxSectionLength));
+                    where a = startTime and b = endTime
+
+                    Technically, the function below has been slightly modified from the equation above.
+                    The real function would be (Math.Pow(DecayWeight, startTime) - Math.Pow(DecayWeight, endTime)) / Math.Log(1 / DecayWeight)
+
+                    This is an intentional change to ensure the relation between individual chunk values and difficulty value remains the same as StrainSkill.
+                    E.g. for a DecayWeight of 0.9, we're multiplying by 10 instead of 9.49122...
+                */
+                double startTime = time;
+                double endTime = time + strain.SectionLength / MaxSectionLength;
+
+                double weight = (Math.Pow(DecayWeight, startTime) - Math.Pow(DecayWeight, endTime)) / (1 - DecayWeight);
+
                 difficulty += strain.Value * weight;
-                time += strain.SectionLength / MaxSectionLength;
+                time = endTime;
             }
 
-            return difficulty * DifficultyMultiplier;
+            return difficulty;
         }
 
         public static double DifficultyToPerformance(double difficulty) => 4.0 * Math.Pow(difficulty, 3.0);

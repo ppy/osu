@@ -22,11 +22,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected virtual double DecayWeight => 0.9;
 
         /// <summary>
-        /// Integral from 0 to infinity of DecayWeight^x dx
-        /// </summary>
-        protected double DecayWeightIntegral => (DecayWeight - 1) / Math.Log(DecayWeight) * (1.0 / (1 - DecayWeight));
-
-        /// <summary>
         /// The maximum length of each strain section.
         /// </summary>
         protected virtual int MaxSectionLength => 400;
@@ -223,12 +218,23 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             // Difficulty is a continuous weighted sum of the sorted strains
             for (int i = 0; i < strains.Count; i++)
             {
-                /* Weighting function:
-                        a+b
-                        ∫ 0.9^x dx
+                /* Weighting function can be thought of as:
+                        b
+                        ∫ DecayWeight^x dx
                         a
-                    where a = startTime and b = strain.SectionLength */
-                double weight = Math.Pow(DecayWeight, time) * (DecayWeightIntegral - DecayWeightIntegral * Math.Pow(DecayWeight, strains[i].SectionLength / MaxSectionLength));
+                    where a = startTime and b = endTime
+
+                    Technically, the function below has been slightly modified from the equation above.
+                    The real function would be (Math.Pow(DecayWeight, startTime) - Math.Pow(DecayWeight, endTime)) / Math.Log(1 / DecayWeight)
+
+                    This is an intentional change to ensure the relation between individual chunk values and difficulty value remains the same as StrainSkill.
+                    E.g. for a DecayWeight of 0.9, we're multiplying by 10 instead of 9.49122...
+                */
+                double startTime = time;
+                double endTime = time + strains[i].SectionLength / MaxSectionLength;
+
+                double weight = (Math.Pow(DecayWeight, startTime) - Math.Pow(DecayWeight, endTime)) / (1 - DecayWeight);
+
                 difficulty += strains[i].Value * weight;
                 time += strains[i].SectionLength / MaxSectionLength;
             }
