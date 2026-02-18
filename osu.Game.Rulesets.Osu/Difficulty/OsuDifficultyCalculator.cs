@@ -184,11 +184,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         public static double SumCognitionDifficulty(double reading, double flashlight)
         {
-            // Base LP summed value, accounting for map being partially memorized with FL
-            double cognition = DifficultyCalculationUtils.Norm(2, reading, flashlight);
+            if (reading <= 0)
+                return flashlight;
 
-            // Inrease FL bonus when it's lower than reading to avoid situations where high reading difficulty makes FL give practically 0 bonus
-            return flashlight >= reading ? cognition : double.Lerp(reading + flashlight, cognition, flashlight / reading);
+            if (flashlight <= 0)
+                return reading;
+
+            // Nerf flashlight value in cognition sum when reading is greater than flashlight
+            return DifficultyCalculationUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, reading, flashlight * Math.Clamp(flashlight / reading, 0.25, 1.0));
         }
 
         private double calculateStarRating(double basePerformance)
@@ -217,7 +220,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 new CombinedAim(mods, true),
                 new CombinedAim(mods, false),
                 new Speed(mods),
-                new Reading(beatmap, mods, clockRate),
+                new Reading(mods),
                 new SnapAim(mods),
                 new FlowAim(mods)
             };
