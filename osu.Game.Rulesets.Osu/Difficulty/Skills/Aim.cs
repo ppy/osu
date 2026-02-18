@@ -32,8 +32,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double currentSpeedStrain;
 
         private double skillMultiplierAim => 33.967;
-        private double skillMultiplierSpeed => 3.5;
-        private double skillMultiplierTotal => 1.51;
+        private double skillMultiplierSpeed => 1.35;
+        private double skillMultiplierTotal => 1.45;
         private double meanExponent => 1.2;
 
         private readonly List<double> sliderStrains = new List<double>();
