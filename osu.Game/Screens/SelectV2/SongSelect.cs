@@ -111,7 +111,7 @@ namespace osu.Game.Screens.SelectV2
 
         private BeatmapCarousel carousel = null!;
 
-        protected FilterControl FilterControl = null!;
+        protected FilterControl FilterControl { get; private set; } = null!;
 
         private BeatmapTitleWedge titleWedge = null!;
         private BeatmapDetailsArea detailsArea = null!;
