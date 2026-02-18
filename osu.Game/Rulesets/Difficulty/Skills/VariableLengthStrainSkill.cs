@@ -149,24 +149,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         }
 
         /// <summary>
-        /// Calculates the number of strains weighted against the top strain.
-        /// The result is scaled by clock rate as it affects the total number of strains.
-        /// </summary>
-        public virtual double CountTopWeightedStrains(double difficultyValue)
-        {
-            if (ObjectDifficulties.Count == 0)
-                return 0.0;
-
-            double consistentTopStrain = difficultyValue * (1 - DecayWeight); // What would the top strain be if all strain values were identical
-
-            if (consistentTopStrain == 0)
-                return ObjectDifficulties.Count;
-
-            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return ObjectDifficulties.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
-        }
-
-        /// <summary>
         /// Saves the current peak strain level to the list of strain peaks, which will be used to calculate an overall difficulty.
         /// </summary>
         private void saveCurrentPeak(double sectionLength)
@@ -251,6 +233,24 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             }
 
             return difficulty;
+        }
+
+        /// <summary>
+        /// Calculates the number of strains weighted against the top strain.
+        /// The result is scaled by clock rate as it affects the total number of strains.
+        /// </summary>
+        public virtual double CountTopWeightedStrains(double difficultyValue)
+        {
+            if (ObjectDifficulties.Count == 0)
+                return 0.0;
+
+            double consistentTopStrain = difficultyValue * (1 - DecayWeight); // What would the top strain be if all strain values were identical
+
+            if (consistentTopStrain == 0)
+                return ObjectDifficulties.Count;
+
+            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
+            return ObjectDifficulties.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
         }
 
         /// <summary>
