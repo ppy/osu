@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double likelyMissedSliderends = Math.Min(4 + likelyMissedSliderendPortion * attributes.SliderCount, attributes.SliderCount);
             double fullComboThreshold = attributes.MaxCombo - likelyMissedSliderends;
 
-            double leniencyBounds = likelyMissedSliderends * 0.5;
+            double leniencyBounds = likelyMissedSliderends / 4;
 
             if (score.MaxCombo < fullComboThreshold + leniencyBounds)
             {
