@@ -27,13 +27,18 @@ namespace osu.Game.Skinning
             set
             {
                 textColour = value;
+                initialNameText.Colour = value;
                 overlayKeyText.Colour = value;
             }
         }
 
         private readonly Container keyContainer;
-        private readonly OsuSpriteText overlayKeyText;
+        private readonly LegacySpriteText overlayKeyText;
+        private readonly OsuSpriteText initialNameText;
+
         private readonly Sprite keySprite;
+
+        private bool activatedOnce;
 
         public LegacyKeyCounter(InputTrigger trigger)
             : base(trigger)
@@ -57,14 +62,26 @@ namespace osu.Game.Skinning
                         AutoSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Child = overlayKeyText = new OsuSpriteText
+                        Children = new Drawable[]
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Text = trigger.Name,
-                            Colour = textColour,
-                            Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
-                        },
+                            // The legacy font doesn't contain all the characters necessary to display placeholders.
+                            // Keep things simple by using a normal font for this case.
+                            initialNameText = new OsuSpriteText
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Text = trigger.Name,
+                                Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
+                                Colour = textColour,
+                            },
+                            overlayKeyText = new LegacySpriteText(LegacyFont.ScoreEntry)
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Alpha = 0,
+                                Colour = textColour,
+                            }
+                        }
                     },
                 }
             };
@@ -85,10 +102,18 @@ namespace osu.Game.Skinning
         protected override void Activate(bool forwardPlayback = true)
         {
             base.Activate(forwardPlayback);
+
             keyContainer.ScaleTo(0.75f, transition_duration, Easing.Out);
             keySprite.Colour = ActiveColour;
+
             overlayKeyText.Text = CountPresses.Value.ToString();
-            overlayKeyText.Font = overlayKeyText.Font.With(weight: FontWeight.SemiBold);
+
+            if (forwardPlayback && !activatedOnce)
+            {
+                activatedOnce = true;
+                initialNameText.FadeOut(transition_duration, Easing.Out);
+                overlayKeyText.FadeIn(transition_duration, Easing.Out);
+            }
         }
 
         protected override void Deactivate(bool forwardPlayback = true)
@@ -96,6 +121,13 @@ namespace osu.Game.Skinning
             base.Deactivate(forwardPlayback);
             keyContainer.ScaleTo(1f, transition_duration, Easing.Out);
             keySprite.Colour = Colour4.White;
+
+            if (!forwardPlayback && activatedOnce && CountPresses.Value == 0)
+            {
+                activatedOnce = false;
+                initialNameText.FadeIn(transition_duration, Easing.Out);
+                overlayKeyText.FadeOut(transition_duration, Easing.Out);
+            }
         }
     }
 }
