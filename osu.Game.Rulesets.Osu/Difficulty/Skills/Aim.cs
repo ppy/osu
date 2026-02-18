@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) =>
             DifficultyCalculationUtils.Norm(meanExponent,
                 currentAimStrain * strainDecayAim(time - current.Previous(0).StartTime),
-                currentSpeedStrain * strainDecaySpeed(time - current.Previous(0).StartTime));
+                currentSpeedStrain * strainDecaySpeed(time - current.Previous(0).StartTime)) * skillMultiplierTotal;
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
@@ -66,12 +66,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentSpeedStrain *= decaySpeed;
             currentSpeedStrain += speedDifficulty * (1 - decaySpeed) * skillMultiplierSpeed;
 
-            double totalStrain = DifficultyCalculationUtils.Norm(meanExponent, currentAimStrain, currentSpeedStrain);
+            double totalStrain = DifficultyCalculationUtils.Norm(meanExponent, currentAimStrain, currentSpeedStrain) * skillMultiplierTotal;
 
             if (current.BaseObject is Slider)
                 sliderStrains.Add(totalStrain);
 
-            return totalStrain * skillMultiplierTotal;
+            return totalStrain;
         }
 
         public double GetDifficultSliders()
