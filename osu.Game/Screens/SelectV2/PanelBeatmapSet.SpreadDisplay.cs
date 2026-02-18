@@ -108,6 +108,7 @@ namespace osu.Game.Screens.SelectV2
                 showConvertedBeatmaps.BindValueChanged(_ => updateBeatmapSet(), true);
                 Expanded.BindValueChanged(_ => updateEnabled());
                 scopedBeatmapSet.BindValueChanged(_ => updateEnabled(), true);
+                scopedBeatmapSet.BindDisabledChanged(_ => updateEnabled(), true);
                 Enabled.BindValueChanged(_ => updateAppearance(), true);
                 FinishTransforms(true);
             }
@@ -210,7 +211,7 @@ namespace osu.Game.Screens.SelectV2
 
             private void updateEnabled()
             {
-                Enabled.Value = Expanded.Value && scopedBeatmapSet.Value == null;
+                Enabled.Value = Expanded.Value && !scopedBeatmapSet.Disabled && scopedBeatmapSet.Value == null;
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)
