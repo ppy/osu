@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double currentAimStrain;
         private double currentSpeedStrain;
 
-        private double skillMultiplierAim => 36.767;
+        private double skillMultiplierAim => 31.167;
         private double skillMultiplierSpeed => 1.35;
         private double skillMultiplierTotal => 1.5;
         private double meanExponent => 1.2;
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) =>
             DifficultyCalculationUtils.Norm(meanExponent,
                 currentAimStrain * strainDecayAim(time - current.Previous(0).StartTime),
-                currentSpeedStrain * strainDecaySpeed(time - current.Previous(0).StartTime));
+                currentSpeedStrain * strainDecaySpeed(time - current.Previous(0).StartTime)) * skillMultiplierTotal;
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
