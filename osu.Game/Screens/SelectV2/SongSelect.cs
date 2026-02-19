@@ -396,19 +396,6 @@ namespace osu.Game.Screens.SelectV2
                 if (ShowOsuLogo)
                     logo?.FadeTo(v.NewValue == Visibility.Visible ? 0f : 1f, 200, Easing.OutQuint);
             });
-
-            Beatmap.BindValueChanged(_ =>
-            {
-                if (!this.IsCurrentScreen())
-                    return;
-
-                ensureGlobalBeatmapValid();
-
-                ensurePlayingSelected();
-                updateBackgroundDim();
-                updateWedgeVisibility();
-                fetchOnlineInfo();
-            });
         }
 
         protected override void Update()
@@ -554,7 +541,7 @@ namespace osu.Game.Screens.SelectV2
         /// </summary>
         /// <param name="beatmap">The beatmap which should be selected. If not provided, the current globally selected beatmap will be used.</param>
         /// <param name="startAction">The action to perform if conditions are met to be able to proceed. May not be invoked if in an invalid state.</param>
-        public void SelectAndRun(BeatmapInfo beatmap, Action startAction)
+        protected void SelectAndRun(BeatmapInfo beatmap, Action startAction)
         {
             if (!this.IsCurrentScreen())
                 return;
@@ -726,8 +713,6 @@ namespace osu.Game.Screens.SelectV2
 
             carousel.VisuallyFocusSelected = false;
 
-            updateWedgeVisibility();
-
             if (ControlGlobalMusic)
             {
                 // Avoid abruptly starting playback at preview point.
@@ -746,16 +731,27 @@ namespace osu.Game.Screens.SelectV2
                 beginLooping();
             }
 
+            Beatmap.BindValueChanged(updateVariousState, true);
+        }
+
+        private void updateVariousState(ValueChangedEvent<WorkingBeatmap> e)
+        {
+            if (!this.IsCurrentScreen())
+                return;
+
             ensureGlobalBeatmapValid();
 
             ensurePlayingSelected();
             updateBackgroundDim();
-            fetchOnlineInfo(force: true);
+            updateWedgeVisibility();
+            fetchOnlineInfo(force: ReferenceEquals(e.OldValue, e.NewValue));
         }
 
         private void onLeavingScreen()
         {
             restoreBackground();
+
+            Beatmap.ValueChanged -= updateVariousState;
 
             modSelectOverlay.SelectedMods.UnbindFrom(Mods);
             modSelectOverlay.Beatmap.UnbindFrom(Beatmap);

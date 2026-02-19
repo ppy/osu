@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -15,6 +17,7 @@ using osu.Game.Database;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Lounge;
@@ -22,6 +25,7 @@ using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Resources;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -35,7 +39,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected IScreen CurrentScreen => multiplayerComponents.CurrentScreen;
         protected IScreen CurrentSubScreen => multiplayerComponents.MultiplayerScreen.CurrentSubScreen;
 
-        private BeatmapManager beatmaps = null!;
+        protected BeatmapManager Beatmaps = null!;
+
         private BeatmapSetInfo importedSet = null!;
         private RulesetStore rulesets = null!;
 
@@ -49,7 +54,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             BeatmapStore beatmapStore;
 
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(Beatmaps = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.CacheAs(beatmapStore = new RealmDetachedBeatmapStore());
             Dependencies.Cache(Realm);
 
@@ -62,13 +67,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("import beatmap", () =>
             {
-                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+                Beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
                 Realm.Write(r =>
                 {
                     foreach (var beatmapInfo in r.All<BeatmapInfo>())
                         beatmapInfo.OnlineMD5Hash = beatmapInfo.MD5Hash;
                 });
-                importedSet = beatmaps.GetAllUsableBeatmapSets().First();
+                importedSet = Beatmaps.GetAllUsableBeatmapSets().First();
                 InitialBeatmap = importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0);
                 OtherBeatmap = importedSet.Beatmaps.Last(b => b.Ruleset.OnlineID == 0);
             });
@@ -116,6 +121,30 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for player", () => multiplayerComponents.CurrentScreen is Player player && player.IsLoaded);
             AddStep("exit player", () => multiplayerComponents.MultiplayerScreen.MakeCurrent());
+        }
+
+        protected void AddBeatmapFromSongSelect(Func<BeatmapInfo> beatmap, RulesetInfo? ruleset = null, IReadOnlyList<Mod>? mods = null)
+        {
+            Screens.SelectV2.SongSelect? songSelect = null;
+
+            AddStep("click add button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerMatchSubScreen.AddItemButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("wait for song select", () => (songSelect = CurrentSubScreen as Screens.SelectV2.SongSelect) != null);
+            AddUntilStep("wait for loaded", () => songSelect.IsCurrentScreen() && !songSelect.AsNonNull().IsFiltering);
+
+            if (ruleset != null)
+                AddStep($"set {ruleset.Name} ruleset", () => songSelect.AsNonNull().Ruleset.Value = ruleset);
+
+            if (mods != null)
+                AddStep($"set mods to {string.Join(",", mods.Select(m => m.Acronym))}", () => songSelect.AsNonNull().Mods.Value = mods);
+
+            AddStep("select other beatmap", () => songSelect.AsNonNull().Beatmap.Value = Beatmaps.GetWorkingBeatmap(beatmap()));
+            AddStep("confirm selection", () => InputManager.Key(Key.Enter));
+            AddUntilStep("wait for return to match", () => CurrentSubScreen is MultiplayerMatchSubScreen);
         }
 
         protected override void Dispose(bool isDisposing)
