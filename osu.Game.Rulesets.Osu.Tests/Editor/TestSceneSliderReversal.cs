@@ -3,10 +3,13 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Tests.Beatmaps;
@@ -58,13 +61,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         [TestCase(0, 250)]
         [TestCase(0, 200)]
-        [TestCase(1, 120, false)]
-        [TestCase(1, 80, false)]
+        [TestCase(1, 120, false, false)]
+        [TestCase(1, 80, false, false)]
         [TestCase(2, 250)]
         [TestCase(2, 190)]
         [TestCase(3, 250)]
         [TestCase(3, 190)]
-        public void TestSliderReversal(int pathIndex, double length, bool assertEqualDistances = true)
+        public void TestSliderReversal(int pathIndex, double length, bool assertEqualDistances = true, bool assertSliderReduction = true)
         {
             var controlPoints = paths[pathIndex];
 
@@ -146,6 +149,67 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
                 return oldControlPointTypes.Take(newControlPointTypes.Length).SequenceEqual(newControlPointTypes);
             });
+
+            if (assertSliderReduction)
+            {
+                AddStep("Move to marker", () =>
+                {
+                    var marker = this.ChildrenOfType<SliderEndDragMarker>().Single();
+                    var position = (marker.ScreenSpaceDrawQuad.TopRight + marker.ScreenSpaceDrawQuad.BottomRight) / 2;
+                    InputManager.MoveMouseTo(position);
+                });
+                AddStep("Click", () => InputManager.PressButton(MouseButton.Left));
+                AddStep("Reduce slider", () =>
+                {
+                    var middleControlPoint = this.ChildrenOfType<PathControlPointPiece<Slider>>().ToArray()[^2];
+                    InputManager.MoveMouseTo(middleControlPoint);
+                });
+                AddStep("Release click", () => InputManager.ReleaseButton(MouseButton.Left));
+
+                AddStep("Save half slider info", () =>
+                {
+                    oldStartPos = selectedSlider.Position;
+                    oldEndPos = selectedSlider.EndPosition;
+                    oldDistance = selectedSlider.Path.Distance;
+                });
+
+                AddStep("Reverse slider", () =>
+                {
+                    InputManager.PressKey(Key.LControl);
+                    InputManager.Key(Key.G);
+                    InputManager.ReleaseKey(Key.LControl);
+                });
+
+                AddAssert("Middle control point has the same distance from start to end", () =>
+                {
+                    var pathControlPoints = selectedSlider.Path.ControlPoints;
+                    float middleToStart = Vector2.Distance(pathControlPoints[^2].Position, pathControlPoints[0].Position);
+                    float middleToEnd = Vector2.Distance(pathControlPoints[^2].Position, pathControlPoints[^1].Position);
+
+                    return Precision.AlmostEquals(middleToStart, middleToEnd, 1f);
+                });
+
+                AddAssert("Middle control point is not at start or end", () =>
+                    Vector2.Distance(selectedSlider.Path.ControlPoints[^2].Position, oldStartPos) > 1 &&
+                    Vector2.Distance(selectedSlider.Path.ControlPoints[^2].Position, oldEndPos) > 1
+                );
+
+                AddAssert("Slider has correct length", () =>
+                    Precision.AlmostEquals(selectedSlider.Path.Distance, oldDistance));
+
+                AddAssert("Slider has correct start position", () =>
+                    Vector2.Distance(selectedSlider.Position, oldEndPos) < 1);
+
+                AddAssert("Slider has correct end position", () =>
+                    Vector2.Distance(selectedSlider.EndPosition, oldStartPos) < 1);
+
+                AddAssert("Control points have correct types", () =>
+                {
+                    var newControlPointTypes = selectedSlider.Path.ControlPoints.Select(p => p.Type).ToArray();
+
+                    return oldControlPointTypes.Take(newControlPointTypes.Length).SequenceEqual(newControlPointTypes);
+                });
+            }
         }
     }
 }
