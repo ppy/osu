@@ -506,7 +506,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
 
             // Check if we need to make this the current screen as a result of the beatmap set changing while the user's selecting a style.
-            if (this.GetChildScreen() is MultiplayerMatchFreestyleSelect)
+            if (this.GetChildScreen() is MultiplayerMatchFreestyleSelectV2)
             {
                 MultiplayerPlaylistItem item = client.Room.CurrentPlaylistItem;
 
@@ -722,7 +722,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
 
             MultiplayerPlaylistItem item = client.Room.CurrentPlaylistItem;
-            this.Push(new MultiplayerMatchFreestyleSelect(room, new PlaylistItem(item)));
+            this.Push(new MultiplayerMatchFreestyleSelectV2(new PlaylistItem(item)));
         }
 
         /// <summary>
