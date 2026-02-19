@@ -236,9 +236,11 @@ Click to see what's new!", version);
         public static LocalisableString ElevatedPrivileges(LocalisableString user) => new TranslatableString(getKey(@"elevated_privileges"), @"Running osu! as {0} does not improve performance, may break integrations and poses a security risk. Please run the game as a normal user.", user);
 
         /// <summary>
-        /// "Screenshot {0} saved!"
+        /// "Screenshot saved!
+        /// {0}"
         /// </summary>
-        public static LocalisableString ScreenshotSaved(string filename) => new TranslatableString(getKey(@"screenshot_saved"), @"Screenshot {0} saved!", filename);
+        public static LocalisableString ScreenshotSaved(string filename) => new TranslatableString(getKey(@"screenshot_saved"), @"Screenshot saved!
+{0}", filename);
 
         /// <summary>
         /// "The multiplayer server will be right back..."
