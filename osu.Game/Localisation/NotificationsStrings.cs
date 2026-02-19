@@ -236,10 +236,10 @@ Click to see what's new!", version);
         public static LocalisableString ElevatedPrivileges(LocalisableString user) => new TranslatableString(getKey(@"elevated_privileges"), @"Running osu! as {0} does not improve performance, may break integrations and poses a security risk. Please run the game as a normal user.", user);
 
         /// <summary>
-        /// "Screenshot saved!
+        /// "Screenshot saved! Click to view.
         /// {0}"
         /// </summary>
-        public static LocalisableString ScreenshotSaved(string filename) => new TranslatableString(getKey(@"screenshot_saved"), @"Screenshot saved!
+        public static LocalisableString ScreenshotSaved(string filename) => new TranslatableString(getKey(@"screenshot_saved"), @"Screenshot saved! Click to view.
 {0}", filename);
 
         /// <summary>
