@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Types;
@@ -55,25 +53,7 @@ namespace osu.Game.Rulesets.Objects
 
             // Recalculate middle perfect curve control points at the end of the slider path.
             if (controlPoints.Count >= 3 && controlPoints[^3].Type == PathType.PERFECT_CURVE && controlPoints[^2].Type == null && segmentEnds.Any())
-            {
-                double lastSegmentStart = segmentEnds.Length > 1 ? segmentEnds[^2] : 0;
-                double lastSegmentEnd = segmentEnds[^1];
-
-                var circleArcPath = new List<Vector2>();
-                sliderPath.GetPathToProgress(circleArcPath, lastSegmentStart / lastSegmentEnd, 1);
-
-                // If the arc path only contains 2 unique values the slider is not an arc
-                controlPoints[^2].Position = circleArcPath
-                                             .Select(v => (
-                                                 (int)Math.Round(v.X / 0.1f),
-                                                 (int)Math.Round(v.Y / 0.1f)
-                                             ))
-                                             .Distinct()
-                                             .Take(3)
-                                             .Count() > 2
-                    ? circleArcPath[circleArcPath.Count / 2]
-                    : Vector2.Divide(circleArcPath[^1], 2);
-            }
+                controlPoints[^2].Position = sliderPath.PositionAt(0.5);
 
             sliderPath.reverseControlPoints(out positionalOffset);
         }

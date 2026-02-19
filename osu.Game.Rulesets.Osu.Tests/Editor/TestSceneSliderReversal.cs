@@ -35,6 +35,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 PathType.PERFECT_CURVE,
                 new Vector2(100.009f, -50.0009f),
                 new Vector2(200.0089f, -100)
+            ),
+            createPathSegment(
+                PathType.PERFECT_CURVE,
+                new Vector2(25, -50),
+                new Vector2(100, 75)
             )
         };
 
@@ -53,11 +58,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         [TestCase(0, 250)]
         [TestCase(0, 200)]
-        [TestCase(1, 120)]
-        [TestCase(1, 80)]
+        [TestCase(1, 120, false)]
+        [TestCase(1, 80, false)]
         [TestCase(2, 250)]
         [TestCase(2, 190)]
-        public void TestSliderReversal(int pathIndex, double length)
+        [TestCase(3, 250)]
+        [TestCase(3, 190)]
+        public void TestSliderReversal(int pathIndex, double length, bool assertEqualDistances = true)
         {
             var controlPoints = paths[pathIndex];
 
@@ -105,6 +112,18 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                     InputManager.Key(Key.G);
                     InputManager.ReleaseKey(Key.LControl);
                 }, 2);
+            }
+
+            if (assertEqualDistances)
+            {
+                AddAssert("Middle control point has the same distance from start to end", () =>
+                {
+                    var pathControlPoints = selectedSlider.Path.ControlPoints;
+                    float middleToStart = Vector2.Distance(pathControlPoints[^2].Position, pathControlPoints[0].Position);
+                    float middleToEnd = Vector2.Distance(pathControlPoints[^2].Position, pathControlPoints[^1].Position);
+
+                    return Precision.AlmostEquals(middleToStart, middleToEnd, 1f);
+                });
             }
 
             AddAssert("Middle control point is not at start or end", () =>
