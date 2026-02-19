@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
@@ -10,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.Select;
 using SongSelect = osu.Game.Screens.SelectV2.SongSelect;
 
@@ -107,6 +109,8 @@ namespace osu.Game.Screens.OnlinePlay
 
             return true;
         }
+
+        public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => [];
 
         void IHandlePresentBeatmap.PresentBeatmap(WorkingBeatmap workingBeatmap, RulesetInfo ruleset)
         {
