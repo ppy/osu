@@ -155,7 +155,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 AddStep("Move to marker", () =>
                 {
                     var marker = this.ChildrenOfType<SliderEndDragMarker>().Single();
-                    var position = (marker.ScreenSpaceDrawQuad.TopRight + marker.ScreenSpaceDrawQuad.BottomRight) / 2;
+                    var markerPos = (marker.ScreenSpaceDrawQuad.TopRight + marker.ScreenSpaceDrawQuad.BottomRight) / 2;
+                    // sometimes the cursor may miss the marker's hitbox so we
+                    // add a little offset here to be sure it lands in a clickable position.
+                    var position = new Vector2(markerPos.X + 2f, markerPos.Y);
                     InputManager.MoveMouseTo(position);
                 });
                 AddStep("Click", () => InputManager.PressButton(MouseButton.Left));
@@ -210,6 +213,124 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                     return oldControlPointTypes.Take(newControlPointTypes.Length).SequenceEqual(newControlPointTypes);
                 });
             }
+        }
+
+        [Test]
+        public void TestSegmentedSliderReversal()
+        {
+            PathControlPoint[] segmentedSliderPath =
+            [
+                new PathControlPoint
+                {
+                    Position = new Vector2(0, 0),
+                    Type = PathType.PERFECT_CURVE
+                },
+                new PathControlPoint
+                {
+                    Position = new Vector2(100, 150),
+                },
+                new PathControlPoint
+                {
+                    Position = new Vector2(75, -50),
+                    Type = PathType.PERFECT_CURVE
+                },
+                new PathControlPoint
+                {
+                    Position = new Vector2(225, -75),
+                },
+                new PathControlPoint
+                {
+                    Position = new Vector2(350, 50),
+                    Type = PathType.PERFECT_CURVE
+                },
+                new PathControlPoint
+                {
+                    Position = new Vector2(500, -75),
+                },
+                new PathControlPoint
+                {
+                    Position = new Vector2(350, -120),
+                },
+            ];
+
+            Vector2 oldStartPos = default;
+            Vector2 oldEndPos = default;
+            double oldDistance = default;
+
+            var oldControlPointTypes = segmentedSliderPath.Select(p => p.Type);
+
+            AddStep("Add slider", () =>
+            {
+                var slider = new Slider
+                {
+                    Position = new Vector2(0, 200),
+                    Path = new SliderPath(segmentedSliderPath)
+                    {
+                        ExpectedDistance = { Value = 1314 }
+                    }
+                };
+
+                EditorBeatmap.Add(slider);
+
+                oldStartPos = slider.Position;
+                oldEndPos = slider.EndPosition;
+                oldDistance = slider.Path.Distance;
+            });
+
+            AddStep("Select slider", () =>
+            {
+                var slider = (Slider)EditorBeatmap.HitObjects[0];
+                EditorBeatmap.SelectedHitObjects.Add(slider);
+            });
+
+            AddRepeatStep("Reverse slider", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.G);
+                InputManager.ReleaseKey(Key.LControl);
+            }, 3);
+
+            AddAssert("First arc's control is not at the slider's middle", () =>
+                Vector2.Distance(selectedSlider.Path.ControlPoints[^2].Position, selectedSlider.Path.PositionAt(0.5)) > 1
+            );
+
+            AddAssert("Last arc's control is not at the slider's middle", () =>
+                Vector2.Distance(selectedSlider.Path.ControlPoints[1].Position, selectedSlider.Path.PositionAt(0.5)) > 1
+            );
+
+            AddAssert("First arc centered middle control point", () =>
+            {
+                var pathControlPoints = selectedSlider.Path.ControlPoints;
+                float middleToStart = Vector2.Distance(pathControlPoints[1].Position, pathControlPoints[0].Position);
+                float middleToEnd = Vector2.Distance(pathControlPoints[1].Position, pathControlPoints[2].Position);
+
+                return Precision.AlmostEquals(middleToStart, middleToEnd, 1f);
+            });
+
+            AddAssert("Last arc centered middle control point", () =>
+            {
+                var pathControlPoints = selectedSlider.Path.ControlPoints;
+                float middleToStart = Vector2.Distance(pathControlPoints[^2].Position, pathControlPoints[^3].Position);
+                float middleToEnd = Vector2.Distance(pathControlPoints[^2].Position, pathControlPoints[^1].Position);
+
+                return Precision.AlmostEquals(middleToStart, middleToEnd, 1f);
+            });
+
+            AddAssert("Slider has correct length", () =>
+                Precision.AlmostEquals(selectedSlider.Path.Distance, oldDistance));
+
+            AddAssert("Slider has correct start position", () =>
+                Vector2.Distance(selectedSlider.Position, oldEndPos) < 1);
+
+            AddAssert("Slider has correct end position", () =>
+                Vector2.Distance(selectedSlider.EndPosition, oldStartPos) < 1);
+
+            AddAssert("Control points have correct types", () =>
+            {
+                var newControlPointTypes = selectedSlider.Path.ControlPoints.Select(p => p.Type).ToArray();
+
+                return oldControlPointTypes.Take(newControlPointTypes.Length).SequenceEqual(newControlPointTypes);
+            });
         }
     }
 }
