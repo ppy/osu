@@ -34,8 +34,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
 
         private bool animationBegan;
 
-        [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
+        public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Plum;
 
         [Resolved]
         private MusicController musicController { get; set; } = null!;
@@ -52,7 +51,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
 
         private IDisposable? duckOperation;
 
-        protected override BackgroundScreen CreateBackground() => new MatchmakingBackgroundScreen(colourProvider);
+        protected override BackgroundScreen CreateBackground() => new MatchmakingBackgroundScreen(ColourProvider);
 
         public ScreenIntro()
         {
@@ -92,7 +91,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
                                     {
                                         new Box
                                         {
-                                            Colour = colourProvider.Background3,
+                                            Colour = ColourProvider.Background3,
                                             RelativeSizeAxes = Axes.Both,
                                         },
                                         new OsuSpriteText
