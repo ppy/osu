@@ -94,6 +94,12 @@ namespace osu.Game.Screens.SelectV2
         protected bool ControlGlobalMusic { get; init; } = true;
 
         /// <summary>
+        /// Whether this song select instance should allow scoping down to a specific beatmap set,
+        /// exposing other difficulties that are otherwise hidden by filter criteria.
+        /// </summary>
+        protected bool SupportScoping { init => scopedBeatmapSet.Disabled = !value; }
+
+        /// <summary>
         /// Whether the osu! logo should be shown at the bottom-right of the screen.
         /// </summary>
         protected bool ShowOsuLogo { get; init; } = true;
@@ -111,7 +117,7 @@ namespace osu.Game.Screens.SelectV2
 
         private BeatmapCarousel carousel = null!;
 
-        protected FilterControl FilterControl = null!;
+        protected FilterControl FilterControl { get; private set; } = null!;
 
         private BeatmapTitleWedge titleWedge = null!;
         private BeatmapDetailsArea detailsArea = null!;
