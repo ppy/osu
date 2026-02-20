@@ -12,6 +12,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Audio.Effects;
@@ -21,7 +22,6 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Play
         private AudioFilter failLowPassFilter = null!;
         private AudioFilter failHighPassFilter = null!;
 
-        private const float duration = 2500;
+        protected const float DURATION = 2500;
 
         private SkinnableSound failSample = null!;
 
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Play
 
             started = true;
 
-            this.TransformBindableTo(trackFreq, 0, duration).OnComplete(_ =>
+            this.TransformBindableTo(trackFreq, 0, DURATION).OnComplete(_ =>
             {
                 // Don't reset frequency as the pause screen may appear post transform, causing a second frequency sweep.
                 removeFilters(false);
@@ -123,14 +123,14 @@ namespace osu.Game.Screens.Play
             });
 
             failHighPassFilter.CutoffTo(300);
-            failLowPassFilter.CutoffTo(300, duration, Easing.OutCubic);
+            failLowPassFilter.CutoffTo(300, DURATION, Easing.OutCubic);
             failSample.Play();
 
             track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
             track.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
             applyToPlayfield(drawableRuleset.Playfield);
-            drawableRuleset.Playfield.HitObjectContainer.FadeOut(duration / 2);
+            drawableRuleset.Playfield.HitObjectContainer.FadeOut(DURATION / 2);
 
             if (config.Get<bool>(OsuSetting.FadePlayfieldWhenHealthLow))
                 redFlashLayer.FadeOutFromOne(1000);
@@ -144,9 +144,9 @@ namespace osu.Game.Screens.Play
                 Depth = float.MaxValue
             });
 
-            Content.ScaleTo(0.85f, duration, Easing.OutQuart);
-            Content.RotateTo(1, duration, Easing.OutQuart);
-            Content.FadeColour(Color4.Gray, duration);
+            Content.ScaleTo(0.85f, DURATION, Easing.OutQuart);
+            Content.RotateTo(1, DURATION, Easing.OutQuart);
+            Content.FadeColour(Color4.Gray, DURATION);
 
             // Will be restored by `ApplyToBackground` logic in `SongSelect`.
             Background?.FadeColour(OsuColour.Gray(0.3f), 60);
@@ -205,27 +205,30 @@ namespace osu.Game.Screens.Play
                 if (appliedObjects.Contains(obj))
                     continue;
 
-                float rotation = RNG.NextSingle(-90, 90);
-                Vector2 originalPosition = obj.Position;
-                Vector2 originalScale = obj.Scale;
+                float randomRotation = RNG.NextSingle(-90, 90);
 
-                dropOffScreen(obj, failTime, rotation, originalScale, originalPosition);
+                using (obj.BeginAbsoluteSequence(failTime))
+                    CreateHitObjectTransforms(obj, randomRotation);
 
                 // need to reapply the fail drop after judgement state changes
-                obj.ApplyCustomUpdateState += (_, _) => dropOffScreen(obj, failTime, rotation, originalScale, originalPosition);
+                obj.ApplyCustomUpdateState += (_, _) =>
+                {
+                    using (obj.BeginAbsoluteSequence(failTime))
+                        CreateHitObjectTransforms(obj, randomRotation);
+                };
 
                 appliedObjects.Add(obj);
             }
         }
 
-        private void dropOffScreen(DrawableHitObject obj, double failTime, float randomRotation, Vector2 originalScale, Vector2 originalPosition)
+        /// <summary>
+        /// Creates a <see cref="TransformSequence{T}"/>  which will be applied to each <see cref="DrawableHitObject"/> when the player fails.
+        /// </summary>
+        /// <param name="hitObject">The specific DHO to apply the TransformSequence to.</param>
+        /// <param name="rotation">The random amount the DHO will be rotated if applicable.</param>
+        protected virtual void CreateHitObjectTransforms(DrawableHitObject hitObject, float rotation)
         {
-            using (obj.BeginAbsoluteSequence(failTime))
-            {
-                obj.RotateTo(randomRotation, duration);
-                obj.ScaleTo(originalScale * 0.5f, duration);
-                obj.MoveTo(originalPosition + new Vector2(0, 400), duration);
-            }
+            hitObject.FadeOutFromOne(DURATION);
         }
     }
 }

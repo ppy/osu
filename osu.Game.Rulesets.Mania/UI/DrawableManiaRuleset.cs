@@ -193,6 +193,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new ManiaPlayfieldAdjustmentContainer(this);
 
+        public override FailAnimationContainer CreateFailAnimationContainer() => new ManiaFailAnimationContainer(this);
+
         protected override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages);
 
         public override int Variant => (int)(Beatmap.Stages.Count == 1 ? PlayfieldType.Single : PlayfieldType.Dual) + Beatmap.TotalColumns;

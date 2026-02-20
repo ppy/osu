@@ -67,6 +67,8 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new OsuPlayfieldAdjustmentContainer { AlignWithStoryboard = true };
 
+        public override FailAnimationContainer CreateFailAnimationContainer() => new OsuFailAnimationContainer(this);
+
         protected override ResumeOverlay CreateResumeOverlay()
         {
             if (Mods.Any(m => m is OsuModAutopilot or OsuModTouchDevice))

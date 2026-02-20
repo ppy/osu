@@ -553,6 +553,8 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         protected virtual ResumeOverlay CreateResumeOverlay() => null;
 
+        public virtual FailAnimationContainer CreateFailAnimationContainer() => new FailAnimationContainer(this);
+
         /// <summary>
         /// Whether to display gameplay overlays, such as <see cref="HUDOverlay"/> and <see cref="BreakOverlay"/>.
         /// </summary>

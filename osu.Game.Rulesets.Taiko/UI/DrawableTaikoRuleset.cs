@@ -115,6 +115,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             LockPlayfieldAspectRange = { BindTarget = LockPlayfieldAspectRange }
         };
 
+        public override FailAnimationContainer CreateFailAnimationContainer() => new TaikoFailAnimationContainer(this);
+
         protected override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
 
         protected override Playfield CreatePlayfield() => new TaikoPlayfield();
