@@ -155,13 +155,62 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                         return SkinUtils.As<TValue>(new Bindable<float>(width));
 
                     case LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour:
-                        var colour = getColourForLayout(columnIndex, stage);
-
-                        return SkinUtils.As<TValue>(new Bindable<Color4>(colour));
+                        return SkinUtils.As<TValue>(new Bindable<Color4>(getColumnColour(columnIndex, stage)));
                 }
             }
 
             return base.GetConfig<TLookup, TValue>(lookup);
+        }
+
+        /// <summary>
+        /// Retrieves the color for a specific column.
+        /// If the skin has customizations defined via skin.ini, some are integrated.
+        /// Falls back to the default Argon colors.
+        /// </summary>
+        private Color4 getColumnColour(int columnIndex, StageDefinition stage)
+        {
+            // Check if a custom color is defined in the skin configuration
+            if (Skin is Skin skin)
+            {
+                Color4? customColour = getCustomSkinColour(skin, columnIndex);
+                if (customColour.HasValue)
+                    return customColour.Value;
+            }
+
+            // Fall back to default Argon colors
+            return getColourForLayout(columnIndex, stage);
+        }
+
+        /// <summary>
+        /// Attempts to retrieve "Colour0" (column number) from the skin configuration dictionary.
+        /// </summary>
+        /// <param name="skin">The skin to retrieve the color from.</param>
+        /// <param name="columnIndex">The column index to look up.</param>
+        /// <returns>The custom color if defined and valid; otherwise, null.</returns>
+        private Color4? getCustomSkinColour(Skin skin, int columnIndex)
+        {
+            string configKey = $"Colour{columnIndex}";
+
+            if (!skin.Configuration.ConfigDictionary.TryGetValue(configKey, out string? colorValue))
+                return null;
+
+            if (string.IsNullOrWhiteSpace(colorValue))
+                return null;
+
+            try
+            {
+                byte[] components = colorValue.Split(',').Select(byte.Parse).ToArray();
+
+                if (components.Length != 4)
+                    return null;
+
+                return new Color4(components[0], components[1], components[2], components[3]);
+            }
+            catch
+            {
+                // Invalid color format in skin configuration
+                return null;
+            }
         }
 
         private Color4 getColourForLayout(int columnIndex, StageDefinition stage)
