@@ -196,10 +196,10 @@ namespace osu.Game.Screens.SelectV2
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = foregroundColour
                                 },
-                                new UserCoverBackground
+                                new CoverBackground
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    User = Score.User,
+                                    Item = Score.User,
                                     Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
