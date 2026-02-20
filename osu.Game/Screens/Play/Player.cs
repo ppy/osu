@@ -824,6 +824,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             GameplayState.HasPassed = true;
+            ConcludeGameplay();
 
             // Setting this early in the process means that even if something were to go wrong in the order of events following, there
             // is no chance that a user could return to the (already completed) Player instance from a child screen.
@@ -992,19 +993,12 @@ namespace osu.Game.Screens.Play
             // finalise the score as "failed".
             Schedule(() =>
             {
-                ConcludeFailedScore(Score);
+                ScoreProcessor.FailScore(Score.ScoreInfo);
+                ConcludeGameplay();
 
                 if (restartOnFail)
                     Restart(true);
             });
-        }
-
-        /// <summary>
-        /// Performs last operations on the supplied <paramref name="score"/> before this <see cref="Player"/> is definitively exited due to failing.
-        /// </summary>
-        protected virtual void ConcludeFailedScore(Score score)
-        {
-            ScoreProcessor.FailScore(score.ScoreInfo);
         }
 
         /// <summary>
@@ -1170,6 +1164,13 @@ namespace osu.Game.Screens.Play
                 SkipIntroOverlay.SkipWhenReady();
         }
 
+        /// <summary>
+        /// Performs any final operations prior to gameplay concluding either as a result of a successful completion, a fail, or exiting the screen.
+        /// </summary>
+        protected virtual void ConcludeGameplay()
+        {
+        }
+
         public override void OnSuspending(ScreenTransitionEvent e)
         {
             Debug.Assert(!ValidForResume);
@@ -1201,6 +1202,8 @@ namespace osu.Game.Screens.Play
 
                 if (DrawableRuleset.ReplayScore == null)
                     ScoreProcessor.FailScore(Score.ScoreInfo);
+
+                ConcludeGameplay();
             }
 
             // GameplayClockContainer performs seeks / start / stop operations on the beatmap's track.

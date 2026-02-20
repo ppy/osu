@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -95,8 +94,5 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             // see also: `MultiplayerPlayer.PerformFail()`
             ScoreProcessor.FailScore(Score.ScoreInfo);
         }
-
-        protected override void ConcludeFailedScore(Score score)
-            => throw new NotSupportedException($"{nameof(MultiSpectatorPlayer)} should never be calling {nameof(ConcludeFailedScore)}. Failing in multiplayer only marks the score with F rank.");
     }
 }
