@@ -282,6 +282,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         private partial class TestScreenWithOverlayWithoutFooter : TestScreenWithOverlay
         {
             public override bool ShowFooter => false;
+
+            public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => Array.Empty<ScreenFooterButton>();
         }
 
         private partial class TestShearedOverlayContainer : ShearedOverlayContainer
