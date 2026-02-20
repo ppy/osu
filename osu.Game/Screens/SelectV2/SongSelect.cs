@@ -596,7 +596,7 @@ namespace osu.Game.Screens.SelectV2
             debounceQueueSelection(groupedBeatmap.Beatmap);
         }
 
-        private bool ensureGlobalBeatmapValid()
+        private bool ensureGlobalBeatmapValid(bool triggeredByCarousel = false)
         {
             if (!this.IsCurrentScreen())
                 return false;
@@ -641,6 +641,28 @@ namespace osu.Game.Screens.SelectV2
                     debounceQueueSelection(beatmap);
                     return true;
                 }
+
+                // If no difficulties whose ruleset is valid, try to switch ruleset to a valid beatmap's ruleset.
+                // `triggeredByCarousel` being true means that the change is triggered by `newItemsPresented` and we shouldn't to modify the ruleset.
+                // These code should only run at `Beatmap` bindable callback.
+                if (!triggeredByCarousel)
+                {
+                    validBeatmaps = activeSet.Beatmaps.Where(checkBeatmapValid).ToArray();
+
+                    if (validBeatmaps.Any())
+                    {
+                        Ruleset.Value = Beatmap.Value.BeatmapInfo.Ruleset;
+
+                        // Refresh the carousel to the new ruleset
+                        // TODO: `criteriaChanged` will be called via the ruleset bindable callback, so it will replace the loading animation of here.
+                        filterDebounce?.Cancel();
+                        carousel.Filter(filterControl.CreateCriteria(), true);
+
+                        carousel.CurrentBeatmap = currentBeatmap.BeatmapInfo;
+                        debounceQueueSelection(currentBeatmap.BeatmapInfo);
+                        return true;
+                    }
+                }
             }
 
             // If all else fails, use the default beatmap.
@@ -650,11 +672,8 @@ namespace osu.Game.Screens.SelectV2
             return validSelection;
         }
 
-        private bool checkBeatmapValidForSelection(BeatmapInfo beatmap)
+        private bool checkBeatmapValid(BeatmapInfo beatmap)
         {
-            if (!beatmap.AllowGameplayWithRuleset(Ruleset.Value, showConvertedBeatmaps.Value))
-                return false;
-
             if (beatmap.Hidden)
                 return false;
 
@@ -665,6 +684,11 @@ namespace osu.Game.Screens.SelectV2
                 return false;
 
             return true;
+        }
+
+        private bool checkBeatmapValidForSelection(BeatmapInfo beatmap)
+        {
+            return beatmap.AllowGameplayWithRuleset(Ruleset.Value, showConvertedBeatmaps.Value) && checkBeatmapValid(beatmap);
         }
 
         #endregion
@@ -904,7 +928,7 @@ namespace osu.Game.Screens.SelectV2
             //
             // `ensureGlobalBeatmapValid` is run post-selection which will resolve any pending incompatibilities (see `Beatmap` bindable callback).
             if (debounceQueuedSelection == null)
-                ensureGlobalBeatmapValid();
+                ensureGlobalBeatmapValid(true);
 
             updateWedgeVisibility();
         }
