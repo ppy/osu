@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -81,6 +80,7 @@ namespace osu.Game.Rulesets.Mods
             private PausableSkinnableSound? finishSample;
 
             private int? firstBeat;
+            private int lastBeat = -1;
 
             public NightcoreBeatContainer()
             {
@@ -116,21 +116,35 @@ namespace osu.Game.Rulesets.Mods
 
                 if (!firstBeat.HasValue || beatIndex < firstBeat)
                     // decide on a good starting beat index if once has not yet been decided.
-                    firstBeat = beatIndex < 0 ? 0 : (beatIndex / segmentLength + 1) * segmentLength;
+                    firstBeat = beatIndex < 0 ? 0 : (beatIndex / segmentLength) * segmentLength;
 
                 if (beatIndex >= firstBeat)
-                    playBeatFor(beatIndex % segmentLength, timingPoint.TimeSignature);
+                    playBeatFor(beatIndex, segmentLength, timingPoint);
             }
 
-            private void playBeatFor(int beatIndex, TimeSignature signature)
+            private void playBeatFor(int beatIndex, int segmentLength, TimingControlPoint timingPoint)
             {
-                if (beatIndex == 0)
-                    finishSample?.Play();
+                // https://github.com/peppy/osu-stable-reference/blob/6ab0cf1f9f7b3449f5c0d8defcd458aae72cdb88/osu!/Audio/NightcoreBeat.cs#L41
+                if (lastBeat == beatIndex)
+                    return;
 
-                switch (signature.Numerator)
+                lastBeat = beatIndex;
+
+                int beatInSegment = beatIndex % segmentLength;
+
+                if (beatInSegment == 0)
+                {
+                    // https://github.com/peppy/osu-stable-reference/blob/6ab0cf1f9f7b3449f5c0d8defcd458aae72cdb88/osu!/Audio/NightcoreBeat.cs#L53
+                    bool playFinish = beatIndex > 0 || !timingPoint.OmitFirstBarLine;
+
+                    if (playFinish)
+                        finishSample?.Play();
+                }
+
+                switch (timingPoint.TimeSignature.Numerator)
                 {
                     case 3:
-                        switch (beatIndex % 6)
+                        switch (beatInSegment % 6)
                         {
                             case 0:
                                 kickSample?.Play();
@@ -148,7 +162,7 @@ namespace osu.Game.Rulesets.Mods
                         break;
 
                     case 4:
-                        switch (beatIndex % 4)
+                        switch (beatInSegment % 4)
                         {
                             case 0:
                                 kickSample?.Play();
@@ -159,6 +173,11 @@ namespace osu.Game.Rulesets.Mods
                                 break;
 
                             default:
+                                // note that in stable hat samples would only play if the beatmap tick rate was even
+                                // (https://github.com/peppy/osu-stable-reference/blob/6ab0cf1f9f7b3449f5c0d8defcd458aae72cdb88/osu!/Audio/NightcoreBeat.cs#L30-L32)
+                                // that kind of presumes that only music timed in 4/4 exists, and does not really work well
+                                // if the beatmap e.g. mixes 4/4 and 3/4 signature timing control points.
+                                // therefore this conditional behaviour is not reimplemented.
                                 hatSample?.Play();
                                 break;
                         }
