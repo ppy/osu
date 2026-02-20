@@ -198,6 +198,33 @@ namespace osu.Game.Rulesets.Objects
             return interpolateVertices(indexOfDistance(d), d);
         }
 
+        public Vector2 DirectionAtProgress(double progress, bool forward)
+        {
+            ensureValid();
+
+            int step = forward ? 1 : -1;
+            if (calculatedPath.Count == 0)
+                return Vector2.UnitX * step;
+
+            int segmentIndex = Math.Clamp(indexOfDistance(progressToDistance(progress)), forward ? 0 : 1, calculatedPath.Count - (forward ? 2 : 1));
+
+            int i = segmentIndex + step;
+            Vector2 p0 = calculatedPath[segmentIndex];
+
+            while (i < calculatedPath.Count && i >= 0)
+            {
+                Vector2 p1 = calculatedPath[i];
+                Vector2 dir = p1 - p0;
+
+                if (dir.X * dir.X + dir.Y * dir.Y > 0.01f)
+                    return dir;
+
+                i += step;
+            }
+
+            return Vector2.UnitX * step;
+        }
+
         /// <summary>
         /// Returns the control points belonging to the same segment as the one given.
         /// The first point has a PathType which all other points inherit.
