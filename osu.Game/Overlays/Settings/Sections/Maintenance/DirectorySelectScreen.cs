@@ -48,8 +48,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         /// </summary>
         protected virtual DirectoryInfo InitialPath => null;
 
-        [Cached]
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+        public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Purple;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -67,7 +66,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background4,
+                        Colour = ColourProvider.Background4,
                     },
                     new GridContainer
                     {
