@@ -55,6 +55,11 @@ namespace osu.Game.Rulesets.Objects
             if (controlPoints.Count >= 3 && controlPoints[^3].Type == PathType.PERFECT_CURVE && controlPoints[^2].Type == null && segmentEnds.Any())
             {
                 double lastSegmentStart = segmentEnds.Length > 1 ? segmentEnds[^2] : 0;
+
+                // we want to shorten the last perfect segment, preserving its shape, so that its end is consistent with the slider path's end.
+                // therefore we also reposition the middle point of the segment to be ideally halfway through its arc.
+                // the end of the segment is assumed to be at path position 1 at all times,
+                // but the start of the segment cannot be assumed to be at 0 because multi-segment sliders exist.
                 controlPoints[^2].Position = sliderPath.PositionAt((lastSegmentStart + 1) / 2);
             }
 
