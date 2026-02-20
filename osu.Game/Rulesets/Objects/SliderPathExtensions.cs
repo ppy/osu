@@ -55,12 +55,7 @@ namespace osu.Game.Rulesets.Objects
             if (controlPoints.Count >= 3 && controlPoints[^3].Type == PathType.PERFECT_CURVE && controlPoints[^2].Type == null && segmentEnds.Any())
             {
                 double lastSegmentStart = segmentEnds.Length > 1 ? segmentEnds[^2] : 0;
-                double lastSegmentEnd = segmentEnds[^1] > 1 ? 1 : segmentEnds[^1];
-
-                if (controlPoints.Count == 3 && lastSegmentEnd < 1)
-                    lastSegmentEnd = 1;
-
-                controlPoints[^2].Position = sliderPath.PositionAt((lastSegmentStart + lastSegmentEnd) / 2);
+                controlPoints[^2].Position = sliderPath.PositionAt((lastSegmentStart + 1) / 2);
             }
 
             sliderPath.reverseControlPoints(out positionalOffset);
