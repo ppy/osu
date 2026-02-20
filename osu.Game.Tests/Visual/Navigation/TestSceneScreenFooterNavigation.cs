@@ -8,9 +8,13 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
 
@@ -126,6 +130,46 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("button two shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button Two"));
         }
 
+        /// <summary>
+        /// Tests clicking the back button while an overlay is open.
+        /// </summary>
+        [Test]
+        public void TestBackButtonWhenOverlayOpen()
+        {
+            TestScreenWithOverlay screen = null!;
+
+            PushAndConfirm(() => screen = new TestScreenWithOverlay());
+
+            AddStep("show overlay", () => screen.Overlay.Show());
+            AddAssert("overlay shown", () => screen.Overlay.State.Value, () => Is.EqualTo(Visibility.Visible));
+
+            AddStep("press back", () => screenFooter.ChildrenOfType<ScreenBackButton>().Single().TriggerClick());
+            AddAssert("overlay hidden", () => screen.Overlay.State.Value, () => Is.EqualTo(Visibility.Hidden));
+            AddAssert("screen still shown", () => screen.IsCurrentScreen(), () => Is.True);
+        }
+
+        /// <summary>
+        /// Tests clicking the back button on an overlay with `BackButtonPressed` being overridden.
+        /// </summary>
+        [Test]
+        public void TestBackButtonWithCustomBackButtonPressed()
+        {
+            TestScreenWithOverlay screen = null!;
+
+            PushAndConfirm(() => screen = new TestScreenWithOverlay());
+
+            AddStep("show overlay", () => screen.Overlay.Show());
+            AddAssert("overlay shown", () => screen.Overlay.State.Value, () => Is.EqualTo(Visibility.Visible));
+            AddStep("set block count", () => screen.Overlay.BackButtonCount = 1);
+
+            AddStep("press back", () => screenFooter.ChildrenOfType<ScreenBackButton>().Single().TriggerClick());
+            AddAssert("overlay still shown", () => screen.Overlay.State.Value, () => Is.EqualTo(Visibility.Visible));
+
+            AddStep("press back again", () => screenFooter.ChildrenOfType<ScreenBackButton>().Single().TriggerClick());
+            AddAssert("overlay hidden", () => screen.Overlay.State.Value, () => Is.EqualTo(Visibility.Hidden));
+            AddAssert("screen still shown", () => screen.IsCurrentScreen(), () => Is.True);
+        }
+
         private void pushSubScreenAndConfirm(Func<TestScreenWithSubScreen> target, Func<Screen> newScreen)
         {
             Screen screen = null!;
@@ -195,6 +239,113 @@ namespace osu.Game.Tests.Visual.Navigation
             public void PushSubScreen(IScreen screen) => SubScreenStack.Push(screen);
 
             public void ExitSubScreen() => SubScreenStack.Exit();
+        }
+
+        private partial class TestScreenWithOverlay : OsuScreen
+        {
+            public override bool ShowFooter => true;
+
+            private IDisposable? overlayRegistration;
+
+            public TestShearedOverlayContainer Overlay { get; private set; } = null!;
+
+            [Resolved]
+            private IOverlayManager? overlayManager { get; set; }
+
+            [Cached]
+            private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                LoadComponent(Overlay = new TestShearedOverlayContainer());
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                overlayRegistration = overlayManager?.RegisterBlockingOverlay(Overlay);
+            }
+
+            public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new[]
+            {
+                new ScreenFooterButton(Overlay)
+                {
+                    AccentColour = Dependencies.Get<OsuColour>().Orange1,
+                    Icon = FontAwesome.Solid.Toolbox,
+                    Text = "One",
+                },
+                new ScreenFooterButton { Text = "Two", Action = () => { } },
+                new ScreenFooterButton { Text = "Three", Action = () => { } },
+            };
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                overlayRegistration?.Dispose();
+            }
+        }
+
+        private partial class TestShearedOverlayContainer : ShearedOverlayContainer
+        {
+            public TestShearedOverlayContainer()
+                : base(OverlayColourScheme.Orange)
+            {
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Header.Title = "Test overlay";
+                Header.Description = "An overlay that is made purely for testing purposes.";
+            }
+
+            public int BackButtonCount;
+
+            public override bool OnBackButton()
+            {
+                if (BackButtonCount > 0)
+                {
+                    BackButtonCount--;
+                    return true;
+                }
+
+                return false;
+            }
+
+            public override VisibilityContainer CreateFooterContent() => new TestFooterContent();
+
+            public partial class TestFooterContent : VisibilityContainer
+            {
+                [BackgroundDependencyLoader]
+                private void load()
+                {
+                    AutoSizeAxes = Axes.Both;
+
+                    InternalChild = new FillFlowContainer
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Children = new[]
+                        {
+                            new ShearedButton(200) { Text = "Action #1", Action = () => { } },
+                            new ShearedButton(140) { Text = "Action #2", Action = () => { } },
+                        }
+                    };
+                }
+
+                protected override void PopIn()
+                {
+                    this.MoveToY(0, 400, Easing.OutQuint)
+                        .FadeIn(400, Easing.OutQuint);
+                }
+
+                protected override void PopOut()
+                {
+                    this.MoveToY(-20f, 200, Easing.OutQuint)
+                        .FadeOut(200, Easing.OutQuint);
+                }
+            }
         }
     }
 }

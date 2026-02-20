@@ -102,44 +102,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestBackButton()
-        {
-            TestScreenWithOverlayWithoutFooter screen = null!;
-
-            AddStep("push screen", () => LoadScreen(screen = new TestScreenWithOverlayWithoutFooter()));
-            AddUntilStep("wait until screen is loaded", () => screen.IsCurrentScreen(), () => Is.True);
-            AddAssert("footer hidden", () => ScreenFooter.State.Value, () => Is.EqualTo(Visibility.Hidden));
-
-            AddStep("show overlay", () => screen.Overlay.Show());
-            AddAssert("footer shown", () => ScreenFooter.State.Value, () => Is.EqualTo(Visibility.Visible));
-
-            AddStep("press back", () => this.ChildrenOfType<ScreenBackButton>().Single().TriggerClick());
-            AddAssert("overlay hidden", () => screen.Overlay.State.Value, () => Is.EqualTo(Visibility.Hidden));
-            AddAssert("footer hidden", () => ScreenFooter.State.Value, () => Is.EqualTo(Visibility.Hidden));
-        }
-
-        [Test]
-        public void TestCustomBackButtonPressedLogic()
-        {
-            TestScreenWithOverlayWithoutFooter screen = null!;
-
-            AddStep("push screen", () => LoadScreen(screen = new TestScreenWithOverlayWithoutFooter()));
-            AddUntilStep("wait until screen is loaded", () => screen.IsCurrentScreen(), () => Is.True);
-            AddAssert("footer hidden", () => ScreenFooter.State.Value, () => Is.EqualTo(Visibility.Hidden));
-
-            AddStep("show overlay", () => screen.Overlay.Show());
-            AddStep("set block count", () => screen.Overlay.BackButtonCount = 1);
-
-            AddStep("press back", () => this.ChildrenOfType<ScreenBackButton>().Single().TriggerClick());
-            AddAssert("overlay still visible", () => screen.Overlay.State.Value, () => Is.EqualTo(Visibility.Visible));
-            AddAssert("footer still visible", () => ScreenFooter.State.Value, () => Is.EqualTo(Visibility.Visible));
-
-            AddStep("press back again", () => this.ChildrenOfType<ScreenBackButton>().Single().TriggerClick());
-            AddAssert("overlay hidden", () => screen.Overlay.State.Value, () => Is.EqualTo(Visibility.Hidden));
-            AddAssert("footer hidden", () => ScreenFooter.State.Value, () => Is.EqualTo(Visibility.Hidden));
-        }
-
-        [Test]
         public void TestShowOverlayHidesOtherOverlays()
         {
             TestScreenWithTwoOverlays screen = null!;
