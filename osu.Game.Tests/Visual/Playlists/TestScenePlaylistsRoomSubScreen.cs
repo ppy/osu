@@ -248,7 +248,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddUntilStep("original beatmap", () => Beatmap.Value.BeatmapInfo.Equals(importedSet.Beatmaps[0]));
 
             AddStep("enter freestyle select", () => playlistsScreen.Stack.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistEditButton>().Single(b => b.IsPresent).TriggerClick());
-            AddUntilStep("wait for select screen", () => playlistsScreen.Stack.CurrentScreen is PlaylistsRoomFreestyleSelectV2 selectScreen && selectScreen.CarouselItemsPresented);
+            AddUntilStep("wait for select screen", () => playlistsScreen.Stack.CurrentScreen is PlaylistsRoomFreestyleSelect selectScreen && selectScreen.CarouselItemsPresented);
 
             AddStep("select next beatmap", () => InputManager.Key(Key.Down));
             AddStep("abort", () => playlistsScreen.Stack.CurrentScreen.Exit());
@@ -287,7 +287,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddUntilStep("original beatmap", () => Beatmap.Value.BeatmapInfo.Equals(importedSet.Beatmaps[0]));
 
             AddStep("enter freestyle select", () => playlistsScreen.Stack.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistEditButton>().Single(b => b.IsPresent).TriggerClick());
-            AddUntilStep("wait for select screen", () => playlistsScreen.Stack.CurrentScreen is PlaylistsRoomFreestyleSelectV2 selectScreen && selectScreen.CarouselItemsPresented);
+            AddUntilStep("wait for select screen", () => playlistsScreen.Stack.CurrentScreen is PlaylistsRoomFreestyleSelect selectScreen && selectScreen.CarouselItemsPresented);
 
             AddStep("select next beatmap", () => InputManager.Key(Key.Down));
             AddStep("select (beatmap)", () => InputManager.Key(Key.Enter));

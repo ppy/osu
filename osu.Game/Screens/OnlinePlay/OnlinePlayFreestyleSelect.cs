@@ -17,7 +17,7 @@ using SongSelect = osu.Game.Screens.SelectV2.SongSelect;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public abstract partial class OnlinePlayFreestyleSelectV2 : SongSelect, IHandlePresentBeatmap, IOnlinePlaySubScreen
+    public abstract partial class OnlinePlayFreestyleSelect : SongSelect, IHandlePresentBeatmap, IOnlinePlaySubScreen
     {
         private readonly PlaylistItem item;
 
@@ -30,7 +30,7 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        protected OnlinePlayFreestyleSelectV2(PlaylistItem item)
+        protected OnlinePlayFreestyleSelect(PlaylistItem item)
         {
             this.item = item;
 
