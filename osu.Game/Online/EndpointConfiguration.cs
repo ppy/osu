@@ -47,5 +47,19 @@ namespace osu.Game.Online
         /// The endpoint for the SignalR metadata server.
         /// </summary>
         public string MetadataUrl { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The URL to a separate endpoint that serves as a "liveness probe" for online services, indicating any potential active outages.
+        /// </summary>
+        /// <remarks>
+        /// <list type="bullet">
+        /// <item>The liveness probe's presence is optional. If this is <see langword="null"/>, the entire mechanism predicated on it will be turned off.</item>
+        /// <item>
+        /// The liveness probe only has any effect if it is reachable and actively returns a response that indicates an ongoing outage.
+        /// Failing to reach the liveness probe has no effect as it is indistinguishable from a problem that is local to the machine the client is running on.
+        /// </item>
+        /// </list>
+        /// </remarks>
+        public string? LivenessProbeUrl { get; set; }
     }
 }
