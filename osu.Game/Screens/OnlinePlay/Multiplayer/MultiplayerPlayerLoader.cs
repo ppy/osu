@@ -3,9 +3,11 @@
 
 using System;
 using System.Threading.Tasks;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Configuration;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Play;
 
@@ -21,7 +23,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private MultiplayerClient multiplayerClient { get; set; } = null!;
 
         [Resolved]
-        private OsuGame? game { get; set; }
+        private OsuGameBase? game { get; set; }
+
+        [Resolved]
+        private OsuConfigManager? configManager { get; set; }
 
         private Player? player;
 
@@ -44,7 +49,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.OnPlayerLoaded();
 
-            game?.Window?.Flash();
+            bool shouldRequestFocus = configManager?.Get<bool>(OsuSetting.RequestFocusOnMultiplayerGameplayStart) ?? false;
+
+            if (shouldRequestFocus && RuntimeInfo.IsDesktop)
+                game?.Window?.Raise();
+            else
+                game?.Window?.Flash();
 
             multiplayerClient.ChangeState(MultiplayerUserState.Loaded)
                              .ContinueWith(task => failAndBail(task.Exception?.Message ?? "Server error"), TaskContinuationOptions.NotOnRanToCompletion);
