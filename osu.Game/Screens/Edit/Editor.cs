@@ -516,6 +516,7 @@ namespace osu.Game.Screens.Edit
         /// </param>
         public EditorState GetState([CanBeNull] RulesetInfo nextRuleset = null) => new EditorState
         {
+            ScreenMode = Mode.Value,
             Time = clock.CurrentTimeAccurate,
             ClipboardContent = nextRuleset == null || editorBeatmap.BeatmapInfo.Ruleset.ShortName == nextRuleset.ShortName ? Clipboard.Content.Value : string.Empty
         };
@@ -526,6 +527,7 @@ namespace osu.Game.Screens.Edit
         /// <param name="state">The state to restore.</param>
         public void RestoreState([NotNull] EditorState state) => Schedule(() =>
         {
+            Mode.Value = state.ScreenMode;
             clock.Seek(state.Time);
             Clipboard.Content.Value = state.ClipboardContent;
         });
