@@ -39,8 +39,7 @@ namespace osu.Game.Screens.Import
         [Resolved]
         private OsuGameBase game { get; set; }
 
-        [Cached]
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+        public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Purple;
 
         [BackgroundDependencyLoader(true)]
         private void load()
@@ -70,7 +69,7 @@ namespace osu.Game.Screens.Import
                         {
                             new Box
                             {
-                                Colour = colourProvider.Background4,
+                                Colour = ColourProvider.Background4,
                                 RelativeSizeAxes = Axes.Both
                             },
                             new Container

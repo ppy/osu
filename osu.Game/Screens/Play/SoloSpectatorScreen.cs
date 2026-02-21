@@ -44,8 +44,7 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private BeatmapModelDownloader beatmapDownloader { get; set; } = null!;
 
-        [Cached]
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+        public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Purple;
 
         private Container beatmapPanelContainer = null!;
         private RoundedButton watchButton = null!;
@@ -85,7 +84,7 @@ namespace osu.Game.Screens.Play
                 {
                     new Box
                     {
-                        Colour = colourProvider.Background5,
+                        Colour = ColourProvider.Background5,
                         RelativeSizeAxes = Axes.Both,
                     },
                     new FillFlowContainer

@@ -43,8 +43,7 @@ namespace osu.Game.Screens.Edit.Submission
 
         protected override bool InitialBackButtonVisibility => false;
 
-        [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+        public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Aquamarine;
 
         [Resolved]
         private RealmAccess realmAccess { get; set; } = null!;
@@ -108,7 +107,7 @@ namespace osu.Game.Screens.Edit.Submission
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = colourProvider.Background5,
+                            Colour = ColourProvider.Background5,
                         },
                         new FillFlowContainer
                         {

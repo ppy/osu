@@ -67,8 +67,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         private DailyChallengeTotalsDisplay totals = null!;
         private DailyChallengeEventFeed feed = null!;
 
-        [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
+        public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Plum;
 
         [Cached(typeof(OnlinePlayBeatmapAvailabilityTracker))]
         private readonly DailyChallengeBeatmapAvailabilityTracker beatmapAvailabilityTracker;
@@ -180,7 +179,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                             new Box
                                             {
                                                 RelativeSizeAxes = Axes.Both,
-                                                Colour = colourProvider.Background4,
+                                                Colour = ColourProvider.Background4,
                                             },
                                             new GridContainer
                                             {
@@ -282,7 +281,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                             new Box
                                             {
                                                 RelativeSizeAxes = Axes.Both,
-                                                Colour = colourProvider.Background5,
+                                                Colour = ColourProvider.Background5,
                                             },
                                             footerButtons = new FillFlowContainer
                                             {

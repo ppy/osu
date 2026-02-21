@@ -96,6 +96,24 @@ namespace osu.Game.Screens
 
         public virtual float BackgroundParallaxAmount => 1;
 
+        public virtual OverlayColourScheme? ColourScheme => null;
+
+        [CanBeNull]
+        private OverlayColourProvider colourProvider;
+
+        protected OverlayColourProvider ColourProvider
+        {
+            get
+            {
+                if (ColourScheme is not OverlayColourScheme colourScheme)
+                    throw new InvalidOperationException($@"A screen must override {nameof(ColourScheme)} in order to use {nameof(ColourProvider)}.");
+
+                colourProvider ??= new OverlayColourProvider(colourScheme);
+
+                return colourProvider;
+            }
+        }
+
         [Resolved]
         private MusicController musicController { get; set; }
 
@@ -129,7 +147,12 @@ namespace osu.Game.Screens
                 createDependencies(parent);
             }
 
-            return base.CreateChildDependencies(screenDependencies);
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(screenDependencies));
+
+            if (ColourScheme != null)
+                dependencies.Cache(ColourProvider);
+
+            return dependencies;
         }
 
         private void createDependencies(IReadOnlyDependencyContainer dependencies)
