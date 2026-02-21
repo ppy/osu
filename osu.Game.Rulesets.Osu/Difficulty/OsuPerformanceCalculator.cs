@@ -378,16 +378,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 if (sliderBreaks > maxPossibleSliderBreaks)
                     missCount = countMiss + maxPossibleSliderBreaks;
             }
-            else
-            {
-                double fullComboThreshold = attributes.MaxCombo - countSliderEndsDropped;
-
-                if (scoreMaxCombo < fullComboThreshold)
-                    missCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
-
-                // Combine regular misses with tick misses since tick misses break combo as well
-                missCount = Math.Min(missCount, countSliderTickMiss + countMiss);
-            }
 
             return missCount;
         }
