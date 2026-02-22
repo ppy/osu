@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
@@ -71,6 +72,9 @@ namespace osu.Game.Overlays.BeatmapListing
 
         [Resolved]
         private IAPIProvider api { get; set; }
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
 
         private IBindable<APIUser> apiUser;
 
@@ -176,6 +180,7 @@ namespace osu.Game.Overlays.BeatmapListing
             searchControl.Extra.CollectionChanged += (_, _) => queueUpdateSearch();
             searchControl.Ranks.CollectionChanged += (_, _) => queueUpdateSearch();
             searchControl.Played.BindValueChanged(_ => queueUpdateSearch());
+            searchControl.Owned.BindValueChanged(_ => queueUpdateSearch());
             searchControl.ExplicitContent.BindValueChanged(_ => queueUpdateSearch());
 
             sortControl.Current.BindValueChanged(_ => queueUpdateSearch());
@@ -243,17 +248,27 @@ namespace osu.Game.Overlays.BeatmapListing
 
             getSetsRequest.Success += response =>
             {
-                var sets = response.BeatmapSets.ToList();
+                var returnedSets = response.BeatmapSets.ToList();
+                var sets = returnedSets;
+
+                if (searchControl.Owned.Value == SearchOwned.ExcludeOwned)
+                    sets = sets.Where(s => !beatmaps.IsAvailableLocally(new BeatmapSetInfo { OnlineID = s.OnlineID })).ToList();
 
                 // If the previous request returned a null cursor, the API is indicating we can't paginate further (maybe there are no more beatmaps left).
-                if (sets.Count == 0 || response.Cursor == null)
+                if (returnedSets.Count == 0 || response.Cursor == null)
                     noMoreResults = true;
-
-                if (CurrentPage == 0)
-                    searchControl.BeatmapSet = sets.FirstOrDefault();
 
                 lastResponse = response;
                 getSetsRequest = null;
+
+                if (sets.Count == 0 && returnedSets.Count > 0 && response.Cursor != null)
+                {
+                    FetchNextPage();
+                    return;
+                }
+
+                if (CurrentPage == 0)
+                    searchControl.BeatmapSet = sets.FirstOrDefault();
 
                 // check if a non-supporter used supporter-only filters
                 if (!api.LocalUser.Value.IsSupporter)
