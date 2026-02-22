@@ -55,8 +55,9 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
             if (allLines.Count == 0)
                 return;
 
-            Remove(allLines.First(), true);
-            allLines.Remove(allLines.First());
+            var firstLine = allLines.First();
+            Remove(firstLine, true);
+            allLines.Remove(firstLine);
         }
 
         private partial class VisualiserLine : Container
