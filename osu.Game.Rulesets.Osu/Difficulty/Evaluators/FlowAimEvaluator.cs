@@ -57,10 +57,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 angleBonus = Math.Max(acuteAngleBonus, angleChangeBonus) * overlappedNotesWeight;
             }
 
-            double speedflowBonus = CalculateSpeedflowBonus(current);
-
             // Add all bonuses
-            flowDifficulty += angleBonus + speedflowBonus;
+            flowDifficulty += angleBonus;
             flowDifficulty *= flow_multiplier * Math.Sqrt(osuCurrObj.SmallCircleBonus);
 
             // Add in additional slider velocity bonus
@@ -81,9 +79,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return Math.Clamp(1 - Math.Pow(Math.Max(distance - radius, 0) / radius, 2), 0, 1);
         }
 
+        // Not used for now
         public static double CalculateSpeedflowBonus(DifficultyHitObject current)
         {
-            const double base_speedflow_multiplier = 0.03; // Base multiplier for speedflow bonus
+            const double base_speedflow_multiplier = 0.00; // Base multiplier for speedflow bonus
             const double bpm_factor = 18; // How steep the bonus is, higher values means more bonus for high BPM
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
