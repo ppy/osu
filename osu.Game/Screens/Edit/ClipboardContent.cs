@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Edit
 {
     public class ClipboardContent
     {
-        [JsonConverter(typeof(TypedListConverter<HitObject>))]
+        [JsonConverter(typeof(TypedListConverter))]
         public IList<HitObject> HitObjects;
 
         public ClipboardContent()
