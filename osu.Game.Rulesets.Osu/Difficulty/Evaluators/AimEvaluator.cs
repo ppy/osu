@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class AimEvaluator
     {
         private const double wide_angle_multiplier = 1.2;
-        private const double acute_angle_multiplier = 2.5;
+        private const double acute_angle_multiplier = 2.3;
         private const double slider_multiplier = 1.5;
         private const double velocity_change_multiplier = 0.9;
         private const double wiggle_multiplier = 1.02; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double angleDifferenceAdjusted = Math.Cos(2 * Math.Min(double.DegreesToRadians(45), Math.Abs(currAngle - lastAngle) * stackFactor));
                 double vectorRepetition = angleVectorRepetition(osuCurrObj);
 
-                double baseFactor = 1 - 0.15 * calcAcuteAngleBonus(lastAngle) * angleDifferenceAdjusted;
+                double baseFactor = 1 - 0.2 * calcAcuteAngleBonus(lastAngle) * angleDifferenceAdjusted;
 
                 // Penalize angle repetition.
                 angleRepetitionNerf = Math.Pow(baseFactor + (1 - baseFactor) * 0.75 * vectorRepetition * stackFactor, 2);
@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     acuteAngleBonus = calcAcuteAngleBonus(currAngle);
 
                     // Penalize angle repetition.
-                    acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 3)));
+                    acuteAngleBonus *= 0.1 + 0.9 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 3)));
 
                     // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
                     acuteAngleBonus *= angleBonus *
