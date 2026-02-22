@@ -61,7 +61,9 @@ namespace osu.Game.Tests.Visual.Online
 
                 api.HandleRequest = req =>
                 {
-                    if (!(req is SearchBeatmapSetsRequest searchBeatmapSetsRequest)) return false;
+                    if (!(req is SearchBeatmapSetsRequest searchBeatmapSetsRequest))
+                        return false;
+
                     List<APIBeatmapSet> beatmaps;
                     bool hasNextPage;
 
@@ -265,7 +267,6 @@ namespace osu.Game.Tests.Visual.Online
             int expectedSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
 
             AddStep("mark local set as downloaded", () => addLocalBeatmapSet(ownedSetId));
-            setOwnedFilter(SearchOwned.ExcludeOwned);
 
             AddStep("set paged search responses", () =>
             {
@@ -280,7 +281,7 @@ namespace osu.Game.Tests.Visual.Online
                     (new[] { notOwned }, false));
             });
 
-            AddStep("trigger search", () => searchControl.Query.Value = $"search {searchCount++}");
+            setOwnedFilter(SearchOwned.ExcludeOwned);
             AddUntilStep("non-owned result loaded", () => this.ChildrenOfType<BeatmapCard>().SingleOrDefault()?.BeatmapSet.OnlineID == expectedSetId);
             noPlaceholderShown();
         }
