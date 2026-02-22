@@ -55,7 +55,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double overallDifficulty;
         private double approachRate;
-        private double circleSize;
         private double drainRate;
 
         private double? speedDeviation;
@@ -100,7 +99,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             approachRate = OsuDifficultyCalculator.CalculateRateAdjustedApproachRate(difficulty.ApproachRate, clockRate);
             overallDifficulty = OsuDifficultyCalculator.CalculateRateAdjustedOverallDifficulty(difficulty.OverallDifficulty, clockRate);
-            circleSize = difficulty.CircleSize;
             drainRate = difficulty.DrainRate;
 
             double comboBasedEstimatedMissCount = calculateComboBasedEstimatedMissCount(osuAttributes);
@@ -253,7 +251,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 // Increasing the speed value for Traceable also isn't ideal as speed distance bonus has been moved to aim.
                 // Minimal buff is given, and is strictly (and significantly) less than the aim bonus.
-                speedValue *= 1.0 + 0.06 * DifficultyCalculationUtils.ReverseLerp(approachRate, 12, 8);
+                speedValue *= 1.0 + 0.08 * DifficultyCalculationUtils.ReverseLerp(approachRate, 12, 8);
             }
 
             double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
@@ -297,9 +295,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double accuracyValue = Math.Pow(1.52163, overallDifficulty) * Math.Pow(betterAccuracyPercentage, 24) * 2.83;
 
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer.
-            accuracyValue *= amountHitObjectsWithAccuracy < 1000
-                ? Math.Pow(amountHitObjectsWithAccuracy / 1000.0, 0.3)
-                : Math.Pow(amountHitObjectsWithAccuracy / 1000.0, 0.1);
+            accuracyValue *= Math.Min(1.15, Math.Pow(amountHitObjectsWithAccuracy / 1000.0, 0.3));
 
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
@@ -516,45 +512,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         private double calculateTraceableBonus(double sliderFactor = 1)
         {
-            // We want to reward slider aim less, more so at higher CS to nerf maps such as A-Type
-            double highApproachRateSliderVisibilityFactor = 1 - ((1 - Math.Pow(sliderFactor, 3)) / 2);
-            double lowApproachRateSliderVisibilityFactor = Math.Pow(sliderFactor, 3);
-            double highCircleSizeSliderVisibilityFactor = Math.Pow(Math.Min(-0.2 * circleSize + 2.2, 1), 1.8);
-
-            // Reduce low CS slider nerf at low AR slightly less due to density increase from fully visible slider borders
-            double lowCircleSizeVisibilityFactor = 0;
-            lowCircleSizeVisibilityFactor += Math.Clamp(-0.3 * circleSize + 0.75, 0, 0.45);
-            if (circleSize < 5)
-                lowCircleSizeVisibilityFactor += Math.Min(-0.0352 * Math.Pow(circleSize - 5, 3), 0.55);
-
-            lowApproachRateSliderVisibilityFactor = 1 - ((1 - lowApproachRateSliderVisibilityFactor) * (1 - (lowCircleSizeVisibilityFactor / 3)));
-
-            // Calculate the time when the approach circle is 2 osu px larger than the hit circle to use as a bonus, scaled by CS
-            double preemptTime = 0;
-            if (approachRate < 5)
-                preemptTime += 1200 + (120 * (5 - approachRate));
-            else
-                preemptTime += 1200 - (150 * (approachRate - 5));
-            double osuPixelCircleSize = (54.4 - (circleSize * 4.48)) * 1.00041;
-            double lowCircleSizeLowApproachRateVisibilityFactor = 1 + (lowCircleSizeVisibilityFactor * Math.Log(preemptTime - (preemptTime * (1 - (2 / (3 * osuPixelCircleSize))))) / 10);
+            // We want to reward slider aim less, more so at lower AR
+            double highApproachRateSliderVisibilityFactor = 1 - ((1 - Math.Pow(sliderFactor, 4.5)) / 2);
+            double lowApproachRateSliderVisibilityFactor = Math.Pow(sliderFactor, 4.5);
 
             // Start from normal curve, rewarding lower AR up to AR7
-            double traceableBonus = 0.025 * (12.0 - Math.Max(approachRate, 7)) * highApproachRateSliderVisibilityFactor * Math.Max(highCircleSizeSliderVisibilityFactor, highApproachRateSliderVisibilityFactor) * lowCircleSizeLowApproachRateVisibilityFactor;
+            double traceableBonus = 0.005;
+            traceableBonus += 0.025 * (12.0 - Math.Max(approachRate, 7)) * highApproachRateSliderVisibilityFactor;
 
             // For AR up to 0 - reduce reward for very low ARs when object is visible
             if (approachRate < 7)
-                traceableBonus += 0.02 * (7.0 - Math.Max(approachRate, 0)) * Math.Pow(lowApproachRateSliderVisibilityFactor, 1.5) * Math.Max(highCircleSizeSliderVisibilityFactor, lowApproachRateSliderVisibilityFactor);
+                traceableBonus += 0.02 * (7.0 - Math.Max(approachRate, 0)) * lowApproachRateSliderVisibilityFactor;
 
             // Starting from AR0 - cap values so they won't grow to infinity
             if (approachRate < 0)
-                traceableBonus += 0.01 * (1 - Math.Pow(1.5, approachRate)) * Math.Pow(lowApproachRateSliderVisibilityFactor, 1.5) * Math.Max(highCircleSizeSliderVisibilityFactor, lowApproachRateSliderVisibilityFactor);
+                traceableBonus += 0.01 * (1 - Math.Pow(1.5, approachRate)) * lowApproachRateSliderVisibilityFactor;
 
             // AR8+ and TC increases difficulty due to increased circle location uncertainty
             // Minimal buffs are given until approximately AR10
             if (approachRate > 8)
-                traceableBonus += ((0.001 * Math.Pow(approachRate - 8, 2)) + (0.005 * (approachRate - 8))) * highApproachRateSliderVisibilityFactor * Math.Max(highCircleSizeSliderVisibilityFactor, highApproachRateSliderVisibilityFactor);
+                traceableBonus += ((0.001 * Math.Pow(approachRate - 8, 2)) + (0.005 * (approachRate - 8))) * highApproachRateSliderVisibilityFactor;
 
-            traceableBonus *= lowCircleSizeLowApproachRateVisibilityFactor;
             return traceableBonus;
         }
 
