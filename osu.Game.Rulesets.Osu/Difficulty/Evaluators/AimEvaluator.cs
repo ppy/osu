@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class AimEvaluator
     {
-        private const double wide_angle_multiplier = 1.5;
+        private const double wide_angle_multiplier = 1.95;
         private const double acute_angle_uncomfy_multiplier = 1.8;
         private const double acute_angle_comfy_multiplier = 0.205;
         private const double slider_multiplier = 1.4;
@@ -103,11 +103,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     acuteAngleBonus *= angleBonus * DifficultyCalculationUtils.Smootherstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime, 2), 300, 400);
                 }
 
-                // Rescale wide angle bonus to reward lower spacing more
-                double velocityThreshold = diameter * 2.3 / osuCurrObj.AdjustedDeltaTime;
-                double wideVelocityBase = Math.Min(angleBonus, velocityThreshold + 0.4 * (angleBonus - velocityThreshold));
-
-                wideAngleBonus = wideVelocityBase * calcWideAngleBonus(currAngle);
+                wideAngleBonus = Math.Pow(angleBonus, 0.5) * calcWideAngleBonus(currAngle);
 
                 // Penalize angle repetition.
                 wideAngleBonus *= 1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3));
