@@ -29,7 +29,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
         private OsuSpriteText explainer = null!;
 
         private Sample? tickSample;
-        private Sample? popInSample;
+        private Sample? tickFinalSample;
+        private Sample? ratingFoundSample;
+        private Sample? noticeSample;
+
+        private float lastTickStdDev;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colour, AudioManager audio)
@@ -135,8 +139,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                 }
             }
 
-            tickSample = audio.Samples.Get("UI/notch-tick");
-            popInSample = audio.Samples.Get("UI/notification-done");
+            tickSample = audio.Samples.Get("Multiplayer/Matchmaking/Ranked/star-rating-tick");
+            tickFinalSample = audio.Samples.Get("Multiplayer/Matchmaking/Ranked/star-rating-tick-final");
+            ratingFoundSample = audio.Samples.Get("Multiplayer/Matchmaking/Ranked/star-rating-found");
+            noticeSample = audio.Samples.Get("Multiplayer/Matchmaking/Ranked/star-rating-notice");
         }
 
         private float starRating { get; set; } = 5;
@@ -174,7 +180,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                 {
                     animateGaussianCurve = false;
 
-                    popInSample?.Play();
+                    ratingFoundSample?.Play();
 
                     var container = new FillFlowContainer
                     {
@@ -216,6 +222,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 
                     creatingMapPool.FadeIn(100);
                     explainer.Delay(1050).FadeIn(100);
+                    Scheduler.AddDelayed(() =>
+                    {
+                        noticeSample?.Play();
+                    }, 1050);
                 });
             }
         }
@@ -296,18 +306,23 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                 return amplitude * MathF.Exp(-v2);
             }
 
-            if (Math.Abs(lastTickStdDev - stdDev) > 0.15)
+            if (Math.Abs(lastTickStdDev - stdDev) <= 0.075) return;
+
+            var tickChannel = tickSample!.GetChannel();
+            tickChannel.Frequency.Value = 1 + amplitude * 0.3f;
+            tickChannel.Volume.Value = 0.5 + amplitude * 0.5;
+            tickChannel.Play();
+
+            if (stdDev < 1)
             {
-                var channel = tickSample!.GetChannel();
-                channel.Frequency.Value = 1 + amplitude * 0.3f;
-                channel.Volume.Value = 0.5 + amplitude * 0.5;
-                channel.Play();
-
-                lastTickStdDev = stdDev;
+                var tickFinalChannel = tickFinalSample!.GetChannel();
+                tickFinalChannel.Frequency.Value = 1 + amplitude * 0.3f;
+                tickFinalChannel.Volume.Value = 0.1f + amplitude * 0.4f;
+                tickFinalChannel.Play();
             }
-        }
 
-        private float lastTickStdDev;
+            lastTickStdDev = stdDev;
+        }
 
         private partial class Bar : CircularContainer
         {

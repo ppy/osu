@@ -3,6 +3,8 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -41,6 +43,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         private DateTimeOffset countdownStartTime;
         private DateTimeOffset countdownEndTime;
 
+        private Sample? timeRunningOutSample;
+        private SampleChannel? timeRunningOutSampleChannel;
+        private Sample? timeUpBuzzerSample;
+        private bool timeUpBuzzerActive = true;
+
+        // When the 'time running out' warning sample starts to play (in remaining seconds)
+        private const int warning_time_threshold = 10;
+
         public RankedPlayStageDisplay(RankedPlayColourScheme colourScheme)
         {
             this.colourScheme = colourScheme;
@@ -49,7 +59,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             const float phase_text_background_height = 55;
             Vector2 progressBarSize = new Vector2(300, 25);
@@ -173,6 +183,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                     Font = OsuFont.TorusAlternate.With(size: 24, weight: FontWeight.SemiBold)
                 }
             };
+
+            timeRunningOutSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/time-running-out");
+            timeUpBuzzerSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/time-up");
         }
 
         protected override void LoadComplete()
@@ -206,6 +219,25 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             int ms = Math.Max(0, remaining.Milliseconds);
 
             progressText.Text = $"{minutes:00}:{seconds:00}.{ms:000}";
+
+            if (remaining.TotalSeconds <= 0)
+            {
+                timeRunningOutSampleChannel?.Stop();
+
+                if (!timeUpBuzzerActive) return;
+
+                timeUpBuzzerSample?.Play();
+                timeUpBuzzerActive = false;
+            }
+            else if (remaining.TotalSeconds < warning_time_threshold)
+            {
+                timeRunningOutSampleChannel ??= timeRunningOutSample?.GetChannel();
+
+                if (timeRunningOutSampleChannel == null || timeRunningOutSampleChannel.Playing) return;
+
+                timeRunningOutSampleChannel.Looping = true;
+                timeRunningOutSampleChannel.Play();
+            }
         }
 
         private void onCountdownStarted(MultiplayerCountdown countdown) => Scheduler.Add(() =>
@@ -214,11 +246,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             {
                 countdownStartTime = DateTimeOffset.Now;
                 countdownEndTime = DateTimeOffset.Now + countdown.TimeRemaining;
+                timeUpBuzzerActive = true;
             }
         });
 
         private void onCountdownStopped(MultiplayerCountdown countdown) => Scheduler.Add(() =>
         {
+            timeRunningOutSampleChannel?.Stop();
+
             if (countdown is not RankedPlayStageCountdown)
                 return;
 
@@ -227,6 +262,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         protected override void Dispose(bool isDisposing)
         {
+            timeRunningOutSampleChannel?.Stop();
+
             base.Dispose(isDisposing);
 
             if (client.IsNotNull())
