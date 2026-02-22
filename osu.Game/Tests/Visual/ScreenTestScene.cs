@@ -48,13 +48,9 @@ namespace osu.Game.Tests.Visual
                     Name = nameof(ScreenTestScene),
                     RelativeSizeAxes = Axes.Both
                 },
-                overlayContent = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = DialogOverlay = new DialogOverlay()
-                },
                 new PopoverContainer
                 {
+                    Depth = -1,
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
@@ -64,6 +60,11 @@ namespace osu.Game.Tests.Visual
                             BackButtonPressed = () => Stack.Exit()
                         }
                     }
+                },
+                overlayContent = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = DialogOverlay = new DialogOverlay()
                 },
             });
 
