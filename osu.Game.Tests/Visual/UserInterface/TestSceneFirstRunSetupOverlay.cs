@@ -12,7 +12,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -23,17 +22,15 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.FirstRunSetup;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
-using osu.Game.Screens.Footer;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public partial class TestSceneFirstRunSetupOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneFirstRunSetupOverlay : ScreenTestScene
     {
-        private FirstRunSetupOverlay overlay;
-        private ScreenFooter footer;
+        private TestFirstRunSetupOverlayScreen screen = null!;
 
         private readonly Mock<TestPerformerFromScreenRunner> performer = new Mock<TestPerformerFromScreenRunner>();
 
@@ -53,8 +50,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [SetUpSteps]
-        public void SetUpSteps()
+        public override void SetUpSteps()
         {
+            base.SetUpSteps();
+
             AddStep("setup dependencies", () =>
             {
                 performer.Reset();
@@ -67,16 +66,16 @@ namespace osu.Game.Tests.Visual.UserInterface
                                    .Callback((Notification n) => lastNotification = n);
             });
 
-            createOverlay();
+            AddStep("reset first run", () => LocalConfig.SetValue(OsuSetting.ShowFirstRunSetup, true));
 
-            AddStep("show overlay", () => overlay.Show());
+            createScreen();
         }
 
         [Test]
         public void TestBasic()
         {
-            AddAssert("overlay visible", () => overlay.State.Value == Visibility.Visible);
-            AddAssert("footer visible", () => footer.State.Value == Visibility.Visible);
+            AddAssert("overlay visible", () => screen.Overlay.State.Value == Visibility.Visible);
+            AddAssert("footer visible", () => ScreenFooter.State.Value == Visibility.Visible);
         }
 
         [Test]
@@ -86,17 +85,18 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddUntilStep("step through", () =>
             {
-                if (overlay.CurrentScreen?.IsLoaded != false) overlay.NextButton.AsNonNull().TriggerClick();
-                return overlay.State.Value == Visibility.Hidden;
+                if (screen.Overlay.CurrentScreen?.IsLoaded != false) screen.Overlay.NextButton.AsNonNull().TriggerClick();
+                return screen.Overlay.State.Value == Visibility.Hidden;
             });
 
             AddAssert("first run false", () => !LocalConfig.Get<bool>(OsuSetting.ShowFirstRunSetup));
 
-            createOverlay();
+            AddStep("exit screen", () => Stack.Exit());
+            createScreen();
 
             AddWaitStep("wait some", 5);
 
-            AddAssert("overlay didn't show", () => overlay.State.Value == Visibility.Hidden);
+            AddAssert("overlay didn't show", () => screen.Overlay.State.Value == Visibility.Hidden);
         }
 
         [TestCase(false)]
@@ -105,24 +105,24 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddUntilStep("step through", () =>
             {
-                if (overlay.CurrentScreen?.IsLoaded != false)
+                if (screen.Overlay.CurrentScreen?.IsLoaded != false)
                 {
                     if (keyboard)
                         InputManager.Key(Key.Enter);
                     else
-                        overlay.NextButton.AsNonNull().TriggerClick();
+                        screen.Overlay.NextButton.AsNonNull().TriggerClick();
                 }
 
-                return overlay.State.Value == Visibility.Hidden;
+                return screen.Overlay.State.Value == Visibility.Hidden;
             });
 
-            AddUntilStep("wait for screens removed", () => !overlay.ChildrenOfType<Screen>().Any());
+            AddUntilStep("wait for screens removed", () => !screen.Overlay.ChildrenOfType<Screen>().Any());
 
             AddStep("no notifications", () => notificationOverlay.VerifyNoOtherCalls());
 
-            AddStep("display again on demand", () => overlay.Show());
+            AddStep("display again on demand", () => screen.Overlay.Show());
 
-            AddUntilStep("back at start", () => overlay.CurrentScreen is ScreenWelcome);
+            AddUntilStep("back at start", () => screen.Overlay.CurrentScreen is ScreenWelcome);
         }
 
         [TestCase(false)]
@@ -131,9 +131,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddUntilStep("step to last", () =>
             {
-                var nextButton = overlay.NextButton.AsNonNull();
+                var nextButton = screen.Overlay.NextButton.AsNonNull();
 
-                if (overlay.CurrentScreen?.IsLoaded != false)
+                if (screen.Overlay.CurrentScreen?.IsLoaded != false)
                     nextButton.TriggerClick();
 
                 return nextButton.Text == CommonStrings.Finish;
@@ -141,28 +141,28 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddUntilStep("step back to start", () =>
             {
-                if (overlay.CurrentScreen?.IsLoaded != false && !(overlay.CurrentScreen is ScreenWelcome))
+                if (screen.Overlay.CurrentScreen?.IsLoaded != false && !(screen.Overlay.CurrentScreen is ScreenWelcome))
                 {
                     if (keyboard)
                         InputManager.Key(Key.Escape);
                     else
-                        footer.BackButton.TriggerClick();
+                        ScreenFooter.BackButton.TriggerClick();
                 }
 
-                return overlay.CurrentScreen is ScreenWelcome;
+                return screen.Overlay.CurrentScreen is ScreenWelcome;
             });
 
-            AddAssert("overlay not dismissed", () => overlay.State.Value == Visibility.Visible);
+            AddAssert("overlay not dismissed", () => screen.Overlay.State.Value == Visibility.Visible);
 
             if (keyboard)
             {
                 AddStep("exit via keyboard", () => InputManager.Key(Key.Escape));
-                AddAssert("overlay dismissed", () => overlay.State.Value == Visibility.Hidden);
+                AddAssert("overlay dismissed", () => screen.Overlay.State.Value == Visibility.Hidden);
             }
             else
             {
-                AddStep("press back button", () => footer.BackButton.TriggerClick());
-                AddAssert("overlay dismissed", () => overlay.State.Value == Visibility.Hidden);
+                AddStep("press back button", () => ScreenFooter.BackButton.TriggerClick());
+                AddAssert("overlay dismissed", () => screen.Overlay.State.Value == Visibility.Hidden);
             }
         }
 
@@ -171,58 +171,78 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("click inside content", () =>
             {
-                InputManager.MoveMouseTo(overlay.ScreenSpaceDrawQuad.Centre);
+                InputManager.MoveMouseTo(screen.Overlay.ScreenSpaceDrawQuad.Centre);
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("overlay not dismissed", () => overlay.State.Value == Visibility.Visible);
+            AddAssert("overlay not dismissed", () => screen.Overlay.State.Value == Visibility.Visible);
 
             AddStep("click outside content", () =>
             {
-                InputManager.MoveMouseTo(new Vector2(overlay.ScreenSpaceDrawQuad.TopLeft.X, overlay.ScreenSpaceDrawQuad.Centre.Y));
+                InputManager.MoveMouseTo(new Vector2(screen.Overlay.ScreenSpaceDrawQuad.TopLeft.X, screen.Overlay.ScreenSpaceDrawQuad.Centre.Y));
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("overlay dismissed", () => overlay.State.Value == Visibility.Hidden);
+            AddAssert("overlay dismissed", () => screen.Overlay.State.Value == Visibility.Hidden);
         }
 
         [Test]
         public void TestResumeViaNotification()
         {
-            AddStep("step to next", () => overlay.NextButton.AsNonNull().TriggerClick());
+            AddStep("step to next", () => screen.Overlay.NextButton.AsNonNull().TriggerClick());
 
-            AddAssert("is at known screen", () => overlay.CurrentScreen is ScreenUIScale);
+            AddAssert("is at known screen", () => screen.Overlay.CurrentScreen is ScreenUIScale);
 
-            AddStep("hide", () => overlay.Hide());
-            AddAssert("overlay hidden", () => overlay.State.Value == Visibility.Hidden);
+            AddStep("hide", () => screen.Overlay.Hide());
+            AddAssert("overlay hidden", () => screen.Overlay.State.Value == Visibility.Hidden);
 
             AddStep("notification arrived", () => notificationOverlay.Verify(n => n.Post(It.IsAny<Notification>()), Times.Once));
 
             AddStep("run notification action", () => lastNotification.Activated?.Invoke());
 
-            AddAssert("overlay shown", () => overlay.State.Value == Visibility.Visible);
-            AddAssert("is resumed", () => overlay.CurrentScreen is ScreenUIScale);
+            AddAssert("overlay shown", () => screen.Overlay.State.Value == Visibility.Visible);
+            AddAssert("is resumed", () => screen.Overlay.CurrentScreen is ScreenUIScale);
         }
 
-        private void createOverlay()
+        private void createScreen()
         {
-            AddStep("add overlay", () =>
-            {
-                var receptor = new ScreenFooter.BackReceptor();
-                footer = new ScreenFooter(receptor);
+            AddStep("push screen", () => LoadScreen(screen = new TestFirstRunSetupOverlayScreen()));
+            AddUntilStep("wait until screen is loaded", () => screen.IsLoaded, () => Is.True);
+        }
 
-                Child = new DependencyProvidingContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    CachedDependencies = new[] { (typeof(ScreenFooter), (object)footer) },
-                    Children = new Drawable[]
-                    {
-                        receptor,
-                        overlay = new FirstRunSetupOverlay(),
-                        footer,
-                    }
-                };
-            });
+        private partial class TestFirstRunSetupOverlayScreen : OsuScreen
+        {
+            public override bool ShowFooter => true;
+
+            public FirstRunSetupOverlay Overlay = null!;
+
+            [CanBeNull]
+            private IDisposable overlayRegistration;
+
+            [CanBeNull]
+            [Resolved]
+            private IOverlayManager overlayManager { get; set; }
+
+            [Cached]
+            private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                LoadComponent(Overlay = new FirstRunSetupOverlay());
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                overlayRegistration = overlayManager?.RegisterBlockingOverlay(Overlay);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                overlayRegistration?.Dispose();
+            }
         }
 
         // interface mocks break hot reload, mocking this stub implementation instead works around it.
