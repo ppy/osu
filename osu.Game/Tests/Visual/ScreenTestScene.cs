@@ -50,6 +50,7 @@ namespace osu.Game.Tests.Visual
                 },
                 new PopoverContainer
                 {
+                    Depth = -1,
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
