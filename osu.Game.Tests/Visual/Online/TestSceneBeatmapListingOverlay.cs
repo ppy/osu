@@ -10,6 +10,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
@@ -28,6 +29,7 @@ namespace osu.Game.Tests.Visual.Online
     public partial class TestSceneBeatmapListingOverlay : OsuManualInputManagerTestScene
     {
         private readonly List<APIBeatmapSet> setsForResponse = new List<APIBeatmapSet>();
+        private readonly Queue<(List<APIBeatmapSet> beatmaps, bool hasNextPage)> queuedResponses = new Queue<(List<APIBeatmapSet> beatmaps, bool hasNextPage)>();
 
         private BeatmapListingOverlay overlay;
 
@@ -50,6 +52,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Child = overlay = new BeatmapListingOverlay { State = { Value = Visibility.Visible } };
                 setsForResponse.Clear();
+                queuedResponses.Clear();
             });
 
             AddStep("initialize dummy", () =>
@@ -59,11 +62,24 @@ namespace osu.Game.Tests.Visual.Online
                 api.HandleRequest = req =>
                 {
                     if (!(req is SearchBeatmapSetsRequest searchBeatmapSetsRequest)) return false;
+                    List<APIBeatmapSet> beatmaps;
+                    bool hasNextPage;
+
+                    if (queuedResponses.TryDequeue(out var queuedResponse))
+                    {
+                        beatmaps = queuedResponse.beatmaps;
+                        hasNextPage = queuedResponse.hasNextPage;
+                    }
+                    else
+                    {
+                        beatmaps = setsForResponse;
+                        hasNextPage = returnCursorOnResponse;
+                    }
 
                     searchBeatmapSetsRequest.TriggerSuccess(new SearchBeatmapSetsResponse
                     {
-                        BeatmapSets = setsForResponse,
-                        Cursor = returnCursorOnResponse ? new Cursor() : null,
+                        BeatmapSets = beatmaps,
+                        Cursor = hasNextPage ? new Cursor() : null,
                     });
 
                     return true;
@@ -216,6 +232,57 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("wait for loaded", () => this.ChildrenOfType<BeatmapCard>().Count() >= 99);
 
             AddAssert("beatmap not duplicated", () => overlay.ChildrenOfType<BeatmapCard>().Count(c => c.BeatmapSet.Equals(beatmapSet)) == 1);
+        }
+
+        [Test]
+        public void TestExcludeOwnedFilterHidesLocalBeatmaps()
+        {
+            int ownedSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
+
+            AddStep("mark local set as downloaded", () => addLocalBeatmapSet(ownedSetId));
+            setOwnedFilter(SearchOwned.ExcludeOwned);
+
+            AddStep("show one owned and one not-owned result", () =>
+            {
+                var owned = CreateAPIBeatmapSet(Ruleset.Value);
+                owned.OnlineID = ownedSetId;
+                owned.Title = "Owned set";
+
+                var notOwned = CreateAPIBeatmapSet(Ruleset.Value);
+                notOwned.Title = "Not owned set";
+
+                fetchFor(owned, notOwned);
+            });
+
+            AddUntilStep("only one card shown", () => this.ChildrenOfType<BeatmapCard>().Count() == 1);
+            AddAssert("owned set filtered out", () => this.ChildrenOfType<BeatmapCard>().Single().BeatmapSet.OnlineID != ownedSetId);
+        }
+
+        [Test]
+        public void TestExcludeOwnedFilterCanPaginatePastFilteredFirstPage()
+        {
+            int ownedSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
+            int expectedSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
+
+            AddStep("mark local set as downloaded", () => addLocalBeatmapSet(ownedSetId));
+            setOwnedFilter(SearchOwned.ExcludeOwned);
+
+            AddStep("set paged search responses", () =>
+            {
+                var owned = CreateAPIBeatmapSet(Ruleset.Value);
+                owned.OnlineID = ownedSetId;
+
+                var notOwned = CreateAPIBeatmapSet(Ruleset.Value);
+                notOwned.OnlineID = expectedSetId;
+
+                setSearchResponses(
+                    (new[] { owned }, true),
+                    (new[] { notOwned }, false));
+            });
+
+            AddStep("trigger search", () => searchControl.Query.Value = $"search {searchCount++}");
+            AddUntilStep("non-owned result loaded", () => this.ChildrenOfType<BeatmapCard>().SingleOrDefault()?.BeatmapSet.OnlineID == expectedSetId);
+            noPlaceholderShown();
         }
 
         [Test]
@@ -388,9 +455,18 @@ namespace osu.Game.Tests.Visual.Online
 
         private void setSearchResponse(APIBeatmapSet[] beatmaps, bool hasNextPage)
         {
+            queuedResponses.Clear();
             setsForResponse.Clear();
             setsForResponse.AddRange(beatmaps);
             returnCursorOnResponse = hasNextPage;
+        }
+
+        private void setSearchResponses(params (IEnumerable<APIBeatmapSet> beatmaps, bool hasNextPage)[] responses)
+        {
+            queuedResponses.Clear();
+
+            foreach (var response in responses)
+                queuedResponses.Enqueue((response.beatmaps.ToList(), response.hasNextPage));
         }
 
         private void setRankAchievedFilter(ScoreRank[] ranks)
@@ -405,6 +481,16 @@ namespace osu.Game.Tests.Visual.Online
         private void setPlayedFilter(SearchPlayed played)
         {
             AddStep($"set Played filter to {played}", () => searchControl.Played.Value = played);
+        }
+
+        private void setOwnedFilter(SearchOwned owned)
+        {
+            AddStep($"set Owned filter to {owned}", () => searchControl.Owned.Value = owned);
+        }
+
+        private void addLocalBeatmapSet(int onlineId)
+        {
+            Realm.Write(r => r.Add(new BeatmapSetInfo { OnlineID = onlineId }));
         }
 
         private void supporterRequiredPlaceholderShown()
