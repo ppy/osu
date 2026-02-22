@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Layout;
 using osu.Framework.Platform;
+using RuntimeInfo = osu.Framework.RuntimeInfo;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
 using osu.Game.Screens;
@@ -281,11 +282,19 @@ namespace osu.Game.Graphics.Containers
             {
                 base.Update();
 
-                if (confineHostCursor && !cursorRectCache.IsValid)
+                if (!confineHostCursor) return;
+
+                if (!cursorRectCache.IsValid)
                 {
                     updateHostCursorConfineRect();
                     cursorRectCache.Validate();
                 }
+
+                // On macOS, cursor confinement/capture can sometimes be lost after certain
+                // interactions (eg. repeated slider clicks). Reapply the confine rect each
+                // frame as a defensive workaround to ensure the host receives mouse input.
+                if (RuntimeInfo.OS == RuntimeInfo.Platform.macOS)
+                    updateHostCursorConfineRect();
             }
 
             private void updateHostCursorConfineRect()
