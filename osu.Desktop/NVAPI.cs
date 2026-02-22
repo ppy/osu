@@ -119,11 +119,13 @@ namespace osu.Desktop
                 if (!IsLaptop)
                     return false;
 
-                if (!getProfile(out nint profileHandle, out _, out bool _))
+                IntPtr profileHandle;
+                if (!getProfile(out profileHandle, out _, out bool _))
                     return false;
 
                 // Get the optimus setting
-                if (!getSetting(NvSettingID.SHIM_RENDERING_MODE_ID, profileHandle, out var setting))
+                NvSetting setting;
+                if (!getSetting(NvSettingID.SHIM_RENDERING_MODE_ID, profileHandle, out setting))
                     return false;
 
                 return (setting.U32CurrentValue & (uint)NvShimSetting.SHIM_RENDERING_MODE_ENABLE) > 0;
@@ -162,11 +164,13 @@ namespace osu.Desktop
                 if (!Available)
                     return NvThreadControlSetting.OGL_THREAD_CONTROL_DEFAULT;
 
-                if (!getProfile(out nint profileHandle, out _, out bool _))
+                IntPtr profileHandle;
+                if (!getProfile(out profileHandle, out _, out bool _))
                     return NvThreadControlSetting.OGL_THREAD_CONTROL_DEFAULT;
 
                 // Get the threaded optimisations setting
-                if (!getSetting(NvSettingID.OGL_THREAD_CONTROL_ID, profileHandle, out var setting))
+                NvSetting setting;
+                if (!getSetting(NvSettingID.OGL_THREAD_CONTROL_ID, profileHandle, out setting))
                     return NvThreadControlSetting.OGL_THREAD_CONTROL_DEFAULT;
 
                 return (NvThreadControlSetting)setting.U32CurrentValue;
@@ -286,7 +290,10 @@ namespace osu.Desktop
 
         private static bool setSetting(NvSettingID settingId, uint settingValue)
         {
-            if (!getProfile(out nint profileHandle, out var application, out bool isApplicationSpecific))
+            NvApplication application;
+            IntPtr profileHandle;
+            bool isApplicationSpecific;
+            if (!getProfile(out profileHandle, out application, out isApplicationSpecific))
                 return false;
 
             if (!isApplicationSpecific)
@@ -371,8 +378,8 @@ namespace osu.Desktop
                     return;
                 }
 
-                getDelegate(0x0150E828, out
-                InitializeDelegate initialize);
+                InitializeDelegate initialize;
+                getDelegate(0x0150E828, out initialize);
 
                 if (initialize?.Invoke() == NvStatus.OK)
                 {
