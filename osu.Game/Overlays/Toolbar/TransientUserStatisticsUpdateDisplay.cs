@@ -32,7 +32,6 @@ namespace osu.Game.Overlays.Toolbar
         private void load(UserStatisticsWatcher? userStatisticsWatcher)
         {
             RelativeSizeAxes = Axes.Y;
-            Alpha = 0;
 
             InternalChild = new FillFlowContainer
             {
