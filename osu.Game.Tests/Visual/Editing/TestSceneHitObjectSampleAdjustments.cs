@@ -19,6 +19,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
+using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Edit.Timing;
 using osu.Game.Tests.Beatmaps;
@@ -110,6 +111,77 @@ namespace osu.Game.Tests.Visual.Editing
 
             setBankViaPopover(HitSampleInfo.BANK_DRUM);
             hitObjectHasSampleBank(1, HitSampleInfo.BANK_DRUM);
+        }
+
+        [Test]
+        public void TestAutoAdditionsBankMatchesNormalBankWhenChangedViaPopover()
+        {
+            clickSamplePiece(0);
+            setBankViaPopover(HitSampleInfo.BANK_SOFT);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_SOFT);
+
+            toggleAdditionViaPopover(1);
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_SOFT);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_SOFT);
+
+            setBankViaPopover(HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+
+            setAdditionBankViaPopover(HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_NORMAL);
+
+            setAdditionBankViaPopover(EditorSelectionHandler.HIT_BANK_AUTO);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+        }
+
+        [Test]
+        public void TestAutoAdditionsBankMatchesNormalBankWhenChangedViaHotkeys()
+        {
+            AddStep("select first object", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[0]));
+            AddStep("set soft normal bank", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.E);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_SOFT);
+
+            AddStep("toggle finish", () => InputManager.Key(Key.E));
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_SOFT);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_SOFT);
+
+            AddStep("set drum normal bank", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+
+            AddStep("set normal addition bank", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.W);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_NORMAL);
+
+            AddStep("set auto addition bank", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
         }
 
         [Test]
