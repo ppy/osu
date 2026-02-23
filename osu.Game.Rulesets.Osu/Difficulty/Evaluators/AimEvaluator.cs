@@ -12,8 +12,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class AimEvaluator
     {
         private const double wide_angle_multiplier = 1.95;
-        private const double acute_angle_uncomfy_multiplier = 1.8;
-        private const double acute_angle_comfy_multiplier = 0.205;
+        private const double acute_angle_uncomfy_multiplier = 1.79;
+        private const double acute_angle_comfy_multiplier = 0.20;
         private const double slider_multiplier = 1.4;
         private const double velocity_change_multiplier = 0.75;
         private const double wiggle_multiplier = 0.53; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
