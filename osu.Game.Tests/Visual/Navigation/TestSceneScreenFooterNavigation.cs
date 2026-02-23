@@ -27,10 +27,13 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestFooterButtonsOnScreenTransitions()
         {
-            PushAndConfirm(() => new TestScreenOne());
+            PushAndConfirm(() => new TestScreen
+            {
+                CreateButtons = () => [new ScreenFooterButton { Text = "Button One" }]
+            });
             AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
 
-            PushAndConfirm(() => new TestScreenTwo());
+            PushAndConfirm(() => new TestScreen { CreateButtons = () => [new ScreenFooterButton { Text = "Button Two" }] });
             AddUntilStep("button two shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button Two"));
 
             AddStep("exit screen", () => Game.ScreenStack.Exit());
@@ -44,7 +47,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("footer hidden", () => screenFooter.State.Value, () => Is.EqualTo(Visibility.Hidden));
             AddAssert("old back button shown", () => Game.BackButton.State.Value, () => Is.EqualTo(Visibility.Visible));
 
-            PushAndConfirm(() => new TestScreen(true));
+            PushAndConfirm(() => new TestScreen());
             AddAssert("footer shown", () => screenFooter.State.Value, () => Is.EqualTo(Visibility.Visible));
             AddAssert("old back button hidden", () => Game.BackButton.State.Value, () => Is.EqualTo(Visibility.Hidden));
 
@@ -73,10 +76,16 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("footer hidden", () => screenFooter.State.Value, () => Is.EqualTo(Visibility.Hidden));
             AddAssert("old back button shown", () => Game.BackButton.State.Value, () => Is.EqualTo(Visibility.Visible));
 
-            pushSubScreenAndConfirm(() => screen, () => new TestScreenOne());
+            pushSubScreenAndConfirm(() => screen, () => new TestScreen
+            {
+                CreateButtons = () => [new ScreenFooterButton { Text = "Button One" }]
+            });
             AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
 
-            pushSubScreenAndConfirm(() => screen, () => new TestScreenTwo());
+            pushSubScreenAndConfirm(() => screen, () => new TestScreen
+            {
+                CreateButtons = () => [new ScreenFooterButton { Text = "Button Two" }]
+            });
             AddUntilStep("button two shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button Two"));
 
             AddStep("exit sub screen", () => screen.ExitSubScreen());
@@ -96,10 +105,16 @@ namespace osu.Game.Tests.Visual.Navigation
             TestScreenWithSubScreen screen = null!;
 
             PushAndConfirm(() => screen = new TestScreenWithSubScreen());
-            pushSubScreenAndConfirm(() => screen, () => new TestScreenOne());
+            pushSubScreenAndConfirm(() => screen, () => new TestScreen
+            {
+                CreateButtons = () => [new ScreenFooterButton { Text = "Button One" }]
+            });
             AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
 
-            PushAndConfirm(() => new TestScreenTwo());
+            PushAndConfirm(() => new TestScreen
+            {
+                CreateButtons = () => [new ScreenFooterButton { Text = "Button Two" }]
+            });
             AddUntilStep("button two shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button Two"));
 
             AddStep("exit parent screen", () => Game.ScreenStack.Exit());
@@ -115,14 +130,23 @@ namespace osu.Game.Tests.Visual.Navigation
             TestScreenWithSubScreen screen = null!;
 
             PushAndConfirm(() => screen = new TestScreenWithSubScreen());
-            pushSubScreenAndConfirm(() => screen, () => new TestScreenOne());
+            pushSubScreenAndConfirm(() => screen, () => new TestScreen
+            {
+                CreateButtons = () => [new ScreenFooterButton { Text = "Button One" }]
+            });
             AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
 
-            PushAndConfirm(() => new TestScreenOne());
+            PushAndConfirm(() => new TestScreen
+            {
+                CreateButtons = () => [new ScreenFooterButton { Text = "Button One" }]
+            });
             AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
 
             // Can't use the helper method because the screen never loads
-            AddStep("Push new sub screen", () => screen.PushSubScreen(new TestScreenTwo()));
+            AddStep("Push new sub screen", () => screen.PushSubScreen(new TestScreen
+            {
+                CreateButtons = () => [new ScreenFooterButton { Text = "Button Two" }]
+            }));
             AddWaitStep("wait for potential screen load", 5);
             AddUntilStep("button one still shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
 
@@ -136,9 +160,28 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestBackButtonWhenOverlayOpen()
         {
-            TestScreenWithOverlay screen = null!;
+            TestScreen screen = null!;
 
-            PushAndConfirm(() => screen = new TestScreenWithOverlay());
+            PushAndConfirm(() =>
+            {
+                ShearedOverlayContainer overlay = new TestShearedOverlayContainer();
+
+                return screen = new TestScreen
+                {
+                    Overlay = overlay,
+                    CreateButtons = () =>
+                    [
+                        new ScreenFooterButton(overlay)
+                        {
+                            AccentColour = Dependencies.Get<OsuColour>().Orange1,
+                            Icon = FontAwesome.Solid.Toolbox,
+                            Text = "One",
+                        },
+                        new ScreenFooterButton { Text = "Two", Action = () => { } },
+                        new ScreenFooterButton { Text = "Three", Action = () => { } },
+                    ],
+                };
+            });
 
             AddStep("show overlay", () => screen.Overlay.Show());
             AddAssert("overlay shown", () => screen.Overlay.State.Value, () => Is.EqualTo(Visibility.Visible));
@@ -154,13 +197,31 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestBackButtonWithCustomBackButtonPressed()
         {
-            TestScreenWithOverlay screen = null!;
+            TestScreen screen = null!;
+            TestShearedOverlayContainer overlay = null!;
 
-            PushAndConfirm(() => screen = new TestScreenWithOverlay());
+            PushAndConfirm(() =>
+            {
+                return screen = new TestScreen
+                {
+                    Overlay = overlay = new TestShearedOverlayContainer(),
+                    CreateButtons = () =>
+                    [
+                        new ScreenFooterButton(overlay)
+                        {
+                            AccentColour = Dependencies.Get<OsuColour>().Orange1,
+                            Icon = FontAwesome.Solid.Toolbox,
+                            Text = "One",
+                        },
+                        new ScreenFooterButton { Text = "Two", Action = () => { } },
+                        new ScreenFooterButton { Text = "Three", Action = () => { } },
+                    ],
+                };
+            });
 
             AddStep("show overlay", () => screen.Overlay.Show());
             AddAssert("overlay shown", () => screen.Overlay.State.Value, () => Is.EqualTo(Visibility.Visible));
-            AddStep("set block count", () => screen.Overlay.BackButtonCount = 1);
+            AddStep("set block count", () => overlay.BackButtonCount = 1);
 
             AddStep("press back", () => screenFooter.ChildrenOfType<ScreenBackButton>().Single().TriggerClick());
             AddAssert("overlay still shown", () => screen.Overlay.State.Value, () => Is.EqualTo(Visibility.Visible));
@@ -186,39 +247,45 @@ namespace osu.Game.Tests.Visual.Navigation
                                                       && (previousScreen == null || previousScreen.GetChildScreen() == screen));
         }
 
-        private partial class TestScreenOne : OsuScreen
-        {
-            public override bool ShowFooter => true;
-
-            [Cached]
-            private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
-
-            public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new[]
-            {
-                new ScreenFooterButton { Text = "Button One" },
-            };
-        }
-
-        private partial class TestScreenTwo : OsuScreen
-        {
-            public override bool ShowFooter => true;
-
-            [Cached]
-            private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
-
-            public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new[]
-            {
-                new ScreenFooterButton { Text = "Button Two" },
-            };
-        }
-
         private partial class TestScreen : OsuScreen
         {
             public override bool ShowFooter { get; }
 
-            public TestScreen(bool footer)
+            public Func<IReadOnlyList<ScreenFooterButton>> CreateButtons = Array.Empty<ScreenFooterButton>;
+
+            public ShearedOverlayContainer Overlay = new TestShearedOverlayContainer();
+
+            private IDisposable? overlayRegistration;
+
+            [Cached]
+            private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
+            [Resolved]
+            private IOverlayManager? overlayManager { get; set; }
+
+            public TestScreen(bool showFooter = true)
             {
-                ShowFooter = footer;
+                ShowFooter = showFooter;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                LoadComponent(Overlay);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                overlayRegistration = overlayManager?.RegisterBlockingOverlay(Overlay);
+            }
+
+            public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => CreateButtons.Invoke();
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                overlayRegistration?.Dispose();
             }
         }
 
@@ -239,52 +306,6 @@ namespace osu.Game.Tests.Visual.Navigation
             public void PushSubScreen(IScreen screen) => SubScreenStack.Push(screen);
 
             public void ExitSubScreen() => SubScreenStack.Exit();
-        }
-
-        private partial class TestScreenWithOverlay : OsuScreen
-        {
-            public override bool ShowFooter => true;
-
-            private IDisposable? overlayRegistration;
-
-            public TestShearedOverlayContainer Overlay { get; private set; } = null!;
-
-            [Resolved]
-            private IOverlayManager? overlayManager { get; set; }
-
-            [Cached]
-            private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                LoadComponent(Overlay = new TestShearedOverlayContainer());
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                overlayRegistration = overlayManager?.RegisterBlockingOverlay(Overlay);
-            }
-
-            public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new[]
-            {
-                new ScreenFooterButton(Overlay)
-                {
-                    AccentColour = Dependencies.Get<OsuColour>().Orange1,
-                    Icon = FontAwesome.Solid.Toolbox,
-                    Text = "One",
-                },
-                new ScreenFooterButton { Text = "Two", Action = () => { } },
-                new ScreenFooterButton { Text = "Three", Action = () => { } },
-            };
-
-            protected override void Dispose(bool isDisposing)
-            {
-                base.Dispose(isDisposing);
-                overlayRegistration?.Dispose();
-            }
         }
 
         private partial class TestShearedOverlayContainer : ShearedOverlayContainer
