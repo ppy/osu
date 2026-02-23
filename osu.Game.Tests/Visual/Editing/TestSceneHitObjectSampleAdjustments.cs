@@ -418,7 +418,7 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     for (int i = 0; i < h.Samples.Count; i++)
                     {
-                        h.Samples[i] = h.Samples[i].With(newBank: HitSampleInfo.BANK_SOFT);
+                        h.Samples[i] = h.Samples[i].With(newBank: HitSampleInfo.BANK_SOFT, newEditorAutoBank: false);
                     }
                 }
             });
@@ -426,7 +426,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("add whistle addition", () =>
             {
                 foreach (var h in EditorBeatmap.HitObjects)
-                    h.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_WHISTLE, HitSampleInfo.BANK_SOFT));
+                    h.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_WHISTLE, HitSampleInfo.BANK_SOFT, editorAutoBank: false));
             });
 
             AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
@@ -671,19 +671,19 @@ namespace osu.Game.Tests.Visual.Editing
                     Path = new SliderPath(new[] { new PathControlPoint(Vector2.Zero), new PathControlPoint(new Vector2(250, 0)) }),
                     Samples =
                     {
-                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL)
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, editorAutoBank: false)
                     },
                     NodeSamples = new List<IList<HitSampleInfo>>
                     {
                         new List<HitSampleInfo>
                         {
-                            new HitSampleInfo(HitSampleInfo.HIT_NORMAL, bank: HitSampleInfo.BANK_DRUM),
-                            new HitSampleInfo(HitSampleInfo.HIT_CLAP, bank: HitSampleInfo.BANK_DRUM),
+                            new HitSampleInfo(HitSampleInfo.HIT_NORMAL, bank: HitSampleInfo.BANK_DRUM, editorAutoBank: false),
+                            new HitSampleInfo(HitSampleInfo.HIT_CLAP, bank: HitSampleInfo.BANK_DRUM, editorAutoBank: false),
                         },
                         new List<HitSampleInfo>
                         {
-                            new HitSampleInfo(HitSampleInfo.HIT_NORMAL, bank: HitSampleInfo.BANK_SOFT),
-                            new HitSampleInfo(HitSampleInfo.HIT_WHISTLE, bank: HitSampleInfo.BANK_SOFT),
+                            new HitSampleInfo(HitSampleInfo.HIT_NORMAL, bank: HitSampleInfo.BANK_SOFT, editorAutoBank: false),
+                            new HitSampleInfo(HitSampleInfo.HIT_WHISTLE, bank: HitSampleInfo.BANK_SOFT, editorAutoBank: false),
                         },
                     }
                 });
