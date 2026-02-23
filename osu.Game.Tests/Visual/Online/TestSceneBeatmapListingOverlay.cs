@@ -246,7 +246,7 @@ namespace osu.Game.Tests.Visual.Online
             int downloadedSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
 
             AddStep("mark local set as downloaded", () => addLocalBeatmapSet(downloadedSetId));
-            setDownloadedFilter(SearchDownloaded.ExcludeDownloaded);
+            setHideDownloadedFilter(true);
 
             AddStep("show one downloaded and one not-downloaded result", () =>
             {
@@ -285,7 +285,7 @@ namespace osu.Game.Tests.Visual.Online
                     (new[] { notDownloaded }, false));
             });
 
-            setDownloadedFilter(SearchDownloaded.ExcludeDownloaded);
+            setHideDownloadedFilter(true);
             AddUntilStep("non-downloaded result loaded", () => this.ChildrenOfType<BeatmapCard>().SingleOrDefault()?.BeatmapSet.OnlineID == expectedSetId);
             noPlaceholderShown();
         }
@@ -317,7 +317,7 @@ namespace osu.Game.Tests.Visual.Online
             int requestsBeforeSearch = 0;
             AddStep("capture request baseline", () => requestsBeforeSearch = searchRequestsHandled);
 
-            setDownloadedFilter(SearchDownloaded.ExcludeDownloaded);
+            setHideDownloadedFilter(true);
 
             notFoundPlaceholderShown();
 
@@ -524,9 +524,15 @@ namespace osu.Game.Tests.Visual.Online
             AddStep($"set Played filter to {played}", () => searchControl.Played.Value = played);
         }
 
-        private void setDownloadedFilter(SearchDownloaded downloaded)
+        private void setHideDownloadedFilter(bool enabled)
         {
-            AddStep($"set Downloaded filter to {downloaded}", () => searchControl.Downloaded.Value = downloaded);
+            AddStep($"set hide-downloaded filter to {enabled}", () =>
+            {
+                searchControl.General.Remove(SearchGeneral.HideAlreadyDownloaded);
+
+                if (enabled)
+                    searchControl.General.Add(SearchGeneral.HideAlreadyDownloaded);
+            });
         }
 
         private void addLocalBeatmapSet(int onlineId)

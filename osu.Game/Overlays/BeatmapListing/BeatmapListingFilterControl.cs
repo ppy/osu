@@ -180,7 +180,6 @@ namespace osu.Game.Overlays.BeatmapListing
             searchControl.Extra.CollectionChanged += (_, _) => queueUpdateSearch();
             searchControl.Ranks.CollectionChanged += (_, _) => queueUpdateSearch();
             searchControl.Played.BindValueChanged(_ => queueUpdateSearch());
-            searchControl.Downloaded.BindValueChanged(_ => queueUpdateSearch());
             searchControl.ExplicitContent.BindValueChanged(_ => queueUpdateSearch());
 
             sortControl.Current.BindValueChanged(_ => queueUpdateSearch());
@@ -251,7 +250,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 var returnedSets = response.BeatmapSets.ToList();
                 var sets = returnedSets;
 
-                if (searchControl.Downloaded.Value == SearchDownloaded.ExcludeDownloaded)
+                if (searchControl.General.Contains(SearchGeneral.HideAlreadyDownloaded))
                     sets = sets.Where(s => !beatmaps.IsAvailableLocally(new BeatmapSetInfo { OnlineID = s.OnlineID })).ToList();
 
                 // If the previous request returned a null cursor, the API is indicating we can't paginate further (maybe there are no more beatmaps left).
