@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Toolbar
                 Origin = Anchor.CentreLeft,
                 Width = 3f,
                 Height = IconContainer.Height,
-                Margin = new MarginPadding { Horizontal = 2.5f },
+                Margin = new MarginPadding { Left = 7.5f, Right = 2.5f },
                 Masking = true,
                 Children = new[]
                 {

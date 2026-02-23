@@ -89,7 +89,10 @@ namespace osu.Game.Overlays.Toolbar
                         },
                     }
                 },
-                new TransientUserStatisticsUpdateDisplay()
+                new TransientUserStatisticsUpdateDisplay
+                {
+                    Alpha = 0,
+                }
             });
 
             apiState = api.State.GetBoundCopy();
