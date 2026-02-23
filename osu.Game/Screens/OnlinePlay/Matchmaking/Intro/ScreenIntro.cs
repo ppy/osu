@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -49,11 +50,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
 
         private IDisposable? duckOperation;
 
-        protected override BackgroundScreen CreateBackground() => new MatchmakingBackgroundScreen(ColourProvider);
+        protected override BackgroundScreen CreateBackground() => new MatchmakingBackgroundScreen(ColourProvider!);
 
         public ScreenIntro()
         {
-            ColourScheme = OverlayColourScheme.Plum;
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
             ValidForResume = false;
         }
@@ -61,6 +62,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
+            Debug.Assert(ColourProvider != null);
+
             InternalChildren = new Drawable[]
             {
                 introContent = new Container

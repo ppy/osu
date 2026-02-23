@@ -93,7 +93,7 @@ namespace osu.Game.Screens.Utility
 
         public LatencyCertifierScreen()
         {
-            ColourScheme = OverlayColourScheme.Orange;
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Orange);
 
             InternalChildren = new Drawable[]
             {
@@ -370,6 +370,8 @@ namespace osu.Game.Screens.Utility
         {
             Drawable background;
             Drawable certifiedText;
+
+            Debug.Assert(ColourProvider != null);
 
             resultsArea.AddRange(new[]
             {

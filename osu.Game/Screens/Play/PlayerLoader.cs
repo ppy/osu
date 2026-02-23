@@ -185,7 +185,7 @@ namespace osu.Game.Screens.Play
 
         public PlayerLoader(Func<Player> createPlayer)
         {
-            ColourScheme = OverlayColourScheme.Purple;
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
             this.createPlayer = createPlayer;
         }

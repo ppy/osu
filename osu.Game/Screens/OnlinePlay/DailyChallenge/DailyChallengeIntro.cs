@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -84,7 +85,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         public DailyChallengeIntro(Room room)
         {
-            ColourScheme = OverlayColourScheme.Plum;
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
             this.room = room;
             item = room.Playlist.Single();
@@ -94,11 +95,13 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             beatmapAvailabilityTracker = new DailyChallengeBeatmapAvailabilityTracker(item);
         }
 
-        protected override BackgroundScreen CreateBackground() => new DailyChallengeIntroBackgroundScreen(ColourProvider);
+        protected override BackgroundScreen CreateBackground() => new DailyChallengeIntroBackgroundScreen(ColourProvider!);
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets, BeatmapDifficultyCache difficultyCache, BeatmapModelDownloader beatmapDownloader, OsuConfigManager config, AudioManager audio)
         {
+            Debug.Assert(ColourProvider != null);
+
             const float horizontal_info_size = 500f;
 
             StarRatingDisplay starRatingDisplay;

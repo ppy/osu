@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Play
         public SoloSpectatorScreen(APIUser targetUser)
             : base(targetUser.Id)
         {
-            ColourScheme = OverlayColourScheme.Purple;
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
             this.targetUser = targetUser;
         }
@@ -71,6 +71,8 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
+            Debug.Assert(ColourProvider != null);
+
             InternalChild = new Container
             {
                 Masking = true,

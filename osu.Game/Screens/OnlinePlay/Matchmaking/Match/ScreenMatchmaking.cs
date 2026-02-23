@@ -56,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
         public override bool ShowFooter => true;
 
-        protected override BackgroundScreen CreateBackground() => new MatchmakingBackgroundScreen(ColourProvider);
+        protected override BackgroundScreen CreateBackground() => new MatchmakingBackgroundScreen(ColourProvider!);
 
         [Cached(typeof(OnlinePlayBeatmapAvailabilityTracker))]
         private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new MultiplayerBeatmapAvailabilityTracker();
@@ -100,7 +100,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
         public ScreenMatchmaking(MultiplayerRoom room)
         {
-            ColourScheme = OverlayColourScheme.Pink;
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
             this.room = room;
 

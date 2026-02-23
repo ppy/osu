@@ -164,7 +164,7 @@ namespace osu.Game.Screens.SelectV2
             // Blue is the most neutral choice, so I'm using that for now.
             // Purple makes the most sense to match the "gameplay" flow, but it's a bit too strong for the current design.
             // TODO: Colour scheme choice should probably be customisable by the user.
-            ColourScheme = OverlayColourScheme.Blue;
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
         }
 
         [BackgroundDependencyLoader]

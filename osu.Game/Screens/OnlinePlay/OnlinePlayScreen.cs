@@ -40,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected OnlinePlayScreen()
         {
-            ColourScheme = OverlayColourScheme.Plum;
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;

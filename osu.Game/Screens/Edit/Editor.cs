@@ -237,7 +237,7 @@ namespace osu.Game.Screens.Edit
 
         public Editor(EditorLoader loader = null)
         {
-            ColourScheme = OverlayColourScheme.Aquamarine;
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
             this.loader = loader;
         }

@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Ranking
 
         protected ResultsScreen(ScoreInfo? score)
         {
-            ColourScheme = OverlayColourScheme.Aquamarine;
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
             Score = score;
 

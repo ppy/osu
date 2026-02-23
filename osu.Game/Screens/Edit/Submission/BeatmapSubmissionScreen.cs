@@ -84,12 +84,14 @@ namespace osu.Game.Screens.Edit.Submission
 
         public BeatmapSubmissionScreen()
         {
-            ColourScheme = OverlayColourScheme.Aquamarine;
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
         }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
+            Debug.Assert(ColourProvider != null);
+
             AddRangeInternal(new Drawable[]
             {
                 overlay = new BeatmapSubmissionOverlay(),
