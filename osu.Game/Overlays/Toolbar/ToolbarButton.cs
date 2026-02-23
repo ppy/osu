@@ -117,7 +117,6 @@ namespace osu.Game.Overlays.Toolbar
                         Flow = new FillFlowContainer
                         {
                             Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(5),
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Padding = new MarginPadding { Left = Toolbar.HEIGHT / 2, Right = Toolbar.HEIGHT / 2 },
