@@ -519,21 +519,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double lowApproachRateSliderVisibilityFactor = Math.Pow(sliderFactor, 4.5);
 
             // Start from normal curve, rewarding lower AR up to AR7
-            double traceableBonus = 0.01;
+            double traceableBonus = 0.0175;
             traceableBonus += 0.025 * (12.0 - Math.Max(approachRate, 7)) * highApproachRateSliderVisibilityFactor;
 
             // For AR up to 0 - reduce reward for very low ARs when object is visible
             if (approachRate < 7)
-                traceableBonus += 0.02 * (7.0 - Math.Max(approachRate, 0)) * lowApproachRateSliderVisibilityFactor;
+                traceableBonus += 0.0225 * (7.0 - Math.Max(approachRate, 0)) * lowApproachRateSliderVisibilityFactor;
 
             // Starting from AR0 - cap values so they won't grow to infinity
             if (approachRate < 0)
                 traceableBonus += 0.01 * (1 - Math.Pow(1.5, approachRate)) * lowApproachRateSliderVisibilityFactor;
-
-            // AR8+ and TC increases difficulty due to increased circle location uncertainty
-            // Minimal buffs are given until approximately AR10
-            if (approachRate > 8)
-                traceableBonus += ((0.001 * Math.Pow(approachRate - 8, 2)) + (0.0025 * (approachRate - 8))) * highApproachRateSliderVisibilityFactor;
 
             return traceableBonus;
         }
