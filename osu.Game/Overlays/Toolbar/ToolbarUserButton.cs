@@ -40,51 +40,48 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, IAPIProvider api, LoginOverlay? login)
         {
-            Flow.Add(new Container
+            Flow.AddRange(new Drawable[]
             {
-                Masking = true,
-                CornerRadius = 4,
-                Size = new Vector2(32),
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                EdgeEffect = new EdgeEffectParameters
+                new Container
                 {
-                    Type = EdgeEffectType.Shadow,
-                    Radius = 4,
-                    Colour = Color4.Black.Opacity(0.1f),
+                    Masking = true,
+                    CornerRadius = 4,
+                    Size = new Vector2(32),
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Radius = 4,
+                        Colour = Color4.Black.Opacity(0.1f),
+                    },
+                    Children = new Drawable[]
+                    {
+                        avatar = new UpdateableAvatar(isInteractive: false)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        spinner = new LoadingLayer(dimBackground: true, withBox: false)
+                        {
+                            BlockPositionalInput = false,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        failingIcon = new SpriteIcon
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Alpha = 0,
+                            Size = new Vector2(0.3f),
+                            Icon = FontAwesome.Solid.ExclamationTriangle,
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colours.YellowLight,
+                        },
+                    }
                 },
-                Children = new Drawable[]
-                {
-                    avatar = new UpdateableAvatar(isInteractive: false)
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    spinner = new LoadingLayer(dimBackground: true, withBox: false)
-                    {
-                        BlockPositionalInput = false,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    failingIcon = new SpriteIcon
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Alpha = 0,
-                        Size = new Vector2(0.3f),
-                        Icon = FontAwesome.Solid.ExclamationTriangle,
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colours.YellowLight,
-                    },
-                }
+                new TransientUserStatisticsUpdateDisplay(),
             });
-
-            Flow.Add(new TransientUserStatisticsUpdateDisplay
-            {
-                Alpha = 0
-            });
-            Flow.AutoSizeEasing = Easing.OutQuint;
-            Flow.AutoSizeDuration = 250;
 
             apiState = api.State.GetBoundCopy();
             apiState.BindValueChanged(onlineStateChanged, true);
