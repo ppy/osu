@@ -16,6 +16,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
@@ -342,6 +343,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Sets the sample bank for all selected <see cref="HitObject"/>s.
         /// </summary>
+        /// <remarks>
+        /// Should be kept in sync with <see cref="SamplePointPiece.SampleEditPopover.setBank"/>.
+        /// </remarks>
         /// <param name="bankName">The name of the sample bank.</param>
         public void SetSampleBank(string bankName)
         {
@@ -379,6 +383,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Sets the sample addition bank for all selected <see cref="HitObject"/>s.
         /// </summary>
+        /// <remarks>
+        /// Should be kept in sync with <see cref="SamplePointPiece.SampleEditPopover.setAdditionBank"/>.
+        /// </remarks>
         /// <param name="bankName">The name of the sample bank.</param>
         public void SetSampleAdditionBank(string bankName)
         {
@@ -432,6 +439,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Adds a hit sample to all selected <see cref="HitObject"/>s.
         /// </summary>
+        /// <remarks>
+        /// Should be kept in sync with <see cref="SamplePointPiece.SampleEditPopover.addHitSample"/>.
+        /// </remarks>
         /// <param name="sampleName">The name of the hit sample.</param>
         public void AddHitSample(string sampleName)
         {
