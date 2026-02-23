@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
     {
         public FlashPiece()
         {
-            Size = OsuHitObject.OBJECT_DIMENSIONS;
+            Size = OsuHitObject.VISUAL_OBJECT_DIMENSIONS;
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;

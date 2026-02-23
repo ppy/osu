@@ -110,21 +110,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
         /// <param name="vertices">The vertices</param>
         protected void SetVertices(IReadOnlyList<Vector2> vertices) => path.Vertices = vertices;
 
-        protected virtual DrawableSliderPath CreateSliderPath() => new DefaultDrawableSliderPath();
-
-        private partial class DefaultDrawableSliderPath : DrawableSliderPath
-        {
-            private const float opacity_at_centre = 0.3f;
-            private const float opacity_at_edge = 0.8f;
-
-            protected override Color4 ColourAt(float position)
-            {
-                if (CalculatedBorderPortion != 0f && position <= CalculatedBorderPortion)
-                    return BorderColour;
-
-                position -= CalculatedBorderPortion;
-                return new Color4(AccentColour.R, AccentColour.G, AccentColour.B, (opacity_at_edge - (opacity_at_edge - opacity_at_centre) * position / GRADIENT_PORTION) * AccentColour.A);
-            }
-        }
+        protected abstract DrawableSliderPath CreateSliderPath();
     }
 }

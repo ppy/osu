@@ -299,12 +299,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 case OsuSkinConfiguration osuLookup:
                     switch (osuLookup)
                     {
-                        case OsuSkinConfiguration.SliderPathRadius:
-                            if (hasHitCircle.Value)
-                                return SkinUtils.As<TValue>(new BindableFloat(LEGACY_CIRCLE_RADIUS));
-
-                            break;
-
                         case OsuSkinConfiguration.HitCircleOverlayAboveNumber:
                             // See https://osu.ppy.sh/help/wiki/Skinning/skin.ini#%5Bgeneral%5D
                             // HitCircleOverlayAboveNumer (with typo) should still be supported for now.
