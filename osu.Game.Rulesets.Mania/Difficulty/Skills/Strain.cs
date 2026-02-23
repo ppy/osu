@@ -58,8 +58,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         }
 
         protected override double ReadonlyStrainValueAt(double offset, ManiaDifficultyHitObject current) =>
-            applyDecay(maxIndividualStrain, offset - PreviousChordTime, individual_decay_base)
-            + applyDecay(chordStrain, offset - PreviousChordTime, chord_decay_base);
+            applyDecay(maxIndividualStrain, offset - CurrentChordTime, individual_decay_base)
+            + applyDecay(chordStrain, offset - CurrentChordTime, chord_decay_base);
 
         private double applyDecay(double value, double deltaTime, double decayBase)
             => value * Math.Pow(decayBase, deltaTime / 1000);

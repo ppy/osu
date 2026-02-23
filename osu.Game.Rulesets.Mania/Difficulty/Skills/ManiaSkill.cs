@@ -44,6 +44,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         {
             ManiaDifficultyHitObject maniaCurrent = (ManiaDifficultyHitObject)current;
 
+            PreChordProcess(maniaCurrent);
+
             // If this is a new time stamp, reset state for the next chord.
             if (maniaCurrent.StartTime > CurrentChordTime && ShouldProcess(maniaCurrent))
             {
@@ -78,10 +80,41 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             ObjectDifficulties.Add(strainValue);
         }
 
+        /// <summary>
+        /// Processing steps to take before the chord begins its processing.
+        /// </summary>
+        /// <param name="current">The current note to process at.</param>
+        protected virtual void PreChordProcess(ManiaDifficultyHitObject current) { }
+
+        /// <summary>
+        /// Processing steps to take on each note before the chord is finalized. Difficulty should generally be converted to strain here.
+        /// </summary>
+        /// <param name="current">The current note in this chord.</param>
         protected abstract void PreprocessChordNote(ManiaDifficultyHitObject current);
+
+        /// <summary>
+        /// Chord-specific cleanup actions to take when the chord is finished its preprocessing.
+        /// </summary>
         protected abstract void FinalizeChord();
+
+        /// <summary>
+        /// The strain value at the current note in this chord. Should generally avoid touching data processed in <see cref="PreprocessChordNote"/>.
+        /// </summary>
+        /// <param name="current">The note to get the strain value at.</param>
+        /// <returns>The strain value of the note.</returns>
         protected abstract double StrainValueAt(ManiaDifficultyHitObject current);
+
+        /// <summary>
+        /// Post-processing steps taken to reset any chord-specific data processed in <see cref="PreprocessChordNote"/>.
+        /// </summary>
         protected abstract void ResetChord();
+
+        /// <summary>
+        /// A readonly strain value used to peek at current strain values, while avoiding any changes that may occur in <see cref="StrainValueAt"/>.
+        /// </summary>
+        /// <param name="time">The time to peek at strain at.</param>
+        /// <param name="current">The previous note to this current strain value calculation.</param>
+        /// <returns>The strain value at this point.</returns>
         protected abstract double ReadonlyStrainValueAt(double time, ManiaDifficultyHitObject current);
 
         private void startNewChord(double newChordTime)
@@ -97,6 +130,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             ResetChord();
         }
 
+        /// <summary>
+        /// Determines if this note should be processed under the current <see cref="lnProcessingMode"/>.
+        /// </summary>
+        /// <param name="current">The note to check.</param>
+        /// <returns>Whether this note should contribute to strain processing (if not, it shall be readonly).</returns>
         protected bool ShouldProcess(DifficultyHitObject current)
         {
             return current.BaseObject switch
@@ -106,14 +144,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             };
         }
 
-        private ManiaDifficultyHitObject? getNext(ManiaDifficultyHitObject curr)
+        /// <summary>
+        /// Gets the next note that should contribute to processing under the current <see cref="lnProcessingMode"/>
+        /// </summary>
+        /// <param name="current">The current note.</param>
+        /// <returns>The next note in sequence that contributes to processing.</returns>
+        private ManiaDifficultyHitObject? getNext(ManiaDifficultyHitObject current)
         {
             return lnProcessingMode switch
             {
-                LnMode.Heads => curr.NextHead(0),
-                LnMode.Tails => curr.NextTail(0),
-                LnMode.Both => (ManiaDifficultyHitObject?)curr.Next(0),
-                _ => (ManiaDifficultyHitObject?)curr.Next(0)
+                LnMode.Heads => current.NextHead(0),
+                LnMode.Tails => current.NextTail(0),
+                _ => (ManiaDifficultyHitObject?)current.Next(0)
             };
         }
     }

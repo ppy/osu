@@ -32,23 +32,26 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         {
         }
 
+        protected sealed override void PreChordProcess(ManiaDifficultyHitObject current)
+        {
+            // The first object doesn't generate a strain, so we begin with an incremented section end
+            if (current.Index == 0)
+                currentSectionEnd = Math.Ceiling(current.ActualTime / SectionLength) * SectionLength;
+
+            while (current.ActualTime > currentSectionEnd)
+            {
+                saveCurrentPeak();
+                startNewSectionFrom(currentSectionEnd, current);
+                currentSectionEnd += SectionLength;
+            }
+        }
+
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
         /// </summary>
         protected sealed override double ProcessInternal(DifficultyHitObject current)
         {
             ManiaDifficultyHitObject maniaCurrent = (ManiaDifficultyHitObject)current;
-
-            // The first object doesn't generate a strain, so we begin with an incremented section end
-            if (current.Index == 0)
-                currentSectionEnd = Math.Ceiling(maniaCurrent.ActualTime / SectionLength) * SectionLength;
-
-            while (maniaCurrent.ActualTime > currentSectionEnd)
-            {
-                saveCurrentPeak();
-                startNewSectionFrom(currentSectionEnd, maniaCurrent);
-                currentSectionEnd += SectionLength;
-            }
 
             double strain = StrainValueAt(maniaCurrent);
             currentSectionPeak = Math.Max(strain, currentSectionPeak);
