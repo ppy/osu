@@ -38,6 +38,7 @@ namespace osu.Game.Tests.Visual.Online
         private OsuConfigManager localConfig;
 
         private bool returnCursorOnResponse;
+        private int searchRequestsHandled;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -53,6 +54,7 @@ namespace osu.Game.Tests.Visual.Online
                 Child = overlay = new BeatmapListingOverlay { State = { Value = Visibility.Visible } };
                 setsForResponse.Clear();
                 queuedResponses.Clear();
+                searchRequestsHandled = 0;
             });
 
             AddStep("initialize dummy", () =>
@@ -63,6 +65,8 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     if (!(req is SearchBeatmapSetsRequest searchBeatmapSetsRequest))
                         return false;
+
+                    searchRequestsHandled++;
 
                     List<APIBeatmapSet> beatmaps;
                     bool hasNextPage;
@@ -284,6 +288,42 @@ namespace osu.Game.Tests.Visual.Online
             setOwnedFilter(SearchOwned.ExcludeOwned);
             AddUntilStep("non-owned result loaded", () => this.ChildrenOfType<BeatmapCard>().SingleOrDefault()?.BeatmapSet.OnlineID == expectedSetId);
             noPlaceholderShown();
+        }
+
+        [Test]
+        public void TestExcludeOwnedFilterStopsFetchingWhenAllPagedResultsAreOwned()
+        {
+            int[] ownedSetIds =
+            {
+                Math.Max(1, Guid.NewGuid().GetHashCode()),
+                Math.Max(1, Guid.NewGuid().GetHashCode()),
+                Math.Max(1, Guid.NewGuid().GetHashCode()),
+            };
+
+            AddStep("mark all paged sets as downloaded", () =>
+            {
+                foreach (int id in ownedSetIds)
+                    addLocalBeatmapSet(id);
+            });
+
+            AddStep("set paged search responses to only owned sets", () =>
+            {
+                setSearchResponses(
+                    (new[] { new APIBeatmapSet { OnlineID = ownedSetIds[0] } }, true),
+                    (new[] { new APIBeatmapSet { OnlineID = ownedSetIds[1] } }, true),
+                    (new[] { new APIBeatmapSet { OnlineID = ownedSetIds[2] } }, false));
+            });
+
+            int requestsBeforeSearch = 0;
+            AddStep("capture request baseline", () => requestsBeforeSearch = searchRequestsHandled);
+
+            setOwnedFilter(SearchOwned.ExcludeOwned);
+
+            notFoundPlaceholderShown();
+
+            AddAssert("one request per available page", () => searchRequestsHandled == requestsBeforeSearch + ownedSetIds.Length);
+            AddWaitStep("wait for any runaway requests", 1000);
+            AddAssert("request count stable after cursor end", () => searchRequestsHandled == requestsBeforeSearch + ownedSetIds.Length);
         }
 
         [Test]
