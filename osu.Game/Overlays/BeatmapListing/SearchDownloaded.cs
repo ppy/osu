@@ -5,12 +5,12 @@ using System.ComponentModel;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    public enum SearchOwned
+    public enum SearchDownloaded
     {
         [Description("Any")]
         Any,
 
-        [Description("Not downloaded")]
-        ExcludeOwned,
+        [Description("Hide already downloaded")]
+        ExcludeDownloaded,
     }
 }
