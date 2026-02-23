@@ -50,6 +50,7 @@ namespace osu.Game.Tests.Visual
                 },
                 new PopoverContainer
                 {
+                    // Ensure the footer is displayed above any content and/or overlays.
                     Depth = -1,
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
