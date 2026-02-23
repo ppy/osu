@@ -487,7 +487,8 @@ namespace osu.Game.Screens.Edit
             base.LoadComplete();
             setUpClipboardActionAvailability();
 
-            Mode.Value = isNewBeatmap ? EditorScreenMode.SongSetup : EditorScreenMode.Compose;
+            if (Mode.Value == EditorScreenMode.SongSetup && !isNewBeatmap)
+                Mode.Value = EditorScreenMode.Compose;
 
             // AddOnce here ensures we don't unnecessarily load multiple modes when entering the editor.
             // See case where Mode is restored via `RestoreState`.
