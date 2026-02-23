@@ -515,8 +515,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double calculateTraceableBonus(double sliderFactor = 1)
         {
             // We want to reward slider aim less, more so at lower AR
-            double highApproachRateSliderVisibilityFactor = 1 - ((1 - Math.Pow(sliderFactor, 4.5)) / 2);
-            double lowApproachRateSliderVisibilityFactor = Math.Pow(sliderFactor, 4.5);
+            double highApproachRateSliderVisibilityFactor = 0.5 + (Math.Pow(sliderFactor, 5) / 2);
+            double lowApproachRateSliderVisibilityFactor = Math.Pow(sliderFactor, 5);
 
             // Start from normal curve, rewarding lower AR up to AR7
             double traceableBonus = 0.0175;
