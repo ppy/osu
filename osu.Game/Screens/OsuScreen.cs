@@ -147,12 +147,7 @@ namespace osu.Game.Screens
                 createDependencies(parent);
             }
 
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(screenDependencies));
-
-            if (ColourScheme != null)
-                dependencies.Cache(ColourProvider);
-
-            return dependencies;
+            return base.CreateChildDependencies(screenDependencies);
         }
 
         private void createDependencies(IReadOnlyDependencyContainer dependencies)
@@ -162,6 +157,9 @@ namespace osu.Game.Screens
             Beatmap = screenDependencies.Beatmap;
             Ruleset = screenDependencies.Ruleset;
             Mods = screenDependencies.Mods;
+
+            if (ColourScheme != null)
+                screenDependencies.Cache(ColourProvider);
         }
 
         /// <summary>
