@@ -273,8 +273,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             public Func<IReadOnlyList<ScreenFooterButton>> CreateButtons = Array.Empty<ScreenFooterButton>;
 
-            public ShearedOverlayContainer? Overlay = new TestShearedOverlayContainer();
-            public ShearedOverlayContainer? SecondOverlay = new TestShearedOverlayContainer();
+            public ShearedOverlayContainer Overlay = new TestShearedOverlayContainer();
+            public ShearedOverlayContainer SecondOverlay = new TestShearedOverlayContainer();
 
             private IDisposable? overlayRegistration;
             private IDisposable? secondOverlayRegistration;
