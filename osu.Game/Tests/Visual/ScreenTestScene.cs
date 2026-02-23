@@ -54,13 +54,13 @@ namespace osu.Game.Tests.Visual
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        content = new Container { RelativeSizeAxes = Axes.Both },
                         screenStackFooter = new ScreenStackFooter(Stack, backReceptor)
                         {
                             BackButtonPressed = () => Stack.Exit()
                         }
                     }
                 },
+                content = new Container { RelativeSizeAxes = Axes.Both },
                 overlayContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
