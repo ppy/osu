@@ -19,8 +19,6 @@ namespace osu.Game.Screens.OnlinePlay
     [Cached]
     public abstract partial class OnlinePlayScreen : OsuScreen, IHasSubScreenStack
     {
-        public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Plum;
-
         public IScreen CurrentSubScreen => screenStack.CurrentScreen;
 
         public override bool CursorVisible => (screenStack.CurrentScreen as IOnlinePlaySubScreen)?.CursorVisible ?? true;
@@ -42,6 +40,8 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected OnlinePlayScreen()
         {
+            ColourScheme = OverlayColourScheme.Plum;
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;

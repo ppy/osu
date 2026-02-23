@@ -86,10 +86,10 @@ namespace osu.Game.Screens.Ranking
 
         private Sample? popInSample;
 
-        public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Aquamarine;
-
         protected ResultsScreen(ScoreInfo? score)
         {
+            ColourScheme = OverlayColourScheme.Aquamarine;
+
             Score = score;
 
             SelectedScore.Value = score;

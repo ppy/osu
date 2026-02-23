@@ -39,7 +39,10 @@ namespace osu.Game.Screens.Import
         [Resolved]
         private OsuGameBase game { get; set; }
 
-        public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Purple;
+        public FileImportScreen()
+        {
+            ColourScheme = OverlayColourScheme.Purple;
+        }
 
         [BackgroundDependencyLoader(true)]
         private void load()

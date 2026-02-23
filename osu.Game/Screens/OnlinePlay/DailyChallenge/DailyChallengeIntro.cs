@@ -53,8 +53,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         private IBindable<StarDifficulty> starDifficulty = null!;
 
-        public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Plum;
-
         [Cached(typeof(OnlinePlayBeatmapAvailabilityTracker))]
         private readonly DailyChallengeBeatmapAvailabilityTracker beatmapAvailabilityTracker;
 
@@ -86,6 +84,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         public DailyChallengeIntro(Room room)
         {
+            ColourScheme = OverlayColourScheme.Plum;
+
             this.room = room;
             item = room.Playlist.Single();
 

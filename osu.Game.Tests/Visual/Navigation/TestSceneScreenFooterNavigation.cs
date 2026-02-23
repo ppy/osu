@@ -145,7 +145,10 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             public override bool ShowFooter => true;
 
-            public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Blue;
+            public TestScreenOne()
+            {
+                ColourScheme = OverlayColourScheme.Blue;
+            }
 
             public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new[]
             {
@@ -157,7 +160,10 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             public override bool ShowFooter => true;
 
-            public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Blue;
+            public TestScreenTwo()
+            {
+                ColourScheme = OverlayColourScheme.Blue;
+            }
 
             public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new[]
             {

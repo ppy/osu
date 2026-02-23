@@ -96,7 +96,7 @@ namespace osu.Game.Screens
 
         public virtual float BackgroundParallaxAmount => 1;
 
-        public virtual OverlayColourScheme? ColourScheme => null;
+        public OverlayColourScheme? ColourScheme { get; init; }
 
         [CanBeNull]
         private OverlayColourProvider colourProvider;

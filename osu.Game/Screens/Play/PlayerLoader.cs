@@ -102,8 +102,6 @@ namespace osu.Game.Screens.Play
 
         private ScheduledDelegate? quickRestartBackButtonRestore;
 
-        public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Purple;
-
         private const double quick_restart_initial_delay = 500;
 
         protected bool BackgroundBrightnessReduction
@@ -187,6 +185,8 @@ namespace osu.Game.Screens.Play
 
         public PlayerLoader(Func<Player> createPlayer)
         {
+            ColourScheme = OverlayColourScheme.Purple;
+
             this.createPlayer = createPlayer;
         }
 

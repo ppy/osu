@@ -48,7 +48,10 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         /// </summary>
         protected virtual DirectoryInfo InitialPath => null;
 
-        public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Purple;
+        protected DirectorySelectScreen()
+        {
+            ColourScheme = OverlayColourScheme.Purple;
+        }
 
         [BackgroundDependencyLoader]
         private void load()

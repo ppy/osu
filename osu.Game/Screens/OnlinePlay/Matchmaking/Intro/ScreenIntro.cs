@@ -34,8 +34,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
 
         private bool animationBegan;
 
-        public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Plum;
-
         [Resolved]
         private MusicController musicController { get; set; } = null!;
 
@@ -55,6 +53,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
 
         public ScreenIntro()
         {
+            ColourScheme = OverlayColourScheme.Plum;
+
             ValidForResume = false;
         }
 

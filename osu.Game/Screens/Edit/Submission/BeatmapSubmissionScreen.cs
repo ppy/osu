@@ -43,8 +43,6 @@ namespace osu.Game.Screens.Edit.Submission
 
         protected override bool InitialBackButtonVisibility => false;
 
-        public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Aquamarine;
-
         [Resolved]
         private RealmAccess realmAccess { get; set; } = null!;
 
@@ -83,6 +81,11 @@ namespace osu.Game.Screens.Edit.Submission
         private Live<BeatmapSetInfo>? importedSet;
 
         private Sample completedSample = null!;
+
+        public BeatmapSubmissionScreen()
+        {
+            ColourScheme = OverlayColourScheme.Aquamarine;
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)

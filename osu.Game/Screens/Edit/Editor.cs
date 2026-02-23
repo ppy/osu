@@ -210,8 +210,6 @@ namespace osu.Game.Screens.Edit
         [Cached]
         public readonly EditorClipboard Clipboard = new EditorClipboard();
 
-        public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Aquamarine;
-
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
@@ -239,6 +237,8 @@ namespace osu.Game.Screens.Edit
 
         public Editor(EditorLoader loader = null)
         {
+            ColourScheme = OverlayColourScheme.Aquamarine;
+
             this.loader = loader;
         }
 

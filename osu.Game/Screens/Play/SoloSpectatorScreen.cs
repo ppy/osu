@@ -44,8 +44,6 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private BeatmapModelDownloader beatmapDownloader { get; set; } = null!;
 
-        public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Purple;
-
         private Container beatmapPanelContainer = null!;
         private RoundedButton watchButton = null!;
         private SettingsCheckbox automaticDownload = null!;
@@ -65,6 +63,8 @@ namespace osu.Game.Screens.Play
         public SoloSpectatorScreen(APIUser targetUser)
             : base(targetUser.Id)
         {
+            ColourScheme = OverlayColourScheme.Purple;
+
             this.targetUser = targetUser;
         }
 

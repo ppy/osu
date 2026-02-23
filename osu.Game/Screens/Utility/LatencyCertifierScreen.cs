@@ -56,8 +56,6 @@ namespace osu.Game.Screens.Utility
         /// </summary>
         private const int target_host_update_frames = 4000;
 
-        public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Orange;
-
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
@@ -95,6 +93,8 @@ namespace osu.Game.Screens.Utility
 
         public LatencyCertifierScreen()
         {
+            ColourScheme = OverlayColourScheme.Orange;
+
             InternalChildren = new Drawable[]
             {
                 new Box

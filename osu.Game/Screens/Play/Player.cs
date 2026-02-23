@@ -122,10 +122,6 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public virtual bool AllowCriticalSettingsAdjustment { get; } = true;
 
-        // Should match PlayerLoader for consistency. Cached here for the rare case we push a Player
-        // without the loading screen (one such usage is the skin editor's scene library).
-        public override OverlayColourScheme? ColourScheme => OverlayColourScheme.Purple;
-
         [Resolved]
         private ScoreManager scoreManager { get; set; }
 
@@ -189,6 +185,10 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected Player(PlayerConfiguration configuration = null)
         {
+            // Should match PlayerLoader for consistency. Cached here for the rare case we push a Player
+            // without the loading screen (one such usage is the skin editor's scene library).
+            ColourScheme = OverlayColourScheme.Purple;
+
             Configuration = configuration ?? new PlayerConfiguration();
         }
 
