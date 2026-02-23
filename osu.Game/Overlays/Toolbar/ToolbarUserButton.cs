@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
@@ -32,6 +33,8 @@ namespace osu.Game.Overlays.Toolbar
 
         private IBindable<APIState> apiState = null!;
 
+        private OsuSpriteText usernameText = null!;
+
         public ToolbarUserButton()
         {
             ButtonContent.AutoSizeAxes = Axes.X;
@@ -42,6 +45,12 @@ namespace osu.Game.Overlays.Toolbar
         {
             Flow.AddRange(new Drawable[]
             {
+                usernameText = new OsuSpriteText
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Margin = new MarginPadding { Right = 5 },
+                },
                 new Container
                 {
                     Masking = true,
@@ -80,7 +89,7 @@ namespace osu.Game.Overlays.Toolbar
                         },
                     }
                 },
-                new TransientUserStatisticsUpdateDisplay(),
+                new TransientUserStatisticsUpdateDisplay()
             });
 
             apiState = api.State.GetBoundCopy();
@@ -94,7 +103,7 @@ namespace osu.Game.Overlays.Toolbar
 
         private void userChanged(ValueChangedEvent<APIUser> user) => Schedule(() =>
         {
-            Text = user.NewValue.Username;
+            usernameText.Text = user.NewValue.Username;
             avatar.User = user.NewValue;
         });
 
