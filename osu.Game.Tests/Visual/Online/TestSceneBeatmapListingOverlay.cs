@@ -241,59 +241,59 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestExcludeOwnedFilterHidesLocalBeatmaps()
+        public void TestExcludeDownloadedFilterHidesLocalBeatmaps()
         {
-            int ownedSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
+            int downloadedSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
 
-            AddStep("mark local set as downloaded", () => addLocalBeatmapSet(ownedSetId));
-            setOwnedFilter(SearchOwned.ExcludeOwned);
+            AddStep("mark local set as downloaded", () => addLocalBeatmapSet(downloadedSetId));
+            setDownloadedFilter(SearchDownloaded.ExcludeDownloaded);
 
-            AddStep("show one owned and one not-owned result", () =>
+            AddStep("show one downloaded and one not-downloaded result", () =>
             {
-                var owned = CreateAPIBeatmapSet(Ruleset.Value);
-                owned.OnlineID = ownedSetId;
-                owned.Title = "Owned set";
+                var downloaded = CreateAPIBeatmapSet(Ruleset.Value);
+                downloaded.OnlineID = downloadedSetId;
+                downloaded.Title = "Downloaded set";
 
-                var notOwned = CreateAPIBeatmapSet(Ruleset.Value);
-                notOwned.Title = "Not owned set";
+                var notDownloaded = CreateAPIBeatmapSet(Ruleset.Value);
+                notDownloaded.Title = "Not downloaded set";
 
-                fetchFor(owned, notOwned);
+                fetchFor(downloaded, notDownloaded);
             });
 
             AddUntilStep("only one card shown", () => this.ChildrenOfType<BeatmapCard>().Count() == 1);
-            AddAssert("owned set filtered out", () => this.ChildrenOfType<BeatmapCard>().Single().BeatmapSet.OnlineID != ownedSetId);
+            AddAssert("downloaded set filtered out", () => this.ChildrenOfType<BeatmapCard>().Single().BeatmapSet.OnlineID != downloadedSetId);
         }
 
         [Test]
-        public void TestExcludeOwnedFilterCanPaginatePastFilteredFirstPage()
+        public void TestExcludeDownloadedFilterCanPaginatePastFilteredFirstPage()
         {
-            int ownedSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
+            int downloadedSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
             int expectedSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
 
-            AddStep("mark local set as downloaded", () => addLocalBeatmapSet(ownedSetId));
+            AddStep("mark local set as downloaded", () => addLocalBeatmapSet(downloadedSetId));
 
             AddStep("set paged search responses", () =>
             {
-                var owned = CreateAPIBeatmapSet(Ruleset.Value);
-                owned.OnlineID = ownedSetId;
+                var downloaded = CreateAPIBeatmapSet(Ruleset.Value);
+                downloaded.OnlineID = downloadedSetId;
 
-                var notOwned = CreateAPIBeatmapSet(Ruleset.Value);
-                notOwned.OnlineID = expectedSetId;
+                var notDownloaded = CreateAPIBeatmapSet(Ruleset.Value);
+                notDownloaded.OnlineID = expectedSetId;
 
                 setSearchResponses(
-                    (new[] { owned }, true),
-                    (new[] { notOwned }, false));
+                    (new[] { downloaded }, true),
+                    (new[] { notDownloaded }, false));
             });
 
-            setOwnedFilter(SearchOwned.ExcludeOwned);
-            AddUntilStep("non-owned result loaded", () => this.ChildrenOfType<BeatmapCard>().SingleOrDefault()?.BeatmapSet.OnlineID == expectedSetId);
+            setDownloadedFilter(SearchDownloaded.ExcludeDownloaded);
+            AddUntilStep("non-downloaded result loaded", () => this.ChildrenOfType<BeatmapCard>().SingleOrDefault()?.BeatmapSet.OnlineID == expectedSetId);
             noPlaceholderShown();
         }
 
         [Test]
-        public void TestExcludeOwnedFilterStopsFetchingWhenAllPagedResultsAreOwned()
+        public void TestExcludeDownloadedFilterStopsFetchingWhenAllPagedResultsAreDownloaded()
         {
-            int[] ownedSetIds =
+            int[] downloadedSetIds =
             {
                 Math.Max(1, Guid.NewGuid().GetHashCode()),
                 Math.Max(1, Guid.NewGuid().GetHashCode()),
@@ -302,28 +302,28 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("mark all paged sets as downloaded", () =>
             {
-                foreach (int id in ownedSetIds)
+                foreach (int id in downloadedSetIds)
                     addLocalBeatmapSet(id);
             });
 
-            AddStep("set paged search responses to only owned sets", () =>
+            AddStep("set paged search responses to only downloaded sets", () =>
             {
                 setSearchResponses(
-                    (new[] { new APIBeatmapSet { OnlineID = ownedSetIds[0] } }, true),
-                    (new[] { new APIBeatmapSet { OnlineID = ownedSetIds[1] } }, true),
-                    (new[] { new APIBeatmapSet { OnlineID = ownedSetIds[2] } }, false));
+                    (new[] { new APIBeatmapSet { OnlineID = downloadedSetIds[0] } }, true),
+                    (new[] { new APIBeatmapSet { OnlineID = downloadedSetIds[1] } }, true),
+                    (new[] { new APIBeatmapSet { OnlineID = downloadedSetIds[2] } }, false));
             });
 
             int requestsBeforeSearch = 0;
             AddStep("capture request baseline", () => requestsBeforeSearch = searchRequestsHandled);
 
-            setOwnedFilter(SearchOwned.ExcludeOwned);
+            setDownloadedFilter(SearchDownloaded.ExcludeDownloaded);
 
             notFoundPlaceholderShown();
 
-            AddAssert("one request per available page", () => searchRequestsHandled == requestsBeforeSearch + ownedSetIds.Length);
+            AddAssert("one request per available page", () => searchRequestsHandled == requestsBeforeSearch + downloadedSetIds.Length);
             AddWaitStep("wait for any runaway requests", 1000);
-            AddAssert("request count stable after cursor end", () => searchRequestsHandled == requestsBeforeSearch + ownedSetIds.Length);
+            AddAssert("request count stable after cursor end", () => searchRequestsHandled == requestsBeforeSearch + downloadedSetIds.Length);
         }
 
         [Test]
@@ -524,9 +524,9 @@ namespace osu.Game.Tests.Visual.Online
             AddStep($"set Played filter to {played}", () => searchControl.Played.Value = played);
         }
 
-        private void setOwnedFilter(SearchOwned owned)
+        private void setDownloadedFilter(SearchDownloaded downloaded)
         {
-            AddStep($"set Owned filter to {owned}", () => searchControl.Owned.Value = owned);
+            AddStep($"set Downloaded filter to {downloaded}", () => searchControl.Downloaded.Value = downloaded);
         }
 
         private void addLocalBeatmapSet(int onlineId)
