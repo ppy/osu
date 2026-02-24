@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -18,6 +17,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Toolbar
         private readonly FillFlowContainer tooltipContainer;
         private readonly SpriteText tooltip1;
         private readonly SpriteText tooltip2;
-        private readonly SpriteText keyBindingTooltip;
+        private HotkeyDisplay keyBindingTooltip;
         protected FillFlowContainer Flow;
 
         protected readonly Container BackgroundContent;
@@ -158,10 +158,14 @@ namespace osu.Game.Overlays.Toolbar
                             Anchor = TooltipAnchor,
                             Origin = TooltipAnchor,
                             Direction = FillDirection.Horizontal,
-                            Children = new[]
+                            Children = new Drawable[]
                             {
                                 tooltip2 = new OsuSpriteText { Shadow = true },
-                                keyBindingTooltip = new OsuSpriteText { Shadow = true }
+                                keyBindingTooltip = new HotkeyDisplay()
+                                {
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                }
                             }
                         }
                     }
@@ -174,8 +178,8 @@ namespace osu.Game.Overlays.Toolbar
         {
             if (Hotkey != null)
             {
-                realmSubscription = realm.SubscribeToPropertyChanged(r => r.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetName == null && rkb.ActionInt == (int)Hotkey.Value),
-                    kb => kb.KeyCombinationString, updateKeyBindingTooltip);
+                keyBindingTooltip.Hotkey = new Hotkey(Hotkey.Value);
+                keyBindingTooltip.Margin = new MarginPadding { Left = 3 };
             }
         }
 
@@ -215,15 +219,6 @@ namespace osu.Game.Overlays.Toolbar
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-        }
-
-        private void updateKeyBindingTooltip(string keyCombination)
-        {
-            string keyBindingString = keyCombinationProvider.GetReadableString(keyCombination);
-
-            keyBindingTooltip.Text = !string.IsNullOrEmpty(keyBindingString)
-                ? $" ({keyBindingString})"
-                : string.Empty;
         }
 
         protected override void Dispose(bool isDisposing)
