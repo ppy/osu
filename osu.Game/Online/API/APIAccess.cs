@@ -11,6 +11,7 @@ using System.Net.Http;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Newtonsoft.Json.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
@@ -25,6 +26,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Notifications.WebSocket;
+using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Online.API
 {
@@ -70,6 +72,9 @@ namespace osu.Game.Online.API
 
         private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
         private readonly Logger log;
+
+        [CanBeNull]
+        public Action<Notification> PostNotification { get; set; }
 
         public APIAccess(OsuGameBase game, OsuConfigManager config, EndpointConfiguration endpoints, string versionHash)
         {
@@ -156,6 +161,8 @@ namespace osu.Game.Online.API
         /// </summary>
         private int failureCount;
 
+        private readonly Stopwatch livenessStopwatch = new Stopwatch();
+
         /// <summary>
         /// The main API thread loop, which will continue to run until the game is shut down.
         /// </summary>
@@ -165,10 +172,14 @@ namespace osu.Game.Online.API
             {
                 if (state.Value == APIState.Failing)
                 {
-                    // To recover from a failing state, falling through and running the full reconnection process seems safest for now.
-                    // This could probably be replaced with a ping-style request if we want to avoid the reconnection overheads.
                     log.Add($@"{nameof(APIAccess)} is in a failing state, waiting a bit before we try again...");
                     Thread.Sleep(5000);
+
+                    // if the liveness probe actively returns a failure state, there's no need to be retrying anything
+                    if (!probeLiveness(out _))
+                        continue;
+
+                    // In any other circumstance, let's attempt the full reconnection flow.
                 }
 
                 // Ensure that we have valid credentials.
@@ -201,9 +212,75 @@ namespace osu.Game.Online.API
                     continue;
                 }
 
+                if (livenessStopwatch.Elapsed.TotalMinutes >= 1)
+                {
+                    bool alive = probeLiveness(out string reason);
+
+                    if (!alive)
+                    {
+                        triggerOutage(reason);
+                        livenessStopwatch.Stop();
+                        continue;
+                    }
+
+                    livenessStopwatch.Restart();
+                }
+
                 processQueuedRequests();
                 Thread.Sleep(50);
             }
+        }
+
+        /// <summary>
+        /// Query the liveness probe to check whether to transition to / remain in <see cref="APIState.Failing"/> state.
+        /// </summary>
+        /// <returns>
+        /// <see langword="true"/> if the liveness probe is disabled, returns that online functions are available, or cannot be reached.
+        /// <see langword="false"/> if the liveness probe explicitly returns that online functions are not available. A user-facing message may be returned via <paramref name="reason"/>.
+        /// </returns>
+        private bool probeLiveness([CanBeNull] out string reason)
+        {
+            if (Endpoints.LivenessProbeUrl == null)
+            {
+                reason = null;
+                return true;
+            }
+
+            var req = new OsuJsonWebRequest<LivenessProbeResponse>(Endpoints.LivenessProbeUrl);
+
+            try
+            {
+                req.Perform();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"Liveness probe failed: {ex}", LoggingTarget.Network);
+                reason = null;
+                return true;
+            }
+
+            if (req.Aborted || req.ResponseObject == null)
+            {
+                reason = null;
+                return true;
+            }
+
+            reason = req.ResponseObject.Reason;
+            return req.ResponseObject.Status == LivenessProbeResponse.LivenessStatus.Up;
+        }
+
+        private void triggerOutage(string reason)
+        {
+            state.Value = APIState.Failing;
+            string userFacingMessage = reason ?? "Online functionality is not available due to an outage. Sorry for the inconvenience.";
+
+            Schedule(() =>
+            {
+                if (PostNotification != null)
+                    PostNotification?.Invoke(new OutageNotification(userFacingMessage));
+                else
+                    log.Add(userFacingMessage, LogLevel.Important);
+            });
         }
 
         /// <summary>
@@ -245,7 +322,13 @@ namespace osu.Game.Online.API
             // save the username at this point, if the user requested for it to be.
             config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
 
-            if (!authentication.HasValidAccessToken && HasLogin)
+            if (!probeLiveness(out string reason))
+            {
+                triggerOutage(reason);
+                return;
+            }
+
+            if (!authentication.HasValidAccessToken)
             {
                 state.Value = APIState.Connecting;
                 LastLoginError = null;
@@ -341,6 +424,7 @@ namespace osu.Game.Online.API
                         localUserState.SetLocalUser(me);
                         SessionVerificationMethod = me.SessionVerificationMethod;
                         state.Value = SessionVerificationMethod == null ? APIState.Online : APIState.RequiresSecondFactorAuth;
+                        livenessStopwatch.Restart();
                         failureCount = 0;
                     };
 
