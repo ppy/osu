@@ -301,12 +301,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             buttons.InsertRange(buttons.FindIndex(b => b is FooterButtonMods) + 1,
             [
-                new FooterButtonFreeModsV2(freeModSelect)
+                new FooterButtonFreeMods(freeModSelect)
                 {
                     FreeMods = { BindTarget = FreeMods },
                     Freestyle = { BindTarget = freestyle }
                 },
-                new FooterButtonFreestyleV2
+                new FooterButtonFreestyle
                 {
                     Freestyle = { BindTarget = freestyle }
                 }
