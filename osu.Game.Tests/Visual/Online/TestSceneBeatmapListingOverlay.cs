@@ -270,7 +270,11 @@ namespace osu.Game.Tests.Visual.Online
             int downloadedSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
             int expectedSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
 
+            if (expectedSetId == downloadedSetId)
+                expectedSetId++;
+
             AddStep("mark local set as downloaded", () => addLocalBeatmapSet(downloadedSetId));
+            setHideDownloadedFilter(true);
 
             AddStep("set paged search responses", () =>
             {
@@ -285,8 +289,11 @@ namespace osu.Game.Tests.Visual.Online
                     (new[] { notDownloaded }, false));
             });
 
-            setHideDownloadedFilter(true);
+            int requestsBeforeSearch = 0;
+            AddStep("capture request baseline", () => requestsBeforeSearch = searchRequestsHandled);
+            AddStep("trigger search", () => searchControl.Query.Value = $"search {searchCount++}");
             AddUntilStep("non-downloaded result loaded", () => this.ChildrenOfType<BeatmapCard>().SingleOrDefault()?.BeatmapSet.OnlineID == expectedSetId);
+            AddAssert("paged search requests were made", () => searchRequestsHandled >= requestsBeforeSearch + 2);
             noPlaceholderShown();
         }
 
