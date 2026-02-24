@@ -478,7 +478,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 if (endTimeHitObject.EndTime == snappedTime)
                                     return;
 
-                                objsToAdjust.Add(hitObject);
+                                if (!objsToAdjust.Contains(hitObject))
+                                    objsToAdjust.Add(hitObject);
 
                                 foreach (var obj in objsToAdjust)
                                 {
