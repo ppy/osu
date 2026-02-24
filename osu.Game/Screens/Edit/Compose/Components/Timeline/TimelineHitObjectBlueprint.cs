@@ -325,9 +325,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private Timeline timeline { get; set; } = null!;
 
             [Resolved]
-            private TimelineBlueprintContainer blueprintContainer { get; set; } = null!;
-
-            [Resolved]
             private IEditorChangeHandler? changeHandler { get; set; }
 
             private ScheduledDelegate? dragOperation;
@@ -411,7 +408,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 changeHandler?.BeginChange();
 
-                var selectionItems = blueprintContainer.SelectionHandler.SelectedItems;
+                var selectionItems = beatmap.SelectedHitObjects;
 
                 if (!selectionItems.Contains(hitObject))
                     return true;
