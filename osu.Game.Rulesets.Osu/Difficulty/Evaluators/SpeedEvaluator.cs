@@ -45,13 +45,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Base difficulty with all bonuses
             double difficulty = (1 + speedBonus) * 1000 / strainTime;
-
-            difficulty *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
+            
+            difficulty *= (DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime) + 8) / 18;
 
             // Apply penalty if there's doubletappable doubles
             return difficulty * doubletapness;
+
+            // Buff strain based on the BPM of the map
+            
         }
 
-        private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.3, ms / 1000));
     }
 }
