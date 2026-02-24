@@ -159,9 +159,9 @@ namespace osu.Game.Screens.Play.HUD
 
                 // cache common lookups ahead of time.
                 foreach (char c in new[] { '.', '%', 'x' })
-                    glyphStore.Get(font_name, c);
+                    glyphStore.Get(font_name, new Grapheme(c));
                 for (int i = 0; i < 10; i++)
-                    glyphStore.Get(font_name, (char)('0' + i));
+                    glyphStore.Get(font_name, new Grapheme((char)('0' + i)));
             }
 
             protected override TextBuilder CreateTextBuilder(ITexturedGlyphLookupStore store) => base.CreateTextBuilder(glyphStore);
@@ -181,16 +181,16 @@ namespace osu.Game.Screens.Play.HUD
                     this.getLookup = getLookup;
                 }
 
-                public ITexturedCharacterGlyph? Get(string? fontName, char character)
+                public ITexturedCharacterGlyph? Get(string? fontName, Grapheme character)
                 {
                     // We only service one font.
                     if (fontName != this.fontName)
                         return null;
 
-                    if (cache.TryGetValue(character, out var cached))
+                    if (cache.TryGetValue(character.CharValue, out var cached))
                         return cached;
 
-                    string lookup = getLookup(character);
+                    string lookup = getLookup(character.CharValue);
                     var texture = textures.Get($"Gameplay/Fonts/{fontName}-{lookup}");
 
                     TexturedCharacterGlyph? glyph = null;
@@ -198,11 +198,11 @@ namespace osu.Game.Screens.Play.HUD
                     if (texture != null)
                         glyph = new TexturedCharacterGlyph(new CharacterGlyph(character, 0, 0, texture.Width, texture.Height, null), texture, 0.125f);
 
-                    cache[character] = glyph;
+                    cache[character.CharValue] = glyph;
                     return glyph;
                 }
 
-                public Task<ITexturedCharacterGlyph?> GetAsync(string fontName, char character) => Task.Run(() => Get(fontName, character));
+                public Task<ITexturedCharacterGlyph?> GetAsync(string fontName, Grapheme character) => Task.Run(() => Get(fontName, character));
             }
         }
     }

@@ -14,13 +14,14 @@ using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
+using osu.Framework.Text;
 using osu.Game.Localisation;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public partial class OsuPasswordTextBox : OsuTextBox
     {
-        protected override Drawable GetDrawableCharacter(char c) => new FallingDownContainer
+        protected override Drawable GetDrawableCharacter(Grapheme c) => new FallingDownContainer
         {
             AutoSizeAxes = Axes.Both,
             Child = new PasswordMaskChar(FontSize),

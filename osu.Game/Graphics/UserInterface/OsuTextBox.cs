@@ -16,6 +16,7 @@ using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Text;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
@@ -276,7 +277,7 @@ namespace osu.Game.Graphics.UserInterface
             base.OnFocusLost(e);
         }
 
-        protected override Drawable GetDrawableCharacter(char c) => new FallingDownContainer
+        protected override Drawable GetDrawableCharacter(Grapheme c) => new FallingDownContainer
         {
             AutoSizeAxes = Axes.Both,
             Child = new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: FontSize) },
