@@ -1153,7 +1153,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddStep("open user style selection", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().ShowUserStyleSelect());
-            AddUntilStep("style selection screen opened", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelectV2>().SingleOrDefault()?.IsCurrentScreen() == true);
+            AddUntilStep("style selection screen opened", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() == true);
 
             AddStep("change beatmap", () =>
             {
@@ -1166,7 +1166,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddWaitStep("wait for potential beatmap change", 2);
-            AddAssert("style selection screen still open", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelectV2>().SingleOrDefault()?.IsCurrentScreen() == true);
+            AddAssert("style selection screen still open", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() == true);
         }
 
         /// <summary>
@@ -1190,7 +1190,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddStep("open user style selection", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().ShowUserStyleSelect());
-            AddUntilStep("style selection screen opened", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelectV2>().SingleOrDefault()?.IsCurrentScreen() == true);
+            AddUntilStep("style selection screen opened", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() == true);
 
             AddStep("change beatmap set", () =>
             {
@@ -1203,7 +1203,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("selected beatmap changed", () => Beatmap.Value.BeatmapInfo.Equals(importedSet2.Beatmaps.First()));
-            AddUntilStep("style selection screen closed", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelectV2>().SingleOrDefault()?.IsCurrentScreen() != true);
+            AddUntilStep("style selection screen closed", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() != true);
         }
 
         private void enterGameplay()

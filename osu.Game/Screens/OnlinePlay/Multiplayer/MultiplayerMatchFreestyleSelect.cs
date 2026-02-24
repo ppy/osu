@@ -12,7 +12,7 @@ using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public partial class MultiplayerMatchFreestyleSelectV2 : OnlinePlayFreestyleSelectV2
+    public partial class MultiplayerMatchFreestyleSelect : OnlinePlayFreestyleSelect
     {
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
@@ -25,7 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private LoadingLayer loadingLayer = null!;
         private IDisposable? selectionOperation;
 
-        public MultiplayerMatchFreestyleSelectV2(PlaylistItem item)
+        public MultiplayerMatchFreestyleSelect(PlaylistItem item)
             : base(item)
         {
         }
