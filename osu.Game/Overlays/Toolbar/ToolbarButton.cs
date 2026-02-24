@@ -45,12 +45,6 @@ namespace osu.Game.Overlays.Toolbar
                 Icon = icon,
             });
 
-        public LocalisableString Text
-        {
-            get => DrawableText.Text;
-            set => DrawableText.Text = value;
-        }
-
         public LocalisableString TooltipMain
         {
             get => tooltip1.Text;
@@ -67,7 +61,6 @@ namespace osu.Game.Overlays.Toolbar
 
         protected readonly Container ButtonContent;
         protected ConstrainedIconContainer IconContainer;
-        protected SpriteText DrawableText;
         protected Box HoverBackground;
         private readonly Box flashBackground;
         private readonly FillFlowContainer tooltipContainer;
@@ -124,7 +117,6 @@ namespace osu.Game.Overlays.Toolbar
                         Flow = new FillFlowContainer
                         {
                             Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(5),
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Padding = new MarginPadding { Left = Toolbar.HEIGHT / 2, Right = Toolbar.HEIGHT / 2 },
@@ -138,11 +130,6 @@ namespace osu.Game.Overlays.Toolbar
                                     Origin = Anchor.CentreLeft,
                                     Size = new Vector2(20),
                                     Alpha = 0,
-                                },
-                                DrawableText = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
                                 },
                             },
                         },
