@@ -20,7 +20,7 @@ using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public partial class PlaylistsSongSelectV2
+    public partial class PlaylistsSongSelect
     {
         public partial class PlaylistTray : CompositeDrawable
         {

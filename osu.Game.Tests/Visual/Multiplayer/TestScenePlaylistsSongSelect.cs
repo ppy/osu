@@ -27,7 +27,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public partial class TestScenePlaylistsSongSelectV2 : OnlinePlayTestScene
+    public partial class TestScenePlaylistsSongSelect : OnlinePlayTestScene
     {
         private RulesetStore rulesets = null!;
         private BeatmapManager manager = null!;
@@ -191,7 +191,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 rulesets.Dispose();
         }
 
-        private partial class TestPlaylistsSongSelect : PlaylistsSongSelectV2
+        private partial class TestPlaylistsSongSelect : PlaylistsSongSelect
         {
             public new IBindable<bool> Freestyle => base.Freestyle;
 

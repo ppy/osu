@@ -23,7 +23,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public partial class PlaylistsSongSelectV2 : SongSelect, IOnlinePlaySubScreen
+    public partial class PlaylistsSongSelect : SongSelect, IOnlinePlaySubScreen
     {
         public string ShortTitle => "song selection";
 
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private IDisposable? modSelectOverlayRegistration;
 
-        public PlaylistsSongSelectV2(Room room)
+        public PlaylistsSongSelect(Room room)
         {
             this.room = room;
 
