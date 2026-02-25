@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             // The reason why this exist in evaluator instead of FlowAim skill - it's because it's very important to keep flowaim in the same scaling as snapaim on evaluator level
             const double flow_multiplier = 6.05;
+            const double distance_exponent = 1.5;
 
             if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
                 return 0;
@@ -30,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Rescale the distance
             // We use the power on normalized distance so we don't have to rebalance everything when changing the exponent
             double distance = withSliderTravelDistance ? osuCurrObj.LazyJumpDistance : osuCurrObj.JumpDistance;
-            distance = Math.Pow(distance / diameter, 1.5) * Math.Pow(diameter, 2);
+            distance = Math.Pow(distance / diameter, distance_exponent) * Math.Pow(diameter, 2);
 
             // Calculate the base difficulty by using rescaled distance and time
             double flowDifficulty = distance / Math.Pow(osuCurrObj.AdjustedDeltaTime, 2);
