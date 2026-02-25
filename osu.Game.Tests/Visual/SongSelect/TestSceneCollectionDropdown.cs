@@ -24,10 +24,13 @@ using osu.Game.Rulesets;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
 using Realms;
-using CollectionDropdown = osu.Game.Screens.SelectV2.CollectionDropdown;
+using CollectionDropdown = osu.Game.Screens.Select.CollectionDropdown;
 
-namespace osu.Game.Tests.Visual.SongSelectV2
+namespace osu.Game.Tests.Visual.SongSelect
 {
+    /// <summary>
+    /// WARNING: TODO: we have TWO `CollectionDropdowns` with diverging functionality. This is not good.
+    /// </summary>
     public partial class TestSceneCollectionDropdown : OsuManualInputManagerTestScene
     {
         private RulesetStore rulesets = null!;
