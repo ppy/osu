@@ -49,15 +49,17 @@ namespace osu.Game.Overlays.Settings.Sections
             base.LoadComplete();
 
             handlerEnabled.BindTo(handler.Enabled);
-            handlerEnabled.BindValueChanged(v => updateEnabledState(), true);
+            handlerEnabled.BindValueChanged(updateEnabledState, true);
         }
 
-        private void updateEnabledState()
+        private void updateEnabledState(ValueChangedEvent<bool> state)
         {
             // set negative bottom margin to not have too much vertical gap between disabled input subsections.
             bool negativeBottomMargin = !handlerEnabled.Value || FlowContent.Count == 0;
             header.TransformTo(nameof(Margin), new MarginPadding { Bottom = negativeBottomMargin ? -VERTICAL_PADDING : 0 }, 300, Easing.OutQuint);
 
+            // Avoid crashes from toggling `AutoSizeAxes` while active `AutoSizeDuration` transforms are still running.
+            // This is probably a framework bug.
             FlowContent.ClearTransforms();
 
             if (!handlerEnabled.Value)
@@ -72,7 +74,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 // enable auto size transform momentarily for smooth pop in animation, and disable it right after the transform is added.
                 // we don't want this specification to apply when a dropdown in the input settings is being open, it causes too slow animation.
                 // (try removing the schedule below then watch a settings dropdown menu opening animation).
-                FlowContent.AutoSizeDuration = 300;
+                FlowContent.AutoSizeDuration = state.NewValue == state.OldValue ? 0 : 300;
                 FlowContent.AutoSizeEasing = Easing.OutQuint;
                 FlowContent.AutoSizeAxes = Axes.Y;
                 ScheduleAfterChildren(() => FlowContent.AutoSizeDuration = 0);
