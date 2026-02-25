@@ -1,18 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
@@ -36,14 +33,7 @@ namespace osu.Game.Overlays.Toolbar
             IconContainer.Show();
         }
 
-        [Resolved]
-        private ReadableKeyCombinationProvider keyCombinationProvider { get; set; } = null!;
-
-        public void SetIcon(IconUsage icon) =>
-            SetIcon(new SpriteIcon
-            {
-                Icon = icon,
-            });
+        public void SetIcon(IconUsage icon) => SetIcon(new SpriteIcon { Icon = icon });
 
         public LocalisableString TooltipMain
         {
@@ -66,15 +56,11 @@ namespace osu.Game.Overlays.Toolbar
         private readonly FillFlowContainer tooltipContainer;
         private readonly SpriteText tooltip1;
         private readonly SpriteText tooltip2;
-        private HotkeyDisplay keyBindingTooltip;
         protected FillFlowContainer Flow;
 
         protected readonly Container BackgroundContent;
 
-        private IDisposable? realmSubscription;
-
-        [Resolved]
-        private RealmAccess realm { get; set; } = null!;
+        private readonly FillFlowContainer subTooltipFlow;
 
         protected ToolbarButton()
         {
@@ -152,7 +138,7 @@ namespace osu.Game.Overlays.Toolbar
                             Shadow = true,
                             Font = OsuFont.GetFont(size: 22, weight: FontWeight.Bold),
                         },
-                        new FillFlowContainer
+                        subTooltipFlow = new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
                             Anchor = TooltipAnchor,
@@ -161,11 +147,6 @@ namespace osu.Game.Overlays.Toolbar
                             Children = new Drawable[]
                             {
                                 tooltip2 = new OsuSpriteText { Shadow = true },
-                                keyBindingTooltip = new HotkeyDisplay()
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                }
                             }
                         }
                     }
@@ -178,8 +159,13 @@ namespace osu.Game.Overlays.Toolbar
         {
             if (Hotkey != null)
             {
-                keyBindingTooltip.Hotkey = new Hotkey(Hotkey.Value);
-                keyBindingTooltip.Margin = new MarginPadding { Left = 3 };
+                subTooltipFlow.Add(new HotkeyDisplay
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Hotkey = new Hotkey(Hotkey.Value),
+                    Margin = new MarginPadding { Left = 3 },
+                });
             }
         }
 
@@ -219,13 +205,6 @@ namespace osu.Game.Overlays.Toolbar
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            realmSubscription?.Dispose();
         }
     }
 
