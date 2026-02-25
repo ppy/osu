@@ -13,7 +13,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Select;
-using SongSelect = osu.Game.Screens.SelectV2.SongSelect;
 
 namespace osu.Game.Screens.OnlinePlay
 {
