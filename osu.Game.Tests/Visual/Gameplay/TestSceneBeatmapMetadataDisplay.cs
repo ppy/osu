@@ -19,7 +19,7 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osuTK;
 
-namespace osu.Game.Tests.Visual.SongSelect
+namespace osu.Game.Tests.Visual.Gameplay
 {
     public partial class TestSceneBeatmapMetadataDisplay : OsuTestScene
     {
