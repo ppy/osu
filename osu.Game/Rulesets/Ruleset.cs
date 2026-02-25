@@ -208,6 +208,8 @@ namespace osu.Game.Rulesets
 
         public ModAutoplay? GetAutoplayMod() => CreateMod<ModAutoplay>();
 
+        public ModCinema? GetCinemaMod() => CreateMod<ModCinema>();
+
         public ModTouchDevice? GetTouchDeviceMod() => CreateMod<ModTouchDevice>();
 
         /// <summary>
