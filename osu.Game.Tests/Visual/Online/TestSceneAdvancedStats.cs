@@ -12,15 +12,15 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.Select.Details;
 using osuTK.Graphics;
 
-namespace osu.Game.Tests.Visual.SongSelect
+namespace osu.Game.Tests.Visual.Online
 {
     [System.ComponentModel.Description("Advanced beatmap statistics display")]
     public partial class TestSceneAdvancedStats : OsuTestScene
