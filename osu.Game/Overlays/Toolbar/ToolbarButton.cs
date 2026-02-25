@@ -180,16 +180,16 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override bool OnHover(HoverEvent e)
         {
-            HoverBackground.FadeIn(200);
-            tooltipContainer.FadeIn(100);
+            HoverBackground.FadeIn(300, Easing.OutQuint);
+            tooltipContainer.FadeIn(200, Easing.OutQuint);
 
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            HoverBackground.FadeOut(200);
-            tooltipContainer.FadeOut(100);
+            HoverBackground.FadeOut(200, Easing.Out);
+            tooltipContainer.FadeOut(100, Easing.Out);
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
