@@ -3,7 +3,7 @@
 
 using osu.Framework.Bindables;
 
-namespace osu.Game.Screens.Select.Leaderboards
+namespace osu.Game.Screens.Play.Leaderboards
 {
     /// <summary>
     /// Provides a leaderboard to show during gameplay.

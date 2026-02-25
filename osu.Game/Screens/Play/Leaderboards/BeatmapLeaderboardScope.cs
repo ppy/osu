@@ -4,7 +4,7 @@
 using osu.Framework.Localisation;
 using osu.Game.Localisation;
 
-namespace osu.Game.Screens.Select.Leaderboards
+namespace osu.Game.Screens.Play.Leaderboards
 {
     public enum BeatmapLeaderboardScope
     {
