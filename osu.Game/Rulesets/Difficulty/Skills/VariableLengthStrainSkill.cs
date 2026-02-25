@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Fills the space between the end of the current section and the current object, if there is any.
         /// </summary>
-        /// <param name="current"></param>
+        /// <param name="current">The object who's <see cref="DifficultyHitObject.StartTime"/> is backfilled to.</param>
         private void backfillPeaks(DifficultyHitObject current)
         {
             // If the current object starts after the current section ends
