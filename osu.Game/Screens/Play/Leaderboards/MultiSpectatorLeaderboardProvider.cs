@@ -5,7 +5,7 @@ using System;
 using osu.Framework.Timing;
 using osu.Game.Online.Multiplayer;
 
-namespace osu.Game.Screens.Select.Leaderboards
+namespace osu.Game.Screens.Play.Leaderboards
 {
     public partial class MultiSpectatorLeaderboardProvider : MultiplayerLeaderboardProvider
     {

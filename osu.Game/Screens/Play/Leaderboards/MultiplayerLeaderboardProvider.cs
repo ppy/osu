@@ -24,7 +24,7 @@ using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Select.Leaderboards
+namespace osu.Game.Screens.Play.Leaderboards
 {
     [LongRunningLoad]
     public partial class MultiplayerLeaderboardProvider : CompositeComponent, IGameplayLeaderboardProvider
