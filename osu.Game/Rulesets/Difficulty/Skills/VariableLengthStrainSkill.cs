@@ -33,10 +33,13 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private static readonly Comparer<StrainPeak> strain_peak_comparer = Comparer<StrainPeak>.Create((p1, p2) => p2.Value.CompareTo(p1.Value));
 
         /// <summary>
-        /// The number of `MaxSectionLength` sections calculated such that 99.999% of the difficulty value is preserved.
-        /// With DecayWeight = 0.9, cutOffTime = ~109.27
+        /// The number of `MaxSectionLength` sections calculated such that enough of the difficulty value is preserved.
+        /// WARNING: This should be overridden if strains are ever used outside of <see cref="DifficultyValue"/>,
+        /// or if <see cref="DifficultyValue"/> is overridden to not use the default geometric sum. This should be removed
+        /// in the future when a better memory-saving technique is implemented.
+        /// <value>Default is 110</value>
         /// </summary>
-        private double cutOffTime => -5 * Math.Log(10) / Math.Log(DecayWeight);
+        private double storedSections => 11 / (1 - DecayWeight);
 
         private readonly List<StrainPeak> strainPeaks = new List<StrainPeak>();
 
@@ -159,7 +162,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             // Remove from the back of our strain peaks if there's any which are too deep to contribute to difficulty.
             // `cutOffTime` dictates for us how many sections will preserve at least 99.999% of the difficulty value.
-            while (totalLength / MaxSectionLength > cutOffTime)
+            while (totalLength > storedSections)
             {
                 totalLength -= strainPeaks[^1].SectionLength;
                 strainPeaks.RemoveAt(strainPeaks.Count - 1);
@@ -228,7 +231,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                     Doing this ensures the relationship between strain values and difficulty values remains the same between the two classes.
                 */
                 double startTime = time;
-                double endTime = time + strains[i].SectionLength / MaxSectionLength;
+                double endTime = time + strains[i].SectionLength;
 
                 double weight = Math.Pow(DecayWeight, startTime) - Math.Pow(DecayWeight, endTime);
 
