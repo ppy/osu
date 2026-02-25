@@ -14,26 +14,27 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osuTK;
 using Realms;
 
-namespace osu.Game.Collections
+namespace osu.Game.Screens.Select
 {
     /// <summary>
     /// A dropdown to select the collection to be used to filter results.
     /// WARNING: TODO: we have TWO `CollectionDropdowns` with diverging functionality. This is not good.
     /// </summary>
-    public partial class CollectionDropdown : OsuDropdown<CollectionFilterMenuItem>
+    public partial class CollectionDropdown : ShearedDropdown<CollectionFilterMenuItem> // TODO: partial class under FilterControl?
     {
         /// <summary>
         /// Whether to show the "manage collections..." menu item in the dropdown.
         /// </summary>
         protected virtual bool ShowManageCollectionsItem => true;
-
-        public Action? RequestFilter { private get; set; }
 
         private readonly BindableList<CollectionFilterMenuItem> filters = new BindableList<CollectionFilterMenuItem>();
 
@@ -48,6 +49,7 @@ namespace osu.Game.Collections
         private readonly CollectionFilterMenuItem allBeatmapsItem = new AllBeatmapsCollectionFilterMenuItem();
 
         public CollectionDropdown()
+            : base(CollectionsStrings.Collection)
         {
             ItemSource = filters;
 
@@ -108,15 +110,11 @@ namespace osu.Game.Collections
                             Current.Value = filters.SingleOrDefault(f => f.Collection?.ID == selectedItem.Collection?.ID) ?? filters[0];
                         });
 
-                        // Trigger an external re-filter if the current item was in the change set.
-                        RequestFilter?.Invoke();
                         break;
                     }
                 }
             }
         }
-
-        private Live<BeatmapCollection>? lastFiltered;
 
         private void selectionChanged(ValueChangedEvent<CollectionFilterMenuItem> filter)
         {
@@ -130,17 +128,6 @@ namespace osu.Game.Collections
             {
                 Current.Value = filter.OldValue;
                 manageCollectionsDialog?.Show();
-                return;
-            }
-
-            var newCollection = filter.NewValue.Collection;
-
-            // This dropdown be weird.
-            // We only care about filtering if the actual collection has changed.
-            if (newCollection != lastFiltered)
-            {
-                RequestFilter?.Invoke();
-                lastFiltered = newCollection;
             }
         }
 
@@ -152,39 +139,25 @@ namespace osu.Game.Collections
 
         protected override LocalisableString GenerateItemText(CollectionFilterMenuItem item) => item.CollectionName;
 
-        protected sealed override DropdownHeader CreateHeader() => CreateCollectionHeader();
-
         protected sealed override DropdownMenu CreateMenu() => CreateCollectionMenu();
 
-        protected virtual CollectionDropdownHeader CreateCollectionHeader() => new CollectionDropdownHeader();
+        protected virtual ShearedCollectionDropdownMenu CreateCollectionMenu() => new ShearedCollectionDropdownMenu();
 
-        protected virtual CollectionDropdownMenu CreateCollectionMenu() => new CollectionDropdownMenu();
-
-        public partial class CollectionDropdownHeader : OsuDropdownHeader
+        protected partial class ShearedCollectionDropdownMenu : ShearedDropdownMenu
         {
-            public CollectionDropdownHeader()
-            {
-                Height = 25;
-                Chevron.Size = new Vector2(12);
-                Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 8, Right = 8 };
-            }
-        }
-
-        protected partial class CollectionDropdownMenu : OsuDropdownMenu
-        {
-            public CollectionDropdownMenu()
+            public ShearedCollectionDropdownMenu()
             {
                 MaxHeight = 200;
             }
 
-            protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new CollectionDropdownDrawableMenuItem(item)
+            protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableCollectionMenuItem(item)
             {
                 BackgroundColourHover = HoverColour,
                 BackgroundColourSelected = SelectionColour
             };
         }
 
-        protected partial class CollectionDropdownDrawableMenuItem : OsuDropdownMenu.DrawableOsuDropdownMenuItem
+        protected partial class DrawableCollectionMenuItem : ShearedDropdownMenu.ShearedMenuItem
         {
             private IconButton addOrRemoveButton = null!;
 
@@ -195,7 +168,7 @@ namespace osu.Game.Collections
             [Resolved]
             private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
-            public CollectionDropdownDrawableMenuItem(MenuItem item)
+            public DrawableCollectionMenuItem(MenuItem item)
                 : base(item)
             {
                 collection = ((DropdownMenuItem<CollectionFilterMenuItem>)item).Value.Collection;
@@ -208,6 +181,7 @@ namespace osu.Game.Collections
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
+                    Shear = -OsuGame.SHEAR,
                     X = -OsuScrollContainer.SCROLL_BAR_WIDTH,
                     Scale = new Vector2(0.65f),
                     Action = addOrRemove,
@@ -226,7 +200,7 @@ namespace osu.Game.Collections
 
                         addOrRemoveButton.Enabled.Value = !beatmap.IsDefault;
                         addOrRemoveButton.Icon = beatmapInCollection ? FontAwesome.Solid.MinusSquare : FontAwesome.Solid.PlusSquare;
-                        addOrRemoveButton.TooltipText = beatmapInCollection ? "Remove selected beatmap" : "Add selected beatmap";
+                        addOrRemoveButton.TooltipText = beatmapInCollection ? CollectionsStrings.RemoveSelectedBeatmap : CollectionsStrings.AddSelectedBeatmap;
 
                         updateButtonVisibility();
                     }, true);
