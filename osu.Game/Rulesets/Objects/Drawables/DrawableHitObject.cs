@@ -45,7 +45,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         /// <summary>
         /// The <see cref="HitObject"/> currently represented by this <see cref="DrawableHitObject"/>.
+        /// This may be null if the <see cref="DrawableHitObject"/> is in a pool and has not yet been applied a <see cref="HitObject"/>.
         /// </summary>
+        [CanBeNull]
         public HitObject HitObject => Entry?.HitObject;
 
         /// <summary>
@@ -814,6 +816,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
     public abstract partial class DrawableHitObject<TObject> : DrawableHitObject
         where TObject : HitObject
     {
+        [CanBeNull]
         public new TObject HitObject => (TObject)base.HitObject;
 
         protected DrawableHitObject([CanBeNull] TObject hitObject)
