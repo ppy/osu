@@ -33,7 +33,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 using osuTK;
 using osuTK.Graphics;
 

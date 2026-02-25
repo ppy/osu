@@ -7,7 +7,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {

@@ -9,10 +9,9 @@ using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
-using osu.Game.Screens.Play;
 using osu.Game.Users;
 
-namespace osu.Game.Screens.Select.Leaderboards
+namespace osu.Game.Screens.Play.Leaderboards
 {
     /// <summary>
     /// Represents a score shown on a gameplay leaderboard.
