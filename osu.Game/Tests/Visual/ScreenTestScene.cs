@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual
                     {
                         screenStackFooter = new ScreenStackFooter(Stack, backReceptor)
                         {
-                            BackButtonPressed = () => Stack.Exit()
+                            BackButtonPressed = BackButtonPressed,
                         }
                     }
                 },
@@ -74,6 +74,8 @@ namespace osu.Game.Tests.Visual
             Stack.ScreenPushed += (_, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed → {newScreen}");
             Stack.ScreenExited += (_, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed ← {newScreen}");
         }
+
+        protected virtual void BackButtonPressed() => Stack.Exit();
 
         protected void LoadScreen(OsuScreen screen) => Stack.Push(screen);
 
