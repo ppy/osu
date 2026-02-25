@@ -7,28 +7,24 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 
-namespace osu.Game.Screens.OnlinePlay.Playlists
+namespace osu.Game.Screens.OnlinePlay
 {
     public partial class PlaylistsRoomFreestyleSelect : OnlinePlayFreestyleSelect
     {
         public new readonly Bindable<BeatmapInfo?> Beatmap = new Bindable<BeatmapInfo?>();
         public new readonly Bindable<RulesetInfo?> Ruleset = new Bindable<RulesetInfo?>();
 
-        public PlaylistsRoomFreestyleSelect(Room room, PlaylistItem item)
-            : base(room, item)
+        public PlaylistsRoomFreestyleSelect(PlaylistItem item)
+            : base(item)
         {
         }
 
-        protected override bool OnStart()
+        protected override void StartAction()
         {
-            if (!base.OnStart())
-                return false;
-
             Beatmap.Value = base.Beatmap.Value.BeatmapInfo;
             Ruleset.Value = base.Ruleset.Value;
 
             this.Exit();
-            return true;
         }
     }
 }

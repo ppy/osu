@@ -32,14 +32,14 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class FilterControl : OverlayContainer
+    public sealed partial class FilterControl : OverlayContainer
     {
         // taken from draw visualiser. used for carousel alignment purposes.
         public const float HEIGHT_FROM_SCREEN_TOP = 141 - corner_radius;
 
         private const float corner_radius = 10;
 
-        public Bindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
+        public IBindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
 
         private SongSelectSearchTextBox searchTextBox = null!;
         private ShearedToggleButton showConvertedBeatmapsButton = null!;
@@ -47,6 +47,14 @@ namespace osu.Game.Screens.SelectV2
         private ShearedDropdown<SortMode> sortDropdown = null!;
         private ShearedDropdown<GroupMode> groupDropdown = null!;
         private CollectionDropdown collectionDropdown = null!;
+
+        /// <summary>
+        /// An optional method which can force certain criteria adjustments.
+        /// </summary>
+        public Action<FilterCriteria>? ApplyRequiredCriteria { get; set; }
+
+        [Resolved]
+        private ISongSelect? songSelect { get; set; }
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
@@ -115,7 +123,7 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 RelativeSizeAxes = Axes.X,
                                 HoldFocus = true,
-                                ScopedBeatmapSet = ScopedBeatmapSet,
+                                ScopedBeatmapSet = { BindTarget = ScopedBeatmapSet },
                             },
                         },
                         new GridContainer
@@ -190,7 +198,7 @@ namespace osu.Game.Screens.SelectV2
                         },
                         new ScopedBeatmapSetDisplay
                         {
-                            ScopedBeatmapSet = ScopedBeatmapSet,
+                            ScopedBeatmapSet = { BindTarget = ScopedBeatmapSet },
                         }
                     },
                 }
@@ -291,6 +299,9 @@ namespace osu.Game.Screens.SelectV2
             criteria.RulesetCriteria = ruleset.Value.CreateInstance().CreateRulesetFilterCriteria();
 
             FilterQueryParser.ApplyQueries(criteria, query);
+
+            ApplyRequiredCriteria?.Invoke(criteria);
+
             return criteria;
         }
 
@@ -298,7 +309,7 @@ namespace osu.Game.Screens.SelectV2
         {
             if (clearScopedSet && ScopedBeatmapSet.Value != null)
             {
-                ScopedBeatmapSet.Value = null;
+                songSelect?.UnscopeBeatmapSet();
                 // because `ScopedBeatmapSet` has a value change callback bound to it that calls `updateCriteria()` again,
                 // we can just do nothing other than clear it to avoid extra work and duplicated `CriteriaChanged` invocations
                 return;
@@ -331,34 +342,22 @@ namespace osu.Game.Screens.SelectV2
 
         internal partial class SongSelectSearchTextBox : ShearedFilterTextBox
         {
-            public Bindable<BeatmapSetInfo?> ScopedBeatmapSet
-            {
-                get => scopedBeatmapSet.Current;
-                set => scopedBeatmapSet.Current = value;
-            }
-
-            private readonly BindableWithCurrent<BeatmapSetInfo?> scopedBeatmapSet = new BindableWithCurrent<BeatmapSetInfo?>();
+            public IBindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
 
             protected override InnerSearchTextBox CreateInnerTextBox() => new InnerTextBox
             {
-                ScopedBeatmapSet = ScopedBeatmapSet,
+                ScopedBeatmapSet = { BindTarget = ScopedBeatmapSet },
             };
 
             private partial class InnerTextBox : InnerFilterTextBox
             {
-                public Bindable<BeatmapSetInfo?> ScopedBeatmapSet
-                {
-                    get => scopedBeatmapSet.Current;
-                    set => scopedBeatmapSet.Current = value;
-                }
-
-                private readonly BindableWithCurrent<BeatmapSetInfo?> scopedBeatmapSet = new BindableWithCurrent<BeatmapSetInfo?>();
+                public IBindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
 
                 public override bool HandleLeftRightArrows => false;
 
                 public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
                 {
-                    if (e.Action == GlobalAction.Back && scopedBeatmapSet.Value != null)
+                    if (e.Action == GlobalAction.Back && ScopedBeatmapSet.Value != null)
                         return false;
 
                     return base.OnPressed(e);
