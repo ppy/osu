@@ -30,8 +30,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private double currentSectionBegin;
         private double currentSectionEnd;
 
-        private static readonly Comparer<StrainPeak> reverse_sort = Comparer<StrainPeak>.Create((p1, p2) => p2.Value.CompareTo(p1.Value));
-
         /// <summary>
         /// The number of `MaxSectionLength` sections calculated such that enough of the difficulty value is preserved.
         /// WARNING: This should be overridden if strains are ever used outside of <see cref="DifficultyValue"/>,
