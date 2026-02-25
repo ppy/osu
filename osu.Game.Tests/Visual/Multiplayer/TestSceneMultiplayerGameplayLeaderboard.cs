@@ -9,7 +9,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {

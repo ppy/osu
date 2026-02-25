@@ -21,7 +21,7 @@ using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {

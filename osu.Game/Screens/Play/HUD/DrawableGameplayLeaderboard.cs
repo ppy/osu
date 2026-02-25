@@ -12,7 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Localisation.SkinComponents;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;

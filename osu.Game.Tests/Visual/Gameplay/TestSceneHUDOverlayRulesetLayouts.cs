@@ -25,7 +25,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Skinning;
 using osu.Game.Tests.Gameplay;
 using osu.Game.Tests.Visual.Spectator;

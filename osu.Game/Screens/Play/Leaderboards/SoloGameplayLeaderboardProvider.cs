@@ -7,73 +7,61 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
-using osu.Game.Online.API;
-using osu.Game.Online.Rooms;
-using osu.Game.Screens.Play;
+using osu.Game.Online.Leaderboards;
+using osu.Game.Scoring;
 
-namespace osu.Game.Screens.Select.Leaderboards
+namespace osu.Game.Screens.Play.Leaderboards
 {
-    [LongRunningLoad]
-    public partial class PlaylistsGameplayLeaderboardProvider : Component, IGameplayLeaderboardProvider
+    public partial class SoloGameplayLeaderboardProvider : Component, IGameplayLeaderboardProvider
     {
         public IBindableList<GameplayLeaderboardScore> Scores => scores;
         private readonly BindableList<GameplayLeaderboardScore> scores = new BindableList<GameplayLeaderboardScore>();
 
-        private readonly Room room;
-        private readonly PlaylistItem playlistItem;
+        [Resolved]
+        private LeaderboardManager? leaderboardManager { get; set; }
+
+        [Resolved]
+        private GameplayState? gameplayState { get; set; }
 
         private readonly Cached sorting = new Cached();
         private bool isPartial;
 
-        public PlaylistsGameplayLeaderboardProvider(Room room, PlaylistItem playlistItem)
+        protected override void LoadComplete()
         {
-            this.room = room;
-            this.playlistItem = playlistItem;
-        }
+            base.LoadComplete();
 
-        [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, GameplayState? gameplayState)
-        {
-            var scoresToShow = new List<GameplayLeaderboardScore>();
+            var globalScores = leaderboardManager?.Scores.Value;
 
-            var scoresRequest = new IndexPlaylistScoresRequest(room.RoomID!.Value, playlistItem.ID);
-            api.Perform(scoresRequest);
+            isPartial = globalScores == null || globalScores.IsPartial;
 
-            var response = scoresRequest.Response;
+            List<GameplayLeaderboardScore> newScores = new List<GameplayLeaderboardScore>();
 
-            if (response != null)
+            if (globalScores != null)
             {
-                isPartial = response.Scores.Count < response.TotalScores;
-
-                for (int i = 0; i < response.Scores.Count; i++)
+                foreach (var topScore in globalScores.AllScores.OrderByTotalScore())
                 {
-                    var score = response.Scores[i];
-                    score.Position = i + 1;
-                    scoresToShow.Add(new GameplayLeaderboardScore(score, tracked: false, GameplayLeaderboardScore.ComboDisplayMode.Highest));
+                    newScores.Add(new GameplayLeaderboardScore(topScore, false, GameplayLeaderboardScore.ComboDisplayMode.Highest));
                 }
-
-                if (response.UserScore != null && response.Scores.All(s => s.ID != response.UserScore.ID))
-                    scoresToShow.Add(new GameplayLeaderboardScore(response.UserScore, tracked: false, GameplayLeaderboardScore.ComboDisplayMode.Highest));
             }
 
             if (gameplayState != null)
             {
-                var localScore = new GameplayLeaderboardScore(gameplayState, tracked: true, GameplayLeaderboardScore.ComboDisplayMode.Highest);
+                var localScore = new GameplayLeaderboardScore(gameplayState, tracked: true, GameplayLeaderboardScore.ComboDisplayMode.Highest)
+                {
+                    // Local score should always show lower than any existing scores in cases of ties.
+                    TotalScoreTiebreaker = long.MaxValue
+                };
                 localScore.TotalScore.BindValueChanged(_ => sorting.Invalidate());
-                scoresToShow.Add(localScore);
+                newScores.Add(localScore);
             }
 
-            // touching the public bindable must happen on the update thread for general thread safety,
-            // since we may have external subscribers bound already
-            Schedule(() =>
-            {
-                scores.AddRange(scoresToShow);
-                sort();
-                Scheduler.AddDelayed(sort, 1000, true);
-            });
+            scores.AddRange(newScores);
+
+            sort();
+            Scheduler.AddDelayed(sort, 1000, true);
         }
 
-        // logic shared with SoloGameplayLeaderboardProvider
+        // logic shared with PlaylistsGameplayLeaderboardProvider
         private void sort()
         {
             if (sorting.IsValid)

@@ -3,10 +3,10 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Screens.Select.Leaderboards;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Screens.Play.Leaderboards;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {

@@ -7,8 +7,8 @@ using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.Select.Leaderboards;
 using Realms;
 
 namespace osu.Game.Scoring
