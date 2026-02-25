@@ -133,11 +133,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 // https://www.desmos.com/calculator/vspzsop6td
                 // we use OD13.3 as maximum since it's the value at which great hitwidow becomes 0
                 // this is well beyond currently maximum achievable OD which is 12.17 (DTx2 + DA with OD11)
-                double okMultiplier = 0.75 * Math.Max(0.0, overallDifficulty > 0.0 ? 1 - overallDifficulty / 13.33 : 1.0);
+                double okMultiplier = 0.8 * Math.Max(0.0, overallDifficulty > 0.0 ? 1 - overallDifficulty / 13.33 : 1.0);
                 double mehMultiplier = Math.Max(0.0, overallDifficulty > 0.0 ? 1 - Math.Pow(overallDifficulty / 13.33, 5) : 1.0);
 
-                // As we're adding Oks and Mehs to an approximated number of combo breaks the result can be higher than total hits in specific scenarios (which breaks some calculations) so we need to clamp it.
-                effectiveMissCount = Math.Min(effectiveMissCount + countOk * okMultiplier + countMeh * mehMultiplier, totalHits);
+                // Sum weighted into total count to make rescale consistent (otherwise 100 Oks and 100 Mehs would be worth less than 200 Mehs).
+                double weightedInaccuracyCount = countOk + countMeh * mehMultiplier / Math.Max(okMultiplier, 1e-17);
+
+                // We would want to rescale inaccuracies into logarithmic scale to make sure that increasing length of the map would never lead to pp decrease.
+                // Cap with Min to make sure that Oks and Mehs aren't penalized more than misses. This makes it reduce inaccuracy count starting from 11 Oks equivalent.
+                double rescaledInnacuracyCount = Math.Min(weightedInaccuracyCount, 10 * Math.Log(weightedInaccuracyCount + 1));
+
+                // As we're adding rescaled inaccuracies to an approximated number of combo breaks the result can be higher than total hits in specific scenarios (which breaks some calculations) so we need to clamp it.
+                effectiveMissCount = Math.Min(effectiveMissCount + rescaledInnacuracyCount * okMultiplier, totalHits);
             }
 
             speedDeviation = calculateSpeedDeviation(osuAttributes);
