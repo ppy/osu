@@ -277,10 +277,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             public double Value { get; }
             public double SectionLength { get; }
 
-            public int CompareTo(StrainPeak other)
-            {
-                return Value.CompareTo(other.Value);
-            }
+            public int CompareTo(StrainPeak other) => Value.CompareTo(other.Value);
         }
 
         /// <summary>
