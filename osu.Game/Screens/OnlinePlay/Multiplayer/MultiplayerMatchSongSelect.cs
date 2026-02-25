@@ -24,9 +24,9 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Footer;
+using osu.Game.Screens.Select;
 using osu.Game.Users;
 using osu.Game.Utils;
-using osu.Game.Screens.SelectV2;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
