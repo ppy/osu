@@ -158,17 +158,13 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             strainPeaks.AddInPlace(new StrainPeak(currentSectionPeak, sectionLength));
             totalLength += sectionLength;
 
-            int strainsToRemove = 0;
-
             // Remove from the back of our strain peaks if there's any which are too deep to contribute to difficulty.
             // `cutOffTime` dictates for us how many sections will preserve at least 99.999% of the difficulty value.
             while (totalLength > storedSections * MaxSectionLength)
             {
-                totalLength -= strainPeaks[strainsToRemove].SectionLength;
-                strainsToRemove++;
+                totalLength -= strainPeaks[0].SectionLength;
+                strainPeaks.RemoveAt(0);
             }
-
-            strainPeaks.RemoveRange(0, strainsToRemove);
         }
 
         /// <summary>
