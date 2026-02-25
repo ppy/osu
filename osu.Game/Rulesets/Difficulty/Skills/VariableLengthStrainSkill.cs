@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         private double currentSectionBegin;
         private double currentSectionEnd;
 
-        private static readonly Comparer<StrainPeak> strain_peak_comparer = Comparer<StrainPeak>.Create((p1, p2) => p2.Value.CompareTo(p1.Value));
+        private static readonly Comparer<StrainPeak> reverse_sort = Comparer<StrainPeak>.Create((p1, p2) => p2.Value.CompareTo(p1.Value));
 
         /// <summary>
         /// The number of `MaxSectionLength` sections calculated such that enough of the difficulty value is preserved.
@@ -157,16 +157,20 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         private void saveCurrentPeak(double sectionLength)
         {
-            strainPeaks.AddInPlace(new StrainPeak(currentSectionPeak, sectionLength), strain_peak_comparer);
+            strainPeaks.AddInPlace(new StrainPeak(currentSectionPeak, sectionLength));
             totalLength += sectionLength;
+
+            int strainsToRemove = 0;
 
             // Remove from the back of our strain peaks if there's any which are too deep to contribute to difficulty.
             // `cutOffTime` dictates for us how many sections will preserve at least 99.999% of the difficulty value.
-            while (totalLength > storedSections)
+            while (totalLength > storedSections * MaxSectionLength)
             {
-                totalLength -= strainPeaks[^1].SectionLength;
-                strainPeaks.RemoveAt(strainPeaks.Count - 1);
+                totalLength -= strainPeaks[strainsToRemove].SectionLength;
+                strainsToRemove++;
             }
+
+            strainPeaks.RemoveRange(0, strainsToRemove);
         }
 
         /// <summary>
