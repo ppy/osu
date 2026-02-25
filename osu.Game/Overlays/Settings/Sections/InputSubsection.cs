@@ -30,6 +30,8 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private readonly BindableBool handlerEnabled = new BindableBool();
 
+        private ToggleableHeader header = null!;
+
         public InputSubsection(InputHandler handler)
         {
             this.handler = handler;
@@ -37,14 +39,10 @@ namespace osu.Game.Overlays.Settings.Sections
             FlowContent.AlwaysPresent = true;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override Drawable CreateHeader() => header = new ToggleableHeader(Header, IsToggleable)
         {
-            HeaderContainer.Child = new ToggleableHeader(Header, IsToggleable)
-            {
-                Current = { BindTarget = handlerEnabled },
-            };
-        }
+            Current = { BindTarget = handlerEnabled },
+        };
 
         protected override void LoadComplete()
         {
@@ -58,7 +56,7 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             // set negative bottom margin to not have too much vertical gap between disabled input subsections.
             bool negativeBottomMargin = !handlerEnabled.Value || FlowContent.Count == 0;
-            HeaderContainer.TransformTo(nameof(Margin), new MarginPadding { Bottom = negativeBottomMargin ? -15 : 0 }, 300, Easing.OutQuint);
+            header.TransformTo(nameof(Margin), new MarginPadding { Bottom = negativeBottomMargin ? -VERTICAL_PADDING : 0 }, 300, Easing.OutQuint);
 
             FlowContent.ClearTransforms();
 
@@ -92,6 +90,11 @@ namespace osu.Game.Overlays.Settings.Sections
 
             public ToggleableHeader(LocalisableString text, bool toggleable)
             {
+                Padding = SettingsPanel.CONTENT_PADDING;
+
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+
                 this.text = text;
                 this.toggleable = toggleable;
             }
@@ -105,8 +108,6 @@ namespace osu.Game.Overlays.Settings.Sections
             [BackgroundDependencyLoader]
             private void load()
             {
-                AutoSizeAxes = Axes.Both;
-
                 InternalChildren = new Drawable[]
                 {
                     switchButton = new SwitchButton
