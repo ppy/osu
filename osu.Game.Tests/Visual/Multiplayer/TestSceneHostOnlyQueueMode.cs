@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void selectNewItem(Func<BeatmapInfo> beatmap)
         {
-            Screens.SelectV2.SongSelect? songSelect = null;
+            Screens.Select.SongSelect? songSelect = null;
 
             AddUntilStep("wait for playlist panels to load", () =>
             {
@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("wait for song select", () => (songSelect = CurrentSubScreen as Screens.SelectV2.SongSelect) != null);
+            AddUntilStep("wait for song select", () => (songSelect = CurrentSubScreen as Screens.Select.SongSelect) != null);
             AddUntilStep("wait for loaded", () => songSelect.IsCurrentScreen() && !songSelect.AsNonNull().IsFiltering);
 
             BeatmapInfo otherBeatmap = null!;

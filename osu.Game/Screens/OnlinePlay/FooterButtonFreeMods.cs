@@ -20,7 +20,7 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay

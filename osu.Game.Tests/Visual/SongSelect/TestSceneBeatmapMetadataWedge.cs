@@ -1,0 +1,298 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System;
+using System.Linq;
+using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
+using osu.Game.Beatmaps;
+using osu.Game.Extensions;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Models;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Screens.Select;
+
+namespace osu.Game.Tests.Visual.SongSelect
+{
+    public partial class TestSceneBeatmapMetadataWedge : SongSelectComponentsTestScene
+    {
+        private BeatmapMetadataWedge wedge = null!;
+
+        [Cached(typeof(IBindable<Screens.Select.SongSelect.BeatmapSetLookupResult?>))]
+        private Bindable<Screens.Select.SongSelect.BeatmapSetLookupResult?> onlineLookupResult = new Bindable<Screens.Select.SongSelect.BeatmapSetLookupResult?>();
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Child = wedge = new BeatmapMetadataWedge
+            {
+                State = { Value = Visibility.Visible },
+            };
+        }
+
+        [Test]
+        public void TestShowHide()
+        {
+            AddStep("all metrics", () => (Beatmap.Value, onlineLookupResult.Value) = createTestBeatmap());
+
+            AddStep("hide wedge", () => wedge.Hide());
+            AddStep("show wedge", () => wedge.Show());
+        }
+
+        [Test]
+        public void TestVariousMetrics()
+        {
+            AddStep("all metrics", () => (Beatmap.Value, onlineLookupResult.Value) = createTestBeatmap());
+
+            AddStep("null beatmap", () => Beatmap.SetDefault());
+            AddStep("no source", () =>
+            {
+                var (working, online) = createTestBeatmap();
+
+                working.Metadata.Source = string.Empty;
+
+                Beatmap.Value = working;
+                onlineLookupResult.Value = online;
+            });
+            AddStep("no success rate", () =>
+            {
+                var (working, online) = createTestBeatmap();
+
+                online.Result!.Beatmaps.Single().PlayCount = 0;
+                online.Result!.Beatmaps.Single().PassCount = 0;
+
+                Beatmap.Value = working;
+                onlineLookupResult.Value = online;
+            });
+            AddStep("no user ratings", () =>
+            {
+                var (working, online) = createTestBeatmap();
+
+                online.Result!.Ratings = Array.Empty<int>();
+
+                Beatmap.Value = working;
+                onlineLookupResult.Value = online;
+            });
+            AddStep("no fail times", () =>
+            {
+                var (working, online) = createTestBeatmap();
+
+                online.Result!.Beatmaps.Single().FailTimes = null;
+
+                Beatmap.Value = working;
+                onlineLookupResult.Value = online;
+            });
+            AddStep("no metrics", () =>
+            {
+                var (working, online) = createTestBeatmap();
+
+                online.Result!.Ratings = Array.Empty<int>();
+                online.Result!.Beatmaps.Single().FailTimes = null;
+
+                Beatmap.Value = working;
+                onlineLookupResult.Value = online;
+            });
+            AddStep("local beatmap", () =>
+            {
+                var (working, _) = createTestBeatmap();
+
+                working.BeatmapInfo.OnlineID = 0;
+
+                Beatmap.Value = working;
+                onlineLookupResult.Value = Screens.Select.SongSelect.BeatmapSetLookupResult.Completed(null);
+            });
+        }
+
+        [Test]
+        public void TestTruncation()
+        {
+            AddStep("long text", () =>
+            {
+                var (working, online) = createTestBeatmap();
+
+                working.BeatmapInfo.Metadata.Author = new RealmUser { Username = "Verrrrryyyy llooonngggggg author" };
+                working.BeatmapInfo.Metadata.Source = "Verrrrryyyy llooonngggggg source";
+                working.BeatmapInfo.Metadata.Tags = string.Join(' ', Enumerable.Repeat(working.BeatmapInfo.Metadata.Tags, 3));
+                online.Result!.Genre = new BeatmapSetOnlineGenre { Id = 12, Name = "Verrrrryyyy llooonngggggg genre" };
+                online.Result!.Language = new BeatmapSetOnlineLanguage { Id = 12, Name = "Verrrrryyyy llooonngggggg language" };
+                online.Result!.Beatmaps.Single().TopTags = Enumerable.Repeat(online.Result!.Beatmaps.Single().TopTags, 3).SelectMany(t => t!).ToArray();
+
+                Beatmap.Value = working;
+                onlineLookupResult.Value = online;
+            });
+        }
+
+        [Test]
+        public void TestOnlineAvailability()
+        {
+            AddStep("online beatmapset", () => (Beatmap.Value, onlineLookupResult.Value) = createTestBeatmap());
+
+            AddUntilStep("rating wedge visible", () => wedge.RatingsVisible);
+            AddUntilStep("fail time wedge visible", () => wedge.FailRetryVisible);
+            AddStep("online beatmapset with local diff", () =>
+            {
+                var (working, lookupResult) = createTestBeatmap();
+
+                working.BeatmapInfo.ResetOnlineInfo();
+
+                Beatmap.Value = working;
+                onlineLookupResult.Value = lookupResult;
+            });
+            AddUntilStep("rating wedge hidden", () => !wedge.RatingsVisible);
+            AddUntilStep("fail time wedge hidden", () => !wedge.FailRetryVisible);
+
+            // just check for text everywhere on the wedge as the classes are private and generic
+            AddAssert("genre is still visible", () => wedge.ChildrenOfType<OsuSpriteText>().Any(t => t.Text == "Pop"));
+            AddAssert("language is still visible", () => wedge.ChildrenOfType<OsuSpriteText>().Any(t => t.Text == "English"));
+
+            AddStep("local beatmap", () =>
+            {
+                var (working, _) = createTestBeatmap();
+
+                Beatmap.Value = working;
+                onlineLookupResult.Value = Screens.Select.SongSelect.BeatmapSetLookupResult.Completed(null);
+            });
+            AddAssert("rating wedge still hidden", () => !wedge.RatingsVisible);
+            AddAssert("fail time wedge still hidden", () => !wedge.FailRetryVisible);
+
+            AddAssert("genre is cleared", () => wedge.ChildrenOfType<OsuSpriteText>().All(t => t.Text != "Pop"));
+            AddAssert("language is cleared", () => wedge.ChildrenOfType<OsuSpriteText>().All(t => t.Text != "English"));
+        }
+
+        [Test]
+        public void TestUserTags()
+        {
+            AddStep("user tags", () => (Beatmap.Value, onlineLookupResult.Value) = createTestBeatmap());
+
+            AddStep("no user tags", () =>
+            {
+                var (working, online) = createTestBeatmap();
+
+                online.Result!.Beatmaps.Single().TopTags = null;
+                online.Result!.RelatedTags = null;
+                working.BeatmapSetInfo.Beatmaps.Single().Metadata.UserTags.Clear();
+
+                Beatmap.Value = working;
+                onlineLookupResult.Value = online;
+            });
+        }
+
+        [Test]
+        public void TestLoading()
+        {
+            AddStep("set beatmap", () =>
+            {
+                var (working, online) = createTestBeatmap();
+
+                Beatmap.Value = working;
+                onlineLookupResult.Value = Screens.Select.SongSelect.BeatmapSetLookupResult.InProgress();
+                Scheduler.AddDelayed(() => onlineLookupResult.Value = online, 500);
+            });
+            AddWaitStep("wait", 5);
+
+            AddStep("set beatmap", () =>
+            {
+                var (working, online) = createTestBeatmap();
+
+                online.Result!.RelatedTags![0].Name = "other/tag";
+                online.Result!.RelatedTags[1].Name = "another/tag";
+                online.Result!.RelatedTags[2].Name = "some/tag";
+
+                Beatmap.Value = working;
+                onlineLookupResult.Value = Screens.Select.SongSelect.BeatmapSetLookupResult.InProgress();
+                Scheduler.AddDelayed(() => onlineLookupResult.Value = online, 500);
+            });
+            AddWaitStep("wait", 5);
+
+            AddStep("no user tags", () =>
+            {
+                var (working, online) = createTestBeatmap();
+
+                online.Result!.Beatmaps.Single().TopTags = null;
+                online.Result!.RelatedTags = null;
+                working.BeatmapSetInfo.Beatmaps.Single().Metadata.UserTags.Clear();
+
+                Beatmap.Value = working;
+                onlineLookupResult.Value = Screens.Select.SongSelect.BeatmapSetLookupResult.InProgress();
+                Scheduler.AddDelayed(() => onlineLookupResult.Value = online, 500);
+            });
+            AddWaitStep("wait", 5);
+
+            AddStep("no user tags", () =>
+            {
+                var (working, online) = createTestBeatmap();
+
+                online.Result!.Beatmaps.Single().TopTags = null;
+                online.Result!.RelatedTags = null;
+                working.BeatmapSetInfo.Beatmaps.Single().Metadata.UserTags.Clear();
+
+                Beatmap.Value = working;
+                onlineLookupResult.Value = Screens.Select.SongSelect.BeatmapSetLookupResult.InProgress();
+                Scheduler.AddDelayed(() => onlineLookupResult.Value = online, 500);
+            });
+            AddWaitStep("wait", 5);
+        }
+
+        private (WorkingBeatmap, Screens.Select.SongSelect.BeatmapSetLookupResult) createTestBeatmap()
+        {
+            var working = CreateWorkingBeatmap(Ruleset.Value);
+            var onlineSet = new APIBeatmapSet
+            {
+                OnlineID = working.BeatmapSetInfo.OnlineID,
+                Genre = new BeatmapSetOnlineGenre { Id = 15, Name = "Pop" },
+                Language = new BeatmapSetOnlineLanguage { Id = 15, Name = "English" },
+                Ratings = Enumerable.Range(0, 11).ToArray(),
+                Beatmaps = new[]
+                {
+                    new APIBeatmap
+                    {
+                        OnlineID = working.BeatmapInfo.OnlineID,
+                        PlayCount = 10000,
+                        PassCount = 4567,
+                        TopTags =
+                        [
+                            new APIBeatmapTag { TagId = 4, VoteCount = 1 },
+                            new APIBeatmapTag { TagId = 2, VoteCount = 1 },
+                            new APIBeatmapTag { TagId = 23, VoteCount = 5 },
+                        ],
+                        FailTimes = new APIFailTimes
+                        {
+                            Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                            Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
+                        },
+                    },
+                },
+                RelatedTags =
+                [
+                    new APITag
+                    {
+                        Id = 2,
+                        Name = "song representation/simple",
+                        Description = "Accessible and straightforward map design."
+                    },
+                    new APITag
+                    {
+                        Id = 4,
+                        Name = "style/clean",
+                        Description = "Visually uncluttered and organised patterns, often involving few overlaps and equal visual spacing between objects."
+                    },
+                    new APITag
+                    {
+                        Id = 23,
+                        Name = "aim/aim control",
+                        Description = "Patterns with velocity or direction changes which strongly go against a player's natural movement pattern."
+                    }
+                ]
+            };
+
+            working.BeatmapSetInfo.DateSubmitted = DateTimeOffset.Now;
+            working.BeatmapSetInfo.DateRanked = DateTimeOffset.Now;
+            working.Metadata.UserTags.AddRange(onlineSet.RelatedTags.Select(t => t.Name));
+            return (working, Screens.Select.SongSelect.BeatmapSetLookupResult.Completed(onlineSet));
+        }
+    }
+}

@@ -23,7 +23,7 @@ using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osu.Game.Utils;
