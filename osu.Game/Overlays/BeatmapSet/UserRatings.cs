@@ -13,7 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Resources.Localisation.Web;
 
-namespace osu.Game.Screens.Select.Details
+namespace osu.Game.Overlays.BeatmapSet
 {
     public partial class UserRatings : Container
     {

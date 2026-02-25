@@ -4,36 +4,36 @@
 #nullable disable
 
 using System;
-using osuTK.Graphics;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Beatmaps;
-using osu.Framework.Bindables;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using osu.Game.Rulesets.Mods;
-using System.Threading;
-using System.Threading.Tasks;
-using JetBrains.Annotations;
-using osu.Framework.Extensions;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Mods;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
-using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
+using osuTK.Graphics;
 
-namespace osu.Game.Screens.Select.Details
+namespace osu.Game.Overlays.BeatmapSet
 {
     public partial class AdvancedStats : Container
     {
