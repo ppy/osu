@@ -35,8 +35,6 @@ namespace osu.Game.Overlays.Settings.Sections
         public InputSubsection(InputHandler handler)
         {
             this.handler = handler;
-
-            FlowContent.AlwaysPresent = true;
         }
 
         protected override Drawable CreateHeader() => header = new ToggleableHeader(Header, IsToggleable)
@@ -50,6 +48,9 @@ namespace osu.Game.Overlays.Settings.Sections
 
             handlerEnabled.BindTo(handler.Enabled);
             handlerEnabled.BindValueChanged(updateEnabledState, true);
+
+            // We use masking to hide the content of these sections.
+            FlowContent.Masking = true;
         }
 
         private void updateEnabledState(ValueChangedEvent<bool> state)
@@ -66,8 +67,6 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 FlowContent.AutoSizeAxes = Axes.None;
                 FlowContent.ResizeHeightTo(0, 300, Easing.OutQuint);
-
-                FlowContent.FadeOut(200, Easing.OutQuint);
             }
             else
             {
@@ -77,9 +76,8 @@ namespace osu.Game.Overlays.Settings.Sections
                 FlowContent.AutoSizeDuration = state.NewValue == state.OldValue ? 0 : 300;
                 FlowContent.AutoSizeEasing = Easing.OutQuint;
                 FlowContent.AutoSizeAxes = Axes.Y;
-                ScheduleAfterChildren(() => FlowContent.AutoSizeDuration = 0);
 
-                FlowContent.FadeIn(300, Easing.OutQuint);
+                ScheduleAfterChildren(() => FlowContent.AutoSizeDuration = 0);
             }
         }
 
