@@ -42,7 +42,7 @@ namespace osu.Game.Screens.SelectV2
                 if (beatmap.Hidden)
                     continue;
 
-                if (!checkCriteriaMatch(beatmap, criteria))
+                if (!CheckCriteriaMatch(beatmap, criteria))
                     continue;
 
                 countMatching++;
@@ -52,7 +52,7 @@ namespace osu.Game.Screens.SelectV2
             BeatmapItemsCount = countMatching;
         }
 
-        private static bool checkCriteriaMatch(BeatmapInfo beatmap, FilterCriteria criteria)
+        public static bool CheckCriteriaMatch(BeatmapInfo beatmap, FilterCriteria criteria)
         {
             bool match = criteria.Ruleset == null || beatmap.AllowGameplayWithRuleset(criteria.Ruleset!, criteria.AllowConvertedBeatmaps);
 
