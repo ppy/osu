@@ -25,7 +25,7 @@ using osu.Game.Tests.Resources;
 using osuTK.Input;
 using Realms;
 
-namespace osu.Game.Tests.Visual.SongSelect
+namespace osu.Game.Tests.Visual.UserInterface
 {
     public partial class TestSceneCollectionDropdown : OsuManualInputManagerTestScene
     {
