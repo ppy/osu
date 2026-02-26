@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             var aim = skills.OfType<Aim>().Single(a => a.IncludeSliders);
             var aimWithoutSliders = skills.OfType<Aim>().Single(a => !a.IncludeSliders);
-            var speed = skills.OfType<Speed>().Single();
+            var speed = skills.OfType<Speed>().Single(s => !s.WithoutStamina);
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
             var reading = skills.OfType<Reading>().Single();
 
@@ -181,7 +181,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 new Aim(mods, true),
                 new Aim(mods, false),
-                new Speed(mods),
+                new Speed(mods, false),
+                new Speed(mods, true),
                 new Reading(mods)
             };
 
