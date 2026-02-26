@@ -31,8 +31,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double currentAimStrain;
         private double currentSpeedStrain;
 
-        private double skillMultiplierAim => 25.85;
-        private double skillMultiplierSpeed => 1.35;
+        private double skillMultiplierAim => 25.0;
+        private double skillMultiplierSpeed => 1.4;
         private double skillMultiplierTotal => 1.0;
         private double meanExponent => 1.2;
 
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) =>
             DifficultyCalculationUtils.Norm(meanExponent,
                 currentAimStrain * strainDecayAim(time - current.Previous(0).StartTime),
-                currentSpeedStrain * strainDecaySpeed(time - current.Previous(0).StartTime));
+                currentSpeedStrain * strainDecaySpeed(time - current.Previous(0).StartTime)) * skillMultiplierTotal;
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
@@ -60,18 +60,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 speedDifficulty = Math.Pow(speedDifficulty, 0.95);
             }
 
+            if (Mods.Any(m => m is OsuModRelax))
+            {
+                speedDifficulty *= 0.0;
+            }
+
             currentAimStrain *= decayAim;
             currentAimStrain += aimDifficulty * (1 - decayAim) * skillMultiplierAim;
 
             currentSpeedStrain *= decaySpeed;
             currentSpeedStrain += speedDifficulty * (1 - decaySpeed) * skillMultiplierSpeed;
 
-            double totalStrain = DifficultyCalculationUtils.Norm(meanExponent, currentAimStrain, currentSpeedStrain);
+            double totalStrain = DifficultyCalculationUtils.Norm(meanExponent, currentAimStrain, currentSpeedStrain) * skillMultiplierTotal;
 
             if (current.BaseObject is Slider)
                 sliderStrains.Add(totalStrain);
 
-            return totalStrain * skillMultiplierTotal;
+            return totalStrain;
         }
 
         public double GetDifficultSliders()
