@@ -6,10 +6,6 @@ using System.Linq;
 
 namespace osu.Game.Rulesets.Difficulty.Utils
 {
-    /// <summary>
-    /// Collection of math formulas useful for difficulty calculation.
-    /// Desmos template with the most useful functions included: https://www.desmos.com/calculator/ii8hueuugi
-    /// </summary>
     public static partial class DifficultyCalculationUtils
     {
         /// <summary>
