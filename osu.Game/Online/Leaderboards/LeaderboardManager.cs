@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
@@ -45,6 +46,9 @@ namespace osu.Game.Online.Leaderboards
 
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
+
+        [Resolved]
+        private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
         /// <summary>
         /// Fetch leaderboard content with the new criteria specified in the background.
@@ -192,10 +196,35 @@ namespace osu.Game.Online.Leaderboards
                 }
             }
 
-            newScores = newScores.Detach().OrderByCriteria(CurrentCriteria.Sorting);
+            newScores = newScores.Detach();
+
+            // score.PP value is never actually set and saved for scores present in database
+            // So just as with other cases where it's used (such as BeatmapLeaderboardScore_Tooltip and ScorePanel PerformanceStatistics)
+            // it has to be calculated in real time before being used
+            if (CurrentCriteria.Sorting == LeaderboardSortMode.PP) updatePpValues(newScores);
+
+            newScores = newScores.OrderByCriteria(CurrentCriteria.Sorting);
 
             var newScoresArray = newScores.ToArray();
             scores.Value = LeaderboardScores.Success(newScoresArray, scoresRequested: newScoresArray.Length, totalScores: newScoresArray.Length, null);
+        }
+
+        private void updatePpValues(IEnumerable<ScoreInfo> scores)
+        {
+            foreach (ScoreInfo score in scores)
+            {
+                var difficultyCalculationTask = difficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset, score.Mods, default);
+                difficultyCalculationTask.WaitSafely();
+                var attributes = difficultyCalculationTask.GetResultSafely();
+
+                var performanceCalculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator();
+
+                if (attributes?.DifficultyAttributes == null || performanceCalculator == null)
+                    continue;
+
+                var result = performanceCalculator.Calculate(score, attributes.Value.DifficultyAttributes);
+                score.PP = result.Total;
+            }
         }
 
         protected override void Dispose(bool isDisposing)
