@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             double samePattern = 0;
             double intervalPenalty = 0;
 
-            double hitWindow = hitObject.HitWindow(HitResult.Great) / 2.0; // this is practically incorrect, but kept as is for balancing
+            double hitWindow = hitObject.HitWindow(HitResult.Great);
 
             if (rhythmData.SameRhythmGroupedHitObjects?.FirstHitObject == hitObject) // Difficulty for SameRhythmGroupedHitObjects
             {
@@ -63,8 +63,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 {
                     intervalDifficulty *= DifficultyCalculationUtils.Logistic(
                         durationDifference / hitWindow,
-                        midpointOffset: 0.7,
-                        multiplier: 1.0,
+                        midpointOffset: 0.35,
+                        multiplier: 2,
                         maxValue: 1);
                 }
             }
@@ -72,8 +72,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             // Penalise patterns that can be hit within a single hit window.
             intervalDifficulty *= DifficultyCalculationUtils.Logistic(
                 sameRhythmGroupedHitObjects.Duration / hitWindow,
-                midpointOffset: 0.6,
-                multiplier: 1,
+                midpointOffset: 0.3,
+                multiplier: 2,
                 maxValue: 1);
 
             return Math.Pow(intervalDifficulty, 0.75);
