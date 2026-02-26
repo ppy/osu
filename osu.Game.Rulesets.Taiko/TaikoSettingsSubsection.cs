@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -33,6 +34,17 @@ namespace osu.Game.Rulesets.Taiko
                     Current = config.GetBindable<TaikoTouchControlScheme>(TaikoRulesetSetting.TouchControlScheme)
                 })
             };
+
+            if (RuntimeInfo.IsMobile)
+            {
+                Add(new SettingsSlider<float>
+                {
+                    LabelText = RulesetSettingsStrings.DrumTouchSize,
+                    Current = config.GetBindable<float>(TaikoRulesetSetting.DrumTouchSize),
+                    KeyboardStep = 1f,
+                    DisplayAsPercentage = true
+                });
+            }
         }
     }
 }

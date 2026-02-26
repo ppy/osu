@@ -18,11 +18,13 @@ namespace osu.Game.Rulesets.Taiko.Configuration
             base.InitialiseDefaults();
 
             SetDefault(TaikoRulesetSetting.TouchControlScheme, TaikoTouchControlScheme.KDDK);
+            SetDefault(TaikoRulesetSetting.DrumTouchSize, 1.0f, 0.5f, 2.0f, 0.01f);
         }
     }
 
     public enum TaikoRulesetSetting
     {
-        TouchControlScheme
+        TouchControlScheme,
+        DrumTouchSize
     }
 }
