@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             aimStrain *= osuCurrObj.SmallCircleBonus;
 
             // Buff strain based on the BPM of the map
-            aimStrain *= (DifficultyCalculationUtils.BPMToMilliseconds(osuCurrObj.AdjustedDeltaTime, 2) + 30) / 57;
+            aimStrain *= (DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime, 2) + 30) / 57;
 
             // We decrease strain for distances <radius to fix cases where doubles with no aim requirement
             // have their strain buffed incredibly high due to the delta time.
