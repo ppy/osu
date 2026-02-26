@@ -52,6 +52,5 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Apply penalty if there's doubletappable doubles
             return difficulty * doubletapness;
         }
-
     }
 }
