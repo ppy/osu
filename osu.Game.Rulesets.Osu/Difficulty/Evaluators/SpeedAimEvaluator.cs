@@ -3,6 +3,7 @@
 
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 
@@ -40,11 +41,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double strain = distanceBonus * 1000 / osuCurrObj.AdjustedDeltaTime;
 
-            strain *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
+            // Buff strain based on the BPM of the map
+            strain *= (DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime) + 8) / 18;
 
             return strain;
         }
-
-        private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.3, ms / 1000));
     }
 }
