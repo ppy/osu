@@ -29,7 +29,9 @@ namespace osu.Game.Overlays.Wiki.Markdown
 
             foreach (object line in yamlFrontMatterBlock.Lines)
             {
-                switch (line.ToString())
+                string? cleaned = line.ToString()?.Split('#')[0].Trim();
+
+                switch (cleaned)
                 {
                     case @"outdated: true":
                         isOutdated = true;
