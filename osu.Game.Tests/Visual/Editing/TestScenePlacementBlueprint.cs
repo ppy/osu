@@ -272,8 +272,8 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("circle has 2 samples", () => EditorBeatmap.HitObjects[1].Samples, () => Has.Count.EqualTo(2));
             AddAssert("normal sample has soft bank", () => EditorBeatmap.HitObjects[1].Samples.Single(s => s.Name == HitSampleInfo.HIT_NORMAL).Bank,
                 () => Is.EqualTo(HitSampleInfo.BANK_SOFT));
-            AddAssert("clap sample has drum bank", () => EditorBeatmap.HitObjects[1].Samples.Single(s => s.Name == HitSampleInfo.HIT_CLAP).Bank,
-                () => Is.EqualTo(HitSampleInfo.BANK_DRUM));
+            AddAssert("clap sample has soft bank", () => EditorBeatmap.HitObjects[1].Samples.Single(s => s.Name == HitSampleInfo.HIT_CLAP).Bank,
+                () => Is.EqualTo(HitSampleInfo.BANK_SOFT));
             AddAssert("circle inherited volume", () => EditorBeatmap.HitObjects[1].Samples.All(s => s.Volume == 70));
 
             AddStep("seek to 1000", () => EditorClock.Seek(1000)); // previous object is the one at time 500, which has no additions
