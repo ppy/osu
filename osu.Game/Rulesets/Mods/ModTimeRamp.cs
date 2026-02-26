@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Mods
         public sealed override bool ValidForFreestyleAsRequiredMod => true;
         public sealed override bool ValidForMultiplayerAsFreeMod => false;
 
-        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModAdaptiveSpeed) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModAdaptiveSpeed), typeof(ModPitchAdjust) };
 
         public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
         {

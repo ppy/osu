@@ -219,7 +219,8 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModBubbles(),
                         new OsuModSynesthesia(),
                         new OsuModDepth(),
-                        new OsuModBloom()
+                        new OsuModBloom(),
+                        new ModPitchAdjust()
                     };
 
                 case ModType.System:
