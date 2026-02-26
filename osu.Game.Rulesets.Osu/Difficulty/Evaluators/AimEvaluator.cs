@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double slider_multiplier = 1.5;
         private const double velocity_change_multiplier = 0.9;
         private const double wiggle_multiplier = 1.02; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
+        private const double maximum_repetition_nerf = 0.2;
+        private const double maximum_vector_influence = 0.75;
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
@@ -87,10 +89,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double angleDifferenceAdjusted = Math.Cos(2 * Math.Min(double.DegreesToRadians(45), Math.Abs(currAngle - lastAngle) * stackFactor));
                 double vectorRepetition = angleVectorRepetition(osuCurrObj);
 
-                double baseFactor = 1 - 0.2 * calcAcuteAngleBonus(lastAngle) * angleDifferenceAdjusted;
+                double baseNerf = 1 - maximum_repetition_nerf * calcAcuteAngleBonus(lastAngle) * angleDifferenceAdjusted;
 
                 // Penalize angle repetition.
-                angleRepetitionNerf = Math.Pow(baseFactor + (1 - baseFactor) * 0.75 * vectorRepetition * stackFactor, 2);
+                angleRepetitionNerf = Math.Pow(baseNerf + (1 - baseNerf) * maximum_vector_influence * vectorRepetition * stackFactor, 2);
 
                 if (Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) < 1.25 * Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) // If rhythms are the same.
                 {
@@ -207,6 +209,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 if (loopObj.IsNull())
                     break;
 
+                // Only consider vectors in the same jump section, stopping to change rhythm ruins momentum
                 if (Math.Abs(current.DeltaTime - loopObj.DeltaTime) > 25)
                     break;
 

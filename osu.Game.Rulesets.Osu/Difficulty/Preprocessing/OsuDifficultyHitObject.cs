@@ -117,11 +117,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double? Angle { get; private set; }
 
         /// <summary>
+        /// Angle of the vector created between current and current-1
+        /// normalised to consider symmetrical vectors in any axis to be the same angle.
+        /// </summary>
+        public double? NormalisedVectorAngle { get; private set; }
+
+        /// <summary>
         /// Selective bonus for maps with higher circle size.
         /// </summary>
         public double SmallCircleBonus { get; private set; }
-
-        public double? NormalisedVectorAngle { get; private set; }
 
         private readonly OsuDifficultyHitObject? lastLastDifficultyObject;
         private readonly OsuDifficultyHitObject? lastDifficultyObject;
