@@ -972,7 +972,9 @@ namespace osu.Game.Screens.SelectV2
         private readonly List<GroupedBeatmap> randomHistory = new List<GroupedBeatmap>();
 
         private Sample? spinSample;
+        private SampleChannel? spinSampleChannel;
         private Sample? randomSelectSample;
+        private SampleChannel? randomSelectSampleChannel;
 
         public bool NextRandom()
         {
@@ -1155,15 +1157,17 @@ namespace osu.Game.Screens.SelectV2
 
         private void playSpinSample(double distance)
         {
-            var chan = spinSample?.GetChannel();
+            spinSampleChannel?.Stop();
+            spinSampleChannel = spinSample?.GetChannel();
 
-            if (chan != null)
+            if (spinSampleChannel != null)
             {
-                chan.Frequency.Value = 1f + Math.Clamp(distance / 200, 0, 1);
-                chan.Play();
+                spinSampleChannel.Frequency.Value = 1f + Math.Clamp(distance / 200, 0, 1);
+                spinSampleChannel.Play();
             }
 
-            randomSelectSample?.Play();
+            randomSelectSampleChannel?.Stop();
+            randomSelectSampleChannel = randomSelectSample?.Play();
         }
 
         #endregion
