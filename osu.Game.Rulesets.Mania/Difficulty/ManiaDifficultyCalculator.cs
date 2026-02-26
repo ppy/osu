@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -12,7 +11,6 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mania.Difficulty.Skills;
-using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Scoring;
@@ -64,22 +62,29 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
-            var sortedObjects = beatmap.HitObjects.ToArray();
+            List<HitObject> objectsList = new List<HitObject>();
+
+            foreach (var obj in beatmap.HitObjects)
+            {
+                if (obj is Note)
+                    objectsList.Add(obj);
+                else
+                    objectsList.AddRange(obj.NestedHitObjects.Where(o => o is not HoldNoteBody));
+            }
+
+            var sortedObjects = objectsList.OrderBy(o => o.StartTime).ToArray();
             int totalColumns = ((ManiaBeatmap)beatmap).TotalColumns;
 
-            LegacySortHelper<HitObject>.Sort(sortedObjects, Comparer<HitObject>.Create((a, b) => (int)Math.Round(a.StartTime) - (int)Math.Round(b.StartTime)));
-
             List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
-            List<DifficultyHitObject>[] perColumnObjects = new List<DifficultyHitObject>[totalColumns];
-
-            for (int column = 0; column < totalColumns; column++)
-                perColumnObjects[column] = new List<DifficultyHitObject>();
+            ManiaMapState mapState = new ManiaMapState(totalColumns);
 
             for (int i = 1; i < sortedObjects.Length; i++)
             {
-                var currentObject = new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1], clockRate, objects, perColumnObjects, objects.Count);
+                var currentObject = new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1], clockRate,
+                    objects, mapState, objects.Count);
+
                 objects.Add(currentObject);
-                perColumnObjects[currentObject.Column].Add(currentObject);
+                mapState.Add(currentObject);
             }
 
             return objects;
