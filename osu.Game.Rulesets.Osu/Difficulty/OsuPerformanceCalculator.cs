@@ -359,10 +359,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
                 // In classic scores we can't know the amount of dropped sliders so we estimate it
-                double fullComboThreshold = attributes.MaxCombo - Math.Min(4 + likelyMissedSliderendPortion * attributes.SliderCount, attributes.SliderCount);
+                double likelyMissedSliderends = Math.Min(4 + likelyMissedSliderendPortion * attributes.SliderCount, attributes.SliderCount);
+                double fullComboThreshold = attributes.MaxCombo - likelyMissedSliderends;
 
-                if (scoreMaxCombo < fullComboThreshold)
+                double leniencyBounds = likelyMissedSliderends / 4;
+
+                if (scoreMaxCombo < fullComboThreshold + leniencyBounds)
+                {
                     missCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
+
+                    // Apply a gradient to ensure combo threshold isn't all or nothing
+                    missCount *= DifficultyCalculationUtils.Smoothstep(scoreMaxCombo, fullComboThreshold + leniencyBounds, fullComboThreshold - leniencyBounds);
+                }
 
                 // In classic scores there can't be more misses than a sum of all non-perfect judgements
                 missCount = Math.Min(missCount, totalImperfectHits);
@@ -532,7 +540,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         // Miss penalty assumes that a player will miss on the hardest parts of a map,
         // so we use the amount of relatively difficult sections to adjust miss penalty
         // to make it more punishing on maps with lower amount of hard sections.
-        private double calculateMissPenalty(double missCount, double difficultStrainCount) => 0.96 / ((missCount / (4 * Math.Pow(Math.Log(difficultStrainCount), 0.94))) + 1);
+        private double calculateMissPenalty(double missCount, double difficultStrainCount)
+        {
+            // In cases where 0 < missCount < 1, penalty should be missCount percent of the penalty for 1 miss
+            if (missCount < 1) return double.Lerp(1, calculateMissPenalty(1, difficultStrainCount), Math.Max(missCount, 0));
+
+            return 0.96 / ((missCount / (4 * Math.Pow(Math.Log(difficultStrainCount), 0.94))) + 1);
+        }
+
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
