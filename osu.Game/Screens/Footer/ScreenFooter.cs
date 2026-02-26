@@ -195,10 +195,16 @@ namespace osu.Game.Screens.Footer
 
             var oldButtons = buttonsFlow.ToArray();
 
+            foreach (var b in oldButtons)
+                b.FinishTransforms();
+
+            buttonsFlow.UpdateSubTree();
+
             for (int i = 0; i < oldButtons.Length; i++)
             {
                 var oldButton = oldButtons[i];
                 oldButton.Enabled.Value = false;
+                oldButton.X = oldButton.DrawPosition.X;
 
                 buttonsFlow.Remove(oldButton, false);
                 hiddenButtonsContainer.Add(oldButton);
@@ -259,9 +265,16 @@ namespace osu.Game.Screens.Footer
                 ? buttonsFlow.SkipWhile(b => b != targetButton).Skip(1)
                 : buttonsFlow);
 
+            foreach (var b in buttonsFlow)
+                b.FinishTransforms();
+
+            buttonsFlow.UpdateSubTree();
+
             for (int i = temporarilyHiddenButtons.Count - 1; i >= 0; i--)
             {
                 var button = temporarilyHiddenButtons[i];
+                button.X = button.DrawPosition.X;
+
                 buttonsFlow.Remove(button, false);
                 hiddenButtonsContainer.Add(button);
 
