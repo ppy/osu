@@ -596,6 +596,172 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestNonAutoBankHotkeysDuringPlacementPersistAfterPlacement()
+        {
+            AddStep("Clear all objects", () => EditorBeatmap.Clear());
+            AddStep("Enter placement mode", () => InputManager.Key(Key.Number2));
+            AddStep("Move mouse to centre", () => InputManager.MoveMouseTo(Editor.ChildrenOfType<HitObjectComposer>().First().ScreenSpaceDrawQuad.Centre));
+
+            AddStep("Move to 3000", () => EditorClock.Seek(3000));
+
+            AddStep("Press drum bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            AddAssert($"Placement sample is {HitSampleInfo.BANK_DRUM}",
+                () => EditorBeatmap.PlacementObject.Value.Samples.First(s => s.Name == HitSampleInfo.HIT_NORMAL).Bank, () => Is.EqualTo(HitSampleInfo.BANK_DRUM));
+
+            AddStep("Press normal addition bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.W);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+
+            AddStep("Press finish sample shortcut", () =>
+            {
+                InputManager.Key(Key.E);
+            });
+
+            AddAssert($"Placement sample addition is {HitSampleInfo.BANK_NORMAL}",
+                () => EditorBeatmap.PlacementObject.Value.Samples.First(s => s.Name != HitSampleInfo.HIT_NORMAL).Bank, () => Is.EqualTo(HitSampleInfo.BANK_NORMAL));
+
+            AddStep("Finish placement", () => InputManager.Click(MouseButton.Left));
+
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasAutoNormalBankFlag(0, false);
+            hitObjectHasAutoAdditionBankFlag(0, false);
+
+            clickSamplePiece(0);
+            samplePopoverIsOpen();
+            samplePopoverHasSingleAdditionBank(HitSampleInfo.BANK_NORMAL);
+        }
+
+        [Test]
+        public void TestAutoAdditionBankHotkeyDuringPlacementPersistsAfterPlacement()
+        {
+            AddStep("Clear all objects", () => EditorBeatmap.Clear());
+            AddStep("Enter placement mode", () => InputManager.Key(Key.Number2));
+            AddStep("Move mouse to centre", () => InputManager.MoveMouseTo(Editor.ChildrenOfType<HitObjectComposer>().First().ScreenSpaceDrawQuad.Centre));
+
+            AddStep("Move to 3000", () => EditorClock.Seek(3000));
+
+            AddStep("Press drum bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            AddAssert($"Placement sample is {HitSampleInfo.BANK_DRUM}",
+                () => EditorBeatmap.PlacementObject.Value.Samples.First(s => s.Name == HitSampleInfo.HIT_NORMAL).Bank, () => Is.EqualTo(HitSampleInfo.BANK_DRUM));
+
+            AddStep("Press normal addition bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.W);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+
+            AddStep("Press finish sample shortcut", () =>
+            {
+                InputManager.Key(Key.E);
+            });
+
+            AddStep("Press auto addition bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+
+            AddAssert($"Placement sample addition is {HitSampleInfo.BANK_DRUM}",
+                () => EditorBeatmap.PlacementObject.Value.Samples.First(s => s.Name != HitSampleInfo.HIT_NORMAL).Bank, () => Is.EqualTo(HitSampleInfo.BANK_DRUM));
+
+            AddStep("Finish placement", () => InputManager.Click(MouseButton.Left));
+
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasAutoNormalBankFlag(0, false);
+            hitObjectHasAutoAdditionBankFlag(0, true);
+
+            clickSamplePiece(0);
+            samplePopoverIsOpen();
+            samplePopoverHasSingleAdditionBank(EditorSelectionHandler.HIT_BANK_AUTO);
+        }
+
+        [Test]
+        public void TestFullAutoBankHotkeyDuringPlacementPersistsAfterPlacement()
+        {
+            AddStep("Clear all objects", () => EditorBeatmap.Clear());
+            AddStep("Enter placement mode", () => InputManager.Key(Key.Number2));
+            AddStep("Move mouse to centre", () => InputManager.MoveMouseTo(Editor.ChildrenOfType<HitObjectComposer>().First().ScreenSpaceDrawQuad.Centre));
+
+            AddStep("Move to 3000", () => EditorClock.Seek(3000));
+
+            AddStep("Press auto normal bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            AddAssert($"Placement sample is {HitSampleInfo.BANK_NORMAL}",
+                () => EditorBeatmap.PlacementObject.Value.Samples.First(s => s.Name == HitSampleInfo.HIT_NORMAL).Bank, () => Is.EqualTo(HitSampleInfo.BANK_NORMAL));
+
+            AddStep("Press finish sample shortcut", () =>
+            {
+                InputManager.Key(Key.E);
+            });
+
+            AddStep("Press auto addition bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+
+            AddAssert($"Placement sample addition is {HitSampleInfo.BANK_NORMAL}",
+                () => EditorBeatmap.PlacementObject.Value.Samples.First(s => s.Name != HitSampleInfo.HIT_NORMAL).Bank, () => Is.EqualTo(HitSampleInfo.BANK_NORMAL));
+
+            AddStep("Finish placement", () => InputManager.Click(MouseButton.Left));
+
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasAutoNormalBankFlag(0, false); // it's the first object - nothing to inherit bank from
+            hitObjectHasAutoAdditionBankFlag(0, true);
+
+            clickSamplePiece(0);
+            samplePopoverIsOpen();
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_NORMAL);
+            samplePopoverHasSingleAdditionBank(EditorSelectionHandler.HIT_BANK_AUTO);
+            dismissPopover();
+
+            AddStep("Move to 5000", () => EditorClock.Seek(5000));
+            AddStep("Enter placement mode", () => InputManager.Key(Key.Number2));
+            AddStep("Move mouse to centre", () => InputManager.MoveMouseTo(Editor.ChildrenOfType<HitObjectComposer>().First().ScreenSpaceDrawQuad.Centre));
+            AddStep("Finish placement", () => InputManager.Click(MouseButton.Left));
+
+            hitObjectHasSamples(1, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH); // finish is still implied, continuing from first placement
+            hitObjectHasSampleNormalBank(1, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(1, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasAutoNormalBankFlag(1, true);
+            hitObjectHasAutoAdditionBankFlag(1, true);
+
+            clickSamplePiece(1);
+            samplePopoverIsOpen();
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_NORMAL);
+            samplePopoverHasSingleAdditionBank(EditorSelectionHandler.HIT_BANK_AUTO);
+        }
+
+        [Test]
         public void PopoverForMultipleSelectionChangesAllSamples()
         {
             AddStep("add slider", () =>
@@ -952,6 +1118,14 @@ namespace osu.Game.Tests.Visual.Editing
             return dropdown?.Current.Value == "(multiple)";
         });
 
+        private void samplePopoverHasSingleAdditionBank(string bank) => AddUntilStep($"sample popover has bank {bank}", () =>
+        {
+            var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
+            var dropdown = popover?.ChildrenOfType<LabelledDropdown<string>>().ElementAt(1);
+
+            return dropdown?.Current.Value == bank;
+        });
+
         private void dismissPopover()
         {
             AddStep("dismiss popover", () => InputManager.Key(Key.Escape));
@@ -1023,6 +1197,18 @@ namespace osu.Game.Tests.Visual.Editing
         {
             var h = EditorBeatmap.HitObjects.ElementAt(objectIndex);
             return h.Samples.Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(o => o.Bank == bank);
+        });
+
+        private void hitObjectHasAutoNormalBankFlag(int objectIndex, bool autoBank) => AddAssert($"{objectIndex.ToOrdinalWords()} has auto normal bank {(autoBank ? "on" : "off")}", () =>
+        {
+            var h = EditorBeatmap.HitObjects.ElementAt(objectIndex);
+            return h.Samples.Where(o => o.Name == HitSampleInfo.HIT_NORMAL).All(o => o.EditorAutoBank == autoBank);
+        });
+
+        private void hitObjectHasAutoAdditionBankFlag(int objectIndex, bool autoBank) => AddAssert($"{objectIndex.ToOrdinalWords()} has auto addition bank {(autoBank ? "on" : "off")}", () =>
+        {
+            var h = EditorBeatmap.HitObjects.ElementAt(objectIndex);
+            return h.Samples.Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(o => o.EditorAutoBank == autoBank);
         });
 
         private void hitObjectNodeHasSamples(int objectIndex, int nodeIndex, params string[] samples) => AddAssert(

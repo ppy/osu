@@ -113,28 +113,28 @@ namespace osu.Game.Rulesets.Edit
             var lastHitObject = getPreviousHitObject();
             var lastHitNormal = lastHitObject?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
 
-            if (AutomaticAdditionBankAssignment)
-            {
-                // Inherit the addition bank from the previous hit object
-                // If there is no previous addition, inherit from the normal sample
-                var lastAddition = lastHitObject?.Samples?.FirstOrDefault(o => o.Name != HitSampleInfo.HIT_NORMAL) ?? lastHitNormal;
-
-                if (lastAddition != null)
-                    HitObject.Samples = HitObject.Samples.Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? s.With(newBank: lastAddition.Bank) : s).ToList();
-            }
+            if (lastHitNormal != null && AutomaticBankAssignment)
+                // Inherit the bank from the previous hit object
+                HitObject.Samples = HitObject.Samples.Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: lastHitNormal.Bank, newEditorAutoBank: true) : s).ToList();
+            else
+                HitObject.Samples = HitObject.Samples.Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newEditorAutoBank: false) : s).ToList();
 
             if (lastHitNormal != null)
             {
-                if (AutomaticBankAssignment)
-                    // Inherit the bank from the previous hit object
-                    HitObject.Samples = HitObject.Samples.Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: lastHitNormal.Bank) : s).ToList();
-
                 // Inherit the volume and sample set info from the previous hit object
                 HitObject.Samples = HitObject.Samples.Select(s => s.With(
                     newVolume: lastHitNormal.Volume,
                     newSuffix: lastHitNormal.Suffix,
                     newUseBeatmapSamples: lastHitNormal.UseBeatmapSamples)).ToList();
             }
+
+            if (AutomaticAdditionBankAssignment)
+            {
+                string bank = HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank ?? HitSampleInfo.BANK_SOFT;
+                HitObject.Samples = HitObject.Samples.Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? s.With(newBank: bank, newEditorAutoBank: true) : s).ToList();
+            }
+            else
+                HitObject.Samples = HitObject.Samples.Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? s.With(newEditorAutoBank: false) : s).ToList();
 
             if (HitObject is IHasRepeats hasRepeats)
             {

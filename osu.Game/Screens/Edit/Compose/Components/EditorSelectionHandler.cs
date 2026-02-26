@@ -297,22 +297,25 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             var samplesInSelection = SelectedItems.SelectMany(enumerateAllSamples).ToArray();
 
-            foreach ((string sampleName, var bindable) in SelectionSampleStates)
+            if (samplesInSelection.Length > 0)
             {
-                bindable.Value = GetStateFromSelection(samplesInSelection, h => h.Any(s => s.Name == sampleName));
-            }
+                foreach ((string sampleName, var bindable) in SelectionSampleStates)
+                {
+                    bindable.Value = GetStateFromSelection(samplesInSelection, h => h.Any(s => s.Name == sampleName));
+                }
 
-            foreach ((string bankName, var bindable) in SelectionBankStates)
-            {
-                bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s).Where(o => o.Name == HitSampleInfo.HIT_NORMAL), h => h.Bank == bankName);
-            }
+                foreach ((string bankName, var bindable) in SelectionBankStates)
+                {
+                    bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s).Where(o => o.Name == HitSampleInfo.HIT_NORMAL), h => h.Bank == bankName);
+                }
 
-            SelectionAdditionBanksEnabled.Value = samplesInSelection.SelectMany(s => s).Any(o => o.Name != HitSampleInfo.HIT_NORMAL);
+                SelectionAdditionBanksEnabled.Value = samplesInSelection.SelectMany(s => s).Any(o => o.Name != HitSampleInfo.HIT_NORMAL);
 
-            foreach ((string bankName, var bindable) in SelectionAdditionBankStates)
-            {
-                bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s).Where(o => o.Name != HitSampleInfo.HIT_NORMAL),
-                    h => (bankName != HIT_BANK_AUTO && h.Bank == bankName && !h.EditorAutoBank) || (bankName == HIT_BANK_AUTO && h.EditorAutoBank));
+                foreach ((string bankName, var bindable) in SelectionAdditionBankStates)
+                {
+                    bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s).Where(o => o.Name != HitSampleInfo.HIT_NORMAL),
+                        h => (bankName != HIT_BANK_AUTO && h.Bank == bankName && !h.EditorAutoBank) || (bankName == HIT_BANK_AUTO && h.EditorAutoBank));
+                }
             }
         }
 
