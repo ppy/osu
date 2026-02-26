@@ -104,6 +104,33 @@ namespace osu.Game.Scoring
             // this requires: max combo, statistics, max statistics (where available), and mods to already be populated on the score.
             if (StandardisedScoreMigrationTools.ShouldMigrateToNewStandardised(model))
                 model.TotalScore = StandardisedScoreMigrationTools.GetNewStandardised(model);
+
+            // Check if a valid replay is available locally
+            model.HasLocalReplay = checkHasReplay(model, archive);
+        }
+
+        private bool checkHasReplay(ScoreInfo score, ArchiveReader? archive)
+        {
+            string? replayFilename = archive?.Filenames.FirstOrDefault(f => f.EndsWith(".osr", StringComparison.OrdinalIgnoreCase));
+
+            if (replayFilename == null)
+                return false;
+
+            try
+            {
+                using (var stream = archive!.GetStream(replayFilename))
+                {
+                    if (stream == null)
+                        return false;
+
+                    var decoded = new DatabasedLegacyScoreDecoder(rulesets, beatmaps()).Parse(stream);
+                    return decoded.Replay?.Frames.Count > 0;
+                }
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         // Very naive local caching to improve performance of large score imports (where the username is usually the same for most or all scores).
