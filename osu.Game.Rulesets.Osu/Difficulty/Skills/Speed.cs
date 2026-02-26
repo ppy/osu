@@ -19,10 +19,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : HarmonicSkill
     {
-        private double totalMultiplier => 0.90;
-        private double burstMultiplier => 2.4;
+        private double totalMultiplier => 1.0;
+        private double burstMultiplier => 2.5;
         private double streamMultiplier => 0.2;
-        private double staminaMultiplier => 0.045;
+        private double staminaMultiplier => 0.05;
         private double meanExponent => 1.25;
 
         private double currentBurstStrain;
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double totalValue = DifficultyCalculationUtils.Norm(meanExponent,
                 currentBurstStrain * currentRhythm,
-                currentStreamStrain,
+                //currentStreamStrain,
                 currentStaminaStrain);
 
             if (current.BaseObject is Slider)
