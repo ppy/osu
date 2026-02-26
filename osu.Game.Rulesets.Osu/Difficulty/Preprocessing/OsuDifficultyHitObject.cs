@@ -116,6 +116,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double? Angle { get; private set; }
 
+        public double? AngleSigned { get; private set; }
+
         /// <summary>
         /// Selective bonus for maps with higher circle size.
         /// </summary>
@@ -259,7 +261,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double angle = calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition);
                 double sliderAngle = calculateSliderAngle(lastDifficultyObject!, lastLastCursorPosition);
 
-                Angle = Math.Min(angle, sliderAngle);
+                AngleSigned = Math.Abs(angle) <= Math.Abs(sliderAngle) ? angle : sliderAngle;
+                Angle = Math.Abs((double)AngleSigned);
             }
         }
 
@@ -392,7 +395,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             float dot = Vector2.Dot(v1, v2);
             float det = v1.X * v2.Y - v1.Y * v2.X;
 
-            return Math.Abs(Math.Atan2(det, dot));
+            return Math.Atan2(det, dot);
         }
 
         private Vector2 getEndCursorPosition(OsuDifficultyHitObject difficultyHitObject)

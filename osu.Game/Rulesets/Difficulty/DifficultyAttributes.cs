@@ -35,6 +35,8 @@ namespace osu.Game.Rulesets.Difficulty
         protected const int ATTRIB_ID_CONSISTENCY_FACTOR = 45;
         protected const int ATTRIB_ID_READING = 47;
         protected const int ATTRIB_ID_READING_DIFFICULT_NOTE_COUNT = 49;
+        protected const int ATTRIB_ID_SNAP_AIM_DIFFICULTY = 51;
+        protected const int ATTRIB_ID_FLOW_AIM_DIFFICULTY = 53;
 
         /// <summary>
         /// The mods which were applied to the beatmap.

@@ -190,5 +190,8 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         /// </summary>
         /// <param name="x">Value to calculate the function for</param>
         public static double ErfcInv(double x) => ErfInv(1 - x);
+
+        public static double SmoothstepTwoDirectional(double x, double y, double lowerMultiplier, double higherMultiplier) => Smoothstep(x, y * lowerMultiplier, y * higherMultiplier) * Smoothstep(y, x * lowerMultiplier, x * higherMultiplier);
+        public static double ReverseLerpTwoDirectional(double x, double y, double lowerMultiplier, double higherMultiplier) => ReverseLerp(x, y * lowerMultiplier, y * higherMultiplier) * ReverseLerp(y, x * lowerMultiplier, x * higherMultiplier);
     }
 }
