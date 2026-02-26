@@ -160,6 +160,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Add in acute angle bonus or wide angle bonus, whichever is larger.
             aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier);
 
+            aimStrain *= calcAimDoubletapMultiplier(current);
+
             // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)
                 aimStrain += sliderBonus * slider_multiplier;
@@ -170,6 +172,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             aimStrain *= highBpmBonus(osuCurrObj.AdjustedDeltaTime, osuCurrObj.LazyJumpDistance);
 
             return aimStrain;
+        }
+
+        private static double calcAimDoubletapMultiplier(DifficultyHitObject current)
+        {
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+            var osuLast0Obj = (OsuDifficultyHitObject)current.Previous(0);
+            var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
+
+            if (osuLast0Obj == null || osuLast2Obj == null)
+                return 1.0;
+
+            // Start from hitwindow. Divide by 2 because only half of hitwindow is used to abuse consecutive jumps.
+            double doubletapHitWindow = osuCurrObj.HitWindowGreat / 2;
+
+            // Check for two doubletaps
+            doubletapHitWindow *= DifficultyCalculationUtils.Smoothstep(osuLast0Obj.LazyJumpDistance, OsuDifficultyHitObject.NORMALISED_DIAMETER, 0)
+                                       * DifficultyCalculationUtils.Smoothstep(osuLast2Obj.LazyJumpDistance, OsuDifficultyHitObject.NORMALISED_DIAMETER, 0);
+
+            // If strain time is too high for this hitwindow - don't punish it
+            doubletapHitWindow *= DifficultyCalculationUtils.Smoothstep(osuCurrObj.HitWindowGreat, osuCurrObj.AdjustedDeltaTime / 2, osuCurrObj.AdjustedDeltaTime);
+
+            return osuCurrObj.AdjustedDeltaTime / (osuCurrObj.AdjustedDeltaTime + doubletapHitWindow);
         }
 
         // We decrease strain for distances <radius to fix cases where doubles with no aim requirement
