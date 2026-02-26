@@ -16,7 +16,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double acute_angle_multiplier = 2.3;
         private const double slider_multiplier = 1.5;
         private const double velocity_change_multiplier = 0.9;
-        private const double wiggle_multiplier = 1.02; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
+
+        private const double
+            wiggle_multiplier = 1.02; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
+
         private const double maximum_repetition_nerf = 0.2;
         private const double maximum_vector_influence = 0.75;
 
@@ -87,12 +90,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double stackFactor = DifficultyCalculationUtils.Smootherstep(osuLastObj.LazyJumpDistance, 0, diameter);
 
                 double angleDifferenceAdjusted = Math.Cos(2 * Math.Min(double.DegreesToRadians(45), Math.Abs(currAngle - lastAngle) * stackFactor));
-                double vectorRepetition = angleVectorRepetition(osuCurrObj);
 
                 double baseNerf = 1 - maximum_repetition_nerf * calcAcuteAngleBonus(lastAngle) * angleDifferenceAdjusted;
 
-                // Penalize angle repetition.
-                angleRepetitionNerf = Math.Pow(baseNerf + (1 - baseNerf) * maximum_vector_influence * vectorRepetition * stackFactor, 2);
+                angleRepetitionNerf = Math.Pow(baseNerf + (1 - baseNerf) * vectorAngleRepetition(osuCurrObj) * maximum_vector_influence * stackFactor, 2);
 
                 if (Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) < 1.25 * Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) // If rhythms are the same.
                 {
@@ -168,6 +169,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 sliderBonus = osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
             }
 
+            // Penalize angle repetition.
             aimStrain *= angleRepetitionNerf;
 
             aimStrain += wiggleBonus * wiggle_multiplier;
@@ -194,7 +196,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private static double highBpmBonus(double ms, double distance) => 1 / (1 - Math.Pow(0.15, ms / 1000))
                                                                           * DifficultyCalculationUtils.Smootherstep(distance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
 
-        private static double angleVectorRepetition(OsuDifficultyHitObject current)
+        private static double vectorAngleRepetition(OsuDifficultyHitObject current)
         {
             const double note_limit = 6;
 
