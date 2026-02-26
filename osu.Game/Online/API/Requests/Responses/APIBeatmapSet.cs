@@ -34,6 +34,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"favourite_count")]
         public int FavouriteCount { get; set; }
 
+        [JsonProperty(@"recent_favourites")]
+        public APIUser[]? RecentFavourites { get; set; }
+
         [JsonProperty(@"bpm")]
         public double BPM { get; set; }
 
