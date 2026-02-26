@@ -13,27 +13,20 @@ namespace osu.Game.Overlays.Chat
     public partial class ReportChatPopover : ReportPopover<ChatReportReason>
     {
         [Resolved]
-        private IAPIProvider api { get; set; } = null!;
-
-        [Resolved]
         private ChannelManager channelManager { get; set; } = null!;
 
         private readonly Message message;
 
         public ReportChatPopover(Message message)
-            : base(ReportStrings.UserTitle(message.Sender?.Username ?? @"Someone"))
+            : base(ReportStrings.UserTitle(message.Sender?.Username ?? @"Someone"), false)
         {
             this.message = message;
-            Action = report;
         }
 
-        protected override bool IsCommentRequired(ChatReportReason reason) => reason == ChatReportReason.Other;
-
-        private void report(ChatReportReason reason, string comments)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            var request = new ChatReportRequest(message.Id, reason, comments);
-
-            request.Success += () =>
+            Success += () =>
             {
                 string thanksMessage;
 
@@ -41,10 +34,10 @@ namespace osu.Game.Overlays.Chat
                 {
                     case ChannelType.PM:
                         thanksMessage = """
-                                  Chat moderators have been alerted. You have reported a private message so they will not be able to read history to maintain your privacy. Please make sure to include as much details as you can.
-                                  You can submit a second report with more details if required, or contact abuse@ppy.sh if a user is being extremely offensive.
-                                  You can also block a user via the block button on their user profile, or by right-clicking on their name in the chat and selecting "Block".
-                                  """;
+                                        Chat moderators have been alerted. You have reported a private message so they will not be able to read history to maintain your privacy. Please make sure to include as much details as you can.
+                                        You can submit a second report with more details if required, or contact abuse@ppy.sh if a user is being extremely offensive.
+                                        You can also block a user via the block button on their user profile, or by right-clicking on their name in the chat and selecting "Block".
+                                        """;
                         break;
 
                     default:
@@ -54,8 +47,10 @@ namespace osu.Game.Overlays.Chat
 
                 channelManager.CurrentChannel.Value.AddNewMessages(new InfoMessage(thanksMessage));
             };
-
-            api.Queue(request);
         }
+
+        protected override APIRequest GetRequest(ChatReportReason reason, string comments) => new ChatReportRequest(message.Id, reason, comments);
+
+        protected override bool IsCommentRequired(ChatReportReason reason) => reason == ChatReportReason.Other;
     }
 }

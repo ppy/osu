@@ -31,6 +31,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         public readonly Bindable<UserProfileData?> User = new Bindable<UserProfileData?>();
 
         private Box background = null!;
+        private UserReportPopoverTarget reportPopoverTarget = null!;
 
         protected override IEnumerable<Drawable> EffectTargets => [background];
 
@@ -60,6 +61,17 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
+                    // This is a bit of a dirty hack. Because `ReportUserPopover` is spawned from `UserActionsPopover`,
+                    // and that they both share the same `PopoverContainer`, the former will get destroyed when the latter
+                    // is opened, causing it to get destroyed as well.
+                    //
+                    // This is worked around by having an additional dummy popover target on the actions button,
+                    // which is then passed to `UserActionsPopover` and the user report action. This way the popover
+                    // can remain attached to it once the actions popover is destroyed.
+                    reportPopoverTarget = new UserReportPopoverTarget
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
                     new SpriteIcon
                     {
                         Size = new Vector2(12),
@@ -77,19 +89,26 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             base.LoadComplete();
 
-            User.BindValueChanged(_ => Alpha = User.Value?.User.OnlineID == api.LocalUser.Value.OnlineID ? 0 : 1, true);
+            User.BindValueChanged(_ =>
+            {
+                Alpha = User.Value?.User.OnlineID == api.LocalUser.Value.OnlineID ? 0 : 1;
+                reportPopoverTarget.User = User.Value?.User;
+            }, true);
         }
 
-        public Popover GetPopover() => new UserActionPopover(User.Value!.User);
+        public Popover GetPopover() => new UserActionPopover(User.Value!.User, reportPopoverTarget);
 
         private partial class UserActionPopover : OsuPopover
         {
             private readonly APIUser user;
 
-            public UserActionPopover(APIUser user)
+            private readonly IHasPopover reportPopoverTarget;
+
+            public UserActionPopover(APIUser user, IHasPopover reportPopoverTarget)
                 : base(false)
             {
                 this.user = user;
+                this.reportPopoverTarget = reportPopoverTarget;
             }
 
             [BackgroundDependencyLoader]
@@ -115,6 +134,14 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                 dialogOverlay?.Push(userBlocked ? ConfirmBlockActionDialog.Unblock(user) : ConfirmBlockActionDialog.Block(user));
                                 this.HidePopover();
                             }
+                        },
+                        new UserAction(FontAwesome.Solid.ExclamationTriangle, ReportStrings.UserButton)
+                        {
+                            Action = () =>
+                            {
+                                this.HidePopover();
+                                reportPopoverTarget.ShowPopover();
+                            },
                         }
                     }
                 };
@@ -180,7 +207,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             new OsuSpriteText
                             {
                                 Text = caption,
-                                Font = OsuFont.Style.Body,
+                                Font = OsuFont.Style.Caption1,
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 UseFullGlyphHeight = false,
@@ -206,6 +233,13 @@ namespace osu.Game.Overlays.Profile.Header.Components
             {
                 background.Alpha = indicator.Alpha = IsHovered ? 1 : 0;
             }
+        }
+
+        private partial class UserReportPopoverTarget : Container, IHasPopover
+        {
+            public APIUser? User;
+
+            public Popover? GetPopover() => User != null ? new ReportUserPopover(User) : null;
         }
     }
 }
