@@ -84,19 +84,22 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     MD5Hash = apiBeatmap.MD5Hash
                 };
 
-                var scores = value.Scores.Select(s => s.ToScoreInfo(rulesets, beatmapInfo)).OrderByTotalScore().ToArray();
+                var scores = value.Scores.OrderByTotalScore().ToArray();
                 var topScore = scores.First();
 
-                scoreTable.DisplayScores(scores, apiBeatmap.Status.GrantsPerformancePoints());
+                var scoreInfos = scores.Select(s => s.ToScoreInfo(rulesets, beatmapInfo)).ToArray();
+                var topScoreInfo = scoreInfos.First();
+
+                scoreTable.DisplayScores(scoreInfos, apiBeatmap.Status.GrantsPerformancePoints());
                 scoreTable.Show();
 
                 var userScore = value.UserScore;
                 var userScoreInfo = userScore?.Score.ToScoreInfo(rulesets, beatmapInfo);
 
-                topScoresContainer.Add(new DrawableTopScore(topScore));
+                topScoresContainer.Add(new DrawableTopScore(topScoreInfo, pinAttributes: topScore.CurrentUserAttributes?.Pin));
 
-                if (userScoreInfo != null && userScoreInfo.OnlineID != topScore.OnlineID)
-                    topScoresContainer.Add(new DrawableTopScore(userScoreInfo, userScore.Position));
+                if (userScoreInfo != null && userScoreInfo.OnlineID != topScoreInfo.OnlineID)
+                    topScoresContainer.Add(new DrawableTopScore(userScoreInfo, userScore.Position, userScore.Score.CurrentUserAttributes?.Pin));
             });
         }
 

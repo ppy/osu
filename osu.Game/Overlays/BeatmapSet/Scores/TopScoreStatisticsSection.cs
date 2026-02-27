@@ -17,6 +17,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -34,6 +39,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly FontUsage smallFont = OsuFont.GetFont(size: 16);
         private readonly FontUsage largeFont = OsuFont.GetFont(size: 22, weight: FontWeight.Light);
 
+        private readonly PinColumn pinColumn;
         private readonly TotalScoreColumn totalScoreColumn;
         private readonly TextColumn accuracyColumn;
         private readonly TextColumn maxComboColumn;
@@ -66,6 +72,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Spacing = new Vector2(margin, 0),
                         Children = new Drawable[]
                         {
+                            pinColumn = new PinColumn(),
                             totalScoreColumn = new TotalScoreColumn(BeatmapsetsStrings.ShowScoreboardHeadersScoreTotal, largeFont, top_columns_min_width),
                             accuracyColumn = new TextColumn(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, largeFont, top_columns_min_width),
                             maxComboColumn = new TextColumn(BeatmapsetsStrings.ShowScoreboardHeadersCombo, largeFont, top_columns_min_width)
@@ -156,6 +163,27 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 if (scoreManager != null)
                     totalScoreColumn.Current = scoreManager.GetBindableTotalScoreString(value);
+
+                pinColumn.Score = value;
+            }
+        }
+
+        private SoloScoreInfo.ScorePinAttributes? pinAttributes;
+
+        public SoloScoreInfo.ScorePinAttributes? PinAttributes
+        {
+            get => pinAttributes;
+            set
+            {
+                pinAttributes = value;
+
+                if (value == null)
+                    pinColumn.Hide();
+                else
+                {
+                    pinColumn.Show();
+                    pinColumn.IsPinned = value.Value.IsPinned;
+                }
             }
         }
 
@@ -317,6 +345,89 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Scale = new Vector2(0.25f),
                     }).ToList();
                 }
+            }
+        }
+
+        private partial class PinColumn : InfoColumn
+        {
+            private readonly RoundedButton button;
+
+            public ScoreInfo Score { get; set; }
+
+            private bool isPinned;
+
+            public bool IsPinned
+            {
+                get => isPinned;
+                set
+                {
+                    isPinned = value;
+                    updateDisplay();
+                }
+            }
+
+            [Resolved]
+            private IAPIProvider api { get; set; } = null!;
+
+            [Resolved(canBeNull: true)]
+            private NotificationOverlay notifications { get; set; }
+
+            public PinColumn()
+                : this(new RoundedButton
+                {
+                    Y = 4,
+                    Size = new Vector2(60, 22),
+                    Scale = new Vector2(0.8f),
+                })
+            {
+            }
+
+            public PinColumn(RoundedButton button)
+                : base(BeatmapsetsStrings.ShowScoreboardHeadersPin, button)
+            {
+                this.button = button;
+
+                button.Action = togglePin;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                updateDisplay();
+            }
+
+            private void updateDisplay()
+            {
+                button.Text = isPinned ? "Unpin" : "Pin";
+            }
+
+            private void togglePin()
+            {
+                button.Enabled.Value = false;
+
+                APIRequest req = IsPinned
+                    ? new UnpinScoreRequest(Score)
+                    : new PinScoreRequest(Score);
+
+                req.Success += () =>
+                {
+                    button.Enabled.Value = true;
+
+                    IsPinned = !IsPinned;
+                };
+
+                req.Failure += e =>
+                {
+                    button.Enabled.Value = true;
+
+                    notifications?.Post(new SimpleNotification
+                    {
+                        Text = e.Message,
+                        Icon = FontAwesome.Solid.Times,
+                    });
+                };
+
+                api.Queue(req);
             }
         }
     }

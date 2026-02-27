@@ -130,6 +130,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("processed")]
         public bool Processed { get; set; }
 
+        [JsonProperty("current_user_attributes")]
+        public ScoreCurrentUserAttributes? CurrentUserAttributes { get; set; }
+
         // These properties are calculated or not relevant to any external usage.
         public bool ShouldSerializeID() => false;
         public bool ShouldSerializeUser() => false;
@@ -265,5 +268,17 @@ namespace osu.Game.Online.API.Requests.Responses
             MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(),
             Pauses = score.Pauses.ToArray(),
         };
+
+        public struct ScoreCurrentUserAttributes
+        {
+            [JsonProperty("pin")]
+            public ScorePinAttributes? Pin { get; set; }
+        }
+
+        public struct ScorePinAttributes
+        {
+            [JsonProperty("is_pinned")]
+            public bool IsPinned { get; set; }
+        }
     }
 }
