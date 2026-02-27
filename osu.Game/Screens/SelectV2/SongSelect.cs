@@ -719,6 +719,9 @@ namespace osu.Game.Screens.SelectV2
 
         private void onArrivingAtScreen()
         {
+            if (manageCollectionsDialog != null)
+                manageCollectionsDialog.FilteredBeatmapsProvider = getFilteredBeatmaps;
+
             modSelectOverlay.Beatmap.BindTo(Beatmap);
             // required due to https://github.com/ppy/osu-framework/issues/3218
             modSelectOverlay.SelectedMods.Disabled = false;
@@ -756,6 +759,9 @@ namespace osu.Game.Screens.SelectV2
         private void onLeavingScreen()
         {
             restoreBackground();
+
+            if (manageCollectionsDialog?.FilteredBeatmapsProvider == getFilteredBeatmaps)
+                manageCollectionsDialog.FilteredBeatmapsProvider = null;
 
             modSelectOverlay.SelectedMods.UnbindFrom(Mods);
             modSelectOverlay.Beatmap.UnbindFrom(Beatmap);
@@ -941,6 +947,19 @@ namespace osu.Game.Screens.SelectV2
 
                 rightGradientBackground.ResizeWidthTo(1, 400, Easing.OutPow10);
             }
+        }
+
+        private IEnumerable<BeatmapInfo> getFilteredBeatmaps()
+        {
+            var items = carousel.GetCarouselItems();
+
+            if (items == null)
+                return Enumerable.Empty<BeatmapInfo>();
+
+            return items.Select(i => i.Model)
+                        .OfType<GroupedBeatmap>()
+                        .Select(gb => gb.Beatmap)
+                        .DistinctBy(b => b.MD5Hash);
         }
 
         #endregion
