@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -17,6 +18,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation.HUD;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -41,6 +43,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         [SettingSource(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.ShowMovingAverage), nameof(BarHitErrorMeterStrings.ShowMovingAverageDescription))]
         public Bindable<bool> ShowMovingAverage { get; } = new BindableBool(true);
 
+        [SettingSource("Moving average style", "How to display the moving average")]
+        public Bindable<MovingAverageStyles> MovingAverageStyle { get; } = new Bindable<MovingAverageStyles>(MovingAverageStyles.Chevron);
+
         [SettingSource(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.CentreMarkerStyle), nameof(BarHitErrorMeterStrings.CentreMarkerStyleDescription))]
         public Bindable<CentreMarkerStyles> CentreMarkerStyle { get; } = new Bindable<CentreMarkerStyles>(CentreMarkerStyles.Circle);
 
@@ -53,13 +58,15 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private const int centre_marker_size = 8;
 
+        private const float chevron_size = 8;
+
         private double maxHitWindow;
 
-        private double floatingAverage;
+        private readonly Bindable<double> floatingAverage = new Bindable<double>();
 
         private readonly DrawablePool<JudgementLine> judgementLinePool = new DrawablePool<JudgementLine>(50);
 
-        private SpriteIcon arrow = null!;
+        private Drawable movingAverage = null!;
         private UprightAspectMaintainingContainer labelEarly = null!;
         private UprightAspectMaintainingContainer labelLate = null!;
 
@@ -69,7 +76,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         private Container judgementsContainer = null!;
 
         private Container colourBars = null!;
-        private Container arrowContainer = null!;
+        private Container movingAverageContainer = null!;
 
         private (HitResult result, double length)[] hitWindows = null!;
 
@@ -85,7 +92,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             const int bar_height = 200;
             const int bar_width = 2;
-            const float chevron_size = 8;
 
             hitWindows = HitWindows.GetAllAvailableWindows().Where(w => w.result.IsHit()).ToArray();
 
@@ -150,7 +156,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             },
                         }
                     },
-                    arrowContainer = new Container
+                    movingAverageContainer = new Container
                     {
                         Name = "average chevron",
                         Anchor = Anchor.CentreLeft,
@@ -160,15 +166,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                         RelativeSizeAxes = Axes.Y,
                         Alpha = 0,
                         Scale = new Vector2(0, 1),
-                        Child = arrow = new SpriteIcon
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.Centre,
-                            RelativePositionAxes = Axes.Y,
-                            Y = 0.5f,
-                            Icon = FontAwesome.Solid.ChevronRight,
-                            Size = new Vector2(chevron_size),
-                        }
                     },
                 }
             };
@@ -185,6 +182,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             CentreMarkerStyle.BindValueChanged(style => recreateCentreMarker(style.NewValue), true);
             LabelStyle.BindValueChanged(style => recreateLabels(style.NewValue), true);
+            MovingAverageStyle.BindValueChanged(style => recreateMovingAverage(style.NewValue), true);
+
             ColourBarVisibility.BindValueChanged(visible =>
             {
                 colourBarsEarly.FadeTo(visible.NewValue ? 1 : 0, 500, Easing.OutQuint);
@@ -192,12 +191,12 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }, true);
 
             // delay the appearance animations for only the initial appearance.
-            using (arrowContainer.BeginDelayedSequence(450))
+            using (movingAverageContainer.BeginDelayedSequence(450))
             {
                 ShowMovingAverage.BindValueChanged(visible =>
                 {
-                    arrowContainer.FadeTo(visible.NewValue ? 1 : 0, 250, Easing.OutQuint);
-                    arrowContainer.ScaleTo(visible.NewValue ? new Vector2(1) : new Vector2(0, 1), 250, Easing.OutQuint);
+                    movingAverageContainer.FadeTo(visible.NewValue ? 1 : 0, 250, Easing.OutQuint);
+                    movingAverageContainer.ScaleTo(visible.NewValue ? new Vector2(1) : new Vector2(0, 1), 250, Easing.OutQuint);
                 }, true);
             }
         }
@@ -339,6 +338,41 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             labelLate.FadeInFromZero(500);
         }
 
+        private void recreateMovingAverage(MovingAverageStyles style)
+        {
+            switch (style)
+            {
+                case MovingAverageStyles.Chevron:
+                    movingAverageContainer.Child = movingAverage = new SpriteIcon
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                        RelativePositionAxes = Axes.Y,
+                        Y = 0.5f,
+                        Icon = FontAwesome.Solid.ChevronRight,
+                        Size = new Vector2(chevron_size),
+                    };
+                    break;
+
+                case MovingAverageStyles.Number:
+                    movingAverageContainer.Child = movingAverage = new MovingAverageCounter
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                        RelativePositionAxes = Axes.Y,
+                        AutoSizeAxes = Axes.X,
+                        Y = 0.5f,
+                        Current = { BindTarget = floatingAverage },
+                    };
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(style), style, null);
+            }
+
+            movingAverage.FadeInFromZero(500);
+        }
+
         private void createColourBars((HitResult result, double length)[] windows)
         {
             // max to avoid div-by-zero.
@@ -427,8 +461,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 judgementsContainer.Add(drawableJudgement);
             });
 
-            arrow.MoveToY(
-                getRelativeJudgementPosition(floatingAverage = floatingAverage * 0.9 + judgement.TimeOffset * 0.1)
+            movingAverage.MoveToY(
+                getRelativeJudgementPosition(floatingAverage.Value = floatingAverage.Value * 0.9 + judgement.TimeOffset * 0.1)
                 , arrow_move_duration, Easing.OutQuint);
         }
 
@@ -485,6 +519,21 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }
         }
 
+        internal partial class MovingAverageCounter : RollingCounter<double>
+        {
+            protected override double RollingDuration => 175;
+
+            protected override LocalisableString FormatCount(double count) => count.ToLocalisableString("0.0");
+
+            protected override OsuSpriteText CreateSpriteText() => new OsuSpriteText
+            {
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.Centre,
+                Font = OsuFont.Torus.With(size: 8, weight: FontWeight.Bold),
+                Rotation = 90,
+            };
+        }
+
         public override void Clear()
         {
             foreach (var j in judgementsContainer)
@@ -516,6 +565,12 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             [LocalisableDescription(typeof(BarHitErrorMeterStrings), nameof(BarHitErrorMeterStrings.LabelStylesText))]
             Text
+        }
+
+        public enum MovingAverageStyles
+        {
+            Chevron,
+            Number
         }
     }
 }
