@@ -16,6 +16,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
@@ -135,8 +136,40 @@ namespace osu.Game.Tests.Visual.Multiplayer
             // A previous test's mod overlay could still be fading out.
             AddUntilStep("wait for only one freemod overlay", () => this.ChildrenOfType<FreeModSelectOverlay>().Count() == 1);
 
+            AddStep("open free mod overlay", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonFreeMods>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
             assertFreeModNotShown(allowedMod);
             assertFreeModNotShown(requiredMod);
+        }
+
+        [Test]
+        public void TestFreeModsDisplayedOnEnter()
+        {
+            AddStep("set room freemods", () =>
+            {
+                var editedItem = MultiplayerClient.ClientRoom!.CurrentPlaylistItem.Clone();
+
+                editedItem.AllowedMods =
+                [
+                    new APIMod(new OsuModHardRock()),
+                ];
+
+                MultiplayerClient.EditPlaylistItem(editedItem);
+            });
+
+            setUp();
+
+            AddStep("open free mod overlay", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonFreeMods>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            assertFreeModShown(typeof(OsuModHardRock));
         }
 
         [Test]
@@ -164,9 +197,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("ruleset is taiko", () => Ruleset.Value.OnlineID, () => Is.EqualTo(1));
         }
 
+        private void assertFreeModShown(Type type)
+        {
+            AddUntilStep($"{type.ReadableName()} displayed in freemod overlay",
+                () => this.ChildrenOfType<FreeModSelectOverlay>()
+                          .Single()
+                          .ChildrenOfType<ModPanel>()
+                          .Where(panel => panel.Visible)
+                          .Any(b => b.Mod.GetType() == type));
+        }
+
         private void assertFreeModNotShown(Type type)
         {
-            AddAssert($"{type.ReadableName()} not displayed in freemod overlay",
+            AddUntilStep($"{type.ReadableName()} not displayed in freemod overlay",
                 () => this.ChildrenOfType<FreeModSelectOverlay>()
                           .Single()
                           .ChildrenOfType<ModPanel>()

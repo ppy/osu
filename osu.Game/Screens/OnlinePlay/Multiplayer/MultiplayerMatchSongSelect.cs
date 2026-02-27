@@ -105,24 +105,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.LoadComplete();
 
-            Mods.BindValueChanged(_ => updateValidMods());
-            Ruleset.BindValueChanged(onRulesetChanged);
-            freestyle.BindValueChanged(onFreestyleChanged);
-
-            freeModSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(freeModSelect);
-
-            updateFooterButtons();
-            updateValidMods();
-
-            operationInProgress.BindTo(operationTracker.InProgress);
-            operationInProgress.BindValueChanged(operation =>
-            {
-                if (operation.NewValue)
-                    loadingLayer.Show();
-                else
-                    loadingLayer.Hide();
-            }, true);
-
             if (initialItem != null)
             {
                 // Prefer using a local databased beatmap lookup since OnlineId may be -1 for an invalid beatmap selection.
@@ -155,6 +137,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
                 freestyle.Value = initialItem.Freestyle;
             }
+
+            Mods.BindValueChanged(_ => updateValidMods());
+            Ruleset.BindValueChanged(onRulesetChanged);
+            freestyle.BindValueChanged(onFreestyleChanged);
+
+            freeModSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(freeModSelect);
+
+            updateFooterButtons();
+            updateValidMods();
+
+            operationInProgress.BindTo(operationTracker.InProgress);
+            operationInProgress.BindValueChanged(operation =>
+            {
+                if (operation.NewValue)
+                    loadingLayer.Show();
+                else
+                    loadingLayer.Hide();
+            }, true);
         }
 
         private void onFreestyleChanged(ValueChangedEvent<bool> enabled)
