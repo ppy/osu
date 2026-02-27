@@ -80,7 +80,12 @@ namespace osu.Game.Storyboards
         /// <summary>
         /// Whether the beatmap's background should be hidden while this storyboard is being displayed.
         /// </summary>
-        public bool ReplacesBackground
+        public bool ReplacesBackground => HasBeatmapBackground;
+
+        /// <summary>
+        /// Whether the beatmap's background is already displayed as an element in the storyboard.
+        /// </summary>
+        public bool HasBeatmapBackground
         {
             get
             {
@@ -93,6 +98,23 @@ namespace osu.Game.Storyboards
                 backgroundPath = backgroundPath.ToLowerInvariant();
 
                 return GetLayer("Background").Elements.Any(e => string.Equals(e.Path, backgroundPath, StringComparison.OrdinalIgnoreCase));
+            }
+        }
+
+        /// <summary>
+        /// Whether there is a video in the beatmap.
+        /// </summary>
+        public bool HasVideo => GetLayer("Video").Elements.Count != 0;
+
+        /// <summary>
+        /// Add the beatmap background as an element of the storyboard if conditions are met.
+        /// </summary>
+        public void AddBeatmapBackgroundIfNeeded()
+        {
+            if (!HasBeatmapBackground && !Beatmap.WidescreenStoryboard && !HasVideo)
+            {
+                var backgroundLayer = GetLayer("Background");
+                backgroundLayer.Elements.Insert(0, new StoryboardBeatmapBackground(BeatmapInfo.Metadata.BackgroundFile));
             }
         }
 

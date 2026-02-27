@@ -333,6 +333,8 @@ namespace osu.Game.Beatmaps
 
                 storyboard.BeatmapInfo = BeatmapInfo;
 
+                storyboard.AddBeatmapBackgroundIfNeeded();
+
                 return storyboard;
             }
 
