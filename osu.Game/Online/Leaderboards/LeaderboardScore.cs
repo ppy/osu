@@ -34,6 +34,7 @@ using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 using CommonStrings = osu.Game.Localisation.CommonStrings;
+using SongSelect = osu.Game.Screens.SelectV2.SongSelect;
 using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Online.Leaderboards

@@ -17,13 +17,13 @@ namespace osu.Game.Tests.Visual.Playlists
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
-        private readonly FooterButtonFreeModsV2 button;
+        private readonly FooterButtonFreeMods button;
 
         public TestSceneFooterButtonFreeModsV2()
         {
             ModSelectOverlay modSelectOverlay;
             Add(modSelectOverlay = new TestModSelectOverlay());
-            Add(button = new FooterButtonFreeModsV2(modSelectOverlay)
+            Add(button = new FooterButtonFreeMods(modSelectOverlay)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.CentreLeft,

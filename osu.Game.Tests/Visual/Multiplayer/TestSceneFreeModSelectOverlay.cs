@@ -9,12 +9,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Overlays.Mods;
-using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Utils;
@@ -25,7 +24,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public partial class TestSceneFreeModSelectOverlay : MultiplayerTestScene
     {
         private FreeModSelectOverlay freeModSelectOverlay = null!;
-        private FooterButtonFreeMods footerButtonFreeMods = null!;
         private ScreenFooter footer = null!;
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
 
@@ -124,32 +122,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("select all button enabled", () => this.ChildrenOfType<SelectAllModsButton>().Single().Enabled.Value);
         }
 
-        [Test]
-        public void TestSelectAllViaFooterButtonThenDeselectFromOverlay()
-        {
-            createFreeModSelect();
-
-            AddAssert("overlay select all button enabled", () => this.ChildrenOfType<SelectAllModsButton>().Single().Enabled.Value);
-            AddAssert("footer button displays off", () => footerButtonFreeMods.ChildrenOfType<IHasText>().Any(t => t.Text == "off"));
-
-            AddStep("click footer select all button", () =>
-            {
-                InputManager.MoveMouseTo(footerButtonFreeMods);
-                InputManager.Click(MouseButton.Left);
-            });
-
-            AddUntilStep("all mods selected", assertAllAvailableModsSelected);
-            AddAssert("footer button displays all", () => footerButtonFreeMods.ChildrenOfType<IHasText>().Any(t => t.Text == "all"));
-
-            AddStep("click deselect all button", () =>
-            {
-                InputManager.MoveMouseTo(this.ChildrenOfType<DeselectAllModsButton>().Single());
-                InputManager.Click(MouseButton.Left);
-            });
-            AddUntilStep("all mods deselected", () => !freeModSelectOverlay.SelectedMods.Value.Any());
-            AddAssert("footer button displays off", () => footerButtonFreeMods.ChildrenOfType<IHasText>().Any(t => t.Text == "off"));
-        }
-
         private void createFreeModSelect()
         {
             AddStep("create free mod select screen", () => Child = new DependencyProvidingContainer
@@ -161,7 +133,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         State = { Value = Visibility.Visible }
                     },
-                    footerButtonFreeMods = new FooterButtonFreeMods(freeModSelectOverlay)
+                    new FooterButtonFreeMods(freeModSelectOverlay)
                     {
                         Anchor = Anchor.BottomRight,
                         Origin = Anchor.BottomRight,
