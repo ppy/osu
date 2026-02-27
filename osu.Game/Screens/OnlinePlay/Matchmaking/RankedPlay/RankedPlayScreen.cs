@@ -58,12 +58,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private BeatmapManager beatmapManager { get; set; } = null!;
-
-        [Resolved]
-        private RulesetStore rulesets { get; set; } = null!;
-
-        [Resolved]
         private IDialogOverlay dialogOverlay { get; set; } = null!;
 
         [Resolved]
@@ -264,16 +258,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     break;
 
                 case RankedPlayStage.GameplayWarmup:
-                    MultiplayerPlaylistItem item = client.Room!.CurrentPlaylistItem;
-
-                    RulesetInfo ruleset = rulesets.GetRuleset(item.RulesetID)!;
-                    Ruleset rulesetInstance = ruleset.CreateInstance();
-                    BeatmapInfo? localBeatmap = beatmapManager.QueryOnlineBeatmapId(item.BeatmapID);
-
-                    Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
-                    Ruleset.Value = ruleset;
-                    Mods.Value = item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
-
                     ShowScreen(new GameplayWarmupScreen());
                     break;
 
