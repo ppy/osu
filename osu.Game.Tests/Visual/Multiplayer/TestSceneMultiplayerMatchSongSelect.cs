@@ -65,7 +65,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
-            AddStep("create room", () => room = CreateDefaultRoom());
+            AddStep("create room", () =>
+            {
+                Ruleset.Value = new OsuRuleset().RulesetInfo;
+                room = CreateDefaultRoom();
+            });
             AddStep("join room", () => JoinRoom(room));
             WaitForJoined();
         }
