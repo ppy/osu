@@ -90,7 +90,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void Disconnect() => isConnected.Value = false;
 
         public MultiplayerRoomUser AddUser(APIUser user, bool markAsPlaying = false)
-            => AddUser(new MultiplayerRoomUser(user.Id) { User = user }, markAsPlaying);
+        {
+            apiRequestHandler.RegisterUser(user); // registers test user
+            return AddUser(new MultiplayerRoomUser(user.Id) { User = user }, markAsPlaying);
+        }
 
         public MultiplayerRoomUser AddUser(MultiplayerRoomUser roomUser, bool markAsPlaying = false)
         {
