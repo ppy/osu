@@ -155,6 +155,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             set => lastInCombo.Value = value;
         }
 
+        public double NoteDensity { get; set; } = 0;
+
         protected OsuHitObject()
         {
             StackHeightBindable.BindValueChanged(height =>
@@ -206,6 +208,24 @@ namespace osu.Game.Rulesets.Osu.Objects
             ComboIndex = index;
             ComboIndexWithOffsets = indexWithOffsets;
             IndexInCurrentCombo = inCurrentCombo;
+        }
+
+        public override void UpdateNoteDensity(HitObject? lastObj)
+        {
+            if (lastObj is OsuHitObject lastHitObj)
+            {
+                // this is an estimate of how many notes have disappeared, it will smooth out with time
+                double visibleNoteLoss = (StartTime - lastHitObj.StartTime) * lastHitObj.NoteDensity / TimePreempt;
+                NoteDensity = Math.Max(lastHitObj.NoteDensity - visibleNoteLoss, 0.0);
+            }
+            else
+            {
+                NoteDensity = 0.0;
+            }
+
+            NoteDensity += 1.0;
+
+            base.UpdateNoteDensity(lastObj);
         }
 
         protected override HitWindows CreateHitWindows() => new OsuHitWindows();
