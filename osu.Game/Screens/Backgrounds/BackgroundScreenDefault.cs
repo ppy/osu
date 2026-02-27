@@ -28,6 +28,7 @@ namespace osu.Game.Screens.Backgrounds
 
         private int currentDisplay;
         private const int background_count = 8;
+        private const int circles_background_count = 7;
         private IBindable<APIUser> user;
         private Bindable<Skin> skin;
         private Bindable<BackgroundSource> source;
@@ -193,6 +194,9 @@ namespace osu.Game.Screens.Backgrounds
             {
                 case IntroSequence.Welcome:
                     return @"Intro/Welcome/menu-background";
+
+                case IntroSequence.Circles:
+                    return $@"Intro/Circles/menu-background-{currentDisplay % circles_background_count + 1}";
 
                 default:
                     return $@"Menu/menu-background-{currentDisplay % background_count + 1}";
