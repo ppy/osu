@@ -1,146 +1,151 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Footer;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Select;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public partial class FooterButtonFreeMods : FooterButton
+    public partial class FooterButtonFreeMods : ScreenFooterButton
     {
-        public readonly Bindable<IReadOnlyList<Mod>> FreeMods = new Bindable<IReadOnlyList<Mod>>();
-        public readonly IBindable<bool> Freestyle = new Bindable<bool>();
-
-        protected override bool IsActive => FreeMods.Value.Count > 0;
+        public readonly Bindable<IReadOnlyList<Mod>> FreeMods = new Bindable<IReadOnlyList<Mod>>([]);
+        public readonly Bindable<bool> Freestyle = new Bindable<bool>();
 
         public new Action Action
         {
             set => throw new NotSupportedException("The click action is handled by the button itself.");
         }
 
-        private OsuSpriteText count = null!;
-        private Circle circle = null!;
-
-        private readonly FreeModSelectOverlay freeModSelectOverlay;
-
-        public FooterButtonFreeMods(FreeModSelectOverlay freeModSelectOverlay)
-        {
-            this.freeModSelectOverlay = freeModSelectOverlay;
-
-            // Overwrite any external behaviour as we delegate the main toggle action to a sub-button.
-            base.Action = toggleAllFreeMods;
-        }
-
         [Resolved]
         private OsuColour colours { get; set; } = null!;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        private Container modsWedge = null!;
+        private ModDisplay modDisplay = null!;
+        private Container modContainer = null!;
+        private FooterButtonMods.ModCountText overflowModCountDisplay = null!;
+
+        public FooterButtonFreeMods(ModSelectOverlay overlay)
+            : base(overlay)
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            ButtonContentContainer.AddRange(new[]
+            Text = OnlinePlayStrings.FooterButtonFreemods;
+            Icon = FontAwesome.Solid.ExchangeAlt;
+            AccentColour = colours.Lime1;
+
+            Add(modsWedge = new InputBlockingContainer
             {
-                new Container
+                Y = -5f,
+                Depth = float.MaxValue,
+                Origin = Anchor.BottomLeft,
+                Shear = OsuGame.SHEAR,
+                CornerRadius = CORNER_RADIUS,
+                Size = new Vector2(BUTTON_WIDTH, FooterButtonMods.BAR_HEIGHT),
+                Masking = true,
+                EdgeEffect = new EdgeEffectParameters
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        circle = new Circle
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Colour = colours.YellowDark,
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        count = new OsuSpriteText
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Padding = new MarginPadding(5),
-                            UseFullGlyphHeight = false,
-                        }
-                    }
+                    Type = EdgeEffectType.Shadow,
+                    Radius = 4,
+                    // Figma says 50% opacity, but it does not match up visually if taken at face value, and looks bad.
+                    Colour = Colour4.Black.Opacity(0.25f),
+                    Offset = new Vector2(0, 2),
                 },
-                new IconButton
+                Alpha = 0,
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(0.8f),
-                    Icon = FontAwesome.Solid.Bars,
-                    Enabled = { BindTarget = Enabled },
-                    Action = () => freeModSelectOverlay.ToggleVisibility()
+                    new Box
+                    {
+                        Colour = colourProvider.Background4,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    modContainer = new Container
+                    {
+                        CornerRadius = CORNER_RADIUS,
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        Children = new Drawable[]
+                        {
+                            modDisplay = new ModDisplay(showExtendedInformation: true)
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Shear = -OsuGame.SHEAR,
+                                Scale = new Vector2(0.5f),
+                                Current = { BindTarget = FreeMods },
+                                ExpansionMode = ExpansionMode.AlwaysContracted,
+                            },
+                            overflowModCountDisplay = new FooterButtonMods.ModCountText
+                            {
+                                Mods = { BindTarget = FreeMods },
+                            },
+                        }
+                    },
                 }
             });
-
-            SelectedColour = colours.Yellow;
-            DeselectedColour = SelectedColour.Opacity(0.5f);
-            Text = @"freemods";
-
-            TooltipText = MultiplayerMatchStrings.FreeModsButtonTooltip;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Freestyle.BindValueChanged(_ => updateModDisplay());
-            FreeMods.BindValueChanged(_ => updateModDisplay(), true);
+            Freestyle.BindValueChanged(f =>
+            {
+                Enabled.Value = !f.NewValue;
+                overflowModCountDisplay.CustomText = f.NewValue ? ModSelectOverlayStrings.AllMods.ToUpper() : (LocalisableString?)null;
+            }, true);
+            FreeMods.BindValueChanged(m =>
+            {
+                if (m.NewValue.Count == 0 && !Freestyle.Value)
+                    modsWedge.FadeOut(300, Easing.OutExpo);
+                else
+                    modsWedge.FadeIn(300, Easing.OutExpo);
+            }, true);
         }
 
-        /// <summary>
-        /// Immediately toggle all free mods on/off.
-        /// </summary>
-        private void toggleAllFreeMods()
+        protected override void Update()
         {
-            var availableMods = allAvailableAndValidMods.ToArray();
+            base.Update();
 
-            FreeMods.Value = FreeMods.Value.Count == availableMods.Length
-                ? Array.Empty<Mod>()
-                : availableMods;
-        }
+            // If there are freemods selected but the display has no width, it's still loading.
+            // Don't update visibility in this state or we will cause an awkward flash.
+            if (FreeMods.Value.Count > 0 && Precision.AlmostEquals(modDisplay.DrawWidth, 0))
+                return;
 
-        private void updateModDisplay()
-        {
-            int currentCount = FreeMods.Value.Count;
+            bool showCountText =
+                // When freestyle is enabled this text shows "ALL MODS"
+                Freestyle.Value
+                // Standard flow where mods are overflowing so we show count text.
+                || modDisplay.DrawWidth * modDisplay.Scale.X > modContainer.DrawWidth;
 
-            if (currentCount == allAvailableAndValidMods.Count() || Freestyle.Value)
-            {
-                count.Text = "all";
-                count.FadeColour(colours.Gray2, 200, Easing.OutQuint);
-                circle.FadeColour(colours.Yellow, 200, Easing.OutQuint);
-            }
-            else if (currentCount > 0)
-            {
-                count.Text = $"{currentCount} mods";
-                count.FadeColour(colours.Gray2, 200, Easing.OutQuint);
-                circle.FadeColour(colours.YellowDark, 200, Easing.OutQuint);
-            }
+            if (showCountText)
+                overflowModCountDisplay.Show();
             else
-            {
-                count.Text = "off";
-                count.FadeColour(colours.GrayF, 200, Easing.OutQuint);
-                circle.FadeColour(colours.Gray4, 200, Easing.OutQuint);
-            }
+                overflowModCountDisplay.Hide();
         }
-
-        private IEnumerable<Mod> allAvailableAndValidMods => freeModSelectOverlay.AllAvailableMods
-                                                                                 .Where(state => state.ValidForSelection.Value)
-                                                                                 .Select(state => state.Mod);
     }
 }

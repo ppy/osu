@@ -15,7 +15,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
         public TestSceneFooterButtonFreestyleV2()
         {
-            Add(new FooterButtonFreestyleV2
+            Add(new FooterButtonFreestyle
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.CentreLeft,

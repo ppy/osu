@@ -24,17 +24,13 @@ using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 using osu.Game.Tests.Beatmaps.IO;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
-    /// <summary>
-    /// Tests copied out of `TestSceneScreenNavigation` which are specific to song select.
-    /// These are for SongSelectV2. Eventually, the tests in the above class should be deleted along with old song select.
-    /// </summary>
     public partial class TestSceneSongSelectNavigation : OsuGameTestScene
     {
         [Test]
@@ -277,7 +273,7 @@ namespace osu.Game.Tests.Visual.Navigation
         /// <summary>
         /// Note: This test was written to demonstrate the failure described at https://github.com/ppy/osu/issues/35023,
         /// but because the failure scenario there entailed a race condition, it was possible for the test to pass regardless
-        /// unless <see cref="osu.Game.Screens.SelectV2.SongSelect.SELECTION_DEBOUNCE"/> was increased.
+        /// unless <see cref="osu.Game.Screens.Select.SongSelect.SELECTION_DEBOUNCE"/> was increased.
         /// </summary>
         [Test]
         public void TestPresentFromResults()

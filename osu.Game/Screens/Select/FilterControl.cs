@@ -1,29 +1,28 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
+using osu.Game.Database;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
-using osu.Game.Resources.Localisation.Web;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select.Filter;
@@ -32,226 +31,29 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
-    public partial class FilterControl : Container
+    public sealed partial class FilterControl : OverlayContainer
     {
-        public const float HEIGHT = 2 * side_margin + 120;
+        // taken from draw visualiser. used for carousel alignment purposes.
+        public const float HEIGHT_FROM_SCREEN_TOP = 141 - corner_radius;
 
-        private const float side_margin = 10;
+        private const float corner_radius = 10;
 
-        public Action<FilterCriteria> FilterChanged;
+        public IBindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
 
-        public Bindable<string> CurrentTextSearch => searchTextBox.Current;
+        private SongSelectSearchTextBox searchTextBox = null!;
+        private ShearedToggleButton showConvertedBeatmapsButton = null!;
+        private DifficultyRangeSlider difficultyRangeSlider = null!;
+        private ShearedDropdown<SortMode> sortDropdown = null!;
+        private ShearedDropdown<GroupMode> groupDropdown = null!;
+        private CollectionDropdown collectionDropdown = null!;
 
-        public LocalisableString InformationalText
-        {
-            get => searchTextBox.FilterText.Text;
-            set => searchTextBox.FilterText.Text = value;
-        }
+        /// <summary>
+        /// An optional method which can force certain criteria adjustments.
+        /// </summary>
+        public Action<FilterCriteria>? ApplyRequiredCriteria { get; set; }
 
-        private OsuTabControl<SortMode> sortTabs;
-        private Bindable<SortMode> sortMode;
-        private Bindable<GroupMode> groupMode;
-        private FilterControlTextBox searchTextBox;
-        private CollectionDropdown collectionDropdown;
-
-        [CanBeNull]
-        private FilterCriteria currentCriteria;
-
-        public virtual FilterCriteria CreateCriteria()
-        {
-            string query = searchTextBox.Text;
-
-            var criteria = new FilterCriteria
-            {
-                Group = groupMode.Value,
-                Sort = sortMode.Value,
-                AllowConvertedBeatmaps = showConverted.Value,
-                Ruleset = ruleset.Value,
-                Mods = mods.Value,
-                CollectionBeatmapMD5Hashes = collectionDropdown.Current.Value?.Collection?.PerformRead(c => c.BeatmapMD5Hashes).ToImmutableHashSet()
-            };
-
-            if (!minimumStars.IsDefault)
-                criteria.UserStarDifficulty.Min = minimumStars.Value;
-
-            if (!maximumStars.IsDefault)
-                criteria.UserStarDifficulty.Max = maximumStars.Value;
-
-            criteria.RulesetCriteria = ruleset.Value.CreateInstance().CreateRulesetFilterCriteria();
-
-            FilterQueryParser.ApplyQueries(criteria, query);
-            return criteria;
-        }
-
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
-            base.ReceivePositionalInputAt(screenSpacePos) || sortTabs.ReceivePositionalInputAt(screenSpacePos);
-
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, OsuConfigManager config)
-        {
-            sortMode = config.GetBindable<SortMode>(OsuSetting.SongSelectSortingMode);
-            groupMode = config.GetBindable<GroupMode>(OsuSetting.SongSelectGroupMode);
-
-            Children = new Drawable[]
-            {
-                new Box
-                {
-                    Colour = OsuColour.Gray(0.05f),
-                    Alpha = 0.96f,
-                    Width = 2,
-                    RelativeSizeAxes = Axes.Both,
-                },
-                new Container
-                {
-                    Padding = new MarginPadding(side_margin),
-                    RelativeSizeAxes = Axes.Both,
-                    Width = 0.5f,
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    // Reverse ChildID so that dropdowns in the top section appear on top of the bottom section.
-                    Child = new ReverseChildIDFillFlowContainer<Drawable>
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Spacing = new Vector2(0, 5),
-                        Children = new Drawable[]
-                        {
-                            searchTextBox = new FilterControlTextBox
-                            {
-                                RelativeSizeAxes = Axes.X,
-                            },
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                Height = 1,
-                                Colour = OsuColour.Gray(80),
-                            },
-                            new GridContainer
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                ColumnDimensions = new[]
-                                {
-                                    new Dimension(GridSizeMode.AutoSize),
-                                    new Dimension(GridSizeMode.Absolute, OsuTabControl<SortMode>.HORIZONTAL_SPACING),
-                                    new Dimension(),
-                                    new Dimension(GridSizeMode.Absolute, OsuTabControl<SortMode>.HORIZONTAL_SPACING),
-                                    new Dimension(GridSizeMode.AutoSize),
-                                },
-                                RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                                Content = new[]
-                                {
-                                    new[]
-                                    {
-                                        new OsuSpriteText
-                                        {
-                                            Text = SortStrings.Default,
-                                            Font = OsuFont.GetFont(size: 14),
-                                            Margin = new MarginPadding(5),
-                                            Anchor = Anchor.BottomRight,
-                                            Origin = Anchor.BottomRight,
-                                        },
-                                        Empty(),
-                                        sortTabs = new OsuTabControl<SortMode>
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            Height = 24,
-                                            AutoSort = true,
-                                            Anchor = Anchor.BottomRight,
-                                            Origin = Anchor.BottomRight,
-                                            AccentColour = colours.GreenLight,
-                                            Current = { BindTarget = sortMode }
-                                        },
-                                        Empty(),
-                                        new OsuTabControlCheckbox
-                                        {
-                                            Text = "Show converted",
-                                            Current = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
-                                            Anchor = Anchor.BottomRight,
-                                            Origin = Anchor.BottomRight,
-                                        },
-                                    }
-                                }
-                            },
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                Height = 40,
-                                Children = new Drawable[]
-                                {
-                                    new RangeSlider
-                                    {
-                                        Anchor = Anchor.TopLeft,
-                                        Origin = Anchor.TopLeft,
-                                        Label = "Difficulty range",
-                                        LowerBound = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
-                                        UpperBound = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
-                                        RelativeSizeAxes = Axes.Both,
-                                        Width = 0.48f,
-                                        DefaultStringLowerBound = "0",
-                                        DefaultStringUpperBound = "∞",
-                                        DefaultTooltipUpperBound = UserInterfaceStrings.NoLimit,
-                                        TooltipSuffix = "stars"
-                                    },
-                                    collectionDropdown = new CollectionDropdown
-                                    {
-                                        Anchor = Anchor.TopRight,
-                                        Origin = Anchor.TopRight,
-                                        RequestFilter = updateCriteria,
-                                        RelativeSizeAxes = Axes.X,
-                                        Y = 4,
-                                        Width = 0.5f,
-                                    }
-                                }
-                            },
-                        }
-                    }
-                }
-            };
-
-            config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConverted);
-            showConverted.ValueChanged += _ => updateCriteria();
-
-            config.BindWith(OsuSetting.DisplayStarsMinimum, minimumStars);
-            minimumStars.ValueChanged += _ => updateCriteria();
-
-            config.BindWith(OsuSetting.DisplayStarsMaximum, maximumStars);
-            maximumStars.ValueChanged += _ => updateCriteria();
-
-            ruleset.BindValueChanged(_ => updateCriteria());
-            mods.BindValueChanged(m =>
-            {
-                // Mods are updated once by the mod select overlay when song select is entered,
-                // regardless of if there are any mods or any changes have taken place.
-                // Updating the criteria here so early triggers a re-ordering of panels on song select, via... some mechanism.
-                // Todo: Investigate/fix and potentially remove this.
-                if (m.NewValue.SequenceEqual(m.OldValue))
-                    return;
-
-                if (currentCriteria?.RulesetCriteria?.FilterMayChangeFromMods(m) == true)
-                    updateCriteria();
-            });
-
-            groupMode.BindValueChanged(_ => updateCriteria());
-            sortMode.BindValueChanged(_ => updateCriteria());
-
-            searchTextBox.Current.ValueChanged += _ => updateCriteria();
-
-            updateCriteria();
-        }
-
-        public void Deactivate()
-        {
-            searchTextBox.ReadOnly = true;
-            searchTextBox.HoldFocus = false;
-            if (searchTextBox.HasFocus)
-                GetContainingFocusManager()!.ChangeFocus(searchTextBox);
-        }
-
-        public void Activate()
-        {
-            searchTextBox.ReadOnly = false;
-            searchTextBox.HoldFocus = true;
-        }
+        [Resolved]
+        private ISongSelect? songSelect { get; set; }
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
@@ -259,50 +61,319 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
-        private readonly Bindable<bool> showConverted = new Bindable<bool>();
-        private readonly Bindable<double> minimumStars = new BindableDouble();
-        private readonly Bindable<double> maximumStars = new BindableDouble();
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
-        private void updateCriteria() => FilterChanged?.Invoke(currentCriteria = CreateCriteria());
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
 
-        protected override bool OnClick(ClickEvent e) => true;
+        private IBindable<APIUser> localUser = null!;
+        private readonly IBindableList<int> localUserFavouriteBeatmapSets = new BindableList<int>();
 
-        protected override bool OnHover(HoverEvent e) => true;
-
-        internal partial class FilterControlTextBox : SeekLimitedSearchTextBox
+        public LocalisableString StatusText
         {
-            private const float filter_text_size = 12;
+            get => searchTextBox.StatusText;
+            set => searchTextBox.StatusText = value;
+        }
 
-            public OsuSpriteText FilterText { get; private set; }
+        public event Action<FilterCriteria>? CriteriaChanged;
 
-            public FilterControlTextBox()
+        private FilterCriteria currentCriteria = null!;
+
+        private IDisposable? collectionsSubscription;
+
+        [BackgroundDependencyLoader]
+        private void load(IAPIProvider api)
+        {
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+
+            Shear = OsuGame.SHEAR;
+            Margin = new MarginPadding { Top = -corner_radius, Right = -40 };
+
+            InternalChildren = new Drawable[]
             {
-                Height += filter_text_size;
-                TextContainer.Height *= (Height - filter_text_size) / Height;
-                TextContainer.Margin = new MarginPadding { Bottom = filter_text_size };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                TextContainer.Add(FilterText = new OsuSpriteText
+                new Container
                 {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.TopLeft,
-                    Depth = float.MinValue,
-                    Font = OsuFont.Default.With(size: filter_text_size, weight: FontWeight.SemiBold),
-                    Margin = new MarginPadding { Top = 2, Left = 2 },
-                    Colour = colours.Yellow
-                });
+                    RelativeSizeAxes = Axes.Both,
+                    CornerRadius = corner_radius,
+                    Masking = true,
+                    Child = new WedgeBackground
+                    {
+                        Anchor = Anchor.TopRight,
+                        Scale = new Vector2(-1, 1),
+                    }
+                },
+                new ReverseChildIDFillFlowContainer<Drawable>
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0f, 5f),
+                    Padding = new MarginPadding { Top = corner_radius + 5, Bottom = 2, Right = 40f, Left = 2f },
+                    Children = new Drawable[]
+                    {
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Shear = -OsuGame.SHEAR,
+                            Child = searchTextBox = new SongSelectSearchTextBox
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                HoldFocus = true,
+                                ScopedBeatmapSet = { BindTarget = ScopedBeatmapSet },
+                            },
+                        },
+                        new GridContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Shear = -OsuGame.SHEAR,
+                            RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                            ColumnDimensions = new[]
+                            {
+                                new Dimension(),
+                                new Dimension(GridSizeMode.Absolute), // can probably be removed?
+                                new Dimension(GridSizeMode.AutoSize),
+                            },
+                            Content = new[]
+                            {
+                                new[]
+                                {
+                                    difficultyRangeSlider = new DifficultyRangeSlider
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        MinRange = 0.1f,
+                                    },
+                                    Empty(),
+                                    showConvertedBeatmapsButton = new ShearedToggleButton
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Text = UserInterfaceStrings.ShowConverts,
+                                        Height = 30f,
+                                    },
+                                },
+                            }
+                        },
+                        new GridContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 30,
+                            Shear = -OsuGame.SHEAR,
+                            RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                            ColumnDimensions = new[]
+                            {
+                                new Dimension(maxSize: 180),
+                                new Dimension(GridSizeMode.Absolute, 5),
+                                new Dimension(maxSize: 180),
+                                new Dimension(GridSizeMode.Absolute, 5),
+                                new Dimension(),
+                                new Dimension(GridSizeMode.AutoSize),
+                            },
+                            Content = new[]
+                            {
+                                new[]
+                                {
+                                    sortDropdown = new ShearedDropdown<SortMode>(SongSelectStrings.Sort)
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Items = Enum.GetValues<SortMode>(),
+                                    },
+                                    Empty(),
+                                    groupDropdown = new ShearedDropdown<GroupMode>(SongSelectStrings.Group)
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Items = Enum.GetValues<GroupMode>(),
+                                    },
+                                    Empty(),
+                                    collectionDropdown = new CollectionDropdown
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                    },
+                                }
+                            }
+                        },
+                        new ScopedBeatmapSetDisplay
+                        {
+                            ScopedBeatmapSet = { BindTarget = ScopedBeatmapSet },
+                        }
+                    },
+                }
+            };
+
+            localUser = api.LocalUser.GetBoundCopy();
+            localUserFavouriteBeatmapSets.BindTo(api.LocalUserState.FavouriteBeatmapSets);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            difficultyRangeSlider.LowerBound = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum);
+            difficultyRangeSlider.UpperBound = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum);
+            config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConvertedBeatmapsButton.Active);
+            config.BindWith(OsuSetting.SongSelectSortingMode, sortDropdown.Current);
+            config.BindWith(OsuSetting.SongSelectGroupMode, groupDropdown.Current);
+
+            ruleset.BindValueChanged(_ => updateCriteria());
+            mods.BindValueChanged(m =>
+            {
+                // The following is a note carried from old song select and may not be a valid reason anymore:
+                // // Mods are updated once by the mod select overlay when song select is entered,
+                // // regardless of if there are any mods or any changes have taken place.
+                // // Updating the criteria here so early triggers a re-ordering of panels on song select, via... some mechanism.
+                // // Todo: Investigate/fix and potentially remove this.
+                // TODO: this might be simply removable with the new song select & carousel code.
+                if (m.NewValue.SequenceEqual(m.OldValue))
+                    return;
+
+                var rulesetCriteria = currentCriteria.RulesetCriteria;
+                if (rulesetCriteria?.FilterMayChangeFromMods(m) == true)
+                    updateCriteria();
+            });
+
+            searchTextBox.Current.BindValueChanged(_ => updateCriteria());
+            difficultyRangeSlider.LowerBound.BindValueChanged(_ => updateCriteria());
+            difficultyRangeSlider.UpperBound.BindValueChanged(_ => updateCriteria());
+            showConvertedBeatmapsButton.Active.BindValueChanged(_ => updateCriteria());
+            sortDropdown.Current.BindValueChanged(_ => updateCriteria());
+            groupDropdown.Current.BindValueChanged(_ => updateCriteria());
+            collectionDropdown.Current.BindValueChanged(v =>
+            {
+                // The hope would be that this never arrives here, but due to bindings receiving changes before
+                // local ValueChanged events, that's not the case (see https://github.com/ppy/osu-framework/pull/1545).
+                if (v.NewValue is ManageCollectionsFilterMenuItem || v.OldValue is ManageCollectionsFilterMenuItem)
+                    return;
+
+                updateCriteria();
+            });
+            collectionsSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), (collections, changeSet) =>
+            {
+                if (changeSet != null && groupDropdown.Current.Value == GroupMode.Collections)
+                    updateCriteria();
+            });
+
+            localUser.BindValueChanged(_ => updateCriteria());
+            localUserFavouriteBeatmapSets.BindCollectionChanged((_, _) => updateCriteria());
+            ScopedBeatmapSet.BindValueChanged(_ => updateCriteria(clearScopedSet: false));
+
+            updateCriteria();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            collectionsSubscription?.Dispose();
+        }
+
+        /// <summary>
+        /// Creates a <see cref="FilterCriteria"/> based on the current state of the controls.
+        /// </summary>
+        public FilterCriteria CreateCriteria()
+        {
+            string query = searchTextBox.Current.Value;
+            bool isValidUser = localUser.Value.Id > 1;
+
+            var criteria = new FilterCriteria
+            {
+                SelectedBeatmapSet = ScopedBeatmapSet.Value,
+                Sort = sortDropdown.Current.Value,
+                Group = groupDropdown.Current.Value,
+                AllowConvertedBeatmaps = showConvertedBeatmapsButton.Active.Value,
+                Ruleset = ruleset.Value,
+                Mods = mods.Value,
+                CollectionBeatmapMD5Hashes = collectionDropdown.Current.Value?.Collection?.PerformRead(c => c.BeatmapMD5Hashes).ToImmutableHashSet(),
+                LocalUserId = isValidUser ? localUser.Value.Id : null,
+                LocalUserUsername = isValidUser ? localUser.Value.Username : null,
+            };
+
+            if (!difficultyRangeSlider.LowerBound.IsDefault)
+                criteria.UserStarDifficulty.Min = difficultyRangeSlider.LowerBound.Value;
+
+            if (!difficultyRangeSlider.UpperBound.IsDefault)
+                criteria.UserStarDifficulty.Max = difficultyRangeSlider.UpperBound.Value;
+
+            criteria.RulesetCriteria = ruleset.Value.CreateInstance().CreateRulesetFilterCriteria();
+
+            FilterQueryParser.ApplyQueries(criteria, query);
+
+            ApplyRequiredCriteria?.Invoke(criteria);
+
+            return criteria;
+        }
+
+        private void updateCriteria(bool clearScopedSet = true)
+        {
+            if (clearScopedSet && ScopedBeatmapSet.Value != null)
+            {
+                songSelect?.UnscopeBeatmapSet();
+                // because `ScopedBeatmapSet` has a value change callback bound to it that calls `updateCriteria()` again,
+                // we can just do nothing other than clear it to avoid extra work and duplicated `CriteriaChanged` invocations
+                return;
             }
 
-            public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
-            {
-                // the "cut" platform key binding (shift-delete) conflicts with the beatmap deletion action.
-                if (e.Action == PlatformAction.Cut && e.ShiftPressed && e.CurrentState.Keyboard.Keys.IsPressed(Key.Delete))
-                    return false;
+            currentCriteria = CreateCriteria();
+            CriteriaChanged?.Invoke(currentCriteria);
+        }
 
-                return base.OnPressed(e);
+        /// <summary>
+        /// Set the query to the search text box.
+        /// </summary>
+        /// <param name="query">The string to search.</param>
+        public void Search(string query)
+        {
+            searchTextBox.Current.Value = query;
+        }
+
+        protected override void PopIn()
+        {
+            this.MoveToX(0, SongSelect.ENTER_DURATION, Easing.OutQuint)
+                .FadeIn(SongSelect.ENTER_DURATION / 3, Easing.In);
+        }
+
+        protected override void PopOut()
+        {
+            this.MoveToX(150, SongSelect.ENTER_DURATION, Easing.OutQuint)
+                .FadeOut(SongSelect.ENTER_DURATION / 3, Easing.In);
+        }
+
+        internal partial class SongSelectSearchTextBox : ShearedFilterTextBox
+        {
+            public IBindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
+
+            protected override InnerSearchTextBox CreateInnerTextBox() => new InnerTextBox
+            {
+                ScopedBeatmapSet = { BindTarget = ScopedBeatmapSet },
+            };
+
+            private partial class InnerTextBox : InnerFilterTextBox
+            {
+                public IBindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
+
+                public override bool HandleLeftRightArrows => false;
+
+                public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+                {
+                    if (e.Action == GlobalAction.Back && ScopedBeatmapSet.Value != null)
+                        return false;
+
+                    return base.OnPressed(e);
+                }
+
+                public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+                {
+                    // Conflicts with default group navigation keys (shift-left shift-right).
+                    if (e.Action == PlatformAction.SelectBackwardChar || e.Action == PlatformAction.SelectForwardChar)
+                        return false;
+
+                    // the "cut" platform key binding (shift-delete) conflicts with the beatmap deletion action.
+                    if (e.Action == PlatformAction.Cut && e.ShiftPressed && e.CurrentState.Keyboard.Keys.IsPressed(Key.Delete))
+                        return false;
+
+                    return base.OnPressed(e);
+                }
             }
         }
     }

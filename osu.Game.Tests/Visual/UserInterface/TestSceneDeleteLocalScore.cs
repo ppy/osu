@@ -26,7 +26,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Select;
 using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Input;
@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.UserInterface
     public partial class TestSceneDeleteLocalScore : OsuManualInputManagerTestScene
     {
         private readonly ContextMenuContainer contextMenuContainer;
-        private readonly BeatmapLeaderboard leaderboard;
+        private readonly BeatmapLeaderboardWedge leaderboard;
 
         private RulesetStore rulesets = null!;
         private BeatmapManager beatmapManager;
@@ -46,8 +46,15 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private BeatmapInfo beatmapInfo;
 
+        private LeaderboardManager leaderboardManager { get; set; }
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
         [Cached(typeof(IDialogOverlay))]
         private readonly DialogOverlay dialogOverlay;
+
+        private IEnumerable<ScoreInfo> scores => leaderboardManager.Scores.Value?.AllScores ?? Enumerable.Empty<ScoreInfo>();
 
         public TestSceneDeleteLocalScore()
         {
@@ -56,13 +63,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                 contextMenuContainer = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = leaderboard = new BeatmapLeaderboard
+                    Child = leaderboard = new BeatmapLeaderboardWedge
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
-                        Size = new Vector2(550f, 450f),
-                        Scope = BeatmapLeaderboardScope.Local,
-                        BeatmapInfo = TestResources.CreateTestBeatmapSetInfo().Beatmaps.First()
+                        Size = new Vector2(0.6f),
                     }
                 },
                 dialogOverlay = new DialogOverlay()
@@ -76,7 +81,10 @@ namespace osu.Game.Tests.Visual.UserInterface
             dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
             dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, Realm, API));
+            dependencies.Cache(leaderboardManager = new LeaderboardManager());
             Dependencies.Cache(Realm);
+
+            Add(leaderboardManager);
 
             return dependencies;
         }
@@ -125,13 +133,13 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
             AddStep("set up leaderboard", () =>
             {
-                leaderboard.BeatmapInfo = beatmapInfo;
-                leaderboard.RefetchScores(); // Required in the case that the beatmap hasn't changed
+                Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapInfo);
+                leaderboard.Show();
             });
 
             // Ensure the leaderboard items have finished showing up
             AddStep("finish transforms", () => leaderboard.FinishTransforms(true));
-            AddUntilStep("wait for drawables", () => leaderboard.ChildrenOfType<LeaderboardScore>().Any());
+            AddUntilStep("wait for drawables", () => leaderboard.ChildrenOfType<BeatmapLeaderboardScore>().Any());
         }
 
         [Test]
@@ -140,7 +148,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             ScoreInfo scoreBeingDeleted = null;
             AddStep("open menu for top score", () =>
             {
-                var leaderboardScore = leaderboard.ChildrenOfType<LeaderboardScore>().First();
+                var leaderboardScore = leaderboard.ChildrenOfType<BeatmapLeaderboardScore>().First();
 
                 scoreBeingDeleted = leaderboardScore.Score;
 
@@ -167,8 +175,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.PressButton(MouseButton.Left);
             });
 
-            AddUntilStep("wait for fetch", () => leaderboard.Scores.Any());
-            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineID != scoreBeingDeleted.OnlineID));
+            AddUntilStep("wait for fetch", () => scores.Any());
+            AddUntilStep("score removed from leaderboard", () => scores.All(s => s.OnlineID != scoreBeingDeleted.OnlineID));
 
             // "Clean up"
             AddStep("release left mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
@@ -178,8 +186,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestDeleteViaDatabase()
         {
             AddStep("delete top score", () => scoreManager.Delete(importedScores[0]));
-            AddUntilStep("wait for fetch", () => leaderboard.Scores.Any());
-            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineID != importedScores[0].OnlineID));
+            AddUntilStep("wait for fetch", () => scores.Any());
+            AddUntilStep("score removed from leaderboard", () => scores.All(s => s.OnlineID != importedScores[0].OnlineID));
         }
 
         protected override void Dispose(bool isDisposing)

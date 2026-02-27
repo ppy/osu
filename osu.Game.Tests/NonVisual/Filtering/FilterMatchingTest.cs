@@ -11,7 +11,6 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Filter;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
-using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Tests.NonVisual.Filtering
@@ -586,6 +585,26 @@ namespace osu.Game.Tests.NonVisual.Filtering
                                     .Select(b => carouselBeatmaps.IndexOf(b)).ToArray();
 
             Assert.That(visibleBeatmaps, Is.EqualTo(expectedBeatmapIndexes));
+        }
+
+        // This is a temporary class that emulates what these tests originally used from song select v1.
+        // If anyone ever ends up tidying up these test, here's a starting point:
+        // https://gist.github.com/peppy/67fda38f6483fd1dd01ef845ed5bf932
+        public class CarouselBeatmap
+        {
+            public readonly BeatmapInfo BeatmapInfo;
+
+            public BindableBool Filtered = new BindableBool();
+
+            public CarouselBeatmap(BeatmapInfo beatmapInfo)
+            {
+                BeatmapInfo = beatmapInfo;
+            }
+
+            public void Filter(FilterCriteria criteria)
+            {
+                Filtered.Value = !BeatmapCarouselFilterMatching.CheckCriteriaMatch(BeatmapInfo, criteria);
+            }
         }
 
         private class CustomCriteria : IRulesetFilterCriteria
