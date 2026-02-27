@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             base.SetUpSteps();
 
-            AddStep("add tray", () => Child = new PlaylistsSongSelectV2.PlaylistTray(room = new Room())
+            AddStep("add tray", () => Child = new PlaylistsSongSelect.PlaylistTray(room = new Room())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre

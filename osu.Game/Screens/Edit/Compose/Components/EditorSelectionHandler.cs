@@ -16,6 +16,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
@@ -296,22 +297,25 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             var samplesInSelection = SelectedItems.SelectMany(enumerateAllSamples).ToArray();
 
-            foreach ((string sampleName, var bindable) in SelectionSampleStates)
+            if (samplesInSelection.Length > 0)
             {
-                bindable.Value = GetStateFromSelection(samplesInSelection, h => h.Any(s => s.Name == sampleName));
-            }
+                foreach ((string sampleName, var bindable) in SelectionSampleStates)
+                {
+                    bindable.Value = GetStateFromSelection(samplesInSelection, h => h.Any(s => s.Name == sampleName));
+                }
 
-            foreach ((string bankName, var bindable) in SelectionBankStates)
-            {
-                bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s).Where(o => o.Name == HitSampleInfo.HIT_NORMAL), h => h.Bank == bankName);
-            }
+                foreach ((string bankName, var bindable) in SelectionBankStates)
+                {
+                    bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s).Where(o => o.Name == HitSampleInfo.HIT_NORMAL), h => h.Bank == bankName);
+                }
 
-            SelectionAdditionBanksEnabled.Value = samplesInSelection.SelectMany(s => s).Any(o => o.Name != HitSampleInfo.HIT_NORMAL);
+                SelectionAdditionBanksEnabled.Value = samplesInSelection.SelectMany(s => s).Any(o => o.Name != HitSampleInfo.HIT_NORMAL);
 
-            foreach ((string bankName, var bindable) in SelectionAdditionBankStates)
-            {
-                bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s).Where(o => o.Name != HitSampleInfo.HIT_NORMAL),
-                    h => (bankName != HIT_BANK_AUTO && h.Bank == bankName && !h.EditorAutoBank) || (bankName == HIT_BANK_AUTO && h.EditorAutoBank));
+                foreach ((string bankName, var bindable) in SelectionAdditionBankStates)
+                {
+                    bindable.Value = GetStateFromSelection(samplesInSelection.SelectMany(s => s).Where(o => o.Name != HitSampleInfo.HIT_NORMAL),
+                        h => (bankName != HIT_BANK_AUTO && h.Bank == bankName && !h.EditorAutoBank) || (bankName == HIT_BANK_AUTO && h.EditorAutoBank));
+                }
             }
         }
 
@@ -342,6 +346,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Sets the sample bank for all selected <see cref="HitObject"/>s.
         /// </summary>
+        /// <remarks>
+        /// Should be kept in sync with <see cref="SamplePointPiece.SampleEditPopover.setBank"/>.
+        /// </remarks>
         /// <param name="bankName">The name of the sample bank.</param>
         public void SetSampleBank(string bankName)
         {
@@ -366,12 +373,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (hasRelevantBank(h))
                     return;
 
-                h.Samples = h.Samples.Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: bankName) : s).ToList();
+                h.Samples = h.Samples.Select(s => s.Name == HitSampleInfo.HIT_NORMAL || s.EditorAutoBank ? s.With(newBank: bankName) : s).ToList();
 
                 if (h is IHasRepeats hasRepeats)
                 {
                     for (int i = 0; i < hasRepeats.NodeSamples.Count; ++i)
-                        hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: bankName) : s).ToList();
+                        hasRepeats.NodeSamples[i] = hasRepeats.NodeSamples[i].Select(s => s.Name == HitSampleInfo.HIT_NORMAL || s.EditorAutoBank ? s.With(newBank: bankName) : s).ToList();
                 }
             });
         }
@@ -379,6 +386,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Sets the sample addition bank for all selected <see cref="HitObject"/>s.
         /// </summary>
+        /// <remarks>
+        /// Should be kept in sync with <see cref="SamplePointPiece.SampleEditPopover.setAdditionBank"/>.
+        /// </remarks>
         /// <param name="bankName">The name of the sample bank.</param>
         public void SetSampleAdditionBank(string bankName)
         {
@@ -432,6 +442,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Adds a hit sample to all selected <see cref="HitObject"/>s.
         /// </summary>
+        /// <remarks>
+        /// Should be kept in sync with <see cref="SamplePointPiece.SampleEditPopover.addHitSample"/>.
+        /// </remarks>
         /// <param name="sampleName">The name of the hit sample.</param>
         public void AddHitSample(string sampleName)
         {

@@ -464,6 +464,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 beatmap.EndChange();
             }
 
+            /// <remarks>
+            /// Should be kept in sync with <see cref="EditorSelectionHandler.SetSampleBank"/>.
+            /// </remarks>
             private void setBank(string newBank)
             {
                 updateAllRelevantSamples((_, relevantSamples) =>
@@ -477,6 +480,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 });
             }
 
+            /// <remarks>
+            /// Should be kept in sync with <see cref="EditorSelectionHandler.SetSampleAdditionBank"/>.
+            /// </remarks>
             private void setAdditionBank(string newBank)
             {
                 updateAllRelevantSamples((_, relevantSamples) =>
@@ -583,6 +589,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
             }
 
+            /// <remarks>
+            /// Should be kept in sync with <see cref="EditorSelectionHandler.AddHitSample"/>.
+            /// </remarks>
             private void addHitSample(string sampleName)
             {
                 if (string.IsNullOrEmpty(sampleName))
