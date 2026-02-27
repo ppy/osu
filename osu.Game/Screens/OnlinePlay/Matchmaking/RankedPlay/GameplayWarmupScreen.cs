@@ -163,6 +163,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             globalBeatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
             globalRuleset.Value = ruleset;
             globalMods.Value = item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+
+            Client.ChangeState(MultiplayerUserState.Ready).FireAndForget();
         }
 
         public override void OnEntering(RankedPlaySubScreen? previous)
@@ -218,8 +220,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     wedgesContainer.MoveToX(0, 1000, Easing.OutPow10);
                 }
             }
-
-            Scheduler.AddDelayed(() => Client.ChangeState(MultiplayerUserState.Ready).FireAndForget(), 10000);
         }
     }
 }
