@@ -13,6 +13,7 @@ using osu.Framework.Logging;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
@@ -181,6 +182,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     wedgesContainer.MoveToX(0, 1000, Easing.OutPow10);
                 }
             }
+
+            Scheduler.AddDelayed(() => Client.ChangeState(MultiplayerUserState.Ready).FireAndForget(), 10000);
         }
     }
 }
