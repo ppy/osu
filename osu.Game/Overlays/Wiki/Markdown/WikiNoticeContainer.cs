@@ -29,7 +29,9 @@ namespace osu.Game.Overlays.Wiki.Markdown
 
             foreach (object line in yamlFrontMatterBlock.Lines)
             {
-                string? cleaned = line.ToString()?.Split('#')[0].Trim();
+                // Not considering more complex usages here.
+                // For parsing simple tags like those below, matching " #" is enough.
+                string? cleaned = line.ToString()?.Split(" #")[0].Trim();
 
                 switch (cleaned)
                 {
