@@ -17,6 +17,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
+using osu.Game.Online.RankedPlay;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 using osuTK;
@@ -26,6 +27,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 {
     public partial class DiscardScreen : RankedPlaySubScreen
     {
+        // When the 'time running out' warning sample starts to play (in remaining seconds)
+        private const int warning_time_threshold = 10;
+
         public CardRow CenterRow { get; private set; } = null!;
 
         private PlayerCardHand playerHand = null!;
@@ -40,6 +44,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         private const int card_play_samples = 2;
         private Sample?[]? cardPlaySamples;
+
+        private bool timeRunningOutWarningActive;
+        private Sample? timeRunningOutSample;
+        private SampleChannel? timeRunningOutSampleChannel;
+
+        private DateTimeOffset stageEndTime;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -106,6 +116,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             cardPlaySamples = new Sample?[card_play_samples];
             for (int i = 0; i < card_play_samples; i++)
                 cardPlaySamples[i] = audio.Samples.Get($@"Multiplayer/Matchmaking/Ranked/card-play-{1 + i}");
+
+            timeRunningOutSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/time-running-out");
         }
 
         protected override void LoadComplete()
@@ -116,23 +128,36 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             matchInfo.PlayerCardRemoved += cardRemoved;
 
             playerHand.SelectionChanged += onSelectionChanged;
+
+            Client.CountdownStarted += onCountdownStarted;
+            Client.CountdownStopped += onCountdownStopped;
+
+            if (Client.Room != null)
+            {
+                foreach (var countdown in Client.Room.ActiveCountdowns)
+                    onCountdownStarted(countdown);
+            }
+
             onSelectionChanged();
         }
 
-        private void onSelectionChanged()
+        protected override void Update()
         {
-            if (playerHand.Selection.Any())
-                discardButton.Text = $"Replace {"card".ToQuantity(playerHand.Selection.Count())}";
-            else
-                discardButton.Text = "Keep cards";
-        }
+            base.Update();
 
-        private void onDiscardButtonClicked()
-        {
-            discardButton.Hide();
+            TimeSpan remainingTime = stageEndTime - DateTimeOffset.Now;
 
-            Client.DiscardCards(playerHand.Selection.Select(it => it.Card).ToArray()).FireAndForget();
-            playerHand.SelectionMode = CardSelectionMode.Disabled;
+            if (timeRunningOutWarningActive && remainingTime.TotalSeconds < warning_time_threshold)
+            {
+                timeRunningOutSampleChannel ??= timeRunningOutSample?.GetChannel();
+
+                if (timeRunningOutSampleChannel == null || timeRunningOutSampleChannel.Playing)
+                    return;
+
+                timeRunningOutSampleChannel.ManualFree = true;
+                timeRunningOutSampleChannel.Looping = true;
+                timeRunningOutSampleChannel.Play();
+            }
         }
 
         public override void OnEntering(RankedPlaySubScreen? previous)
@@ -156,6 +181,42 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             }
 
             playerHand.UpdateLayout(stagger: 50);
+        }
+
+        private void onCountdownStarted(MultiplayerCountdown countdown) => Scheduler.Add(() =>
+        {
+            if (countdown is not RankedPlayStageCountdown stageCountdown)
+                return;
+
+            stageEndTime = DateTimeOffset.Now + countdown.TimeRemaining;
+            timeRunningOutWarningActive = stageCountdown.Stage == RankedPlayStage.CardDiscard;
+        });
+
+        private void onCountdownStopped(MultiplayerCountdown countdown) => Scheduler.Add(() =>
+        {
+            if (countdown is not RankedPlayStageCountdown)
+                return;
+
+            timeRunningOutSampleChannel?.Stop();
+
+            stageEndTime = DateTimeOffset.Now;
+            timeRunningOutWarningActive = false;
+        });
+
+        private void onSelectionChanged()
+        {
+            if (playerHand.Selection.Any())
+                discardButton.Text = $"Replace {"card".ToQuantity(playerHand.Selection.Count())}";
+            else
+                discardButton.Text = "Keep cards";
+        }
+
+        private void onDiscardButtonClicked()
+        {
+            discardButton.Hide();
+
+            Client.DiscardCards(playerHand.Selection.Select(it => it.Card).ToArray()).FireAndForget();
+            playerHand.SelectionMode = CardSelectionMode.Disabled;
         }
 
         private readonly List<RankedPlayCardWithPlaylistItem> discardedCards = new List<RankedPlayCardWithPlaylistItem>();
@@ -234,7 +295,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             discardButton.Hide();
 
             double presentationTime = Math.Max(earliestPresentationTime, Time.Current);
-
             Scheduler.AddDelayed(presentRemainingCards, presentationTime - Time.Current);
         }
 
@@ -278,6 +338,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         protected override void Dispose(bool isDisposing)
         {
+            timeRunningOutSampleChannel?.Stop();
+            timeRunningOutSampleChannel?.Dispose();
+
             matchInfo.PlayerCardAdded -= cardAdded;
             matchInfo.PlayerCardRemoved -= cardRemoved;
 
