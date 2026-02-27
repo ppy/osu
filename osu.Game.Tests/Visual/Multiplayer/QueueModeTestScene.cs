@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected IScreen CurrentScreen => multiplayerComponents.CurrentScreen;
         protected IScreen CurrentSubScreen => multiplayerComponents.MultiplayerScreen.CurrentSubScreen;
 
-        protected BeatmapManager Beatmaps = null!;
+        protected BeatmapManager Beatmaps { get; private set; } = null!;
 
         private BeatmapSetInfo importedSet = null!;
         private RulesetStore rulesets = null!;
