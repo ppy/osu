@@ -23,7 +23,18 @@ namespace osu.Game.Online.Matchmaking
         /// <see cref="IMatchmakingServer.MatchmakingDeclineInvitation">declined</see>,
         /// or ignored - in which case it will automatically be declined after a short timeout period.
         /// </summary>
+        /// <remarks>
+        /// Provided for compatibility with older clients - can be removed 20260825.
+        /// </remarks>
         Task MatchmakingRoomInvited();
+
+        /// <summary>
+        /// Signals that a match has been found and the local user is invited to it.
+        /// The invitation may be <see cref="IMatchmakingServer.MatchmakingAcceptInvitation">accepted</see>,
+        /// <see cref="IMatchmakingServer.MatchmakingDeclineInvitation">declined</see>,
+        /// or ignored - in which case it will automatically be declined after a short timeout period.
+        /// </summary>
+        Task MatchmakingRoomInvitedWithParams(MatchmakingRoomInvitationParams invitation);
 
         /// <summary>
         /// Signals that the matchmaking room is ready to be opened.
