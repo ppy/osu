@@ -13,6 +13,8 @@ using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Mania;
@@ -23,6 +25,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
+using osu.Game.Tests.Testing;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Input;
@@ -204,11 +207,138 @@ namespace osu.Game.Tests.Visual.SongSelectV2
             });
             AddStep("click use these mods", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<DrawableOsuMenuItem>().Single());
+                InputManager.MoveMouseTo(this.ChildrenOfType<DrawableOsuMenuItem>().First(item => item.Item.Text.Value == SongSelectStrings.UseTheseMods));
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("mods received HD", () => score.SelectedMods.Value.Any(m => m is OsuModHidden));
             AddAssert("mods did not receive SV2", () => !score.SelectedMods.Value.Any(m => m is ModScoreV2));
+        }
+
+        [Test]
+        public void TestDeleteButtonOnScoresWithCustomRuleset()
+        {
+            BeatmapLeaderboardScore score = null!;
+
+            AddStep("create content", () =>
+            {
+                Child = new PopoverContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
+                    {
+                        fillFlow = new FillFlowContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Spacing = new Vector2(0f, 2f),
+                            Shear = OsuGame.SHEAR,
+                        },
+                        drawWidthText = new OsuSpriteText(),
+                    }
+                };
+
+                var scoreInfo = new ScoreInfo
+                {
+                    Position = 1,
+                    Rank = ScoreRank.X,
+                    Accuracy = 1,
+                    MaxCombo = 100,
+                    TotalScore = 1_000_000,
+                    MaximumStatistics = { { HitResult.Great, 100 } },
+                    Ruleset = new TestSceneRulesetDependencies.TestRuleset().RulesetInfo,
+                    User = new APIUser
+                    {
+                        Id = DummyAPIAccess.DUMMY_USER_ID,
+                        Username = @"custom ruleset gamer",
+                        CountryCode = CountryCode.US,
+                    },
+                    Date = DateTimeOffset.Now,
+                };
+
+                fillFlow.Add(score = new BeatmapLeaderboardScore(scoreInfo)
+                {
+                    Rank = scoreInfo.Position,
+                    Shear = Vector2.Zero,
+                });
+
+                score.Show();
+            });
+
+            AddStep("right click panel", () =>
+            {
+                InputManager.MoveMouseTo(score);
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddAssert("delete menu item exists", () =>
+                this.ChildrenOfType<DrawableOsuMenuItem>().Any(item => ((OsuMenuItem)item.Item).Type == MenuItemType.Destructive));
+        }
+
+        [Test]
+        public void TestNoDeleteButtonOnOtherUserScore()
+        {
+            BeatmapLeaderboardScore score = null!;
+
+            AddStep("create content", () =>
+            {
+                Child = new PopoverContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
+                    {
+                        fillFlow = new FillFlowContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Spacing = new Vector2(0f, 2f),
+                            Shear = OsuGame.SHEAR,
+                        },
+                        drawWidthText = new OsuSpriteText(),
+                    }
+                };
+
+                var scoreInfo = new ScoreInfo
+                {
+                    Position = 1,
+                    Rank = ScoreRank.X,
+                    Accuracy = 1,
+                    MaxCombo = 100,
+                    TotalScore = 1_000_000,
+                    MaximumStatistics = { { HitResult.Great, 100 } },
+                    Ruleset = new TestSceneRulesetDependencies.TestRuleset().RulesetInfo,
+                    User = new APIUser
+                    {
+                        // different from local user
+                        Id = DummyAPIAccess.DUMMY_USER_ID + 1,
+                        Username = @"some other player",
+                        CountryCode = CountryCode.JP,
+                    },
+                    Date = DateTimeOffset.Now,
+                };
+
+                fillFlow.Add(score = new BeatmapLeaderboardScore(scoreInfo)
+                {
+                    Rank = scoreInfo.Position,
+                    Shear = Vector2.Zero,
+                });
+
+                score.Show();
+            });
+
+            AddStep("right click panel to open context menu", () =>
+            {
+                InputManager.MoveMouseTo(score);
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddAssert("no delete menu item in context menu", () =>
+                ((IHasContextMenu)score).ContextMenuItems?.Any(item => item is OsuMenuItem osuItem && osuItem.Type == MenuItemType.Destructive) == false);
         }
 
         public override void SetUpSteps()
