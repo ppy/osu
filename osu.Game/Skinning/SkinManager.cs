@@ -158,7 +158,7 @@ namespace osu.Game.Skinning
 
                 var userSkins = realm.All<SkinInfo>()
                                      .Where(s => !s.DeletePending && !s.Protected)
-                                     .OrderByDescending(s => s.IsFavourite)
+                                     .OrderByDescending(s => s.Favourite)
                                      .ThenBy(s => s.Name, StringComparer.OrdinalIgnoreCase)
                                      .AsEnumerable()
                                      .Select(s => s.ToLive(Realm));

@@ -77,8 +77,7 @@ namespace osu.Game.Tests.Visual.Settings
             {
                 skinDropdown?.Expire();
 
-                Add(
-                    new DependencyProvidingContainer
+                Add(new DependencyProvidingContainer
                     {
                         CachedDependencies =
                         [
@@ -339,7 +338,7 @@ namespace osu.Game.Tests.Visual.Settings
 
                 var userSkins = r.All<SkinInfo>()
                                  .Where(s => !s.DeletePending && !s.Protected)
-                                 .OrderByDescending(s => s.IsFavourite)
+                                 .OrderByDescending(s => s.Favourite)
                                  .ThenBy(s => s.Name, StringComparer.OrdinalIgnoreCase)
                                  .AsEnumerable()
                                  .Select(s => s.ToLive(realm));

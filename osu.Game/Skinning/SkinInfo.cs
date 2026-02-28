@@ -38,7 +38,7 @@ namespace osu.Game.Skinning
 
         public string Hash { get; set; } = string.Empty;
 
-        public bool IsFavourite { get; set; }
+        public bool Favourite { get; set; }
 
         public bool Protected { get; set; }
 

@@ -206,7 +206,7 @@ namespace osu.Game.Overlays.Settings
                             var skin = r.All<SkinInfo>().FirstOrDefault(s => s.ID == SkinData.ID);
 
                             if (skin.IsNotNull())
-                                skin.IsFavourite = isFavourite;
+                                skin.Favourite = isFavourite;
                         });
                     }
 
@@ -267,7 +267,7 @@ namespace osu.Game.Overlays.Settings
                             var skin = r.All<SkinInfo>().FirstOrDefault(s => s.ID == SkinData.ID);
 
                             if (skin.IsNotNull())
-                                skin.IsFavourite = isFavourite;
+                                skin.Favourite = isFavourite;
                         });
                     }
 
@@ -318,7 +318,7 @@ namespace osu.Game.Overlays.Settings
 
                         if (skin != null)
                         {
-                            skinItem.isFavourite = skin.IsFavourite;
+                            skinItem.isFavourite = skin.Favourite;
                             if (skinItem.isFavourite)
                                 ShowFavouriteIndicator(true);
                         }
