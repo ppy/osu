@@ -117,6 +117,33 @@ needs_cleanup: true
         }
 
         [Test]
+        public void TestOutdatedNoticeBoxWithComments()
+        {
+            AddStep("Add outdated yaml with comments", () =>
+            {
+                markdownContainer.Text = @"---
+outdated: true  # not sure about the format for ""list of mods"".
+---";
+            });
+
+            AddAssert("Outdated notice box visible", () => markdownContainer.ChildrenOfType<Container>().Any());
+        }
+
+        [Test]
+        public void TestCommentedOutFrontMatter()
+        {
+            AddStep("Add commented out front matter", () =>
+            {
+                markdownContainer.Text = @"---
+#outdated: true
+# stub: true
+---";
+            });
+
+            AddAssert("No notice box visible", () => !markdownContainer.ChildrenOfType<Container>().Any());
+        }
+
+        [Test]
         public void TestAbsoluteImage()
         {
             AddStep("Add absolute image", () =>

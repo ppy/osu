@@ -29,7 +29,11 @@ namespace osu.Game.Overlays.Wiki.Markdown
 
             foreach (object line in yamlFrontMatterBlock.Lines)
             {
-                switch (line.ToString())
+                // Not considering more complex usages here.
+                // For parsing simple tags like those below, matching " #" is enough.
+                string? cleaned = line.ToString()?.Split(" #")[0].Trim();
+
+                switch (cleaned)
                 {
                     case @"outdated: true":
                         isOutdated = true;
