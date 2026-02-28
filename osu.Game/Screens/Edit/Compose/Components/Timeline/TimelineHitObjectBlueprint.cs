@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -312,6 +313,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             private readonly HitObject? hitObject;
 
+            private readonly List<HitObject> objsToAdjust = new List<HitObject>();
+
             [Resolved]
             private EditorBeatmap beatmap { get; set; } = null!;
 
@@ -404,6 +407,25 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             protected override bool OnDragStart(DragStartEvent e)
             {
                 changeHandler?.BeginChange();
+
+                var selectionItems = beatmap.SelectedHitObjects;
+
+                if (!selectionItems.Contains(hitObject))
+                    return true;
+
+                foreach (var item in selectionItems)
+                {
+                    if (item == hitObject) continue;
+
+                    var durationItem = item as IHasDuration;
+
+                    if (Precision.AlmostEquals(durationItem!.Duration, (hitObject as IHasDuration)!.Duration, 1) &&
+                        Precision.AlmostEquals(item.StartTime, hitObject!.StartTime, 1))
+                    {
+                        objsToAdjust.Add(item);
+                    }
+                }
+
                 return true;
             }
 
@@ -456,8 +478,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 if (endTimeHitObject.EndTime == snappedTime)
                                     return;
 
-                                endTimeHitObject.Duration = snappedTime - hitObject.StartTime;
-                                beatmap.Update(hitObject);
+                                if (!objsToAdjust.Contains(hitObject))
+                                    objsToAdjust.Add(hitObject);
+
+                                foreach (var obj in objsToAdjust)
+                                {
+                                    (obj as IHasDuration)!.Duration = snappedTime - obj.StartTime;
+                                    beatmap.Update(obj);
+                                }
+
                                 break;
                         }
                     }
@@ -473,6 +502,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 changeHandler?.EndChange();
                 OnDragHandled?.Invoke(null);
+                objsToAdjust.Clear();
             }
         }
 
