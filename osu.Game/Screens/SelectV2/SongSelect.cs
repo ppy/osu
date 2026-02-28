@@ -109,12 +109,6 @@ namespace osu.Game.Screens.SelectV2
         private ModSelectOverlay modSelectOverlay = null!;
         private ModSpeedHotkeyHandler modSpeedHotkeyHandler = null!;
 
-        // Blue is the most neutral choice, so I'm using that for now.
-        // Purple makes the most sense to match the "gameplay" flow, but it's a bit too strong for the current design.
-        // TODO: Colour scheme choice should probably be customisable by the user.
-        [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
-
         private BeatmapCarousel carousel = null!;
 
         protected FilterControl FilterControl { get; private set; } = null!;
@@ -171,6 +165,14 @@ namespace osu.Game.Screens.SelectV2
         private Bindable<bool> showConvertedBeatmaps = null!;
 
         private IDisposable? modSelectOverlayRegistration;
+
+        protected SongSelect()
+        {
+            // Blue is the most neutral choice, so I'm using that for now.
+            // Purple makes the most sense to match the "gameplay" flow, but it's a bit too strong for the current design.
+            // TODO: Colour scheme choice should probably be customisable by the user.
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)

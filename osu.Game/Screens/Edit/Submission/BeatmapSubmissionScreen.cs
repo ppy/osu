@@ -43,9 +43,6 @@ namespace osu.Game.Screens.Edit.Submission
 
         protected override bool InitialBackButtonVisibility => false;
 
-        [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
-
         [Resolved]
         private RealmAccess realmAccess { get; set; } = null!;
 
@@ -85,9 +82,16 @@ namespace osu.Game.Screens.Edit.Submission
 
         private Sample completedSample = null!;
 
+        public BeatmapSubmissionScreen()
+        {
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+        }
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
+            Debug.Assert(ColourProvider != null);
+
             AddRangeInternal(new Drawable[]
             {
                 overlay = new BeatmapSubmissionOverlay(),
@@ -108,7 +112,7 @@ namespace osu.Game.Screens.Edit.Submission
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = colourProvider.Background5,
+                            Colour = ColourProvider.Background5,
                         },
                         new FillFlowContainer
                         {

@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
@@ -146,8 +145,10 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             public override bool ShowFooter => true;
 
-            [Cached]
-            private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+            public TestScreenOne()
+            {
+                ColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+            }
 
             public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new[]
             {
@@ -159,8 +160,10 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             public override bool ShowFooter => true;
 
-            [Cached]
-            private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+            public TestScreenTwo()
+            {
+                ColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+            }
 
             public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new[]
             {
