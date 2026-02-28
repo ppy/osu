@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double distanceBonus = Math.Pow(distance / SINGLE_SPACING_THRESHOLD, 3.0);
 
             // Apply reduced small circle bonus because flow aim difficulty on small circles doesn't scale as hard as jumps
-            distanceBonus *= Math.Sqrt(osuCurrObj.SmallCircleBonus);
+            distanceBonus *= Math.Pow(osuCurrObj.SmallCircleBonus, 0.7);
 
             double strain = distanceBonus * 1000 / osuCurrObj.AdjustedDeltaTime;
 
