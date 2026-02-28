@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double wide_angle_multiplier = 1.2;
         private const double acute_angle_multiplier = 2.15;
         private const double slider_multiplier = 1.5;
-        private const double velocity_change_multiplier = 0.9;
+        private const double velocity_change_multiplier = 1.0;
         private const double wiggle_multiplier = 1.02; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
         private const double maximum_repetition_nerf = 0.2;
         private const double maximum_vector_influence = 0.75;
@@ -49,10 +49,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
             if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
             {
-                double travelVelocity = osuLastObj.TravelDistance / osuLastObj.TravelTime; // calculate the slider velocity from slider head to slider end.
-                double movementVelocity = osuCurrObj.MinimumJumpDistance / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
+                double sliderDistance = osuLastObj.TravelDistance + osuCurrObj.MinimumJumpDistance;
+                double sliderTime = osuLastObj.TravelTime + osuCurrObj.MinimumJumpTime;
 
-                currVelocity = Math.Max(currVelocity, movementVelocity + travelVelocity); // take the larger total combined velocity.
+                currVelocity = Math.Max(currVelocity, sliderDistance / sliderTime);
             }
 
             // As above, do the same for the previous hitobject.
@@ -61,10 +61,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (osuLastLastObj.BaseObject is Slider && withSliderTravelDistance)
             {
-                double travelVelocity = osuLastLastObj.TravelDistance / osuLastLastObj.TravelTime;
-                double movementVelocity = osuLastObj.MinimumJumpDistance / osuLastObj.MinimumJumpTime;
+                double sliderDistance = osuLastLastObj.TravelDistance + osuLastObj.MinimumJumpDistance;
+                double sliderTime = osuLastLastObj.TravelTime + osuLastObj.MinimumJumpTime;
 
-                prevVelocity = Math.Max(prevVelocity, movementVelocity + travelVelocity);
+                prevVelocity = Math.Max(prevVelocity, sliderDistance / sliderTime);
             }
 
             double wideAngleBonus = 0;
@@ -173,11 +173,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             aimStrain += velocityChangeBonus * velocity_change_multiplier;
 
             // Add in acute angle bonus or wide angle bonus, whichever is larger.
-            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier);
+            aimStrain += Math.Max(acuteAngleBonus * 2.6, wideAngleBonus * wide_angle_multiplier);
 
             // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)
-                aimStrain += sliderBonus * slider_multiplier;
+                aimStrain += Math.Sqrt(sliderBonus) * 2.6;
 
             // Apply high circle size bonus
             aimStrain *= osuCurrObj.SmallCircleBonus;
@@ -190,7 +190,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         // We decrease strain for distances <radius to fix cases where doubles with no aim requirement
         // have their strain buffed incredibly high due to the delta time.
         // These objects do not require any movement, so it does not make sense to award them.
-        private static double highBpmBonus(double ms, double distance) => 1 / (1 - Math.Pow(0.15, ms / 1000))
+        private static double highBpmBonus(double ms, double distance) => 1 / (1 - Math.Pow(0.03, Math.Pow(ms / 1000, 0.75)))
                                                                           * DifficultyCalculationUtils.Smootherstep(distance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
 
         private static double vectorAngleRepetition(OsuDifficultyHitObject current)
