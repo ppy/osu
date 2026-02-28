@@ -1,6 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -373,6 +376,145 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("search for first", () => dialog.ChildrenOfType<SearchTextBox>().Single().Current.Value = "firs");
 
             assertCollectionCount(1);
+        }
+
+        [Test]
+        public void TestSaveFilteredResultsViaUI()
+        {
+            const int total = 1000;
+            const int unique_to_add = 500;
+
+            AddStep("add target collection", () => Realm.Write(r => r.Add(new BeatmapCollection(name: "Save target"))));
+
+            // provider that yields `total` beatmaps cycling through `uniqueToAdd` distinct hashes
+            IEnumerable<BeatmapInfo> provider()
+            {
+                string[] distinct = Enumerable.Range(0, unique_to_add).Select(i => Guid.NewGuid().ToString("N")).ToArray();
+                for (int i = 0; i < total; i++)
+                    yield return new BeatmapInfo { MD5Hash = distinct[i % distinct.Length] };
+            }
+
+            AddStep("set provider", () => dialog.FilteredBeatmapsProvider = provider);
+
+            AddUntilStep("save button enabled", () =>
+            {
+                var save = dialog.ChildrenOfType<Graphics.UserInterfaceV2.RoundedButton>().FirstOrDefault(b => b.Text.ToString() == "Save");
+                return save != null && save.Enabled.Value;
+            });
+
+            AddStep("click save", () =>
+            {
+                var save = dialog.ChildrenOfType<Graphics.UserInterfaceV2.RoundedButton>().First(b => b.Text.ToString() == "Save");
+                InputManager.MoveMouseTo(save);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("collection has hashes", () =>
+            {
+                var c = Realm.Run(r => r.All<BeatmapCollection>().FirstOrDefault(coll => coll.Name == "Save target"));
+                return c != null && c.BeatmapMD5Hashes.Count == unique_to_add;
+            });
+        }
+
+        [Test]
+        public void Performance_SaveFilteredResults_10k_5k()
+        {
+            const int total = 10_000;
+            const int unique_to_add = 5_000;
+
+            AddStep("add target collection", () => Realm.Write(r => r.Add(new BeatmapCollection(name: "Perf target 10k"))));
+
+            IEnumerable<BeatmapInfo> provider()
+            {
+                string[] distinct = Enumerable.Range(0, unique_to_add).Select(i => Guid.NewGuid().ToString("N")).ToArray();
+                for (int i = 0; i < total; i++)
+                    yield return new BeatmapInfo { MD5Hash = distinct[i % distinct.Length] };
+            }
+
+            AddStep("set provider", () => dialog.FilteredBeatmapsProvider = provider);
+
+            AddUntilStep("save button enabled", () =>
+            {
+                var save = dialog.ChildrenOfType<Graphics.UserInterfaceV2.RoundedButton>().FirstOrDefault(b => b.Text.ToString() == "Save");
+                return save != null && save.Enabled.Value;
+            });
+
+            Stopwatch sw = null!;
+
+            AddStep("click save and start timer", () =>
+            {
+                var save = dialog.ChildrenOfType<Graphics.UserInterfaceV2.RoundedButton>().First(b => b.Text.ToString() == "Save");
+                sw = Stopwatch.StartNew();
+                InputManager.MoveMouseTo(save);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("collection has hashes", () =>
+            {
+                var c = Realm.Run(r => r.All<BeatmapCollection>().FirstOrDefault(coll => coll.Name == "Perf target 10k"));
+                if (c == null) return false;
+
+                bool ok = c.BeatmapMD5Hashes.Count == unique_to_add;
+
+                if (ok)
+                {
+                    sw.Stop();
+                    TestContext.Progress.WriteLine($"10k->5k: elapsed {sw.ElapsedMilliseconds} ms");
+                }
+
+                return ok;
+            });
+        }
+
+        [Test]
+        public void Performance_SaveFilteredResults_100k_50k()
+        {
+            const int total = 100_000;
+            const int unique_to_add = 50_000;
+
+            AddStep("add target collection", () => Realm.Write(r => r.Add(new BeatmapCollection(name: "Perf target 100k"))));
+
+            IEnumerable<BeatmapInfo> provider()
+            {
+                string[] distinct = Enumerable.Range(0, unique_to_add).Select(i => Guid.NewGuid().ToString("N")).ToArray();
+                for (int i = 0; i < total; i++)
+                    yield return new BeatmapInfo { MD5Hash = distinct[i % distinct.Length] };
+            }
+
+            AddStep("set provider", () => dialog.FilteredBeatmapsProvider = provider);
+
+            AddUntilStep("save button enabled", () =>
+            {
+                var save = dialog.ChildrenOfType<Graphics.UserInterfaceV2.RoundedButton>().FirstOrDefault(b => b.Text.ToString() == "Save");
+                return save != null && save.Enabled.Value;
+            });
+
+            Stopwatch sw = null!;
+
+            AddStep("click save and start timer", () =>
+            {
+                var save = dialog.ChildrenOfType<Graphics.UserInterfaceV2.RoundedButton>().First(b => b.Text.ToString() == "Save");
+                sw = Stopwatch.StartNew();
+                InputManager.MoveMouseTo(save);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            // allow plenty of time for large workload
+            AddUntilStep("collection has hashes", () =>
+            {
+                var c = Realm.Run(r => r.All<BeatmapCollection>().FirstOrDefault(coll => coll.Name == "Perf target 100k"));
+                if (c == null) return false;
+
+                bool ok = c.BeatmapMD5Hashes.Count == unique_to_add;
+
+                if (ok)
+                {
+                    sw.Stop();
+                    TestContext.Progress.WriteLine($"100k->50k: elapsed {sw.ElapsedMilliseconds} ms");
+                }
+
+                return ok;
+            });
         }
 
         private void assertCollectionCount(int count)
