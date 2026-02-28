@@ -139,7 +139,7 @@ namespace osu.Game.Skinning
 
         /// <summary>
         /// Returns the dropdown ordering for use mainly by the skin selection UI.
-        /// Inserts the defaults first, then 'random skin', then custom ones.
+        /// Inserts the defaults first, then 'random skin', then favourite (custom) skins, then the rest of the custom ones.
         /// Returns a list of <see cref="Live{SkinInfo}"/> items.
         /// </summary>
         public IList<Live<SkinInfo>> GetAllUsableSkins()
@@ -158,7 +158,8 @@ namespace osu.Game.Skinning
 
                 var userSkins = realm.All<SkinInfo>()
                                      .Where(s => !s.DeletePending && !s.Protected)
-                                     .OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase)
+                                     .OrderByDescending(s => s.Favourite)
+                                     .ThenBy(s => s.Name, StringComparer.OrdinalIgnoreCase)
                                      .AsEnumerable()
                                      .Select(s => s.ToLive(Realm));
 
