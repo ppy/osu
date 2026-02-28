@@ -165,7 +165,7 @@ namespace osu.Game.Overlays
 
             var newCards = createCardsFor(searchResult.Results);
 
-            if (filterControl.CurrentPage == 0)
+            if (filterControl.CurrentPage == 0 || foundContent == null)
             {
                 //No matches case
                 if (!newCards.Any())
