@@ -487,8 +487,12 @@ namespace osu.Game.Screens.Edit
             base.LoadComplete();
             setUpClipboardActionAvailability();
 
-            Mode.Value = isNewBeatmap ? EditorScreenMode.SongSetup : EditorScreenMode.Compose;
-            Mode.BindValueChanged(onModeChanged, true);
+            if (Mode.Value == EditorScreenMode.SongSetup && !isNewBeatmap)
+                Mode.Value = EditorScreenMode.Compose;
+
+            // AddOnce here ensures we don't unnecessarily load multiple modes when entering the editor.
+            // See case where Mode is restored via `RestoreState`.
+            Mode.BindValueChanged(_ => Scheduler.AddOnce(loadModeScreen), true);
 
             MutationTracker.InProgress.BindValueChanged(_ =>
             {
@@ -516,6 +520,7 @@ namespace osu.Game.Screens.Edit
         /// </param>
         public EditorState GetState([CanBeNull] RulesetInfo nextRuleset = null) => new EditorState
         {
+            ScreenMode = Mode.Value,
             Time = clock.CurrentTimeAccurate,
             ClipboardContent = nextRuleset == null || editorBeatmap.BeatmapInfo.Ruleset.ShortName == nextRuleset.ShortName ? Clipboard.Content.Value : string.Empty
         };
@@ -526,6 +531,7 @@ namespace osu.Game.Screens.Edit
         /// <param name="state">The state to restore.</param>
         public void RestoreState([NotNull] EditorState state) => Schedule(() =>
         {
+            Mode.Value = state.ScreenMode;
             clock.Seek(state.Time);
             Clipboard.Content.Value = state.ClipboardContent;
         });
@@ -1070,15 +1076,16 @@ namespace osu.Game.Screens.Edit
             musicController.TrackChanged -= onTrackChanged;
         }
 
-        private void onModeChanged(ValueChangedEvent<EditorScreenMode> e)
+        private void loadModeScreen()
         {
             var lastScreen = currentScreen;
+            var newMode = Mode.Value;
 
             lastScreen?.Hide();
 
             try
             {
-                if ((currentScreen = screenContainer.SingleOrDefault(s => s.Type == e.NewValue)) != null)
+                if ((currentScreen = screenContainer.SingleOrDefault(s => s.Type == newMode)) != null)
                 {
                     screenContainer.ChangeChildDepth(currentScreen, lastScreen?.Depth + 1 ?? 0);
 
@@ -1086,7 +1093,7 @@ namespace osu.Game.Screens.Edit
                     return;
                 }
 
-                switch (e.NewValue)
+                switch (newMode)
                 {
                     case EditorScreenMode.SongSetup:
                         currentScreen = new SetupScreen();
@@ -1318,7 +1325,8 @@ namespace osu.Game.Screens.Edit
                 yield return new EditorMenuItem(EditorStrings.OpenInfoPage, MenuItemType.Standard,
                     () => (Game as OsuGame)?.OpenUrlExternally(editorBeatmap.BeatmapInfo.GetOnlineURL(api, editorBeatmap.BeatmapInfo.Ruleset)));
                 yield return new EditorMenuItem(EditorStrings.OpenDiscussionPage, MenuItemType.Standard,
-                    () => (Game as OsuGame)?.OpenUrlExternally($@"{api.Endpoints.WebsiteUrl}/beatmapsets/{editorBeatmap.BeatmapInfo.BeatmapSet!.OnlineID}/discussion/{editorBeatmap.BeatmapInfo.OnlineID}"));
+                    () => (Game as OsuGame)?.OpenUrlExternally(
+                        $@"{api.Endpoints.WebsiteUrl}/beatmapsets/{editorBeatmap.BeatmapInfo.BeatmapSet!.OnlineID}/discussion/{editorBeatmap.BeatmapInfo.OnlineID}"));
             }
 
             yield return new OsuMenuItemSpacer();
@@ -1602,8 +1610,13 @@ namespace osu.Game.Screens.Edit
 
             Mode.Value = EditorScreenMode.Compose;
 
-            // Delegate handling the selection to the ruleset.
-            currentScreen.Dependencies.Get<HitObjectComposer>().SelectFromTimestamp(position, selection);
+            Schedule(() =>
+            {
+                // Delegate handling the selection to the ruleset.
+                if (currentScreen is ComposeScreen composeScreen)
+                    composeScreen.Composer.SelectFromTimestamp(position, selection);
+            });
+
             return true;
         }
 

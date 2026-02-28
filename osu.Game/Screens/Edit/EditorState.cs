@@ -9,6 +9,11 @@ namespace osu.Game.Screens.Edit
     public class EditorState
     {
         /// <summary>
+        /// The current editor screen being displayed.
+        /// </summary>
+        public EditorScreenMode ScreenMode { get; set; }
+
+        /// <summary>
         /// The current audio time.
         /// </summary>
         public double Time { get; set; }

@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Edit.Compose
 
         private Bindable<string> clipboard { get; set; }
 
-        private HitObjectComposer composer;
+        public HitObjectComposer Composer { get; private set; }
 
         public ComposeScreen()
             : base(EditorScreenMode.Compose)
@@ -50,26 +50,26 @@ namespace osu.Game.Screens.Edit.Compose
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
             ruleset = parent.Get<IBindable<WorkingBeatmap>>().Value.BeatmapInfo.Ruleset.CreateInstance();
-            composer = ruleset?.CreateHitObjectComposer();
+            Composer = ruleset?.CreateHitObjectComposer();
 
             // make the composer available to the timeline and other components in this screen.
-            if (composer != null)
-                dependencies.CacheAs(composer);
+            if (Composer != null)
+                dependencies.CacheAs(Composer);
 
             return dependencies;
         }
 
         protected override Drawable CreateMainContent()
         {
-            if (ruleset == null || composer == null)
+            if (ruleset == null || Composer == null)
                 return new ScreenWhiteBox.UnderConstructionMessage(ruleset == null ? "This beatmap" : $"{ruleset.Description}'s composer");
 
-            return wrapSkinnableContent(composer);
+            return wrapSkinnableContent(Composer);
         }
 
         protected override Drawable CreateTimelineContent()
         {
-            if (ruleset == null || composer == null)
+            if (ruleset == null || Composer == null)
                 return base.CreateTimelineContent();
 
             TimelineBreakDisplay breakDisplay = new TimelineBreakDisplay
@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Edit.Compose
                     // We want to display this below hitobjects to better expose placement objects visually.
                     // It needs to be above the blueprint container to handle drags on breaks though.
                     breakDisplay.CreateProxy(),
-                    new TimelineBlueprintContainer(composer),
+                    new TimelineBlueprintContainer(Composer),
                     breakDisplay
                 }
             });
@@ -112,12 +112,12 @@ namespace osu.Game.Screens.Edit.Compose
             base.LoadComplete();
 
             // May be null in the case of a ruleset that doesn't have editor support, see CreateMainContent().
-            if (composer == null)
+            if (Composer == null)
                 return;
 
             EditorBeatmap.SelectedHitObjects.BindCollectionChanged((_, _) => updateClipboardActionAvailability());
             clipboard.BindValueChanged(_ => updateClipboardActionAvailability());
-            composer.OnLoadComplete += _ => updateClipboardActionAvailability();
+            Composer.OnLoadComplete += _ => updateClipboardActionAvailability();
             updateClipboardActionAvailability();
         }
 
@@ -173,16 +173,16 @@ namespace osu.Game.Screens.Edit.Compose
         private void updateClipboardActionAvailability()
         {
             CanCut.Value = CanCopy.Value = EditorBeatmap.SelectedHitObjects.Any();
-            CanPaste.Value = composer.IsLoaded && !string.IsNullOrEmpty(clipboard.Value);
+            CanPaste.Value = Composer.IsLoaded && !string.IsNullOrEmpty(clipboard.Value);
         }
 
         private string getTimestamp()
         {
-            if (composer == null)
+            if (Composer == null)
                 return string.Empty;
 
             double displayTime = EditorBeatmap.SelectedHitObjects.MinBy(h => h.StartTime)?.StartTime ?? clock.CurrentTime;
-            string selectionAsString = composer.ConvertSelectionToString();
+            string selectionAsString = Composer.ConvertSelectionToString();
 
             return !string.IsNullOrEmpty(selectionAsString)
                 ? $"{displayTime.ToEditorFormattedString()} ({selectionAsString}) - "

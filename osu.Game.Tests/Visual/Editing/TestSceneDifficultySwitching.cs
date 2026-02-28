@@ -114,6 +114,25 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestScreenModePreservedAfterSwitch()
+        {
+            BeatmapInfo targetDifficulty = null;
+
+            AddStep("switch to timing screen", () => Editor.Mode.Value = EditorScreenMode.Timing);
+
+            AddStep("set target difficulty", () => targetDifficulty = importedBeatmapSet.Beatmaps.Last(beatmap => !beatmap.Equals(Beatmap.Value.BeatmapInfo)));
+            switchToDifficulty(() => targetDifficulty);
+            confirmEditingBeatmap(() => targetDifficulty);
+
+            AddAssert("timing screen displayed", () => Editor.Mode.Value == EditorScreenMode.Timing);
+
+            AddStep("exit editor", () => Stack.Exit());
+
+            // ensure editor loader didn't resume.
+            AddAssert("stack empty", () => Stack.CurrentScreen == null);
+        }
+
+        [Test]
         public void TestPreventSwitchDueToUnsavedChanges()
         {
             BeatmapInfo targetDifficulty = null;
