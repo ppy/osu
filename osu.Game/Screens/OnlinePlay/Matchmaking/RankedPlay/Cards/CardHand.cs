@@ -62,7 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
             }
         }
 
-        private bool contracted;
+        protected bool Contracted { get; private set; }
 
         /// <summary>
         /// Contracts all cards towards the bottom (or top when <see cref="Flipped"/>).
@@ -70,7 +70,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
         /// </summary>
         public void Contract()
         {
-            contracted = true;
+            Contracted = true;
 
             double delay = 0;
 
@@ -144,7 +144,20 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
 
         protected virtual HandCard CreateHandCard(RankedPlayCard card) => new HandCard(card);
 
-        protected virtual void OnCardStateChanged(HandCard card, RankedPlayCardState state) => InvalidateLayout();
+        protected virtual void OnCardStateChanged(HandCard card, RankedPlayCardState state)
+        {
+            InvalidateLayout();
+
+            // hovered state can be caused by keyboard focus, in which case we have to clean up after the other cards manually
+            if (state.Hovered)
+            {
+                foreach (var c in cardContainer)
+                {
+                    if (c != card)
+                        c.CardHovered = false;
+                }
+            }
+        }
 
         #region Layout
 
@@ -160,7 +173,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
 
         private void updateLayout(double stagger = 0)
         {
-            if (contracted)
+            if (Contracted)
                 return;
 
             const float spacing = -20;

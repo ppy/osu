@@ -150,13 +150,86 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
 
         public Dictionary<Guid, RankedPlayCardState> State => Cards.Select(static card => new KeyValuePair<Guid, RankedPlayCardState>(card.Item.Card.ID, card.State)).ToDictionary();
 
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat || Contracted)
+                return false;
+
+            switch (e.Key)
+            {
+                case >= Key.Number1 and <= Key.Number9:
+                    focusCard(e.Key - Key.Number1);
+                    return true;
+
+                case Key.Space:
+                    if (selectionMode == CardSelectionMode.Disabled)
+                        return false;
+
+                    if (Cards.FirstOrDefault(it => it.HasFocus) is not PlayerHandCard card)
+                        return false;
+
+                    if (card.Selected)
+                        card.PlayButton.TriggerClick();
+                    else
+                        card.TriggerClick();
+
+                    return true;
+
+                case Key.Left:
+                    moveCardFocus(-1);
+                    return true;
+
+                case Key.Right:
+                    moveCardFocus(1);
+                    return true;
+            }
+
+            return base.OnKeyDown(e);
+        }
+
+        private void moveCardFocus(int direction)
+        {
+            int currentIndex = Cards.ToList().FindIndex(c => c.HasFocus);
+
+            // default behaviour is to start from either end of the cards if no card is focused currently
+            // in single-selection mode we can however use the current selection as a fallback index if there's no focus
+            if (selectionMode == CardSelectionMode.Single && currentIndex == -1)
+                currentIndex = Cards.ToList().FindIndex(c => c.Selected);
+
+            int newIndex = currentIndex + direction;
+
+            if (newIndex < 0)
+                newIndex = Cards.Count() - 1;
+            else if (newIndex >= Cards.Count())
+                newIndex = 0;
+
+            focusCard(newIndex);
+        }
+
+        private void focusCard(int index)
+        {
+            var card = Cards.ElementAtOrDefault(index);
+
+            if (card == null)
+                return;
+
+            GetContainingFocusManager()?.ChangeFocus(card);
+
+            if (SelectionMode == CardSelectionMode.Single && !card.Selected)
+                card.TriggerClick();
+        }
+
         public partial class PlayerHandCard : HandCard
         {
+            private Action? playAction;
+
             public Action? PlayAction
             {
+                get => playAction;
                 set
                 {
-                    playButton.Action = value;
+                    playAction = value;
+                    PlayButton.Action = value;
                     updatePlayButtonVisibility();
                 }
             }
@@ -168,7 +241,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
             private readonly Drawable cardInputArea;
             private readonly Drawable fullInputArea;
 
-            private readonly ShearedButton playButton;
+            public readonly ShearedButton PlayButton;
 
             public PlayerHandCard(RankedPlayCard card)
                 : base(card)
@@ -195,7 +268,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
                         Child = fullInputArea = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Child = playButton = new ShearedButton(width: 90f, height: 30f)
+                            Child = PlayButton = new ShearedButton(width: 90f, height: 30f)
                             {
                                 Name = "Play Button",
                                 Anchor = Anchor.TopCentre,
@@ -225,12 +298,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
 
             private void updatePlayButtonVisibility()
             {
-                playButton.Alpha = playButton.Action != null && Selected ? 1 : 0;
+                PlayButton.Alpha = PlayButton.Action != null && Selected ? 1 : 0;
             }
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
             {
-                if (playButton.Alpha > 0)
+                if (PlayButton.Alpha > 0)
                     return fullInputArea.ReceivePositionalInputAt(screenSpacePos);
 
                 // input events are handled for an area that's slightly larger than the actual card so the cursor always hovers a card when moving over a gap between two cards
@@ -275,6 +348,24 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
                 Clicked(this);
 
                 return true;
+            }
+
+            public override bool AcceptsFocus => true;
+
+            public override bool ChangeFocusOnClick => false;
+
+            protected override void OnFocus(FocusEvent e)
+            {
+                base.OnFocus(e);
+
+                CardHovered = true;
+            }
+
+            protected override void OnFocusLost(FocusLostEvent e)
+            {
+                base.OnFocusLost(e);
+
+                CardHovered = false;
             }
         }
     }
