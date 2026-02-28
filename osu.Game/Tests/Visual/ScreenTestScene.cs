@@ -43,29 +43,28 @@ namespace osu.Game.Tests.Visual
             base.Content.AddRange(new Drawable[]
             {
                 backReceptor = new ScreenFooter.BackReceptor(),
-                Stack = new OsuScreenStack
-                {
-                    Name = nameof(ScreenTestScene),
-                    RelativeSizeAxes = Axes.Both
-                },
                 new PopoverContainer
                 {
-                    // Ensure the footer is displayed above any content and/or overlays.
-                    Depth = -1,
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
+                        Stack = new OsuScreenStack
+                        {
+                            Name = nameof(ScreenTestScene),
+                            RelativeSizeAxes = Axes.Both
+                        },
+                        // TODO: is this ever used? it probably shouldn't be.
+                        content = new Container { RelativeSizeAxes = Axes.Both },
+                        overlayContent = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = DialogOverlay = new DialogOverlay()
+                        },
                         screenStackFooter = new ScreenStackFooter(Stack, backReceptor)
                         {
                             BackButtonPressed = BackButtonPressed,
                         }
                     }
-                },
-                content = new Container { RelativeSizeAxes = Axes.Both },
-                overlayContent = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = DialogOverlay = new DialogOverlay()
                 },
             });
 

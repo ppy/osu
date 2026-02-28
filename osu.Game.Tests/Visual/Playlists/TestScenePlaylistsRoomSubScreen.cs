@@ -30,7 +30,6 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Screens;
-using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Tests.Resources;
@@ -248,7 +247,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddUntilStep("original beatmap", () => Beatmap.Value.BeatmapInfo.Equals(importedSet.Beatmaps[0]));
 
             AddStep("enter freestyle select", () => playlistsScreen.Stack.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistEditButton>().Single(b => b.IsPresent).TriggerClick());
-            AddUntilStep("wait for select screen", () => playlistsScreen.Stack.CurrentScreen is PlaylistsRoomFreestyleSelectV2 selectScreen && selectScreen.CarouselItemsPresented);
+            AddUntilStep("wait for select screen", () => playlistsScreen.Stack.CurrentScreen is PlaylistsRoomFreestyleSelect selectScreen && selectScreen.CarouselItemsPresented);
 
             AddStep("select next beatmap", () => InputManager.Key(Key.Down));
             AddStep("abort", () => playlistsScreen.Stack.CurrentScreen.Exit());
@@ -287,7 +286,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddUntilStep("original beatmap", () => Beatmap.Value.BeatmapInfo.Equals(importedSet.Beatmaps[0]));
 
             AddStep("enter freestyle select", () => playlistsScreen.Stack.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistEditButton>().Single(b => b.IsPresent).TriggerClick());
-            AddUntilStep("wait for select screen", () => playlistsScreen.Stack.CurrentScreen is PlaylistsRoomFreestyleSelectV2 selectScreen && selectScreen.CarouselItemsPresented);
+            AddUntilStep("wait for select screen", () => playlistsScreen.Stack.CurrentScreen is PlaylistsRoomFreestyleSelect selectScreen && selectScreen.CarouselItemsPresented);
 
             AddStep("select next beatmap", () => InputManager.Key(Key.Down));
             AddStep("select (beatmap)", () => InputManager.Key(Key.Enter));
@@ -676,19 +675,9 @@ namespace osu.Game.Tests.Visual.Playlists
 
             public TestPlaylistsScreen(PlaylistsRoomSubScreen screen)
             {
-                ScreenFooter footer;
-                InternalChild = new DependencyProvidingContainer
+                InternalChild = Stack = new OnlinePlaySubScreenStack
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        Stack = new OnlinePlaySubScreenStack
-                        {
-                            RelativeSizeAxes = Axes.Both
-                        },
-                        footer = new ScreenFooter(),
-                    },
-                    CachedDependencies = new (Type, object)[] { (typeof(ScreenFooter), footer) },
+                    RelativeSizeAxes = Axes.Both
                 };
 
                 Stack.Push(screen);
