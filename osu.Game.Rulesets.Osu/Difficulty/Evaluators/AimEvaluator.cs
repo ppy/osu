@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
@@ -11,11 +12,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class AimEvaluator
     {
-        private const double wide_angle_multiplier = 1.5;
-        private const double acute_angle_multiplier = 2.6;
+        private const double wide_angle_multiplier = 1.2;
+        private const double acute_angle_multiplier = 2.15;
         private const double slider_multiplier = 1.5;
         private const double velocity_change_multiplier = 0.9;
         private const double wiggle_multiplier = 1.02; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
+        private const double maximum_repetition_nerf = 0.2;
+        private const double maximum_vector_influence = 0.75;
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
@@ -69,6 +72,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double sliderBonus = 0;
             double velocityChangeBonus = 0;
             double wiggleBonus = 0;
+            double angleRepetitionNerf = 1;
 
             double aimStrain = currVelocity; // Start strain with regular velocity.
 
@@ -79,6 +83,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 // Rewarding angles, take the smaller velocity as base.
                 double angleBonus = Math.Min(currVelocity, prevVelocity);
+
+                double stackFactor = DifficultyCalculationUtils.Smootherstep(osuLastObj.LazyJumpDistance, 0, diameter);
+
+                double angleDifferenceAdjusted = Math.Cos(2 * Math.Min(double.DegreesToRadians(45), Math.Abs(currAngle - lastAngle) * stackFactor));
+
+                double baseNerf = 1 - maximum_repetition_nerf * calcAcuteAngleBonus(lastAngle) * angleDifferenceAdjusted;
+
+                angleRepetitionNerf = Math.Pow(baseNerf + (1 - baseNerf) * vectorAngleRepetition(osuCurrObj) * maximum_vector_influence * stackFactor, 2);
 
                 if (Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) < 1.25 * Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) // If rhythms are the same.
                 {
@@ -122,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                     if (distance < 1)
                     {
-                        wideAngleBonus *= 1 - 0.35 * (1 - distance);
+                        wideAngleBonus *= 1 - 0.55 * (1 - distance);
                     }
                 }
             }
@@ -154,6 +166,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 sliderBonus = osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
             }
 
+            // Penalize angle repetition.
+            aimStrain *= angleRepetitionNerf;
+
             aimStrain += wiggleBonus * wiggle_multiplier;
             aimStrain += velocityChangeBonus * velocity_change_multiplier;
 
@@ -177,6 +192,38 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         // These objects do not require any movement, so it does not make sense to award them.
         private static double highBpmBonus(double ms, double distance) => 1 / (1 - Math.Pow(0.15, ms / 1000))
                                                                           * DifficultyCalculationUtils.Smootherstep(distance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
+
+        private static double vectorAngleRepetition(OsuDifficultyHitObject current)
+        {
+            const double note_limit = 6;
+
+            double constantAngleCount = 0;
+            int index = 0;
+            double notesProcessed = 0;
+
+            while (notesProcessed < note_limit)
+            {
+                var loopObj = (OsuDifficultyHitObject)current.Previous(index);
+
+                if (loopObj.IsNull())
+                    break;
+
+                // Only consider vectors in the same jump section, stopping to change rhythm ruins momentum
+                if (Math.Abs(current.DeltaTime - loopObj.DeltaTime) > 25)
+                    break;
+
+                if (loopObj.NormalisedVectorAngle.IsNotNull() && current.NormalisedVectorAngle.IsNotNull())
+                {
+                    double angleDifference = Math.Abs(current.NormalisedVectorAngle.Value - loopObj.NormalisedVectorAngle.Value);
+                    constantAngleCount += Math.Cos(8 * Math.Min(double.DegreesToRadians(11.25), angleDifference));
+                }
+
+                notesProcessed++;
+                index++;
+            }
+
+            return Math.Pow(Math.Min(0.5 / constantAngleCount, 1), 2);
+        }
 
         private static double calcWideAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(40), double.DegreesToRadians(140));
 
