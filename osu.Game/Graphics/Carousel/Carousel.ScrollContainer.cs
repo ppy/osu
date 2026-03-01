@@ -33,6 +33,9 @@ namespace osu.Game.Graphics.Carousel
         /// </summary>
         protected partial class ScrollContainer : UserTrackingScrollContainer, IKeyBindingHandler<GlobalAction>
         {
+            public Action? OnPageUp { get; init; }
+            public Action? OnPageDown { get; init; }
+
             public readonly Container Panels;
 
             public void SetLayoutHeight(float height) => Panels.Height = height;
@@ -126,6 +129,22 @@ namespace osu.Game.Graphics.Carousel
             public bool AbsoluteScrolling { get; private set; }
 
             protected override bool IsDragging => base.IsDragging || AbsoluteScrolling;
+
+            protected override bool OnKeyDown(KeyDownEvent e)
+            {
+                switch (e.Key)
+                {
+                    case Key.PageUp:
+                        OnPageUp?.Invoke();
+                        return true;
+
+                    case Key.PageDown:
+                        OnPageDown?.Invoke();
+                        return true;
+                }
+
+                return base.OnKeyDown(e);
+            }
 
             public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {
