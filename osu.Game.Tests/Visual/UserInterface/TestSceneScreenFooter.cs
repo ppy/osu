@@ -279,14 +279,13 @@ namespace osu.Game.Tests.Visual.UserInterface
             private IDisposable? overlayRegistration;
             private IDisposable? secondOverlayRegistration;
 
-            [Cached]
-            private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
-
             [Resolved]
             private IOverlayManager? overlayManager { get; set; }
 
             public TestScreen(bool showFooter = true)
             {
+                ColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
                 ShowFooter = showFooter;
             }
 
