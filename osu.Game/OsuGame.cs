@@ -1139,6 +1139,7 @@ namespace osu.Game
                                 },
                                 new PopoverContainer
                                 {
+                                    // Ensure the footer is displayed above any content and/or overlays.
                                     Depth = -1,
                                     RelativeSizeAxes = Axes.Both,
                                     Child = screenStackFooter = new ScreenStackFooter(ScreenStack, backReceptor)
