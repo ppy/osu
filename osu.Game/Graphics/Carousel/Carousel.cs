@@ -317,6 +317,8 @@ namespace osu.Game.Graphics.Carousel
             {
                 Masking = false,
                 RelativeSizeAxes = Axes.Both,
+                OnPageUp = () => Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Page, -1)),
+                OnPageDown = () => Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Page, 1)),
             };
 
             Items.BindCollectionChanged((_, args) =>
@@ -491,14 +493,6 @@ namespace osu.Game.Graphics.Carousel
                     Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Keyboard, 1));
                     return true;
 
-                case GlobalAction.SelectPreviousPage:
-                    Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Page, -1));
-                    return true;
-
-                case GlobalAction.SelectNextPage:
-                    Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Page, 1));
-                    return true;
-
                 case GlobalAction.ActivatePreviousSet:
                     Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Set, -1));
                     return true;
@@ -546,30 +540,30 @@ namespace osu.Game.Graphics.Carousel
             }
 
             return false;
+        }
 
-            void traverseFromKey(TraversalOperation traversal)
+        private void traverseFromKey(TraversalOperation traversal)
+        {
+            switch (traversal.Type)
             {
-                switch (traversal.Type)
-                {
-                    case TraversalType.Keyboard:
-                        traverseKeyboardSelection(traversal.Direction);
-                        break;
+                case TraversalType.Keyboard:
+                    traverseKeyboardSelection(traversal.Direction);
+                    break;
 
-                    case TraversalType.Page:
-                        traverseKeyboardPage(traversal.Direction);
-                        break;
+                case TraversalType.Page:
+                    traverseKeyboardPage(traversal.Direction);
+                    break;
 
-                    case TraversalType.Set:
-                        traverseSetSelection(traversal.Direction);
-                        break;
+                case TraversalType.Set:
+                    traverseSetSelection(traversal.Direction);
+                    break;
 
-                    case TraversalType.Group:
-                        traverseGroupSelection(traversal.Direction);
-                        break;
+                case TraversalType.Group:
+                    traverseGroupSelection(traversal.Direction);
+                    break;
 
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
