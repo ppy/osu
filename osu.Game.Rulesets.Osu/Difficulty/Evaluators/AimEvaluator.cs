@@ -49,10 +49,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
             if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
             {
-                double sliderDistance = osuLastObj.TravelDistance + osuCurrObj.MinimumJumpDistance;
-                double sliderTime = osuLastObj.TravelTime + osuCurrObj.MinimumJumpTime;
-
-                currVelocity = Math.Max(currVelocity, sliderDistance / sliderTime);
+                double sliderDistance = osuLastObj.LazyTravelDistance + osuCurrObj.LazyJumpDistance;
+                currVelocity = Math.Max(currVelocity, sliderDistance / osuCurrObj.AdjustedDeltaTime);
             }
 
             // As above, do the same for the previous hitobject.
@@ -61,10 +59,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (osuLastLastObj.BaseObject is Slider && withSliderTravelDistance)
             {
-                double sliderDistance = osuLastLastObj.TravelDistance + osuLastObj.MinimumJumpDistance;
-                double sliderTime = osuLastLastObj.TravelTime + osuLastObj.MinimumJumpTime;
-
-                prevVelocity = Math.Max(prevVelocity, sliderDistance / sliderTime);
+                double sliderDistance = osuLastLastObj.LazyTravelDistance + osuLastObj.LazyJumpDistance;
+                prevVelocity = Math.Max(prevVelocity, sliderDistance / osuLastObj.AdjustedDeltaTime);
             }
 
             double wideAngleBonus = 0;
