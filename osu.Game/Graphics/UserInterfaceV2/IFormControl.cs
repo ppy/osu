@@ -31,5 +31,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// Whether the control is currently disabled.
         /// </summary>
         bool IsDisabled { get; }
+
+        /// <summary>
+        /// The height of the main part of the control (when not expanded).
+        /// This is used to attach external elements.
+        /// </summary>
+        float MainDrawHeight { get; }
     }
 }

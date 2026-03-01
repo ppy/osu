@@ -24,6 +24,33 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestInitialVisualState()
+        {
+            AddBeatmaps(3, splitApart: true);
+
+            WaitForDrawablePanels();
+            SelectNextSet();
+            WaitForSetSelection(set: 0, diff: 0);
+
+            AddAssert("selected item is visible", () => GetSelectedPanel()?.Item?.IsVisible, () => Is.True);
+            AddAssert("has visually expanded set", () => Carousel.GetCarouselItems()!.Count(item => item.Model is GroupedBeatmapSet && item.IsExpanded && item.IsVisible), () => Is.EqualTo(1));
+
+            CreateCarousel(retainSelection: true);
+            WaitForDrawablePanels();
+            WaitForSetSelection(set: 0, diff: 0);
+
+            AddAssert("selected item is visible", () => GetSelectedPanel()?.Item?.IsVisible, () => Is.True);
+            AddAssert("has visually expanded set", () => Carousel.GetCarouselItems()!.Count(item => item.Model is GroupedBeatmapSet && item.IsExpanded && item.IsVisible), () => Is.EqualTo(1));
+
+            CreateCarousel(retainSelection: true);
+            WaitForDrawablePanels();
+            WaitForSetSelection(set: 0, diff: 0);
+
+            AddAssert("selected item is visible", () => GetSelectedPanel()?.Item?.IsVisible, () => Is.True);
+            AddAssert("has visually expanded set", () => Carousel.GetCarouselItems()!.Count(item => item.Model is GroupedBeatmapSet && item.IsExpanded && item.IsVisible), () => Is.EqualTo(1));
+        }
+
+        [Test]
         public void TestSetTraversal()
         {
             AddBeatmaps(3, splitApart: true);

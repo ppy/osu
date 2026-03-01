@@ -254,6 +254,54 @@ namespace osu.Game.Tests.Visual.SongSelectV2
         }
 
         [Test]
+        public void TestGroupDoesExpandAfterRandomTraversal()
+        {
+            SelectNextSet();
+
+            ToggleGroupCollapse();
+            AddAssert("group not expanded", () => Carousel.ExpandedGroup, () => Is.Null);
+
+            SelectRandomSet();
+
+            AddAssert("group expanded", () => Carousel.ExpandedGroup, () => Is.Not.Null);
+        }
+
+        [Test]
+        public void TestFilterWhileCollapsedUpdatesVisualStateCorrectly()
+        {
+            SelectNextSet();
+
+            CheckHasSelection();
+            AddAssert("group expanded", () => Carousel.ExpandedGroup, () => Is.Not.Null);
+            AddAssert("has expanded set", () => Carousel.ExpandedBeatmapSet != null);
+
+            AddAssert("has visible beatmaps", () => Carousel.GetCarouselItems()!.Count(item => item.Model is GroupedBeatmap && item.IsVisible), () => Is.EqualTo(3));
+            AddAssert("has visually expanded set", () => Carousel.GetCarouselItems()!.Count(item => item.Model is GroupedBeatmapSet && item.IsExpanded && item.IsVisible), () => Is.EqualTo(1));
+
+            ToggleGroupCollapse();
+
+            CheckHasSelection();
+            AddAssert("group not expanded", () => Carousel.ExpandedGroup, () => Is.Null);
+            AddAssert("has expanded set", () => Carousel.ExpandedBeatmapSet != null);
+
+            AddAssert("has no visible beatmaps", () => Carousel.GetCarouselItems()!.Count(item => item.Model is GroupedBeatmap && item.IsVisible), () => Is.Zero);
+            AddAssert("has no visually expanded set", () => Carousel.GetCarouselItems()!.Count(item => item.Model is GroupedBeatmapSet && item.IsExpanded && item.IsVisible), () => Is.Zero);
+
+            // filter while collapsed.
+            ApplyToFilterAndWaitForFilter("filter", c => c.SearchText = Carousel.SelectedBeatmapSet!.Metadata.Title);
+
+            // then expand.
+            ToggleGroupCollapse();
+
+            CheckHasSelection();
+            AddAssert("group expanded", () => Carousel.ExpandedGroup, () => Is.Not.Null);
+            AddAssert("has expanded set", () => Carousel.ExpandedBeatmapSet != null);
+
+            AddAssert("has visible beatmaps", () => Carousel.GetCarouselItems()!.Count(item => item.Model is GroupedBeatmap && item.IsVisible), () => Is.EqualTo(3));
+            AddAssert("has visually expanded set", () => Carousel.GetCarouselItems()!.Count(item => item.Model is GroupedBeatmapSet && item.IsExpanded && item.IsVisible), () => Is.EqualTo(1));
+        }
+
+        [Test]
         public void TestGroupDoesNotExpandAgainOnRefilterIfManuallyCollapsed()
         {
             ApplyToFilterAndWaitForFilter("filter", c => c.SearchText = BeatmapSets[2].Metadata.Title);

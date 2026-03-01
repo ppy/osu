@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            InternalChild = textFlow = new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 12, weight: FontWeight.SemiBold))
+            InternalChild = textFlow = new OsuTextFlowContainer(t => t.Font = OsuFont.Style.Caption1)
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,

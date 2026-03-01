@@ -13,6 +13,7 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Extensions;
 using osu.Game.IO;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -198,7 +199,7 @@ namespace osu.Game.Database
             ProgressNotification notification = new ProgressNotification
             {
                 State = ProgressNotificationState.Active,
-                Text = $"Exporting {itemFilename}...",
+                Text = NotificationsStrings.FileExportOngoing(itemFilename),
             };
 
             PostNotification?.Invoke(notification);
@@ -225,7 +226,7 @@ namespace osu.Game.Database
                 throw;
             }
 
-            notification.CompletionText = $"Exported {itemFilename}! Click to view.";
+            notification.CompletionText = NotificationsStrings.FileExportFinished(itemFilename);
             notification.CompletionClickAction = () => ExportStorage.PresentFileExternally(filename);
             notification.State = ProgressNotificationState.Completed;
         });

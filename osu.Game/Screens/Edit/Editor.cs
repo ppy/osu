@@ -424,7 +424,7 @@ namespace osu.Game.Screens.Edit
                                             },
                                             new OsuMenuItemSpacer(),
                                             new BackgroundDimMenuItem(editorBackgroundDim),
-                                            new ToggleMenuItem("Show storyboard")
+                                            new ToggleMenuItem(EditorStrings.ShowStoryboard)
                                             {
                                                 State = { BindTarget = editorShowStoryboard },
                                             },
@@ -1620,8 +1620,9 @@ namespace osu.Game.Screens.Edit
         private partial class BeatmapEditorToast : Toast
         {
             public BeatmapEditorToast(LocalisableString value, string beatmapDisplayName)
-                : base(InputSettingsStrings.EditorSection, value, beatmapDisplayName)
+                : base(InputSettingsStrings.EditorSection, value)
             {
+                ExtraText = beatmapDisplayName;
             }
         }
 

@@ -567,7 +567,13 @@ namespace osu.Game.Graphics.Carousel
             }
         }
 
-        private enum TraversalType { Keyboard, Page, Set, Group }
+        private enum TraversalType
+        {
+            Keyboard,
+            Set,
+            Page,
+            Group
+        }
 
         private record TraversalOperation(TraversalType Type, int Direction);
 

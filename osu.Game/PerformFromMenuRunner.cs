@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Notifications;
@@ -165,7 +166,11 @@ namespace osu.Game
 
                 // the last dialog encountered has been dismissed but the screen has not changed, abort.
                 Cancel();
-                notifications.Post(new SimpleNotification { Text = @"An action was interrupted due to a dialog being displayed." });
+                notifications.Post(new SimpleNotification
+                {
+                    Text = NotificationsStrings.ActionInterruptedByDialog
+                });
+
                 return true;
             }
 

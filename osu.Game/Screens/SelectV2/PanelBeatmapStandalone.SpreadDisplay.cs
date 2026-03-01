@@ -29,10 +29,13 @@ namespace osu.Game.Screens.SelectV2
 
             protected override Colour4 DimColour => Colour4.White;
 
-            private readonly Bindable<BeatmapSetInfo?> scopedBeatmapSet = new Bindable<BeatmapSetInfo?>();
+            private readonly IBindable<BeatmapSetInfo?> scopedBeatmapSet = new Bindable<BeatmapSetInfo?>();
             private readonly Bindable<bool> showConvertedBeatmaps = new Bindable<bool>();
 
             private const double transition_duration = 200;
+
+            [Resolved]
+            private ISongSelect? songSelect { get; set; }
 
             [Resolved]
             private Bindable<RulesetInfo> ruleset { get; set; } = null!;
@@ -52,10 +55,16 @@ namespace osu.Game.Screens.SelectV2
                 AutoSizeAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
                 Content.CornerRadius = 5;
+
+                Action = () =>
+                {
+                    if (Beatmap.Value != null)
+                        songSelect?.ScopeToBeatmapSet(Beatmap.Value.BeatmapSet!);
+                };
             }
 
             [BackgroundDependencyLoader]
-            private void load(ISongSelect? songSelect, OsuConfigManager configManager)
+            private void load(OsuConfigManager configManager)
             {
                 Add(new FillFlowContainer
                 {
@@ -214,8 +223,6 @@ namespace osu.Game.Screens.SelectV2
                         dot.Alpha = (1 + 4 * (float)(succeeding.Count - i) / succeeding.Count) / 5;
                     }
                 }
-
-                Action = () => scopedBeatmapSet.Value = Beatmap.Value.BeatmapSet!;
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)
