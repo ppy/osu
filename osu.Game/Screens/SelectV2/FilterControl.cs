@@ -32,7 +32,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class FilterControl : OverlayContainer
+    public sealed partial class FilterControl : OverlayContainer
     {
         // taken from draw visualiser. used for carousel alignment purposes.
         public const float HEIGHT_FROM_SCREEN_TOP = 141 - corner_radius;
@@ -47,6 +47,11 @@ namespace osu.Game.Screens.SelectV2
         private ShearedDropdown<SortMode> sortDropdown = null!;
         private ShearedDropdown<GroupMode> groupDropdown = null!;
         private CollectionDropdown collectionDropdown = null!;
+
+        /// <summary>
+        /// An optional method which can force certain criteria adjustments.
+        /// </summary>
+        public Action<FilterCriteria>? ApplyRequiredCriteria { get; set; }
 
         [Resolved]
         private ISongSelect? songSelect { get; set; }
@@ -294,6 +299,9 @@ namespace osu.Game.Screens.SelectV2
             criteria.RulesetCriteria = ruleset.Value.CreateInstance().CreateRulesetFilterCriteria();
 
             FilterQueryParser.ApplyQueries(criteria, query);
+
+            ApplyRequiredCriteria?.Invoke(criteria);
+
             return criteria;
         }
 

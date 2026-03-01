@@ -722,7 +722,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
 
             MultiplayerPlaylistItem item = client.Room.CurrentPlaylistItem;
-            this.Push(new MultiplayerMatchFreestyleSelect(room, new PlaylistItem(item)));
+            this.Push(new MultiplayerMatchFreestyleSelect(new PlaylistItem(item)));
         }
 
         /// <summary>
