@@ -5,12 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Utils;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Mods;
 
@@ -18,17 +16,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public class Reading : HarmonicSkill
     {
-        private readonly IReadOnlyList<HitObject> objectList;
+        private readonly List<DifficultyHitObject> objectList = new List<DifficultyHitObject>();
 
-        private readonly double clockRate;
         private readonly bool hasHiddenMod;
 
-        public Reading(IBeatmap beatmap, Mod[] mods, double clockRate)
+        public Reading(Mod[] mods)
             : base(mods)
         {
-            this.clockRate = clockRate;
             hasHiddenMod = mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value);
-            objectList = beatmap.HitObjects;
         }
 
         private double currentDifficulty;
@@ -40,6 +35,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double ObjectDifficultyOf(DifficultyHitObject current)
         {
+            objectList.Add(current);
+
             currentDifficulty *= strainDecay(current.DeltaTime);
 
             currentDifficulty += ReadingEvaluator.EvaluateDifficultyOf(current, hasHiddenMod) * skillMultiplier;
@@ -50,9 +47,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override void ApplyDifficultyTransformation(double[] difficulties)
         {
             const double reduced_difficulty_base_line = 0.0; // Assume the first seconds are completely memorised
-
-            if (difficulties.Length == 0)
-                return;
 
             int reducedNoteCount = calculateReducedNoteCount();
 
@@ -67,19 +61,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             const double reduced_difficulty_duration = 60 * 1000;
 
-            if (objectList.Count < 2)
+            if (objectList.Count == 0)
                 return 0;
 
-            // We take the 2nd note to match `CreateDifficultyHitObjects`
-            HitObject firstDifficultyObject = objectList[1];
-
-            double reducedDuration = (firstDifficultyObject.StartTime / clockRate) + reduced_difficulty_duration;
+            double reducedDuration = objectList.First().StartTime + reduced_difficulty_duration;
 
             int reducedNoteCount = 0;
 
             foreach (var hitObject in objectList)
             {
-                if (hitObject.StartTime / clockRate > reducedDuration)
+                if (hitObject.StartTime > reducedDuration)
                     break;
 
                 reducedNoteCount++;

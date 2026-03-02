@@ -5,9 +5,11 @@ using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data;
+using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 {
@@ -16,14 +18,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// <summary>
         /// Evaluate the difficulty of a hitobject considering its interval change.
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject hitObject, double hitWindow)
+        public static double EvaluateDifficultyOf(DifficultyHitObject hitObject)
         {
+            if (hitObject.BaseObject is not Hit)
+                return 0;
+
             TaikoRhythmData rhythmData = ((TaikoDifficultyHitObject)hitObject).RhythmData;
             double difficulty = 0.0d;
 
             double sameRhythm = 0;
             double samePattern = 0;
             double intervalPenalty = 0;
+
+            double hitWindow = hitObject.HitWindow(HitResult.Great);
 
             if (rhythmData.SameRhythmGroupedHitObjects?.FirstHitObject == hitObject) // Difficulty for SameRhythmGroupedHitObjects
             {
@@ -56,8 +63,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 {
                     intervalDifficulty *= DifficultyCalculationUtils.Logistic(
                         durationDifference / hitWindow,
-                        midpointOffset: 0.7,
-                        multiplier: 1.0,
+                        midpointOffset: 0.35,
+                        multiplier: 2,
                         maxValue: 1);
                 }
             }
@@ -65,8 +72,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             // Penalise patterns that can be hit within a single hit window.
             intervalDifficulty *= DifficultyCalculationUtils.Logistic(
                 sameRhythmGroupedHitObjects.Duration / hitWindow,
-                midpointOffset: 0.6,
-                multiplier: 1,
+                midpointOffset: 0.3,
+                multiplier: 2,
                 maxValue: 1);
 
             return Math.Pow(intervalDifficulty, 0.75);

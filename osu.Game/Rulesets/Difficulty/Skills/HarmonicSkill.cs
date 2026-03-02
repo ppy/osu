@@ -59,6 +59,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             // These notes will not contribute to the difficulty.
             double[] difficulties = ObjectDifficulties.Where(p => p > 0).ToArray();
 
+            if (difficulties.Length == 0)
+                return 0;
+
             ApplyDifficultyTransformation(difficulties);
 
             double difficulty = 0;
