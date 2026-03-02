@@ -4,7 +4,6 @@
 #nullable disable
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -48,8 +47,6 @@ namespace osu.Game.Screens.Import
         [BackgroundDependencyLoader(true)]
         private void load()
         {
-            Debug.Assert(ColourProvider != null);
-
             InternalChild = contentContainer = new Container
             {
                 Masking = true,
