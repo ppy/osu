@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double wide_angle_multiplier = 1.2;
         private const double acute_angle_multiplier = 2.15;
-        private const double slider_multiplier = 1.5;
+        private const double slider_multiplier = 2.0;
         private const double velocity_change_multiplier = 1.0;
         private const double wiggle_multiplier = 1.02; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
         private const double maximum_repetition_nerf = 0.15;
@@ -173,7 +173,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)
-                aimStrain += (sliderBonus < 1 ? sliderBonus : Math.Sqrt(sliderBonus)) * 2.0;
+                aimStrain += (sliderBonus < 1 ? sliderBonus : Math.Pow(sliderBonus, 0.75)) * slider_multiplier;
 
             // Apply high circle size bonus
             aimStrain *= osuCurrObj.SmallCircleBonus;
