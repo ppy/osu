@@ -19,8 +19,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : HarmonicSkill
     {
-        private double skillMultiplier => 1.07;
-
         private readonly List<double> sliderStrains = new List<double>();
 
         private double currentDifficulty;
@@ -42,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double decay = strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
 
             currentDifficulty *= decay;
-            currentDifficulty += SpeedEvaluator.EvaluateDifficultyOf(current) * (1 - decay) * skillMultiplier;
+            currentDifficulty += SpeedEvaluator.EvaluateDifficultyOf(current) * (1 - decay);
 
             double currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
 

@@ -11,8 +11,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuRatingCalculator
     {
-        private const double difficulty_multiplier = 0.0675;
-
         private readonly Mod[] mods;
         private readonly int totalHits;
         private readonly double overallDifficulty;
@@ -132,6 +130,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightRating * Math.Sqrt(ratingMultiplier);
         }
 
-        public static double CalculateDifficultyRating(double difficultyValue) => Math.Sqrt(difficultyValue) * difficulty_multiplier;
+        public static double CalculateDifficultyRating(double difficultyValue) => Math.Sqrt(difficultyValue);
     }
 }

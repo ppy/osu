@@ -10,6 +10,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class SpeedAimEvaluator
     {
+        private static double multiplier => 0.00687935302368;
+
         public const double SINGLE_SPACING_THRESHOLD = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25; // 1.25 circles distance between centers
 
         /// <summary>
@@ -42,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             strain *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
 
-            return strain;
+            return strain * multiplier;
         }
 
         private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.3, ms / 1000));
