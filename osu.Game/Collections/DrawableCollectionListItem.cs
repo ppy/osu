@@ -143,6 +143,10 @@ namespace osu.Game.Collections
             private readonly Live<BeatmapCollection> collection;
 
             private OsuSpriteText countText = null!;
+            private OsuSpriteText actionText = null!;
+
+            private Color4 addedTextColour;
+            private Color4 removedTextColour;
 
             public ItemTextBox(Live<BeatmapCollection> collection)
             {
@@ -173,6 +177,19 @@ namespace osu.Game.Collections
                         Colour = colours.Yellow
                     });
 
+                    TextContainer.Add(actionText = new OsuSpriteText
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.TopLeft,
+                        Depth = float.MinValue,
+                        Font = OsuFont.Default.With(size: count_text_size, weight: FontWeight.SemiBold),
+                        Margin = new MarginPadding { Top = 2, Left = 2 },
+                        Alpha = 0,
+                    });
+
+                    addedTextColour = colours.Lime;
+                    removedTextColour = colours.Pink;
+
                     // interestingly, it is not required to subscribe to change notifications on this collection at all for this to work correctly.
                     // the reasoning for this is that `DrawableCollectionList` already takes out a subscription on the set of all `BeatmapCollection`s -
                     // but that subscription does not only cover *changes to the set of collections* (i.e. addition/removal/rearrangement of collections),
@@ -190,6 +207,57 @@ namespace osu.Game.Collections
                 {
                     PlaceholderText = CollectionsStrings.CreateNew;
                 }
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                if (collection.IsManaged)
+                {
+                    BatchAddToCollectionHandler.OperationCompleted += onBatchOperationCompleted;
+
+                    var collectionId = collection.PerformRead(c => c.ID);
+
+                    if (BatchAddToCollectionHandler.TryGetRecentResult(collectionId, out var recentResult))
+                        Schedule(() => showActionFeedback(recentResult));
+                }
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                if (collection.IsManaged)
+                    BatchAddToCollectionHandler.OperationCompleted -= onBatchOperationCompleted;
+            }
+
+            private void onBatchOperationCompleted(BatchAddToCollectionHandler.BatchAddResult result)
+            {
+                if (!collection.IsManaged)
+                    return;
+
+                if (collection.PerformRead(c => c.ID) != result.CollectionId)
+                    return;
+
+                Schedule(() => showActionFeedback(result));
+            }
+
+            private void showActionFeedback(BatchAddToCollectionHandler.BatchAddResult result)
+            {
+                actionText.Colour = result.Operation == BatchAddToCollectionHandler.BatchAddOperation.Added
+                    ? addedTextColour
+                    : removedTextColour;
+
+                actionText.Text = result.Operation == BatchAddToCollectionHandler.BatchAddOperation.Added
+                    ? $"{result.Count:#,0} items added"
+                    : $"{result.Count:#,0} items removed";
+
+                actionText.X = countText.DrawWidth + 8;
+                actionText.ClearTransforms();
+                actionText.FadeIn(120, Easing.OutQuint)
+                          .Delay(2000)
+                          .FadeOut(350, Easing.OutQuint);
             }
         }
 

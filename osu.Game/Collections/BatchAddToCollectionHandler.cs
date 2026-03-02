@@ -14,6 +14,37 @@ namespace osu.Game.Collections
 {
     internal static partial class BatchAddToCollectionHandler
     {
+        public enum BatchAddOperation
+        {
+            Added,
+            Removed,
+        }
+
+        public readonly record struct BatchAddResult(Guid CollectionId, BatchAddOperation Operation, int Count);
+
+        public static event Action<BatchAddResult>? OperationCompleted;
+
+        private static readonly Dictionary<Guid, (BatchAddResult Result, DateTimeOffset Timestamp)> recent_results = new Dictionary<Guid, (BatchAddResult Result, DateTimeOffset Timestamp)>();
+        private static readonly object recent_results_lock = new object();
+        private static readonly TimeSpan recent_result_lifetime = TimeSpan.FromSeconds(6);
+
+        public static bool TryGetRecentResult(Guid collectionId, out BatchAddResult result)
+        {
+            lock (recent_results_lock)
+            {
+                cleanupExpiredResults();
+
+                if (recent_results.TryGetValue(collectionId, out var entry))
+                {
+                    result = entry.Result;
+                    return true;
+                }
+            }
+
+            result = default;
+            return false;
+        }
+
         public static void RequestSaveToCollection(
             Live<BeatmapCollection> collection,
             Func<IEnumerable<BeatmapInfo>>? filteredBeatmapsProvider,
@@ -37,7 +68,7 @@ namespace osu.Game.Collections
             if (overlapCount == hashes.Count)
             {
                 showDialog(new RemoveFilteredResultsDialog(
-                    onRemove: () => runHashRemoval(collection, intersection)));
+                    onRemove: () => runHashRemoval(collection, intersection, BatchAddOperation.Removed)));
                 return;
             }
 
@@ -48,8 +79,8 @@ namespace osu.Game.Collections
 
                 showDialog(new PartialOverlapFilteredResultsDialog(
                     overlapCount,
-                    onAddDifference: () => runHashAddition(collection, toAdd),
-                    onRemoveIntersection: () => runHashRemoval(collection, toRemove)));
+                    onAddDifference: () => runHashAddition(collection, toAdd, BatchAddOperation.Added),
+                    onRemoveIntersection: () => runHashRemoval(collection, toRemove, BatchAddOperation.Removed)));
                 return;
             }
 
@@ -58,31 +89,71 @@ namespace osu.Game.Collections
             showDialog(new AddFilteredResultsDialog(
                 collectionName,
                 hashes.Count,
-                onAddAll: () => runHashAddition(collection, hashes)));
+                onAddAll: () => runHashAddition(collection, hashes, BatchAddOperation.Added)));
         }
 
-        private static void runHashAddition(Live<BeatmapCollection> collection, IReadOnlyList<string> hashes)
+        private static void runHashAddition(Live<BeatmapCollection> collection, IReadOnlyList<string> hashes, BatchAddOperation operation)
         {
             if (hashes.Count == 0)
                 return;
 
             Task.Run(() => collection.PerformWrite(c =>
             {
+                int affected = 0;
+
                 foreach (string hash in hashes)
                 {
-                    if (!c.BeatmapMD5Hashes.Contains(hash))
-                        c.BeatmapMD5Hashes.Add(hash);
+                    if (c.BeatmapMD5Hashes.Contains(hash))
+                        continue;
+
+                    c.BeatmapMD5Hashes.Add(hash);
+                    affected++;
                 }
+
+                if (affected > 0)
+                    notifyOperationCompleted(c.ID, operation, affected);
             }));
         }
 
-        private static void runHashRemoval(Live<BeatmapCollection> collection, IReadOnlyList<string> hashes)
+        private static void runHashRemoval(Live<BeatmapCollection> collection, IReadOnlyList<string> hashes, BatchAddOperation operation)
         {
             Task.Run(() => collection.PerformWrite(c =>
             {
+                int affected = 0;
+
                 foreach (string hash in hashes)
-                    c.BeatmapMD5Hashes.Remove(hash);
+                {
+                    if (c.BeatmapMD5Hashes.Remove(hash))
+                        affected++;
+                }
+
+                if (affected > 0)
+                    notifyOperationCompleted(c.ID, operation, affected);
             }));
+        }
+
+        private static void notifyOperationCompleted(Guid collectionId, BatchAddOperation operation, int count)
+        {
+            var result = new BatchAddResult(collectionId, operation, count);
+
+            lock (recent_results_lock)
+            {
+                recent_results[collectionId] = (result, DateTimeOffset.UtcNow);
+                cleanupExpiredResults();
+            }
+
+            OperationCompleted?.Invoke(result);
+        }
+
+        private static void cleanupExpiredResults()
+        {
+            var now = DateTimeOffset.UtcNow;
+
+            foreach (var entry in recent_results.ToArray())
+            {
+                if (now - entry.Value.Timestamp > recent_result_lifetime)
+                    recent_results.Remove(entry.Key);
+            }
         }
 
         private partial class AddFilteredResultsDialog : DangerousActionDialog
