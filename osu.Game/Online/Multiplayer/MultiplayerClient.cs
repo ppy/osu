@@ -123,7 +123,7 @@ namespace osu.Game.Online.Multiplayer
 
         public event Action? MatchmakingQueueJoined;
         public event Action? MatchmakingQueueLeft;
-        public event Action? MatchmakingRoomInvited;
+        public event Action<MatchmakingRoomInvitationParams>? MatchmakingRoomInvited;
         public event Action<long, string>? MatchmakingRoomReady;
         public event Action<MatchmakingLobbyStatus>? MatchmakingLobbyStatusChanged;
         public event Action<MatchmakingQueueStatus>? MatchmakingQueueStatusChanged;
@@ -1085,7 +1085,13 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMatchmakingClient.MatchmakingRoomInvited()
         {
-            Scheduler.Add(() => MatchmakingRoomInvited?.Invoke());
+            // Compatibility with older servers.
+            return ((IMatchmakingClient)this).MatchmakingRoomInvitedWithParams(new MatchmakingRoomInvitationParams { Type = MatchmakingPoolType.QuickPlay });
+        }
+
+        Task IMatchmakingClient.MatchmakingRoomInvitedWithParams(MatchmakingRoomInvitationParams invitation)
+        {
+            Scheduler.Add(() => MatchmakingRoomInvited?.Invoke(invitation));
             return Task.CompletedTask;
         }
 
