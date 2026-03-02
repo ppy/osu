@@ -34,10 +34,13 @@ namespace osu.Game.Screens.SelectV2
 
             protected override Colour4 DimColour => Colour4.White;
 
-            private readonly Bindable<BeatmapSetInfo?> scopedBeatmapSet = new Bindable<BeatmapSetInfo?>();
+            private readonly IBindable<BeatmapSetInfo?> scopedBeatmapSet = new Bindable<BeatmapSetInfo?>();
             private readonly Bindable<bool> showConvertedBeatmaps = new Bindable<bool>();
 
             private const double transition_duration = 200;
+
+            [Resolved]
+            private ISongSelect? songSelect { get; set; }
 
             [Resolved]
             private Bindable<RulesetInfo> ruleset { get; set; } = null!;
@@ -59,7 +62,7 @@ namespace osu.Game.Screens.SelectV2
             }
 
             [BackgroundDependencyLoader]
-            private void load(ISongSelect? songSelect, OsuConfigManager configManager)
+            private void load(OsuConfigManager configManager)
             {
                 Add(new FillFlowContainer
                 {
@@ -105,6 +108,7 @@ namespace osu.Game.Screens.SelectV2
                 showConvertedBeatmaps.BindValueChanged(_ => updateBeatmapSet(), true);
                 Expanded.BindValueChanged(_ => updateEnabled());
                 scopedBeatmapSet.BindValueChanged(_ => updateEnabled(), true);
+                scopedBeatmapSet.BindDisabledChanged(_ => updateEnabled(), true);
                 Enabled.BindValueChanged(_ => updateAppearance(), true);
                 FinishTransforms(true);
             }
@@ -201,13 +205,13 @@ namespace osu.Game.Screens.SelectV2
                     }
                 }
 
-                Action = () => scopedBeatmapSet.Value = BeatmapSet.Value;
+                Action = () => songSelect?.ScopeToBeatmapSet(BeatmapSet.Value);
                 updateEnabled();
             }
 
             private void updateEnabled()
             {
-                Enabled.Value = Expanded.Value && scopedBeatmapSet.Value == null;
+                Enabled.Value = Expanded.Value && !scopedBeatmapSet.Disabled && scopedBeatmapSet.Value == null;
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)

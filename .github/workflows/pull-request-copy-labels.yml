@@ -5,8 +5,8 @@ on:
     types: [opened]
 
 permissions:
-  issues: write # to read the labels of any linked issue(s), and to put the found labels if any on the PR
-  # not granting any `pull_requests` permissions because in github's modeling pull requests are a subset of issues. it's confusing.
+  issues: read # to read the labels of any linked issue(s)
+  pull-requests: write # to put the found labels if any on the PR
 
 jobs:
   copy-labels:

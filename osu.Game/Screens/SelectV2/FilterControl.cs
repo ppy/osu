@@ -36,7 +36,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.SelectV2
 {
-    public partial class FilterControl : OverlayContainer
+    public sealed partial class FilterControl : OverlayContainer
     {
         // taken from draw visualiser. used for carousel alignment purposes.
         public const float HEIGHT_FROM_SCREEN_TOP = 141 - corner_radius;
@@ -51,6 +51,11 @@ namespace osu.Game.Screens.SelectV2
         private ShearedDropdown<SortMode> sortDropdown = null!;
         private ShearedDropdown<GroupMode> groupDropdown = null!;
         private CollectionDropdown collectionDropdown = null!;
+
+        /// <summary>
+        /// An optional method which can force certain criteria adjustments.
+        /// </summary>
+        public Action<FilterCriteria>? ApplyRequiredCriteria { get; set; }
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
@@ -122,7 +127,7 @@ namespace osu.Game.Screens.SelectV2
                                 ApplyFilter = applyFilter,
                                 SaveFilter = saveFilter,
                                 Ruleset = ruleset,
-                                ScopedBeatmapSet = ScopedBeatmapSet,
+                                ScopedBeatmapSet = { BindTarget = ScopedBeatmapSet },
                             },
                         },
                         new GridContainer
@@ -197,7 +202,7 @@ namespace osu.Game.Screens.SelectV2
                         },
                         new ScopedBeatmapSetDisplay
                         {
-                            ScopedBeatmapSet = ScopedBeatmapSet,
+                            ScopedBeatmapSet = { BindTarget = ScopedBeatmapSet },
                             Depth = float.MinValue, // hack to ensure that the scoped display handles `GlobalAction.Back` input before the filter control
                         }
                     },
@@ -344,6 +349,9 @@ namespace osu.Game.Screens.SelectV2
             criteria.RulesetCriteria = ruleset.Value.CreateInstance().CreateRulesetFilterCriteria();
 
             FilterQueryParser.ApplyQueries(criteria, query);
+
+            ApplyRequiredCriteria?.Invoke(criteria);
+
             return criteria;
         }
 
@@ -388,13 +396,7 @@ namespace osu.Game.Screens.SelectV2
             public Action<string>? SaveFilter { get; set; }
             public IBindable<RulesetInfo> Ruleset { get; set; } = null!;
 
-            public Bindable<BeatmapSetInfo?> ScopedBeatmapSet
-            {
-                get => scopedBeatmapSet.Current;
-                set => scopedBeatmapSet.Current = value;
-            }
-
-            private readonly BindableWithCurrent<BeatmapSetInfo?> scopedBeatmapSet = new BindableWithCurrent<BeatmapSetInfo?>();
+            public IBindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
 
             private readonly Box hoverBox;
 
@@ -451,24 +453,18 @@ namespace osu.Game.Screens.SelectV2
 
             protected override InnerSearchTextBox CreateInnerTextBox() => new InnerTextBox
             {
-                ScopedBeatmapSet = ScopedBeatmapSet,
+                ScopedBeatmapSet = { BindTarget = ScopedBeatmapSet },
             };
 
             private partial class InnerTextBox : InnerFilterTextBox
             {
-                public Bindable<BeatmapSetInfo?> ScopedBeatmapSet
-                {
-                    get => scopedBeatmapSet.Current;
-                    set => scopedBeatmapSet.Current = value;
-                }
-
-                private readonly BindableWithCurrent<BeatmapSetInfo?> scopedBeatmapSet = new BindableWithCurrent<BeatmapSetInfo?>();
+                public IBindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
 
                 public override bool HandleLeftRightArrows => false;
 
                 public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
                 {
-                    if (e.Action == GlobalAction.Back && scopedBeatmapSet.Value != null)
+                    if (e.Action == GlobalAction.Back && ScopedBeatmapSet.Value != null)
                         return false;
 
                     return base.OnPressed(e);
