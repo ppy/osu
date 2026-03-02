@@ -396,17 +396,24 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("set provider", () => dialog.FilteredBeatmapsProvider = provider);
 
-            AddUntilStep("save button enabled", () =>
+            AddUntilStep("save-to-collection button shown", () =>
             {
-                var save = dialog.ChildrenOfType<Graphics.UserInterfaceV2.RoundedButton>().FirstOrDefault(b => b.Text.ToString() == "Save");
-                return save != null && save.Enabled.Value;
+                var save = dialog.ChildrenOfType<DrawableCollectionListItem.BatchAddToCollectionButton>().FirstOrDefault();
+                return save != null;
             });
 
             AddStep("click save", () =>
             {
-                var save = dialog.ChildrenOfType<Graphics.UserInterfaceV2.RoundedButton>().First(b => b.Text.ToString() == "Save");
+                var save = dialog.ChildrenOfType<DrawableCollectionListItem.BatchAddToCollectionButton>().First();
                 InputManager.MoveMouseTo(save);
                 InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("confirmation dialog shown", () => dialogOverlay.CurrentDialog != null);
+            AddStep("confirm add", () =>
+            {
+                InputManager.MoveMouseTo(dialogOverlay.CurrentDialog.ChildrenOfType<PopupDialogButton>().First());
+                InputManager.PressButton(MouseButton.Left);
             });
 
             AddUntilStep("collection has hashes", () =>
@@ -414,6 +421,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var c = Realm.Run(r => r.All<BeatmapCollection>().FirstOrDefault(coll => coll.Name == "Save target"));
                 return c != null && c.BeatmapMD5Hashes.Count == unique_to_add;
             });
+
+            AddStep("release mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
         }
 
         [Test]
@@ -433,20 +442,27 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("set provider", () => dialog.FilteredBeatmapsProvider = provider);
 
-            AddUntilStep("save button enabled", () =>
+            AddUntilStep("save-to-collection button shown", () =>
             {
-                var save = dialog.ChildrenOfType<Graphics.UserInterfaceV2.RoundedButton>().FirstOrDefault(b => b.Text.ToString() == "Save");
-                return save != null && save.Enabled.Value;
+                var save = dialog.ChildrenOfType<DrawableCollectionListItem.BatchAddToCollectionButton>().FirstOrDefault();
+                return save != null;
             });
 
             Stopwatch sw = null!;
 
             AddStep("click save and start timer", () =>
             {
-                var save = dialog.ChildrenOfType<Graphics.UserInterfaceV2.RoundedButton>().First(b => b.Text.ToString() == "Save");
+                var save = dialog.ChildrenOfType<DrawableCollectionListItem.BatchAddToCollectionButton>().First();
                 sw = Stopwatch.StartNew();
                 InputManager.MoveMouseTo(save);
                 InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("confirmation dialog shown", () => dialogOverlay.CurrentDialog != null);
+            AddStep("confirm add", () =>
+            {
+                InputManager.MoveMouseTo(dialogOverlay.CurrentDialog.ChildrenOfType<PopupDialogButton>().First());
+                InputManager.PressButton(MouseButton.Left);
             });
 
             AddUntilStep("collection has hashes", () =>
@@ -464,6 +480,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 return ok;
             });
+
+            AddStep("release mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
         }
 
         [Test]
@@ -483,20 +501,27 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("set provider", () => dialog.FilteredBeatmapsProvider = provider);
 
-            AddUntilStep("save button enabled", () =>
+            AddUntilStep("save-to-collection button shown", () =>
             {
-                var save = dialog.ChildrenOfType<Graphics.UserInterfaceV2.RoundedButton>().FirstOrDefault(b => b.Text.ToString() == "Save");
-                return save != null && save.Enabled.Value;
+                var save = dialog.ChildrenOfType<DrawableCollectionListItem.BatchAddToCollectionButton>().FirstOrDefault();
+                return save != null;
             });
 
             Stopwatch sw = null!;
 
             AddStep("click save and start timer", () =>
             {
-                var save = dialog.ChildrenOfType<Graphics.UserInterfaceV2.RoundedButton>().First(b => b.Text.ToString() == "Save");
+                var save = dialog.ChildrenOfType<DrawableCollectionListItem.BatchAddToCollectionButton>().First();
                 sw = Stopwatch.StartNew();
                 InputManager.MoveMouseTo(save);
                 InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("confirmation dialog shown", () => dialogOverlay.CurrentDialog != null);
+            AddStep("confirm add", () =>
+            {
+                InputManager.MoveMouseTo(dialogOverlay.CurrentDialog.ChildrenOfType<PopupDialogButton>().First());
+                InputManager.PressButton(MouseButton.Left);
             });
 
             // allow plenty of time for large workload
@@ -515,6 +540,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 return ok;
             });
+
+            AddStep("release mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
         }
 
         private void assertCollectionCount(int count)

@@ -45,14 +45,14 @@ namespace osu.Game.Localisation
         public static LocalisableString AddSelectedBeatmap => new TranslatableString(getKey(@"add_selected_beatmap"), @"Add selected beatmap");
 
         /// <summary>
-        /// "Remove filtered beatmaps"
+        /// "Remove all visible beatmaps from collection"
         /// </summary>
-        public static LocalisableString RemoveFilteredBeatmaps => new TranslatableString(getKey(@"remove_filtered_beatmaps"), @"Remove filtered beatmaps");
+        public static LocalisableString RemoveAllVisibleBeatmapsToCollection => new TranslatableString(getKey(@"remove_all_visible_beatmaps_to_collection"), @"Remove all visible beatmaps from collection");
 
         /// <summary>
-        /// "Add filtered beatmaps"
+        /// "Add all visible beatmaps to collection"
         /// </summary>
-        public static LocalisableString AddFilteredBeatmaps => new TranslatableString(getKey(@"add_filtered_beatmaps"), @"Add filtered beatmaps");
+        public static LocalisableString AddAllVisibleBeatmapsToCollection => new TranslatableString(getKey(@"add_all_visible_beatmaps_to_collection"), @"Add all visible beatmaps to collection");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

@@ -7,8 +7,11 @@ using System.Collections.Immutable;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
@@ -16,6 +19,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -28,6 +32,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osuTK;
+using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Screens.SelectV2
@@ -55,6 +60,9 @@ namespace osu.Game.Screens.SelectV2
 
         [Resolved]
         private ISongSelect? songSelect { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
@@ -235,7 +243,19 @@ namespace osu.Game.Screens.SelectV2
                     updateCriteria();
             });
 
-            searchTextBox.Current.BindValueChanged(_ => updateCriteria());
+            searchTextBox.Current.BindValueChanged(_ =>
+            {
+                updateCriteria();
+                updateVisibleResultsActionAvailability();
+            });
+
+            searchTextBox.VisibleResultsAction = () =>
+            {
+                if (manageCollectionsDialog == null)
+                    return;
+
+                manageCollectionsDialog.Show();
+            };
             difficultyRangeSlider.LowerBound.BindValueChanged(_ => updateCriteria());
             difficultyRangeSlider.UpperBound.BindValueChanged(_ => updateCriteria());
             showConvertedBeatmapsButton.Active.BindValueChanged(_ => updateCriteria());
@@ -260,7 +280,14 @@ namespace osu.Game.Screens.SelectV2
             localUserFavouriteBeatmapSets.BindCollectionChanged((_, _) => updateCriteria());
             ScopedBeatmapSet.BindValueChanged(_ => updateCriteria(clearScopedSet: false));
 
+            updateVisibleResultsActionAvailability();
             updateCriteria();
+        }
+
+        private void updateVisibleResultsActionAvailability()
+        {
+            bool available = !string.IsNullOrWhiteSpace(searchTextBox.Current.Value);
+            searchTextBox.UpdateVisibleResultsActionAvailability(available);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -344,6 +371,29 @@ namespace osu.Game.Screens.SelectV2
         {
             public IBindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
 
+            public Action? VisibleResultsAction { get; set; }
+
+            private readonly BatchAddToCollectionButton batchAddToCollectionButton;
+
+            public SongSelectSearchTextBox()
+            {
+                AddInternal(batchAddToCollectionButton = new BatchAddToCollectionButton
+                {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    X = -50,
+                    Alpha = 0,
+                    TooltipText = "Add all visible beatmaps to collection",
+                    Action = () => VisibleResultsAction?.Invoke(),
+                });
+            }
+
+            public void UpdateVisibleResultsActionAvailability(bool available)
+            {
+                batchAddToCollectionButton.Enabled.Value = available;
+                batchAddToCollectionButton.FadeTo(available ? 1 : 0, 200, Easing.OutQuint);
+            }
+
             protected override InnerSearchTextBox CreateInnerTextBox() => new InnerTextBox
             {
                 ScopedBeatmapSet = { BindTarget = ScopedBeatmapSet },
@@ -374,6 +424,64 @@ namespace osu.Game.Screens.SelectV2
                         return false;
 
                     return base.OnPressed(e);
+                }
+            }
+
+            private partial class BatchAddToCollectionButton : OsuClickableContainer
+            {
+                private readonly Box background;
+
+                private Color4 normalColour;
+                private Color4 hoverColour;
+
+                public BatchAddToCollectionButton()
+                {
+                    RelativeSizeAxes = Axes.Y;
+                    Width = 50;
+                    CornerRadius = 7;
+                    Masking = true;
+
+                    Child = background = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    };
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
+                {
+                    normalColour = colours.Yellow.Darken(0.45f);
+                    hoverColour = colours.Yellow;
+
+                    background.Colour = normalColour;
+
+                    AddInternal(new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
+                        {
+                            new SpriteIcon
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Icon = FontAwesome.Solid.Plus,
+                                Size = new Vector2(10),
+                                Shear = -OsuGame.SHEAR,
+                            }
+                        }
+                    });
+                }
+
+                protected override bool OnHover(HoverEvent e)
+                {
+                    background.FadeColour(hoverColour, 100, Easing.Out);
+                    return base.OnHover(e);
+                }
+
+                protected override void OnHoverLost(HoverLostEvent e)
+                {
+                    background.FadeColour(normalColour, 100, Easing.Out);
+                    base.OnHoverLost(e);
                 }
             }
         }
