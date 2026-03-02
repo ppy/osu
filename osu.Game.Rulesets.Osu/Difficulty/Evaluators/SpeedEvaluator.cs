@@ -12,6 +12,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class SpeedEvaluator
     {
+        private static double multiplier => 0.00525779123953;
+
         private const double min_speed_bonus = 200; // 200 BPM 1/4th
         private const double speed_balancing_factor = 40;
 
@@ -49,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             difficulty *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
 
             // Apply penalty if there's doubletappable doubles
-            return difficulty * doubletapness;
+            return difficulty * doubletapness * multiplier;
         }
 
         private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.3, ms / 1000));

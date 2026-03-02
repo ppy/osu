@@ -13,6 +13,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class ReadingEvaluator
     {
+        private static double multiplier => 0.0122845589709;
+
         private const double reading_window_size = 3000; // 3 seconds
         private const double distance_influence_threshold = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.5; // 1.5 circles distance between centers
         private const double hidden_multiplier = 0.28;
@@ -48,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double difficulty = DifficultyCalculationUtils.Norm(1.5, preemptDifficulty, hiddenDifficulty, noteDensityDifficulty);
 
-            return difficulty;
+            return difficulty * multiplier;
         }
 
         /// <summary>

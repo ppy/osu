@@ -11,6 +11,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class AimEvaluator
     {
+        private static double multiplier => 0.122845589709;
+
         private const double wide_angle_multiplier = 1.5;
         private const double acute_angle_multiplier = 2.6;
         private const double slider_multiplier = 1.5;
@@ -169,7 +171,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             aimStrain *= highBpmBonus(osuCurrObj.AdjustedDeltaTime, osuCurrObj.LazyJumpDistance);
 
-            return aimStrain;
+            return aimStrain * multiplier;
         }
 
         // We decrease strain for distances <radius to fix cases where doubles with no aim requirement

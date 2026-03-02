@@ -158,7 +158,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateStarRating(double basePerformance)
         {
-            return Math.Cbrt(basePerformance * OsuPerformanceCalculator.PERFORMANCE_BASE_MULTIPLIER);
+            return Math.Cbrt(basePerformance);
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
