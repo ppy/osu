@@ -95,15 +95,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             closeNotifications();
         });
 
-        private void onMatchmakingRoomInvited() => Scheduler.Add(() =>
+        private void onMatchmakingRoomInvited(MatchmakingRoomInvitationParams invitation) => Scheduler.Add(() =>
         {
             CurrentState.Value = ScreenQueue.MatchmakingScreenState.PendingAccept;
 
-            if (backgroundNotification != null)
-            {
-                backgroundNotification.State = ProgressNotificationState.Completed;
-                backgroundNotification = null;
-            }
+            backgroundNotification?.Complete(invitation);
+            backgroundNotification = null;
         });
 
         private void onMatchmakingRoomReady(long roomId, string password) => Scheduler.Add(() =>
@@ -184,6 +181,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     return false;
                 };
 
+                CancelRequested = () =>
+                {
+                    client.MatchmakingLeaveQueue().FireAndForget();
+                    return true;
+                };
+
+                matchFoundSample = audio.Samples.Get(@"Multiplayer/Matchmaking/match-found");
+            }
+
+            public void Complete(MatchmakingRoomInvitationParams invitation)
+            {
                 CompletionClickAction = () =>
                 {
                     client.MatchmakingAcceptInvitation().FireAndForget();
@@ -196,13 +204,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     return true;
                 };
 
-                CancelRequested = () =>
-                {
-                    client.MatchmakingLeaveQueue().FireAndForget();
-                    return true;
-                };
-
-                matchFoundSample = audio.Samples.Get(@"Multiplayer/Matchmaking/match-found");
+                State = ProgressNotificationState.Completed;
             }
 
             protected override Notification CreateCompletionNotification()

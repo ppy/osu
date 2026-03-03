@@ -30,7 +30,6 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Screens;
-using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Tests.Resources;
@@ -676,19 +675,9 @@ namespace osu.Game.Tests.Visual.Playlists
 
             public TestPlaylistsScreen(PlaylistsRoomSubScreen screen)
             {
-                ScreenFooter footer;
-                InternalChild = new DependencyProvidingContainer
+                InternalChild = Stack = new OnlinePlaySubScreenStack
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        Stack = new OnlinePlaySubScreenStack
-                        {
-                            RelativeSizeAxes = Axes.Both
-                        },
-                        footer = new ScreenFooter(),
-                    },
-                    CachedDependencies = new (Type, object)[] { (typeof(ScreenFooter), footer) },
+                    RelativeSizeAxes = Axes.Both
                 };
 
                 Stack.Push(screen);

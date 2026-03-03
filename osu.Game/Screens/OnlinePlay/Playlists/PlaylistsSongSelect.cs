@@ -211,12 +211,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             buttons.InsertRange(buttons.FindIndex(b => b is FooterButtonMods) + 1,
             [
-                new FooterButtonFreeModsV2(freeModSelect)
+                new FooterButtonFreeMods(freeModSelect)
                 {
                     FreeMods = { BindTarget = freeMods },
                     Freestyle = { BindTarget = Freestyle }
                 },
-                new FooterButtonFreestyleV2
+                new FooterButtonFreestyle
                 {
                     Freestyle = { BindTarget = Freestyle }
                 }
