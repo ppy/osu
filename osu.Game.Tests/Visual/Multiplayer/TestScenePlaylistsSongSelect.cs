@@ -164,20 +164,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("freestyle enabled", () => songSelect.Freestyle.Value, () => Is.True);
             AddStep("click icon in free mods button", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonFreeModsV2>().Single());
+                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonFreeMods>().Single());
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("mod select not visible", () => this.ChildrenOfType<FreeModSelectOverlay>().Single().State.Value, () => Is.EqualTo(Visibility.Hidden));
 
             AddStep("toggle freestyle off", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonFreestyleV2>().Single());
+                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonFreestyle>().Single());
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("freestyle disabled", () => songSelect.Freestyle.Value, () => Is.False);
             AddStep("click icon in free mods button", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonFreeModsV2>().Single());
+                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonFreeMods>().Single());
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("mod select visible", () => this.ChildrenOfType<FreeModSelectOverlay>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
