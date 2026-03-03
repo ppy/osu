@@ -117,6 +117,12 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"owners")]
         public BeatmapOwner[] BeatmapOwners { get; set; } = Array.Empty<BeatmapOwner>();
 
+        /// <summary>
+        /// Minimum count of votes required to display a tag on the beatmap's page.
+        /// Should match value specified web-side as https://github.com/ppy/osu-web/blob/cae2fdf03cfb8c30c8e332cfb142e03188ceffef/config/osu.php#L59.
+        /// </summary>
+        public const int MINIMUM_USER_TAG_VOTES_FOR_DISPLAY = 5;
+
         public (APITag Tag, int VoteCount)[] GetTopUserTags()
         {
             if (TopTags == null || TopTags.Length == 0 || BeatmapSet?.RelatedTags == null)
