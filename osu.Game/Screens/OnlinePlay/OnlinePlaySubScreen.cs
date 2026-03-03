@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.OnlinePlay
 {
@@ -16,6 +17,8 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected OnlinePlaySubScreen()
         {
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
