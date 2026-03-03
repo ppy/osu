@@ -96,7 +96,7 @@ namespace osu.Game.Screens
 
         public virtual float BackgroundParallaxAmount => 1;
 
-        protected OverlayColourProvider ColourProvider { get; init; } = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+        protected OverlayColourProvider ColourProvider { get; set; } = null!;
 
         [Resolved]
         private MusicController musicController { get; set; }
@@ -142,6 +142,9 @@ namespace osu.Game.Screens
             Ruleset = screenDependencies.Ruleset;
             Mods = screenDependencies.Mods;
 
+            var existingColourProvider = dependencies.Get<OverlayColourProvider>();
+
+            ColourProvider ??= existingColourProvider ?? new OverlayColourProvider(OverlayColourScheme.Aquamarine);
             screenDependencies.Cache(ColourProvider);
         }
 
