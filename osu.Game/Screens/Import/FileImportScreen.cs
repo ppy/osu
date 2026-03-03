@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,12 +40,16 @@ namespace osu.Game.Screens.Import
         [Resolved]
         private OsuGameBase game { get; set; }
 
-        [Cached]
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+        public FileImportScreen()
+        {
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+        }
 
         [BackgroundDependencyLoader(true)]
         private void load()
         {
+            Debug.Assert(ColourProvider != null);
+
             InternalChild = contentContainer = new Container
             {
                 Masking = true,
@@ -70,7 +75,7 @@ namespace osu.Game.Screens.Import
                         {
                             new Box
                             {
-                                Colour = colourProvider.Background4,
+                                Colour = ColourProvider.Background4,
                                 RelativeSizeAxes = Axes.Both
                             },
                             new Container

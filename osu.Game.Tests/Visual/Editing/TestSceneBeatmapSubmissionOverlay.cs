@@ -39,8 +39,10 @@ namespace osu.Game.Tests.Visual.Editing
             [Resolved]
             private IOverlayManager? overlayManager { get; set; }
 
-            [Cached]
-            private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+            public TestBeatmapSubmissionOverlayScreen()
+            {
+                ColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+            }
 
             [BackgroundDependencyLoader]
             private void load()

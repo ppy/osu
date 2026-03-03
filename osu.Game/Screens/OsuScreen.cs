@@ -96,6 +96,9 @@ namespace osu.Game.Screens
 
         public virtual float BackgroundParallaxAmount => 1;
 
+        [CanBeNull]
+        protected OverlayColourProvider ColourProvider { get; init; }
+
         [Resolved]
         private MusicController musicController { get; set; }
 
@@ -139,6 +142,9 @@ namespace osu.Game.Screens
             Beatmap = screenDependencies.Beatmap;
             Ruleset = screenDependencies.Ruleset;
             Mods = screenDependencies.Mods;
+
+            if (ColourProvider != null)
+                screenDependencies.Cache(ColourProvider);
         }
 
         /// <summary>

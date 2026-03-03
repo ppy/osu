@@ -56,9 +56,6 @@ namespace osu.Game.Screens.Utility
         /// </summary>
         private const int target_host_update_frames = 4000;
 
-        [Cached]
-        private readonly OverlayColourProvider overlayColourProvider = new OverlayColourProvider(OverlayColourScheme.Orange);
-
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
@@ -96,11 +93,13 @@ namespace osu.Game.Screens.Utility
 
         public LatencyCertifierScreen()
         {
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Orange);
+
             InternalChildren = new Drawable[]
             {
                 new Box
                 {
-                    Colour = overlayColourProvider.Background6,
+                    Colour = ColourProvider.Background6,
                     RelativeSizeAxes = Axes.Both,
                 },
                 mainArea = new Container<LatencyArea>
@@ -111,7 +110,7 @@ namespace osu.Game.Screens.Utility
                 new Box
                 {
                     Name = "separator",
-                    Colour = ColourInfo.GradientHorizontal(overlayColourProvider.Background6, overlayColourProvider.Background6.Opacity(0)),
+                    Colour = ColourInfo.GradientHorizontal(ColourProvider.Background6, ColourProvider.Background6.Opacity(0)),
                     Width = 100,
                     RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.TopCentre,
@@ -120,7 +119,7 @@ namespace osu.Game.Screens.Utility
                 new Box
                 {
                     Name = "separator",
-                    Colour = ColourInfo.GradientHorizontal(overlayColourProvider.Background6.Opacity(0), overlayColourProvider.Background6),
+                    Colour = ColourInfo.GradientHorizontal(ColourProvider.Background6.Opacity(0), ColourProvider.Background6),
                     Width = 100,
                     RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.TopCentre,
@@ -372,11 +371,13 @@ namespace osu.Game.Screens.Utility
             Drawable background;
             Drawable certifiedText;
 
+            Debug.Assert(ColourProvider != null);
+
             resultsArea.AddRange(new[]
             {
                 background = new Box
                 {
-                    Colour = overlayColourProvider.Background4,
+                    Colour = ColourProvider.Background4,
                     RelativeSizeAxes = Axes.Both,
                 },
                 (certifiedText = new OsuSpriteText
@@ -387,7 +388,7 @@ namespace osu.Game.Screens.Utility
                     Blending = BlendingParameters.Additive,
                 }).WithEffect(new GlowEffect
                 {
-                    Colour = overlayColourProvider.Colour1,
+                    Colour = ColourProvider.Colour1,
                     PadExtent = true
                 }).With(e =>
                 {

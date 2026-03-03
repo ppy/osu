@@ -44,9 +44,6 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private BeatmapModelDownloader beatmapDownloader { get; set; } = null!;
 
-        [Cached]
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
-
         private Container beatmapPanelContainer = null!;
         private RoundedButton watchButton = null!;
         private SettingsCheckbox automaticDownload = null!;
@@ -66,12 +63,16 @@ namespace osu.Game.Screens.Play
         public SoloSpectatorScreen(APIUser targetUser)
             : base(targetUser.Id)
         {
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+
             this.targetUser = targetUser;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
+            Debug.Assert(ColourProvider != null);
+
             InternalChild = new Container
             {
                 Masking = true,
@@ -85,7 +86,7 @@ namespace osu.Game.Screens.Play
                 {
                     new Box
                     {
-                        Colour = colourProvider.Background5,
+                        Colour = ColourProvider.Background5,
                         RelativeSizeAxes = Axes.Both,
                     },
                     new FillFlowContainer

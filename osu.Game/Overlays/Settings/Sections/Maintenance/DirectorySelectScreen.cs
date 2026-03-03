@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Diagnostics;
 using osu.Framework.Graphics;
 using System.IO;
 using osu.Framework.Allocation;
@@ -48,12 +49,16 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         /// </summary>
         protected virtual DirectoryInfo InitialPath => null;
 
-        [Cached]
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+        protected DirectorySelectScreen()
+        {
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+        }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            Debug.Assert(ColourProvider != null);
+
             InternalChild = new Container
             {
                 Masking = true,
@@ -67,7 +72,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background4,
+                        Colour = ColourProvider.Background4,
                     },
                     new GridContainer
                     {

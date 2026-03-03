@@ -210,9 +210,6 @@ namespace osu.Game.Screens.Edit
         [Cached]
         public readonly EditorClipboard Clipboard = new EditorClipboard();
 
-        [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
-
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
@@ -240,6 +237,8 @@ namespace osu.Game.Screens.Edit
 
         public Editor(EditorLoader loader = null)
         {
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
             this.loader = loader;
         }
 

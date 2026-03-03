@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -53,9 +54,6 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         private IBindable<StarDifficulty> starDifficulty = null!;
 
-        [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
-
         [Cached(typeof(OnlinePlayBeatmapAvailabilityTracker))]
         private readonly DailyChallengeBeatmapAvailabilityTracker beatmapAvailabilityTracker;
 
@@ -87,6 +85,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
         public DailyChallengeIntro(Room room)
         {
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
+
             this.room = room;
             item = room.Playlist.Single();
 
@@ -95,11 +95,13 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             beatmapAvailabilityTracker = new DailyChallengeBeatmapAvailabilityTracker(item);
         }
 
-        protected override BackgroundScreen CreateBackground() => new DailyChallengeIntroBackgroundScreen(colourProvider);
+        protected override BackgroundScreen CreateBackground() => new DailyChallengeIntroBackgroundScreen(ColourProvider!);
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets, BeatmapDifficultyCache difficultyCache, BeatmapModelDownloader beatmapDownloader, OsuConfigManager config, AudioManager audio)
         {
+            Debug.Assert(ColourProvider != null);
+
             const float horizontal_info_size = 500f;
 
             StarRatingDisplay starRatingDisplay;
@@ -138,7 +140,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                     {
                                         new Box
                                         {
-                                            Colour = colourProvider.Background3,
+                                            Colour = ColourProvider.Background3,
                                             RelativeSizeAxes = Axes.Both,
                                         },
                                         new OsuSpriteText
@@ -164,7 +166,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                     {
                                         new Box
                                         {
-                                            Colour = colourProvider.Background3,
+                                            Colour = ColourProvider.Background3,
                                             RelativeSizeAxes = Axes.Both,
                                         },
                                         new OsuSpriteText
@@ -198,14 +200,14 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                     Origin = Anchor.TopCentre,
                                     Size = new Vector2(horizontal_info_size, 150f),
                                     CornerRadius = 20f,
-                                    BorderColour = colourProvider.Content2,
+                                    BorderColour = ColourProvider.Content2,
                                     BorderThickness = 3f,
                                     Masking = true,
                                     Children = new Drawable[]
                                     {
                                         new Box
                                         {
-                                            Colour = colourProvider.Background3,
+                                            Colour = ColourProvider.Background3,
                                             RelativeSizeAxes = Axes.Both,
                                         },
                                         flash = new Box
@@ -229,7 +231,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                     {
                                         new Box
                                         {
-                                            Colour = colourProvider.Background3,
+                                            Colour = ColourProvider.Background3,
                                             RelativeSizeAxes = Axes.Both,
                                         },
                                         new FillFlowContainer
@@ -293,7 +295,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                     {
                                         new Box
                                         {
-                                            Colour = colourProvider.Background3,
+                                            Colour = ColourProvider.Background3,
                                             RelativeSizeAxes = Axes.Both,
                                         },
                                         new ModFlowDisplay

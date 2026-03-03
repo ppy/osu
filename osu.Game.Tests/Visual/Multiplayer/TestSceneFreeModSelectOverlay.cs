@@ -170,8 +170,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             [Resolved]
             private IOverlayManager? overlayManager { get; set; }
 
-            [Cached]
-            private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+            public TestFreeModSelectOverlayScreen()
+            {
+                ColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+            }
 
             [BackgroundDependencyLoader]
             private void load()
