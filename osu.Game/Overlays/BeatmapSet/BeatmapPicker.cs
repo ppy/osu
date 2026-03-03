@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
@@ -108,8 +109,14 @@ namespace osu.Game.Overlays.BeatmapSet
                             Margin = new MarginPadding { Top = 5 },
                             Children = new[]
                             {
-                                nominations = new Statistic(FontAwesome.Solid.ThumbsUp),
-                                plays = new Statistic(FontAwesome.Solid.PlayCircle),
+                                nominations = new Statistic(FontAwesome.Solid.ThumbsUp)
+                                {
+                                    TooltipText = BeatmapsetsStrings.ShowStatsNominations,
+                                },
+                                plays = new Statistic(FontAwesome.Solid.PlayCircle)
+                                {
+                                    TooltipText = BeatmapsetsStrings.ShowStatsPlaycount,
+                                },
                                 favourites = new Statistic(FontAwesome.Solid.Heart),
                             },
                         },
@@ -188,6 +195,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             plays.Value = BeatmapSet?.PlayCount ?? 0;
             favourites.Value = BeatmapSet?.FavouriteCount ?? 0;
+            favourites.TooltipText = BeatmapSet?.FavouriteCount > 0 ? BeatmapsetsStrings.ShowStatsFavourites : BeatmapsetsStrings.ShowStatsNoFavourites;
 
             updateDifficultyButtons();
         }
@@ -377,7 +385,7 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
-        private partial class Statistic : FillFlowContainer
+        private partial class Statistic : FillFlowContainer, IHasTooltip
         {
             private readonly OsuSpriteText text;
 
@@ -417,6 +425,8 @@ namespace osu.Game.Overlays.BeatmapSet
                     },
                 };
             }
+
+            public LocalisableString TooltipText { get; set; }
         }
 
         public enum DifficultySelectorState
