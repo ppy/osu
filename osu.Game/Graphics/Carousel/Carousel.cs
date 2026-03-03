@@ -411,11 +411,13 @@ namespace osu.Game.Graphics.Carousel
 
                 HandleFilterCompleted();
 
+                NewItemsPresented?.Invoke(carouselItems);
+
                 refreshAfterSelection();
                 if (!Scroll.UserScrolling)
                     ScrollToSelection(immediate: true);
 
-                NewItemsPresented?.Invoke(carouselItems);
+                selectionValid.Validate();
             });
 
             return items;
