@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -121,6 +122,8 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
+            Debug.Assert(ColourProvider != null);
+
             sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
 
             FillFlowContainer footerButtons;

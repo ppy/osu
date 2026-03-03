@@ -371,6 +371,8 @@ namespace osu.Game.Screens.Utility
             Drawable background;
             Drawable certifiedText;
 
+            Debug.Assert(ColourProvider != null);
+
             resultsArea.AddRange(new[]
             {
                 background = new Box

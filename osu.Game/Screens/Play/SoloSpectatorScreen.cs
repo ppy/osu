@@ -71,6 +71,8 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
+            Debug.Assert(ColourProvider != null);
+
             InternalChild = new Container
             {
                 Masking = true,

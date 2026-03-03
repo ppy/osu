@@ -90,6 +90,8 @@ namespace osu.Game.Screens.Edit.Submission
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
+            Debug.Assert(ColourProvider != null);
+
             AddRangeInternal(new Drawable[]
             {
                 overlay = new BeatmapSubmissionOverlay(),

@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System.Diagnostics;
 using osu.Framework.Graphics;
 using System.IO;
 using osu.Framework.Allocation;
@@ -56,6 +57,8 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         [BackgroundDependencyLoader]
         private void load()
         {
+            Debug.Assert(ColourProvider != null);
+
             InternalChild = new Container
             {
                 Masking = true,
