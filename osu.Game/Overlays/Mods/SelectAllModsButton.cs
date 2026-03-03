@@ -18,8 +18,9 @@ namespace osu.Game.Overlays.Mods
         private readonly Bindable<string> searchTerm = new Bindable<string>();
 
         public SelectAllModsButton(FreeModSelectOverlay modSelectOverlay)
-            : base(ModSelectOverlay.BUTTON_WIDTH)
         {
+            Width = ModSelectOverlay.BUTTON_WIDTH;
+
             Text = CommonStrings.SelectAll;
             Action = modSelectOverlay.SelectAll;
 

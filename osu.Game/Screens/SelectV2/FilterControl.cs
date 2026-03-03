@@ -152,6 +152,7 @@ namespace osu.Game.Screens.SelectV2
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
+                                        AutoSizeAxes = Axes.X,
                                         Text = UserInterfaceStrings.ShowConverts,
                                         Height = 30f,
                                     },
