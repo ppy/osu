@@ -9,17 +9,21 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Input.Bindings;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -39,7 +43,7 @@ namespace osu.Game.Screens.SelectV2
 
         private const float corner_radius = 10;
 
-        public IBindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
+        public Bindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
 
         private SongSelectSearchTextBox searchTextBox = null!;
         private ShearedToggleButton showConvertedBeatmapsButton = null!;
@@ -52,9 +56,6 @@ namespace osu.Game.Screens.SelectV2
         /// An optional method which can force certain criteria adjustments.
         /// </summary>
         public Action<FilterCriteria>? ApplyRequiredCriteria { get; set; }
-
-        [Resolved]
-        private ISongSelect? songSelect { get; set; }
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
@@ -123,6 +124,9 @@ namespace osu.Game.Screens.SelectV2
                             {
                                 RelativeSizeAxes = Axes.X,
                                 HoldFocus = true,
+                                ApplyFilter = applyFilter,
+                                SaveFilter = saveFilter,
+                                Ruleset = ruleset,
                                 ScopedBeatmapSet = { BindTarget = ScopedBeatmapSet },
                             },
                         },
@@ -199,6 +203,7 @@ namespace osu.Game.Screens.SelectV2
                         new ScopedBeatmapSetDisplay
                         {
                             ScopedBeatmapSet = { BindTarget = ScopedBeatmapSet },
+                            Depth = float.MinValue, // hack to ensure that the scoped display handles `GlobalAction.Back` input before the filter control
                         }
                     },
                 }
@@ -269,6 +274,51 @@ namespace osu.Game.Screens.SelectV2
             collectionsSubscription?.Dispose();
         }
 
+        private void applyFilter(SavedBeatmapFilter filter)
+        {
+            searchTextBox.Current.Value = filter.SearchQuery;
+
+            sortDropdown.Current.Value = Enum.IsDefined(typeof(SortMode), filter.SortMode)
+                ? (SortMode)filter.SortMode
+                : SortMode.Title;
+
+            groupDropdown.Current.Value = Enum.IsDefined(typeof(GroupMode), filter.GroupMode)
+                ? (GroupMode)filter.GroupMode
+                : GroupMode.None;
+
+            showConvertedBeatmapsButton.Active.Value = filter.ShowConverted;
+
+            var lowerBound = (BindableNumber<double>)difficultyRangeSlider.LowerBound;
+            var upperBound = (BindableNumber<double>)difficultyRangeSlider.UpperBound;
+
+            double min = Math.Clamp(filter.MinStars, lowerBound.MinValue, lowerBound.MaxValue);
+            double max = Math.Clamp(filter.MaxStars, upperBound.MinValue, upperBound.MaxValue);
+
+            if (min > max)
+                min = max;
+
+            difficultyRangeSlider.LowerBound.Value = min;
+            difficultyRangeSlider.UpperBound.Value = max;
+        }
+
+        private void saveFilter(string name)
+        {
+            if (string.IsNullOrEmpty(ruleset.Value?.ShortName))
+                return;
+
+            realm.Write(r => r.Add(new SavedBeatmapFilter
+            {
+                Name = name.Trim(),
+                SearchQuery = searchTextBox.Current.Value,
+                SortMode = (int)sortDropdown.Current.Value,
+                GroupMode = (int)groupDropdown.Current.Value,
+                ShowConverted = showConvertedBeatmapsButton.Active.Value,
+                MinStars = difficultyRangeSlider.LowerBound.Value,
+                MaxStars = difficultyRangeSlider.UpperBound.Value,
+                RulesetShortName = ruleset.Value.ShortName
+            }));
+        }
+
         /// <summary>
         /// Creates a <see cref="FilterCriteria"/> based on the current state of the controls.
         /// </summary>
@@ -309,7 +359,7 @@ namespace osu.Game.Screens.SelectV2
         {
             if (clearScopedSet && ScopedBeatmapSet.Value != null)
             {
-                songSelect?.UnscopeBeatmapSet();
+                ScopedBeatmapSet.Value = null;
                 // because `ScopedBeatmapSet` has a value change callback bound to it that calls `updateCriteria()` again,
                 // we can just do nothing other than clear it to avoid extra work and duplicated `CriteriaChanged` invocations
                 return;
@@ -342,7 +392,64 @@ namespace osu.Game.Screens.SelectV2
 
         internal partial class SongSelectSearchTextBox : ShearedFilterTextBox
         {
+            public Action<SavedBeatmapFilter>? ApplyFilter { get; set; }
+            public Action<string>? SaveFilter { get; set; }
+            public IBindable<RulesetInfo> Ruleset { get; set; } = null!;
+
             public IBindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
+
+            private readonly Box hoverBox;
+
+            public SongSelectSearchTextBox()
+            {
+                var filterButton = new SearchFilterButton
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                };
+
+                RightInterface.Clear();
+                RightInterface.Add(filterButton);
+
+                // Create hover box
+                hoverBox = new Box
+                {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 55,
+                    Alpha = 0,
+                };
+
+                BackgroundContent.Add(hoverBox);
+
+                var popoverTarget = new PopoverTarget
+                {
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.TopRight,
+                    RelativePositionAxes = Axes.Y,
+                    Y = 1,
+                    Size = Vector2.Zero,
+                    CreatePopover = createPopover
+                };
+
+                AddInternal(popoverTarget);
+
+                filterButton.HoverTarget = hoverBox;
+                filterButton.PopoverTarget = popoverTarget;
+                filterButton.SetIconShear(-Shear);
+            }
+
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                hoverBox.Colour = colours.Blue;
+            }
+
+            private Popover createPopover() => new SavedFiltersPopover(f => ApplyFilter?.Invoke(f), n => SaveFilter?.Invoke(n), Ruleset.Value);
 
             protected override InnerSearchTextBox CreateInnerTextBox() => new InnerTextBox
             {
@@ -375,6 +482,12 @@ namespace osu.Game.Screens.SelectV2
 
                     return base.OnPressed(e);
                 }
+            }
+
+            private partial class PopoverTarget : Container, IHasPopover
+            {
+                public Func<Popover>? CreatePopover { get; set; }
+                public Popover GetPopover() => CreatePopover?.Invoke()!;
             }
         }
     }
