@@ -23,9 +23,10 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Select;
+using osu.Game.Screens.Footer;
 using osu.Game.Users;
 using osu.Game.Utils;
+using osu.Game.Screens.SelectV2;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
@@ -35,18 +36,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public override string Title => ShortTitle.Humanize();
 
-        public override bool AllowEditing => false;
-
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
         [Resolved]
         private OngoingOperationTracker operationTracker { get; set; } = null!;
 
+        [Resolved]
+        private IOverlayManager? overlayManager { get; set; }
+
         private readonly Room room;
         private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
         private readonly PlaylistItem? itemToEdit;
 
+        private ModSelectOverlay modSelect = null!;
         private LoadingLayer loadingLayer = null!;
         private IDisposable? selectionOperation;
 
@@ -64,7 +67,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private readonly PlaylistItem? initialItem;
         private readonly FreeModSelectOverlay freeModSelect;
-        private FooterButton freeModsFooterButton = null!;
 
         private IDisposable? freeModSelectOverlayRegistration;
 
@@ -80,6 +82,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             initialItem = itemToEdit ?? room.Playlist.LastOrDefault();
 
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
+            LeftPadding = new MarginPadding { Top = CORNER_RADIUS_HIDE_OFFSET + Header.HEIGHT };
 
             freeModSelect = new FreeModSelectOverlay
             {
@@ -91,10 +94,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
-            LeftArea.Padding = new MarginPadding { Top = Header.HEIGHT };
-
             LoadComponent(freeModSelect);
-            AddInternal(loadingLayer = new LoadingLayer(true));
+            AddInternal(loadingLayer = new LoadingLayer(true)
+            {
+                BlockNonPositionalInput = true,
+            });
         }
 
         protected override void LoadComplete()
@@ -138,7 +142,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Ruleset.BindValueChanged(onRulesetChanged);
             freestyle.BindValueChanged(onFreestyleChanged);
 
-            freeModSelectOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(freeModSelect);
+            freeModSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(freeModSelect);
 
             updateFooterButtons();
             updateValidMods();
@@ -152,8 +156,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     loadingLayer.Hide();
             }, true);
         }
-
-        protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
 
         private void onFreestyleChanged(ValueChangedEvent<bool> enabled)
         {
@@ -184,12 +186,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private void updateFooterButtons()
         {
             if (freestyle.Value)
-            {
-                freeModsFooterButton.Enabled.Value = false;
                 freeModSelect.Hide();
-            }
-            else
-                freeModsFooterButton.Enabled.Value = true;
         }
 
         /// <summary>
@@ -206,11 +203,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!validFreeMods.SequenceEqual(FreeMods.Value))
                 FreeMods.Value = validFreeMods;
 
-            ModSelect.IsValidMod = isValidRequiredMod;
+            modSelect.IsValidMod = isValidRequiredMod;
             freeModSelect.IsValidMod = isValidAllowedMod;
         }
 
-        protected sealed override bool OnStart()
+        protected sealed override void OnStart()
         {
             var item = new PlaylistItem(Beatmap.Value.BeatmapInfo)
             {
@@ -220,7 +217,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 Freestyle = freestyle.Value
             };
 
-            return selectItem(item);
+            selectItem(item);
         }
 
         private bool selectItem(PlaylistItem item)
@@ -263,11 +260,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 }, onError: _ =>
                 {
                     selectionOperation.Dispose();
-
-                    Schedule(() =>
-                    {
-                        Carousel.AllowSelection = true;
-                    });
                 });
             }
             else
@@ -296,31 +288,31 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             return base.OnExiting(e);
         }
 
-        protected override ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay(OverlayColourScheme.Plum)
+        protected override ModSelectOverlay CreateModSelectOverlay() => modSelect = new UserModSelectOverlay(OverlayColourScheme.Plum)
         {
             IsValidMod = isValidRequiredMod
         };
 
-        protected override IEnumerable<(FooterButton button, OverlayContainer? overlay)> CreateSongSelectFooterButtons()
+        public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons()
         {
-            var baseButtons = base.CreateSongSelectFooterButtons().ToList();
+            var buttons = base.CreateFooterButtons().ToList();
 
-            baseButtons.Single(i => i.button is FooterButtonMods).button.TooltipText = MultiplayerMatchStrings.RequiredModsButtonTooltip;
+            buttons.Single(i => i is FooterButtonMods).TooltipText = MultiplayerMatchStrings.RequiredModsButtonTooltip;
 
-            baseButtons.InsertRange(baseButtons.FindIndex(b => b.button is FooterButtonMods) + 1, new (FooterButton, OverlayContainer?)[]
-            {
-                (freeModsFooterButton = new FooterButtonFreeMods(freeModSelect)
+            buttons.InsertRange(buttons.FindIndex(b => b is FooterButtonMods) + 1,
+            [
+                new FooterButtonFreeMods(freeModSelect)
                 {
                     FreeMods = { BindTarget = FreeMods },
                     Freestyle = { BindTarget = freestyle }
-                }, null),
-                (new FooterButtonFreestyle
+                },
+                new FooterButtonFreestyle
                 {
                     Freestyle = { BindTarget = freestyle }
-                }, null)
-            });
+                }
+            ]);
 
-            return baseButtons;
+            return buttons;
         }
 
         /// <summary>

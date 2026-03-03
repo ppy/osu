@@ -228,7 +228,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // edit playlist item
             AddStep("Press select", () => InputManager.Key(Key.Enter));
-            AddUntilStep("wait for song select", () => InputManager.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            waitForSongSelect();
 
             // select beatmap
             AddStep("Press select", () => InputManager.Key(Key.Enter));
@@ -451,7 +451,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 ((MultiplayerMatchSubScreen)currentSubScreen).ShowSongSelect(item);
             });
 
-            AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            waitForSongSelect();
 
             AddUntilStep("Beatmap matches current item", () => Beatmap.Value.BeatmapInfo.OnlineID == multiplayerClient.ClientRoom?.Playlist.First().BeatmapID);
 
@@ -492,7 +492,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 ((MultiplayerMatchSubScreen)currentSubScreen).ShowSongSelect(item);
             });
 
-            AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            waitForSongSelect();
 
             AddUntilStep("Ruleset matches current item", () => Ruleset.Value.OnlineID == multiplayerClient.ClientRoom?.Playlist.First().RulesetID);
 
@@ -533,7 +533,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 ((MultiplayerMatchSubScreen)currentSubScreen).ShowSongSelect(item);
             });
 
-            AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            waitForSongSelect();
 
             AddUntilStep("Mods match current item",
                 () => SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(multiplayerClient.ClientRoom.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
@@ -1051,7 +1051,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("press edit on second item", () => this.ChildrenOfType<DrawableRoomPlaylistItem>().Single(i => i.Item.RulesetID == 1)
                                                            .ChildrenOfType<DrawableRoomPlaylistItem.PlaylistEditButton>().Single().TriggerClick());
 
-            AddUntilStep("wait for song select", () => InputManager.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            waitForSongSelect();
             AddAssert("ruleset is taiko", () => Ruleset.Value.OnlineID == 1);
 
             AddStep("start match", () => multiplayerClient.StartMatch().WaitSafely());
@@ -1247,6 +1247,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
 
             AddUntilStep("wait for join", () => multiplayerClient.RoomJoined);
+        }
+
+        private void waitForSongSelect()
+        {
+            AddUntilStep("wait for song select", () =>
+            {
+                var songSelect = InputManager.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault();
+                return songSelect != null && songSelect.IsCurrentScreen() && !songSelect.IsFiltering;
+            });
         }
 
         protected override void Dispose(bool isDisposing)

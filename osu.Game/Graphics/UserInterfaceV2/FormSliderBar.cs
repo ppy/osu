@@ -157,7 +157,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 Current = currentNumberInstantaneous,
                 OnCommit = () => current.Value = currentNumberInstantaneous.Value,
-                TooltipFormat = TooltipFormat,
+                TooltipFormat = s => TooltipFormat(s),
                 DisplayAsPercentage = DisplayAsPercentage,
                 PlaySamplesOnAdjust = PlaySamplesOnAdjust,
                 ResetToDefault = () =>

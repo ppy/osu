@@ -14,7 +14,6 @@ using osu.Game.Localisation;
 using osu.Game.Screens;
 using osu.Game.Screens.SelectV2;
 using osuTK;
-using SongSelect = osu.Game.Screens.Select.SongSelect;
 
 namespace osu.Game.Overlays.SkinEditor
 {
