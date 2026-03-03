@@ -244,9 +244,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                         weight *= DifficultyCalculationUtils.ReverseLerp(loopObjPrev1.JumpDistance, loopObjPrev2.JumpDistance * 0.6 + 1, loopObjPrev2.JumpDistance * 0.8 + 1);
                         weight *= DifficultyCalculationUtils.ReverseLerp(loopObjPrev1.JumpDistance, loopObjPrev2.JumpDistance * 1.4 + 1, loopObjPrev2.JumpDistance * 1.2 + 1);
 
-                        // Don't nerf extremely low spaced patterns
-                        weight *= DifficultyCalculationUtils.ReverseLerp(Math.Max(loopObj.JumpDistance, loopObjPrev0.JumpDistance), OsuDifficultyHitObject.NORMALISED_RADIUS, OsuDifficultyHitObject.NORMALISED_RADIUS * 3);
-
                         // Lerp between max angle difference and rescaled alternating difference, with more harsh scaling compared to normal difference
                         angleDifferenceAlternating = double.Lerp(Math.PI, 0.1 * angleDifferenceAlternating, weight);
                     }
