@@ -70,7 +70,6 @@ namespace osu.Game.Screens.SelectV2
 
         private static void updateRealmBeatmapSet(Realm r, APIBeatmapSet onlineBeatmapSet)
         {
-            var tagsById = (onlineBeatmapSet.RelatedTags ?? []).ToDictionary(t => t.Id);
             var onlineBeatmaps = onlineBeatmapSet.Beatmaps.ToDictionary(b => b.OnlineID);
 
             var dbBeatmapSets = r.All<BeatmapSetInfo>().Where(b => b.OnlineID == onlineBeatmapSet.OnlineID);
@@ -104,7 +103,7 @@ namespace osu.Game.Screens.SelectV2
                         onlineBeatmap.BeatmapSet = onlineBeatmapSet;
                         HashSet<string> userTags = onlineBeatmap.GetTopUserTags(confirmedOnly: true)
                                                                 .Select(t => t.Tag.Name)
-                                                                .ToHashSet() ?? [];
+                                                                .ToHashSet();
 
                         if (!userTags.SetEquals(dbBeatmap.Metadata.UserTags))
                         {
