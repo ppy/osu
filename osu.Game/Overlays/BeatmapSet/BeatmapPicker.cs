@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
@@ -32,7 +33,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float tile_spacing = 2;
 
         private readonly LinkFlowContainer infoContainer;
-        private readonly Statistic plays, favourites;
+        private readonly Statistic nominations, plays, favourites;
 
         public readonly DifficultiesContainer Difficulties;
 
@@ -107,6 +108,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Margin = new MarginPadding { Top = 5 },
                             Children = new[]
                             {
+                                nominations = new Statistic(FontAwesome.Solid.ThumbsUp),
                                 plays = new Statistic(FontAwesome.Solid.PlayCircle),
                                 favourites = new Statistic(FontAwesome.Solid.Heart),
                             },
@@ -175,6 +177,14 @@ namespace osu.Game.Overlays.BeatmapSet
 
             // Else just choose the first available difficulty for now.
             Beatmap.Value ??= Difficulties.FirstOrDefault()?.Beatmap;
+
+            if (beatmapSet?.Status == BeatmapOnlineStatus.Pending && beatmapSet.NominationStatus != null)
+            {
+                nominations.Show();
+                nominations.Value = beatmapSet.NominationStatus.Current;
+            }
+            else
+                nominations.Hide();
 
             plays.Value = BeatmapSet?.PlayCount ?? 0;
             favourites.Value = BeatmapSet?.FavouriteCount ?? 0;
