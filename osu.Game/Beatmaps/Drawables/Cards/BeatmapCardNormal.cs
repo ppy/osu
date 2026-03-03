@@ -278,8 +278,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             if (nominationsStatistic != null)
                 yield return nominationsStatistic;
 
-            yield return new FavouritesStatistic(BeatmapSet) { Current = FavouriteState };
             yield return new PlayCountStatistic(BeatmapSet);
+            yield return new FavouritesStatistic(BeatmapSet) { Current = FavouriteState };
 
             var dateStatistic = BeatmapCardDateStatistic.CreateFor(BeatmapSet);
             if (dateStatistic != null)

@@ -17,7 +17,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
         {
             this.dateTime = dateTime;
 
-            Icon = FontAwesome.Regular.CheckCircle;
+            Icon = FontAwesome.Solid.CheckCircle;
             Text = dateTime.ToLocalisedMediumDate();
         }
 

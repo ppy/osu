@@ -72,6 +72,10 @@ namespace osu.Game.Tests.Visual.Online
                     Preview = @"https://b.ppy.sh/preview/12345.mp3",
                     PlayCount = 123,
                     FavouriteCount = 456,
+                    NominationStatus = new BeatmapSetNominationStatus
+                    {
+                        Current = 2,
+                    },
                     Submitted = DateTime.Now,
                     Ranked = DateTime.Now,
                     BPM = 111,
