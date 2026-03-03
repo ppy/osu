@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const int history_time_max = 5 * 1000; // 5 seconds
         private const int history_objects_max = 32;
-        private const double rhythm_overall_multiplier = 0.8;
+        private const double rhythm_overall_multiplier = 0.9;
         private const double rhythm_ratio_multiplier = 32.0;
 
         /// <summary>
