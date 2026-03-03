@@ -102,7 +102,7 @@ namespace osu.Game.Screens.SelectV2
                             dbBeatmap.Status = onlineBeatmap.Status;
 
                         onlineBeatmap.BeatmapSet = onlineBeatmapSet;
-                        HashSet<string> userTags = onlineBeatmap.GetTopUserTags()?
+                        HashSet<string> userTags = onlineBeatmap.GetTopUserTags(confirmedOnly: true)
                                                                 .Select(t => t.Tag.Name)
                                                                 .ToHashSet() ?? [];
 
