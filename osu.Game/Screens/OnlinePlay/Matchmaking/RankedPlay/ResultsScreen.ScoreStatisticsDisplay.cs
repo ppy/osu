@@ -5,8 +5,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Scoring;
 using osu.Game.Screens.SelectV2;
 using osuTK;
@@ -42,12 +40,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     Spacing = new Vector2(20),
                     Children = new Drawable[]
                     {
-                        new OsuSpriteText
-                        {
-                            Text = score.TotalScore.ToString("N0"),
-                            Font = OsuFont.Torus.With(size: 72),
-                            UseFullGlyphHeight = false,
-                        },
                         statisticsFlow = new FillFlowContainer<BeatmapTitleWedge.StatisticDifficulty>
                         {
                             RelativeSizeAxes = Axes.X,
@@ -57,7 +49,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                             {
                                 Width = 80,
                                 Value = new BeatmapTitleWedge.StatisticDifficulty.Data(it.DisplayName, it.Count, it.Count, it.MaxCount ?? it.Count),
-                                AccentColour = colours.PrimaryDarker
+                                AccentColour = colours.PrimaryDarker,
                             }).ToArray(),
                         }
                     }

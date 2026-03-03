@@ -162,7 +162,10 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void TestHealthChange()
         {
+            AddStep("set play phase", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.CardPlay, state => state.ActiveUserId = 2).WaitSafely());
+            AddWaitStep("wait", 5);
             AddStep("change player 1 health", () => MultiplayerClient.RankedPlayChangeUserState(MultiplayerClient.LocalUser!.UserID, state => state.Life = 250_000).WaitSafely());
+            AddWaitStep("wait", 5);
             AddStep("change player 2 health", () => MultiplayerClient.RankedPlayChangeUserState(2, state => state.Life = 250_000).WaitSafely());
         }
     }

@@ -184,6 +184,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     Child = new RankedPlayUserDisplay(localUserId, Anchor.BottomLeft, RankedPlayColourScheme.Blue)
                     {
                         RelativeSizeAxes = Axes.Both,
+                        Health = { BindTarget = matchInfo.PlayerHealth }
                     }
                 },
                 new RankedPlayCornerPiece(RankedPlayColourScheme.Red, Anchor.TopRight)
@@ -192,6 +193,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     Child = new RankedPlayUserDisplay(opponentUserId, Anchor.TopRight, RankedPlayColourScheme.Red)
                     {
                         RelativeSizeAxes = Axes.Both,
+                        Health = { BindTarget = matchInfo.OpponentHealth }
                     }
                 },
             ]);

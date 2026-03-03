@@ -133,9 +133,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         {
             this.FadeIn(300);
 
-            Content.MoveToX(0, 400, Easing.OutExpo)
+            Content.Delay(150)
+                   .MoveToX(0, 400, Easing.OutExpo)
                    .ScaleTo(1f, 400, Easing.OutExpo)
                    .FadeIn();
+
             background.MoveToY(0, 400, Easing.OutExpo);
 
             bottomLayer.RotateTo(0, 400, Easing.OutQuart);

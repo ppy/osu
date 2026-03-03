@@ -18,8 +18,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
@@ -34,9 +32,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             MinValue = 0,
             Value = 1_000_000,
         };
-
-        [Resolved]
-        private MultiplayerClient client { get; set; } = null!;
 
         [Resolved]
         private UserLookupCache users { get; set; } = null!;
@@ -61,6 +56,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         private void load()
         {
             APIUser user = users.GetUserAsync(userId).GetResultSafely()!;
+
+            var shear = contentAnchor == Anchor.TopLeft || contentAnchor == Anchor.BottomRight
+                ? -OsuGame.SHEAR
+                : OsuGame.SHEAR;
 
             InternalChildren =
             [
@@ -96,7 +95,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                     Direction = FillDirection.Vertical,
                     Children =
                     [
-                        new HealthBar(colourScheme, (contentAnchor & Anchor.x0) != 0)
+                        HealthDisplay = new HealthBar(colourScheme, (contentAnchor & Anchor.x0) != 0, shear)
                         {
                             Health = { BindTarget = Health },
                             RelativeSizeAxes = Axes.X,
@@ -119,11 +118,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             ];
         }
 
+        public HealthBar HealthDisplay { get; private set; } = null!;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            client.MatchRoomStateChanged += onRoomStateChanged;
 
             Health.BindValueChanged(e =>
             {
@@ -132,22 +131,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             });
         }
 
-        private void onRoomStateChanged(MatchRoomState state) => Scheduler.Add(() =>
-        {
-            if (state is not RankedPlayRoomState rankedPlayState)
-                return;
-
-            Health.Value = rankedPlayState.Users[userId].Life;
-        });
-
-        protected override void Dispose(bool isDisposing)
-        {
-            client.MatchRoomStateChanged -= onRoomStateChanged;
-
-            base.Dispose(isDisposing);
-        }
-
-        private partial class HealthBar : CompositeDrawable
+        public partial class HealthBar : CompositeDrawable
         {
             private readonly bool leftToRight;
 
@@ -174,11 +158,24 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             private readonly SpriteIcon heartIcon;
             private readonly OsuSpriteText healthText;
 
-            public HealthBar(RankedPlayColourScheme colourScheme, bool leftToRight)
+            /// <summary>
+            /// Impact position for damage animation
+            /// </summary>
+            public Vector2 ScreenSpaceImpactPosition
+            {
+                get
+                {
+                    var rect = healthBar.ScreenSpaceDrawQuad.AABBFloat;
+
+                    return leftToRight ? new Vector2(rect.Right, rect.Centre.Y) : new Vector2(rect.Left, rect.Centre.Y);
+                }
+            }
+
+            public HealthBar(RankedPlayColourScheme colourScheme, bool leftToRight, Vector2 shear)
             {
                 this.leftToRight = leftToRight;
 
-                Shear = OsuGame.SHEAR;
+                Shear = shear;
 
                 Anchor contentAnchor = leftToRight ? Anchor.CentreLeft : Anchor.CentreRight;
 
@@ -243,7 +240,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                     content = new BufferedContainer(pixelSnapping: true)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Shear = -OsuGame.SHEAR,
+                        Shear = -shear,
                         BackgroundColour = Color4.White.Opacity(0), // workaround for non-premultiplied alpha blending of white content on transparent background
                         Child = new FillFlowContainer
                         {

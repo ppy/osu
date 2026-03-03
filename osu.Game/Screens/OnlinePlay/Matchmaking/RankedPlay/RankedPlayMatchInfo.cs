@@ -59,6 +59,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         /// </summary>
         public event Action<RankedPlayCardWithPlaylistItem>? CardPlayed;
 
+        /// <summary>
+        /// The player's health
+        /// </summary>
+        public readonly BindableInt PlayerHealth = new BindableInt { MinValue = 0, MaxValue = 1_000_000, Value = 1_000_000 };
+
+        /// <summary>
+        /// The opponent's health
+        /// </summary>
+        public readonly BindableInt OpponentHealth = new BindableInt { MinValue = 0, MaxValue = 1_000_000, Value = 1_000_000 };
+
         public RankedPlayRoomState RoomState { get; private set; } = null!;
 
         public bool IsOwnTurn => RoomState.ActiveUserId == client.LocalUser?.UserID;
@@ -106,6 +116,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             RoomState = roomState;
 
             stage.Value = roomState.Stage;
+
+            foreach (var (userId, userInfo) in roomState.Users)
+            {
+                if (userId == player.Id)
+                    PlayerHealth.Value = userInfo.Life;
+                else
+                    OpponentHealth.Value = userInfo.Life;
+            }
         }
 
         private void onCardAdded(int userId, RankedPlayCardWithPlaylistItem item)
