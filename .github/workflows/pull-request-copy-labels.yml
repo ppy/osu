@@ -5,8 +5,9 @@ on:
     types: [opened]
 
 permissions:
-  issues: read # to read the labels of any linked issue(s)
-  pull-requests: write # to put the found labels if any on the PR
+  issues: write
+  pull-requests: write
+  contents: read
 
 jobs:
   copy-labels:

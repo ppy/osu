@@ -220,6 +220,8 @@ namespace osu.Game.Graphics.Carousel
 
                 private readonly Drawable box;
 
+                private bool capturingMouseDown;
+
                 protected override float MinimumDimSize => SCROLL_BAR_WIDTH * 3;
 
                 private const float expanded_size_ratio = 2;
@@ -280,6 +282,7 @@ namespace osu.Game.Graphics.Carousel
                 {
                     if (!base.OnMouseDown(e)) return false;
 
+                    capturingMouseDown = true;
                     updateVisuals(e);
                     return true;
                 }
@@ -294,13 +297,14 @@ namespace osu.Game.Graphics.Carousel
                 {
                     if (e.Button != MouseButton.Left) return;
 
+                    capturingMouseDown = false;
                     updateVisuals(e);
                     base.OnMouseUp(e);
                 }
 
                 private void updateVisuals(MouseEvent e)
                 {
-                    if (IsDragged || e.PressedButtons.Contains(MouseButton.Left))
+                    if (capturingMouseDown)
                         box.FadeColour(highlightColour, 100);
                     else if (IsHovered)
                         box.FadeColour(hoverColour, 100);
