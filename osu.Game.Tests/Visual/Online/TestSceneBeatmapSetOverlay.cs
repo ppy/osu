@@ -22,7 +22,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.Select.Details;
 using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Online
@@ -72,6 +71,10 @@ namespace osu.Game.Tests.Visual.Online
                     Preview = @"https://b.ppy.sh/preview/12345.mp3",
                     PlayCount = 123,
                     FavouriteCount = 456,
+                    NominationStatus = new BeatmapSetNominationStatus
+                    {
+                        Current = 2,
+                    },
                     Submitted = DateTime.Now,
                     Ranked = DateTime.Now,
                     BPM = 111,

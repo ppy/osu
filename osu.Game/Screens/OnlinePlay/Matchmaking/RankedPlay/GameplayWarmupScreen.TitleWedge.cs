@@ -15,7 +15,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 using osu.Game.Utils;
 using osuTK;
 

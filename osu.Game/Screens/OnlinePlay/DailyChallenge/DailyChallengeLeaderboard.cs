@@ -17,7 +17,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.DailyChallenge

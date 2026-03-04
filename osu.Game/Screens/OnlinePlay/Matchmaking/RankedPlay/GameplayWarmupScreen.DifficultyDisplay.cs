@@ -18,7 +18,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay

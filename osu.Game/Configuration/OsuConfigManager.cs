@@ -14,6 +14,7 @@ using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dashboard.Friends;
 using osu.Game.Overlays.Mods.Input;
@@ -22,7 +23,6 @@ using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
-using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Skinning;
 using osu.Game.Users;
 

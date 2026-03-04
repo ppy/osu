@@ -12,7 +12,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
