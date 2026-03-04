@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : HarmonicSkill
     {
-        private double skillMultiplier => 1.07;
+        private double skillMultiplier => 1.38;
 
         private readonly List<double> sliderStrains = new List<double>();
 
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double strainDecayBase => 0.3;
 
         protected override double HarmonicScale => 20;
-        protected override double DecayExponent => 0.85;
+        protected override double DecayExponent => 0.95;
 
         public Speed(Mod[] mods)
             : base(mods)
