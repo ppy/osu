@@ -17,7 +17,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {

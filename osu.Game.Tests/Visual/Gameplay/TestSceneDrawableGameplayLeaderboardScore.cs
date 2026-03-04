@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay

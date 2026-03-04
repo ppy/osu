@@ -18,7 +18,7 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Footer;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 using osu.Game.Utils;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists

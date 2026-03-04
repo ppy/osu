@@ -4,7 +4,6 @@
 using System;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
-using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Mods;
 using System.Collections.Generic;
@@ -12,6 +11,7 @@ using System.Globalization;
 using System.Linq;
 using osu.Framework.IO.Network;
 using osu.Game.Extensions;
+using osu.Game.Screens.Play.Leaderboards;
 
 namespace osu.Game.Online.API.Requests
 {
