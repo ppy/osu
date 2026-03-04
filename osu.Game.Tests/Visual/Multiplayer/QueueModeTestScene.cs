@@ -125,7 +125,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         protected void AddBeatmapFromSongSelect(Func<BeatmapInfo> beatmap, RulesetInfo? ruleset = null, IReadOnlyList<Mod>? mods = null)
         {
-            Screens.SelectV2.SongSelect? songSelect = null;
+            Screens.Select.SongSelect? songSelect = null;
 
             AddStep("click add button", () =>
             {
@@ -133,7 +133,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("wait for song select", () => (songSelect = CurrentSubScreen as Screens.SelectV2.SongSelect) != null);
+            AddUntilStep("wait for song select", () => (songSelect = CurrentSubScreen as Screens.Select.SongSelect) != null);
             AddUntilStep("wait for loaded", () => songSelect.IsCurrentScreen() && !songSelect.AsNonNull().IsFiltering);
 
             if (ruleset != null)

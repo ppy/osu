@@ -1,21 +1,20 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osuTK;
-using osuTK.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Game.Graphics.Containers;
-using osu.Game.Beatmaps.ControlPoints;
-using osu.Framework.Audio.Track;
-using System;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Game.Screens.Select;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -31,7 +30,9 @@ namespace osu.Game.Graphics.UserInterface
 
         private const float shear_width = 5f;
 
-        private static readonly Vector2 shear = new Vector2(shear_width / Footer.HEIGHT, 0);
+        public const float HEIGHT = 50;
+
+        private static readonly Vector2 shear = new Vector2(shear_width / HEIGHT, 0);
 
         public static readonly Vector2 SIZE_EXTENDED = new Vector2(140, 50);
         public static readonly Vector2 SIZE_RETRACTED = new Vector2(100, 50);
