@@ -131,7 +131,7 @@ namespace osu.Game.Online.API.Requests.Responses
         /// If <see langword="true"/>, only tags above <see cref="MINIMUM_USER_TAG_VOTES_FOR_DISPLAY"/> will be shown.
         /// If <see langword="false"/>, all tags regardless of vote count will be shown.
         /// </param>
-        public (APITag Tag, int VoteCount)[] GetTopUserTags(bool confirmedOnly)
+        public (APITag Tag, int VoteCount)[] GetTopUserTags(bool confirmedOnly = true)
         {
             if (TopTags == null || TopTags.Length == 0 || BeatmapSet?.RelatedTags == null)
                 return [];

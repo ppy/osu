@@ -458,7 +458,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                             new OsuSpriteText
                             {
                                 Padding = new MarginPadding { Vertical = 3, Horizontal = 8 },
-                                Text = beatmap.GetTopUserTags(confirmedOnly: true).FirstOrDefault().Tag?.Name ?? string.Empty,
+                                Text = beatmap.GetTopUserTags().FirstOrDefault().Tag?.Name ?? string.Empty,
                                 AlwaysPresent = true,
                                 Colour = colourProvider.Content2,
                                 Font = OsuFont.Style.Caption2,
@@ -468,7 +468,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                     };
                 }
 
-                public LocalisableString TooltipText => string.Join('\n', beatmap.GetTopUserTags(confirmedOnly: false).Select(t => $"{t.Tag.Name} ({t.VoteCount})"));
+                public LocalisableString TooltipText => string.Join('\n', beatmap.GetTopUserTags().Select(t => $"{t.Tag.Name} ({t.VoteCount})"));
             }
         }
     }
