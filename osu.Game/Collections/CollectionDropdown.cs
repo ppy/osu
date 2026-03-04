@@ -24,6 +24,7 @@ namespace osu.Game.Collections
 {
     /// <summary>
     /// A dropdown to select the collection to be used to filter results.
+    /// WARNING: TODO: we have TWO `CollectionDropdowns` with diverging functionality. This is not good.
     /// </summary>
     public partial class CollectionDropdown : OsuDropdown<CollectionFilterMenuItem>
     {
