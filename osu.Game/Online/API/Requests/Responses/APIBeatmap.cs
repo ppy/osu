@@ -117,7 +117,21 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"owners")]
         public BeatmapOwner[] BeatmapOwners { get; set; } = Array.Empty<BeatmapOwner>();
 
-        public (APITag Tag, int VoteCount)[] GetTopUserTags()
+        /// <summary>
+        /// Minimum count of votes required to display a tag on the beatmap's page.
+        /// Should match value specified web-side as https://github.com/ppy/osu-web/blob/cae2fdf03cfb8c30c8e332cfb142e03188ceffef/config/osu.php#L59.
+        /// </summary>
+        public const int MINIMUM_USER_TAG_VOTES_FOR_DISPLAY = 5;
+
+        /// <summary>
+        /// Retrieves top user tags for the beatmap, ordered in a way matching osu!web.
+        /// Requires <see cref="BeatmapSet"/> to be populated.
+        /// </summary>
+        /// <param name="confirmedOnly">
+        /// If <see langword="true"/>, only tags above <see cref="MINIMUM_USER_TAG_VOTES_FOR_DISPLAY"/> will be shown.
+        /// If <see langword="false"/>, all tags regardless of vote count will be shown.
+        /// </param>
+        public (APITag Tag, int VoteCount)[] GetTopUserTags(bool confirmedOnly = true)
         {
             if (TopTags == null || TopTags.Length == 0 || BeatmapSet?.RelatedTags == null)
                 return [];
@@ -126,7 +140,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
             return TopTags
                    .Select(t => (topTag: t, relatedTag: tagsById.GetValueOrDefault(t.TagId)))
-                   .Where(t => t.relatedTag != null)
+                   .Where(t => t.relatedTag != null && (!confirmedOnly || t.topTag.VoteCount >= MINIMUM_USER_TAG_VOTES_FOR_DISPLAY))
                    // see https://github.com/ppy/osu-web/blob/bb3bd2e7c6f84f26066df5ea20a81c77ec9bb60a/resources/js/beatmapsets-show/controller.ts#L103-L106 for sort criteria
                    .OrderByDescending(t => t.topTag.VoteCount)
                    .ThenBy(t => t.relatedTag!.Name)
