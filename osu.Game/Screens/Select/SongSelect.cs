@@ -58,10 +58,6 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
-    /// <summary>
-    /// This screen is intended to house all components introduced in the new song select design to add transitions and examine the overall look.
-    /// This will be gradually built upon and ultimately replace <see cref="SongSelect"/> once everything is in place.
-    /// </summary>
     public abstract partial class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, ISongSelect, IHandlePresentBeatmap, IProvideCursor
     {
         /// <summary>
