@@ -107,6 +107,8 @@ namespace osu.Game.Screens.OnlinePlay
                     },
                 }
             });
+
+            TooltipText = MultiplayerMatchStrings.FreeModsButtonTooltip;
         }
 
         protected override void LoadComplete()
