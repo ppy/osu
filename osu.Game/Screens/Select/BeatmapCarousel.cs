@@ -7,568 +7,1150 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Caching;
+using osu.Framework.Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Pooling;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
-using osu.Framework.Layout;
+using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Extensions;
-using osu.Game.Graphics.Containers;
-using osu.Game.Input.Bindings;
-using osu.Game.Screens.Select.Carousel;
-using osu.Game.Screens.Select.Filter;
-using osuTK;
-using osuTK.Input;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Carousel;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Rulesets;
+using osu.Game.Scoring;
+using Realms;
 
 namespace osu.Game.Screens.Select
 {
-    public partial class BeatmapCarousel : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+    [Cached]
+    public partial class BeatmapCarousel : Carousel<BeatmapInfo>
     {
-        /// <summary>
-        /// Height of the area above the carousel that should be treated as visible due to transparency of elements in front of it.
-        /// </summary>
-        public float BleedTop { get; set; }
+        public Action<BeatmapInfo>? RequestPresentBeatmap { private get; init; }
 
         /// <summary>
-        /// Height of the area below the carousel that should be treated as visible due to transparency of elements in front of it.
+        /// From the provided beatmaps, select the most appropriate one for the user's skill.
         /// </summary>
-        public float BleedBottom { get; set; }
+        public required Action<IEnumerable<GroupedBeatmap>> RequestRecommendedSelection { private get; init; }
 
         /// <summary>
-        /// Triggered when <see cref="BeatmapSets"/> finish loading, or are subsequently changed.
+        /// Selection requested for the provided beatmap.
         /// </summary>
-        public Action? BeatmapSetsChanged;
+        public required Action<GroupedBeatmap> RequestSelection { private get; init; }
+
+        public const float SPACING = 3f;
+
+        private IBindableList<BeatmapSetInfo> detachedBeatmaps = null!;
+
+        private readonly LoadingLayer loading;
+
+        private readonly BeatmapCarouselFilterGrouping grouping;
 
         /// <summary>
-        /// Triggered after filter conditions have finished being applied to the model hierarchy.
+        /// Total number of beatmap difficulties displayed with the filter.
         /// </summary>
-        public Action? FilterApplied;
+        public int MatchedBeatmapsCount => Filters.Last().BeatmapItemsCount;
 
-        /// <summary>
-        /// The currently selected beatmap.
-        /// </summary>
-        public BeatmapInfo? SelectedBeatmapInfo => selectedBeatmap?.BeatmapInfo;
-
-        private CarouselBeatmap? selectedBeatmap => selectedBeatmapSet?.Beatmaps.FirstOrDefault(s => s.State.Value == CarouselItemState.Selected);
-
-        /// <summary>
-        /// The total count of non-filtered beatmaps displayed.
-        /// </summary>
-        public int CountDisplayed => beatmapSets.Where(s => !s.Filtered.Value).Sum(s => s.TotalItemsNotFiltered);
-
-        /// <summary>
-        /// The currently selected beatmap set.
-        /// </summary>
-        public BeatmapSetInfo? SelectedBeatmapSet => selectedBeatmapSet?.BeatmapSet;
-
-        /// <summary>
-        /// A function to optionally decide on a recommended difficulty from a beatmap set.
-        /// </summary>
-        public Func<IEnumerable<BeatmapInfo>, BeatmapInfo?>? GetRecommendedBeatmap;
-
-        private CarouselBeatmapSet? selectedBeatmapSet;
-
-        /// <summary>
-        /// Raised when the <see cref="SelectedBeatmapInfo"/> is changed.
-        /// </summary>
-        public Action<BeatmapInfo?>? SelectionChanged;
-
-        public override bool HandleNonPositionalInput => AllowSelection;
-        public override bool HandlePositionalInput => AllowSelection;
-
-        public override bool PropagatePositionalInputSubTree => AllowSelection;
-        public override bool PropagateNonPositionalInputSubTree => AllowSelection;
-
-        private (int first, int last) displayedRange;
-
-        /// <summary>
-        /// Extend the range to retain already loaded pooled drawables.
-        /// </summary>
-        private const float distance_offscreen_before_unload = 2048;
-
-        /// <summary>
-        /// Extend the range to update positions / retrieve pooled drawables outside of visible range.
-        /// </summary>
-        private const float distance_offscreen_to_preload = 768;
-
-        /// <summary>
-        /// Whether carousel items have completed asynchronously loaded.
-        /// </summary>
-        public bool BeatmapSetsLoaded { get; private set; }
-
-        [Cached]
-        protected readonly CarouselScrollContainer Scroll;
-
-        [Resolved]
-        private RealmAccess realm { get; set; } = null!;
-
-        private IBindableList<BeatmapSetInfo>? detachedBeatmapSets;
-
-        private readonly NoResultsPlaceholder noResultsPlaceholder;
-
-        private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Items.OfType<CarouselBeatmapSet>();
-
-        internal IEnumerable<BeatmapSetInfo> BeatmapSets => beatmapSets.Select(g => g.BeatmapSet);
-
-        private void loadNewRoot()
+        protected override float GetSpacingBetweenPanels(CarouselItem top, CarouselItem bottom)
         {
-            beatmapsSplitOut = activeCriteria.Sort == SortMode.Difficulty;
+            // Group panels do not overlap with any other panel but should overlap with themselves.
+            if ((top.Model is GroupDefinition) ^ (bottom.Model is GroupDefinition))
+                return SPACING * 2;
 
-            // Ensure no changes are made to the list while we are initialising items.
-            // We'll catch up on changes via subscriptions anyway.
-            BeatmapSetInfo[] loadableSets = detachedBeatmapSets!.ToArray();
-
-            if (selectedBeatmapSet != null && !loadableSets.Contains(selectedBeatmapSet.BeatmapSet, EqualityComparer<BeatmapSetInfo>.Default))
-                selectedBeatmapSet = null;
-
-            var selectedBeatmapBefore = selectedBeatmap?.BeatmapInfo;
-
-            CarouselRoot newRoot = new CarouselRoot(this);
-
-            if (beatmapsSplitOut)
+            if (grouping.BeatmapSetsGroupedTogether)
             {
-                var carouselBeatmapSets = loadableSets.SelectMany(s => s.Beatmaps).Select(b =>
-                {
-                    return createCarouselSet(new BeatmapSetInfo(new[] { b })
-                    {
-                        ID = b.BeatmapSet!.ID,
-                        OnlineID = b.BeatmapSet!.OnlineID,
-                        Status = b.BeatmapSet!.Status,
-                    });
-                }).OfType<CarouselBeatmapSet>();
+                // Give some space around the expanded beatmap set, at the top..
+                if (bottom.Model is GroupedBeatmapSet && bottom.IsExpanded)
+                    return SPACING * 2;
 
-                newRoot.AddItems(carouselBeatmapSets);
+                // ..and the bottom.
+                if (top.Model is GroupedBeatmap && bottom.Model is GroupedBeatmapSet)
+                    return SPACING * 2;
+
+                // Beatmap difficulty panels do not overlap with themselves or any other panel.
+                if (top.Model is GroupedBeatmap || bottom.Model is GroupedBeatmap)
+                    return SPACING;
             }
             else
             {
-                var carouselBeatmapSets = loadableSets.Select(createCarouselSet).OfType<CarouselBeatmapSet>();
-
-                newRoot.AddItems(carouselBeatmapSets);
+                if (CurrentSelection != null && (top == CurrentSelectionItem || bottom == CurrentSelectionItem))
+                    return SPACING * 2;
             }
 
-            root = newRoot;
-            root.Filter(activeCriteria);
-
-            Scroll.Clear(false);
-            itemsCache.Invalidate();
-            ScrollToSelected();
-
-            // Restore selection
-            if (selectedBeatmapBefore != null && newRoot.BeatmapSetsByID.TryGetValue(selectedBeatmapBefore.BeatmapSet!.ID, out var newSelectionCandidates))
-            {
-                CarouselBeatmap? found = newSelectionCandidates.SelectMany(s => s.Beatmaps).SingleOrDefault(b => b.BeatmapInfo.ID == selectedBeatmapBefore.ID);
-
-                if (found != null)
-                    found.State.Value = CarouselItemState.Selected;
-            }
-
-            Schedule(() =>
-            {
-                invalidateAfterChange();
-                BeatmapSetsLoaded = true;
-            });
+            return -SPACING;
         }
 
-        private readonly List<CarouselItem> visibleItems = new List<CarouselItem>();
-
-        private readonly Cached itemsCache = new Cached();
-        private PendingScrollOperation pendingScrollOperation = PendingScrollOperation.None;
-
-        public Bindable<RandomSelectAlgorithm> RandomAlgorithm = new Bindable<RandomSelectAlgorithm>();
-        private readonly List<CarouselBeatmapSet> previouslyVisitedRandomSets = new List<CarouselBeatmapSet>();
-        private readonly List<CarouselBeatmap> randomSelectedBeatmaps = new List<CarouselBeatmap>();
-
-        private CarouselRoot root;
-
-        private readonly DrawablePool<DrawableCarouselBeatmapSet> setPool = new DrawablePool<DrawableCarouselBeatmapSet>(100);
-
-        private Sample? spinSample;
-        private Sample? randomSelectSample;
-
-        private int visibleSetsCount;
-
-        public BeatmapCarousel(FilterCriteria initialCriteria)
+        public BeatmapCarousel()
         {
-            root = new CarouselRoot(this);
-            InternalChild = new Container
+            DebounceDelay = 100;
+            DistanceOffscreenToPreload = 100;
+
+            // Account for the osu! logo being in the way.
+            Scroll.ScrollbarPaddingBottom = 70;
+
+            Filters = new ICarouselFilter[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                new BeatmapCarouselFilterMatching(() => Criteria!),
+                new BeatmapCarouselFilterSorting(() => Criteria!),
+                grouping = new BeatmapCarouselFilterGrouping
                 {
-                    setPool,
-                    Scroll = new CarouselScrollContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    noResultsPlaceholder = new NoResultsPlaceholder()
+                    GetCriteria = () => Criteria!,
+                    GetCollections = GetAllCollections,
+                    GetLocalUserTopRanks = GetBeatmapInfoGuidToTopRankMapping,
+                    GetFavouriteBeatmapSets = GetFavouriteBeatmapSets,
                 }
             };
 
-            activeCriteria = initialCriteria;
+            AddInternal(loading = new LoadingLayer());
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, AudioManager audio, BeatmapStore beatmaps, CancellationToken? cancellationToken)
+        private void load(BeatmapStore beatmapStore, AudioManager audio, OsuConfigManager config, CancellationToken? cancellationToken)
         {
-            spinSample = audio.Samples.Get("SongSelect/random-spin");
-            randomSelectSample = audio.Samples.Get(@"SongSelect/select-random");
+            setupPools();
+            detachedBeatmaps = beatmapStore.GetBeatmapSets(cancellationToken);
+            loadSamples(audio);
 
-            config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
-
-            detachedBeatmapSets = beatmaps.GetBeatmapSets(cancellationToken);
-            detachedBeatmapSets.BindCollectionChanged(beatmapSetsChanged);
-            loadNewRoot();
+            config.BindWith(OsuSetting.RandomSelectAlgorithm, randomAlgorithm);
         }
 
-        private readonly HashSet<BeatmapSetInfo> setsRequiringUpdate = new HashSet<BeatmapSetInfo>();
-        private readonly HashSet<BeatmapSetInfo> setsRequiringRemoval = new HashSet<BeatmapSetInfo>();
-
-        private void beatmapSetsChanged(object? beatmaps, NotifyCollectionChangedEventArgs changed)
+        protected override void LoadComplete()
         {
-            IEnumerable<BeatmapSetInfo>? oldBeatmapSets = changed.OldItems?.Cast<BeatmapSetInfo>();
-            HashSet<Guid> oldBeatmapSetIDs = oldBeatmapSets?.Select(s => s.ID).ToHashSet() ?? [];
+            base.LoadComplete();
+            detachedBeatmaps.BindCollectionChanged(beatmapSetsChanged, true);
+        }
 
-            IEnumerable<BeatmapSetInfo>? newBeatmapSets = changed.NewItems?.Cast<BeatmapSetInfo>();
-            HashSet<Guid> newBeatmapSetIDs = newBeatmapSets?.Select(s => s.ID).ToHashSet() ?? [];
+        #region Beatmap source hookup
+
+        private void beatmapSetsChanged(object? beatmaps, NotifyCollectionChangedEventArgs changed) => Schedule(() =>
+        {
+            // This callback is scheduled to ensure there's no added overhead during gameplay.
+            // If this ever becomes an issue, it's important to note that the actual carousel filtering is already
+            // implemented in a way it will only run when at song select.
+            //
+            // The overhead we are avoiding here is that of this method directly – things like Items.IndexOf calls
+            // that can be slow for very large beatmap libraries. There are definitely ways to optimise this further.
+
+            // TODO: moving management of BeatmapInfo tracking to BeatmapStore might be something we want to consider.
+            // right now we are managing this locally which is a bit of added overhead.
+            IEnumerable<BeatmapSetInfo>? newItems = changed.NewItems?.Cast<BeatmapSetInfo>();
+            IEnumerable<BeatmapSetInfo>? oldItems = changed.OldItems?.Cast<BeatmapSetInfo>();
 
             switch (changed.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    setsRequiringRemoval.RemoveWhere(s => newBeatmapSetIDs.Contains(s.ID));
-                    setsRequiringUpdate.AddRange(newBeatmapSets!);
+                    if (!newItems!.Any())
+                        return;
+
+                    Items.AddRange(newItems!.SelectMany(s => s.Beatmaps));
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    setsRequiringUpdate.RemoveWhere(s => oldBeatmapSetIDs.Contains(s.ID));
-                    setsRequiringRemoval.AddRange(oldBeatmapSets!);
-                    break;
+                    bool selectedSetDeleted = false;
 
-                case NotifyCollectionChangedAction.Replace:
-                    setsRequiringUpdate.RemoveWhere(s => oldBeatmapSetIDs.Contains(s.ID));
-                    setsRequiringRemoval.AddRange(oldBeatmapSets!);
-
-                    setsRequiringRemoval.RemoveWhere(s => newBeatmapSetIDs.Contains(s.ID));
-                    setsRequiringUpdate.AddRange(newBeatmapSets!);
-                    break;
-
-                case NotifyCollectionChangedAction.Move:
-                    setsRequiringUpdate.AddRange(newBeatmapSets!);
-                    break;
-
-                case NotifyCollectionChangedAction.Reset:
-                    setsRequiringRemoval.Clear();
-                    setsRequiringUpdate.Clear();
-                    loadNewRoot();
-                    break;
-            }
-
-            Scheduler.AddOnce(processBeatmapChanges);
-        }
-
-        // All local operations must be scheduled.
-        //
-        // If we don't schedule, beatmaps getting changed while song select is suspended (ie. last played being updated)
-        // will cause unexpected sounds and operations to occur in the background.
-        private void processBeatmapChanges()
-        {
-            try
-            {
-                // To handle the beatmap update flow, attempt to track selection changes across delete-insert transactions.
-                // When an update occurs, the previous beatmap set is either soft or hard deleted.
-                // Check if the current selection was potentially deleted by re-querying its validity.
-                bool selectedSetMarkedDeleted = SelectedBeatmapSet != null && fetchFromID(SelectedBeatmapSet.ID)?.DeletePending != false;
-
-                foreach (var set in setsRequiringRemoval) removeBeatmapSet(set.ID);
-
-                foreach (var set in setsRequiringUpdate) updateBeatmapSet(set);
-
-                if (setsRequiringRemoval.Count > 0 && SelectedBeatmapInfo != null)
-                {
-                    // If SelectedBeatmapInfo is non-null, the set should also be non-null.
-                    Debug.Assert(SelectedBeatmapSet != null);
-
-                    if (selectedSetMarkedDeleted && setsRequiringUpdate.Any())
+                    foreach (var set in oldItems!)
                     {
-                        // If it is no longer valid, make the bold assumption that an updated version will be available in the modified/inserted indices.
-                        // This relies on the full update operation being in a single transaction, so please don't change that.
-                        foreach (var set in setsRequiringUpdate)
+                        foreach (var beatmap in set.Beatmaps)
                         {
-                            foreach (var beatmapInfo in set.Beatmaps)
-                            {
-                                if (!((IBeatmapMetadataInfo)beatmapInfo.Metadata).Equals(SelectedBeatmapInfo.Metadata)) continue;
+                            Items.RemoveAll(i => i is BeatmapInfo bi && beatmap.Equals(bi));
+                            selectedSetDeleted |= CheckModelEquality((CurrentSelection as GroupedBeatmap)?.Beatmap, beatmap);
+                        }
+                    }
 
-                                // Best effort matching. We can't use ID because in the update flow a new version will get its own GUID.
-                                if (beatmapInfo.DifficultyName == SelectedBeatmapInfo.DifficultyName)
-                                {
-                                    SelectBeatmap(beatmapInfo);
-                                    return;
-                                }
+                    // After removing all items in this batch, we want to make an immediate reselection
+                    // based on adjacency to the previous selection if it was deleted.
+                    //
+                    // This needs to be done immediately to avoid song select making a random selection.
+                    // This needs to be done in this class because we need to know final display order.
+                    // This needs to be done with attention to detail of which beatmaps have not been deleted.
+                    if (selectedSetDeleted && CurrentSelectionIndex != null)
+                    {
+                        var items = GetCarouselItems()!;
+                        if (items.Count == 0)
+                            break;
+
+                        bool success = false;
+
+                        // Try selecting forwards first
+                        for (int i = CurrentSelectionIndex.Value + 1; i < items.Count; i++)
+                        {
+                            if (attemptSelection(items[i]))
+                            {
+                                success = true;
+                                break;
                             }
                         }
 
-                        // If a direct selection couldn't be made, it's feasible that the difficulty name (or beatmap metadata) changed.
-                        // Let's attempt to follow set-level selection anyway.
-                        SelectBeatmap(setsRequiringUpdate.First().Beatmaps.First());
+                        if (success)
+                            break;
+
+                        // Then try backwards (we might be at the end of available items).
+                        for (int i = Math.Min(items.Count - 1, CurrentSelectionIndex.Value); i >= 0; i--)
+                        {
+                            if (attemptSelection(items[i]))
+                                break;
+                        }
+
+                        bool attemptSelection(CarouselItem item)
+                        {
+                            if (CheckValidForSetSelection(item))
+                            {
+                                if (item.Model is GroupedBeatmap groupedBeatmap)
+                                {
+                                    // check the new selection wasn't deleted above
+                                    if (!Items.Contains(groupedBeatmap.Beatmap))
+                                        return false;
+
+                                    RequestSelection(groupedBeatmap);
+                                    return true;
+                                }
+
+                                if (item.Model is GroupedBeatmapSet groupedSet)
+                                {
+                                    if (oldItems.Contains(groupedSet.BeatmapSet))
+                                        return false;
+
+                                    selectRecommendedDifficultyForBeatmapSet(groupedSet);
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        }
                     }
+
+                    break;
+
+                case NotifyCollectionChangedAction.Move:
+                    // We can ignore move operations as we are applying our own sort in all cases.
+                    break;
+
+                case NotifyCollectionChangedAction.Replace:
+                    var oldSetBeatmaps = oldItems!.Single().Beatmaps;
+                    var newSetBeatmaps = newItems!.Single().Beatmaps.ToList();
+
+                    // Handling replace operations is a touch manual, as we need to locally diff the beatmaps of each version of the beatmap set.
+                    // Matching is done based on online IDs, then difficulty names as these are the most stable thing between updates (which are usually triggered
+                    // by users editing the beatmap or by difficulty/metadata recomputation).
+                    //
+                    // In the case of difficulty reprocessing, this will trigger multiple times per beatmap as it's always triggering a set update.
+                    // We may want to look to improve this in the future either here or at the source (only trigger an update after all difficulties
+                    // have been processed) if it becomes an issue for animation or performance reasons.
+                    foreach (var beatmap in oldSetBeatmaps)
+                    {
+                        int previousIndex = Items.IndexOf(beatmap);
+                        Debug.Assert(previousIndex >= 0);
+
+                        // we're intentionally being lenient with there being two difficulties with equal online ID or difficulty name.
+                        // this can be the case when the user modifies the beatmap using the editor's "external edit" feature.
+                        BeatmapInfo? matchingNewBeatmap =
+                            newSetBeatmaps.FirstOrDefault(b => b.OnlineID > 0 && b.OnlineID == beatmap.OnlineID) ??
+                            newSetBeatmaps.FirstOrDefault(b => b.DifficultyName == beatmap.DifficultyName && b.Ruleset.Equals(beatmap.Ruleset));
+
+                        // The matching beatmap may have been deleted or invalidated in some way since this event was fired.
+                        // Let's make sure we have the most up-to-date realm state.
+                        if (matchingNewBeatmap?.ID is Guid matchingID)
+                            matchingNewBeatmap = realm.Run(r => r.FindWithRefresh<BeatmapInfo>(matchingID)?.Detach());
+
+                        if (matchingNewBeatmap != null)
+                        {
+                            // TODO: should this exist in song select instead of here?
+                            // we need to ensure the global beatmap is also updated alongside changes.
+                            if (CurrentBeatmap != null && beatmap.Equals(CurrentBeatmap))
+                                // we don't know in which group the matching new beatmap is, but that's fine - we can keep the previous one for now.
+                                // we are about to modify `Items`, which - if required - will trigger a re-filter,
+                                // which will pick a correct group - if one is present - via `HandleFilterCompleted()`.
+                                RequestSelection(new GroupedBeatmap(CurrentGroupedBeatmap?.Group, matchingNewBeatmap));
+
+                            Items.ReplaceRange(previousIndex, 1, [matchingNewBeatmap]);
+                            newSetBeatmaps.Remove(matchingNewBeatmap);
+                        }
+                        else
+                        {
+                            Items.RemoveAt(previousIndex);
+                        }
+                    }
+
+                    // Add any items which weren't found in the previous pass (difficulty names didn't match).
+                    foreach (var beatmap in newSetBeatmaps)
+                        Items.Add(beatmap);
+
+                    break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    Items.Clear();
+                    break;
+            }
+        });
+
+        #endregion
+
+        #region Selection handling
+
+        protected GroupDefinition? ExpandedGroup { get; private set; }
+
+        protected GroupedBeatmapSet? ExpandedBeatmapSet { get; private set; }
+
+        protected override bool ShouldActivateOnKeyboardSelection(CarouselItem item) =>
+            grouping.BeatmapSetsGroupedTogether && item.Model is GroupedBeatmap;
+
+        /// <summary>
+        /// The currently selected <see cref="GroupedBeatmap"/>.
+        /// </summary>
+        /// <remarks>
+        /// The selection is never reset due to not existing. It can be set to anything.
+        /// If no matching carousel item exists, there will be no visually selected item while waiting for potential new item which matches.
+        /// </remarks>
+        public GroupedBeatmap? CurrentGroupedBeatmap
+        {
+            get => CurrentSelection as GroupedBeatmap;
+            set => CurrentSelection = value;
+        }
+
+        /// <summary>
+        /// The currently selected <see cref="BeatmapInfo"/>.
+        /// </summary>
+        /// <remarks>
+        /// This is a property mostly dedicated to external consumers who only care about showing some particular copy of a beatmap
+        /// (there could be multiple panels for one beatmap due to grouping).
+        /// Through this property, the carousel basically figures out what group to use internally.
+        /// </remarks>
+        public BeatmapInfo? CurrentBeatmap
+        {
+            get => CurrentGroupedBeatmap?.Beatmap;
+            set
+            {
+                if (value == null)
+                {
+                    CurrentGroupedBeatmap = null;
+                    return;
+                }
+
+                if (CurrentGroupedBeatmap != null && value.Equals(CurrentGroupedBeatmap.Beatmap))
+                    return;
+
+                // it is not universally guaranteed that the carousel items will be materialised at the time this is set.
+                // therefore, in cases where it is known that they will not be, default to a null group.
+                // even if grouping is active, this will be rectified to a correct group on the next invocation of `HandleFilterCompleted()`.
+                CurrentGroupedBeatmap = IsLoaded && !IsFiltering
+                    ? GetCarouselItems()?.Select(item => item.Model).OfType<GroupedBeatmap>().FirstOrDefault(gb => gb.Beatmap.Equals(value))
+                    : new GroupedBeatmap(null, value);
+            }
+        }
+
+        protected override void HandleItemActivated(CarouselItem item)
+        {
+            try
+            {
+                switch (item.Model)
+                {
+                    case GroupDefinition group:
+                        // Special case – collapsing an open group.
+                        if (ExpandedGroup == group)
+                        {
+                            setExpansionStateOfGroup(ExpandedGroup, false);
+                            ExpandedGroup = null;
+                            return;
+                        }
+
+                        setExpandedGroup(group);
+
+                        // If the active selection is within this group, it should get keyboard focus immediately.
+                        if (CurrentSelectionItem?.IsVisible == true && CurrentSelection is GroupedBeatmap gb)
+                            RequestSelection(gb);
+
+                        return;
+
+                    case GroupedBeatmapSet groupedSet:
+                        selectRecommendedDifficultyForBeatmapSet(groupedSet);
+                        return;
+
+                    case GroupedBeatmap groupedBeatmap:
+                        if (CurrentSelection != null && CheckModelEquality(CurrentSelection, groupedBeatmap))
+                        {
+                            RequestPresentBeatmap?.Invoke(groupedBeatmap.Beatmap);
+                            return;
+                        }
+
+                        RequestSelection(groupedBeatmap);
+                        return;
                 }
             }
             finally
             {
-                BeatmapSetsLoaded = true;
-                invalidateAfterChange();
-            }
-
-            setsRequiringRemoval.Clear();
-            setsRequiringUpdate.Clear();
-
-            BeatmapSetInfo? fetchFromID(Guid id) => realm.Realm.Find<BeatmapSetInfo>(id);
-        }
-
-        public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
-        {
-            removeBeatmapSet(beatmapSet.ID);
-            invalidateAfterChange();
-        });
-
-        private void removeBeatmapSet(Guid beatmapSetID)
-        {
-            if (!root.BeatmapSetsByID.TryGetValue(beatmapSetID, out var existingSets))
-                return;
-
-            foreach (var set in existingSets)
-            {
-                foreach (var beatmap in set.Beatmaps)
-                    randomSelectedBeatmaps.Remove(beatmap);
-                previouslyVisitedRandomSets.Remove(set);
-
-                root.RemoveItem(set);
+                playActivationSound(item);
             }
         }
 
-        public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
+        protected override void HandleItemSelected(object? model)
         {
-            updateBeatmapSet(beatmapSet);
-            invalidateAfterChange();
-        });
+            base.HandleItemSelected(model);
 
-        private void updateBeatmapSet(BeatmapSetInfo beatmapSet)
-        {
-            var newSets = new List<CarouselBeatmapSet>();
-
-            if (beatmapsSplitOut)
+            switch (model)
             {
-                foreach (var beatmap in beatmapSet.Beatmaps)
-                {
-                    var newSet = createCarouselSet(new BeatmapSetInfo(new[] { beatmap })
+                case GroupedBeatmapSet:
+                case GroupDefinition:
+                    throw new InvalidOperationException("Groups should never become selected");
+
+                case GroupedBeatmap groupedBeatmap:
+                    setExpandedGroup(groupedBeatmap.Group);
+
+                    setExpandedSet(new GroupedBeatmapSet(groupedBeatmap.Group, groupedBeatmap.Beatmap.BeatmapSet!));
+                    break;
+            }
+        }
+
+        protected override bool HandleItemsChanged(NotifyCollectionChangedEventArgs args)
+        {
+            switch (args.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                case NotifyCollectionChangedAction.Remove:
+                case NotifyCollectionChangedAction.Move:
+                case NotifyCollectionChangedAction.Reset:
+                    return true;
+
+                case NotifyCollectionChangedAction.Replace:
+                    var oldBeatmaps = args.OldItems!.OfType<BeatmapInfo>().ToList();
+                    var newBeatmaps = args.NewItems!.OfType<BeatmapInfo>().ToList();
+
+                    for (int i = 0; i < oldBeatmaps.Count; i++)
                     {
-                        ID = beatmapSet.ID,
-                        OnlineID = beatmapSet.OnlineID,
-                        Status = beatmapSet.Status,
-                    });
+                        var oldBeatmap = oldBeatmaps[i];
+                        var newBeatmap = newBeatmaps[i];
 
-                    if (newSet != null)
-                        newSets.Add(newSet);
+                        // Ignore changes which don't concern us.
+                        //
+                        // Here are some examples of things that can go wrong:
+                        // - Background difficulty calculation runs and causes a realm update.
+                        //   We use `BeatmapDifficultyCache` and don't want to know about these.
+                        // - Background user tag population runs and causes a realm update.
+                        //   We don't display user tags so want to ignore this.
+                        bool equalForDisplayPurposes =
+                            // covers import-as-update flows, such as updating the beatmap with the latest online versions, or external editing inside editor
+                            oldBeatmap.ID == newBeatmap.ID &&
+                            // covers metadata changes
+                            oldBeatmap.Hash == newBeatmap.Hash &&
+                            // sanity check
+                            oldBeatmap.OnlineID == newBeatmap.OnlineID &&
+                            // displayed on panel
+                            oldBeatmap.Status == newBeatmap.Status &&
+                            // displayed on panel
+                            oldBeatmap.DifficultyName == newBeatmap.DifficultyName &&
+                            // hidden changed, needs re-filter
+                            oldBeatmap.Hidden == newBeatmap.Hidden &&
+                            // might be used for grouping, returning from gameplay
+                            oldBeatmap.LastPlayed == newBeatmap.LastPlayed;
+
+                        if (equalForDisplayPurposes)
+                            return false;
+                    }
+
+                    return true;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        protected override void FindCarouselItemsForSelection(ref Selection keyboardSelection, ref Selection selection, IList<CarouselItem> items)
+        {
+            if (keyboardSelection.Model != null && grouping.ItemMap.TryGetValue(keyboardSelection.Model, out var keyboardSelectionItem))
+                keyboardSelection = keyboardSelection with { CarouselItem = keyboardSelectionItem.item, Index = keyboardSelectionItem.index };
+
+            if (selection.Model != null && grouping.ItemMap.TryGetValue(selection.Model, out var selectionItem))
+                selection = selection with { CarouselItem = selectionItem.item, Index = selectionItem.index };
+        }
+
+        protected override void HandleFilterCompleted()
+        {
+            base.HandleFilterCompleted();
+
+            attemptSelectSingleFilteredResult();
+
+            if (CurrentSelection is GroupedBeatmap selection)
+            {
+                // Check whether the selection-group mapping is still valid post-filter.
+                if (!grouping.ItemMap.ContainsKey(selection))
+                {
+                    // If the group no longer exists (or the item no longer exists in the previous group), grab an arbitrary other instance of the beatmap under the first group encountered.
+                    var newSelection = GetCarouselItems()?
+                                       .Select(i => i.Model)
+                                       .OfType<GroupedBeatmap>()
+                                       .FirstOrDefault(gb => CheckModelEquality(gb.Beatmap, selection.Beatmap));
+
+                    // Only change the selection if we actually got a positive hit.
+                    // This is necessary so that selection isn't lost if the panel reappears later due to e.g. unapplying some filter criteria that made it disappear in the first place.
+                    if (newSelection != null)
+                        CurrentSelection = newSelection;
                 }
             }
-            else
+
+            // Transfer the previous flag states across to the new models.
+            if (ExpandedBeatmapSet != null) setExpandedSet(ExpandedBeatmapSet);
+            if (ExpandedGroup != null) setExpandedGroup(ExpandedGroup);
+
+            foreach (var item in Scroll.Panels.OfType<PanelBeatmapSet>().Where(p => p.Item != null))
+                updateVisibleBeatmaps((GroupedBeatmapSet)item.Item!.Model, item);
+        }
+
+        private void selectRecommendedDifficultyForBeatmapSet(GroupedBeatmapSet set)
+        {
+            // Selecting a set isn't valid – let's re-select the first visible difficulty.
+            if (grouping.SetItems.TryGetValue(set, out var items))
             {
-                var newSet = createCarouselSet(beatmapSet);
-
-                if (newSet != null)
-                    newSets.Add(newSet);
-            }
-
-            var removedSets = root.ReplaceItem(beatmapSet, newSets);
-
-            // If we don't remove these here, it may remain in a hidden state until scrolled off screen.
-            // Doesn't really affect anything during actual user interaction, but makes testing annoying.
-            foreach (var removedSet in removedSets)
-            {
-                var removedDrawable = Scroll.FirstOrDefault(c => c.Item == removedSet);
-                if (removedDrawable != null)
-                    expirePanelImmediately(removedDrawable);
+                var beatmaps = items.Select(i => i.Model).OfType<GroupedBeatmap>();
+                RequestRecommendedSelection(beatmaps);
             }
         }
 
         /// <summary>
-        /// Selects a given beatmap on the carousel.
+        /// If we don't have a selection and there's a single beatmap set returned, select it for the user.
         /// </summary>
-        /// <param name="beatmapInfo">The beatmap to select.</param>
-        /// <param name="bypassFilters">Whether to select the beatmap even if it is filtered (i.e., not visible on carousel).</param>
-        /// <returns>True if a selection was made, False if it wasn't.</returns>
-        public bool SelectBeatmap(BeatmapInfo? beatmapInfo, bool bypassFilters = true)
+        private void attemptSelectSingleFilteredResult()
         {
-            // ensure that any pending events from BeatmapManager have been run before attempting a selection.
-            Scheduler.Update();
+            var items = GetCarouselItems();
 
-            if (beatmapInfo?.Hidden != false)
-                return false;
+            if (items == null || items.Count == 0) return;
 
-            foreach (CarouselBeatmapSet set in beatmapSets)
+            BeatmapSetInfo? beatmapSetInfo = null;
+
+            foreach (var item in items)
             {
-                if (!bypassFilters && set.Filtered.Value)
-                    continue;
+                if (item.Model is GroupedBeatmap groupedBeatmap)
+                {
+                    var beatmapInfo = groupedBeatmap.Beatmap;
 
-                var item = set.Beatmaps.FirstOrDefault(p => p.BeatmapInfo.Equals(beatmapInfo));
+                    if (beatmapSetInfo == null)
+                    {
+                        beatmapSetInfo = beatmapInfo.BeatmapSet!;
+                        continue;
+                    }
 
-                if (item == null)
-                    // The beatmap that needs to be selected doesn't exist in this set
-                    continue;
+                    // Found a beatmap with a different beatmap set, abort.
+                    if (!beatmapSetInfo.Equals(beatmapInfo.BeatmapSet))
+                        return;
+                }
+            }
 
-                if (!bypassFilters && item.Filtered.Value)
+            var beatmaps = items.Select(i => i.Model).OfType<GroupedBeatmap>();
+
+            // do not request recommended selection if the user already had selected a difficulty within the single filtered beatmap set,
+            // as it could change the difficulty that will be selected
+            var preexistingSelection = beatmaps.FirstOrDefault(b => b.Equals(CurrentSelection as GroupedBeatmap));
+
+            if (preexistingSelection != null)
+            {
+                // the selection might not have an item associated with it, if it was fully filtered away previously
+                // in this case, request to reselect it
+                if (CurrentSelectionItem == null)
+                    RequestSelection(preexistingSelection);
+
+                return;
+            }
+
+            RequestRecommendedSelection(beatmaps);
+        }
+
+        protected override bool CheckValidForGroupSelection(CarouselItem item) => item.Model is GroupDefinition;
+
+        protected override bool CheckValidForSetSelection(CarouselItem item)
+        {
+            switch (item.Model)
+            {
+                case GroupedBeatmapSet:
+                    return true;
+
+                case GroupedBeatmap:
+                    return !grouping.BeatmapSetsGroupedTogether;
+
+                case GroupDefinition:
                     return false;
 
-                select(item);
+                default:
+                    throw new ArgumentException($"Unsupported model type {item.Model}");
+            }
+        }
 
-                // if we got here and the set is filtered, it means we were bypassing filters.
-                // in this case, reapplying the filter is necessary to ensure the panel is in the correct place
-                // (since it is forcefully being included in the carousel).
-                if (set.Filtered.Value)
+        private void setExpandedGroup(GroupDefinition? group)
+        {
+            if (ExpandedGroup != null)
+                setExpansionStateOfGroup(ExpandedGroup, false);
+
+            ExpandedGroup = group;
+
+            if (ExpandedGroup != null)
+                setExpansionStateOfGroup(ExpandedGroup, true);
+        }
+
+        private void setExpansionStateOfGroup(GroupDefinition group, bool expanded)
+        {
+            if (grouping.GroupItems.TryGetValue(group, out var items))
+            {
+                if (expanded)
                 {
-                    Debug.Assert(bypassFilters);
+                    foreach (var i in items)
+                    {
+                        switch (i.Model)
+                        {
+                            case GroupDefinition:
+                                i.IsExpanded = true;
+                                break;
 
-                    applyActiveCriteria(false);
+                            case GroupedBeatmapSet groupedSet:
+                                // Case where there are set headers, header should be visible
+                                // and items should use the set's expanded state.
+                                i.IsVisible = true;
+                                setExpansionStateOfSetItems(groupedSet, i.IsExpanded);
+                                break;
+
+                            default:
+                                // Case where there are no set headers, all items should be visible.
+                                if (!grouping.BeatmapSetsGroupedTogether)
+                                    i.IsVisible = true;
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var i in items)
+                    {
+                        switch (i.Model)
+                        {
+                            case GroupDefinition:
+                                i.IsExpanded = false;
+                                break;
+
+                            default:
+                                i.IsVisible = false;
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void setExpandedSet(GroupedBeatmapSet set)
+        {
+            GroupedBeatmapSet? lastExpandedSet = ExpandedBeatmapSet;
+
+            // It's important that we update the stored ExpandedBeatmapSet even when
+            // sets are not grouped together.
+            //
+            // This is stored when selection is changed and used later to ensure correct
+            // visual states are achieved (see call of this method in `HandleFilterCompleted`
+            // for an important case).
+            ExpandedBeatmapSet = set;
+
+            if (!grouping.BeatmapSetsGroupedTogether)
+                return;
+
+            setExpansionStateOfSetItems(lastExpandedSet, false);
+            setExpansionStateOfSetItems(ExpandedBeatmapSet, true);
+        }
+
+        private void setExpansionStateOfSetItems(GroupedBeatmapSet? set, bool expanded)
+        {
+            if (set == null)
+                return;
+
+            bool canMakeVisible = !grouping.GroupItems.Any() || ExpandedGroup == set.Group;
+
+            if (grouping.SetItems.TryGetValue(set, out var items))
+            {
+                foreach (var i in items)
+                {
+                    if (i.Model is GroupedBeatmapSet)
+                        i.IsExpanded = expanded;
+                    else
+                        i.IsVisible = canMakeVisible && expanded;
+                }
+            }
+        }
+
+        protected override double? GetScrollTarget()
+        {
+            double? target = base.GetScrollTarget();
+
+            // if the base implementation returned null, it means that the keyboard selection has been filtered out and is no longer visible
+            // attempt a fallback to other possibly expanded panels (set first, then group)
+            if (target == null)
+            {
+                CarouselItem? targetItem = null;
+
+                if (ExpandedBeatmapSet != null && grouping.ItemMap.TryGetValue(ExpandedBeatmapSet, out var setItem))
+                    targetItem = setItem.item;
+
+                if (targetItem == null && ExpandedGroup != null && grouping.ItemMap.TryGetValue(ExpandedGroup, out var groupItem))
+                    targetItem = groupItem.item;
+
+                target = targetItem?.CarouselYPosition;
+            }
+
+            return target;
+        }
+
+        #endregion
+
+        #region Audio
+
+        private Sample? sampleChangeDifficulty;
+        private Sample? sampleChangeSet;
+        private Sample? sampleToggleGroup;
+
+        private double audioFeedbackLastPlaybackTime;
+
+        private void loadSamples(AudioManager audio)
+        {
+            sampleChangeDifficulty = audio.Samples.Get(@"SongSelect/select-difficulty");
+            sampleChangeSet = audio.Samples.Get(@"SongSelect/select-expand");
+            sampleToggleGroup = audio.Samples.Get(@"SongSelect/select-group");
+
+            spinSample = audio.Samples.Get("SongSelect/random-spin");
+            randomSelectSample = audio.Samples.Get(@"SongSelect/select-random");
+        }
+
+        private void playActivationSound(CarouselItem item)
+        {
+            if (Time.Current - audioFeedbackLastPlaybackTime >= OsuGameBase.SAMPLE_DEBOUNCE_TIME)
+            {
+                switch (item.Model)
+                {
+                    case GroupDefinition:
+                        sampleToggleGroup?.Play();
+                        return;
+
+                    case GroupedBeatmapSet:
+                        sampleChangeSet?.Play();
+                        return;
+
+                    case GroupedBeatmap:
+                        sampleChangeDifficulty?.Play();
+                        return;
                 }
 
+                audioFeedbackLastPlaybackTime = Time.Current;
+            }
+        }
+
+        #endregion
+
+        #region Animation
+
+        /// <summary>
+        /// Moves non-selected beatmaps to the right, hiding off-screen.
+        /// </summary>
+        public bool VisuallyFocusSelected { get; set; }
+
+        private float selectionFocusOffset;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            selectionFocusOffset = (float)Interpolation.DampContinuously(selectionFocusOffset, VisuallyFocusSelected ? 300 : 0, 100, Time.Elapsed);
+        }
+
+        protected override float GetPanelXOffset(Drawable panel)
+        {
+            return base.GetPanelXOffset(panel) + (((ICarouselPanel)panel).Selected.Value ? 0 : selectionFocusOffset);
+        }
+
+        #endregion
+
+        #region Filtering
+
+        public FilterCriteria? Criteria { get; private set; }
+
+        private ScheduledDelegate? loadingDebounce;
+
+        public void Filter(FilterCriteria criteria, bool showLoadingImmediately = false)
+        {
+            bool resetDisplay = grouping.BeatmapSetsGroupedTogether != BeatmapCarouselFilterGrouping.ShouldGroupBeatmapsTogether(criteria);
+
+            Criteria = criteria;
+
+            loadingDebounce ??= Scheduler.AddDelayed(() =>
+            {
+                if (loading.State.Value == Visibility.Visible)
+                    return;
+
+                Scroll.FadeColour(OsuColour.Gray(0.5f), 1000, Easing.OutQuint);
+                loading.Show();
+            }, showLoadingImmediately ? 0 : 250);
+
+            FilterAsync(resetDisplay).ContinueWith(_ => Schedule(() =>
+            {
+                loadingDebounce?.Cancel();
+                loadingDebounce = null;
+
+                Scroll.FadeColour(OsuColour.Gray(1f), 500, Easing.OutQuint);
+                loading.Hide();
+            }));
+        }
+
+        protected override Task<IEnumerable<CarouselItem>> FilterAsync(bool clearExistingPanels = false)
+        {
+            if (Criteria == null)
+                return Task.FromResult(Enumerable.Empty<CarouselItem>());
+
+            return base.FilterAsync(clearExistingPanels);
+        }
+
+        #endregion
+
+        #region Fetches for grouping support
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
+        /// <remarks>
+        /// FOOTGUN WARNING: this being sorted on the realm side before detaching is IMPORTANT.
+        /// realm supports sorting as an internal operation, and realm's implementation of string sorting does NOT match dotnet's
+        /// with respect to treatment of punctuation characters like <c>-</c> or <c>_</c>, among others.
+        /// All other places that show lists of collections also use the realm-side sorting implementation,
+        /// because they use the sorting operation inside subscription queries for efficient drawable management,
+        /// so this usage kind of has to follow suit.
+        /// </remarks>
+        protected virtual List<BeatmapCollection> GetAllCollections() => realm.Run(r => r.All<BeatmapCollection>().OrderBy(c => c.Name).AsEnumerable().Detach());
+
+        protected virtual Dictionary<Guid, ScoreRank> GetBeatmapInfoGuidToTopRankMapping(FilterCriteria criteria) => realm.Run(r =>
+        {
+            var topRankMapping = new Dictionary<Guid, ScoreRank>();
+
+            var allLocalScores = r.GetAllLocalScoresForUser(criteria.LocalUserId)
+                                  .Filter($@"{nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $0", criteria.Ruleset?.ShortName)
+                                  .OrderByDescending(s => s.TotalScore)
+                                  .ThenBy(s => s.Date);
+
+            foreach (var score in allLocalScores)
+            {
+                Debug.Assert(score.BeatmapInfo != null);
+
+                if (topRankMapping.ContainsKey(score.BeatmapInfo.ID))
+                    continue;
+
+                topRankMapping[score.BeatmapInfo.ID] = score.Rank;
+            }
+
+            return topRankMapping;
+        });
+
+        /// <remarks>
+        /// Note that calling <c>.ToHashSet()</c> below has two purposes:
+        /// one being performance of contain checks in filtering code,
+        /// another being slightly better thread safety (as <see cref="ILocalUserState.FavouriteBeatmapSets"/> could be mutated during async filtering).
+        /// </remarks>
+        protected HashSet<int> GetFavouriteBeatmapSets() => api.LocalUserState.FavouriteBeatmapSets.ToHashSet();
+
+        #endregion
+
+        #region Drawable pooling
+
+        private readonly DrawablePool<PanelBeatmap> beatmapPanelPool = new DrawablePool<PanelBeatmap>(100);
+        private readonly DrawablePool<PanelBeatmapStandalone> standalonePanelPool = new DrawablePool<PanelBeatmapStandalone>(100);
+        private readonly DrawablePool<PanelBeatmapSet> setPanelPool = new DrawablePool<PanelBeatmapSet>(100);
+        private readonly DrawablePool<PanelGroup> groupPanelPool = new DrawablePool<PanelGroup>(100);
+        private readonly DrawablePool<PanelGroupStarDifficulty> starsGroupPanelPool = new DrawablePool<PanelGroupStarDifficulty>(11);
+        private readonly DrawablePool<PanelGroupRankDisplay> ranksGroupPanelPool = new DrawablePool<PanelGroupRankDisplay>(9);
+        private readonly DrawablePool<PanelGroupRankedStatus> statusGroupPanelPool = new DrawablePool<PanelGroupRankedStatus>(8);
+
+        private void setupPools()
+        {
+            AddInternal(statusGroupPanelPool);
+            AddInternal(ranksGroupPanelPool);
+            AddInternal(starsGroupPanelPool);
+            AddInternal(groupPanelPool);
+            AddInternal(beatmapPanelPool);
+            AddInternal(standalonePanelPool);
+            AddInternal(setPanelPool);
+        }
+
+        protected override bool CheckModelEquality(object? x, object? y)
+        {
+            // In the confines of the carousel logic, we assume that CurrentSelection (and all items) are using non-stale
+            // BeatmapInfo reference, and that we can match based on beatmap / beatmapset (GU)IDs.
+            //
+            // If there's a case where updates don't come in as expected, diagnosis should start from BeatmapStore, ensuring
+            // it is doing a Replace operation on the list. If it is, then check the local handling in beatmapSetsChanged
+            // before changing matching requirements here.
+
+            if (x is GroupedBeatmapSet groupedSetX && y is GroupedBeatmapSet groupedSetY)
+                return groupedSetX.Equals(groupedSetY);
+
+            if (x is GroupedBeatmap groupedBeatmapX && y is GroupedBeatmap groupedBeatmapY)
+                return groupedBeatmapX.Equals(groupedBeatmapY);
+
+            // `BeatmapInfo` is no longer used directly in carousel items, but in rare circumstances still is used for model equality comparisons
+            // (see `beatmapSetsChanged()` deletion handling logic, which aims to find a beatmap close to the just-deleted one, disregarding grouping concerns)
+            if (x is BeatmapInfo beatmapInfoX && y is BeatmapInfo beatmapInfoY)
+                return beatmapInfoX.Equals(beatmapInfoY);
+
+            if (x is StarDifficultyGroupDefinition starX && y is StarDifficultyGroupDefinition starY)
+                return starX.Equals(starY);
+
+            if (x is RankDisplayGroupDefinition rankX && y is RankDisplayGroupDefinition rankY)
+                return rankX.Equals(rankY);
+
+            if (x is RankedStatusGroupDefinition statusX && y is RankedStatusGroupDefinition statusY)
+                return statusX.Equals(statusY);
+
+            // NOTE: this branch must be AFTER all branches that compare `GroupDefinition` subtypes!
+            // this is an optimisation measure. any subclass of `GroupDefinition` will pass the `is GroupDefinition` check,
+            // and testing a subclass of `GroupDefinition` against any other `GroupDefinition` (or subclass thereof)
+            // will result in a casting cascade of `Equals(GroupDefinition) -> Equals(object) -> Equals(GroupDefinitionSubClass)`
+            // (that last one only if the type check passes)
+            if (x is GroupDefinition groupX && y is GroupDefinition groupY)
+                return groupX.Equals(groupY);
+
+            return base.CheckModelEquality(x, y);
+        }
+
+        protected override Drawable GetDrawableForDisplay(CarouselItem item)
+        {
+            switch (item.Model)
+            {
+                case RankedStatusGroupDefinition:
+                    return statusGroupPanelPool.Get();
+
+                case StarDifficultyGroupDefinition:
+                    return starsGroupPanelPool.Get();
+
+                case RankDisplayGroupDefinition:
+                    return ranksGroupPanelPool.Get();
+
+                case GroupDefinition:
+                    return groupPanelPool.Get();
+
+                case GroupedBeatmap:
+                    if (!grouping.BeatmapSetsGroupedTogether)
+                        return standalonePanelPool.Get();
+
+                    return beatmapPanelPool.Get();
+
+                case GroupedBeatmapSet groupedBeatmapSet:
+                    var setPanel = setPanelPool.Get();
+                    updateVisibleBeatmaps(groupedBeatmapSet, setPanel);
+                    return setPanel;
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        private void updateVisibleBeatmaps(GroupedBeatmapSet groupedBeatmapSet, PanelBeatmapSet setPanel)
+        {
+            HashSet<BeatmapInfo> visibleBeatmaps = [];
+            if (grouping.SetItems.TryGetValue(groupedBeatmapSet, out var visibleItems))
+                visibleBeatmaps = visibleItems.Where(i => i.Model is GroupedBeatmap).Select(i => ((GroupedBeatmap)i.Model).Beatmap).ToHashSet();
+
+            setPanel.VisibleBeatmaps.Value = visibleBeatmaps;
+        }
+
+        #endregion
+
+        #region Random selection handling
+
+        private readonly Bindable<RandomSelectAlgorithm> randomAlgorithm = new Bindable<RandomSelectAlgorithm>();
+        private readonly HashSet<BeatmapInfo> previouslyVisitedRandomBeatmaps = new HashSet<BeatmapInfo>();
+        private readonly List<GroupedBeatmap> randomHistory = new List<GroupedBeatmap>();
+
+        private Sample? spinSample;
+        private Sample? randomSelectSample;
+
+        public bool NextRandom()
+        {
+            var carouselItems = GetCarouselItems();
+
+            if (carouselItems?.Any() != true)
+                return false;
+
+            var selectionBefore = CurrentSelectionItem;
+            var beatmapBefore = selectionBefore?.Model as GroupedBeatmap;
+
+            bool success;
+
+            if (beatmapBefore != null)
+            {
+                // keep track of visited beatmaps and sets for rewind
+                randomHistory.Add(beatmapBefore);
+                // keep track of visited beatmaps for "RandomPermutation" random tracking.
+                // note that this is reset when we run out of beatmaps, while `randomHistory` is not.
+                previouslyVisitedRandomBeatmaps.Add(beatmapBefore.Beatmap);
+            }
+
+            if (grouping.BeatmapSetsGroupedTogether)
+                success = nextRandomSet();
+            else
+                success = nextRandomBeatmap();
+
+            if (!success)
+            {
+                if (beatmapBefore != null)
+                    randomHistory.RemoveAt(randomHistory.Count - 1);
+                return false;
+            }
+
+            // CurrentSelectionItem won't be valid until UpdateAfterChildren.
+            // We probably want to fix this at some point since a few places are working-around this quirk.
+            ScheduleAfterChildren(() =>
+            {
+                if (selectionBefore != null && CurrentSelectionItem != null)
+                    playSpinSample(visiblePanelCountBetweenItems(selectionBefore, CurrentSelectionItem));
+            });
+
+            return true;
+        }
+
+        private bool nextRandomBeatmap()
+        {
+            ICollection<GroupedBeatmap> visibleBeatmaps = ExpandedGroup != null && grouping.GroupItems.TryGetValue(ExpandedGroup, out var groupItems)
+                // In the case of grouping, users expect random to only operate on the expanded group.
+                // This is going to incur some overhead as we don't have a group-beatmapset mapping currently.
+                //
+                // If this becomes an issue, we could either store a mapping, or run the random algorithm many times
+                // using the `SetItems` method until we get a group HIT.
+                ? groupItems.Select(i => i.Model).OfType<GroupedBeatmap>().ToArray()
+                : GetCarouselItems()!.Select(i => i.Model).OfType<GroupedBeatmap>().ToArray();
+
+            GroupedBeatmap beatmap;
+
+            switch (randomAlgorithm.Value)
+            {
+                case RandomSelectAlgorithm.RandomPermutation:
+                {
+                    ICollection<GroupedBeatmap> notYetVisitedBeatmaps = visibleBeatmaps.ExceptBy(previouslyVisitedRandomBeatmaps, gb => gb.Beatmap).ToList();
+
+                    if (!notYetVisitedBeatmaps.Any())
+                    {
+                        previouslyVisitedRandomBeatmaps.ExceptWith(visibleBeatmaps.Select(b => b.Beatmap));
+                        notYetVisitedBeatmaps = visibleBeatmaps;
+                        if (CurrentSelection is GroupedBeatmap groupedBeatmap)
+                            notYetVisitedBeatmaps = notYetVisitedBeatmaps.Except([groupedBeatmap]).ToList();
+                    }
+
+                    if (notYetVisitedBeatmaps.Count == 0)
+                        return false;
+
+                    beatmap = notYetVisitedBeatmaps.ElementAt(RNG.Next(notYetVisitedBeatmaps.Count));
+                    break;
+                }
+
+                case RandomSelectAlgorithm.Random:
+                    beatmap = visibleBeatmaps.ElementAt(RNG.Next(visibleBeatmaps.Count));
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            RequestSelection(beatmap);
+            return true;
+        }
+
+        private bool nextRandomSet()
+        {
+            ICollection<GroupedBeatmapSet> visibleGroupedSets = ExpandedGroup != null && grouping.GroupItems.TryGetValue(ExpandedGroup, out var groupItems)
+                // In the case of grouping, users expect random to only operate on the expanded group.
+                // This is going to incur some overhead as we don't have a group-beatmapset mapping currently.
+                //
+                // If this becomes an issue, we could either store a mapping, or run the random algorithm many times
+                // using the `SetItems` method until we get a group HIT.
+                ? groupItems.Select(i => i.Model).OfType<GroupedBeatmapSet>().ToArray()
+                // This is the fastest way to retrieve sets for randomisation.
+                : grouping.SetItems.Keys;
+
+            GroupedBeatmapSet set;
+
+            switch (randomAlgorithm.Value)
+            {
+                case RandomSelectAlgorithm.RandomPermutation:
+                {
+                    ICollection<GroupedBeatmapSet> notYetVisitedSets =
+                        visibleGroupedSets.ExceptBy(previouslyVisitedRandomBeatmaps.Select(b => b.BeatmapSet!), groupedSet => groupedSet.BeatmapSet).ToList();
+
+                    if (!notYetVisitedSets.Any())
+                    {
+                        previouslyVisitedRandomBeatmaps.ExceptWith(visibleGroupedSets.SelectMany(setUnderGrouping => setUnderGrouping.BeatmapSet.Beatmaps));
+                        notYetVisitedSets = visibleGroupedSets;
+                        if (CurrentSelection is GroupedBeatmap groupedBeatmap)
+                            notYetVisitedSets = notYetVisitedSets.ExceptBy([groupedBeatmap.Beatmap.BeatmapSet!], groupedSet => groupedSet.BeatmapSet).ToList();
+                    }
+
+                    if (notYetVisitedSets.Count == 0)
+                        return false;
+
+                    set = notYetVisitedSets.ElementAt(RNG.Next(notYetVisitedSets.Count));
+                    break;
+                }
+
+                case RandomSelectAlgorithm.Random:
+                    set = visibleGroupedSets.ElementAt(RNG.Next(visibleGroupedSets.Count));
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            selectRecommendedDifficultyForBeatmapSet(set);
+            return true;
+        }
+
+        public bool PreviousRandom()
+        {
+            var carouselItems = GetCarouselItems();
+
+            if (carouselItems?.Any() != true)
+                return false;
+
+            while (randomHistory.Any())
+            {
+                var previousBeatmap = randomHistory[^1];
+                randomHistory.RemoveAt(randomHistory.Count - 1);
+
+                // when going back through rewind history, we may no longer be in the same grouping mode.
+                // the user wants to go back to the beatmap first and foremost, so the most important thing is to find a panel that corresponds to the beatmap.
+                // going back to the same group is a nice-to-have, but a secondary concern.
+                var previousBeatmapItem = carouselItems.Where(i => i.Model is GroupedBeatmap gb && gb.Beatmap.Equals(previousBeatmap.Beatmap))
+                                                       .MaxBy(i => ((GroupedBeatmap)i.Model).Group == previousBeatmap.Group);
+
+                if (previousBeatmapItem == null)
+                    return false;
+
+                if (CurrentSelection is GroupedBeatmap groupedBeatmap)
+                {
+                    if (randomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
+                        previouslyVisitedRandomBeatmaps.Remove(groupedBeatmap.Beatmap);
+
+                    if (CurrentSelectionItem == null)
+                        playSpinSample(0);
+                    else
+                        playSpinSample(visiblePanelCountBetweenItems(previousBeatmapItem, CurrentSelectionItem));
+                }
+
+                RequestSelection((GroupedBeatmap)previousBeatmapItem.Model);
                 return true;
             }
 
             return false;
         }
 
-        /// <summary>
-        /// Increment selection in the carousel in a chosen direction.
-        /// </summary>
-        /// <param name="direction">The direction to increment. Negative is backwards.</param>
-        /// <param name="skipDifficulties">Whether to skip individual difficulties and only increment over full groups.</param>
-        public void SelectNext(int direction = 1, bool skipDifficulties = true)
-        {
-            if (beatmapSets.All(s => s.Filtered.Value))
-                return;
-
-            if (skipDifficulties)
-                selectNextSet(direction, true);
-            else
-                selectNextDifficulty(direction);
-        }
-
-        private void selectNextSet(int direction, bool skipDifficulties)
-        {
-            if (selectedBeatmap == null || selectedBeatmapSet == null)
-                return;
-
-            var unfilteredSets = beatmapSets.Where(s => !s.Filtered.Value).ToList();
-
-            var nextSet = unfilteredSets[(unfilteredSets.IndexOf(selectedBeatmapSet) + direction + unfilteredSets.Count) % unfilteredSets.Count];
-
-            if (skipDifficulties)
-                select(nextSet);
-            else
-                select(direction > 0 ? nextSet.Beatmaps.First(b => !b.Filtered.Value) : nextSet.Beatmaps.Last(b => !b.Filtered.Value));
-        }
-
-        private void selectNextDifficulty(int direction)
-        {
-            if (selectedBeatmap == null || selectedBeatmapSet == null)
-                return;
-
-            var unfilteredDifficulties = selectedBeatmapSet.Items.Where(s => !s.Filtered.Value).ToList();
-
-            int index = unfilteredDifficulties.IndexOf(selectedBeatmap);
-
-            if (index + direction < 0 || index + direction >= unfilteredDifficulties.Count)
-                selectNextSet(direction, false);
-            else
-                select(unfilteredDifficulties[index + direction]);
-        }
-
-        /// <summary>
-        /// Select the next beatmap in the random sequence.
-        /// </summary>
-        /// <returns>True if a selection could be made, else False.</returns>
-        public bool SelectNextRandom()
-        {
-            if (!AllowSelection)
-                return false;
-
-            var visibleSets = beatmapSets.Where(s => !s.Filtered.Value).ToList();
-
-            visibleSetsCount = visibleSets.Count;
-
-            if (!visibleSets.Any())
-                return false;
-
-            if (selectedBeatmap != null && selectedBeatmapSet != null)
-            {
-                randomSelectedBeatmaps.Add(selectedBeatmap);
-
-                // when performing a random, we want to add the current set to the previously visited list
-                // else the user may be "randomised" to the existing selection.
-                if (previouslyVisitedRandomSets.LastOrDefault() != selectedBeatmapSet)
-                    previouslyVisitedRandomSets.Add(selectedBeatmapSet);
-            }
-
-            CarouselBeatmapSet set;
-
-            if (RandomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
-            {
-                var notYetVisitedSets = visibleSets.Except(previouslyVisitedRandomSets).ToList();
-
-                if (!notYetVisitedSets.Any())
-                {
-                    previouslyVisitedRandomSets.RemoveAll(visibleSets.Contains);
-                    notYetVisitedSets = visibleSets;
-                }
-
-                set = notYetVisitedSets.ElementAt(RNG.Next(notYetVisitedSets.Count));
-                previouslyVisitedRandomSets.Add(set);
-            }
-            else
-                set = visibleSets.ElementAt(RNG.Next(visibleSets.Count));
-
-            if (selectedBeatmapSet != null)
-                playSpinSample(distanceBetween(set, selectedBeatmapSet));
-
-            select(set);
-            return true;
-        }
-
-        public void SelectPreviousRandom()
-        {
-            while (randomSelectedBeatmaps.Any())
-            {
-                var beatmap = randomSelectedBeatmaps[^1];
-                randomSelectedBeatmaps.RemoveAt(randomSelectedBeatmaps.Count - 1);
-
-                if (!beatmap.Filtered.Value && beatmap.BeatmapInfo.BeatmapSet?.DeletePending != true)
-                {
-                    if (selectedBeatmapSet != null)
-                    {
-                        if (RandomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
-                            previouslyVisitedRandomSets.Remove(selectedBeatmapSet);
-
-                        playSpinSample(distanceBetween(beatmap, selectedBeatmapSet));
-                    }
-
-                    select(beatmap);
-                    break;
-                }
-            }
-        }
-
-        private double distanceBetween(CarouselItem item1, CarouselItem item2) => Math.Ceiling(Math.Abs(item1.CarouselYPosition - item2.CarouselYPosition) / DrawableCarouselItem.MAX_HEIGHT);
+        private double visiblePanelCountBetweenItems(CarouselItem item1, CarouselItem item2) => Math.Ceiling(Math.Abs(item1.CarouselYPosition - item2.CarouselYPosition) / PanelBeatmapSet.HEIGHT);
 
         private void playSpinSample(double distance)
         {
@@ -576,705 +1158,70 @@ namespace osu.Game.Screens.Select
 
             if (chan != null)
             {
-                chan.Frequency.Value = 1f + Math.Min(1f, distance / visibleSetsCount);
+                chan.Frequency.Value = 1f + Math.Clamp(distance / 200, 0, 1);
                 chan.Play();
             }
 
             randomSelectSample?.Play();
         }
 
-        private void select(CarouselItem? item)
-        {
-            if (!AllowSelection)
-                return;
-
-            if (item == null) return;
-
-            item.State.Value = CarouselItemState.Selected;
-        }
-
-        private FilterCriteria activeCriteria;
-
-        protected ScheduledDelegate? PendingFilter;
-
-        public bool AllowSelection = true;
-
-        /// <summary>
-        /// Half the height of the visible content.
-        /// <remarks>
-        /// This is different from the height of <see cref="ScrollContainer{T}"/>.displayableContent, since
-        /// the beatmap carousel bleeds into the <see cref="FilterControl"/> and the <see cref="Footer"/>
-        /// </remarks>
-        /// </summary>
-        private float visibleHalfHeight => (DrawHeight + BleedBottom + BleedTop) / 2;
-
-        /// <summary>
-        /// The position of the lower visible bound with respect to the current scroll position.
-        /// </summary>
-        private float visibleBottomBound => (float)(Scroll.Current + DrawHeight + BleedBottom);
-
-        /// <summary>
-        /// The position of the upper visible bound with respect to the current scroll position.
-        /// </summary>
-        private float visibleUpperBound => (float)(Scroll.Current - BleedTop);
-
-        public void FlushPendingFilterOperations()
-        {
-            if (!IsLoaded)
-                return;
-
-            if (PendingFilter?.Completed == false)
-            {
-                applyActiveCriteria(false);
-                Update();
-            }
-        }
-
-        public void Filter(FilterCriteria? newCriteria)
-        {
-            if (newCriteria != null)
-                activeCriteria = newCriteria;
-
-            applyActiveCriteria(true);
-        }
-
-        private bool beatmapsSplitOut;
-
-        private void applyActiveCriteria(bool debounce)
-        {
-            PendingFilter?.Cancel();
-            PendingFilter = null;
-
-            if (debounce)
-                PendingFilter = Scheduler.AddDelayed(perform, 250);
-            else
-            {
-                // if initial load is not yet finished, this will be run inline in loadBeatmapSets to ensure correct order of operation.
-                if (!BeatmapSetsLoaded)
-                    PendingFilter = Schedule(perform);
-                else
-                    perform();
-            }
-
-            void perform()
-            {
-                PendingFilter = null;
-
-                if ((activeCriteria.Sort == SortMode.Difficulty) != beatmapsSplitOut)
-                {
-                    loadNewRoot();
-                    return;
-                }
-
-                root.Filter(activeCriteria);
-                itemsCache.Invalidate();
-
-                ScrollToSelected(true);
-
-                FilterApplied?.Invoke();
-            }
-        }
-
-        private void invalidateAfterChange()
-        {
-            itemsCache.Invalidate();
-
-            if (!Scroll.UserScrolling)
-                ScrollToSelected(true);
-
-            BeatmapSetsChanged?.Invoke();
-        }
-
-        private float? scrollTarget;
-
-        /// <summary>
-        /// Scroll to the current <see cref="SelectedBeatmapInfo"/>.
-        /// </summary>
-        /// <param name="immediate">
-        /// Whether the scroll position should immediately be shifted to the target, delegating animation to visible panels.
-        /// This should be true for operations like filtering - where panels are changing visibility state - to avoid large jumps in animation.
-        /// </param>
-        public void ScrollToSelected(bool immediate = false) =>
-            pendingScrollOperation = immediate ? PendingScrollOperation.Immediate : PendingScrollOperation.Standard;
-
-        #region Button selection logic
-
-        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
-        {
-            switch (e.Action)
-            {
-                case GlobalAction.SelectNext:
-                case GlobalAction.ActivateNextSet:
-                    SelectNext(1, e.Action == GlobalAction.ActivateNextSet);
-                    return true;
-
-                case GlobalAction.SelectPrevious:
-                case GlobalAction.ActivatePreviousSet:
-                    SelectNext(-1, e.Action == GlobalAction.ActivatePreviousSet);
-                    return true;
-            }
-
-            return false;
-        }
-
-        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
-        {
-        }
-
         #endregion
-
-        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
-        {
-            // handles the vertical size of the carousel changing (ie. on window resize when aspect ratio has changed).
-            if (invalidation.HasFlag(Invalidation.DrawSize))
-                itemsCache.Invalidate();
-
-            return base.OnInvalidate(invalidation, source);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            bool revalidateItems = !itemsCache.IsValid;
-
-            // First we iterate over all non-filtered carousel items and populate their
-            // vertical position data.
-            if (revalidateItems)
-            {
-                updateYPositions();
-
-                if (visibleItems.Count == 0)
-                {
-                    noResultsPlaceholder.Filter = activeCriteria;
-                    noResultsPlaceholder.Show();
-                }
-                else
-                    noResultsPlaceholder.Hide();
-            }
-
-            // if there is a pending scroll action we apply it without animation and transfer the difference in position to the panels.
-            // this is intentionally applied before updating the visible range below, to avoid animating new items (sourced from pool) from locations off-screen, as it looks bad.
-            if (pendingScrollOperation != PendingScrollOperation.None)
-                updateScrollPosition();
-
-            // This data is consumed to find the currently displayable range.
-            // This is the range we want to keep drawables for, and should exceed the visible range slightly to avoid drawable churn.
-            var newDisplayRange = getDisplayRange();
-
-            // If the filtered items or visible range has changed, pooling requirements need to be checked.
-            // This involves fetching new items from the pool, returning no-longer required items.
-            if (revalidateItems || newDisplayRange != displayedRange)
-            {
-                displayedRange = newDisplayRange;
-
-                if (visibleItems.Count > 0)
-                {
-                    var toDisplay = visibleItems.GetRange(displayedRange.first, displayedRange.last - displayedRange.first + 1);
-
-                    foreach (var panel in Scroll)
-                    {
-                        Debug.Assert(panel.Item != null);
-
-                        if (toDisplay.Remove(panel.Item))
-                        {
-                            // panel already displayed.
-                            continue;
-                        }
-
-                        // panel loaded as drawable but not required by visible range.
-                        // remove but only if too far off-screen
-                        if (panel.Y + panel.DrawHeight < visibleUpperBound - distance_offscreen_before_unload || panel.Y > visibleBottomBound + distance_offscreen_before_unload)
-                            expirePanelImmediately(panel);
-                    }
-
-                    // Add those items within the previously found index range that should be displayed.
-                    foreach (var item in toDisplay)
-                    {
-                        var panel = setPool.Get();
-
-                        panel.Item = item;
-                        panel.Y = item.CarouselYPosition;
-
-                        Scroll.Add(panel);
-                    }
-                }
-            }
-
-            // Update externally controlled state of currently visible items (e.g. x-offset and opacity).
-            // This is a per-frame update on all drawable panels.
-            foreach (DrawableCarouselItem item in Scroll)
-            {
-                updateItem(item);
-
-                Debug.Assert(item.Item != null);
-
-                if (item.Item.Visible)
-                {
-                    bool isSelected = item.Item.State.Value == CarouselItemState.Selected;
-
-                    bool hasPassedSelection = item.Item.CarouselYPosition < selectedBeatmapSet?.CarouselYPosition;
-
-                    // Cheap way of doing animations when entering / exiting song select.
-                    const double half_time = 50;
-                    const float panel_x_offset_when_inactive = 200;
-
-                    if (isSelected || AllowSelection)
-                    {
-                        item.Alpha = (float)Interpolation.DampContinuously(item.Alpha, 1, half_time, Clock.ElapsedFrameTime);
-                        item.X = (float)Interpolation.DampContinuously(item.X, 0, half_time, Clock.ElapsedFrameTime);
-                    }
-                    else
-                    {
-                        item.Alpha = (float)Interpolation.DampContinuously(item.Alpha, 0, half_time, Clock.ElapsedFrameTime);
-                        item.X = (float)Interpolation.DampContinuously(item.X, panel_x_offset_when_inactive, half_time, Clock.ElapsedFrameTime);
-                    }
-
-                    Scroll.ChangeChildDepth(item, hasPassedSelection ? -item.Item.CarouselYPosition : item.Item.CarouselYPosition);
-                }
-
-                if (item is DrawableCarouselBeatmapSet set)
-                {
-                    for (int i = 0; i < set.DrawableBeatmaps.Count; i++)
-                        updateItem(set.DrawableBeatmaps[i], item);
-                }
-            }
-        }
-
-        private static void expirePanelImmediately(DrawableCarouselItem panel)
-        {
-            // may want a fade effect here (could be seen if a huge change happens, like a set with 20 difficulties becomes selected).
-            panel.ClearTransforms();
-            panel.Expire();
-        }
-
-        private readonly CarouselBoundsItem carouselBoundsItem = new CarouselBoundsItem();
-
-        private (int firstIndex, int lastIndex) getDisplayRange()
-        {
-            // Find index range of all items that should be on-screen
-            carouselBoundsItem.CarouselYPosition = visibleUpperBound - distance_offscreen_to_preload;
-            int firstIndex = visibleItems.BinarySearch(carouselBoundsItem);
-            if (firstIndex < 0) firstIndex = ~firstIndex;
-
-            carouselBoundsItem.CarouselYPosition = visibleBottomBound + distance_offscreen_to_preload;
-            int lastIndex = visibleItems.BinarySearch(carouselBoundsItem);
-            if (lastIndex < 0) lastIndex = ~lastIndex;
-
-            // as we can't be 100% sure on the size of individual carousel drawables,
-            // always play it safe and extend bounds by one.
-            firstIndex = Math.Max(0, firstIndex - 1);
-            lastIndex = Math.Clamp(lastIndex + 1, firstIndex, Math.Max(0, visibleItems.Count - 1));
-
-            return (firstIndex, lastIndex);
-        }
-
-        private CarouselBeatmapSet? createCarouselSet(BeatmapSetInfo beatmapSet)
-        {
-            // This can be moved to the realm query if required using:
-            // .Filter("DeletePending == false && Protected == false && ANY Beatmaps.Hidden == false")
-            //
-            // As long as we are detaching though, it makes more sense to do it here as adding to the realm query has an overhead
-            // as seen at https://github.com/realm/realm-dotnet/discussions/2773#discussioncomment-2004275.
-            if (beatmapSet.Beatmaps.All(b => b.Hidden))
-                return null;
-
-            var set = new CarouselBeatmapSet(beatmapSet)
-            {
-                GetRecommendedBeatmap = beatmaps => GetRecommendedBeatmap?.Invoke(beatmaps)
-            };
-
-            foreach (var c in set.Beatmaps)
-            {
-                c.State.ValueChanged += state =>
-                {
-                    if (state.NewValue == CarouselItemState.Selected)
-                    {
-                        selectedBeatmapSet = set;
-                        SelectionChanged?.Invoke(c.BeatmapInfo);
-
-                        itemsCache.Invalidate();
-                        ScrollToSelected();
-                    }
-                };
-            }
-
-            return set;
-        }
-
-        /// <summary>
-        /// Computes the target Y positions for every item in the carousel.
-        /// </summary>
-        /// <returns>The Y position of the currently selected item.</returns>
-        private void updateYPositions()
-        {
-            visibleItems.Clear();
-
-            float currentY = visibleHalfHeight;
-
-            scrollTarget = null;
-
-            foreach (CarouselItem item in root.Items)
-            {
-                if (item.Filtered.Value)
-                    continue;
-
-                switch (item)
-                {
-                    case CarouselBeatmapSet set:
-                    {
-                        bool isSelected = item.State.Value == CarouselItemState.Selected;
-
-                        float padding = isSelected ? 5 : -5;
-
-                        if (isSelected)
-                            // double padding because we want to cancel the negative padding from the last item.
-                            currentY += padding * 2;
-
-                        visibleItems.Add(set);
-                        set.CarouselYPosition = currentY;
-
-                        if (isSelected)
-                        {
-                            // scroll position at currentY makes the set panel appear at the very top of the carousel's screen space
-                            // move down by half of visible height (height of the carousel's visible extent, including semi-transparent areas)
-                            // then reapply the top semi-transparent area (because carousel's screen space starts below it)
-                            scrollTarget = currentY + DrawableCarouselBeatmapSet.HEIGHT - visibleHalfHeight + BleedTop;
-
-                            foreach (var b in set.Beatmaps)
-                            {
-                                if (!b.Visible)
-                                    continue;
-
-                                if (b.State.Value == CarouselItemState.Selected)
-                                {
-                                    scrollTarget += b.TotalHeight / 2;
-                                    break;
-                                }
-
-                                scrollTarget += b.TotalHeight;
-                            }
-                        }
-
-                        currentY += set.TotalHeight + padding;
-                        break;
-                    }
-                }
-            }
-
-            currentY += visibleHalfHeight;
-
-            Scroll.ScrollContent.Height = currentY;
-
-            itemsCache.Validate();
-
-            // update and let external consumers know about selection loss.
-            if (BeatmapSetsLoaded && AllowSelection)
-            {
-                bool selectionLost = selectedBeatmapSet != null && selectedBeatmapSet.State.Value != CarouselItemState.Selected;
-
-                if (selectionLost)
-                {
-                    selectedBeatmapSet = null;
-                    SelectionChanged?.Invoke(null);
-                }
-            }
-        }
-
-        private bool firstScroll = true;
-
-        private void updateScrollPosition()
-        {
-            if (scrollTarget != null)
-            {
-                if (firstScroll)
-                {
-                    // reduce movement when first displaying the carousel.
-                    Scroll.ScrollTo(scrollTarget.Value - 200, false);
-                    firstScroll = false;
-                }
-
-                switch (pendingScrollOperation)
-                {
-                    case PendingScrollOperation.Standard:
-                        Scroll.ScrollTo(scrollTarget.Value);
-                        break;
-
-                    case PendingScrollOperation.Immediate:
-
-                        // in order to simplify animation logic, rather than using the animated version of ScrollTo,
-                        // we take the difference in scroll height and apply to all visible panels.
-                        // this avoids edge cases like when the visible panels is reduced suddenly, causing ScrollContainer
-                        // to enter clamp-special-case mode where it animates completely differently to normal.
-                        float scrollChange = (float)(scrollTarget.Value - Scroll.Current);
-                        Scroll.ScrollTo(scrollTarget.Value, false);
-                        foreach (var i in Scroll)
-                            i.Y += scrollChange;
-                        break;
-                }
-
-                pendingScrollOperation = PendingScrollOperation.None;
-            }
-        }
-
-        /// <summary>
-        /// Computes the x-offset of currently visible items. Makes the carousel appear round.
-        /// </summary>
-        /// <param name="dist">
-        /// Vertical distance from the center of the carousel container
-        /// ranging from -1 to 1.
-        /// </param>
-        /// <param name="halfHeight">Half the height of the carousel container.</param>
-        private static float offsetX(float dist, float halfHeight)
-        {
-            // The radius of the circle the carousel moves on.
-            const float circle_radius = 3;
-            float discriminant = MathF.Max(0, circle_radius * circle_radius - dist * dist);
-            float x = (circle_radius - MathF.Sqrt(discriminant)) * halfHeight;
-
-            return 125 + x;
-        }
-
-        /// <summary>
-        /// Update an item's x position and multiplicative alpha based on its y position and
-        /// the current scroll position.
-        /// </summary>
-        /// <param name="item">The item to be updated.</param>
-        /// <param name="parent">For nested items, the parent of the item to be updated.</param>
-        private void updateItem(DrawableCarouselItem item, DrawableCarouselItem? parent = null)
-        {
-            Vector2 posInScroll = Scroll.ScrollContent.ToLocalSpace(item.Header.ScreenSpaceDrawQuad.Centre);
-            float itemDrawY = posInScroll.Y - visibleUpperBound;
-            float dist = Math.Abs(1f - itemDrawY / visibleHalfHeight);
-
-            // adjusting the item's overall X position can cause it to become masked away when
-            // child items (difficulties) are still visible.
-            item.Header.X = offsetX(dist, visibleHalfHeight) - (parent?.X ?? 0);
-        }
-
-        private enum PendingScrollOperation
-        {
-            None,
-            Standard,
-            Immediate,
-        }
-
-        /// <summary>
-        /// A carousel item strictly used for binary search purposes.
-        /// </summary>
-        private class CarouselBoundsItem : CarouselItem
-        {
-            public override DrawableCarouselItem CreateDrawableRepresentation() => throw new NotImplementedException();
-        }
-
-        private class CarouselRoot : CarouselGroupEagerSelect
-        {
-            // May only be null during construction (State.Value set causes PerformSelection to be triggered).
-            private readonly BeatmapCarousel? carousel;
-
-            public readonly Dictionary<Guid, List<CarouselBeatmapSet>> BeatmapSetsByID = new Dictionary<Guid, List<CarouselBeatmapSet>>();
-
-            public CarouselRoot(BeatmapCarousel carousel)
-            {
-                // root should always remain selected. if not, PerformSelection will not be called.
-                State.Value = CarouselItemState.Selected;
-                State.ValueChanged += _ => State.Value = CarouselItemState.Selected;
-
-                this.carousel = carousel;
-            }
-
-            public override void AddItem(CarouselItem i)
-            {
-                CarouselBeatmapSet set = (CarouselBeatmapSet)i;
-                if (BeatmapSetsByID.TryGetValue(set.BeatmapSet.ID, out var sets))
-                    sets.Add(set);
-                else
-                    BeatmapSetsByID.Add(set.BeatmapSet.ID, new List<CarouselBeatmapSet> { set });
-
-                base.AddItem(i);
-            }
-
-            /// <summary>
-            /// A special method to handle replace operations (general for updating a beatmap).
-            /// Avoids event-driven selection flip-flopping during the remove/add process.
-            /// </summary>
-            /// <param name="oldItem">The beatmap set to be replaced.</param>
-            /// <param name="newItems">All new items to replace the removed beatmap set.</param>
-            /// <returns>All removed items, for any further processing.</returns>
-            public IEnumerable<CarouselBeatmapSet> ReplaceItem(BeatmapSetInfo oldItem, List<CarouselBeatmapSet> newItems)
-            {
-                var previousSelection = (LastSelected as CarouselBeatmapSet)?.Beatmaps
-                                                                            .FirstOrDefault(s => s.State.Value == CarouselItemState.Selected)
-                                                                            ?.BeatmapInfo;
-
-                bool wasSelected = previousSelection?.BeatmapSet?.ID == oldItem.ID;
-
-                // Without doing this, the removal of the old beatmap will cause carousel's eager selection
-                // logic to invoke, causing one unnecessary selection.
-                DisableSelection = true;
-                var removedSets = RemoveItemsByID(oldItem.ID);
-                DisableSelection = false;
-
-                foreach (var set in newItems)
-                    AddItem(set);
-
-                // Check if we can/need to maintain our current selection.
-                if (wasSelected)
-                {
-                    CarouselBeatmap? matchingBeatmap = newItems.SelectMany(s => s.Beatmaps)
-                                                               .FirstOrDefault(b => b.BeatmapInfo.ID == previousSelection?.ID);
-
-                    if (matchingBeatmap != null)
-                        matchingBeatmap.State.Value = CarouselItemState.Selected;
-                }
-
-                return removedSets;
-            }
-
-            public IEnumerable<CarouselBeatmapSet> RemoveItemsByID(Guid beatmapSetID)
-            {
-                if (BeatmapSetsByID.TryGetValue(beatmapSetID, out var carouselBeatmapSets))
-                {
-                    foreach (var set in carouselBeatmapSets)
-                        RemoveItem(set);
-
-                    return carouselBeatmapSets;
-                }
-
-                return Enumerable.Empty<CarouselBeatmapSet>();
-            }
-
-            public override void RemoveItem(CarouselItem i)
-            {
-                CarouselBeatmapSet set = (CarouselBeatmapSet)i;
-                BeatmapSetsByID.Remove(set.BeatmapSet.ID);
-
-                base.RemoveItem(i);
-            }
-
-            protected override void PerformSelection()
-            {
-                if (LastSelected == null)
-                    carousel?.SelectNextRandom();
-                else
-                    base.PerformSelection();
-            }
-        }
-
-        public partial class CarouselScrollContainer : UserTrackingScrollContainer<DrawableCarouselItem>, IKeyBindingHandler<GlobalAction>
-        {
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
-
-            public CarouselScrollContainer()
-            {
-                // size is determined by the carousel itself, due to not all content necessarily being loaded.
-                ScrollContent.AutoSizeAxes = Axes.None;
-
-                // the scroll container may get pushed off-screen by global screen changes, but we still want panels to display outside of the bounds.
-                Masking = false;
-            }
-
-            #region Absolute scrolling
-
-            private bool absoluteScrolling;
-
-            protected override bool IsDragging => base.IsDragging || absoluteScrolling;
-
-            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
-            {
-                switch (e.Action)
-                {
-                    case GlobalAction.AbsoluteScrollSongList:
-                        beginAbsoluteScrolling(e);
-                        return true;
-                }
-
-                return false;
-            }
-
-            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
-            {
-                switch (e.Action)
-                {
-                    case GlobalAction.AbsoluteScrollSongList:
-                        endAbsoluteScrolling();
-                        break;
-                }
-            }
-
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                if (e.Button == MouseButton.Right)
-                {
-                    // To avoid conflicts with context menus, disallow absolute scroll if it looks like things will fall over.
-                    if (GetContainingInputManager()!.HoveredDrawables.OfType<IHasContextMenu>().Any())
-                        return false;
-
-                    beginAbsoluteScrolling(e);
-                }
-
-                return base.OnMouseDown(e);
-            }
-
-            protected override void OnMouseUp(MouseUpEvent e)
-            {
-                if (e.Button == MouseButton.Right)
-                    endAbsoluteScrolling();
-                base.OnMouseUp(e);
-            }
-
-            protected override bool OnMouseMove(MouseMoveEvent e)
-            {
-                if (absoluteScrolling)
-                {
-                    ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
-                    return true;
-                }
-
-                return base.OnMouseMove(e);
-            }
-
-            private void beginAbsoluteScrolling(UIEvent e)
-            {
-                ScrollToAbsolutePosition(e.CurrentState.Mouse.Position);
-                absoluteScrolling = true;
-            }
-
-            private void endAbsoluteScrolling() => absoluteScrolling = false;
-
-            #endregion
-
-            protected override ScrollbarContainer CreateScrollbar(Direction direction)
-            {
-                return new PaddedScrollbar();
-            }
-
-            protected partial class PaddedScrollbar : OsuScrollbar
-            {
-                public PaddedScrollbar()
-                    : base(Direction.Vertical)
-                {
-                }
-            }
-
-            private const float top_padding = 10;
-            private const float bottom_padding = 70;
-
-            protected override float ToScrollbarPosition(double scrollPosition)
-            {
-                if (Precision.AlmostEquals(0, ScrollableExtent))
-                    return 0;
-
-                return (float)(top_padding + (ScrollbarMovementExtent - (top_padding + bottom_padding)) * (scrollPosition / ScrollableExtent));
-            }
-
-            protected override float FromScrollbarPosition(float scrollbarPosition)
-            {
-                if (Precision.AlmostEquals(0, ScrollbarMovementExtent))
-                    return 0;
-
-                return (float)(ScrollableExtent * ((scrollbarPosition - top_padding) / (ScrollbarMovementExtent - (top_padding + bottom_padding))));
-            }
-        }
     }
+
+    /// <summary>
+    /// Defines a grouping header for a set of carousel items.
+    /// </summary>
+    public record GroupDefinition
+    {
+        /// <summary>
+        /// The order of this group in the carousel, sorted using ascending order.
+        /// </summary>
+        public int Order { get; }
+
+        /// <summary>
+        /// The title of this group.
+        /// </summary>
+        public LocalisableString Title { get; }
+
+        private readonly string uncasedTitle;
+
+        public GroupDefinition(int order, LocalisableString title)
+        {
+            Order = order;
+            Title = title;
+            uncasedTitle = title.ToLower().GetLocalised(LocalisationParameters.DEFAULT);
+        }
+
+        public virtual bool Equals(GroupDefinition? other) => uncasedTitle == other?.uncasedTitle;
+
+        public override int GetHashCode() => HashCode.Combine(uncasedTitle);
+    }
+
+    /// <summary>
+    /// Defines a grouping header for a set of carousel items grouped by star difficulty.
+    /// </summary>
+    public record StarDifficultyGroupDefinition(int Order, LocalisableString Title, StarDifficulty Difficulty) : GroupDefinition(Order, Title);
+
+    /// <summary>
+    /// Defines a grouping header for a set of carousel items grouped by achieved rank.
+    /// </summary>
+    public record RankDisplayGroupDefinition(ScoreRank Rank) : GroupDefinition(-(int)Rank, Rank.GetLocalisableDescription());
+
+    /// <summary>
+    /// Defines a grouping header for a set of carousel items grouped by ranked status.
+    /// </summary>
+    public record RankedStatusGroupDefinition(int Order, BeatmapOnlineStatus Status) : GroupDefinition(Order, Status.GetLocalisableDescription());
+
+    /// <summary>
+    /// Used to represent a portion of a <see cref="BeatmapSetInfo"/> under a <see cref="GroupDefinition"/>.
+    /// The purpose of this model is to support splitting beatmap sets apart when the active grouping mode demands it.
+    /// </summary>
+    public record GroupedBeatmapSet([UsedImplicitly] GroupDefinition? Group, BeatmapSetInfo BeatmapSet);
+
+    /// <summary>
+    /// Used to represent a <see cref="Beatmap"/> under a <see cref="GroupDefinition"/>.
+    /// The purpose of this model is to support showing multiple copies of a beatmap, which can occur if a beatmap appears in multiple groups
+    /// (most prominently, collections group mode).
+    /// </summary>
+    public record GroupedBeatmap(GroupDefinition? Group, BeatmapInfo Beatmap);
 }
