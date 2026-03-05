@@ -73,10 +73,11 @@ namespace osu.Game.Screens.Select
                                 Colour = colourProvider.Background6,
                                 Padding = new MarginPadding { Right = 80, Vertical = 5 }
                             },
-                            new ShearedButton(80)
+                            new ShearedButton
                             {
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
+                                Width = 80,
                                 Text = CommonStrings.Back,
                                 RelativeSizeAxes = Axes.Y,
                                 Height = 1,

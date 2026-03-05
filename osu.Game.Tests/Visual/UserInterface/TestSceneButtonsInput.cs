@@ -72,12 +72,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Enabled = { Value = true },
                         Text = "Rounded button"
                     },
-                    shearedButton = new ShearedButton(width)
+                    shearedButton = new ShearedButton
                     {
                         Text = "Sheared button",
                         LighterColour = Colour4.FromHex("#FFFFFF"),
                         DarkerColour = Colour4.FromHex("#FFCC22"),
                         TextColour = Colour4.Black,
+                        Width = width,
                         Height = 40,
                         Enabled = { Value = true },
                         Padding = new MarginPadding(0)

@@ -13,14 +13,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public partial class AddToPlaylistFooterButton : ShearedButton
     {
-        public AddToPlaylistFooterButton()
-            : base(width: 220)
-        {
-        }
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            Width = 220;
+
             DarkerColour = colours.Blue3;
             LighterColour = colours.Blue1;
 
