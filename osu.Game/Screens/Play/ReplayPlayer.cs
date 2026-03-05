@@ -160,6 +160,10 @@ namespace osu.Game.Screens.Play
                     else
                         GameplayClockContainer.Stop();
                     return true;
+
+                case >= GlobalAction.JumpReplay0 and <= GlobalAction.JumpReplay9:
+                    JumpReplayTo(e.Action - GlobalAction.JumpReplay0);
+                    return true;
             }
 
             return false;
@@ -183,6 +187,13 @@ namespace osu.Game.Screens.Play
         public void SeekInDirection(float amount)
         {
             double target = Math.Clamp(GameplayClockContainer.CurrentTime + amount * BASE_SEEK_AMOUNT, 0, GameplayState.Beatmap.GetLastObjectTime());
+
+            Seek(target);
+        }
+
+        public void JumpReplayTo(int digit)
+        {
+            double target = (digit / 10.0) * GameplayState.Beatmap.GetLastObjectTime();
 
             Seek(target);
         }

@@ -194,6 +194,17 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Comma, GlobalAction.StepReplayBackward),
             new KeyBinding(InputKey.Period, GlobalAction.StepReplayForward),
             new KeyBinding(new[] { InputKey.Control, InputKey.H }, GlobalAction.ToggleReplaySettings),
+
+            new KeyBinding(InputKey.Number0, GlobalAction.JumpReplay0),
+            new KeyBinding(InputKey.Number1, GlobalAction.JumpReplay1),
+            new KeyBinding(InputKey.Number2, GlobalAction.JumpReplay2),
+            new KeyBinding(InputKey.Number3, GlobalAction.JumpReplay3),
+            new KeyBinding(InputKey.Number4, GlobalAction.JumpReplay4),
+            new KeyBinding(InputKey.Number5, GlobalAction.JumpReplay5),
+            new KeyBinding(InputKey.Number6, GlobalAction.JumpReplay6),
+            new KeyBinding(InputKey.Number7, GlobalAction.JumpReplay7),
+            new KeyBinding(InputKey.Number8, GlobalAction.JumpReplay8),
+            new KeyBinding(InputKey.Number9, GlobalAction.JumpReplay9),
         };
 
         private static IEnumerable<KeyBinding> songSelectKeyBindings => new[]
@@ -528,6 +539,36 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.NextSkin))]
         NextSkin,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.JumpReplay0))]
+        JumpReplay0,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.JumpReplay1))]
+        JumpReplay1,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.JumpReplay2))]
+        JumpReplay2,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.JumpReplay3))]
+        JumpReplay3,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.JumpReplay4))]
+        JumpReplay4,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.JumpReplay5))]
+        JumpReplay5,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.JumpReplay6))]
+        JumpReplay6,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.JumpReplay7))]
+        JumpReplay7,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.JumpReplay8))]
+        JumpReplay8,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.JumpReplay9))]
+        JumpReplay9,
     }
 
     public enum GlobalActionCategory

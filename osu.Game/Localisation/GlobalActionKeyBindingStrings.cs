@@ -489,6 +489,57 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString EditorDiscardUnsavedChanges => new TranslatableString(getKey(@"editor_discard_unsaved_changes"), @"Discard unsaved changes");
 
+        /// <summary>
+        /// "Jump replay to 0% progress"
+        /// </summary>
+        public static LocalisableString JumpReplay0 => new TranslatableString(getKey(@"jump_replay_0"), @"Jump replay to 0% progress");
+
+        /// <summary>
+        /// "Jump replay to 10% progress"
+        /// </summary>
+        public static LocalisableString JumpReplay1 => new TranslatableString(getKey(@"jump_replay_1"), @"Jump replay to 10% progress");
+
+        /// <summary>
+        /// "Jump replay to 20% progress"
+        /// </summary>
+        public static LocalisableString JumpReplay2 => new TranslatableString(getKey(@"jump_replay_2"), @"Jump replay to 20% progress");
+
+        /// <summary>
+        /// "Jump replay to 30% progress"
+        /// </summary>
+        public static LocalisableString JumpReplay3 => new TranslatableString(getKey(@"jump_replay_3"), @"Jump replay to 30% progress");
+
+        /// <summary>
+        /// "Jump replay to 40% progress"
+        /// </summary>
+        public static LocalisableString JumpReplay4 => new TranslatableString(getKey(@"jump_replay_4"), @"Jump replay to 40% progress");
+
+        /// <summary>
+        /// "Jump replay to 50% progress"
+        /// </summary>
+        public static LocalisableString JumpReplay5 => new TranslatableString(getKey(@"jump_replay_5"), @"Jump replay to 50% progress");
+
+        /// <summary>
+        /// "Jump replay to 60% progress"
+        /// </summary>
+        public static LocalisableString JumpReplay6 => new TranslatableString(getKey(@"jump_replay_6"), @"Jump replay to 60% progress");
+
+        /// <summary>
+        /// "Jump replay to 70% progress"
+        /// </summary>
+        public static LocalisableString JumpReplay7 => new TranslatableString(getKey(@"jump_replay_7"), @"Jump replay to 70% progress");
+
+        /// <summary>
+        /// "Jump replay to 80% progress"
+        /// </summary>
+        public static LocalisableString JumpReplay8 => new TranslatableString(getKey(@"jump_replay_8"), @"Jump replay to 80% progress");
+
+        /// <summary>
+        /// "Jump replay to 90% progress"
+        /// </summary>
+        public static LocalisableString JumpReplay9 => new TranslatableString(getKey(@"jump_replay_9"), @"Jump replay to 90% progress");
+
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
