@@ -31,6 +31,7 @@ using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.Gameplay;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro;
@@ -45,8 +46,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         protected override bool InitialBackButtonVisibility => false;
 
         public override bool HideOverlaysOnEnter => true;
-
-        public bool RetryRequested { get; private set; }
 
         public RankedPlaySubScreen? ActiveSubScreen { get; private set; }
 
@@ -92,6 +91,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         [Resolved]
         private MusicController music { get; set; } = null!;
+
+        [Resolved]
+        private QueueController? controller { get; set; }
 
         private readonly MultiplayerRoom room;
         private readonly Container<RankedPlaySubScreen> screenContainer;
@@ -311,7 +313,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     {
                         ExitRequested = retry =>
                         {
-                            RetryRequested = retry;
+                            retryRequested = retry;
                             exitConfirmed = true;
 
                             if (this.IsCurrentScreen())
@@ -427,6 +429,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         }
 
         private bool exitConfirmed;
+        private bool retryRequested;
 
         public override bool OnExiting(ScreenExitEvent e)
         {
@@ -441,6 +444,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 endHandlingTrack();
 
                 client.LeaveRoom().FireAndForget();
+
+                if (retryRequested)
+                    controller?.RejoinQueue();
+
                 return false;
             }
 
