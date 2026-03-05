@@ -269,12 +269,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                 AvailablePools = { BindTarget = availablePools },
                                 SelectedPool = { BindTarget = selectedPool }
                             },
-                            new BeginQueueingButton(200)
+                            new BeginQueueingButton
                             {
                                 DarkerColour = colours.Blue2,
                                 LighterColour = colours.Blue1,
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
+                                Width = 200,
                                 SelectedPool = { BindTarget = selectedPool },
                                 Action = () =>
                                 {
@@ -308,12 +309,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                             {
                                 State = { Value = Visibility.Visible },
                             },
-                            new ShearedButton(200)
+                            new ShearedButton
                             {
                                 DarkerColour = colours.Red3,
                                 LighterColour = colours.Red4,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
+                                Width = 200,
                                 Text = "Stop queueing",
                                 Action = () => client.MatchmakingLeaveQueue().FireAndForget()
                             }
@@ -430,11 +432,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             public readonly IBindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
 
-            public BeginQueueingButton(float? width = null)
-                : base(width)
-            {
-            }
-
             protected override void LoadComplete()
             {
                 base.LoadComplete();
@@ -445,11 +442,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private partial class SelectionButton : ShearedButton, IKeyBindingHandler<GlobalAction>
         {
-            protected SelectionButton(float? width = null, float height = DEFAULT_HEIGHT)
-                : base(width, height)
-            {
-            }
-
             public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {
                 if (e.Action == GlobalAction.Select && !e.Repeat)
