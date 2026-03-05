@@ -77,6 +77,10 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// Creates a new <see cref="ShearedButton"/>
         /// </summary>
+        /// <remarks>
+        /// By default, the button will have a height of <see cref="DEFAULT_HEIGHT"/>.
+        /// Width should be set for each usage.
+        /// </remarks>
         public ShearedButton()
         {
             Height = DEFAULT_HEIGHT;
