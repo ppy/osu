@@ -171,7 +171,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     if (!configHitAnimation.Value)
                     {
                         // Make the object instantly invisible when hit
-                        ClearTransforms();
                         Alpha = 0;
                         this.Delay(StrongNestedHit.SECOND_HIT_WINDOW).Expire();
                         break;
