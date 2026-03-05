@@ -539,7 +539,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString JumpReplay9 => new TranslatableString(getKey(@"jump_replay_9"), @"Jump replay to 90% progress");
 
-
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
