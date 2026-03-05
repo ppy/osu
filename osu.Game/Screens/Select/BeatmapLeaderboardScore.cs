@@ -58,6 +58,7 @@ namespace osu.Game.Screens.Select
 
         public int? Rank { get; init; }
         public HighlightType? Highlight { get; init; }
+        public Action<ScoreInfo>? ShowReplay { get; init; }
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -630,7 +631,8 @@ namespace osu.Game.Screens.Select
                 if (items.Count > 0)
                     items.Add(new OsuMenuItemSpacer());
 
-                items.Add(new OsuMenuItem(SongSelectStrings.WatchReplay, MenuItemType.Standard, () => game?.PresentScore(Score, ScorePresentType.Gameplay)));
+                if (ShowReplay != null)
+                    items.Add(new OsuMenuItem(SongSelectStrings.WatchReplay, MenuItemType.Standard, () => ShowReplay.Invoke(Score)));
                 items.Add(new OsuMenuItem(CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(Score)));
                 items.Add(new OsuMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
 

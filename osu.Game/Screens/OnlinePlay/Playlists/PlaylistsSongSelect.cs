@@ -17,13 +17,14 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Select;
 using osu.Game.Utils;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public partial class PlaylistsSongSelect : SongSelect, IOnlinePlaySubScreen
+    public partial class PlaylistsSongSelect : SongSelect, IOnlinePlaySubScreen, ISongSelect
     {
         public string ShortTitle => "song selection";
 
@@ -260,5 +261,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             base.Dispose(isDisposing);
             modSelectOverlayRegistration?.Dispose();
         }
+
+        bool ISongSelect.CanPresentScore => false;
+
+        void ISongSelect.PresentScore(ScoreInfo score, ScorePresentType presentType) { }
     }
 }

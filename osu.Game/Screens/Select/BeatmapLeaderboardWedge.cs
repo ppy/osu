@@ -308,7 +308,12 @@ namespace osu.Game.Screens.Select
                     Rank = i + 1,
                     Highlight = highlightType,
                     SelectedMods = { BindTarget = mods },
-                    Action = () => onLeaderboardScoreClicked(s),
+                    Action = songSelect?.CanPresentScore == true
+                        ? () => songSelect.PresentScore(s)
+                        : null,
+                    ShowReplay = songSelect?.CanPresentScore == true
+                        ? info => songSelect.PresentScore(info, ScorePresentType.Gameplay)
+                        : null
                 };
             }), loadedScores =>
             {
