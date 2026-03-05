@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -22,6 +23,9 @@ namespace osu.Game.Rulesets.Edit
         public Playfield Playfield => drawableRuleset.Playfield;
 
         private readonly DrawableRuleset<TObject> drawableRuleset;
+
+        private Action? onStateChange;
+        private Action<HitObject>? onHitObjectUpdated;
 
         [Resolved]
         private EditorBeatmap beatmap { get; set; } = null!;
@@ -55,11 +59,13 @@ namespace osu.Game.Rulesets.Edit
             if (changeHandler != null)
             {
                 // for now only regenerate replay on a finalised state change, not HitObjectUpdated.
-                changeHandler.OnStateChange += () => Scheduler.AddOnce(regenerateAutoplay);
+                onStateChange = () => Scheduler.AddOnce(regenerateAutoplay);
+                changeHandler.OnStateChange += onStateChange;
             }
             else
             {
-                beatmap.HitObjectUpdated += _ => Scheduler.AddOnce(regenerateAutoplay);
+                onHitObjectUpdated = _ => Scheduler.AddOnce(regenerateAutoplay);
+                beatmap.HitObjectUpdated += onHitObjectUpdated;
             }
 
             Scheduler.AddOnce(regenerateAutoplay);
@@ -97,7 +103,11 @@ namespace osu.Game.Rulesets.Edit
             {
                 beatmap.HitObjectAdded -= addHitObject;
                 beatmap.HitObjectRemoved -= removeHitObject;
+                beatmap.HitObjectUpdated -= onHitObjectUpdated;
             }
+
+            if (changeHandler != null)
+                changeHandler.OnStateChange -= onStateChange;
         }
     }
 }
