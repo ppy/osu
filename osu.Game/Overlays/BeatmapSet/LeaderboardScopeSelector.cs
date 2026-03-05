@@ -46,10 +46,6 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 switch (Value)
                 {
-                    case BeatmapLeaderboardScope.Local:
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(Value), Value, null);
-
                     case BeatmapLeaderboardScope.Global:
                         return BeatmapsetsStrings.ShowScoreboardGlobal;
 
@@ -61,6 +57,9 @@ namespace osu.Game.Overlays.BeatmapSet
 
                     case BeatmapLeaderboardScope.Team:
                         return BeatmapsetsStrings.ShowScoreboardTeam;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
 
