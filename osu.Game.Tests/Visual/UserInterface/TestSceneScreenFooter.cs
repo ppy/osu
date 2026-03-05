@@ -342,8 +342,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                         AutoSizeAxes = Axes.Both,
                         Children = new[]
                         {
-                            new ShearedButton(200) { Text = "Action #1", Action = () => { } },
-                            new ShearedButton(140) { Text = "Action #2", Action = () => { } },
+                            new ShearedButton { Width = 200, Text = "Action #1", Action = () => { } },
+                            new ShearedButton { Width = 140, Text = "Action #2", Action = () => { } },
                         }
                     };
                 }

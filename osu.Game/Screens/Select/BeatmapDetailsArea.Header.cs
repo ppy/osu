@@ -76,6 +76,7 @@ namespace osu.Game.Screens.Select
                                     {
                                         Anchor = Anchor.CentreRight,
                                         Origin = Anchor.CentreRight,
+                                        AutoSizeAxes = Axes.X,
                                         Text = UserInterfaceStrings.SelectedMods,
                                         Height = 30f,
                                         // Eyeballed to make spacing match. Because shear is silly and implemented in different ways between dropdown and button.
