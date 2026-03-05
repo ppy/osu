@@ -90,6 +90,8 @@ namespace osu.Game.Graphics
         public static IconUsage Twitter => get(OsuIconMapping.Twitter);
         public static IconUsage UserInterface => get(OsuIconMapping.UserInterface);
         public static IconUsage Wiki => get(OsuIconMapping.Wiki);
+        public static IconUsage Add => get(OsuIconMapping.Add);
+        public static IconUsage Remove => get(OsuIconMapping.Remove);
         public static IconUsage EditorAddControlPoint => get(OsuIconMapping.EditorAddControlPoint);
         public static IconUsage EditorConvertToStream => get(OsuIconMapping.EditorConvertToStream);
         public static IconUsage EditorDistanceSnap => get(OsuIconMapping.EditorDistanceSnap);
@@ -395,6 +397,12 @@ namespace osu.Game.Graphics
 
             [Description(@"wiki")]
             Wiki,
+
+            [Description(@"add")]
+            Add,
+
+            [Description(@"remove")]
+            Remove,
 
             [Description(@"Editor/add-control-point")]
             EditorAddControlPoint = 1000,
