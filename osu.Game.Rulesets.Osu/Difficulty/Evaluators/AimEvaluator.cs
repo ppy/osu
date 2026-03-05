@@ -120,9 +120,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 if (withSliderTravelDistance)
                 {
-                    // We want to use the average velocity over the whole object when awarding differences, not the individual jump and slider path velocities.
-                    prevVelocity = (osuLastObj.LazyJumpDistance + osuLastLastObj.TravelDistance) / osuLastObj.AdjustedDeltaTime;
-                    currVelocity = (osuCurrObj.LazyJumpDistance + osuLastObj.TravelDistance) / osuCurrObj.AdjustedDeltaTime;
+                    // We want to use just the object jump without slider velocity when awarding differences
+                    currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
                 }
 
                 // Scale with ratio of difference compared to 0.5 * max dist.
