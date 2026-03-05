@@ -114,22 +114,24 @@ namespace osu.Game.Overlays.Mods
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            useCurrentModsButton = new ShearedButton(content_width)
+                            useCurrentModsButton = new ShearedButton
                             {
                                 // todo: for some very odd reason, this needs to be anchored to topright for the fill flow to be correctly sized to the AABB of the sheared button
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
+                                Width = content_width,
                                 Text = ModSelectOverlayStrings.UseCurrentMods,
                                 DarkerColour = colours.Blue1,
                                 LighterColour = colours.Blue0,
                                 TextColour = colourProvider.Background6,
                                 Action = useCurrentMods,
                             },
-                            saveButton = new ShearedButton(content_width)
+                            saveButton = new ShearedButton
                             {
                                 // todo: for some very odd reason, this needs to be anchored to topright for the fill flow to be correctly sized to the AABB of the sheared button
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
+                                Width = content_width,
                                 Text = Resources.Localisation.Web.CommonStrings.ButtonsSave,
                                 DarkerColour = colours.Orange1,
                                 LighterColour = colours.Orange0,
