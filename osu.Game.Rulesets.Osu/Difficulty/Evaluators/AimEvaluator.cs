@@ -11,9 +11,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class AimEvaluator
     {
-        private const double wide_angle_multiplier = 1.4;
-        private const double acute_angle_multiplier = 2.6;
-        private const double slider_multiplier = 2.0;
+        private const double wide_angle_multiplier = 1.35;
+        private const double acute_angle_multiplier = 2.5;
+        private const double slider_multiplier = 1.9;
         private const double velocity_change_multiplier = 1.1;
         private const double wiggle_multiplier = 1.02; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
 
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 wideAngleBonus *= 1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3));
 
                 // Apply full wide angle bonus for distance more than SINGLE_SPACING_THRESHOLD
-                wideAngleBonus *= angleBonus * Math.Pow(DifficultyCalculationUtils.Smoothstep(currDistance, 0, SpeedAimEvaluator.SINGLE_SPACING_THRESHOLD), 3.0);
+                wideAngleBonus *= angleBonus * DifficultyCalculationUtils.Smoothstep(currDistance, 0, SpeedAimEvaluator.SINGLE_SPACING_THRESHOLD);
 
                 // Apply wiggle bonus for jumps that are [radius, 3*diameter] in distance, with < 110 angle
                 // https://www.desmos.com/calculator/dp0v0nvowc
@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         // We decrease strain for distances <radius to fix cases where doubles with no aim requirement
         // have their strain buffed incredibly high due to the delta time.
         // These objects do not require any movement, so it does not make sense to award them.
-        private static double highBpmBonus(double ms, double distance) => 1 / (1 - Math.Pow(0.03, Math.Pow(ms / 1000, 0.75)))
+        private static double highBpmBonus(double ms, double distance) => 1 / (1 - Math.Pow(0.03, Math.Pow(ms / 1000, 0.65)))
                                                                           * DifficultyCalculationUtils.Smootherstep(distance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
 
         private static double calcWideAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(40), double.DegreesToRadians(140));
