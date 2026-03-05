@@ -23,6 +23,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Select;
 using osu.Game.Users;
@@ -30,7 +31,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public partial class MultiplayerMatchSongSelect : SongSelect, IOnlinePlaySubScreen
+    public partial class MultiplayerMatchSongSelect : SongSelect, IOnlinePlaySubScreen, ISongSelect
     {
         public string ShortTitle => "song selection";
 
@@ -336,5 +337,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.Dispose(isDisposing);
             freeModSelectOverlayRegistration?.Dispose();
         }
+
+        bool ISongSelect.CanPresentScore => false;
+
+        void ISongSelect.PresentScore(ScoreInfo score, ScorePresentType presentType) { }
     }
 }
