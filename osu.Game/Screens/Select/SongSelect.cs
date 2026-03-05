@@ -1148,12 +1148,23 @@ namespace osu.Game.Screens.Select
 
         void ISongSelect.Search(string query) => FilterControl.Search(query);
 
-        void ISongSelect.PresentScore(ScoreInfo score)
-        {
-            Debug.Assert(Beatmap.Value.BeatmapInfo.Equals(score.BeatmapInfo));
-            Debug.Assert(Ruleset.Value.Equals(score.Ruleset));
+        bool ISongSelect.CanPresentScore => true;
 
-            this.Push(new SoloResultsScreen(score));
+        void ISongSelect.PresentScore(ScoreInfo score, ScorePresentType presentType)
+        {
+            switch (presentType)
+            {
+                case ScorePresentType.Results:
+                    Debug.Assert(Beatmap.Value.BeatmapInfo.Equals(score.BeatmapInfo));
+                    Debug.Assert(Ruleset.Value.Equals(score.Ruleset));
+
+                    this.Push(new SoloResultsScreen(score));
+                    break;
+
+                case ScorePresentType.Gameplay:
+                    (game as OsuGame)?.PresentScore(score, presentType);
+                    break;
+            }
         }
 
         #endregion

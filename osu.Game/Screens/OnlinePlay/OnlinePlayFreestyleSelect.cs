@@ -11,12 +11,13 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public abstract partial class OnlinePlayFreestyleSelect : SongSelect, IHandlePresentBeatmap, IOnlinePlaySubScreen
+    public abstract partial class OnlinePlayFreestyleSelect : SongSelect, IHandlePresentBeatmap, IOnlinePlaySubScreen, ISongSelect
     {
         private readonly PlaylistItem item;
 
@@ -115,5 +116,9 @@ namespace osu.Game.Screens.OnlinePlay
         {
             // This screen cannot present beatmaps.
         }
+
+        bool ISongSelect.CanPresentScore => false;
+
+        void ISongSelect.PresentScore(ScoreInfo score, ScorePresentType presentType) { }
     }
 }

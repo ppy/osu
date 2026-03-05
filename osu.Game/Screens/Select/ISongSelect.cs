@@ -32,10 +32,16 @@ namespace osu.Game.Screens.Select
         void ManageCollections();
 
         /// <summary>
+        /// Whether <see cref="PresentScore"/> can be performed by this screen.
+        /// If <see langword="false"/>, <see cref="PresentScore"/> will have no effect.
+        /// </summary>
+        bool CanPresentScore { get; }
+
+        /// <summary>
         /// Opens results screen with the given score.
         /// This assumes active beatmap and ruleset selection matches the score.
         /// </summary>
-        void PresentScore(ScoreInfo score);
+        void PresentScore(ScoreInfo score, ScorePresentType presentType = ScorePresentType.Results);
 
         /// <summary>
         /// Set the current filter text query to the provided string.
