@@ -49,17 +49,17 @@ namespace osu.Game.Rulesets.Edit
         {
             base.LoadComplete();
 
-            beatmap.HitObjectAdded += addHitObject;
-            beatmap.HitObjectRemoved += removeHitObject;
+            beatmap.HitObjectAdded += hitObjectAdded;
+            beatmap.HitObjectRemoved += hitObjectRemoved;
 
             if (changeHandler != null)
             {
                 // for now only regenerate replay on a finalised state change, not HitObjectUpdated.
-                changeHandler.OnStateChange += () => Scheduler.AddOnce(regenerateAutoplay);
+                changeHandler.OnStateChange += stateChanged;
             }
             else
             {
-                beatmap.HitObjectUpdated += _ => Scheduler.AddOnce(regenerateAutoplay);
+                beatmap.HitObjectUpdated += hitObjectUpdated;
             }
 
             Scheduler.AddOnce(regenerateAutoplay);
@@ -71,17 +71,21 @@ namespace osu.Game.Rulesets.Edit
             drawableRuleset.SetReplayScore(autoplayMod.CreateScoreFromReplayData(drawableRuleset.Beatmap, drawableRuleset.Mods));
         }
 
-        private void addHitObject(HitObject hitObject)
+        private void hitObjectAdded(HitObject hitObject)
         {
             drawableRuleset.AddHitObject((TObject)hitObject);
             drawableRuleset.Playfield.PostProcess();
         }
 
-        private void removeHitObject(HitObject hitObject)
+        private void hitObjectRemoved(HitObject hitObject)
         {
             drawableRuleset.RemoveHitObject((TObject)hitObject);
             drawableRuleset.Playfield.PostProcess();
         }
+
+        private void hitObjectUpdated(HitObject _) => Scheduler.AddOnce(regenerateAutoplay);
+
+        private void stateChanged() => Scheduler.AddOnce(regenerateAutoplay);
 
         public override bool PropagatePositionalInputSubTree => false;
 
@@ -95,9 +99,13 @@ namespace osu.Game.Rulesets.Edit
 
             if (beatmap.IsNotNull())
             {
-                beatmap.HitObjectAdded -= addHitObject;
-                beatmap.HitObjectRemoved -= removeHitObject;
+                beatmap.HitObjectAdded -= hitObjectAdded;
+                beatmap.HitObjectRemoved -= hitObjectRemoved;
+                beatmap.HitObjectUpdated -= hitObjectUpdated;
             }
+
+            if (changeHandler != null)
+                changeHandler.OnStateChange -= stateChanged;
         }
     }
 }
