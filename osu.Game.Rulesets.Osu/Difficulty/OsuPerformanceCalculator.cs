@@ -323,7 +323,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (effectiveMissCount > 0)
                 flashlightValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
 
-            flashlightValue *= getComboScalingFactor(attributes);
+            // Flashlight pp must be combo scaled to account for visible area shrinking with higher combo.
+            if (attributes.MaxCombo > 0)
+            {
+                double comboPortion = Math.Min((double)scoreMaxCombo / attributes.MaxCombo, 1.0);
+                double leftoverComboFactor = 1.0;
+
+                if (effectiveMissCount > 0)
+                {
+                    // Check what is the average combo was on remaining combo
+                    double leftoverCombo = attributes.MaxCombo - scoreMaxCombo;
+                    double averageComboAfterMax = leftoverCombo / effectiveMissCount;
+                    leftoverComboFactor = Math.Min(averageComboAfterMax / 200, 1.0);
+                }
+
+                // We use default lenient combo scaling
+                flashlightValue *= 0.25 + 0.75 * Math.Pow(comboPortion, 0.5);
+
+                // And make it harsher if on non-max combo parts player breaks too often
+                flashlightValue *= comboPortion + (1 - comboPortion) * leftoverComboFactor;
+            }
 
             // Scale the flashlight value with accuracy _slightly_.
             flashlightValue *= 0.5 + accuracy / 2.0;
@@ -533,7 +552,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         // so we use the amount of relatively difficult sections to adjust miss penalty
         // to make it more punishing on maps with lower amount of hard sections.
         private double calculateMissPenalty(double missCount, double difficultStrainCount) => 0.96 / ((missCount / (4 * Math.Pow(Math.Log(difficultStrainCount), 0.94))) + 1);
-        private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
         private int totalSuccessfulHits => countGreat + countOk + countMeh;
