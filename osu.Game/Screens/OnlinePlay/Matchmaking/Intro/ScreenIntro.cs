@@ -46,12 +46,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
         private Sample? dateWindupSample;
         private Sample? dateImpactSample;
         private Sample? beatmapWindupSample;
-        private Sample? beatmapImpactSample;
 
         private SampleChannel? dateWindupChannel;
         private SampleChannel? dateImpactChannel;
         private SampleChannel? beatmapWindupChannel;
-        private SampleChannel? beatmapImpactChannel;
 
         private IDisposable? duckOperation;
 
@@ -126,7 +124,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
             dateWindupSample = audio.Samples.Get(@"DailyChallenge/date-windup");
             dateImpactSample = audio.Samples.Get(@"DailyChallenge/date-impact");
             beatmapWindupSample = audio.Samples.Get(@"DailyChallenge/beatmap-windup");
-            beatmapImpactSample = audio.Samples.Get(@"DailyChallenge/beatmap-impact");
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -230,12 +227,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
             beatmapWindupChannel?.Play();
         }
 
-        private void playBeatmapImpactSample()
-        {
-            beatmapImpactChannel = beatmapImpactSample?.GetChannel();
-            beatmapImpactChannel?.Play();
-        }
-
         protected override void Dispose(bool isDisposing)
         {
             resetAudio();
@@ -247,7 +238,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
             dateWindupChannel?.Stop();
             dateImpactChannel?.Stop();
             beatmapWindupChannel?.Stop();
-            beatmapImpactChannel?.Stop();
             duckOperation?.Dispose();
         }
     }
