@@ -37,53 +37,59 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
         [BackgroundDependencyLoader]
         private void load()
         {
-            Masking = true;
-            CornerRadius = RankedPlayCard.CORNER_RADIUS;
-
             InternalChildren =
             [
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colours.Background,
-                },
                 new Container
                 {
-                    Name = "Top Area",
                     RelativeSizeAxes = Axes.Both,
-                    FillMode = FillMode.Fit,
+                    Masking = true,
+                    CornerRadius = RankedPlayCard.CORNER_RADIUS,
                     Children =
                     [
-                        new CardCover(Beatmap)
+                        new Box
                         {
                             RelativeSizeAxes = Axes.Both,
+                            Colour = colours.Background,
                         },
-                        new CardMetadata(Beatmap)
+                        new Container
                         {
+                            Name = "Top Area",
                             RelativeSizeAxes = Axes.Both,
-                        },
-                        new DifficultyNameBadge(Beatmap)
-                        {
-                            Width = 100,
-                            AutoSizeAxes = Axes.Y,
+                            FillMode = FillMode.Fit,
+                            Children =
+                            [
+                                new CardCover(Beatmap)
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                new CardMetadata(Beatmap)
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                new DifficultyNameBadge(Beatmap)
+                                {
+                                    Width = 100,
+                                    AutoSizeAxes = Axes.Y,
 
-                            // this container partially overlaps with the bottom area
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.Centre,
-                        }
-                    ],
-                },
-                new Container
-                {
-                    Name = "Bottom Area",
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = RankedPlayCard.SIZE.X + 6 },
-                    Children =
-                    [
-                        new AttributeListing(Beatmap)
+                                    // this container partially overlaps with the bottom area
+                                    Anchor = Anchor.BottomCentre,
+                                    Origin = Anchor.Centre,
+                                }
+                            ],
+                        },
+                        new Container
                         {
+                            Name = "Bottom Area",
                             RelativeSizeAxes = Axes.Both,
-                        }
+                            Padding = new MarginPadding { Top = RankedPlayCard.SIZE.X + 6 },
+                            Children =
+                            [
+                                new AttributeListing(Beatmap)
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                }
+                            ]
+                        },
                     ]
                 },
                 new CardBorder()

@@ -20,6 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
 {
+    [Cached]
     public partial class RankedPlayCard : CompositeDrawable
     {
         public static readonly Vector2 SIZE = new Vector2(120, 200);
@@ -30,10 +31,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
 
         private readonly IBindable<MultiplayerPlaylistItem?> playlistItem;
 
+        public readonly Bindable<bool> SongPreviewEnabled = new BindableBool(true);
+
         private readonly Container content;
         private readonly Container cardContent;
         private readonly Container shadow;
         private readonly SelectionOutline selectionOutline;
+        private readonly SongPreviewContainer songPreviewContainer;
 
         public bool ShowSelectionOutline
         {
@@ -41,6 +45,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
         }
 
         public float Elevation;
+
+        public bool PreviewTrackLoaded => songPreviewContainer.TrackLoaded;
+        public bool PreviewTrackRunning => songPreviewContainer.IsRunning;
 
         private Sample? cardFlipSample;
 
@@ -55,48 +62,55 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
 
             playlistItem = item.PlaylistItem.GetBoundCopy();
 
-            InternalChildren =
-            [
-                shadow = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    CornerRadius = CORNER_RADIUS,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Radius = 5,
-                        Colour = Color4.Black.Opacity(0.1f),
-                    },
-                    Child = new Box
+            InternalChild = songPreviewContainer = new SongPreviewContainer
+            {
+                Enabled = { BindTarget = SongPreviewEnabled },
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Children =
+                [
+                    shadow = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Alpha = 0,
-                        AlwaysPresent = true,
-                    }
-                },
-                content = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Children =
-                    [
-                        cardContent = new Container
+                        Masking = true,
+                        CornerRadius = CORNER_RADIUS,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        EdgeEffect = new EdgeEffectParameters
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Child = new RankedPlayCardBackSide()
+                            Type = EdgeEffectType.Shadow,
+                            Radius = 5,
+                            Colour = Color4.Black.Opacity(0.1f),
                         },
-                        selectionOutline = new SelectionOutline
+                        Child = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
+                            AlwaysPresent = true,
                         }
-                    ]
-                }
-            ];
+                    },
+                    content = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Children =
+                        [
+                            cardContent = new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Child = new RankedPlayCardBackSide()
+                            },
+                            selectionOutline = new SelectionOutline
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0,
+                            }
+                        ]
+                    }
+                ]
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -152,7 +166,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
                 return;
             }
 
-            Schedule(() => SetContent(new RankedPlayCardContent(beatmap), flip));
+            Schedule(() =>
+            {
+                SetContent(new RankedPlayCardContent(beatmap), flip);
+                songPreviewContainer.LoadPreview(beatmap);
+            });
         });
 
         public void SetContent(Drawable newContent, bool flip)

@@ -13,7 +13,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
 {
     public partial class RankedPlayCardContent
     {
-        private class CardColours(APIBeatmap beatmap, OsuColour colour)
+        public class CardColours(APIBeatmap beatmap, OsuColour colour)
         {
             private static readonly Color4 base_background = Color4Extensions.FromHex("#222228");
 

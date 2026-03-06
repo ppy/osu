@@ -1,30 +1,53 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
-using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards;
-using osu.Game.Tests.Resources;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.RankedPlay
 {
-    public partial class TestSceneRankedPlayCard : OsuTestScene
+    public partial class TestSceneRankedPlayCard : RankedPlayTestScene
     {
+        protected override Container<Drawable> Content { get; }
+
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+
+        [Cached]
+        private readonly CardDetailsOverlayContainer overlayContainer;
+
+        [Cached]
+        private readonly SongPreviewParticleContainer particleContainer;
+
+        private readonly BeatmapRequestHandler requestHandler = new BeatmapRequestHandler();
+
+        public TestSceneRankedPlayCard()
+        {
+            base.Content.AddRange(new Drawable[]
+            {
+                new OsuContextMenuContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = Content = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    }
+                },
+                overlayContainer = new CardDetailsOverlayContainer(),
+                particleContainer = new SongPreviewParticleContainer(),
+            });
+        }
 
         [Test]
         public void TestCards()
@@ -33,20 +56,13 @@ namespace osu.Game.Tests.Visual.RankedPlay
             {
                 FillFlowContainer flow;
 
-                Child = new OsuContextMenuContainer
+                Child = flow = new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = new CardDetailsOverlayContainer
-                    {
-                        Child = flow = new FillFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.Y,
-                            Width = 800f,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Spacing = new Vector2(10),
-                        }
-                    }
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 800f,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Spacing = new Vector2(10),
                 };
 
                 for (int i = 0; i < 10; i++)
@@ -104,36 +120,24 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void TestCardHand()
         {
+            AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
+
             AddStep("add cards", () =>
             {
                 PlayerCardHand cardHand;
 
-                Child = new OsuContextMenuContainer
+                Child = cardHand = new PlayerCardHand
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = new CardDetailsOverlayContainer
-                    {
-                        Child = cardHand = new PlayerCardHand
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(0.5f),
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                        },
-                    }
+                    Size = new Vector2(0.5f),
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    SelectionMode = CardSelectionMode.Single
                 };
 
-                foreach (var beatmap in getBeatmaps())
+                foreach (var beatmap in requestHandler.Beatmaps)
                 {
-                    var card = new RankedPlayCard(new RankedPlayCardWithPlaylistItem(new RankedPlayCardItem()));
-
-                    cardHand.AddCard(card);
-
-                    Schedule(() => card.SetContent(new RankedPlayCardContent(beatmap)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    }, false));
+                    cardHand.AddCard(new RevealedRankedPlayCardWithPlaylistItem(beatmap));
                 }
             });
         }
@@ -152,17 +156,13 @@ namespace osu.Game.Tests.Visual.RankedPlay
                 {
                     FillFlowContainer flow;
 
-                    Child = new OsuContextMenuContainer
+                    Child = flow = new FillFlowContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Child = flow = new FillFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.Y,
-                            Width = 800f,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Spacing = new Vector2(10),
-                        }
+                        RelativeSizeAxes = Axes.Y,
+                        Width = 800f,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Spacing = new Vector2(10),
                     };
 
                     for (int i = 0; i < 10; i++)
@@ -216,14 +216,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     }
                 });
             }
-        }
-
-        private APIBeatmap[] getBeatmaps()
-        {
-            using var resourceStream = TestResources.OpenResource("Requests/api-beatmaps-rankedplay.json");
-            using var reader = new StreamReader(resourceStream);
-
-            return JsonConvert.DeserializeObject<APIBeatmap[]>(reader.ReadToEnd())!;
         }
     }
 }
