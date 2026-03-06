@@ -152,8 +152,12 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                         // This is quite dodgy – it affects the global `UserLookupCache`.
                         //
                         // but it's the best we can do for now.
-                        // this should probaly be returned by server-spectator not osu-web.
-                        user.LastVisit = DateTimeOffset.Now;
+                        // this should probably be returned by server-spectator not osu-web.
+                        var now = DateTimeOffset.Now;
+
+                        // Drop the seconds to avoid every new user appearing at the top of the list and causing
+                        // the list to visually churn in an unusable way (especially on first display).
+                        user.LastVisit = new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, now.Offset);
 
                         var panel = createUserPanel(user);
                         updateUserSpectateState(presence.Value, panel);
@@ -219,7 +223,9 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                         default:
                         case UserSortCriteria.LastVisit:
                             // Todo: Last visit time is not currently updated according to realtime user presence.
-                            return panels.OrderByDescending(panel => panel.User.LastVisit).ThenBy(panel => panel.User.Id);
+                            return panels.OrderByDescending(panel => panel.User.LastVisit)
+                                         .ThenBy(panel => panel.User.Rank?.Rank != null)
+                                         .ThenBy(panel => panel.User.Rank?.Rank ?? 0);
 
                         case UserSortCriteria.Rank:
                             // Todo: Rank is not currently displayed in the panels. Additionally the sort mode kind of breaks if you change ruleset with this overlay open.

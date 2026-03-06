@@ -1098,8 +1098,8 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMatchmakingClient.MatchmakingRoomInvited()
         {
-            // Compatibility with older servers.
-            return ((IMatchmakingClient)this).MatchmakingRoomInvitedWithParams(new MatchmakingRoomInvitationParams { Type = MatchmakingPoolType.QuickPlay });
+            // Not implemented (used by older clients).
+            return Task.CompletedTask;
         }
 
         Task IMatchmakingClient.MatchmakingRoomInvitedWithParams(MatchmakingRoomInvitationParams invitation)
