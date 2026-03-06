@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private FillFlowContainer mainSettings;
 
-        private Container noTabletMessage;
+        private Drawable noTabletMessage;
 
         protected override LocalisableString Header => TabletSettingsStrings.Tablet;
 
@@ -94,69 +94,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             scalingSizeX = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX);
             scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
 
-            AddRange(new Drawable[]
+            AddRange(new[]
             {
-                noTabletMessage = new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = SettingsPanel.CONTENT_PADDING,
-                    Child = new Container
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Masking = true,
-                        CornerRadius = 5,
-                        CornerExponent = 2.5f,
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = colourProvider.Dark2,
-                            },
-                            new FillFlowContainer
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Direction = FillDirection.Vertical,
-                                Spacing = new Vector2(5f),
-                                Padding = new MarginPadding { Horizontal = 8, Vertical = 10 },
-                                Children = new Drawable[]
-                                {
-                                    new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.TopCentre,
-                                        Origin = Anchor.TopCentre,
-                                        Text = TabletSettingsStrings.NoTabletDetected,
-                                        Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
-                                        Colour = colourProvider.Content2,
-                                    },
-                                    new LinkFlowContainer(cp =>
-                                    {
-                                        cp.Colour = colours.Orange1;
-                                        cp.Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold);
-                                    })
-                                    {
-                                        TextAnchor = Anchor.TopCentre,
-                                        Anchor = Anchor.TopCentre,
-                                        Origin = Anchor.TopCentre,
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                    }.With(t =>
-                                    {
-                                        t.NewLine();
-
-                                        const string url = @"https://opentabletdriver.net/Wiki/FAQ/General";
-                                        var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedString(TabletSettingsStrings.NoTabletDetectedDescription(url)));
-
-                                        t.AddLinks(formattedSource.Text, formattedSource.Links);
-                                    }),
-                                }
-                            },
-                        },
-                    },
-                },
+                noTabletMessage = new NoTabletMessage(),
                 mainSettings = new FillFlowContainer
                 {
                     Alpha = 0,
@@ -402,5 +342,91 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private static float getHeight(float width, float aspectRatio) => width / aspectRatio;
 
         private static float getWidth(float height, float aspectRatio) => height * aspectRatio;
+
+        private partial class NoTabletMessage : CompositeDrawable
+        {
+            private readonly Bindable<Language> currentLanguage = new Bindable<Language>();
+            private LinkFlowContainer linkContainer;
+
+            [Resolved]
+            private LocalisationManager localisation { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuGameBase game, OsuColour colours, OverlayColourProvider colourProvider)
+            {
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+                Padding = SettingsPanel.CONTENT_PADDING;
+
+                InternalChild = new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Masking = true,
+                    CornerRadius = 5,
+                    CornerExponent = 2.5f,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colourProvider.Dark2,
+                        },
+                        new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(5f),
+                            Padding = new MarginPadding { Horizontal = 8, Vertical = 10 },
+                            Children = new Drawable[]
+                            {
+                                new OsuSpriteText
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Text = TabletSettingsStrings.NoTabletDetected,
+                                    Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
+                                    Colour = colourProvider.Content2,
+                                },
+                                linkContainer = new LinkFlowContainer(cp =>
+                                {
+                                    cp.Colour = colours.Orange1;
+                                    cp.Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold);
+                                })
+                                {
+                                    TextAnchor = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                },
+                            }
+                        },
+                    },
+                };
+
+                if (game != null)
+                    currentLanguage.BindTo(game.CurrentLanguage);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                currentLanguage.BindValueChanged(_ =>
+                    // schedule required because `LocalisationManager` won't have new language set correctly yet.
+                    Schedule(() =>
+                    {
+                        linkContainer.Clear();
+                        linkContainer.NewLine();
+
+                        const string url = @"https://opentabletdriver.net/Wiki/FAQ/General";
+                        var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedString(TabletSettingsStrings.NoTabletDetectedDescription(url)));
+
+                        linkContainer.AddLinks(formattedSource.Text, formattedSource.Links);
+                    }), true);
+            }
+        }
     }
 }
