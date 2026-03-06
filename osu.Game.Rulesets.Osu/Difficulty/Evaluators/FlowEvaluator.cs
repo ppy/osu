@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             // Add all bonuses
-            //flowDifficulty += angleBonus;
+            flowDifficulty *= 1 + angleBonus;
             flowDifficulty *= Math.Sqrt(osuCurrObj.SmallCircleBonus);
 
             // Add in additional slider velocity bonus
@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // If spacing is too low - decrease reward
             acuteAngleBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.JumpDistance, radius, diameter);
 
-            return acuteAngleBonus * acute_angle_bonus_multiplier;
+            return acuteAngleBonus * 0.002;
         }
 
         // This bonus accounts for flow aim being harder when angle is changing.
@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Take the largest of last 3 distances and if it's too small - decrease flow angle change bonus, because it's cheesable
             angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(Math.Max(osuCurrObj.JumpDistance, osuLast1Obj.JumpDistance), 0, diameter);
 
-            return angleChangeBonus * angle_change_bonus_multiplier;
+            return angleChangeBonus * 0.002;
         }
     }
 }
