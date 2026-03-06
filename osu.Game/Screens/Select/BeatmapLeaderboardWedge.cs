@@ -256,7 +256,9 @@ namespace osu.Game.Screens.Select
                 {
                     // only bind this after the first fetch to avoid reading stale scores.
                     fetchedScores.BindTo(leaderboardManager.Scores);
-                    fetchedScores.BindValueChanged(_ => updateScores(), true);
+
+                    // Schedule is important here to avoid handling changes after this drawable is disposed.
+                    fetchedScores.BindValueChanged(_ => Schedule(updateScores), true);
                     initialFetchComplete = true;
                 }
             }, initialFetchComplete && fetchScope != BeatmapLeaderboardScope.Local ? 300 : 0);
