@@ -29,8 +29,10 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
@@ -74,8 +76,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private readonly IBindable<MatchmakingScreenState> currentState = new Bindable<MatchmakingScreenState>();
 
-        private readonly Bindable<MatchmakingPool[]> availablePools = new Bindable<MatchmakingPool[]>();
+        private readonly Bindable<MatchmakingPool[]> availablePools = new Bindable<MatchmakingPool[]>([]);
         private readonly Bindable<MatchmakingPool?> selectedPool = new Bindable<MatchmakingPool?>();
+
+        private readonly MatchmakingPoolType poolType;
 
         private CancellationTokenSource userLookupCancellation = new CancellationTokenSource();
 
@@ -86,6 +90,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private SampleChannel? waitingLoopChannel;
         private ScheduledDelegate? startLoopPlaybackDelegate;
 
+        public ScreenQueue(MatchmakingPoolType poolType)
+        {
+            this.poolType = poolType;
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -95,6 +104,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
+                    new GlobalScrollAdjustsVolume(),
                     cloud = new CloudVisualisation
                     {
                         Y = -100,
@@ -151,7 +161,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private async Task populateAvailablePools()
         {
-            MatchmakingPool[] pools = await client.GetMatchmakingPoolsOfType(MatchmakingPoolType.QuickPlay).ConfigureAwait(false);
+            MatchmakingPool[] pools = await client.GetMatchmakingPoolsOfType(poolType).ConfigureAwait(false);
 
             Schedule(() =>
             {
@@ -228,7 +238,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
                 case MatchmakingScreenState.PendingAccept:
                 case MatchmakingScreenState.AcceptedWaitingForRoom:
-                    client.MatchmakingLeaveQueue().FireAndForget();
+                    controller.LeaveQueue();
                     return true;
 
                 case MatchmakingScreenState.InRoom:
@@ -280,7 +290,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                 Action = () =>
                                 {
                                     Debug.Assert(selectedPool.Value != null);
-                                    client.MatchmakingJoinQueue(selectedPool.Value.Id).FireAndForget();
+                                    controller.JoinQueue(selectedPool.Value);
                                 },
                                 Text = "Begin queueing",
                             }
@@ -317,7 +327,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                 Origin = Anchor.Centre,
                                 Width = 200,
                                 Text = "Stop queueing",
-                                Action = () => client.MatchmakingLeaveQueue().FireAndForget()
+                                Action = () => controller.LeaveQueue()
                             }
                         }
                     };
@@ -383,7 +393,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     };
 
                     using (BeginDelayedSequence(2000))
-                        Schedule(() => this.Push(new ScreenMatchmaking(client.Room!)));
+                    {
+                        Schedule(() =>
+                        {
+                            switch (poolType)
+                            {
+                                case MatchmakingPoolType.QuickPlay:
+                                    this.Push(new ScreenMatchmaking(client.Room!));
+                                    break;
+
+                                case MatchmakingPoolType.RankedPlay:
+                                    this.Push(new RankedPlayScreen(client.Room!));
+                                    break;
+                            }
+                        });
+                    }
+
                     break;
 
                 default:
