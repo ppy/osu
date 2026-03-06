@@ -10,14 +10,11 @@ namespace osu.Game.Screens.Select
 {
     public partial class BeatmapGroupDeleteDialog : DeletionDialog
     {
-        private readonly GroupDefinition group;
         private readonly IReadOnlyList<BeatmapSetInfo> beatmapSets;
 
         public BeatmapGroupDeleteDialog(GroupDefinition group, IReadOnlyList<BeatmapSetInfo> beatmapSets)
         {
-            this.group = group;
             this.beatmapSets = beatmapSets;
-
             BodyText = group.Title;
         }
 
