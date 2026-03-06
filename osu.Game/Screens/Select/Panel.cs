@@ -265,7 +265,12 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnClick(ClickEvent e)
         {
-            carousel?.Activate(Item!);
+            // Item may be set to null before actual `FreeAfterUse`.
+            // This is because Carousel knows to do this ahead of time and let the drawable fade/animate away.
+            // See https://github.com/ppy/osu/blob/033e13cb3b79e6195ddcd9f659b04095aa52fd2f/osu.Game/Graphics/Carousel/Carousel.cs#L1132-L1135.
+            if (item != null)
+                carousel?.Activate(item);
+
             return true;
         }
 
@@ -362,7 +367,8 @@ namespace osu.Game.Screens.Select
                 if (ReferenceEquals(item, value))
                     return;
 
-                // If a new item is set and we already have an item, this is a case of reuse.
+                // If a new item is set and we already have an item, this is a special case of reuse.
+                // See https://github.com/ppy/osu/blob/033e13cb3b79e6195ddcd9f659b04095aa52fd2f/osu.Game/Graphics/Carousel/Carousel.cs#L1071
                 // To keep things simple, assume that we need to do a full refresh.
                 //
                 // In the future, this could be more contextual and check whether the associated model has actually changed.

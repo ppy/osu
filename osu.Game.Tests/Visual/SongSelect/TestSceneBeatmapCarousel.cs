@@ -96,6 +96,23 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestClickExpiredPanel()
+        {
+            CreateCarousel();
+
+            AddStep("set eager loading very low", () =>
+            {
+                Carousel.DistanceOffscreenToPreload = -100;
+            });
+
+            AddBeatmaps(50, 10);
+
+            AddUntilStep("wait for panels", () => Carousel.ChildrenOfType<Panel>().Any());
+
+            AddRepeatStep("click last panel", () => Carousel.ChildrenOfType<Panel>().FirstOrDefault()?.TriggerClick(), 20);
+        }
+
+        [Test]
         public void TestHighChurnUpdatesStillShowsPanels()
         {
             ScheduledDelegate updateTask = null!;
