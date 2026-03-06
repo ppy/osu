@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double skillMultiplierAim => 65.2;
         private double skillMultiplierSpeed => 2.7;
-        private double skillMultiplierFlow => 16.5;
+        private double skillMultiplierFlow => 15.4;
         private double skillMultiplierTotal => 1.0;
         private double meanExponent => 1.2;
 

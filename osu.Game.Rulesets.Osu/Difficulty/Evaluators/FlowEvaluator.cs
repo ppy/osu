@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuCurrObj.AngleSigned != null && osuLast0Obj.AngleSigned != null && osuLast1Obj.AngleSigned != null)
             {
                 double acuteAngleBonus = CalculateFlowAcuteAngleBonus(current);
-                double angleChangeBonus = CalculateFlowAngleChangeBonus(current);
+                double angleChangeBonus = 0;//CalculateFlowAngleChangeBonus(current);
 
                 // If all three notes are overlapping - don't reward angle bonuses as you don't have to do additional movement
                 double overlappedNotesWeight = 1;
@@ -60,8 +60,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             flowDifficulty *= 1 + Math.Min(0.25, Math.Pow((Math.Max(osuCurrObj.AdjustedDeltaTime, osuLast0Obj.AdjustedDeltaTime) - Math.Min(osuCurrObj.AdjustedDeltaTime, osuLast0Obj.AdjustedDeltaTime)) / 50, 4));
 
             // Add all bonuses
-            //flowDifficulty *= 1 + angleBonus;
-            flowDifficulty *= Math.Sqrt(osuCurrObj.SmallCircleBonus);
+            flowDifficulty *= 1 + angleBonus;
+            flowDifficulty *= osuCurrObj.SmallCircleBonus;
 
             // Add in additional slider velocity bonus
             // In order for compensate for lack of slider velocity in base difficulty - increase this bonus
@@ -107,15 +107,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double currAngle = (double)osuCurrObj.Angle;
 
-            // Use d/t^2 velocity as a base
-            double bonusBase = osuCurrObj.JumpDistance * diameter / Math.Pow(osuCurrObj.AdjustedDeltaTime, 1);
+            double bonusBase = osuCurrObj.JumpDistance * diameter / osuCurrObj.AdjustedDeltaTime;
 
             double acuteAngleBonus = bonusBase * AimEvaluator.CalcAcuteAngleBonus(currAngle);
 
             // If spacing is too low - decrease reward
             acuteAngleBonus *= DifficultyCalculationUtils.ReverseLerp(osuCurrObj.JumpDistance, radius, diameter);
 
-            return acuteAngleBonus * 0.002;
+            return acuteAngleBonus * acute_angle_bonus_multiplier;
         }
 
         // This bonus accounts for flow aim being harder when angle is changing.
