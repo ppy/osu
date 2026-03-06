@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             flowDifficulty *= 1 + Math.Min(0.25, Math.Pow((Math.Max(osuCurrObj.AdjustedDeltaTime, osuLast0Obj.AdjustedDeltaTime) - Math.Min(osuCurrObj.AdjustedDeltaTime, osuLast0Obj.AdjustedDeltaTime)) / 50, 4));
 
             // Add all bonuses
-            flowDifficulty *= 1 + angleBonus;
+            //flowDifficulty *= 1 + angleBonus;
             flowDifficulty *= Math.Sqrt(osuCurrObj.SmallCircleBonus);
 
             // Add in additional slider velocity bonus
@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return flowDifficulty * 10;
         }
 
-        private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.03, Math.Pow(ms / 1000, 0.65)));
+        private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.03, Math.Pow(ms / 1000, 0.5)));
 
         private static double getOverlapness(OsuDifficultyHitObject odho1, OsuDifficultyHitObject odho2)
         {
