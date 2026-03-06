@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuCurrObj.AngleSigned != null && osuLast0Obj.AngleSigned != null && osuLast1Obj.AngleSigned != null)
             {
                 double acuteAngleBonus = CalculateFlowAcuteAngleBonus(current);
-                double angleChangeBonus = 0;//CalculateFlowAngleChangeBonus(current);
+                double angleChangeBonus = CalculateFlowAngleChangeBonus(current);
 
                 // If all three notes are overlapping - don't reward angle bonuses as you don't have to do additional movement
                 double overlappedNotesWeight = 1;
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Add all bonuses
             flowDifficulty *= 1 + angleBonus;
-            flowDifficulty *= osuCurrObj.SmallCircleBonus;
+            flowDifficulty *= Math.Pow(osuCurrObj.SmallCircleBonus, 1.5);
 
             // Add in additional slider velocity bonus
             // In order for compensate for lack of slider velocity in base difficulty - increase this bonus
@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double currAngle = (double)osuCurrObj.Angle;
 
-            double bonusBase = osuCurrObj.JumpDistance * diameter / osuCurrObj.AdjustedDeltaTime;
+            double bonusBase = osuCurrObj.JumpDistance / osuCurrObj.AdjustedDeltaTime;
 
             double acuteAngleBonus = bonusBase * AimEvaluator.CalcAcuteAngleBonus(currAngle);
 
@@ -141,14 +141,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double minVelocity = Math.Min(currVelocity, prevVelocity);
 
             // Adjust to d/t^2 to match evaluator scaling
-            double bonusBase = minVelocity * diameter / osuCurrObj.AdjustedDeltaTime;
+            double bonusBase = minVelocity / osuCurrObj.AdjustedDeltaTime;
 
             double angleChangeBonus = Math.Pow(Math.Sin((currAngle - lastAngle) / 2), 2) * bonusBase;
 
             // Take the largest of last 3 distances and if it's too small - decrease flow angle change bonus, because it's cheesable
             angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(Math.Max(osuCurrObj.JumpDistance, osuLast1Obj.JumpDistance), 0, diameter);
 
-            return angleChangeBonus * 0.002;
+            return angleChangeBonus * angle_change_bonus_multiplier;
         }
     }
 }

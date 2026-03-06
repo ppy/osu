@@ -28,28 +28,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             IncludeSliders = includeSliders;
         }
 
-        private double currentAimStrain;
-        private double currentSpeedStrain;
-        private double currentFlowStrain;
+        private double currentStrain;
 
         private double skillMultiplierAim => 65.2;
         private double skillMultiplierSpeed => 2.7;
-        private double skillMultiplierFlow => 15.4;
+        private double skillMultiplierFlow => 16.8;
         private double skillMultiplierTotal => 1.0;
         private double meanExponent => 1.2;
 
         private readonly List<double> sliderStrains = new List<double>();
 
-        private double strainDecayAim(double ms) => Math.Pow(0.15, ms / 1000);
-        private double strainDecaySpeed(double ms) => Math.Pow(0.3, ms / 1000);
+        private double strainDecay(double ms) => Math.Pow(0.15, ms / 1000);
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) =>
-            currentAimStrain * strainDecayAim(time - current.Previous(0).StartTime);
+            currentStrain * strainDecay(time - current.Previous(0).StartTime);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            double decayAim = strainDecayAim(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
-            double decaySpeed = strainDecaySpeed(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
+            double decayAim = strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
 
             double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierAim;
             double speedDifficulty = SpeedAimEvaluator.EvaluateDifficultyOf(current) * skillMultiplierSpeed;
@@ -68,21 +64,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double totalDifficulty = calcTotalValue(aimDifficulty, speedDifficulty, flowDifficulty);
 
-            currentAimStrain *= decayAim;
-            currentAimStrain += totalDifficulty * (1 - decayAim);
-
-            currentSpeedStrain *= decaySpeed;
-            currentSpeedStrain += speedDifficulty * (1 - decaySpeed);
-
-            currentFlowStrain *= decayAim;
-            currentFlowStrain += flowDifficulty * (1 - decayAim);
-
-            double totalStrain = currentAimStrain;//calcTotalValue(aimDifficulty, currentSpeedStrain, flowDifficulty);
+            currentStrain *= decayAim;
+            currentStrain += totalDifficulty * (1 - decayAim);
 
             if (current.BaseObject is Slider)
-                sliderStrains.Add(totalStrain);
+                sliderStrains.Add(currentStrain);
 
-            return totalStrain;
+            return currentStrain;
         }
 
         private double calcTotalValue(double snapDifficulty, double agilityDifficulty, double flowDifficulty)
