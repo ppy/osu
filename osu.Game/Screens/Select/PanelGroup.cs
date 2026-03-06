@@ -194,7 +194,7 @@ namespace osu.Game.Screens.Select
                     new OsuMenuItem(
                         SongSelectStrings.DeleteAllInGroup,
                         MenuItemType.Destructive,
-                        () => songSelect.DeleteGroup(group))
+                        () => songSelect.DeleteGroup((GroupDefinition)Item.Model))
                 };
             }
         }
