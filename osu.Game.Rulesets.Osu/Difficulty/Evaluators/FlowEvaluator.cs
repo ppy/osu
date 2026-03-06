@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
             // The reason why this exist in evaluator instead of FlowAim skill - it's because it's very important to keep flowaim in the same scaling as snapaim on evaluator level
-            double distance_exponent = 1.3;
+            double distance_exponent = 1.2;
 
             if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
                 return 0;
@@ -30,10 +30,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Rescale the distance
             // We use the power on normalized distance so we don't have to rebalance everything when changing the exponent
             double distance = withSliderTravelDistance ? osuCurrObj.LazyJumpDistance : osuCurrObj.JumpDistance;
-            distance = Math.Pow(distance, distance_exponent);
+            //distance = Math.Pow(distance, distance_exponent);
 
             // Calculate the base difficulty by using rescaled distance and time
-            double flowDifficulty = distance / Math.Pow(osuCurrObj.AdjustedDeltaTime, 1);
+            double flowDifficulty = distance / osuCurrObj.AdjustedDeltaTime;
 
             double angleBonus = 0;
 
@@ -56,6 +56,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 angleBonus = Math.Max(acuteAngleBonus, angleChangeBonus) * overlappedNotesWeight;
             }
+
+            flowDifficulty *= 1 + Math.Min(0.25, Math.Pow((Math.Max(osuCurrObj.AdjustedDeltaTime, osuLast0Obj.AdjustedDeltaTime) - Math.Min(osuCurrObj.AdjustedDeltaTime, osuLast0Obj.AdjustedDeltaTime)) / 50, 4));
 
             // Add all bonuses
             flowDifficulty *= 1 + angleBonus;

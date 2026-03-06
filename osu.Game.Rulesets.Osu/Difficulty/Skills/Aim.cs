@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double skillMultiplierAim => 65.2;
         private double skillMultiplierSpeed => 2.8;
-        private double skillMultiplierFlow => 3.1;
+        private double skillMultiplierFlow => 12.5;
         private double skillMultiplierTotal => 1.0;
         private double meanExponent => 1.2;
 
@@ -44,18 +44,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double strainDecaySpeed(double ms) => Math.Pow(0.3, ms / 1000);
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) =>
-            calcTotalValue(currentAimStrain * strainDecayAim(time - current.Previous(0).StartTime),
-                currentSpeedStrain * strainDecaySpeed(time - current.Previous(0).StartTime),
-                currentFlowStrain * strainDecayAim(time - current.Previous(0).StartTime));
+            currentAimStrain * strainDecayAim(time - current.Previous(0).StartTime);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             double decayAim = strainDecayAim(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
             double decaySpeed = strainDecaySpeed(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
 
-            double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders);
-            double speedDifficulty = SpeedAimEvaluator.EvaluateDifficultyOf(current);
-            double flowDifficulty = FlowAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders);
+            double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierAim;
+            double speedDifficulty = SpeedAimEvaluator.EvaluateDifficultyOf(current) * skillMultiplierSpeed;
+            double flowDifficulty = FlowAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierFlow;
 
             if (Mods.Any(m => m is OsuModTouchDevice))
             {
@@ -68,16 +66,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 speedDifficulty *= 0.0;
             }
 
+            double totalDifficulty = calcTotalValue(aimDifficulty, speedDifficulty, flowDifficulty);
+
             currentAimStrain *= decayAim;
-            currentAimStrain += aimDifficulty * (1 - decayAim) * skillMultiplierAim;
+            currentAimStrain += totalDifficulty * (1 - decayAim);
 
             currentSpeedStrain *= decaySpeed;
-            currentSpeedStrain += speedDifficulty * (1 - decaySpeed) * skillMultiplierSpeed;
+            currentSpeedStrain += speedDifficulty * (1 - decaySpeed);
 
             currentFlowStrain *= decayAim;
-            currentFlowStrain += flowDifficulty * (1 - decayAim) * skillMultiplierFlow;
+            currentFlowStrain += flowDifficulty * (1 - decayAim);
 
-            double totalStrain = calcTotalValue(currentAimStrain, currentSpeedStrain, currentFlowStrain);
+            double totalStrain = currentAimStrain;//calcTotalValue(aimDifficulty, currentSpeedStrain, flowDifficulty);
 
             if (current.BaseObject is Slider)
                 sliderStrains.Add(totalStrain);
@@ -85,15 +85,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return totalStrain;
         }
 
-        private double calcTotalValue(double currentAimStrain, double currentSpeedStrain, double currentFlowStrain)
+        private double calcTotalValue(double snapDifficulty, double agilityDifficulty, double flowDifficulty)
         {
-            double snapDifficulty = DifficultyCalculationUtils.Norm(meanExponent, currentAimStrain, currentSpeedStrain);
-            double flowDifficulty = currentFlowStrain;
+            double combinedSnapDifficulty = DifficultyCalculationUtils.Norm(meanExponent, snapDifficulty, agilityDifficulty);
 
-            double pSnap = ProbabilityOf(currentFlowStrain / snapDifficulty);
+            double pSnap = ProbabilityOf(flowDifficulty / combinedSnapDifficulty);
             double pFlow = 1 - pSnap;
 
-            double totalDifficulty = snapDifficulty * pSnap + flowDifficulty * pFlow;
+            double totalDifficulty = combinedSnapDifficulty * pSnap + flowDifficulty * pFlow;
 
             double totalStrain = totalDifficulty * skillMultiplierTotal;
 
