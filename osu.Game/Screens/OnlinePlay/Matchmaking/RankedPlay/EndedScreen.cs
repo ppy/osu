@@ -147,15 +147,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                         Direction = FillDirection.Horizontal,
                         Children = new Drawable[]
                         {
-                            new ShearedButton(100)
+                            new ShearedButton
                             {
+                                Width = 100,
                                 Text = "Quit",
                                 Action = () => ExitRequested?.Invoke(false),
                                 DarkerColour = colours.Red3,
                                 LighterColour = colours.Red4,
                             },
-                            new ShearedButton(200)
+                            new ShearedButton
                             {
+                                Width = 200,
                                 Text = "Play Again",
                                 Action = () => ExitRequested?.Invoke(true),
                                 DarkerColour = colours.Green3,

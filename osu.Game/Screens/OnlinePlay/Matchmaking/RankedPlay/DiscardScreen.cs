@@ -73,11 +73,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     CaptionColour = Color4.White,
                     Margin = new MarginPadding { Top = 60 },
                 },
-                discardButton = new ShearedButton(width: 150)
+                discardButton = new ShearedButton
                 {
                     Name = "Discard Button",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Width = 150,
                     Action = onDiscardButtonClicked,
                     Enabled = { Value = true },
                 }

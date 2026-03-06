@@ -268,11 +268,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
                         Child = fullInputArea = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Child = PlayButton = new ShearedButton(width: 90f, height: 30f)
+                            Child = PlayButton = new ShearedButton
                             {
                                 Name = "Play Button",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
+                                Size = new Vector2(90, 30),
                                 Text = "Play",
                                 TextSize = 14,
                                 LighterColour = Colour4.FromHex("87D8FA"),
