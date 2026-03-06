@@ -172,29 +172,17 @@ namespace osu.Game.Screens.Select
                 if (Item == null)
                     return Array.Empty<MenuItem>();
 
-                var group = (GroupDefinition)Item.Model;
-
-                var expandItem = new OsuMenuItem(
-                    Expanded.Value ? WebCommonStrings.ButtonsCollapse.ToSentence() : WebCommonStrings.ButtonsExpand.ToSentence(),
-                    MenuItemType.Highlighted,
-                    () => TriggerClick());
-
-                if (songSelect == null)
-                {
-                    return new MenuItem[]
-                    {
-                        expandItem
-                    };
-                }
-
                 return new MenuItem[]
                 {
-                    expandItem,
+                    new OsuMenuItem(
+                        Expanded.Value ? WebCommonStrings.ButtonsCollapse.ToSentence() : WebCommonStrings.ButtonsExpand.ToSentence(),
+                        MenuItemType.Highlighted,
+                        () => TriggerClick()),
                     new OsuMenuItemSpacer(),
                     new OsuMenuItem(
                         SongSelectStrings.DeleteAllInGroup,
                         MenuItemType.Destructive,
-                        () => songSelect.DeleteGroup((GroupDefinition)Item.Model))
+                        () => songSelect?.DeleteGroup((GroupDefinition)Item.Model))
                 };
             }
         }
