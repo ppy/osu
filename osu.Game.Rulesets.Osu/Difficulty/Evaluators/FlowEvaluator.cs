@@ -18,8 +18,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
             // The reason why this exist in evaluator instead of FlowAim skill - it's because it's very important to keep flowaim in the same scaling as snapaim on evaluator level
-            const double flow_multiplier = 6.05;
-            const double distance_exponent = 1.5;
+            double distance_exponent = 1.25;
 
             if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
                 return 0;
@@ -60,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Add all bonuses
             flowDifficulty += angleBonus;
-            flowDifficulty *= flow_multiplier * Math.Sqrt(osuCurrObj.SmallCircleBonus);
+            flowDifficulty *= Math.Sqrt(osuCurrObj.SmallCircleBonus);
 
             // Add in additional slider velocity bonus
             // In order for compensate for lack of slider velocity in base difficulty - increase this bonus
