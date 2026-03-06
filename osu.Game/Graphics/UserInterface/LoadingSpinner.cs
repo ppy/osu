@@ -49,9 +49,6 @@ namespace osu.Game.Graphics.UserInterface
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            // Font awesome icon isn't centered perfectly.
-            Vector2 spinnerActualCentre = new Vector2(29.78f, 29.78f);
-
             if (withBox)
             {
                 Child = MainContents = new Container
@@ -84,7 +81,6 @@ namespace osu.Game.Graphics.UserInterface
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Custom,
-                            OriginPosition = spinnerActualCentre,
                             Colour = inverted ? Color4.Black : Color4.White,
                             Scale = new Vector2(0.6f),
                             RelativeSizeAxes = Axes.Both,
@@ -108,7 +104,6 @@ namespace osu.Game.Graphics.UserInterface
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Custom,
-                                OriginPosition = spinnerActualCentre,
                                 Colour = inverted ? Color4.Black : Color4.White,
                                 RelativeSizeAxes = Axes.Both,
                                 Icon = FontAwesome.Solid.CircleNotch
@@ -153,6 +148,9 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
+
+            // Font awesome icon isn't centered perfectly.
+            spinner.OriginPosition = spinner.DrawSize * 0.4963333333f;
 
             if (withBox)
             {
