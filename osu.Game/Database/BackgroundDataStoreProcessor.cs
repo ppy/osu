@@ -96,6 +96,7 @@ namespace osu.Game.Database
                 upgradeScoreRanks();
                 backpopulateMissingSubmissionAndRankDates();
                 backpopulateUserTags();
+                populateHasLocalReplay();
             }, TaskCreationOptions.LongRunning).ContinueWith(t =>
             {
                 if (t.Exception?.InnerException is ObjectDisposedException)
@@ -734,6 +735,97 @@ namespace osu.Game.Database
 
             completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
             config.SetValue(OsuSetting.LastOnlineTagsPopulation, metadataSourceFetchDate);
+        }
+
+        private void populateHasLocalReplay()
+        {
+            Logger.Log("Querying for scores with unpopulated HasLocalReplay...");
+
+            HashSet<Guid> scoreIds = new HashSet<Guid>();
+
+            realmAccess.Run(r =>
+            {
+                foreach (var score in r.All<ScoreInfo>().Where(s => s.HasLocalReplay == null))
+                    scoreIds.Add(score.ID);
+            });
+
+            if (scoreIds.Count == 0)
+                return;
+
+            Logger.Log($"Found {scoreIds.Count} scores which require HasLocalReplay population.");
+
+            var notification = showProgressNotification(scoreIds.Count, "Checking replay availability for scores", "scores have been checked for replay availability");
+
+            int processedCount = 0;
+            int failedCount = 0;
+
+            // Create file store for reading replay files
+            var files = new RealmFileStore(realmAccess, storage);
+
+            foreach (var id in scoreIds)
+            {
+                if (notification?.State == ProgressNotificationState.Cancelled)
+                    break;
+
+                updateNotificationProgress(notification, processedCount, scoreIds.Count);
+
+                sleepIfRequired();
+
+                try
+                {
+                    // First, get the score info and replay file path outside of the write transaction
+                    string? replayFilePath = null;
+
+                    realmAccess.Run(r =>
+                    {
+                        var score = r.Find<ScoreInfo>(id);
+                        replayFilePath = score?.Files.FirstOrDefault(f => f.Filename.EndsWith(".osr", StringComparison.OrdinalIgnoreCase))?.File.GetStoragePath();
+                    });
+
+                    bool hasReplay = false;
+
+                    if (replayFilePath != null)
+                    {
+                        try
+                        {
+                            using (var stream = files.Store.GetStream(replayFilePath))
+                            {
+                                if (stream != null)
+                                {
+                                    var decoded = new DatabasedLegacyScoreDecoder(rulesetStore, beatmapManager).Parse(stream);
+                                    hasReplay = decoded.Replay?.Frames.Count > 0;
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log($"Failed to decode replay for score {id}: {ex.Message}");
+                            hasReplay = false;
+                        }
+                    }
+
+                    realmAccess.Write(r =>
+                    {
+                        var score = r.Find<ScoreInfo>(id);
+
+                        if (score != null)
+                            score.HasLocalReplay = hasReplay;
+                    });
+
+                    ++processedCount;
+                }
+                catch (ObjectDisposedException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Failed to populate HasLocalReplay for score {id}: {e}");
+                    ++failedCount;
+                }
+            }
+
+            completeNotification(notification, processedCount, scoreIds.Count, failedCount);
         }
 
         private void updateNotificationProgress(ProgressNotification? notification, int processedCount, int totalCount)
