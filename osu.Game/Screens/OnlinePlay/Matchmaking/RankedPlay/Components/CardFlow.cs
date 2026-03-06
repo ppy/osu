@@ -6,9 +6,10 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
 using osuTK;
 
-namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
+namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 {
     /// <summary>
     /// Container that arranges a collection of <see cref="RankedPlayCard"/>s horizontally.
@@ -17,7 +18,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
     /// <remarks>
     /// Drawables are expected to be added to this container with an Anchor/Origin of <see cref="Anchor.Centre"/>.
     /// </remarks>
-    public partial class CardRow : Container<RankedPlayCard>
+    public partial class CardFlow : Container<RankedPlayCard>
     {
         public float Spacing = 20;
 

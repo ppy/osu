@@ -12,7 +12,8 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
-using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.RankedPlay
@@ -124,20 +125,20 @@ namespace osu.Game.Tests.Visual.RankedPlay
 
             AddStep("add cards", () =>
             {
-                PlayerCardHand cardHand;
+                PlayerHandOfCards handOfCards;
 
-                Child = cardHand = new PlayerCardHand
+                Child = handOfCards = new PlayerHandOfCards
                 {
                     RelativeSizeAxes = Axes.Both,
                     Size = new Vector2(0.5f),
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    SelectionMode = CardSelectionMode.Single
+                    SelectionMode = HandSelectionMode.Single
                 };
 
                 foreach (var beatmap in requestHandler.Beatmaps)
                 {
-                    cardHand.AddCard(new RevealedRankedPlayCardWithPlaylistItem(beatmap));
+                    handOfCards.AddCard(new RevealedRankedPlayCardWithPlaylistItem(beatmap));
                 }
             });
         }

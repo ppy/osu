@@ -5,12 +5,12 @@ using System;
 using System.Collections.Generic;
 using osu.Game.Online.RankedPlay;
 
-namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
+namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 {
     /// <summary>
     /// Card hand representing the opponent's current hand, intended to be placed at the top edge of the screen.
     /// </summary>
-    public partial class OpponentCardHand : CardHand
+    public partial class OpponentHandOfCards : HandOfCards
     {
         protected override bool Flipped => true;
 

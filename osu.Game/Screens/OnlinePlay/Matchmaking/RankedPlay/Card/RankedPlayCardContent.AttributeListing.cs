@@ -15,7 +15,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osuTK;
 
-namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
+namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 {
     public partial class RankedPlayCardContent
     {

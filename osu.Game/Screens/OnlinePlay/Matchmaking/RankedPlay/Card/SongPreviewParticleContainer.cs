@@ -13,7 +13,7 @@ using osu.Framework.Utils;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
+namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 {
     public partial class SongPreviewParticleContainer : CompositeDrawable
     {

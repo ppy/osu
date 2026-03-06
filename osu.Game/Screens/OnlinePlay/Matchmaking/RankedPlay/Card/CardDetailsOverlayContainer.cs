@@ -14,7 +14,7 @@ using osu.Game.Overlays;
 using osu.Game.Screens.Ranking;
 using osuTK;
 
-namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
+namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 {
     [Cached]
     public partial class CardDetailsOverlayContainer : Container

@@ -13,8 +13,9 @@ using osu.Game.Audio;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.RankedPlay;
-using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
@@ -24,10 +25,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         // When the 'time running out' warning sample starts to play (in remaining seconds)
         private const int warning_time_threshold = 10;
 
-        public CardRow CenterRow { get; private set; } = null!;
+        public CardFlow CenterRow { get; private set; } = null!;
 
-        private PlayerCardHand playerHand = null!;
-        private OpponentCardHand opponentHand = null!;
+        private PlayerHandOfCards playerHand = null!;
+        private OpponentHandOfCards opponentHand = null!;
 
         [Resolved]
         private RankedPlayMatchInfo matchInfo { get; set; } = null!;
@@ -58,7 +59,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
             Children =
             [
-                CenterRow = new CardRow
+                CenterRow = new CardFlow
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
@@ -74,16 +75,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
             CenterColumn.Children =
             [
-                playerHand = new PlayerCardHand
+                playerHand = new PlayerHandOfCards
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
-                    SelectionMode = CardSelectionMode.Single,
+                    SelectionMode = HandSelectionMode.Single,
                     PlayCardAction = onPlayButtonClicked
                 },
-                opponentHand = new OpponentCardHand
+                opponentHand = new OpponentHandOfCards
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -91,8 +92,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     Height = 0.5f,
                     Y = -100,
                 },
-                new CardHandReplayRecorder(playerHand),
-                new CardHandReplayPlayer(opponentHand),
+                new HandReplayRecorder(playerHand),
+                new HandReplayPlayer(matchInfo.OpponentId, opponentHand),
             ];
 
             cardAddSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/card-add-1");
@@ -211,7 +212,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             if (selection != null)
             {
                 hasPlayedCard = true;
-                playerHand.SelectionMode = CardSelectionMode.Disabled;
+                playerHand.SelectionMode = HandSelectionMode.Disabled;
 
                 Client.PlayCard(selection.Card).FireAndForget();
             }
@@ -250,7 +251,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             opponentHand.Contract();
             playerHand.Contract();
 
-            playerHand.SelectionMode = CardSelectionMode.Disabled;
+            playerHand.SelectionMode = HandSelectionMode.Disabled;
         }
 
         protected override void Dispose(bool isDisposing)

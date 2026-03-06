@@ -18,8 +18,9 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.RankedPlay;
-using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand;
 using osuTK;
 using osuTK.Graphics;
 
@@ -30,9 +31,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         // When the 'time running out' warning sample starts to play (in remaining seconds)
         private const int warning_time_threshold = 10;
 
-        public CardRow CenterRow { get; private set; } = null!;
+        public CardFlow CenterRow { get; private set; } = null!;
 
-        private PlayerCardHand playerHand = null!;
+        private PlayerHandOfCards playerHand = null!;
         private ShearedButton discardButton = null!;
         private OsuTextFlowContainer explainer = null!;
 
@@ -60,7 +61,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
             Children =
             [
-                CenterRow = new CardRow
+                CenterRow = new CardFlow
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
@@ -86,13 +87,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
             CenterColumn.Children =
             [
-                playerHand = new PlayerCardHand
+                playerHand = new PlayerHandOfCards
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
-                    SelectionMode = CardSelectionMode.Multiple,
+                    SelectionMode = HandSelectionMode.Multiple,
                 },
                 explainer = new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 24))
                 {
@@ -217,7 +218,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             discardButton.Hide();
 
             Client.DiscardCards(playerHand.Selection.Select(it => it.Card).ToArray()).FireAndForget();
-            playerHand.SelectionMode = CardSelectionMode.Disabled;
+            playerHand.SelectionMode = HandSelectionMode.Disabled;
         }
 
         private readonly List<RankedPlayCardWithPlaylistItem> discardedCards = new List<RankedPlayCardWithPlaylistItem>();

@@ -7,7 +7,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Online.API;
-using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.RankedPlay
@@ -26,9 +27,9 @@ namespace osu.Game.Tests.Visual.RankedPlay
 
             AddStep("add cards", () =>
             {
-                PlayerCardHand cardHand;
+                PlayerHandOfCards handOfCards;
 
-                Child = cardHand = new PlayerCardHand
+                Child = handOfCards = new PlayerHandOfCards
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomCentre,
@@ -38,7 +39,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
 
                 foreach (var beatmap in requestHandler.Beatmaps.Take(3))
                 {
-                    cardHand.AddCard(new RevealedRankedPlayCardWithPlaylistItem(beatmap), handCard =>
+                    handOfCards.AddCard(new RevealedRankedPlayCardWithPlaylistItem(beatmap), handCard =>
                     {
                         handCard.Card.SongPreviewEnabled.BindTarget = previewEnabled;
                     });

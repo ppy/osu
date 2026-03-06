@@ -18,7 +18,7 @@ using osu.Game.Online.Rooms;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
+namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 {
     [Cached]
     public partial class RankedPlayCard : CompositeDrawable

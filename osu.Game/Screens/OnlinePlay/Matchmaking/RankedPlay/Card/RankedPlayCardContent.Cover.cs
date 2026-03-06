@@ -10,7 +10,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 
-namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
+namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 {
     public partial class RankedPlayCardContent
     {

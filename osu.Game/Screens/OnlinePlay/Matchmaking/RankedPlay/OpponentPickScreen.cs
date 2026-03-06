@@ -11,18 +11,19 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
-using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 {
     public partial class OpponentPickScreen : RankedPlaySubScreen
     {
-        public CardRow CenterRow { get; private set; } = null!;
+        public CardFlow CenterRow { get; private set; } = null!;
 
-        private PlayerCardHand playerHand = null!;
-        private OpponentCardHand opponentHand = null!;
+        private PlayerHandOfCards playerHand = null!;
+        private OpponentHandOfCards opponentHand = null!;
 
         [Resolved]
         private RankedPlayMatchInfo matchInfo { get; set; } = null!;
@@ -39,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
             Children =
             [
-                CenterRow = new CardRow
+                CenterRow = new CardFlow
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
@@ -55,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
             CenterColumn.Children =
             [
-                playerHand = new PlayerCardHand
+                playerHand = new PlayerHandOfCards
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
@@ -64,15 +65,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     Y = 100,
                     HoverYOffset = 90
                 },
-                opponentHand = new OpponentCardHand
+                opponentHand = new OpponentHandOfCards
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
                 },
-                new CardHandReplayRecorder(playerHand),
-                new CardHandReplayPlayer(opponentHand),
+                new HandReplayRecorder(playerHand),
+                new HandReplayPlayer(matchInfo.OpponentId, opponentHand),
             ];
 
             cardPlaySamples = new Sample?[card_play_samples];

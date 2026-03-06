@@ -16,7 +16,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osuTK;
 
-namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
+namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 {
     public partial class RankedPlayCardContent : CompositeDrawable, IHasContextMenu
     {

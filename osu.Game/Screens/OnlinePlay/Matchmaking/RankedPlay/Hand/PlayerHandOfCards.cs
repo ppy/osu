@@ -8,22 +8,19 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.RankedPlay;
-using osuTK;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
 using osuTK.Input;
 
-namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
+namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 {
     /// <summary>
     /// Card hand representing the player's current hand, intended to be placed at the bottom edge of the screen.
     /// This version of the card hand reacts to player inputs like hovering a card.
     /// </summary>
-    public partial class PlayerCardHand : CardHand
+    public partial class PlayerHandOfCards : HandOfCards
     {
         /// <summary>
         /// Fired if any card is selected or deselected
@@ -31,27 +28,27 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
         public event Action? SelectionChanged;
 
         /// <summary>
-        /// Fired if a card's <see cref="CardHand.HandCard.State"/> has changed
+        /// Fired if a card's <see cref="HandOfCards.HandCard.State"/> has changed
         /// </summary>
         public event Action? StateChanged;
 
-        private CardSelectionMode selectionMode;
+        private HandSelectionMode selectionMode;
 
         /// <summary>
         /// Current selection mode.
         /// </summary>
         /// <remarks>
-        /// <see cref="CardSelectionMode.Disabled"/> will disable some of the card's mouse interactions.
+        /// <see cref="HandSelectionMode.Disabled"/> will disable some of the card's mouse interactions.
         /// </remarks>
-        public CardSelectionMode SelectionMode
+        public HandSelectionMode SelectionMode
         {
             get => selectionMode;
             set
             {
                 selectionMode = value;
-                allowSelection.Value = value != CardSelectionMode.Disabled;
+                allowSelection.Value = value != HandSelectionMode.Disabled;
 
-                if (value == CardSelectionMode.Disabled)
+                if (value == HandSelectionMode.Disabled)
                 {
                     foreach (var card in Cards)
                         card.Selected = false;
@@ -112,12 +109,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
 
         private void cardClicked(PlayerHandCard card)
         {
-            if (selectionMode == CardSelectionMode.Disabled)
+            if (selectionMode == HandSelectionMode.Disabled)
                 return;
 
             try
             {
-                if (selectionMode == CardSelectionMode.Single)
+                if (selectionMode == HandSelectionMode.Single)
                 {
                     // only play feedback SFX if the selected card has changed
                     if (!card.Selected)
@@ -162,7 +159,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
                     return true;
 
                 case Key.Space:
-                    if (selectionMode == CardSelectionMode.Disabled)
+                    if (selectionMode == HandSelectionMode.Disabled)
                         return false;
 
                     if (Cards.FirstOrDefault(it => it.HasFocus) is not PlayerHandCard card)
@@ -193,7 +190,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
 
             // default behaviour is to start from either end of the cards if no card is focused currently
             // in single-selection mode we can however use the current selection as a fallback index if there's no focus
-            if (selectionMode == CardSelectionMode.Single && currentIndex == -1)
+            if (selectionMode == HandSelectionMode.Single && currentIndex == -1)
                 currentIndex = Cards.ToList().FindIndex(c => c.Selected);
 
             int newIndex = currentIndex + direction;
@@ -215,159 +212,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
 
             GetContainingFocusManager()?.ChangeFocus(card);
 
-            if (SelectionMode == CardSelectionMode.Single && !card.Selected)
+            if (SelectionMode == HandSelectionMode.Single && !card.Selected)
                 card.TriggerClick();
-        }
-
-        public partial class PlayerHandCard : HandCard
-        {
-            private Action? playAction;
-
-            public Action? PlayAction
-            {
-                get => playAction;
-                set
-                {
-                    playAction = value;
-                    PlayButton.Action = value;
-                    updatePlayButtonVisibility();
-                }
-            }
-
-            public required Action<PlayerHandCard> Clicked;
-
-            public required IBindable<bool> AllowSelection;
-
-            private readonly Drawable cardInputArea;
-            private readonly Drawable fullInputArea;
-
-            public readonly ShearedButton PlayButton;
-
-            public PlayerHandCard(RankedPlayCard card)
-                : base(card)
-            {
-                AddRangeInternal(new Drawable[]
-                {
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding(-10)
-                        {
-                            // card moves upwards on hover which can produce jitter if the hitbox doesn't extend all the way to the bottom of the screen
-                            Bottom = -50
-                        },
-                        Child = cardInputArea = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                    },
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Top = -40 },
-                        Child = fullInputArea = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Child = PlayButton = new ShearedButton
-                            {
-                                Name = "Play Button",
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Size = new Vector2(90, 30),
-                                Text = "Play",
-                                TextSize = 14,
-                                LighterColour = Colour4.FromHex("87D8FA"),
-                                DarkerColour = Colour4.FromHex("72D5FF")
-                            }
-                        }
-                    }
-                });
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                AddInternal(new HoverSounds());
-            }
-
-            protected override void OnStateChanged(ValueChangedEvent<RankedPlayCardState> state)
-            {
-                base.OnStateChanged(state);
-                updatePlayButtonVisibility();
-            }
-
-            private void updatePlayButtonVisibility()
-            {
-                PlayButton.Alpha = PlayButton.Action != null && Selected ? 1 : 0;
-            }
-
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
-            {
-                if (PlayButton.Alpha > 0)
-                    return fullInputArea.ReceivePositionalInputAt(screenSpacePos);
-
-                // input events are handled for an area that's slightly larger than the actual card so the cursor always hovers a card when moving over a gap between two cards
-                return cardInputArea.ReceivePositionalInputAt(screenSpacePos);
-            }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                CardHovered = true;
-
-                return true;
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                CardHovered = false;
-            }
-
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                if (e.Button == MouseButton.Left && AllowSelection.Value)
-                {
-                    CardPressed = true;
-
-                    return true;
-                }
-
-                return false;
-            }
-
-            protected override void OnMouseUp(MouseUpEvent e)
-            {
-                if (e.Button == MouseButton.Left)
-                    CardPressed = false;
-            }
-
-            protected override bool OnClick(ClickEvent e)
-            {
-                if (!AllowSelection.Value)
-                    return false;
-
-                Clicked(this);
-
-                return true;
-            }
-
-            public override bool AcceptsFocus => true;
-
-            public override bool ChangeFocusOnClick => false;
-
-            protected override void OnFocus(FocusEvent e)
-            {
-                base.OnFocus(e);
-
-                CardHovered = true;
-            }
-
-            protected override void OnFocusLost(FocusLostEvent e)
-            {
-                base.OnFocusLost(e);
-
-                CardHovered = false;
-            }
         }
     }
 }

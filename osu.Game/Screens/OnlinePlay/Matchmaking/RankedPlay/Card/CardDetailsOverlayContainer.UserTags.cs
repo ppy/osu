@@ -13,7 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Ranking;
 using osuTK;
 
-namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Cards
+namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 {
     public partial class CardDetailsOverlayContainer
     {
