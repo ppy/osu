@@ -1046,6 +1046,174 @@ namespace osu.Game.Tests.Visual.Editing
             }
         }
 
+        [Test]
+        public void TestAddSoundBeforeSettingNonAutoAdditionBankOnSelectedObject()
+        {
+            AddStep("select first object", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.Clear();
+                EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[0]);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+
+            AddStep("add finish sound", () => InputManager.Key(Key.E));
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasAutoAdditionBankFlag(0, true);
+
+            AddStep("set drum addition bank", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasAutoAdditionBankFlag(0, false);
+        }
+
+        [Test]
+        public void TestAddSoundAfterSettingNonAutoAdditionBankOnSelectedObject()
+        {
+            AddStep("select first object", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.Clear();
+                EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[0]);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+
+            AddStep("set drum addition bank", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+
+            AddStep("add finish sound", () => InputManager.Key(Key.E));
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasAutoAdditionBankFlag(0, false);
+        }
+
+        [Test]
+        public void TestSwitchSoundAfterSettingNonAutoAdditionBankOnSelectedObject()
+        {
+            AddStep("select first object", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.Clear();
+                EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[0]);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+
+            AddStep("set drum addition bank", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+
+            AddStep("add finish sound", () => InputManager.Key(Key.E));
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasAutoAdditionBankFlag(0, false);
+
+            AddStep("remove finish sound", () => InputManager.Key(Key.E));
+            AddStep("add whistle sound", () => InputManager.Key(Key.W));
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_WHISTLE);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasAutoAdditionBankFlag(0, false);
+        }
+
+        [Test]
+        public void TestAddSoundBeforeSettingAutoAdditionBankOnSelectedObject()
+        {
+            AddStep("select first object", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.Clear();
+                EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[0]);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+
+            AddStep("add finish sound", () => InputManager.Key(Key.E));
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasAutoAdditionBankFlag(0, true);
+
+            AddStep("set auto addition bank", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasAutoAdditionBankFlag(0, true);
+
+            AddStep("set drum normal bank", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasAutoAdditionBankFlag(0, true);
+        }
+
+        [Test]
+        public void TestAddSoundAfterSettingAutoAdditionBankOnSelectedObject()
+        {
+            AddStep("select first object", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.Clear();
+                EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[0]);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+
+            AddStep("set auto addition bank", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+
+            AddStep("add finish sound", () => InputManager.Key(Key.E));
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasAutoAdditionBankFlag(0, true);
+
+            AddStep("set drum normal bank", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasAutoAdditionBankFlag(0, true);
+        }
+
         private void clickSamplePiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} sample piece", () =>
         {
             var samplePiece = this.ChildrenOfType<SamplePointPiece>().Single(piece => piece is not NodeSamplePointPiece && piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
