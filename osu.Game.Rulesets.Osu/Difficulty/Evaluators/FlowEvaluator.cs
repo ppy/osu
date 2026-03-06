@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             flowDifficulty *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
 
-            return flowDifficulty * 10;
+            return flowDifficulty * 10 * DifficultyCalculationUtils.Smootherstep(distance, 0, diameter);
         }
 
         private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.03, Math.Pow(ms / 1000, 0.5)));
