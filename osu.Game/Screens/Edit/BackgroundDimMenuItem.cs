@@ -24,6 +24,7 @@ namespace osu.Game.Screens.Edit
                 createMenuItem(0.25f),
                 createMenuItem(0.5f),
                 createMenuItem(0.75f),
+                createMenuItem(1),
             };
 
             this.backgroundDim = backgroundDim;
