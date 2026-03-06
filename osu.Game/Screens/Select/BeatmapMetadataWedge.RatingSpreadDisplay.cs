@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Select
 {
     public partial class BeatmapMetadataWedge
     {
-        private partial class RatingSpreadDisplay : CompositeDrawable
+        public partial class RatingSpreadDisplay : CompositeDrawable
         {
             private const float min_height = 4f;
             private const float max_height = 32f;

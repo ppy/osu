@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Select
 {
     public partial class BeatmapMetadataWedge
     {
-        private partial class SuccessRateDisplay : CompositeDrawable, IHasTooltip
+        public partial class SuccessRateDisplay : CompositeDrawable, IHasTooltip
         {
             private readonly OsuSpriteText valueText;
             private readonly Circle backgroundBar;

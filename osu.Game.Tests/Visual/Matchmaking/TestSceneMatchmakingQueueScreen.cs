@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Matchmaking;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Intro;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
 using osu.Game.Tests.Visual.Multiplayer;
@@ -26,7 +27,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             base.SetUpSteps();
 
-            AddStep("load screen", () => LoadScreen(new ScreenIntro()));
+            AddStep("load screen", () => LoadScreen(new ScreenIntro(MatchmakingPoolType.QuickPlay)));
         }
 
         [Test]

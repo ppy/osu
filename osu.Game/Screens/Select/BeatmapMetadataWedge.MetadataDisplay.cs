@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Select
 {
     public partial class BeatmapMetadataWedge
     {
-        private partial class MetadataDisplay : FillFlowContainer
+        public partial class MetadataDisplay : FillFlowContainer
         {
             private readonly OsuSpriteText labelText;
             private readonly OsuSpriteText contentText;
