@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (Mods.Any(m => m is OsuModTouchDevice))
             {
-                aimDifficulty = Math.Pow(aimDifficulty, 0.8);
+                aimDifficulty = Math.Pow(aimDifficulty, 0.75);
                 speedDifficulty = Math.Pow(speedDifficulty, 0.95);
             }
 
