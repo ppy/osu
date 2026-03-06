@@ -115,6 +115,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// Calculated as the angle between the circles (current-2, current-1, current).
         /// </summary>
         public double? Angle { get; private set; }
+        public double? AngleSigned { get; private set; }
 
         /// <summary>
         /// Selective bonus for maps with higher circle size.
@@ -259,7 +260,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double angle = calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition);
                 double sliderAngle = calculateSliderAngle(lastDifficultyObject!, lastLastCursorPosition);
 
-                Angle = Math.Min(angle, sliderAngle);
+                AngleSigned = Math.Abs(angle) <= Math.Abs(sliderAngle) ? angle : sliderAngle;
+                Angle = Math.Abs((double)AngleSigned);
             }
         }
 
