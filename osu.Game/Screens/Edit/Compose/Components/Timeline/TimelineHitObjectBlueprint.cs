@@ -415,11 +415,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 foreach (var item in selectionItems)
                 {
-                    if (item == hitObject) continue;
+                    if (item == hitObject || item is not IHasDuration durationItem) continue;
 
-                    var durationItem = item as IHasDuration;
-
-                    if (Precision.AlmostEquals(durationItem!.Duration, (hitObject as IHasDuration)!.Duration, 1) &&
+                    if (Precision.AlmostEquals(durationItem.Duration, (hitObject as IHasDuration)!.Duration, 1) &&
                         Precision.AlmostEquals(item.StartTime, hitObject!.StartTime, 1))
                     {
                         objsToAdjust.Add(item);

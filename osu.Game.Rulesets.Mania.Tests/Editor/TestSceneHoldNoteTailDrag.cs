@@ -300,6 +300,40 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             );
         }
 
+        [Test]
+        public void TestDragHoldNoteWithNotes()
+        {
+            AddStep("Add notes", () =>
+            {
+                EditorBeatmap.AddRange([
+                    new HoldNote { StartTime = 2170, Duration = 937.5, Column = 0 },
+                    new Note { StartTime = 2170, Column = 1 },
+                    new Note { StartTime = 3107.5, Column = 2 },
+                    new HoldNote { StartTime = 2170, Duration = 937.5, Column = 3 }
+                ]);
+            });
+
+            AddStep("Select all", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects);
+            });
+
+            AddStep("Drag tail", () =>
+            {
+                var blueprintDragArea = this.ChildrenOfType<DragArea>().First();
+                dragBackward(blueprintDragArea);
+            });
+
+            AddStep("Release tail", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddAssert("Both durations are lower", () =>
+                {
+                    var holdNotes = EditorBeatmap.HitObjects.OfType<HoldNote>();
+                    return holdNotes.First().Duration < 937.5f && holdNotes.Last().Duration < 937.5f;
+                }
+            );
+        }
+
         private void dragForward(DragArea dragArea)
         {
             InputManager.MoveMouseTo(dragArea);
