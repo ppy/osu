@@ -34,8 +34,6 @@ namespace osu.Game.Screens.Select
 
         protected const float DURATION = 400;
 
-        public override bool HandlePositionalInput => Item != null;
-
         protected float PanelXOffset { get; init; }
 
         private Container backgroundContainer = null!;
@@ -267,7 +265,12 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnClick(ClickEvent e)
         {
-            carousel?.Activate(Item!);
+            // Item may be set to null before actual `FreeAfterUse`.
+            // This is because Carousel knows to do this ahead of time and let the drawable fade/animate away.
+            // See https://github.com/ppy/osu/blob/033e13cb3b79e6195ddcd9f659b04095aa52fd2f/osu.Game/Graphics/Carousel/Carousel.cs#L1132-L1135.
+            if (item != null)
+                carousel?.Activate(item);
+
             return true;
         }
 
