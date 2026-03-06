@@ -117,7 +117,7 @@ needs_cleanup: true
         }
 
         [Test]
-        public void TestOutdatedNoticeBoxWithComments()
+        public void TestOutdatedNoticeBoxWithSuffixComments()
         {
             AddStep("Add outdated yaml with comments", () =>
             {
@@ -136,7 +136,7 @@ outdated: true  # not sure about the format for ""list of mods"".
             {
                 markdownContainer.Text = @"---
 #outdated: true
-# stub: true
+# outdated: true
 ---";
             });
 
