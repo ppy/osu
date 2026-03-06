@@ -20,6 +20,7 @@ using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Users;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -160,10 +161,6 @@ namespace osu.Game.Screens.Play
                     else
                         GameplayClockContainer.Stop();
                     return true;
-
-                case >= GlobalAction.JumpReplay0 and <= GlobalAction.JumpReplay9:
-                    JumpReplayTo(e.Action - GlobalAction.JumpReplay0);
-                    return true;
             }
 
             return false;
@@ -191,11 +188,17 @@ namespace osu.Game.Screens.Play
             Seek(target);
         }
 
-        public void JumpReplayTo(int digit)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            double target = (digit / 10.0) * GameplayState.Beatmap.GetLastObjectTime();
+            if (e.Key >= Key.Number0 && e.Key <= Key.Number9)
+            {
+                int digit = e.Key - Key.Number0;
+                double target = (digit / 10.0) * GameplayState.Beatmap.GetLastObjectTime();
 
-            Seek(target);
+                Seek(target);
+            }
+
+            return true;
         }
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
