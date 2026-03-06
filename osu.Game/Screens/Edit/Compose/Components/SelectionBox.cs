@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (canReverse == value) return;
 
                 canReverse = value;
-                recreate();
+                recreateButtons();
             }
         }
 
@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (canFlipX == value) return;
 
                 canFlipX = value;
-                recreate();
+                recreateButtons();
             }
         }
 
@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (canFlipY == value) return;
 
                 canFlipY = value;
-                recreate();
+                recreateButtons();
             }
         }
 
@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         }
 
         private SelectionBoxDragHandleContainer dragHandles = null!;
-        private FillFlowContainer buttons = null!;
+        private FillFlowContainer<SelectionBoxButton> buttons = null!;
 
         private OsuSpriteText? selectionDetailsText;
 
@@ -126,66 +126,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (rotationHandler != null)
-                canRotate.BindTo(rotationHandler.CanRotateAroundSelectionOrigin);
-
-            if (scaleHandler != null)
-            {
-                canScaleX.BindTo(scaleHandler.CanScaleX);
-                canScaleY.BindTo(scaleHandler.CanScaleY);
-                canScaleDiagonally.BindTo(scaleHandler.CanScaleDiagonally);
-            }
-
-            canRotate.BindValueChanged(_ => recreate());
-            canScaleX.BindValueChanged(_ => recreate());
-            canScaleY.BindValueChanged(_ => recreate());
-            canScaleDiagonally.BindValueChanged(_ => recreate(), true);
-        }
-
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (e.Repeat || !e.ControlPressed)
-                return false;
-
-            switch (e.Key)
-            {
-                case Key.G:
-                    if (!CanReverse || reverseButton == null)
-                        return false;
-
-                    reverseButton.TriggerAction();
-                    return true;
-
-                case Key.Comma:
-                    if (!canRotate.Value || rotateCounterClockwiseButton == null)
-                        return false;
-
-                    rotateCounterClockwiseButton.TriggerAction();
-                    return true;
-
-                case Key.Period:
-                    if (!canRotate.Value || rotateClockwiseButton == null)
-                        return false;
-
-                    rotateClockwiseButton.TriggerAction();
-                    return true;
-            }
-
-            return base.OnKeyDown(e);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            ensureButtonsOnScreen();
-        }
-
-        private void recreate()
-        {
-            if (LoadState < LoadState.Loading)
-                return;
-
             InternalChildren = new Drawable[]
             {
                 new Container
@@ -231,7 +171,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     // ensures that the centres of all drag handles line up with the middle of the selection box border.
                     Padding = new MarginPadding(BORDER_RADIUS / 2)
                 },
-                buttons = new FillFlowContainer
+                buttons = new FillFlowContainer<SelectionBoxButton>
                 {
                     AutoSizeAxes = Axes.X,
                     Height = 30,
@@ -240,19 +180,111 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 }
             };
 
-            if (canScaleX.Value) addXScaleComponents();
-            if (canScaleDiagonally.Value) addFullScaleComponents();
-            if (canScaleY.Value) addYScaleComponents();
-            if (CanFlipX) addXFlipComponents();
-            if (CanFlipY) addYFlipComponents();
-            if (canRotate.Value) addRotationComponents();
-            if (CanReverse) reverseButton = addButton(FontAwesome.Solid.Backward, "Reverse pattern (Ctrl-G)", () => OnReverse?.Invoke());
+            if (rotationHandler != null)
+                canRotate.BindTo(rotationHandler.CanRotateAroundSelectionOrigin);
+
+            if (scaleHandler != null)
+            {
+                canScaleX.BindTo(scaleHandler.CanScaleX);
+                canScaleY.BindTo(scaleHandler.CanScaleY);
+                canScaleDiagonally.BindTo(scaleHandler.CanScaleDiagonally);
+            }
+
+            canScaleX.BindValueChanged(_ => recreateScaleHandles());
+            canScaleY.BindValueChanged(_ => recreateScaleHandles());
+            canScaleDiagonally.BindValueChanged(_ => recreateScaleHandles(), true);
+            canRotate.BindValueChanged(_ =>
+            {
+                recreateRotationHandles();
+                recreateButtons();
+            }, true);
         }
 
-        private void addRotationComponents()
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            rotateCounterClockwiseButton = addButton(FontAwesome.Solid.Undo, "Rotate 90 degrees counter-clockwise (Ctrl-<)", () => rotationHandler?.Rotate(-90));
-            rotateClockwiseButton = addButton(FontAwesome.Solid.Redo, "Rotate 90 degrees clockwise (Ctrl->)", () => rotationHandler?.Rotate(90));
+            if (e.Repeat || !e.ControlPressed)
+                return false;
+
+            switch (e.Key)
+            {
+                case Key.G:
+                    if (!CanReverse || reverseButton == null)
+                        return false;
+
+                    reverseButton.TriggerAction();
+                    return true;
+
+                case Key.Comma:
+                    if (!canRotate.Value || rotateCounterClockwiseButton == null)
+                        return false;
+
+                    rotateCounterClockwiseButton.TriggerAction();
+                    return true;
+
+                case Key.Period:
+                    if (!canRotate.Value || rotateClockwiseButton == null)
+                        return false;
+
+                    rotateClockwiseButton.TriggerAction();
+                    return true;
+            }
+
+            return base.OnKeyDown(e);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            ensureButtonsOnScreen();
+        }
+
+        private void recreateScaleHandles()
+        {
+            if (LoadState < LoadState.Loading)
+                return;
+
+            dragHandles.ClearScaleHandles();
+
+            if (canScaleY.Value)
+            {
+                addScaleHandle(Anchor.TopCentre);
+                addScaleHandle(Anchor.BottomCentre);
+            }
+
+            if (canScaleDiagonally.Value)
+            {
+                addScaleHandle(Anchor.TopLeft);
+                addScaleHandle(Anchor.TopRight);
+                addScaleHandle(Anchor.BottomLeft);
+                addScaleHandle(Anchor.BottomRight);
+            }
+
+            if (canScaleX.Value)
+            {
+                addScaleHandle(Anchor.CentreLeft);
+                addScaleHandle(Anchor.CentreRight);
+            }
+        }
+
+        private void addScaleHandle(Anchor anchor)
+        {
+            var handle = new SelectionBoxScaleHandle
+            {
+                Anchor = anchor,
+            };
+
+            handle.OperationStarted += operationStarted;
+            handle.OperationEnded += operationEnded;
+            dragHandles.AddScaleHandle(handle);
+        }
+
+        private void recreateRotationHandles()
+        {
+            if (LoadState < LoadState.Loading)
+                return;
+
+            dragHandles.ClearRotationHandles();
 
             addRotateHandle(Anchor.TopLeft);
             addRotateHandle(Anchor.TopRight);
@@ -260,34 +292,39 @@ namespace osu.Game.Screens.Edit.Compose.Components
             addRotateHandle(Anchor.BottomRight);
         }
 
-        private void addYScaleComponents()
+        private void addRotateHandle(Anchor anchor)
         {
-            addScaleHandle(Anchor.TopCentre);
-            addScaleHandle(Anchor.BottomCentre);
+            var handle = new SelectionBoxRotationHandle
+            {
+                Anchor = anchor,
+            };
+
+            handle.OperationStarted += operationStarted;
+            handle.OperationEnded += operationEnded;
+            dragHandles.AddRotationHandle(handle);
         }
 
-        private void addFullScaleComponents()
+        private void recreateButtons()
         {
-            addScaleHandle(Anchor.TopLeft);
-            addScaleHandle(Anchor.TopRight);
-            addScaleHandle(Anchor.BottomLeft);
-            addScaleHandle(Anchor.BottomRight);
-        }
+            if (LoadState < LoadState.Loading)
+                return;
 
-        private void addXScaleComponents()
-        {
-            addScaleHandle(Anchor.CentreLeft);
-            addScaleHandle(Anchor.CentreRight);
-        }
+            clearButtons();
 
-        private void addXFlipComponents()
-        {
-            addButton(FontAwesome.Solid.ArrowsAltH, "Flip horizontally", () => OnFlip?.Invoke(Direction.Horizontal, false));
-        }
+            if (canRotate.Value)
+            {
+                rotateCounterClockwiseButton = addButton(FontAwesome.Solid.Undo, "Rotate 90 degrees counter-clockwise (Ctrl-<)", () => rotationHandler?.Rotate(-90));
+                rotateClockwiseButton = addButton(FontAwesome.Solid.Redo, "Rotate 90 degrees clockwise (Ctrl->)", () => rotationHandler?.Rotate(90));
+            }
 
-        private void addYFlipComponents()
-        {
-            addButton(FontAwesome.Solid.ArrowsAltV, "Flip vertically", () => OnFlip?.Invoke(Direction.Vertical, false));
+            if (CanFlipX)
+                addButton(FontAwesome.Solid.ArrowsAltH, "Flip horizontally", () => OnFlip?.Invoke(Direction.Horizontal, false));
+
+            if (CanFlipY)
+                addButton(FontAwesome.Solid.ArrowsAltV, "Flip vertically", () => OnFlip?.Invoke(Direction.Vertical, false));
+
+            if (CanReverse)
+                reverseButton = addButton(FontAwesome.Solid.Backward, "Reverse pattern (Ctrl-G)", () => OnReverse?.Invoke());
         }
 
         private SelectionBoxButton addButton(IconUsage icon, string tooltip, Action action)
@@ -308,6 +345,21 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return button;
         }
 
+        private void clearButtons()
+        {
+            foreach (var button in buttons)
+            {
+                button.Clicked -= freezeButtonPosition;
+                button.HoverLost -= unfreezeButtonPosition;
+
+                button.OperationStarted -= operationStarted;
+                button.OperationEnded -= operationEnded;
+            }
+
+            unfreezeButtonPosition();
+            buttons.Clear();
+        }
+
         /// <remarks>
         /// This method should be called when a selection needs to be flipped
         /// because of an ongoing scale handle drag that would otherwise cause width or height to go negative.
@@ -325,30 +377,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 dragHandles.FlipScaleHandles(Direction.Vertical);
                 OnFlip?.Invoke(Direction.Vertical, false);
             }
-        }
-
-        private void addScaleHandle(Anchor anchor)
-        {
-            var handle = new SelectionBoxScaleHandle
-            {
-                Anchor = anchor,
-            };
-
-            handle.OperationStarted += operationStarted;
-            handle.OperationEnded += operationEnded;
-            dragHandles.AddScaleHandle(handle);
-        }
-
-        private void addRotateHandle(Anchor anchor)
-        {
-            var handle = new SelectionBoxRotationHandle
-            {
-                Anchor = anchor,
-            };
-
-            handle.OperationStarted += operationStarted;
-            handle.OperationEnded += operationEnded;
-            dragHandles.AddRotationHandle(handle);
         }
 
         private int activeOperations;
