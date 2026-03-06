@@ -184,7 +184,6 @@ namespace osu.Game.Screens.Select
                     return new MenuItem[]
                     {
                         expandItem
-
                     };
                 }
 
