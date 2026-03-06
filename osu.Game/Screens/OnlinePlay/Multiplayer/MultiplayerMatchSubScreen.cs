@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -15,8 +16,10 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online;
 using osu.Game.Online.API;
@@ -26,6 +29,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -133,6 +137,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         [Cached(typeof(OnlinePlayBeatmapAvailabilityTracker))]
         private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new MultiplayerBeatmapAvailabilityTracker();
+
+        private readonly Bindable<IReadOnlyList<Mod>> userMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+        private ModSettingChangeTracker? modSettingChangeTracker;
+        private ScheduledDelegate? debouncedModSettingsUpdate;
 
         private readonly Room room;
 
@@ -415,7 +423,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             LoadComponent(userModsSelectOverlay = new MultiplayerUserModSelectOverlay
             {
-                Beatmap = { BindTarget = Beatmap }
+                Beatmap = { BindTarget = Beatmap },
+                SelectedMods = { BindTarget = userMods },
             });
         }
 
@@ -433,6 +442,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             client.LoadRequested += onLoadRequested;
 
             beatmapAvailabilityTracker.Availability.BindValueChanged(onBeatmapAvailabilityChanged, true);
+
+            userMods.BindValueChanged(onUserModsChanged);
 
             onRoomUpdated();
             updateGameplayState();
@@ -621,6 +632,33 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         client.ChangeState(MultiplayerUserState.Idle).FireAndForget();
                     break;
             }
+        }
+
+        /// <summary>
+        /// Responds to changes in the local user's selected mods to notify the server and prepare the gameplay session.
+        /// </summary>
+        private void onUserModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
+        {
+            modSettingChangeTracker?.Dispose();
+
+            if (client.Room == null)
+                return;
+
+            client.ChangeUserMods(mods.NewValue).FireAndForget();
+
+            modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
+            modSettingChangeTracker.SettingChanged += _ =>
+            {
+                // Debounce changes to mod settings so as to not thrash the network.
+                debouncedModSettingsUpdate?.Cancel();
+                debouncedModSettingsUpdate = Scheduler.AddDelayed(() =>
+                {
+                    if (client.Room == null)
+                        return;
+
+                    client.ChangeUserMods(userMods.Value).FireAndForget();
+                }, 500);
+            };
         }
 
         /// <summary>
@@ -926,6 +964,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.Dispose(isDisposing);
 
             userModsSelectOverlayRegistration?.Dispose();
+            modSettingChangeTracker?.Dispose();
 
             if (client.IsNotNull())
             {

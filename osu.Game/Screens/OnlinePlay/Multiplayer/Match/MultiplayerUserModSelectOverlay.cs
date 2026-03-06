@@ -4,10 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
-using osu.Framework.Threading;
-using osu.Game.Configuration;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -26,9 +23,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
-        private ModSettingChangeTracker? modSettingChangeTracker;
-        private ScheduledDelegate? debouncedModSettingsUpdate;
-
         public MultiplayerUserModSelectOverlay()
             : base(OverlayColourScheme.Plum)
         {
@@ -39,7 +33,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             base.LoadComplete();
 
             client.RoomUpdated += onRoomUpdated;
-            SelectedMods.BindValueChanged(onSelectedModsChanged);
 
             updateValidMods();
         }
@@ -48,30 +41,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             // Importantly, this is not scheduled because the client must not skip intermediate server states to validate the allowed mods.
             updateValidMods();
-        }
-
-        private void onSelectedModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
-        {
-            modSettingChangeTracker?.Dispose();
-
-            if (client.Room == null)
-                return;
-
-            client.ChangeUserMods(mods.NewValue).FireAndForget();
-
-            modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
-            modSettingChangeTracker.SettingChanged += _ =>
-            {
-                // Debounce changes to mod settings so as to not thrash the network.
-                debouncedModSettingsUpdate?.Cancel();
-                debouncedModSettingsUpdate = Scheduler.AddDelayed(() =>
-                {
-                    if (client.Room == null)
-                        return;
-
-                    client.ChangeUserMods(SelectedMods.Value).FireAndForget();
-                }, 500);
-            };
         }
 
         private void updateValidMods()
@@ -113,8 +82,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             if (client.IsNotNull())
                 client.RoomUpdated -= onRoomUpdated;
-
-            modSettingChangeTracker?.Dispose();
         }
     }
 }
