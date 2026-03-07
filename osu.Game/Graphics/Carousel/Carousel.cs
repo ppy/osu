@@ -689,6 +689,10 @@ namespace osu.Game.Graphics.Carousel
             }
         }
 
+        /// <summary>
+        /// Select the first or last item in the carousel.
+        /// </summary>
+        /// <param name="direction">Positive for last item, negative for first item.</param>
         private void traverseKeyboardEdge(int direction)
         {
             if (carouselItems == null || carouselItems.Count == 0)
