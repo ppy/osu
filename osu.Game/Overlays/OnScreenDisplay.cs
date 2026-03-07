@@ -43,7 +43,8 @@ namespace osu.Game.Overlays
                     Position = new Vector2(0.5f, 0.75f),
                     Masking = true,
                     AutoSizeAxes = Axes.X,
-                    Height = height_contracted,
+                    Height = height,
+                    Scale = new Vector2(0.9f),
                     Alpha = 0,
                     CornerRadius = 20,
                 },
@@ -107,7 +108,7 @@ namespace osu.Game.Overlays
             {
                 fadeIn = toDisplay.Animate(
                     b => b.FadeIn(500, Easing.OutQuint),
-                    b => b.ResizeHeightTo(height, 500, Easing.OutQuint)
+                    b => b.ScaleTo(1, 1000, Easing.OutElastic)
                 );
 
                 fadeIn.Finally(_ => fadeIn = null);
@@ -117,9 +118,9 @@ namespace osu.Game.Overlays
             fadeOut = Scheduler.AddDelayed(() =>
             {
                 toDisplay.Animate(
-                    b => b.FadeOutFromOne(1500, Easing.InQuint),
-                    b => b.ResizeHeightTo(height_contracted, 1500, Easing.InQuint));
-            }, 500);
+                    b => b.FadeOutFromOne(500, Easing.InQuint),
+                    b => b.ScaleTo(0.9f, 500, Easing.InQuint));
+            }, 1500);
         }
     }
 }
