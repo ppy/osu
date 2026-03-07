@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
@@ -35,6 +36,8 @@ namespace osu.Game.Graphics.Carousel
         {
             public Action? OnPageUp { get; init; }
             public Action? OnPageDown { get; init; }
+            public Action? OnListStart { get; init; }
+            public Action? OnListEnd { get; init; }
 
             public readonly Container Panels;
 
@@ -144,6 +147,25 @@ namespace osu.Game.Graphics.Carousel
                 }
 
                 return base.OnKeyDown(e);
+            }
+
+            public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+            {
+                if (IsHandlingKeyboardScrolling)
+                {
+                    switch (e.Action)
+                    {
+                        case PlatformAction.MoveBackwardLine:
+                            OnListStart?.Invoke();
+                            return true;
+
+                        case PlatformAction.MoveForwardLine:
+                            OnListEnd?.Invoke();
+                            return true;
+                    }
+                }
+
+                return base.OnPressed(e);
             }
 
             public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
