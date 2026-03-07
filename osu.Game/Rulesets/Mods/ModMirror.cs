@@ -13,5 +13,6 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModMirror;
         public override ModType Type => ModType.Conversion;
         public override double ScoreMultiplier => 1;
+        public override bool Ranked => true;
     }
 }
