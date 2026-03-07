@@ -31,6 +31,7 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Text;
 using osu.Framework.Timing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -477,21 +478,35 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Torus-Alternate/Torus-Alternate-SemiBold");
             AddFont(Resources, @"Fonts/Torus-Alternate/Torus-Alternate-Bold");
 
-            AddFont(Resources, @"Fonts/Inter/Inter-Regular");
-            AddFont(Resources, @"Fonts/Inter/Inter-RegularItalic");
-            AddFont(Resources, @"Fonts/Inter/Inter-Light");
-            AddFont(Resources, @"Fonts/Inter/Inter-LightItalic");
-            AddFont(Resources, @"Fonts/Inter/Inter-SemiBold");
-            AddFont(Resources, @"Fonts/Inter/Inter-SemiBoldItalic");
-            AddFont(Resources, @"Fonts/Inter/Inter-Bold");
-            AddFont(Resources, @"Fonts/Inter/Inter-BoldItalic");
+            var inter = AddVariableFont(Resources, @"Fonts/Inter/Inter");
+            var interItalic = AddVariableFont(Resources, @"Fonts/Inter/Inter-Italic");
+            inter.AddInstance(@"Inter-Regular");
+            inter.AddInstance(@"Inter-Light");
+            inter.AddInstance(@"Inter-SemiBold");
+            inter.AddInstance(@"Inter-Bold");
+            interItalic.AddInstance(@"Inter-Italic", @"Inter-RegularItalic");
+            interItalic.AddInstance(@"Inter-LightItalic");
+            interItalic.AddInstance(@"Inter-SemiBoldItalic");
+            interItalic.AddInstance(@"Inter-BoldItalic");
 
-            AddFont(Resources, @"Fonts/Noto/Noto-Basic");
-            AddFont(Resources, @"Fonts/Noto/Noto-Bopomofo");
-            AddFont(Resources, @"Fonts/Noto/Noto-CJK-Basic");
-            AddFont(Resources, @"Fonts/Noto/Noto-CJK-Compatibility");
-            AddFont(Resources, @"Fonts/Noto/Noto-Hangul");
-            AddFont(Resources, @"Fonts/Noto/Noto-Thai");
+            var notoBasic = AddVariableFont(Resources, @"Fonts/Noto/NotoSans");
+            var notoCjk = AddVariableFont(Resources, @"Fonts/Noto/NotoSansCJKsc");
+            var notoThai = AddVariableFont(Resources, @"Fonts/Noto/NotoSansThai");
+            notoBasic.AddInstance(@"NotoSans-Regular");
+            notoBasic.AddInstance(@"NotoSans-Light");
+            notoBasic.AddInstance(@"NotoSans-SemiBold");
+            notoBasic.AddInstance(@"NotoSans-Bold");
+            notoCjk.AddInstance(@"NotoSansCJKsc-Regular");
+            notoCjk.AddInstance(@"NotoSansCJKsc-Light");
+            notoCjk.AddInstance(new FontVariation
+            {
+                Axes = new Dictionary<string, double> { { "wght", 600 } }
+            }, @"NotoSaneCJKsc-SemiBold");
+            notoCjk.AddInstance(@"NotoSansCJKsc-Bold");
+            notoThai.AddInstance(@"NotoSansThai-Regular");
+            notoThai.AddInstance(@"NotoSansThai-Light");
+            notoThai.AddInstance(@"NotoSansThai-SemiBold");
+            notoThai.AddInstance(@"NotoSansThai-Bold");
 
             AddFont(Resources, @"Fonts/Venera/Venera-Light");
             AddFont(Resources, @"Fonts/Venera/Venera-Bold");
