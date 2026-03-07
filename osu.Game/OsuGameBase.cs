@@ -486,6 +486,11 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Inter/Inter-Bold");
             AddFont(Resources, @"Fonts/Inter/Inter-BoldItalic");
 
+            AddFont(Resources, @"Fonts/NotoSansKR/NotoSansKR-Regular");
+            AddFont(Resources, @"Fonts/NotoSansKR/NotoSansKR-Bold");
+            AddFont(Resources, @"Fonts/NotoSansKR/NotoSansKR-SemiBold");
+            AddFont(Resources, @"Fonts/NotoSansKR/NotoSansKR-Light");
+
             AddFont(Resources, @"Fonts/Noto/Noto-Basic");
             AddFont(Resources, @"Fonts/Noto/Noto-Bopomofo");
             AddFont(Resources, @"Fonts/Noto/Noto-CJK-Basic");
