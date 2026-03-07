@@ -69,6 +69,9 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private SearchBeatmapSetsRequest getSetsRequest;
         private SearchBeatmapSetsResponse lastResponse;
+        private int filteredEmptyAutoFetchCount;
+
+        private const int max_filtered_empty_auto_fetch_pages = 20;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -262,8 +265,21 @@ namespace osu.Game.Overlays.BeatmapListing
 
                 if (sets.Count == 0 && returnedSets.Count > 0 && response.Cursor != null)
                 {
-                    FetchNextPage();
-                    return;
+                    filteredEmptyAutoFetchCount++;
+
+                    if (filteredEmptyAutoFetchCount >= max_filtered_empty_auto_fetch_pages)
+                    {
+                        noMoreResults = true;
+                    }
+                    else
+                    {
+                        FetchNextPage();
+                        return;
+                    }
+                }
+                else
+                {
+                    filteredEmptyAutoFetchCount = 0;
                 }
 
                 if (CurrentPage == 0)
@@ -299,6 +315,7 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             noMoreResults = false;
             CurrentPage = 0;
+            filteredEmptyAutoFetchCount = 0;
 
             lastResponse = null;
 

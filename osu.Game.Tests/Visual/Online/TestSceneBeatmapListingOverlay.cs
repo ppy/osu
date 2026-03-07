@@ -38,6 +38,7 @@ namespace osu.Game.Tests.Visual.Online
         private OsuConfigManager localConfig;
 
         private bool returnCursorOnResponse;
+        private bool consumeQueuedResponses;
         private int searchRequestsHandled;
 
         [BackgroundDependencyLoader]
@@ -54,6 +55,7 @@ namespace osu.Game.Tests.Visual.Online
                 Child = overlay = new BeatmapListingOverlay { State = { Value = Visibility.Visible } };
                 setsForResponse.Clear();
                 queuedResponses.Clear();
+                consumeQueuedResponses = false;
                 searchRequestsHandled = 0;
             });
 
@@ -71,7 +73,7 @@ namespace osu.Game.Tests.Visual.Online
                     List<APIBeatmapSet> beatmaps;
                     bool hasNextPage;
 
-                    if (queuedResponses.TryDequeue(out var queuedResponse))
+                    if (consumeQueuedResponses && queuedResponses.TryDequeue(out var queuedResponse))
                     {
                         beatmaps = queuedResponse.beatmaps;
                         hasNextPage = queuedResponse.hasNextPage;
@@ -274,7 +276,6 @@ namespace osu.Game.Tests.Visual.Online
                 expectedSetId++;
 
             AddStep("mark local set as downloaded", () => addLocalBeatmapSet(downloadedSetId));
-            setHideDownloadedFilter(true);
 
             AddStep("set paged search responses", () =>
             {
@@ -291,7 +292,8 @@ namespace osu.Game.Tests.Visual.Online
 
             int requestsBeforeSearch = 0;
             AddStep("capture request baseline", () => requestsBeforeSearch = searchRequestsHandled);
-            AddStep("trigger search", () => searchControl.Query.Value = $"search {searchCount++}");
+            AddStep("enable queued responses", () => consumeQueuedResponses = true);
+            setHideDownloadedFilter(true);
             AddUntilStep("non-downloaded result loaded", () => this.ChildrenOfType<BeatmapCard>().SingleOrDefault()?.BeatmapSet.OnlineID == expectedSetId);
             AddAssert("paged search requests were made", () => searchRequestsHandled >= requestsBeforeSearch + 2);
             noPlaceholderShown();
@@ -323,6 +325,7 @@ namespace osu.Game.Tests.Visual.Online
 
             int requestsBeforeSearch = 0;
             AddStep("capture request baseline", () => requestsBeforeSearch = searchRequestsHandled);
+            AddStep("enable queued responses", () => consumeQueuedResponses = true);
 
             setHideDownloadedFilter(true);
 
@@ -331,6 +334,37 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("one request per available page", () => searchRequestsHandled == requestsBeforeSearch + downloadedSetIds.Length);
             AddWaitStep("wait for any runaway requests", 1000);
             AddAssert("request count stable after cursor end", () => searchRequestsHandled == requestsBeforeSearch + downloadedSetIds.Length);
+        }
+
+        [Test]
+        public void TestExcludeDownloadedFilterAutoFetchIsCapped()
+        {
+            const int auto_fetch_cap = 20;
+
+            AddStep("set many paged downloaded-only responses", () =>
+            {
+                var responses = Enumerable.Range(0, auto_fetch_cap * 2)
+                                          .Select(_ =>
+                                          {
+                                              int onlineId = Math.Max(1, Guid.NewGuid().GetHashCode());
+                                              addLocalBeatmapSet(onlineId);
+                                              return (beatmaps: (IEnumerable<APIBeatmapSet>)new[] { new APIBeatmapSet { OnlineID = onlineId } }, hasNextPage: true);
+                                          })
+                                          .ToArray();
+
+                setSearchResponses(responses);
+            });
+
+            int requestsBeforeSearch = 0;
+            AddStep("capture request baseline", () => requestsBeforeSearch = searchRequestsHandled);
+            AddStep("enable queued responses", () => consumeQueuedResponses = true);
+            setHideDownloadedFilter(true);
+
+            notFoundPlaceholderShown();
+
+            int requestsAfterCompletion = 0;
+            AddStep("capture request count after completion", () => requestsAfterCompletion = searchRequestsHandled);
+            AddAssert("autofetch is bounded", () => requestsAfterCompletion <= requestsBeforeSearch + auto_fetch_cap);
         }
 
         [Test]
@@ -535,10 +569,15 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep($"set hide-downloaded filter to {enabled}", () =>
             {
-                searchControl.General.Remove(SearchGeneral.HideAlreadyDownloaded);
-
                 if (enabled)
-                    searchControl.General.Add(SearchGeneral.HideAlreadyDownloaded);
+                {
+                    if (!searchControl.General.Contains(SearchGeneral.HideAlreadyDownloaded))
+                        searchControl.General.Add(SearchGeneral.HideAlreadyDownloaded);
+                }
+                else
+                {
+                    searchControl.General.Remove(SearchGeneral.HideAlreadyDownloaded);
+                }
             });
         }
 
