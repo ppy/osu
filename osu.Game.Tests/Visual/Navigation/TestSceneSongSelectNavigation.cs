@@ -82,6 +82,8 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
 
             AddStep("open menu", () => InputManager.Key(Key.F3));
+            AddUntilStep("wait for footer focus", () => InputManager.FocusedDrawable is FooterButtonOptions.Popover);
+
             AddStep("trigger edit", () =>
             {
                 // TODO: should be 5, not 4.
