@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
@@ -64,7 +65,7 @@ namespace osu.Game.Tournament
         private TournamentSpriteText initialisationText = null!;
 
         [BackgroundDependencyLoader]
-        private void load(Storage baseStorage)
+        private void load(Storage baseStorage, FrameworkConfigManager frameworkConfig)
         {
             Add(initialisationText = new TournamentSpriteText
             {
@@ -85,6 +86,8 @@ namespace osu.Game.Tournament
             dependencies.CacheAs(new StableInfo(storage));
 
             beatmapCache = dependencies.Get<BeatmapLookupCache>();
+
+            InitialiseLocalisation(frameworkConfig);
         }
 
         protected override void LoadComplete()
@@ -95,6 +98,8 @@ namespace osu.Game.Tournament
             GlobalCursorDisplay.MenuCursor.Alpha = 0;
 
             base.LoadComplete();
+
+            Localisation.AddLocaleMappings(LocalisationMappings);
 
             Task.Run(readBracket);
         }
