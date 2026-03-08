@@ -69,6 +69,36 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString MobileDisclaimerOkButton => new TranslatableString(getKey(@"mobile_disclaimer_ok_button"), @"Understood");
 
+        /// <summary>
+        /// "Are you sure you want to exit osu!?"
+        /// </summary>
+        public static LocalisableString ConfirmExitHeaderText => new TranslatableString(getKey(@"confirm_exit_header_text"), @"Are you sure you want to exit osu!?");
+
+        /// <summary>
+        /// "Last chance to turn back"
+        /// </summary>
+        public static LocalisableString ConfirmExitBodyText => new TranslatableString(getKey(@"confirm_exit_body_text"), @"Last chance to turn back");
+
+        /// <summary>
+        /// "There are currently some background operations which will be aborted if you continue:"
+        /// </summary>
+        public static LocalisableString ConfirmExitBodyTextOngoingOperations => new TranslatableString(getKey(@"confirm_exit_body_text_ongoing_operations"), @"There are currently some background operations which will be aborted if you continue:");
+
+        /// <summary>
+        /// "and {0} other operation(s)."
+        /// </summary>
+        public static LocalisableString ConfirmExitBodyTextOtherOngoingOperations(int count) => new TranslatableString(getKey(@"confirm_exit_body_text_other_ongoing_operations"), @"and {0} other operation(s).", count);
+
+        /// <summary>
+        /// "Let me out!"
+        /// </summary>
+        public static LocalisableString ConfirmExitOkButton => new TranslatableString(getKey(@"confirm_exit_ok_button"), @"Let me out!");
+
+        /// <summary>
+        /// "Just a little more..."
+        /// </summary>
+        public static LocalisableString ConfirmExitCancelButton => new TranslatableString(getKey(@"confirm_exit_cancel_button"), @"Just a little more...");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

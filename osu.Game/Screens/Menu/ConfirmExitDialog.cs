@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
@@ -30,31 +31,32 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(INotificationOverlay notifications)
         {
-            HeaderText = "Are you sure you want to exit osu!?";
+            HeaderText = DialogStrings.ConfirmExitHeaderText;
 
             Icon = FontAwesome.Solid.ExclamationTriangle;
 
             if (notifications.HasOngoingOperations)
             {
-                string text = "There are currently some background operations which will be aborted if you continue:\n\n";
-
                 var ongoingOperations = notifications.OngoingOperations.ToArray();
+                var ongoingOperationsText = string.Empty;
 
                 foreach (var n in ongoingOperations.Take(10))
-                    text += $"{n.Text} ({n.Progress:0%})\n";
+                    ongoingOperationsText += $"{n.Text} ({n.Progress:0%})\n";
+
+                LocalisableString ongoingOperationsLocalisableString;
 
                 if (ongoingOperations.Length > 10)
-                    text += $"\nand {ongoingOperations.Length - 10} other operation(s).\n";
+                    ongoingOperationsLocalisableString = LocalisableString.Interpolate($"{ongoingOperationsText}\n{DialogStrings.ConfirmExitBodyTextOtherOngoingOperations(ongoingOperations.Length - 10)}\n");
+                else
+                    ongoingOperationsLocalisableString = ongoingOperationsText;
 
-                text += "\nLast chance to turn back";
-
-                BodyText = text;
+                BodyText = LocalisableString.Interpolate($"{DialogStrings.ConfirmExitBodyTextOngoingOperations}\n\n{ongoingOperationsLocalisableString}\n{DialogStrings.ConfirmExitBodyText}");
 
                 Buttons = new PopupDialogButton[]
                 {
                     new PopupDialogDangerousButton
                     {
-                        Text = @"Let me out!",
+                        Text = DialogStrings.ConfirmExitOkButton,
                         Action = onConfirm
                     },
                     new PopupDialogCancelButton
@@ -66,18 +68,18 @@ namespace osu.Game.Screens.Menu
             }
             else
             {
-                BodyText = "Last chance to turn back";
+                BodyText = DialogStrings.ConfirmExitBodyText;
 
                 Buttons = new PopupDialogButton[]
                 {
                     new PopupDialogOkButton
                     {
-                        Text = @"Let me out!",
+                        Text = DialogStrings.ConfirmExitOkButton,
                         Action = onConfirm
                     },
                     new PopupDialogCancelButton
                     {
-                        Text = @"Just a little more...",
+                        Text = DialogStrings.ConfirmExitCancelButton,
                         Action = onCancel
                     },
                 };
