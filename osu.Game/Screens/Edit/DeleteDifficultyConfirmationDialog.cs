@@ -3,6 +3,7 @@
 
 using System;
 using osu.Game.Beatmaps;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Edit
@@ -11,7 +12,7 @@ namespace osu.Game.Screens.Edit
     {
         public DeleteDifficultyConfirmationDialog(BeatmapInfo beatmapInfo, Action deleteAction)
         {
-            BodyText = $"\"{beatmapInfo.DifficultyName}\" difficulty";
+            BodyText = DialogStrings.DeleteDifficultyConfirmationBodyText(beatmapInfo.DifficultyName);
             DangerousAction = deleteAction;
         }
     }

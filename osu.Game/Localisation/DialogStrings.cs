@@ -129,6 +129,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString SaveRequiredCancelButton => new TranslatableString(getKey(@"save_required_cancel_button"), @"Oops, continue editing");
 
+        /// <summary>
+        /// "&quot;{0}&quot; difficulty"
+        /// </summary>
+        public static LocalisableString DeleteDifficultyConfirmationBodyText(string difficultyName) => new TranslatableString(getKey(@"delete_difficulty_confirmation_body_text"), @"""{0}"" difficulty", difficultyName);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
