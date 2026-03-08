@@ -49,6 +49,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString StableDirectoryLocationCancelButton => new TranslatableString(getKey(@"stable_directory_location_cancel_button"), @"Actually I don't have osu!stable installed.");
 
+        /// <summary>
+        /// "All local scores on {0}"
+        /// </summary>
+        public static LocalisableString BeatmapClearScoresBodyText(string difficulty) => new TranslatableString(getKey(@"beatmap_clear_scores_body_text"), @"All local scores on {0}", difficulty);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
