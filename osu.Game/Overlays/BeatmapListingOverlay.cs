@@ -193,15 +193,18 @@ namespace osu.Game.Overlays
 
             var newCards = createCardsFor(searchResult.Results);
 
+            if (!newCards.Any())
+            {
+                if (!hasDisplayedResultsForCurrentSearch)
+                    replaceResultsAreaContent(new NotFoundDrawable());
+                else
+                    Loading.Hide();
+
+                return;
+            }
+
             if (filterControl.CurrentPage == 0 || foundContent == null)
             {
-                //No matches case
-                if (!newCards.Any())
-                {
-                    replaceResultsAreaContent(new NotFoundDrawable());
-                    return;
-                }
-
                 hasDisplayedResultsForCurrentSearch = true;
 
                 var content = createCardContainerFor(newCards);
