@@ -117,6 +117,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double? Angle { get; private set; }
         public double? AngleSigned { get; private set; }
 
+        public double? AngularVelocity { get; private set; }
+
         /// <summary>
         /// Selective bonus for maps with higher circle size.
         /// </summary>
@@ -262,6 +264,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                 AngleSigned = Math.Abs(angle) <= Math.Abs(sliderAngle) ? angle : sliderAngle;
                 Angle = Math.Abs((double)AngleSigned);
+
+                if (lastLastDifficultyObject.Angle != null)
+                {
+                    double angleDifference = Math.Abs(Angle.Value - lastLastDifficultyObject.Angle.Value);
+                    double angleDifferenceAdjusted = Math.Sin(angleDifference / 2) * 180.0;
+                    AngularVelocity = angleDifferenceAdjusted / (AdjustedDeltaTime * 0.1);
+                }
             }
         }
 
