@@ -114,6 +114,21 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ConfirmDiscardChangesCancelButton => new TranslatableString(getKey(@"confirm_discard_changes_cancel_button"), @"No I didn't mean to");
 
+        /// <summary>
+        /// "The beatmap will be saved to continue with this operation."
+        /// </summary>
+        public static LocalisableString SaveRequiredHeaderText => new TranslatableString(getKey(@"save_required_header_text"), @"The beatmap will be saved to continue with this operation.");
+
+        /// <summary>
+        /// "Sounds good, let's go!"
+        /// </summary>
+        public static LocalisableString SaveRequiredOkButton => new TranslatableString(getKey(@"save_required_ok_button"), @"Sounds good, let's go!");
+
+        /// <summary>
+        /// "Oops, continue editing"
+        /// </summary>
+        public static LocalisableString SaveRequiredCancelButton => new TranslatableString(getKey(@"save_required_cancel_button"), @"Oops, continue editing");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
