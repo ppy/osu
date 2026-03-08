@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             flowDifficulty += velocityChangeBonus * velocity_change_multiplier;
 
             // Apply high circle size bonus
-            flowDifficulty *= Math.Pow(osuCurrObj.SmallCircleBonus, 1.5);
+            flowDifficulty *= Math.Pow(osuCurrObj.SmallCircleBonus, 2);
 
             return Math.Pow(flowDifficulty, 1.45);
         }
