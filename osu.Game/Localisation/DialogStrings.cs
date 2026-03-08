@@ -134,6 +134,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString DeleteDifficultyConfirmationBodyText(string difficultyName) => new TranslatableString(getKey(@"delete_difficulty_confirmation_body_text"), @"""{0}"" difficulty", difficultyName);
 
+        /// <summary>
+        /// "All Bookmarks"
+        /// </summary>
+        public static LocalisableString BookmarkResetBodyText => new TranslatableString(getKey(@"bookmark_reset_body_text"), @"All Bookmarks");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

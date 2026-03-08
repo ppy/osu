@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Edit
@@ -13,7 +14,7 @@ namespace osu.Game.Screens.Edit
         public BookmarkResetDialog(EditorBeatmap editorBeatmap)
         {
             editor = editorBeatmap;
-            BodyText = "All Bookmarks";
+            BodyText = DialogStrings.BookmarkResetBodyText;
         }
 
         [BackgroundDependencyLoader]
@@ -23,4 +24,3 @@ namespace osu.Game.Screens.Edit
         }
     }
 }
-
