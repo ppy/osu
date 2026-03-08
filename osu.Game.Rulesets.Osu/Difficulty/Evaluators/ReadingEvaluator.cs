@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double density_difficulty_base = 2.5;
         private const double preempt_balancing_factor = 140000;
         private const double preempt_starting_point = 500; // AR 9.66 in milliseconds
-        private const double preempt_change_multiplier = 5;
+        private const double preempt_change_multiplier = 6;
         private const double minimum_angle_relevancy_time = 2000; // 2 seconds
         private const double maximum_angle_relevancy_time = 200;
 
@@ -76,17 +76,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Value higher note densities exponentially
             double noteDensityDifficulty = Math.Pow(pastObjectDifficultyInfluence + futureObjectDifficultyInfluence, 1.7) * 0.4 * constantAngleNerfFactor * velocity;
 
-            if (nextObj != null)
+            if (nextObj != null && nextObj.Preempt != currObj.Preempt)
             {
-                if (nextObj.Preempt > currObj.Preempt)
+                if (nextObj.Preempt > currObj.Preempt && currObj.StartTime + nextObj.Preempt > nextObj.StartTime)
                 {
-                    double preemptChangeDifficulty = DifficultyCalculationUtils.Smootherstep(nextObj.Preempt / currObj.Preempt, 1, 3);
-                    noteDensityDifficulty += preempt_change_multiplier * (Math.Pow(1 + preemptChangeDifficulty, 4) - 1);
+                    double preemptChangeDifficulty = DifficultyCalculationUtils.Smootherstep(nextObj.Preempt / currObj.Preempt, 1, 2);
+                    noteDensityDifficulty += preempt_change_multiplier * (Math.Pow(1 + preemptChangeDifficulty, 3) - 1);
                 }
-                else
+                else if (nextObj.StartTime + currObj.Preempt > currObj.StartTime)
                 {
-                    double preemptChangeDifficulty = DifficultyCalculationUtils.Smootherstep(currObj.Preempt / nextObj.Preempt, 1, 3);
-                    noteDensityDifficulty += preempt_change_multiplier * (Math.Pow(1 + preemptChangeDifficulty, 4) - 1);
+                    double preemptChangeDifficulty = DifficultyCalculationUtils.Smootherstep(currObj.Preempt / nextObj.Preempt, 1, 2);
+                    noteDensityDifficulty += preempt_change_multiplier * (Math.Pow(1 + preemptChangeDifficulty, 3) - 1);
                 }
             }
 
