@@ -139,6 +139,20 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString BookmarkResetBodyText => new TranslatableString(getKey(@"bookmark_reset_body_text"), @"All Bookmarks");
 
+        /// <summary>
+        /// "Are you sure you want to open the following link in a web browser?
+        ///
+        /// {0}"
+        /// </summary>
+        public static LocalisableString ExternalLinkBodyText(string url) => new TranslatableString(getKey(@"external_link_body_text"), @"Are you sure you want to open the following link in a web browser?
+
+{0}", url);
+
+        /// <summary>
+        /// "Open in browser"
+        /// </summary>
+        public static LocalisableString ExternalLinkOkButton => new TranslatableString(getKey(@"external_link_ok_button"), @"Open in browser");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
