@@ -501,7 +501,7 @@ namespace osu.Game.Screens.Menu
                 {
                     new PopupDialogOkButton
                     {
-                        Text = DialogStrings.MobileDisclaimerOkButton,
+                        Text = ButtonSystemStrings.MobileDisclaimerOkButton,
                         Action = confirmed,
                     },
                 };
