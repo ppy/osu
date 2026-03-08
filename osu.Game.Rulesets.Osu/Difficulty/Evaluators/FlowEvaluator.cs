@@ -85,7 +85,5 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             return Math.Pow(flowDifficulty, 1.45);
         }
-
-        private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.15, Math.Pow(ms / 1000, 0.65)));
     }
 }
