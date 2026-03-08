@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            double decayAim = strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
+            double decay = strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
 
             double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierAim;
             double speedDifficulty = SpeedAimEvaluator.EvaluateDifficultyOf(current) * skillMultiplierSpeed;
@@ -55,17 +55,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 aimDifficulty = Math.Pow(aimDifficulty, 0.8);
                 speedDifficulty = Math.Pow(speedDifficulty, 0.95);
+                flowDifficulty = Math.Pow(flowDifficulty, 1.1);
             }
 
             if (Mods.Any(m => m is OsuModRelax))
             {
                 speedDifficulty *= 0.0;
+                flowDifficulty *= 0.1;
             }
 
             double totalDifficulty = calcTotalValue(aimDifficulty, speedDifficulty, flowDifficulty);
 
-            currentStrain *= decayAim;
-            currentStrain += totalDifficulty * (1 - decayAim);
+            currentStrain *= decay;
+            currentStrain += totalDifficulty * (1 - decay);
 
             if (current.BaseObject is Slider)
                 sliderStrains.Add(currentStrain);
