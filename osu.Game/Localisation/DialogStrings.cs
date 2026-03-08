@@ -153,6 +153,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString DeleteCommentBodyText => new TranslatableString(getKey(@"delete_comment_body_text"), @"Do you really want to delete your comment?");
 
+        /// <summary>
+        /// "Are you sure you want to leave this multiplayer match?"
+        /// </summary>
+        public static LocalisableString ConfirmExitMultiplayerMatchBodyText => new TranslatableString(getKey(@"confirm_exit_multiplayer_match_body_text"), @"Are you sure you want to leave this multiplayer match?");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
