@@ -157,7 +157,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 Current = currentNumberInstantaneous,
                 OnCommit = () => current.Value = currentNumberInstantaneous.Value,
-                TooltipFormat = TooltipFormat,
+                TooltipFormat = s => TooltipFormat(s),
                 DisplayAsPercentage = DisplayAsPercentage,
                 PlaySamplesOnAdjust = PlaySamplesOnAdjust,
                 ResetToDefault = () =>
@@ -631,5 +631,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public void SetDefault() => Current.SetDefault();
 
         public bool IsDisabled => Current.Disabled;
+
+        public float MainDrawHeight => DrawHeight;
     }
 }

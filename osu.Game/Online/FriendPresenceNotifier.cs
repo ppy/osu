@@ -221,6 +221,8 @@ namespace osu.Game.Online
         {
             public MultipleFriendsOnlineNotification(ICollection<APIUser> users)
             {
+                Transient = true;
+                IsImportant = false;
                 Text = NotificationsStrings.FriendOnline(string.Join(@", ", users.Select(u => u.Username)));
             }
 
@@ -258,6 +260,8 @@ namespace osu.Game.Online
         {
             public MultipleFriendsOfflineNotification(ICollection<APIUser> users)
             {
+                Transient = true;
+                IsImportant = false;
                 Text = NotificationsStrings.FriendOffline(string.Join(@", ", users.Select(u => u.Username)));
             }
 
