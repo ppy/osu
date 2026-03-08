@@ -99,6 +99,21 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ConfirmExitCancelButton => new TranslatableString(getKey(@"confirm_exit_cancel_button"), @"Just a little more...");
 
+        /// <summary>
+        /// "Are you sure you want to go back?"
+        /// </summary>
+        public static LocalisableString ConfirmDiscardChangesHeaderText => new TranslatableString(getKey(@"confirm_discard_changes_header_text"), @"Are you sure you want to go back?");
+
+        /// <summary>
+        /// "This will discard any unsaved changes"
+        /// </summary>
+        public static LocalisableString ConfirmDiscardChangesBodyText => new TranslatableString(getKey(@"confirm_discard_changes_body_text"), @"This will discard any unsaved changes");
+
+        /// <summary>
+        /// "No I didn't mean to"
+        /// </summary>
+        public static LocalisableString ConfirmDiscardChangesCancelButton => new TranslatableString(getKey(@"confirm_discard_changes_cancel_button"), @"No I didn't mean to");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
