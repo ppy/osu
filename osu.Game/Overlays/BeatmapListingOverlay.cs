@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -20,8 +21,10 @@ using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing;
@@ -42,7 +45,9 @@ namespace osu.Game.Overlays
         private IBindable<APIUser> apiUser;
 
         private Container panelTarget;
+        private Container limitReachedPromptTarget;
         private FillFlowContainer<BeatmapCard> foundContent;
+        private bool hasDisplayedResultsForCurrentSearch;
 
         private BeatmapListingFilterControl filterControl => Header.FilterControl;
 
@@ -81,6 +86,11 @@ namespace osu.Game.Overlays
                             }
                         },
                     },
+                    limitReachedPromptTarget = new Container
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                    }
                 }
             };
 
@@ -145,11 +155,14 @@ namespace osu.Game.Overlays
         private void onSearchStarted()
         {
             cancellationToken?.Cancel();
+            hasDisplayedResultsForCurrentSearch = false;
 
             previewTrackManager.StopAnyPlaying(this);
 
             if (panelTarget.Any())
                 Loading.Show();
+
+            clearLimitReachedPrompt();
         }
 
         private void onSearchFinished(BeatmapListingFilterControl.SearchResult searchResult)
@@ -163,6 +176,21 @@ namespace osu.Game.Overlays
                 return;
             }
 
+            if (searchResult.Type == BeatmapListingFilterControl.SearchResultType.FilteredResultsLimitReached)
+            {
+                if (!hasDisplayedResultsForCurrentSearch)
+                    replaceResultsAreaContent(new FilteredResultsLimitReachedDrawable(() => filterControl.FetchMoreAfterFilteredLimit()));
+                else
+                {
+                    showLimitReachedPrompt();
+                    Loading.Hide();
+                }
+
+                return;
+            }
+
+            clearLimitReachedPrompt();
+
             var newCards = createCardsFor(searchResult.Results);
 
             if (filterControl.CurrentPage == 0 || foundContent == null)
@@ -173,6 +201,8 @@ namespace osu.Game.Overlays
                     replaceResultsAreaContent(new NotFoundDrawable());
                     return;
                 }
+
+                hasDisplayedResultsForCurrentSearch = true;
 
                 var content = createCardContainerFor(newCards);
 
@@ -188,6 +218,10 @@ namespace osu.Game.Overlays
                 panelLoadTask = LoadComponentsAsync(newCards, loaded =>
                 {
                     lastFetchDisplayedTime = Time.Current;
+
+                    if (loaded.Any())
+                        hasDisplayedResultsForCurrentSearch = true;
+
                     foundContent.AddRange(loaded);
                     loaded.ForEach(p => p.FadeIn(200, Easing.OutQuint));
                 }, (cancellationToken = new CancellationTokenSource()).Token);
@@ -227,9 +261,26 @@ namespace osu.Game.Overlays
             Loading.Hide();
             lastFetchDisplayedTime = Time.Current;
 
+            foundContent = content as FillFlowContainer<BeatmapCard>;
             panelTarget.Child = content;
 
             content.FadeInFromZero();
+        }
+
+        private void showLimitReachedPrompt()
+        {
+            if (limitReachedPromptTarget.Children.FirstOrDefault() is FilteredResultsLimitReachedDrawable existing)
+            {
+                existing.ResetLoadMoreState();
+                return;
+            }
+
+            limitReachedPromptTarget.Child = new FilteredResultsLimitReachedDrawable(() => filterControl.FetchMoreAfterFilteredLimit());
+        }
+
+        private void clearLimitReachedPrompt()
+        {
+            limitReachedPromptTarget.Clear();
         }
 
         private void onCardSizeChanged()
@@ -296,6 +347,82 @@ namespace osu.Game.Overlays
                         }
                     }
                 });
+            }
+        }
+
+        public partial class FilteredResultsLimitReachedDrawable : CompositeDrawable
+        {
+            private readonly Action loadMoreAction;
+            private RoundedButton loadMoreButton = null!;
+            private LoadingSpinner loadMoreSpinner = null!;
+            private bool loadMoreInProgress;
+
+            public FilteredResultsLimitReachedDrawable(Action loadMoreAction)
+            {
+                this.loadMoreAction = loadMoreAction;
+
+                RelativeSizeAxes = Axes.X;
+                Height = 250;
+                Alpha = 0;
+                Margin = new MarginPadding { Top = 15 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                AddInternal(new FillFlowContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 10),
+                    Children = new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Text = "Too many maps are hidden by the downloaded filter."
+                        },
+                        loadMoreButton = new RoundedButton
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Width = 140,
+                            Height = 30,
+                            Text = "Load more",
+                            Action = onLoadMoreClicked,
+                        },
+                    }
+                });
+
+                loadMoreButton.Add(loadMoreSpinner = new LoadingSpinner
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(16),
+                    State = { Value = Visibility.Hidden }
+                });
+            }
+
+            private void onLoadMoreClicked()
+            {
+                if (loadMoreInProgress)
+                    return;
+
+                loadMoreInProgress = true;
+                loadMoreButton.Text = string.Empty;
+                loadMoreSpinner.Show();
+
+                loadMoreAction();
+            }
+
+            public void ResetLoadMoreState()
+            {
+                loadMoreInProgress = false;
+                loadMoreSpinner.Hide();
+                loadMoreButton.Text = "Load more";
             }
         }
 
@@ -368,10 +495,18 @@ namespace osu.Game.Overlays
             base.Update();
 
             const int pagination_scroll_distance = 500;
+            bool hasVisibleResultsAndNotScrollable = foundContent != null
+                                                     && foundContent.Any()
+                                                     && ScrollFlow.ScrollableExtent <= 0;
+            bool noLimitPromptShown = !limitReachedPromptTarget.Any();
+            bool nearEndScrollable = ScrollFlow.ScrollableExtent > 0 && ScrollFlow.IsScrolledToEnd(pagination_scroll_distance);
+            bool waitingForLoadTask = panelLoadTask?.IsCompleted == false;
+            bool throttledByTime = Time.Current - lastFetchDisplayedTime <= time_between_fetches;
 
-            bool shouldShowMore = panelLoadTask?.IsCompleted != false
-                                  && Time.Current - lastFetchDisplayedTime > time_between_fetches
-                                  && (ScrollFlow.ScrollableExtent > 0 && ScrollFlow.IsScrolledToEnd(pagination_scroll_distance));
+            bool shouldShowMore = !waitingForLoadTask
+                                  && !throttledByTime
+                                  && (nearEndScrollable
+                                      || (hasVisibleResultsAndNotScrollable && noLimitPromptShown));
 
             if (shouldShowMore)
                 filterControl.FetchNextPage();

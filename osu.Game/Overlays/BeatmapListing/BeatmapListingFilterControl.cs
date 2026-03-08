@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.BeatmapListing
         private SearchBeatmapSetsResponse lastResponse;
         private int filteredEmptyAutoFetchCount;
 
-        private const int max_filtered_empty_auto_fetch_pages = 20;
+        private const int max_filtered_empty_auto_fetch_pages = 5;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -213,6 +213,16 @@ namespace osu.Game.Overlays.BeatmapListing
             performRequest();
         }
 
+        public void FetchMoreAfterFilteredLimit()
+        {
+            if (lastResponse?.Cursor == null)
+                return;
+
+            noMoreResults = false;
+            filteredEmptyAutoFetchCount = 0;
+            FetchNextPage();
+        }
+
         private void resetSortControl() => sortControl.Reset(searchControl.Category.Value, !string.IsNullOrEmpty(searchControl.Query.Value));
 
         private void queueUpdateSearch(bool queryTextChanged = false)
@@ -233,11 +243,13 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private void performRequest()
         {
+            var requestGeneralFilters = searchControl.General.Where(g => g != SearchGeneral.HideAlreadyDownloaded).ToList();
+
             getSetsRequest = new SearchBeatmapSetsRequest(
                 searchControl.Query.Value,
                 searchControl.Ruleset.Value,
                 lastResponse?.Cursor,
-                searchControl.General,
+                requestGeneralFilters,
                 searchControl.Category.Value,
                 sortControl.Current.Value,
                 sortControl.SortDirection.Value,
@@ -270,6 +282,8 @@ namespace osu.Game.Overlays.BeatmapListing
                     if (filteredEmptyAutoFetchCount >= max_filtered_empty_auto_fetch_pages)
                     {
                         noMoreResults = true;
+                        SearchFinished?.Invoke(SearchResult.FilteredResultsLimitReached(sets));
+                        return;
                     }
                     else
                     {
@@ -345,7 +359,12 @@ namespace osu.Game.Overlays.BeatmapListing
             /// <summary>
             /// The user is not a supporter, but used supporter-only search filters.
             /// </summary>
-            SupporterOnlyFilters
+            SupporterOnlyFilters,
+
+            /// <summary>
+            /// Downloaded-filtered empty pages hit the automatic continuation limit.
+            /// </summary>
+            FilteredResultsLimitReached
         }
 
         /// <summary>
@@ -377,6 +396,12 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 Type = SearchResultType.SupporterOnlyFilters,
                 SupporterOnlyFiltersUsed = filters
+            };
+
+            public static SearchResult FilteredResultsLimitReached(List<APIBeatmapSet> results) => new SearchResult
+            {
+                Type = SearchResultType.FilteredResultsLimitReached,
+                Results = results,
             };
         }
     }

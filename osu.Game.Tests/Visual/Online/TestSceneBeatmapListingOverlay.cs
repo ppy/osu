@@ -28,10 +28,14 @@ namespace osu.Game.Tests.Visual.Online
 {
     public partial class TestSceneBeatmapListingOverlay : OsuManualInputManagerTestScene
     {
+        private const int downloaded_filter_auto_fetch_cap = 5;
+
         private readonly List<APIBeatmapSet> setsForResponse = new List<APIBeatmapSet>();
         private readonly Queue<(List<APIBeatmapSet> beatmaps, bool hasNextPage)> queuedResponses = new Queue<(List<APIBeatmapSet> beatmaps, bool hasNextPage)>();
 
         private BeatmapListingOverlay overlay;
+
+        private BeatmapListingFilterControl filterControl => overlay.ChildrenOfType<BeatmapListingFilterControl>().Single();
 
         private BeatmapListingSearchControl searchControl => overlay.ChildrenOfType<BeatmapListingSearchControl>().Single();
 
@@ -300,6 +304,44 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestExcludeDownloadedFilterAutoPaginatesWhenFirstPageHasSingleVisibleResult()
+        {
+            int downloadedSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
+            int firstVisibleSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
+            int secondVisibleSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
+
+            if (firstVisibleSetId == downloadedSetId)
+                firstVisibleSetId++;
+
+            if (secondVisibleSetId == downloadedSetId || secondVisibleSetId == firstVisibleSetId)
+                secondVisibleSetId += 2;
+
+            AddStep("mark one set as downloaded", () => addLocalBeatmapSet(downloadedSetId));
+            AddStep("set paged search responses", () =>
+            {
+                setSearchResponses(
+                    (new[]
+                    {
+                        new APIBeatmapSet { OnlineID = firstVisibleSetId },
+                        new APIBeatmapSet { OnlineID = downloadedSetId },
+                    }, true),
+                    (new[]
+                    {
+                        new APIBeatmapSet { OnlineID = secondVisibleSetId },
+                    }, false));
+            });
+
+            int requestsBeforeSearch = 0;
+            AddStep("capture request baseline", () => requestsBeforeSearch = searchRequestsHandled);
+            AddStep("enable queued responses", () => consumeQueuedResponses = true);
+            setHideDownloadedFilter(true);
+
+            AddUntilStep("both visible results loaded", () =>
+                this.ChildrenOfType<BeatmapCard>().Select(c => c.BeatmapSet.OnlineID).Distinct().Count() == 2);
+            AddAssert("second page was requested", () => searchRequestsHandled >= requestsBeforeSearch + 2);
+        }
+
+        [Test]
         public void TestExcludeDownloadedFilterStopsFetchingWhenAllPagedResultsAreDownloaded()
         {
             int[] downloadedSetIds =
@@ -339,11 +381,9 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestExcludeDownloadedFilterAutoFetchIsCapped()
         {
-            const int auto_fetch_cap = 20;
-
             AddStep("set many paged downloaded-only responses", () =>
             {
-                var responses = Enumerable.Range(0, auto_fetch_cap * 2)
+                var responses = Enumerable.Range(0, downloaded_filter_auto_fetch_cap * 2)
                                           .Select(_ =>
                                           {
                                               int onlineId = Math.Max(1, Guid.NewGuid().GetHashCode());
@@ -360,11 +400,78 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("enable queued responses", () => consumeQueuedResponses = true);
             setHideDownloadedFilter(true);
 
-            notFoundPlaceholderShown();
+            filteredLimitPlaceholderShown();
 
             int requestsAfterCompletion = 0;
             AddStep("capture request count after completion", () => requestsAfterCompletion = searchRequestsHandled);
-            AddAssert("autofetch is bounded", () => requestsAfterCompletion <= requestsBeforeSearch + auto_fetch_cap);
+            AddAssert("autofetch is bounded", () => requestsAfterCompletion <= requestsBeforeSearch + downloaded_filter_auto_fetch_cap);
+        }
+
+        [Test]
+        public void TestExcludeDownloadedFilterCanLoadMoreAfterAutoFetchCap()
+        {
+            const int expectedSetId = int.MaxValue - 12345;
+
+            AddStep("set paged downloaded-only responses then a non-downloaded one", () =>
+            {
+                var downloadedResponses = Enumerable.Range(0, downloaded_filter_auto_fetch_cap)
+                                                   .Select(_ =>
+                                                   {
+                                                       int onlineId = Math.Max(1, Guid.NewGuid().GetHashCode());
+                                                       addLocalBeatmapSet(onlineId);
+                                                       return (beatmaps: (IEnumerable<APIBeatmapSet>)new[] { new APIBeatmapSet { OnlineID = onlineId } }, hasNextPage: true);
+                                                   });
+
+                var notDownloaded = new APIBeatmapSet { OnlineID = expectedSetId };
+
+                setSearchResponses(downloadedResponses.Append((new[] { notDownloaded }, false)).ToArray());
+            });
+
+            AddStep("enable queued responses", () => consumeQueuedResponses = true);
+            int requestsBeforeSearch = 0;
+            AddStep("capture request baseline", () => requestsBeforeSearch = searchRequestsHandled);
+            setHideDownloadedFilter(true);
+
+            AddUntilStep("autofetch capped", () => searchRequestsHandled >= requestsBeforeSearch + downloaded_filter_auto_fetch_cap);
+            AddStep("load more", () => filterControl.FetchMoreAfterFilteredLimit());
+            AddUntilStep("non-downloaded result loaded", () => this.ChildrenOfType<BeatmapCard>().SingleOrDefault()?.BeatmapSet.OnlineID == expectedSetId);
+        }
+
+        [Test]
+        public void TestExcludeDownloadedFilterShowsPromptWhenCapHitAfterResultsAreVisible()
+        {
+            int[] downloadedIds = Enumerable.Range(0, downloaded_filter_auto_fetch_cap)
+                                            .Select(_ => Math.Max(1, Guid.NewGuid().GetHashCode()))
+                                            .ToArray();
+
+            AddStep("mark later pages as downloaded", () =>
+            {
+                foreach (int id in downloadedIds)
+                    addLocalBeatmapSet(id);
+            });
+
+            AddStep("set responses with visible first page then downloaded pages", () =>
+            {
+                var firstPageVisible = getManyBeatmaps(60);
+
+                var responses = new List<(IEnumerable<APIBeatmapSet> beatmaps, bool hasNextPage)>
+                {
+                    (firstPageVisible, true),
+                };
+
+                responses.AddRange(downloadedIds.Select(id =>
+                    ((IEnumerable<APIBeatmapSet>)new[] { new APIBeatmapSet { OnlineID = id } }, true)));
+
+                setSearchResponses(responses.ToArray());
+            });
+
+            AddStep("enable queued responses", () => consumeQueuedResponses = true);
+            setHideDownloadedFilter(true);
+
+            AddUntilStep("initial results visible", () => this.ChildrenOfType<BeatmapCard>().Any());
+            AddStep("scroll to end", () => overlay.ChildrenOfType<OverlayScrollContainer>().Single().ScrollToEnd());
+            AddUntilStep("\"filtered limit reached\" prompt added", () => this.ChildrenOfType<BeatmapListingOverlay.FilteredResultsLimitReachedDrawable>().Any());
+            AddAssert("results remain visible", () => this.ChildrenOfType<BeatmapCard>().Any());
         }
 
         [Test]
@@ -600,6 +707,11 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddUntilStep("\"supporter required\" placeholder not shown", () => !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any(d => d.IsPresent));
             AddUntilStep("\"no maps found\" placeholder not shown", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any(d => d.IsPresent));
+        }
+
+        private void filteredLimitPlaceholderShown()
+        {
+            AddUntilStep("\"filtered limit reached\" placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.FilteredResultsLimitReachedDrawable>().Any());
         }
 
         private void setCardSize(BeatmapCardSize cardSize, bool viaConfig) => AddStep($"set card size to {cardSize}", () =>
