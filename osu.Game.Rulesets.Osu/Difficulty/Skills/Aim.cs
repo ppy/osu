@@ -30,9 +30,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain;
 
-        private double skillMultiplierAim => 65.2;
+        private double skillMultiplierAim => 65.3;
         private double skillMultiplierSpeed => 2.7;
-        private double skillMultiplierFlow => 220.0;
+        private double skillMultiplierFlow => 275.0;
         private double skillMultiplierTotal => 1.0;
         private double meanExponent => 1.2;
 
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierAim;
             double speedDifficulty = SpeedAimEvaluator.EvaluateDifficultyOf(current) * skillMultiplierSpeed;
-            double flowDifficulty = FlowAimEvaluator.LiveEvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierFlow;
+            double flowDifficulty = FlowAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierFlow;
 
             if (Mods.Any(m => m is OsuModTouchDevice))
             {
