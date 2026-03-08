@@ -59,6 +59,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ClosePlaylistHeaderText => new TranslatableString(getKey(@"close_playlist_header_text"), @"Are you sure you want to close the following playlist:");
 
+        /// <summary>
+        /// "Are you sure you want to abort the match?"
+        /// </summary>
+        public static LocalisableString ConfirmAbortMatchHeaderText => new TranslatableString(getKey(@"confirm_abort_match_header_text"), @"Are you sure you want to abort the match?");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
