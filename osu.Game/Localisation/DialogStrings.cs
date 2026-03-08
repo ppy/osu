@@ -77,7 +77,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Last chance to turn back"
         /// </summary>
-        public static LocalisableString ConfirmExitBodyText => new TranslatableString(getKey(@"confirm_exit_body_text"), @"Last chance to turn back");
+        public static LocalisableString ConfirmDialogBodyText => new TranslatableString(getKey(@"confirm_exit_body_text"), @"Last chance to turn back");
 
         /// <summary>
         /// "There are currently some background operations which will be aborted if you continue:"

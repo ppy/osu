@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Menu
                 else
                     ongoingOperationsLocalisableString = ongoingOperationsText;
 
-                BodyText = LocalisableString.Interpolate($"{DialogStrings.ConfirmExitBodyTextOngoingOperations}\n\n{ongoingOperationsLocalisableString}\n{DialogStrings.ConfirmExitBodyText}");
+                BodyText = LocalisableString.Interpolate($"{DialogStrings.ConfirmExitBodyTextOngoingOperations}\n\n{ongoingOperationsLocalisableString}\n{DialogStrings.ConfirmDialogBodyText}");
 
                 Buttons = new PopupDialogButton[]
                 {
@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Menu
             }
             else
             {
-                BodyText = DialogStrings.ConfirmExitBodyText;
+                BodyText = DialogStrings.ConfirmDialogBodyText;
 
                 Buttons = new PopupDialogButton[]
                 {
