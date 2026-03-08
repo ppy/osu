@@ -148,6 +148,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ExternalLinkOkButton => new TranslatableString(getKey(@"external_link_ok_button"), @"Open in browser");
 
+        /// <summary>
+        /// "Do you really want to delete your comment?"
+        /// </summary>
+        public static LocalisableString DeleteCommentBodyText => new TranslatableString(getKey(@"delete_comment_body_text"), @"Do you really want to delete your comment?");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
