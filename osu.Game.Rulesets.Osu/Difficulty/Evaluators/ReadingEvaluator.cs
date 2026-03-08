@@ -64,10 +64,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private static double calculateDensityDifficulty(OsuDifficultyHitObject currObj, OsuDifficultyHitObject? nextObj, double velocity, double constantAngleNerfFactor,
                                                          double pastObjectDifficultyInfluence, double currentVisibleObjectDensity)
         {
+            if (nextObj == null)
+            {
+                return 0;
+            }
+
             // Consider future densities too because it can make the path the cursor takes less clear
             double futureObjectDifficultyInfluence = Math.Sqrt(currentVisibleObjectDensity);
 
-            if (nextObj != null)
             {
                 // Reduce difficulty if movement to next object is small
                 futureObjectDifficultyInfluence *= DifficultyCalculationUtils.Smootherstep(nextObj.LazyJumpDistance, 15, distance_influence_threshold);
@@ -76,7 +80,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Value higher note densities exponentially
             double noteDensityDifficulty = Math.Pow(pastObjectDifficultyInfluence + futureObjectDifficultyInfluence, 1.7) * 0.4 * constantAngleNerfFactor * velocity;
 
-            if (nextObj != null && nextObj.Preempt != currObj.Preempt)
+            // Freeze Frame adds additional difficulty due to the changing preempt time between objects,
+            // so we account for that.
+            if (nextObj.Preempt != currObj.Preempt)
             {
                 if (nextObj.Preempt > currObj.Preempt && currObj.StartTime + nextObj.Preempt > nextObj.StartTime)
                 {
