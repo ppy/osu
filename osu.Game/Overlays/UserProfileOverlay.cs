@@ -48,6 +48,9 @@ namespace osu.Game.Overlays
         private IUser? user;
         private IRulesetInfo? ruleset;
 
+        [Cached]
+        private readonly ScorePinningManager pinningManager;
+
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         [Resolved]
@@ -61,6 +64,7 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
+                    pinningManager = new ScorePinningManager(),
                     onlineViewContainer = new OnlineViewContainer($"Sign in to view the {Header.Title.Title}")
                     {
                         RelativeSizeAxes = Axes.Both
@@ -110,6 +114,8 @@ namespace osu.Game.Overlays
 
             userReq?.Cancel();
             lastSection = null;
+
+            pinningManager.Invalidate();
 
             sections = !user.IsBot
                 ? new ProfileSection[]
