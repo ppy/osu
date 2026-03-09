@@ -28,33 +28,36 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
         }
 
-        public override double DifficultyValue()
+        /// <summary>
+        /// Returns a sorted enumerable of strain peaks with the highest values reduced.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<StrainPeak> GetReducedStrainPeaks()
         {
-            double difficulty = 0;
-
             // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
             // These sections will not contribute to the difficulty.
             var peaks = GetCurrentStrainPeaks().Where(p => p.Value > 0);
 
             List<StrainPeak> strains = peaks.OrderByDescending(p => p.Value).ToList();
 
-            double time = 0; // Time is measured in units of strains
             const int chunk_size = 20;
-            int strainsToRemove = 0;
+            double time = 0;
+            int strainsToRemove = 0; // All strains are removed at the end for optimization purposes
 
             // We are reducing the highest strains first to account for extreme difficulty spikes
-            // Split the strain into 20ms chunks to try to mitigate inconsistencies caused by reducing strains
+            // Strains are split into 20ms chunks to try to mitigate inconsistencies caused by reducing strains
             while (strains.Count > strainsToRemove && time < ReducedSectionTime)
             {
                 StrainPeak strain = strains[strainsToRemove];
-                double addedTime = 0;
 
-                while (addedTime < strain.SectionLength)
+                for (double addedTime = 0; addedTime < strain.SectionLength; addedTime += chunk_size)
                 {
                     double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((time + addedTime) / ReducedSectionTime, 0, 1)));
 
-                    strains.Add(new StrainPeak(strain.Value * Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale), Math.Min(chunk_size, strain.SectionLength - addedTime)));
-                    addedTime += chunk_size;
+                    strains.Add(new StrainPeak(
+                        strain.Value * Interpolation.Lerp(ReducedStrainBaseline, 1.0, scale),
+                        Math.Min(chunk_size, strain.SectionLength - addedTime)
+                    ));
                 }
 
                 time += strain.SectionLength;
@@ -63,11 +66,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             strains.RemoveRange(0, strainsToRemove);
 
-            // Reset time for summing
-            time = 0;
+            return strains.OrderByDescending(p => p.Value);
+        }
+
+        public override double DifficultyValue()
+        {
+            double difficulty = 0;
+            double time = 0;
+
+            var strains = GetReducedStrainPeaks();
 
             // Difficulty is a continuous weighted sum of the sorted strains
-            foreach (StrainPeak strain in strains.OrderByDescending(s => s.Value))
+            foreach (StrainPeak strain in strains)
             {
                 /* Weighting function can be thought of as:
                         b
