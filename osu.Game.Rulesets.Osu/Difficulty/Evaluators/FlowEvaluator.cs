@@ -41,6 +41,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double flowDifficulty = currVelocity; // Start strain with regular velocity.
 
+            // Apply high circle size bonus
+            flowDifficulty *= Math.Pow(osuCurrObj.SmallCircleBonus, 1.0);
+
             // rhythm change bonus
             flowDifficulty *= 1 + Math.Min(0.25, Math.Pow((Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) - Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) / 50, 4));
 
@@ -80,8 +83,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             flowDifficulty += velocityChangeBonus * velocity_change_multiplier;
 
-            // Apply high circle size bonus
-            flowDifficulty *= Math.Pow(osuCurrObj.SmallCircleBonus, 2);
+            if (osuCurrObj.BaseObject is Slider)
+            {
+                // Reward sliders based on velocity.
+                flowDifficulty += osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
+            }
+
 
             return Math.Pow(flowDifficulty, 1.45);
         }

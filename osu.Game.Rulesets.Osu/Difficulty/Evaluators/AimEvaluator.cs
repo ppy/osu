@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class AimEvaluator
     {
-        private const double wide_angle_multiplier = 1.35;
+        private const double wide_angle_multiplier = 1.3;
         private const double acute_angle_multiplier = 2.5;
         private const double slider_multiplier = 1.9;
         private const double velocity_change_multiplier = 1.0;
@@ -89,10 +89,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                                        DifficultyCalculationUtils.Smootherstep(currDistance, 0, diameter * 2);
                 }
 
-                wideAngleBonus = calcWideAngleBonus(currAngle) * angleBonus;
+                wideAngleBonus = calcWideAngleBonus(currAngle);
 
                 // Penalize angle repetition.
-                wideAngleBonus *= 1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3));
+                wideAngleBonus *= 0.25 + 0.75 * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3)));
+
+                wideAngleBonus *= angleBonus;
 
                 // Apply wiggle bonus for jumps that are [radius, 3*diameter] in distance, with < 110 angle
                 // https://www.desmos.com/calculator/dp0v0nvowc
