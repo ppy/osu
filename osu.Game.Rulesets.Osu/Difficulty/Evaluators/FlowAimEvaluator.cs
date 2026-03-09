@@ -14,9 +14,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double velocity_change_multiplier = 2.0;
 
-        private const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
-        private const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
-
         /// <summary>
         /// Evaluates difficulty of "flow aim" - aiming pattern where player doesn't stop their cursor on every object and instead "flows" through them.
         /// </summary>
@@ -28,7 +25,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
             var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
-            var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
 
             double currDistance = withSliderTravelDistance ? osuCurrObj.LazyJumpDistance : osuCurrObj.JumpDistance;
             double prevDistance = withSliderTravelDistance ? osuLastObj.LazyJumpDistance : osuLastObj.JumpDistance;
@@ -64,9 +60,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (current.Index > 2)
             {
-                double o1 = getOverlapness(osuCurrObj, osuLastObj);
-                double o2 = getOverlapness(osuCurrObj, osuLastLastObj);
-                double o3 = getOverlapness(osuLastObj, osuLastLastObj);
+                double o1 = calculateOverlapFactor(osuCurrObj, osuLastObj);
+                double o2 = calculateOverlapFactor(osuCurrObj, osuLastLastObj);
+                double o3 = calculateOverlapFactor(osuLastObj, osuLastLastObj);
 
                 overlappedNotesWeight = 1 - o1 * o2 * o3;
             }
@@ -92,7 +88,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double distRatio = DifficultyCalculationUtils.Smoothstep(Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity), 0, 1);
 
                 // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
-                double overlapVelocityBuff = Math.Min(diameter * 1.25 / Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime), Math.Abs(prevVelocity - currVelocity));
+                double overlapVelocityBuff = Math.Min(OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25 / Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime),
+                    Math.Abs(prevVelocity - currVelocity));
 
                 flowDifficulty += overlapVelocityBuff * distRatio * velocity_change_multiplier;
             }
@@ -107,13 +104,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return Math.Pow(flowDifficulty, 1.45);
         }
 
-        private static double getOverlapness(OsuDifficultyHitObject odho1, OsuDifficultyHitObject odho2)
+        private static double calculateOverlapFactor(OsuDifficultyHitObject first, OsuDifficultyHitObject second)
         {
-            OsuHitObject o1 = (OsuHitObject)odho1.BaseObject, o2 = (OsuHitObject)odho2.BaseObject;
+            var firstBase = (OsuHitObject)first.BaseObject;
+            var secondBase = (OsuHitObject)second.BaseObject;
+            double objectRadius = firstBase.Radius;
 
-            double distance = Vector2.Distance(o1.StackedPosition, o2.StackedPosition);
-            double objectRadius = o1.Radius;
-
+            double distance = Vector2.Distance(firstBase.StackedPosition, secondBase.StackedPosition);
             return Math.Clamp(1 - Math.Pow(Math.Max(distance - objectRadius, 0) / objectRadius, 2), 0, 1);
         }
     }

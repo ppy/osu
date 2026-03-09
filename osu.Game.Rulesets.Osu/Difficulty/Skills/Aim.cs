@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 flowDifficulty *= 0.1;
             }
 
-            double totalDifficulty = calcTotalValue(snapDifficulty, agilityDifficulty, flowDifficulty);
+            double totalDifficulty = calculateTotalValue(snapDifficulty, agilityDifficulty, flowDifficulty);
 
             currentStrain *= decay;
             currentStrain += totalDifficulty * (1 - decay);
@@ -75,14 +75,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return currentStrain;
         }
 
-        private double calcTotalValue(double snapDifficulty, double agilityDifficulty, double flowDifficulty)
+        private double calculateTotalValue(double snapDifficulty, double agilityDifficulty, double flowDifficulty)
         {
             // We compare flow to combined snap and agility because snap by itself doesn't have enough difficulty to be above flow on streams
             // Agility on the other hand is supposed to measure the rate of cursor velocity changes while snapping
             // So snapping every circle on a stream requires an enormous amount of agility at which point it's easier to flow
             double combinedSnapDifficulty = DifficultyCalculationUtils.Norm(meanExponent, snapDifficulty, agilityDifficulty);
 
-            double pSnap = snapFlowProbability(flowDifficulty / combinedSnapDifficulty);
+            double pSnap = calculateSnapFlowProbability(flowDifficulty / combinedSnapDifficulty);
             double pFlow = 1 - pSnap;
 
             double totalDifficulty = combinedSnapDifficulty * pSnap + flowDifficulty * pFlow;
@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         // Therefore: f(x) + f(1/x) = 1
         // 0 <= f(x) <= 1 (cannot have negative or greater than 100% probability of snapping or flowing)
         // This logistic function is a solution, which fits nicely with the general idea of interpolation and provides a tuneable constant
-        private static double snapFlowProbability(double ratio)
+        private static double calculateSnapFlowProbability(double ratio)
         {
             const double k = 7.27;
 
