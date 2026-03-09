@@ -116,6 +116,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double? Angle { get; private set; }
 
+        public double? AngularVelocity { get; private set; }
+
         /// <summary>
         /// Angle of the vector created between current and current-1
         /// normalised to consider symmetrical vectors in any axis to be the same angle.
@@ -269,6 +271,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 NormalisedVectorAngle = Math.Atan2(Math.Abs(v.Y), Math.Abs(v.X));
 
                 Angle = Math.Min(angle, sliderAngle);
+
+                if (lastLastDifficultyObject.Angle != null)
+                {
+                    double angleDifference = Math.Abs(Angle.Value - lastLastDifficultyObject.Angle.Value);
+                    double angleDifferenceAdjusted = Math.Sin(angleDifference / 2) * 180.0;
+                    AngularVelocity = angleDifferenceAdjusted / (AdjustedDeltaTime * 0.1);
+                }
             }
         }
 
