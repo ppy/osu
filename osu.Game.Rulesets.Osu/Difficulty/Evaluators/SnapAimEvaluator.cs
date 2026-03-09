@@ -13,9 +13,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     public static class SnapAimEvaluator
     {
         private const double wide_angle_multiplier = 1.05;
-        private const double acute_angle_multiplier = 2.5;
+        private const double acute_angle_multiplier = 2.41;
         private const double slider_multiplier = 1.5;
-        private const double velocity_change_multiplier = 0.95;
+        private const double velocity_change_multiplier = 0.9;
         private const double wiggle_multiplier = 1.02; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
         private const double maximum_repetition_nerf = 0.15;
         private const double maximum_vector_influence = 0.5;
@@ -217,7 +217,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double angleDifferenceAdjusted = Math.Cos(2 * Math.Min(double.DegreesToRadians(45), Math.Abs(currAngle - lastAngle) * stackFactor));
 
-            double baseNerf = 1 - maximum_repetition_nerf * calcAcuteAngleBonus(lastAngle) * angleDifferenceAdjusted;
+            double baseNerf = 1 - maximum_repetition_nerf * CalcAcuteAngleBonus(lastAngle) * angleDifferenceAdjusted;
 
             return Math.Pow(baseNerf + (1 - baseNerf) * vectorRepetition * maximum_vector_influence * stackFactor, 2);
         }
