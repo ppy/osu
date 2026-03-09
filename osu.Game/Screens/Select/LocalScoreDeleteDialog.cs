@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Scoring;
 
@@ -19,7 +20,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(ScoreManager scoreManager)
         {
-            BodyText = $"{score.User} ({score.DisplayAccuracy}, {score.Rank})";
+            BodyText = $"{score.User} ({score.DisplayAccuracy}, {score.Rank.GetLocalisableDescription()})";
             DangerousAction = () => scoreManager.Delete(score);
         }
     }
