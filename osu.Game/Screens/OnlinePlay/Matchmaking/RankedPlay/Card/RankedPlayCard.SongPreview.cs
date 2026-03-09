@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -183,7 +184,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 
                     this.ScaleTo(1.02f, EXPAND_DURATION, Easing.In)
                         .Then()
-                        .ScaleTo(1f, beatLength - EXPAND_DURATION, new CubicBezierEasingFunction(easeIn: 0.1f, easeOut: 1f));
+                        .ScaleTo(1f, Math.Max(0, beatLength - EXPAND_DURATION), new CubicBezierEasingFunction(easeIn: 0.1f, easeOut: 1f));
                 }
             }
 
