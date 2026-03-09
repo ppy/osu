@@ -31,8 +31,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double currentAimStrain;
         private double currentSpeedStrain;
 
-        private double skillMultiplierAim => 25.0;
-        private double skillMultiplierSpeed => 1.4;
+        private double skillMultiplierAim => 65.2;
+        private double skillMultiplierSpeed => 2.8;
         private double skillMultiplierTotal => 1.0;
         private double meanExponent => 1.2;
 
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (Mods.Any(m => m is OsuModTouchDevice))
             {
-                aimDifficulty = Math.Pow(aimDifficulty, 0.8);
+                aimDifficulty = Math.Pow(aimDifficulty, 0.76);
                 speedDifficulty = Math.Pow(speedDifficulty, 0.95);
             }
 
