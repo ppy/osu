@@ -115,7 +115,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// Calculated as the angle between the circles (current-2, current-1, current).
         /// </summary>
         public double? Angle { get; private set; }
-        public double? AngleSigned { get; private set; }
 
         public double? AngularVelocity { get; private set; }
 
@@ -262,8 +261,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double angle = calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition);
                 double sliderAngle = calculateSliderAngle(lastDifficultyObject!, lastLastCursorPosition);
 
-                AngleSigned = Math.Abs(angle) <= Math.Abs(sliderAngle) ? angle : sliderAngle;
-                Angle = Math.Abs((double)AngleSigned);
+                Angle = Math.Min(angle, sliderAngle);
 
                 if (lastLastDifficultyObject.Angle != null)
                 {
@@ -403,7 +401,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             float dot = Vector2.Dot(v1, v2);
             float det = v1.X * v2.Y - v1.Y * v2.X;
 
-            return Math.Atan2(det, dot);
+            return Math.Abs(Math.Atan2(det, dot));
         }
 
         private Vector2 getEndCursorPosition(OsuDifficultyHitObject difficultyHitObject)
