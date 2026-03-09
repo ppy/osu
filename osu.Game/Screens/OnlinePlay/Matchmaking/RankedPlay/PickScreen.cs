@@ -38,12 +38,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private const int card_play_samples = 2;
         private Sample?[]? cardPlaySamples;
 
-        private bool timeRunningOutWarningActive;
         private Sample? timeRunningOutSample;
         private SampleChannel? timeRunningOutSampleChannel;
         private Sample? timeUpBuzzerSample;
 
         private DateTimeOffset stageEndTime;
+        private TimeSpan stageDuration;
 
         /// <summary>
         /// Whether the local user has played a card themselves.
@@ -122,13 +122,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             }
         }
 
+        private bool shouldPlayWarningSample
+            => matchInfo.Stage.Value == RankedPlayStage.CardPlay
+               && stageDuration > TimeSpan.FromSeconds(warning_time_threshold)
+               && stageEndTime - DateTimeOffset.Now < TimeSpan.FromSeconds(warning_time_threshold)
+               && !hasPlayedCard;
+
         protected override void Update()
         {
             base.Update();
 
-            TimeSpan remainingTime = stageEndTime - DateTimeOffset.Now;
-
-            if (timeRunningOutWarningActive && remainingTime.TotalSeconds < warning_time_threshold)
+            if (shouldPlayWarningSample)
             {
                 timeRunningOutSampleChannel ??= timeRunningOutSample?.GetChannel();
 
@@ -139,6 +143,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 timeRunningOutSampleChannel.Looping = true;
                 timeRunningOutSampleChannel.Play();
             }
+            else
+                timeRunningOutSampleChannel?.Stop();
         }
 
         public override void OnEntering(RankedPlaySubScreen? previous)
@@ -184,11 +190,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         private void onCountdownStarted(MultiplayerCountdown countdown) => Scheduler.Add(() =>
         {
-            if (countdown is not RankedPlayStageCountdown stageCountdown)
+            if (countdown is not RankedPlayStageCountdown)
                 return;
 
             stageEndTime = DateTimeOffset.Now + countdown.TimeRemaining;
-            timeRunningOutWarningActive = stageCountdown.Stage == RankedPlayStage.CardPlay;
+            stageDuration = countdown.TimeRemaining;
         });
 
         private void onCountdownStopped(MultiplayerCountdown countdown) => Scheduler.Add(() =>
@@ -196,10 +202,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             if (countdown is not RankedPlayStageCountdown stageCountdown)
                 return;
 
-            timeRunningOutSampleChannel?.Stop();
-
             stageEndTime = DateTimeOffset.Now;
-            timeRunningOutWarningActive = false;
+            stageDuration = TimeSpan.Zero;
 
             if (stageCountdown.Stage == RankedPlayStage.CardPlay && !hasPlayedCard)
                 timeUpBuzzerSample?.Play();
