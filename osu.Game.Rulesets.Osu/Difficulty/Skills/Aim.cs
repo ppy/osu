@@ -53,8 +53,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (Mods.Any(m => m is OsuModTouchDevice))
             {
-                snapDifficulty = Math.Pow(snapDifficulty, 0.8);
-                agilityDifficulty = Math.Pow(agilityDifficulty, 0.95);
+                snapDifficulty = Math.Pow(snapDifficulty, 0.89);
+                // we don't adjust agility here since agility represents TD difficulty in a decent enough way
                 flowDifficulty = Math.Pow(flowDifficulty, 1.1);
             }
 
