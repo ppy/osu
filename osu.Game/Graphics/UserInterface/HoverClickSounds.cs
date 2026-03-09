@@ -7,8 +7,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions;
 using osu.Framework.Input.Events;
-using osu.Framework.Utils;
-using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -21,20 +19,20 @@ namespace osu.Game.Graphics.UserInterface
         private Sample? sampleClick;
         private Sample? sampleClickDisabled;
 
-        private readonly MouseButton[] buttons;
+        private readonly osuTK.Input.MouseButton[] buttons;
 
         /// <summary>
-        /// a container which plays sounds on hover and click for any specified <see cref="MouseButton"/>s.
+        /// a container which plays sounds on hover and click for any specified <see cref="osuTK.Input.MouseButton"/>s.
         /// </summary>
         /// <param name="sampleSet">Set of click samples to play.</param>
         /// <param name="buttons">
         /// Array of button codes which should trigger the click sound.
         /// If this optional parameter is omitted or set to <code>null</code>, the click sound will only be played on left click.
         /// </param>
-        public HoverClickSounds(HoverSampleSet sampleSet = HoverSampleSet.Default, MouseButton[]? buttons = null)
+        public HoverClickSounds(HoverSampleSet sampleSet = HoverSampleSet.Default, osuTK.Input.MouseButton[]? buttons = null)
             : base(sampleSet)
         {
-            this.buttons = buttons ?? new[] { MouseButton.Left };
+            this.buttons = buttons ?? new[] { osuTK.Input.MouseButton.Left };
         }
 
         [BackgroundDependencyLoader]
@@ -61,7 +59,7 @@ namespace osu.Game.Graphics.UserInterface
 
             if (channel != null)
             {
-                channel.Frequency.Value = 0.99 + RNG.NextDouble(0.02);
+                channel.Frequency.Value = 0.99 + osu.Framework.Utils.RNG.NextDouble(0.02);
                 channel.Play();
             }
         }
