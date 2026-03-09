@@ -32,7 +32,7 @@ namespace osu.Game.Graphics.Carousel
         /// Implementation of scroll container which handles very large vertical lists by internally using <c>double</c> precision
         /// for pre-display Y values.
         /// </summary>
-        protected partial class ScrollContainer : UserTrackingScrollContainer, IKeyBindingHandler<GlobalAction>
+        protected partial class ScrollContainer : UserTrackingScrollContainer, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>
         {
             public Action? OnPageUp { get; init; }
             public Action? OnPageDown { get; init; }
@@ -149,7 +149,7 @@ namespace osu.Game.Graphics.Carousel
                 return base.OnKeyDown(e);
             }
 
-            public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+            public new bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
             {
                 if (IsHandlingKeyboardScrolling)
                 {
