@@ -30,8 +30,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain;
 
-        private double skillMultiplierAim => 65.2;
-        private double skillMultiplierSpeed => 2.7;
+        private double skillMultiplierSnap => 65.2;
+        private double skillMultiplierAgility => 2.7;
         private double skillMultiplierFlow => 262.0;
         private double skillMultiplierTotal => 1.0;
         private double meanExponent => 1.2;
@@ -47,24 +47,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             double decay = strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
 
-            double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierAim;
-            double speedDifficulty = SpeedAimEvaluator.EvaluateDifficultyOf(current) * skillMultiplierSpeed;
+            double snapDifficulty = SnapAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierSnap;
+            double agilityDifficulty = AgilityEvaluator.EvaluateDifficultyOf(current) * skillMultiplierAgility;
             double flowDifficulty = FlowAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierFlow;
 
             if (Mods.Any(m => m is OsuModTouchDevice))
             {
-                aimDifficulty = Math.Pow(aimDifficulty, 0.8);
-                speedDifficulty = Math.Pow(speedDifficulty, 0.95);
+                snapDifficulty = Math.Pow(snapDifficulty, 0.8);
+                agilityDifficulty = Math.Pow(agilityDifficulty, 0.95);
                 flowDifficulty = Math.Pow(flowDifficulty, 1.1);
             }
 
             if (Mods.Any(m => m is OsuModRelax))
             {
-                speedDifficulty *= 0.0;
+                agilityDifficulty *= 0.0;
                 flowDifficulty *= 0.1;
             }
 
-            double totalDifficulty = calcTotalValue(aimDifficulty, speedDifficulty, flowDifficulty);
+            double totalDifficulty = calcTotalValue(snapDifficulty, agilityDifficulty, flowDifficulty);
 
             currentStrain *= decay;
             currentStrain += totalDifficulty * (1 - decay);
@@ -77,9 +77,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double calcTotalValue(double snapDifficulty, double agilityDifficulty, double flowDifficulty)
         {
+            // We compare flow to combined snap and agility because snap by itself doesn't have enough difficulty to be above flow on streams
+            // Agility on the other hand is supposed to measure the rate of cursor velocity changes while snapping
+            // So snapping every circle on a stream requires an enormous amount of agility at which point it's easier to flow
             double combinedSnapDifficulty = DifficultyCalculationUtils.Norm(meanExponent, snapDifficulty, agilityDifficulty);
 
-            double pSnap = ProbabilityOf(flowDifficulty / combinedSnapDifficulty);
+            double pSnap = snapFlowProbability(flowDifficulty / combinedSnapDifficulty);
             double pFlow = 1 - pSnap;
 
             double totalDifficulty = combinedSnapDifficulty * pSnap + flowDifficulty * pFlow;
@@ -89,8 +92,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return totalStrain;
         }
 
-        private const double k = 7.27;
-
         // A function that turns the ratio of snap : flow into the probability of snapping/flowing
         // It has the constraints:
         // P(snap) + P(flow) = 1 (the object is always either snapped or flowed)
@@ -98,10 +99,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         // Therefore: f(x) + f(1/x) = 1
         // 0 <= f(x) <= 1 (cannot have negative or greater than 100% probability of snapping or flowing)
         // This logistic function is a solution, which fits nicely with the general idea of interpolation and provides a tuneable constant
-        protected static double ProbabilityOf(double ratio)
-            => ratio == 0 ? 0 :
-                double.IsNaN(ratio) ? 1 :
-                (1 / (1 + Math.Exp(-k * Math.Log(ratio))));
+        private static double snapFlowProbability(double ratio)
+        {
+            const double k = 7.27;
+
+            if (ratio == 0)
+                return 0;
+
+            if (double.IsNaN(ratio))
+                return 1;
+
+            return DifficultyCalculationUtils.Logistic(-k * Math.Log(ratio));
+        }
 
         public double GetDifficultSliders()
         {

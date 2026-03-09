@@ -9,15 +9,12 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
-    public static class SpeedAimEvaluator
+    public static class AgilityEvaluator
     {
-        public const double SINGLE_SPACING_THRESHOLD = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25; // 1.25 circles distance between centers
+        private const double distance_cap = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25; // 1.25 circles distance between centers
 
         /// <summary>
-        /// Evaluates the difficulty of aiming the current object, based on:
-        /// <list type="bullet">
-        /// <item><description>distance between the previous and current object</description></item>
-        /// </list>
+        /// Evaluates the difficulty of fast aiming
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
@@ -30,12 +27,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double travelDistance = osuPrevObj?.LazyTravelDistance ?? 0;
             double distance = travelDistance + osuCurrObj.LazyJumpDistance;
 
-            // Cap distance at single_spacing_threshold
-            distance = Math.Min(distance, SINGLE_SPACING_THRESHOLD);
+            double distanceScaled = Math.Min(distance, distance_cap) / distance_cap;
 
-            double distanceBonus = distance / SINGLE_SPACING_THRESHOLD;
-
-            double strain = distanceBonus * 1000 / osuCurrObj.AdjustedDeltaTime;
+            double strain = distanceScaled * 1000 / osuCurrObj.AdjustedDeltaTime;
 
             strain *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
 

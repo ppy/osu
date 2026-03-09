@@ -6,19 +6,21 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class FlowAimEvaluator
     {
+        private const double velocity_change_multiplier = 2.0;
+
         private const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
         private const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
+        /// <summary>
+        /// Evaluates difficulty of "flow aim" - aiming pattern where player doesn't stop their cursor on every object and instead "flows" through them.
+        /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
-            const double velocity_change_multiplier = 2.0;
-
             if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
                 return 0;
 
@@ -26,40 +28,40 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
 
             double currDistance = withSliderTravelDistance ? osuCurrObj.LazyJumpDistance : osuCurrObj.JumpDistance;
+            double prevDistance = withSliderTravelDistance ? osuLastObj.LazyJumpDistance : osuLastObj.JumpDistance;
+
             double currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
 
-            // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
             if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
             {
+                // If the last object is a slider, then we extend the travel velocity through the slider into the current object.
                 double sliderDistance = osuLastObj.LazyTravelDistance + osuCurrObj.LazyJumpDistance;
                 currVelocity = Math.Max(currVelocity, sliderDistance / osuCurrObj.AdjustedDeltaTime);
             }
 
-            // As above, do the same for the previous hitobject.
-            double prevDistance = withSliderTravelDistance ? osuLastObj.LazyJumpDistance : osuLastObj.JumpDistance;
             double prevVelocity = prevDistance / osuLastObj.AdjustedDeltaTime;
 
-            double flowDifficulty = currVelocity; // Start strain with regular velocity.
+            double flowDifficulty = currVelocity;
 
-            // Apply high circle size bonus
-            flowDifficulty *= Math.Pow(osuCurrObj.SmallCircleBonus, 1.0);
+            // Apply high circle size bonus to the base velocity
+            flowDifficulty *= osuCurrObj.SmallCircleBonus;
 
-            // rhythm change bonus
-            flowDifficulty *= 1 + Math.Min(0.25, Math.Pow((Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) - Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) / 50, 4));
+            // Rhythm changes are harder to flow
+            flowDifficulty *= 1 + Math.Min(0.25,
+                Math.Pow((Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) - Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) / 50, 4));
 
             if (osuCurrObj.AngularVelocity != null)
             {
-                // angular velocity adjustment
+                // Low angular velocity flow (angles are consistent) is easier to follow than erratic flow
                 flowDifficulty *= 0.8 + Math.Sqrt(osuCurrObj.AngularVelocity.Value / 270.0);
             }
 
             if (osuCurrObj.Angle != null && osuLastObj.Angle != null)
             {
-                // acute difficulty increase
-                flowDifficulty += Math.Sqrt(currVelocity) * AimEvaluator.CalcAcuteAngleBonus(osuCurrObj.Angle.Value);
+                // Acute angles are also hard to flow
+                // We square root velocity to make acute angle switches in streams aren't having difficulty higher than snap
+                flowDifficulty += Math.Sqrt(currVelocity) * SnapAimEvaluator.CalcAcuteAngleBonus(osuCurrObj.Angle.Value);
             }
-
-            double velocityChangeBonus = 0;
 
             if (Math.Max(prevVelocity, currVelocity) != 0)
             {
@@ -75,21 +77,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
                 double overlapVelocityBuff = Math.Min(diameter * 1.25 / Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime), Math.Abs(prevVelocity - currVelocity));
 
-                velocityChangeBonus = overlapVelocityBuff * distRatio;
-
-                // Penalize for rhythm changes.
-                velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) / Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime), 2);
+                flowDifficulty += overlapVelocityBuff * distRatio * velocity_change_multiplier;
             }
-
-            flowDifficulty += velocityChangeBonus * velocity_change_multiplier;
 
             if (osuCurrObj.BaseObject is Slider)
             {
-                // Reward sliders based on velocity.
+                // Include slider velocity to make velocity more consistent with snap
                 flowDifficulty += osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
             }
 
-
+            // Final velocity is being raised to a power because flow difficulty scales harder with both high distance and time, and we want to account for that
             return Math.Pow(flowDifficulty, 1.45);
         }
     }
