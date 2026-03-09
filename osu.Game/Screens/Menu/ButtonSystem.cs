@@ -47,7 +47,8 @@ namespace osu.Game.Screens.Menu
         public Action? OnSolo;
         public Action? OnSettings;
         public Action? OnMultiplayer;
-        public Action? OnMatchmaking;
+        public Action? OnQuickPlay;
+        public Action? OnRankedPlay;
         public Action? OnPlaylists;
         public Action<Room>? OnDailyChallenge;
 
@@ -157,11 +158,15 @@ namespace osu.Game.Screens.Menu
             buttonsPlay.Add(new DailyChallengeButton(@"button-daily-select", new Color4(94, 63, 186, 255), onDailyChallenge, Key.D));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
-            buttonsMulti.Add(new MainMenuButton("lounge", @"button-default-select", FontAwesome.Solid.Couch, new Color4(94, 63, 186, 255), onMultiplayer, Key.L, Key.M)
+            buttonsMulti.Add(new MainMenuButton(ButtonSystemStrings.Lounge, @"button-default-select", FontAwesome.Solid.Couch, new Color4(94, 63, 186, 255), onMultiplayer, Key.L, Key.M)
             {
                 Padding = new MarginPadding { Left = WEDGE_WIDTH }
             });
-            buttonsMulti.Add(new MainMenuButton("quick play", @"button-daily-select", FontAwesome.Solid.Bolt, new Color4(94, 63, 186, 255), onMatchmaking, Key.Q));
+#if DEBUG
+            buttonsMulti.Add(new MainMenuButton(ButtonSystemStrings.RankedPlay, @"button-daily-select", FontAwesome.Solid.Crown, new Color4(94, 63, 186, 255), onRankedPlay, Key.R));
+#else
+            buttonsMulti.Add(new MainMenuButton(ButtonSystemStrings.QuickPlay, @"button-daily-select", FontAwesome.Solid.Bolt, new Color4(94, 63, 186, 255), onQuickPlay, Key.Q));
+#endif
             buttonsMulti.ForEach(b => b.VisibleState = ButtonSystemState.Multi);
 
             buttonsEdit.Add(new MainMenuButton(EditorStrings.BeatmapEditor.ToLower(), @"button-default-select", OsuIcon.Beatmap, new Color4(238, 170, 0, 255), (_, _) => OnEditBeatmap?.Invoke(), Key.B,
@@ -217,7 +222,7 @@ namespace osu.Game.Screens.Menu
             OnMultiplayer?.Invoke();
         }
 
-        private void onMatchmaking(MainMenuButton mainMenuButton, UIEvent uiEvent)
+        private void onQuickPlay(MainMenuButton mainMenuButton, UIEvent uiEvent)
         {
             if (api.State.Value != APIState.Online)
             {
@@ -225,7 +230,18 @@ namespace osu.Game.Screens.Menu
                 return;
             }
 
-            OnMatchmaking?.Invoke();
+            OnQuickPlay?.Invoke();
+        }
+
+        private void onRankedPlay(MainMenuButton mainMenuButton, UIEvent uiEvent)
+        {
+            if (api.State.Value != APIState.Online)
+            {
+                loginOverlay?.Show();
+                return;
+            }
+
+            OnRankedPlay?.Invoke();
         }
 
         private void onPlaylists(MainMenuButton mainMenuButton, UIEvent uiEvent)

@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Metadata;
 using osu.Game.Overlays.Dashboard;
+using osu.Game.Overlays.Dashboard.CurrentlyOnline;
 using osu.Game.Overlays.Dashboard.Friends;
 
 namespace osu.Game.Overlays

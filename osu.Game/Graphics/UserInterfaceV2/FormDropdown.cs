@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -14,6 +15,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
@@ -28,7 +30,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// <summary>
         /// Hint text containing an extended description of this slider bar, displayed in a tooltip when hovering the caption.
         /// </summary>
-        public LocalisableString HintText { get; init; }
+        public LocalisableString HintText
+        {
+            get => header.HintText;
+            set => header.HintText = value;
+        }
 
         /// <summary>
         /// The maximum height of the dropdown's menu.
@@ -37,6 +43,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public float MaxHeight { get; set; } = 200;
 
         private FormDropdownHeader header = null!;
+
+        private const float header_menu_spacing = 5;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -71,6 +79,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public void SetDefault() => Current.SetDefault();
 
         public bool IsDisabled => Current.Disabled;
+
+        public float MainDrawHeight => header.DrawHeight;
 
         protected override DropdownHeader CreateHeader() => header = new FormDropdownHeader
         {
@@ -133,6 +143,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             private FormFieldCaption caption = null!;
             private OsuSpriteText label = null!;
             private SpriteIcon chevron = null!;
+            private FormControlBackground background = null!;
 
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -140,45 +151,54 @@ namespace osu.Game.Graphics.UserInterfaceV2
             [BackgroundDependencyLoader]
             private void load()
             {
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.None;
-                Height = 50;
-
                 Masking = true;
                 CornerRadius = 5;
 
-                Foreground.AutoSizeAxes = Axes.None;
-                Foreground.RelativeSizeAxes = Axes.Both;
-                Foreground.Padding = new MarginPadding(9);
+                // We use our own background for more control.
+                Background.Alpha = 0;
+
                 Foreground.Children = new Drawable[]
                 {
-                    caption = new FormFieldCaption
-                    {
-                        Anchor = Anchor.TopLeft,
-                        Origin = Anchor.TopLeft,
-                        Caption = Caption,
-                        TooltipText = HintText,
-                    },
-                    label = new OsuSpriteText
+                    background = new FormControlBackground(),
+                    new Container
                     {
                         RelativeSizeAxes = Axes.X,
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
-                    },
-                    chevron = new SpriteIcon
-                    {
-                        Icon = FontAwesome.Solid.ChevronDown,
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Size = new Vector2(16),
-                        Margin = new MarginPadding { Right = 5 },
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding(9),
+                        Children = new Drawable[]
+                        {
+                            new FillFlowContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(0, 4),
+                                Children = new Drawable[]
+                                {
+                                    caption = new FormFieldCaption
+                                    {
+                                        Caption = Caption,
+                                        TooltipText = HintText,
+                                    },
+                                    label = new TruncatingSpriteText
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Padding = new MarginPadding { Right = 25 },
+                                        AlwaysPresent = true,
+                                    },
+                                }
+                            },
+                            chevron = new SpriteIcon
+                            {
+                                Icon = FontAwesome.Solid.ChevronDown,
+                                Anchor = Anchor.BottomRight,
+                                Origin = Anchor.BottomRight,
+                                Size = new Vector2(16),
+                                Margin = new MarginPadding { Right = 5 },
+                            },
+                        }
                     },
                 };
-
-                AddInternal(new HoverClickSounds
-                {
-                    Enabled = { BindTarget = Enabled },
-                });
             }
 
             protected override void LoadComplete()
@@ -212,8 +232,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             private void updateState()
             {
-                label.Alpha = string.IsNullOrEmpty(SearchBar.SearchTerm.Value) ? 1 : 0;
-
                 caption.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content2;
                 label.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content1;
                 chevron.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content1;
@@ -221,25 +239,26 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                 bool dropdownOpen = Dropdown.Menu.State == MenuState.Open;
 
-                BorderThickness = IsHovered || dropdownOpen ? 2 : 0;
+                if (dropdownOpen)
+                    label.Alpha = AlwaysShowSearchBar || !string.IsNullOrEmpty(SearchBar.SearchTerm.Value) ? 0 : 1;
+                else
+                    label.Alpha = 1;
 
                 if (Dropdown.Current.Disabled)
-                    BorderColour = colourProvider.Dark1;
-                else
-                    BorderColour = dropdownOpen ? colourProvider.Highlight1 : colourProvider.Light4;
-
-                if (dropdownOpen)
-                    Background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
+                    background.VisualStyle = VisualStyle.Disabled;
+                else if (dropdownOpen)
+                    background.VisualStyle = VisualStyle.Focused;
                 else if (IsHovered)
-                    Background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
+                    background.VisualStyle = VisualStyle.Hovered;
                 else
-                    Background.Colour = colourProvider.Background5;
+                    background.VisualStyle = VisualStyle.Normal;
             }
 
             private void updateChevron()
             {
                 bool open = Dropdown.Menu.State == MenuState.Open;
                 chevron.ScaleTo(open ? new Vector2(1f, -1f) : Vector2.One, 300, Easing.OutQuint);
+                chevron.MoveToY(open ? -chevron.DrawHeight : 0, 300, Easing.OutQuint);
             }
         }
 
@@ -250,7 +269,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
             protected override void PopIn() => this.FadeIn();
             protected override void PopOut() => this.FadeOut();
 
-            protected override TextBox CreateTextBox() => TextBox = new FormTextBox.InnerTextBox();
+            protected override TextBox CreateTextBox() => TextBox = new FormTextBox.InnerTextBox
+            {
+                PlaceholderText = HomeStrings.SearchPlaceholder,
+            };
 
             [BackgroundDependencyLoader]
             private void load()
@@ -258,7 +280,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 TextBox.Anchor = Anchor.BottomLeft;
                 TextBox.Origin = Anchor.BottomLeft;
                 TextBox.RelativeSizeAxes = Axes.X;
-                TextBox.Margin = new MarginPadding(9);
+                Padding = new MarginPadding { Left = 9, Bottom = 9, Right = 34 };
             }
         }
 
@@ -268,10 +290,26 @@ namespace osu.Game.Graphics.UserInterfaceV2
             private void load(OverlayColourProvider colourProvider)
             {
                 ItemsContainer.Padding = new MarginPadding(9);
-                Margin = new MarginPadding { Top = 5 };
 
-                MaskingContainer.BorderThickness = 2;
+                MaskingContainer.BorderThickness = FormControlBackground.BORDER_THICKNESS;
+                MaskingContainer.CornerExponent = FormControlBackground.CORNER_EXPONENT;
                 MaskingContainer.BorderColour = colourProvider.Highlight1;
+            }
+
+            protected override void AnimateOpen()
+            {
+                base.AnimateOpen();
+
+                this.TransformTo(nameof(Margin), new MarginPadding
+                {
+                    Top = header_menu_spacing,
+                }, 300, Easing.OutQuint);
+            }
+
+            protected override void AnimateClose()
+            {
+                base.AnimateClose();
+                this.TransformTo(nameof(Margin), new MarginPadding(), 300, Easing.OutQuint);
             }
         }
     }

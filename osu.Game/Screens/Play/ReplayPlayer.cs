@@ -15,9 +15,9 @@ using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
-using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Skinning;
 using osu.Game.Users;
 
@@ -77,11 +77,7 @@ namespace osu.Game.Screens.Play
         /// Add a settings group to the HUD overlay. Intended to be used by rulesets to add replay-specific settings.
         /// </summary>
         /// <param name="settings">The settings group to be shown.</param>
-        public void AddSettings(PlayerSettingsGroup settings) => Schedule(() =>
-        {
-            settings.Expanded.Value = false;
-            HUDOverlay.PlayerSettingsOverlay.Add(settings);
-        });
+        public void AddSettings(PlayerSettingsGroup settings) => Schedule(() => HUDOverlay.PlayerSettingsOverlay.Add(settings));
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)

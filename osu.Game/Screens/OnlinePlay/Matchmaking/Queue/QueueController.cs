@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -11,6 +12,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
+using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -39,6 +41,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private BackgroundQueueNotification? backgroundNotification;
         private bool isBackgrounded;
+        private MatchmakingPool? lastJoinedPool;
 
         protected override void LoadComplete()
         {
@@ -51,6 +54,36 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             client.MatchmakingRoomReady += onMatchmakingRoomReady;
         }
 
+        /// <summary>
+        /// Joins the matchmaking queue.
+        /// </summary>
+        /// <param name="pool">The pool to join.</param>
+        public void JoinQueue(MatchmakingPool pool)
+        {
+            client.MatchmakingJoinQueue(pool.Id).FireAndForget();
+            lastJoinedPool = pool;
+        }
+
+        /// <summary>
+        /// Leaves the matchmaking queue.
+        /// </summary>
+        public void LeaveQueue()
+        {
+            client.MatchmakingLeaveQueue().FireAndForget();
+        }
+
+        /// <summary>
+        /// Rejoins the last joined matchmaking queue.
+        /// </summary>
+        public void RejoinQueue()
+        {
+            if (lastJoinedPool != null)
+                JoinQueue(lastJoinedPool);
+        }
+
+        /// <summary>
+        /// Moves the matchmaking queue search to the background.
+        /// </summary>
         public void SearchInBackground()
         {
             if (isBackgrounded)
@@ -60,6 +93,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             postNotification();
         }
 
+        /// <summary>
+        /// Moves the matchmaking queue search to the foreground.
+        /// </summary>
         public void SearchInForeground()
         {
             if (!isBackgrounded)
@@ -94,15 +130,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             closeNotifications();
         });
 
-        private void onMatchmakingRoomInvited() => Scheduler.Add(() =>
+        private void onMatchmakingRoomInvited(MatchmakingRoomInvitationParams invitation) => Scheduler.Add(() =>
         {
             CurrentState.Value = ScreenQueue.MatchmakingScreenState.PendingAccept;
 
-            if (backgroundNotification != null)
-            {
-                backgroundNotification.State = ProgressNotificationState.Completed;
-                backgroundNotification = null;
-            }
+            backgroundNotification?.Complete(invitation);
+            backgroundNotification = null;
         });
 
         private void onMatchmakingRoomReady(long roomId, string password) => Scheduler.Add(() =>
@@ -119,7 +152,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             if (backgroundNotification != null)
                 return;
 
-            notifications?.Post(backgroundNotification = new BackgroundQueueNotification(this));
+            Debug.Assert(lastJoinedPool != null);
+            notifications?.Post(backgroundNotification = new BackgroundQueueNotification(this, lastJoinedPool.Type));
         }
 
         private void closeNotifications()
@@ -155,13 +189,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             private MultiplayerClient client { get; set; } = null!;
 
             private readonly QueueController controller;
+            private readonly MatchmakingPoolType poolType;
 
             private Notification? foundNotification;
             private Sample? matchFoundSample;
 
-            public BackgroundQueueNotification(QueueController controller)
+            public BackgroundQueueNotification(QueueController controller, MatchmakingPoolType poolType)
             {
                 this.controller = controller;
+                this.poolType = poolType;
             }
 
             [BackgroundDependencyLoader]
@@ -176,22 +212,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         if (s is ScreenIntro || s is ScreenQueue)
                             return;
 
-                        s.Push(new ScreenIntro());
+                        s.Push(new ScreenIntro(poolType));
                     }, [typeof(ScreenIntro), typeof(ScreenQueue)]);
 
                     // Closed when appropriate by SearchInForeground().
                     return false;
-                };
-
-                CompletionClickAction = () =>
-                {
-                    client.MatchmakingAcceptInvitation().FireAndForget();
-                    controller.CurrentState.Value = ScreenQueue.MatchmakingScreenState.AcceptedWaitingForRoom;
-
-                    performer?.PerformFromScreen(s => s.Push(new ScreenIntro()));
-
-                    Close(false);
-                    return true;
                 };
 
                 CancelRequested = () =>
@@ -201,6 +226,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 };
 
                 matchFoundSample = audio.Samples.Get(@"Multiplayer/Matchmaking/match-found");
+            }
+
+            public void Complete(MatchmakingRoomInvitationParams invitation)
+            {
+                CompletionClickAction = () =>
+                {
+                    client.MatchmakingAcceptInvitation().FireAndForget();
+                    controller.CurrentState.Value = ScreenQueue.MatchmakingScreenState.AcceptedWaitingForRoom;
+
+                    performer?.PerformFromScreen(s => s.Push(new ScreenIntro(invitation.Type)));
+
+                    Close(false);
+                    return true;
+                };
+
+                State = ProgressNotificationState.Completed;
             }
 
             protected override Notification CreateCompletionNotification()
