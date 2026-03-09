@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Stores previous strains so that, if a high difficulty hit object is followed by a lower
         /// difficulty hit object, the high difficulty hit object gets a full strain instead of being cut short.
         /// </summary>
-        private readonly List<StrainObject> queuedStrains = new List<StrainObject>();
+        private readonly List<(double StrainValue, double StartTime)> queuedStrains = new List<(double, double)>();
 
         protected VariableLengthStrainSkill(Mod[] mods)
             : base(mods)
@@ -97,10 +97,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             else
             {
                 // Empty the queue of smaller elements as they won't be relevant to difficulty
-                while (queuedStrains.Count > 0 && queuedStrains[^1].Value < currentStrain)
+                while (queuedStrains.Count > 0 && queuedStrains[^1].StrainValue < currentStrain)
                     queuedStrains.RemoveAt(queuedStrains.Count - 1);
 
-                queuedStrains.Add(new StrainObject(currentStrain, current.StartTime));
+                queuedStrains.Add((currentStrain, current.StartTime));
             }
 
             return currentStrain;
@@ -125,18 +125,18 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 // If we have any strains queued, then we will use those until the object falls into the new section.
                 if (queuedStrains.Count > 0)
                 {
-                    StrainObject queuedStrain = queuedStrains[0];
+                    (double strain, double startTime) = queuedStrains[0];
                     queuedStrains.RemoveAt(0); // Could likely optimize this to remove all used strains at once
 
                     // We want the section to end `MaxSectionLength` after the strain we're using as an influence.
                     // This effectively means the queued strain will exist in its own section if the gap between the queued strain and current object is large enough.
                     // This is required to make sure there's no harsh difficulty difference between 2 sections if there was a large gap.
-                    currentSectionEnd = queuedStrain.StartTime + MaxSectionLength;
+                    currentSectionEnd = startTime + MaxSectionLength;
                     startNewSectionFrom(currentSectionBegin, current);
 
                     // If the current object's peak was higher, we don't want to override it with a lower strain.
                     // Only use the queued strain if it contributes more difficulty.
-                    currentSectionPeak = Math.Max(currentSectionPeak, queuedStrain.Value);
+                    currentSectionPeak = Math.Max(currentSectionPeak, strain);
                 }
                 // If the queue is empty then we should start the section from the current object instead.
                 // The queue can be empty if we're starting off of the back of a new peak, or if we drained through all the queue
@@ -260,7 +260,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         /// <summary>
         /// Used to store the difficulty of a section of a map.
-        /// <remarks>Not to be confused with <see cref="StrainObject"/></remarks>
         /// </summary>
         public readonly struct StrainPeak : IComparable<StrainPeak>
         {
@@ -274,22 +273,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             public double SectionLength { get; }
 
             public int CompareTo(StrainPeak other) => Value.CompareTo(other.Value);
-        }
-
-        /// <summary>
-        /// Used to store the difficulty and start time of an object in a map.
-        /// <remarks>Not to be confused with <see cref="StrainPeak"/></remarks>
-        /// </summary>
-        private readonly struct StrainObject
-        {
-            public StrainObject(double value, double startTime)
-            {
-                Value = value;
-                StartTime = startTime;
-            }
-
-            public double Value { get; }
-            public double StartTime { get; }
         }
     }
 }
