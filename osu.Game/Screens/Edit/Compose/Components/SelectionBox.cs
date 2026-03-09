@@ -286,10 +286,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             dragHandles.ClearRotationHandles();
 
-            addRotateHandle(Anchor.TopLeft);
-            addRotateHandle(Anchor.TopRight);
-            addRotateHandle(Anchor.BottomLeft);
-            addRotateHandle(Anchor.BottomRight);
+            if (canRotate.Value)
+            {
+                addRotateHandle(Anchor.TopLeft);
+                addRotateHandle(Anchor.TopRight);
+                addRotateHandle(Anchor.BottomLeft);
+                addRotateHandle(Anchor.BottomRight);
+            }
         }
 
         private void addRotateHandle(Anchor anchor)
