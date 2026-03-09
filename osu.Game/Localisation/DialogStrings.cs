@@ -110,31 +110,6 @@ namespace osu.Game.Localisation
         public static LocalisableString ConfirmDiscardChangesCancelButton => new TranslatableString(getKey(@"confirm_discard_changes_cancel_button"), @"No I didn't mean to");
 
         /// <summary>
-        /// "The beatmap will be saved to continue with this operation."
-        /// </summary>
-        public static LocalisableString SaveRequiredHeaderText => new TranslatableString(getKey(@"save_required_header_text"), @"The beatmap will be saved to continue with this operation.");
-
-        /// <summary>
-        /// "Sounds good, let's go!"
-        /// </summary>
-        public static LocalisableString SaveRequiredOkButton => new TranslatableString(getKey(@"save_required_ok_button"), @"Sounds good, let's go!");
-
-        /// <summary>
-        /// "Oops, continue editing"
-        /// </summary>
-        public static LocalisableString SaveRequiredCancelButton => new TranslatableString(getKey(@"save_required_cancel_button"), @"Oops, continue editing");
-
-        /// <summary>
-        /// "&quot;{0}&quot; difficulty"
-        /// </summary>
-        public static LocalisableString DeleteDifficultyConfirmationBodyText(string difficultyName) => new TranslatableString(getKey(@"delete_difficulty_confirmation_body_text"), @"""{0}"" difficulty", difficultyName);
-
-        /// <summary>
-        /// "All Bookmarks"
-        /// </summary>
-        public static LocalisableString BookmarkResetBodyText => new TranslatableString(getKey(@"bookmark_reset_body_text"), @"All Bookmarks");
-
-        /// <summary>
         /// "Are you sure you want to open the following link in a web browser?
         ///
         /// {0}"

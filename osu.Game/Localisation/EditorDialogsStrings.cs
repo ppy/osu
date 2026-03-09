@@ -59,6 +59,26 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString DiscardUnsavedChangesDialogHeader => new TranslatableString(getKey(@"discard_unsaved_changes_dialog_header"), @"Discard all unsaved changes? This cannot be undone.");
 
+        /// <summary>
+        /// "The beatmap will be saved to continue with this operation."
+        /// </summary>
+        public static LocalisableString SaveRequiredDialogHeader => new TranslatableString(getKey(@"save_required_dialog_header"), @"The beatmap will be saved to continue with this operation.");
+
+        /// <summary>
+        /// "Sounds good, let's go!"
+        /// </summary>
+        public static LocalisableString SoundsGood => new TranslatableString(getKey(@"sounds_good"), @"Sounds good, let's go!");
+
+        /// <summary>
+        /// "&quot;{0}&quot; difficulty"
+        /// </summary>
+        public static LocalisableString Difficulty(string difficultyName) => new TranslatableString(getKey(@"difficulty"), @"""{0}"" difficulty", difficultyName);
+
+        /// <summary>
+        /// "All Bookmarks"
+        /// </summary>
+        public static LocalisableString AllBookmarks => new TranslatableString(getKey(@"all_bookmarks"), @"All Bookmarks");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

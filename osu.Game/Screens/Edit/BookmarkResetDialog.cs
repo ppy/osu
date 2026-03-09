@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Edit
         public BookmarkResetDialog(EditorBeatmap editorBeatmap)
         {
             editor = editorBeatmap;
-            BodyText = DialogStrings.BookmarkResetBodyText;
+            BodyText = EditorDialogsStrings.AllBookmarks;
         }
 
         [BackgroundDependencyLoader]

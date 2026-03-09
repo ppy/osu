@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Edit
     {
         public SaveRequiredPopupDialog(Action saveAndAction)
         {
-            HeaderText = DialogStrings.SaveRequiredHeaderText;
+            HeaderText = EditorDialogsStrings.SaveRequiredDialogHeader;
 
             Icon = FontAwesome.Regular.Save;
 
@@ -20,12 +20,12 @@ namespace osu.Game.Screens.Edit
             {
                 new PopupDialogOkButton
                 {
-                    Text = DialogStrings.SaveRequiredOkButton,
+                    Text = EditorDialogsStrings.SoundsGood,
                     Action = saveAndAction
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = DialogStrings.SaveRequiredCancelButton,
+                    Text = EditorDialogsStrings.ContinueEditing,
                 },
             };
         }
