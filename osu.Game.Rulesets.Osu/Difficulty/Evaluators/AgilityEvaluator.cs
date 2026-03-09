@@ -3,20 +3,18 @@
 
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
-    public static class SpeedAimEvaluator
+    public static class AgilityEvaluator
     {
-        public const double SINGLE_SPACING_THRESHOLD = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25; // 1.25 circles distance between centers
+        private const double distance_cap = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25; // 1.25 circles distance between centers
 
         /// <summary>
-        /// Evaluates the difficulty of aiming the current object, based on:
-        /// <list type="bullet">
-        /// <item><description>distance between the previous and current object</description></item>
-        /// </list>
+        /// Evaluates the difficulty of fast aiming
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
@@ -29,20 +27,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double travelDistance = osuPrevObj?.LazyTravelDistance ?? 0;
             double distance = travelDistance + osuCurrObj.LazyJumpDistance;
 
-            // Cap distance at single_spacing_threshold
-            distance = Math.Min(distance, SINGLE_SPACING_THRESHOLD);
+            double distanceScaled = Math.Min(distance, distance_cap) / distance_cap;
 
-            // Max distance bonus is 1 * `distance_multiplier` at single_spacing_threshold
-            double distanceBonus = Math.Pow(distance / SINGLE_SPACING_THRESHOLD, 2.9);
-
-            // Apply increased high circle size bonus
-            distanceBonus *= Math.Pow(osuCurrObj.SmallCircleBonus, 1.5);
-
-            double strain = distanceBonus * 1000 / osuCurrObj.AdjustedDeltaTime;
+            double strain = distanceScaled * 1000 / osuCurrObj.AdjustedDeltaTime;
 
             strain *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
 
-            return strain;
+            return strain * DifficultyCalculationUtils.Smootherstep(distance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
         }
 
         private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.3, Math.Pow(ms / 1000, 0.9)));
