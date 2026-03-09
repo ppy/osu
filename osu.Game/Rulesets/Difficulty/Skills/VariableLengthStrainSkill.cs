@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 if (queuedStrains.Count > 0)
                 {
                     (double strain, double startTime) = queuedStrains[0];
-                    queuedStrains.RemoveAt(0); // Could likely optimize this to remove all used strains at once
+                    queuedStrains.RemoveAt(0);
 
                     // We want the section to end `MaxSectionLength` after the strain we're using as an influence.
                     // This effectively means the queued strain will exist in its own section if the gap between the queued strain and current object is large enough.
