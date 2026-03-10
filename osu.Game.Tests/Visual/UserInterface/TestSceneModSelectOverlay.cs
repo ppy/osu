@@ -699,7 +699,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestTouchDeviceDoesNotInterefereWithDeselectAll()
+        public void TestTouchDeviceDoesNotInterfereWithDeselectAll()
         {
             createScreen();
             changeRuleset(0);
