@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
+using osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Mods;
