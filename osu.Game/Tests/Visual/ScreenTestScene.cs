@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Logging;
-using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
@@ -34,44 +33,48 @@ namespace osu.Game.Tests.Visual
         protected DialogOverlay DialogOverlay { get; private set; }
 
         [Cached]
-        protected ScreenFooter Footer { get; private set; }
+        protected ScreenFooter ScreenFooter { get; private set; }
 
         protected ScreenTestScene()
         {
+            ScreenStackFooter screenStackFooter;
+            ScreenFooter.BackReceptor backReceptor;
+
             base.Content.AddRange(new Drawable[]
             {
-                Stack = new OsuScreenStack
-                {
-                    Name = nameof(ScreenTestScene),
-                    RelativeSizeAxes = Axes.Both
-                },
+                backReceptor = new ScreenFooter.BackReceptor(),
                 new PopoverContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
+                        Stack = new OsuScreenStack
+                        {
+                            Name = nameof(ScreenTestScene),
+                            RelativeSizeAxes = Axes.Both
+                        },
+                        // TODO: is this ever used? it probably shouldn't be.
                         content = new Container { RelativeSizeAxes = Axes.Both },
-                        Footer = new ScreenFooter(),
+                        overlayContent = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = DialogOverlay = new DialogOverlay()
+                        },
+                        screenStackFooter = new ScreenStackFooter(Stack, backReceptor)
+                        {
+                            BackButtonPressed = BackButtonPressed,
+                        }
                     }
-                },
-                overlayContent = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = DialogOverlay = new DialogOverlay()
                 },
             });
 
-            Stack.ScreenPushed += (oldScreen, newScreen) =>
-            {
-                updateFooter(oldScreen, newScreen);
-                Logger.Log($"{nameof(ScreenTestScene)} screen changed → {newScreen}");
-            };
-            Stack.ScreenExited += (oldScreen, newScreen) =>
-            {
-                updateFooter(oldScreen, newScreen);
-                Logger.Log($"{nameof(ScreenTestScene)} screen changed ← {newScreen}");
-            };
+            ScreenFooter = screenStackFooter.Footer;
+
+            Stack.ScreenPushed += (_, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed → {newScreen}");
+            Stack.ScreenExited += (_, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed ← {newScreen}");
         }
+
+        protected virtual void BackButtonPressed() => Stack.Exit();
 
         protected void LoadScreen(OsuScreen screen) => Stack.Push(screen);
 
@@ -94,39 +97,6 @@ namespace osu.Game.Tests.Visual
                 Stack.Exit();
                 return false;
             });
-        }
-
-        private void updateFooter(IScreen? _, IScreen? newScreen)
-        {
-            if (newScreen is OsuScreen osuScreen && osuScreen.ShowFooter)
-            {
-                Footer.Show();
-
-                if (osuScreen.IsLoaded)
-                    updateFooterButtons();
-                else
-                {
-                    // ensure the current buttons are immediately disabled on screen change (so they can't be pressed).
-                    Footer.SetButtons(Array.Empty<ScreenFooterButton>());
-
-                    osuScreen.OnLoadComplete += _ => updateFooterButtons();
-                }
-
-                void updateFooterButtons()
-                {
-                    var buttons = osuScreen.CreateFooterButtons();
-
-                    osuScreen.LoadComponentsAgainstScreenDependencies(buttons);
-
-                    Footer.SetButtons(buttons);
-                    Footer.Show();
-                }
-            }
-            else
-            {
-                Footer.Hide();
-                Footer.SetButtons(Array.Empty<ScreenFooterButton>());
-            }
         }
 
         #region IOverlayManager

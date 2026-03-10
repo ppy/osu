@@ -28,6 +28,7 @@ namespace osu.Game.Graphics
         public static IconUsage EditCircle => get(OsuIconMapping.EditCircle);
         public static IconUsage LeftCircle => get(OsuIconMapping.LeftCircle);
         public static IconUsage RightCircle => get(OsuIconMapping.RightCircle);
+        public static IconUsage Undo => get(OsuIconMapping.Undo);
 
         public static IconUsage Audio => get(OsuIconMapping.Audio);
         public static IconUsage Beatmap => get(OsuIconMapping.Beatmap);
@@ -385,6 +386,9 @@ namespace osu.Game.Graphics
 
             [Description(@"twitter")]
             Twitter,
+
+            [Description(@"undo")]
+            Undo,
 
             [Description(@"user-interface")]
             UserInterface,

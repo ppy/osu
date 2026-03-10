@@ -128,6 +128,9 @@ namespace osu.Game.Skinning
 
                                     if (spectatorList != null)
                                         spectatorList.Position = pos;
+
+                                    foreach (var d in container.OfType<ISerialisableDrawable>())
+                                        d.UsesFixedAnchor = true;
                                 })
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -238,6 +241,9 @@ namespace osu.Game.Skinning
                                             keyCounter.Position = new Vector2(-(hitError.Width + padding), -(padding * 2 + song_progress_offset_height));
                                         }
                                     }
+
+                                    foreach (var d in container.OfType<ISerialisableDrawable>())
+                                        d.UsesFixedAnchor = true;
                                 }
                             })
                             {

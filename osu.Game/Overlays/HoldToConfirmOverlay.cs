@@ -61,10 +61,15 @@ namespace osu.Game.Overlays
             audio.Samples.AddAdjustment(AdjustableProperty.Volume, audioVolume);
         }
 
-        protected override void Dispose(bool isDisposing)
+        protected void RemoveAudioAdjustments()
         {
             audio?.Tracks.RemoveAdjustment(AdjustableProperty.Volume, audioVolume);
             audio?.Samples.RemoveAdjustment(AdjustableProperty.Volume, audioVolume);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            RemoveAudioAdjustments();
             base.Dispose(isDisposing);
         }
     }
