@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Edit.Checks;
@@ -62,6 +63,37 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
         }
 
         [Test]
+        public void TestCircleOnPlayfieldBounds()
+        {
+            assertInsidePlayfield(new Beatmap<HitObject>
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new HitCircle
+                    {
+                        StartTime = 3000,
+                        Position = new Vector2(0, playfield_centre.Y)
+                    },
+                    new HitCircle
+                    {
+                        StartTime = 4000,
+                        Position = new Vector2(512, playfield_centre.Y)
+                    },
+                    new HitCircle
+                    {
+                        StartTime = 5000,
+                        Position = new Vector2(playfield_centre.X, 0)
+                    },
+                    new HitCircle
+                    {
+                        StartTime = 6000,
+                        Position = new Vector2(playfield_centre.X, 384)
+                    }
+                }
+            });
+        }
+
+        [Test]
         public void TestCircleNearEdgeStackedOffscreen()
         {
             assertOffscreenCircle(new Beatmap<HitObject>
@@ -89,6 +121,38 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     {
                         StartTime = 3000,
                         Position = new Vector2(0, 0)
+                    }
+                }
+            });
+        }
+
+        [Test]
+        public void TestCircleOutsidePlayfieldLeft()
+        {
+            assertCircleOutsidePlayfield(new Beatmap<HitObject>
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new HitCircle
+                    {
+                        StartTime = 3000,
+                        Position = new Vector2(-1, playfield_centre.Y)
+                    }
+                }
+            });
+        }
+
+        [Test]
+        public void TestCircleOutsidePlayfieldRight()
+        {
+            assertCircleOutsidePlayfield(new Beatmap<HitObject>
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new HitCircle
+                    {
+                        StartTime = 3000,
+                        Position = new Vector2(513, playfield_centre.Y)
                     }
                 }
             });
@@ -223,6 +287,48 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
             });
         }
 
+        [Test]
+        public void TestSliderHeadOutsidePlayfield()
+        {
+            assertSliderOutsidePlayfield(new Beatmap<HitObject>
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new Slider
+                    {
+                        StartTime = 3000,
+                        Position = new Vector2(-1, playfield_centre.Y),
+                        Path = new SliderPath(new[]
+                        {
+                            new PathControlPoint(new Vector2(0, 0), PathType.LINEAR),
+                            new PathControlPoint(new Vector2(100, 0))
+                        }),
+                    }
+                }
+            });
+        }
+
+        [Test]
+        public void TestSliderTailOutsidePlayfield()
+        {
+            assertSliderOutsidePlayfield(new Beatmap<HitObject>
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new Slider
+                    {
+                        StartTime = 3000,
+                        Position = new Vector2(256, playfield_centre.Y),
+                        Path = new SliderPath(new[]
+                        {
+                            new PathControlPoint(new Vector2(0, 0), PathType.LINEAR),
+                            new PathControlPoint(new Vector2(300, 0))
+                        }),
+                    }
+                }
+            });
+        }
+
         private void assertOk(IBeatmap beatmap)
         {
             var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
@@ -234,8 +340,15 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
             var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
             var issues = check.Run(context).ToList();
 
-            Assert.That(issues, Has.Count.EqualTo(1));
-            Assert.That(issues.Single().Template is CheckOffscreenObjects.IssueTemplateOffscreenCircle);
+            Assert.That(issues, Has.Some.Matches<Issue>(i => i.Template is CheckOffscreenObjects.IssueTemplateOffscreenCircle));
+        }
+
+        private void assertCircleOutsidePlayfield(IBeatmap beatmap)
+        {
+            var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
+            var issues = check.Run(context).ToList();
+
+            Assert.That(issues, Has.Some.Matches<Issue>(i => i.Template is CheckOffscreenObjects.IssueTemplateCircleOutsidePlayfield));
         }
 
         private void assertOffscreenSlider(IBeatmap beatmap)
@@ -243,8 +356,26 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
             var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
             var issues = check.Run(context).ToList();
 
-            Assert.That(issues, Has.Count.EqualTo(1));
-            Assert.That(issues.Single().Template is CheckOffscreenObjects.IssueTemplateOffscreenSlider);
+            Assert.That(issues, Has.Some.Matches<Issue>(i => i.Template is CheckOffscreenObjects.IssueTemplateOffscreenSlider));
+        }
+
+        private void assertSliderOutsidePlayfield(IBeatmap beatmap)
+        {
+            var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
+            var issues = check.Run(context).ToList();
+
+            Assert.That(issues, Has.Some.Matches<Issue>(i => i.Template is CheckOffscreenObjects.IssueTemplateSliderOutsidePlayfield));
+        }
+
+        // This is its own assertion because objects inside or exactly on the playfield
+        // bounds should not trigger the strict playfield issue, but may still trip
+        // the broader 4:3 offscreen check depending on the actual circle's size.
+        private void assertInsidePlayfield(IBeatmap beatmap)
+        {
+            var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
+            var issues = check.Run(context).ToList();
+
+            Assert.That(issues, Has.None.Matches<Issue>(i => i.Template is CheckOffscreenObjects.IssueTemplateCircleOutsidePlayfield));
         }
     }
 }
