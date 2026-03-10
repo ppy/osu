@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Menu
@@ -16,8 +17,8 @@ namespace osu.Game.Screens.Menu
         /// <param name="onCancel">An optional action to perform on cancel.</param>
         public ConfirmDiscardChangesDialog(Action onConfirm, Action? onCancel = null)
         {
-            HeaderText = "Are you sure you want to go back?";
-            BodyText = "This will discard any unsaved changes";
+            HeaderText = DialogStrings.ConfirmDiscardChangesHeaderText;
+            BodyText = DialogStrings.ConfirmDiscardChangesBodyText;
 
             Icon = FontAwesome.Solid.ExclamationTriangle;
 
@@ -25,12 +26,12 @@ namespace osu.Game.Screens.Menu
             {
                 new PopupDialogDangerousButton
                 {
-                    Text = @"Yes",
+                    Text = DialogStrings.Confirm,
                     Action = onConfirm
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = @"No I didn't mean to",
+                    Text = DialogStrings.ConfirmDiscardChangesCancelButton,
                     Action = onCancel
                 },
             };
