@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play
             // TODO: This should be customised for `MultiplayerSpectatorPlayer` to be static and only show the player name.
             // Or maybe we should completely redesign this to show the user avatar and other things if that happens.
             OsuTextFlowContainer message;
-            AddInternal(new ScrollingMessage(message = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Body))
+            AddInternal(new ScrollingMessage(message = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Body) { AutoSizeAxes = Axes.Both })
             {
                 Y = 100,
                 Anchor = Anchor.TopCentre,

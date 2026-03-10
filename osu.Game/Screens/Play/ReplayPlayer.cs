@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Play
             });
 
             OsuTextFlowContainer message;
-            AddInternal(new ScrollingMessage(message = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Body))
+            AddInternal(new ScrollingMessage(message = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Body) { AutoSizeAxes = Axes.Both })
             {
                 Y = 100,
                 Anchor = Anchor.TopCentre,
