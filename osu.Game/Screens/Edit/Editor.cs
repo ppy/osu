@@ -188,15 +188,14 @@ namespace osu.Game.Screens.Edit
 
         private bool isNewBeatmap;
 
-        protected override UserActivity InitialActivity
-        {
-            get
-            {
-                if (Beatmap.Value.Metadata.Author.OnlineID == api.LocalUser.Value.OnlineID)
-                    return new UserActivity.EditingBeatmap(Beatmap.Value.BeatmapInfo);
+        protected override UserActivity InitialActivity => getCurrentUserActivity();
 
-                return new UserActivity.ModdingBeatmap(Beatmap.Value.BeatmapInfo);
-            }
+        private UserActivity getCurrentUserActivity()
+        {
+            if (Beatmap.Value.Metadata.Author.OnlineID == api.LocalUser.Value.OnlineID)
+                return new UserActivity.EditingBeatmap(Beatmap.Value.BeatmapInfo);
+
+            return new UserActivity.ModdingBeatmap(Beatmap.Value.BeatmapInfo);
         }
 
         protected override bool InitialBackButtonVisibility => false;
@@ -604,6 +603,9 @@ namespace osu.Game.Screens.Edit
             updateLastSavedHash();
             onScreenDisplay?.Display(new BeatmapEditorToast(ToastStrings.BeatmapSaved, editorBeatmap.BeatmapInfo.GetDisplayTitle()));
             Saved?.Invoke();
+
+            // This triggers an update to the window title post-save (ie if the difficulty name changed).
+            Activity.Value = getCurrentUserActivity();
             return true;
         }
 
