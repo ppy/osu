@@ -11,11 +11,15 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
     {
         private const double direction_change_bonus = 21.0;
 
-        public static double EvaluateDifficultyOf(DifficultyHitObject current, double catcherSpeedMultiplier)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
             var catchCurrent = (CatchDifficultyHitObject)current;
             var catchLast = (CatchDifficultyHitObject)current.Previous(0);
             var catchLastLast = (CatchDifficultyHitObject)current.Previous(1);
+
+            // In catch, clockrate adjustments do not only affect the timings of hitobjects,
+            // but also the speed of the player's catcher, which has an impact on difficulty
+            double catcherSpeedMultiplier = current.ClockRate;
 
             double weightedStrainTime = catchCurrent.StrainTime + 13 + (3 / catcherSpeedMultiplier);
 
