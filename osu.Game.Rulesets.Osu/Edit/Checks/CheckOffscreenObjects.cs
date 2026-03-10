@@ -47,10 +47,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
                 {
                     case Slider slider:
                     {
-                        if (isOutsidePlayfield(slider.StackedPosition))
+                        if (isOutsidePlayfield(slider.Position))
                             yield return new IssueTemplateSliderOutsidePlayfield(this).Create(slider, slider.StartTime);
 
-                        if (isOutsidePlayfield(slider.StackedEndPosition))
+                        if (isOutsidePlayfield(slider.EndPosition))
                             yield return new IssueTemplateSliderOutsidePlayfield(this).Create(slider, slider.EndTime);
 
                         foreach (var issue in sliderIssues(slider))
@@ -64,7 +64,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
                         if (isOffscreen(circle.StackedPosition, circle.Radius))
                             yield return new IssueTemplateOffscreenCircle(this).Create(circle);
 
-                        if (isOutsidePlayfield(circle.StackedPosition))
+                        // Stacked notes use drawn (stacked) position for offscreen check but actual position for playfield check.
+                        // Many circles stacked at the same in-bounds position should not trigger the playfield check, and any real issues
+                        // with stacking should be caught by the offscreen check.
+                        if (isOutsidePlayfield(circle.Position))
                             yield return new IssueTemplateCircleOutsidePlayfield(this).Create(circle);
 
                         break;

@@ -159,6 +159,24 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
         }
 
         [Test]
+        public void TestStackedCirclesWithActualPositionInsidePlayfield()
+        {
+            var hitObjects = new List<HitObject>();
+
+            for (int i = 0; i < 10; i++)
+            {
+                hitObjects.Add(new HitCircle
+                {
+                    StartTime = 3000 + i * 50,
+                    Position = playfield_centre,
+                    StackHeight = i
+                });
+            }
+
+            assertInsidePlayfield(new Beatmap<HitObject> { HitObjects = hitObjects });
+        }
+
+        [Test]
         public void TestSliderInCenter()
         {
             assertOk(new Beatmap<HitObject>
