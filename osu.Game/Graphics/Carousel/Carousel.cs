@@ -319,6 +319,8 @@ namespace osu.Game.Graphics.Carousel
                 RelativeSizeAxes = Axes.Both,
                 OnPageUp = () => Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Page, -1)),
                 OnPageDown = () => Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Page, 1)),
+                OnListStart = () => Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Edge, -1)),
+                OnListEnd = () => Scheduler.AddOnce(traverseFromKey, new TraversalOperation(TraversalType.Edge, 1)),
             };
 
             Items.BindCollectionChanged((_, args) =>
@@ -554,6 +556,10 @@ namespace osu.Game.Graphics.Carousel
                     traverseKeyboardPage(traversal.Direction);
                     break;
 
+                case TraversalType.Edge:
+                    traverseKeyboardEdge(traversal.Direction);
+                    break;
+
                 case TraversalType.Set:
                     traverseSetSelection(traversal.Direction);
                     break;
@@ -572,6 +578,7 @@ namespace osu.Game.Graphics.Carousel
             Keyboard,
             Set,
             Page,
+            Edge,
             Group
         }
 
@@ -677,6 +684,27 @@ namespace osu.Game.Graphics.Carousel
             if (fallback != null && !CheckModelEquality(fallback.Model, currentKeyboardSelection.Model))
             {
                 setKeyboardSelection(fallback.Model);
+                ScrollToSelection();
+                playTraversalSound();
+            }
+        }
+
+        /// <summary>
+        /// Select the first or last item in the carousel.
+        /// </summary>
+        /// <param name="direction">Positive for last item, negative for first item.</param>
+        private void traverseKeyboardEdge(int direction)
+        {
+            if (carouselItems == null || carouselItems.Count == 0)
+                return;
+
+            var item = direction > 0
+                ? carouselItems.LastOrDefault(x => x.IsVisible)
+                : carouselItems.FirstOrDefault(x => x.IsVisible);
+
+            if (item != null && !CheckModelEquality(item.Model, currentKeyboardSelection.Model))
+            {
+                setKeyboardSelection(item.Model);
                 ScrollToSelection();
                 playTraversalSound();
             }
