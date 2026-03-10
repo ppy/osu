@@ -10,7 +10,8 @@ namespace osu.Game.Online.Matchmaking
         /// <summary>
         /// Retrieves all active matchmaking pools.
         /// </summary>
-        Task<MatchmakingPool[]> GetMatchmakingPools();
+        /// <param name="type"></param>
+        Task<MatchmakingPool[]> GetMatchmakingPoolsOfType(MatchmakingPoolType type);
 
         /// <summary>
         /// Joins the matchmaking lobby, allowing the local user to receive status updates.
@@ -45,7 +46,7 @@ namespace osu.Game.Online.Matchmaking
         /// <summary>
         /// Raise a candidate playlist item to be played in the current round.
         /// </summary>
-        /// <param name="playlistItemId">The playlist item.</param>
+        /// <param name="playlistItemId">The playlist item, or -1 to indicate a random selection.</param>
         Task MatchmakingToggleSelection(long playlistItemId);
 
         /// <summary>

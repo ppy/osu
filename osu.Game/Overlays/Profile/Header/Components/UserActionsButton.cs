@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             {
                 Background.Colour = colourProvider.Background6;
 
-                bool userBlocked = api.Blocks.Any(b => b.TargetID == user.Id);
+                bool userBlocked = api.LocalUserState.Blocks.Any(b => b.TargetID == user.Id);
 
                 AllowableAnchors = [Anchor.BottomCentre, Anchor.TopCentre];
 

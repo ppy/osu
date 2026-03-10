@@ -34,7 +34,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
                 return string.Empty;
 
-                string format(string acronym, DifficultyBindable bindable, int digits) => $"{acronym}{bindable.Value!.Value.ToStandardFormattedString(digits)}";
+                string format(string acronym, DifficultyBindable bindable, int digits)
+                    => $"{acronym}{bindable.Value!.Value.ToStandardFormattedString(digits)}";
             }
         }
 
