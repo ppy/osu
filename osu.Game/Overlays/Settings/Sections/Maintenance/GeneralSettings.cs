@@ -47,5 +47,12 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 }
             });
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            selector?.Dispose();
+        }
     }
 }

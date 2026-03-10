@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Threading.Tasks;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -58,20 +57,15 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 },
             });
 
-            bool supportsExport = RuntimeInfo.OS != RuntimeInfo.Platform.Android;
-
-            if (supportsExport)
+            Add(new SettingsButtonV2
             {
-                Add(new SettingsButtonV2
-                {
-                    Text = GeneralSettingsStrings.ExportLogs,
-                    BackgroundColour = colours.YellowDarker.Darken(0.5f),
-                    Keywords = new[] { @"bug", "report", "logs", "files" },
-                    Action = () => Task.Run(exportLogs),
-                });
+                Text = GeneralSettingsStrings.ExportLogs,
+                BackgroundColour = colours.YellowDarker.Darken(0.5f),
+                Keywords = new[] { @"bug", "report", "logs", "files" },
+                Action = () => Task.Run(exportLogs),
+            });
 
-                exportStorage = (storage as OsuStorage)?.GetExportStorage() ?? storage.GetStorageForDirectory(@"exports");
-            }
+            exportStorage = (storage as OsuStorage)?.GetExportStorage() ?? storage.GetStorageForDirectory(@"exports");
         }
 
         [Resolved]
