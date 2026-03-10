@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Beatmaps;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
 
@@ -10,9 +9,9 @@ namespace osu.Game.Screens.Edit
 {
     public partial class DeleteDifficultyConfirmationDialog : DeletionDialog
     {
-        public DeleteDifficultyConfirmationDialog(BeatmapInfo beatmapInfo, Action deleteAction)
+        public DeleteDifficultyConfirmationDialog(string difficultyName, int objectCount, Action deleteAction)
         {
-            BodyText = EditorDialogsStrings.Difficulty(beatmapInfo.DifficultyName);
+            BodyText = EditorDialogsStrings.DeleteDifficultyDetails(difficultyName, objectCount);
             DangerousAction = deleteAction;
         }
     }

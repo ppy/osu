@@ -65,14 +65,14 @@ namespace osu.Game.Localisation
         public static LocalisableString SaveRequiredDialogHeader => new TranslatableString(getKey(@"save_required_dialog_header"), @"The beatmap will be saved to continue with this operation.");
 
         /// <summary>
-        /// "Sounds good, let's go!"
+        /// "Sounds good, let&#39;s go!"
         /// </summary>
         public static LocalisableString SoundsGood => new TranslatableString(getKey(@"sounds_good"), @"Sounds good, let's go!");
 
         /// <summary>
-        /// "&quot;{0}&quot; difficulty"
+        /// "Difficulty &quot;{0}&quot; with {1} objects"
         /// </summary>
-        public static LocalisableString Difficulty(string difficultyName) => new TranslatableString(getKey(@"difficulty"), @"""{0}"" difficulty", difficultyName);
+        public static LocalisableString DeleteDifficultyDetails(string difficultyName, int objectCount) => new TranslatableString(getKey(@"delete_difficulty_details"), @"Difficulty ""{0}"" with {1} objects", difficultyName, objectCount);
 
         /// <summary>
         /// "All Bookmarks"
