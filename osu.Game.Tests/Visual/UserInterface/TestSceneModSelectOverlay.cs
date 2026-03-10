@@ -716,6 +716,15 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddUntilStep("touch mod still present", () => SelectedMods.Value, () => Is.EqualTo(new Mod[] { new OsuModTouchDevice() }));
+
+            AddStep("select NC + TD", () => SelectedMods.Value = new Mod[] { new OsuModTouchDevice(), new OsuModNightcore() });
+            AddStep("click deselect all button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<DeselectAllModsButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("touch mod still present", () => SelectedMods.Value, () => Is.EqualTo(new Mod[] { new OsuModTouchDevice() }));
         }
 
         [Test]
