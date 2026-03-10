@@ -19,6 +19,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
         private const int max_x = 579;
         private const int max_y = 428;
 
+        // Strict playfield bounds in gameplay space coordinates.
+        private const int playfield_min_x = 0;
+        private const int playfield_min_y = 0;
+        private const int playfield_max_x = 512;
+        private const int playfield_max_y = 384;
+
         // The amount of milliseconds to step through a slider path at a time
         // (higher = more performant, but higher false-negative chance).
         private const int path_step_size = 5;
@@ -28,7 +34,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
             new IssueTemplateOffscreenCircle(this),
-            new IssueTemplateOffscreenSlider(this)
+            new IssueTemplateOffscreenSlider(this),
+            new IssueTemplateCircleOutsidePlayfield(this),
+            new IssueTemplateSliderOutsidePlayfield(this)
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
@@ -39,6 +47,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
                 {
                     case Slider slider:
                     {
+                        if (isOutsidePlayfield(slider.StackedPosition))
+                            yield return new IssueTemplateSliderOutsidePlayfield(this).Create(slider, slider.StartTime);
+
+                        if (isOutsidePlayfield(slider.StackedEndPosition))
+                            yield return new IssueTemplateSliderOutsidePlayfield(this).Create(slider, slider.EndTime);
+
                         foreach (var issue in sliderIssues(slider))
                             yield return issue;
 
@@ -49,6 +63,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
                     {
                         if (isOffscreen(circle.StackedPosition, circle.Radius))
                             yield return new IssueTemplateOffscreenCircle(this).Create(circle);
+
+                        if (isOutsidePlayfield(circle.StackedPosition))
+                            yield return new IssueTemplateCircleOutsidePlayfield(this).Create(circle);
 
                         break;
                     }
@@ -92,6 +109,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
                    position.Y - radius < min_y || position.Y + radius > max_y;
         }
 
+        private bool isOutsidePlayfield(Vector2 position)
+        {
+            return position.X < playfield_min_x || position.X > playfield_max_x ||
+                   position.Y < playfield_min_y || position.Y > playfield_max_y;
+        }
+
         public class IssueTemplateOffscreenCircle : IssueTemplate
         {
             public IssueTemplateOffscreenCircle(ICheck check)
@@ -106,6 +129,26 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
         {
             public IssueTemplateOffscreenSlider(ICheck check)
                 : base(check, IssueType.Problem, "This slider goes offscreen here on a 4:3 aspect ratio.")
+            {
+            }
+
+            public Issue Create(Slider slider, double offscreenTime) => new Issue(slider, this) { Time = offscreenTime };
+        }
+
+        public class IssueTemplateCircleOutsidePlayfield : IssueTemplate
+        {
+            public IssueTemplateCircleOutsidePlayfield(ICheck check)
+                : base(check, IssueType.Problem, "This circle is placed outside the 512x384 playfield bounds.")
+            {
+            }
+
+            public Issue Create(HitCircle circle) => new Issue(circle, this);
+        }
+
+        public class IssueTemplateSliderOutsidePlayfield : IssueTemplate
+        {
+            public IssueTemplateSliderOutsidePlayfield(ICheck check)
+                : base(check, IssueType.Problem, "This slider is placed outside the 512x384 playfield bounds.")
             {
             }
 
