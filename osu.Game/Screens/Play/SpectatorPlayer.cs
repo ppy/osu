@@ -29,24 +29,23 @@ namespace osu.Game.Screens.Play
             this.score = score;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override Drawable CreateOverlayComponents()
         {
             // TODO: This should be customised for `MultiplayerSpectatorPlayer` to be static and only show the player name.
             // Or maybe we should completely redesign this to show the user avatar and other things if that happens.
-            OsuTextFlowContainer message;
-            AddInternal(new ScrollingMessage(message = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Body) { AutoSizeAxes = Axes.Both })
-            {
-                Y = 100,
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-            });
-
+            OsuTextFlowContainer message = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Body) { AutoSizeAxes = Axes.Both };
             message.AddText("Watching ");
             message.AddText(Score.ScoreInfo.User.Username, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
             message.AddText(" play ");
             message.AddText(Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(), s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
             message.AddText(" live", s => s.Font = s.Font.With(weight: FontWeight.Bold));
+
+            return new ScrollingMessage(message)
+            {
+                Y = 100,
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+            };
         }
 
         protected override void LoadComplete()
