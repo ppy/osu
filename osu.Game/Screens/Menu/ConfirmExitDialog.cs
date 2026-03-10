@@ -43,11 +43,11 @@ namespace osu.Game.Screens.Menu
                 LocalisableString ongoingOperationsLocalisableString;
 
                 if (ongoingOperations.Length > 10)
-                    ongoingOperationsLocalisableString = LocalisableString.Interpolate($"{ongoingOperationsText}\n{DialogStrings.ConfirmExitBodyTextOtherOngoingOperations(ongoingOperations.Length - 10)}\n");
+                    ongoingOperationsLocalisableString = DialogStrings.ConfirmExitBodyTextOtherOngoingOperations(ongoingOperationsText, ongoingOperations.Length - 10);
                 else
-                    ongoingOperationsLocalisableString = ongoingOperationsText;
+                    ongoingOperationsLocalisableString = DialogStrings.ConfirmExitBodyTextOngoingOperations(ongoingOperationsText);
 
-                BodyText = LocalisableString.Interpolate($"{DialogStrings.ConfirmExitBodyTextOngoingOperations}\n\n{ongoingOperationsLocalisableString}\n{DialogStrings.ConfirmDialogBodyText}");
+                BodyText = LocalisableString.Interpolate($"{ongoingOperationsLocalisableString}\n\n{DialogStrings.ConfirmDialogBodyText}");
 
                 Buttons = new PopupDialogButton[]
                 {

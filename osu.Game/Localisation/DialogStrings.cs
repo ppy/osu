@@ -75,14 +75,26 @@ namespace osu.Game.Localisation
         public static LocalisableString ConfirmDialogBodyText => new TranslatableString(getKey(@"confirm_exit_body_text"), @"Last chance to turn back");
 
         /// <summary>
-        /// "There are currently some background operations which will be aborted if you continue:"
+        /// "There are currently some background operations which will be aborted if you continue:
+        ///
+        /// {0}"
         /// </summary>
-        public static LocalisableString ConfirmExitBodyTextOngoingOperations => new TranslatableString(getKey(@"confirm_exit_body_text_ongoing_operations"), @"There are currently some background operations which will be aborted if you continue:");
+        public static LocalisableString ConfirmExitBodyTextOngoingOperations(string ongoingOperationsText) => new TranslatableString(getKey(@"confirm_exit_body_text_ongoing_operations"), @"There are currently some background operations which will be aborted if you continue:
+
+{0}", ongoingOperationsText);
 
         /// <summary>
-        /// "and {0} other operation(s)."
+        /// "There are currently some background operations which will be aborted if you continue:
+        ///
+        /// {0}
+        ///
+        /// and {1} other operation(s)."
         /// </summary>
-        public static LocalisableString ConfirmExitBodyTextOtherOngoingOperations(int count) => new TranslatableString(getKey(@"confirm_exit_body_text_other_ongoing_operations"), @"and {0} other operation(s).", count);
+        public static LocalisableString ConfirmExitBodyTextOtherOngoingOperations(string ongoingOperationsText, int count) => new TranslatableString(getKey(@"confirm_exit_body_text_other_ongoing_operations"), @"There are currently some background operations which will be aborted if you continue:
+
+{0}
+
+and {1} other operation(s).", ongoingOperationsText, count);
 
         /// <summary>
         /// "Let me out!"
