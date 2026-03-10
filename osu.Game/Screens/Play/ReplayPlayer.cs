@@ -123,9 +123,9 @@ namespace osu.Game.Screens.Play
                 Origin = Anchor.TopCentre,
             });
 
-            message.AddText("Watching replay of ");
+            message.AddText("Watching ");
             message.AddText(Score.ScoreInfo.User.Username, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
-            message.AddText(" playing ");
+            message.AddText(" play ");
             message.AddText(Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(), s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
             message.AddText(" on ");
             message.AddArbitraryDrawable(new PlayedOnText(Score.ScoreInfo.Date, false)
