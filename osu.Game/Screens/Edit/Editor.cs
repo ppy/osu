@@ -1287,12 +1287,9 @@ namespace osu.Game.Screens.Edit
                 Hotkey = new Hotkey(GlobalAction.EditorDiscardUnsavedChanges)
             };
 
-            if (RuntimeInfo.OS != RuntimeInfo.Platform.Android)
-            {
-                var export = createExportMenu();
-                saveRelatedMenuItems.AddRange(export.Items);
-                yield return export;
-            }
+            var export = createExportMenu();
+            saveRelatedMenuItems.AddRange(export.Items);
+            yield return export;
 
             if (RuntimeInfo.IsDesktop)
             {
