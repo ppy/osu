@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
@@ -9,13 +10,15 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
-    public static class AimEvaluator
+    public static class SnapAimEvaluator
     {
-        private const double wide_angle_multiplier = 1.35;
-        private const double acute_angle_multiplier = 2.5;
-        private const double slider_multiplier = 1.9;
-        private const double velocity_change_multiplier = 1.1;
+        private const double wide_angle_multiplier = 1.05;
+        private const double acute_angle_multiplier = 2.41;
+        private const double slider_multiplier = 1.5;
+        private const double velocity_change_multiplier = 0.9;
         private const double wiggle_multiplier = 1.02; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
+        private const double maximum_repetition_nerf = 0.15;
+        private const double maximum_vector_influence = 0.5;
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
@@ -78,24 +81,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 if (Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) < 1.25 * Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) // If rhythms are the same.
                 {
-                    acuteAngleBonus = calcAcuteAngleBonus(currAngle);
+                    acuteAngleBonus = CalcAcuteAngleBonus(currAngle);
 
                     // Penalize angle repetition.
-                    acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastAngle), 3)));
+                    acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(CalcAcuteAngleBonus(lastAngle), 3)));
 
                     // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
                     acuteAngleBonus *= angleBonus *
                                        DifficultyCalculationUtils.Smootherstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime, 2), 300, 400) *
-                                       DifficultyCalculationUtils.Smootherstep(currDistance, diameter, diameter * 2);
+                                       DifficultyCalculationUtils.Smootherstep(currDistance, 0, diameter * 2);
                 }
 
                 wideAngleBonus = calcWideAngleBonus(currAngle);
 
                 // Penalize angle repetition.
-                wideAngleBonus *= 1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3));
+                wideAngleBonus *= 0.25 + 0.75 * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3)));
 
-                // Apply full wide angle bonus for distance more than SINGLE_SPACING_THRESHOLD
-                wideAngleBonus *= angleBonus * DifficultyCalculationUtils.Smoothstep(currDistance, 0, SpeedAimEvaluator.SINGLE_SPACING_THRESHOLD);
+                wideAngleBonus *= angleBonus;
 
                 // Apply wiggle bonus for jumps that are [radius, 3*diameter] in distance, with < 110 angle
                 // https://www.desmos.com/calculator/dp0v0nvowc
@@ -118,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                     if (distance < 1)
                     {
-                        wideAngleBonus *= 1 - 0.35 * (1 - distance);
+                        wideAngleBonus *= 1 - 0.55 * (1 - distance);
                     }
                 }
             }
@@ -150,6 +152,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 sliderBonus = osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
             }
 
+            // Penalize angle repetition.
+            aimStrain *= vectorAngleRepetition(osuCurrObj, osuLastObj);
+
             aimStrain += wiggleBonus * wiggle_multiplier;
             aimStrain += velocityChangeBonus * velocity_change_multiplier;
 
@@ -174,8 +179,51 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private static double highBpmBonus(double ms, double distance) => 1 / (1 - Math.Pow(0.03, Math.Pow(ms / 1000, 0.65)))
                                                                           * DifficultyCalculationUtils.Smootherstep(distance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
 
+        private static double vectorAngleRepetition(OsuDifficultyHitObject current, OsuDifficultyHitObject previous)
+        {
+            if (current.Angle == null || previous.Angle == null)
+                return 1;
+
+            const double note_limit = 6;
+
+            double constantAngleCount = 0;
+
+            for (int index = 0; index < note_limit; index++)
+            {
+                var loopObj = (OsuDifficultyHitObject)current.Previous(index);
+
+                if (loopObj.IsNull())
+                    break;
+
+                // Only consider vectors in the same jump section, stopping to change rhythm ruins momentum
+                if (Math.Max(current.AdjustedDeltaTime, loopObj.AdjustedDeltaTime) > 1.1 * Math.Min(current.AdjustedDeltaTime, loopObj.AdjustedDeltaTime))
+                    break;
+
+                if (loopObj.NormalisedVectorAngle.IsNotNull() && current.NormalisedVectorAngle.IsNotNull())
+                {
+                    double angleDifference = Math.Abs(current.NormalisedVectorAngle.Value - loopObj.NormalisedVectorAngle.Value);
+                    // Refer to this desmos for tuning, constants need to be precise so that values stay within the range of 0 and 1.
+                    // https://www.desmos.com/calculator/a8jesv5sv2
+                    constantAngleCount += Math.Cos(8 * Math.Min(double.DegreesToRadians(11.25), angleDifference));
+                }
+            }
+
+            double vectorRepetition = Math.Pow(Math.Min(0.5 / constantAngleCount, 1), 2);
+
+            double stackFactor = DifficultyCalculationUtils.Smootherstep(current.LazyJumpDistance, 0, OsuDifficultyHitObject.NORMALISED_DIAMETER);
+
+            double currAngle = current.Angle.Value;
+            double lastAngle = previous.Angle.Value;
+
+            double angleDifferenceAdjusted = Math.Cos(2 * Math.Min(double.DegreesToRadians(45), Math.Abs(currAngle - lastAngle) * stackFactor));
+
+            double baseNerf = 1 - maximum_repetition_nerf * CalcAcuteAngleBonus(lastAngle) * angleDifferenceAdjusted;
+
+            return Math.Pow(baseNerf + (1 - baseNerf) * vectorRepetition * maximum_vector_influence * stackFactor, 2);
+        }
+
         private static double calcWideAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(40), double.DegreesToRadians(140));
 
-        private static double calcAcuteAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(140), double.DegreesToRadians(40));
+        public static double CalcAcuteAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(140), double.DegreesToRadians(40));
     }
 }
