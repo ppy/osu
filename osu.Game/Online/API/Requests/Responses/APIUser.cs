@@ -247,6 +247,20 @@ namespace osu.Game.Online.API.Requests.Responses
             }
         }
 
+        // Only provided via /users/ batch lookups. Usually implicitly comes inside `UserStatistics`.
+        [JsonProperty(@"global_rank")]
+        [CanBeNull]
+        public GlobalRank Rank { get; set; }
+
+        public class GlobalRank
+        {
+            [JsonProperty(@"rank")]
+            public int? Rank;
+
+            [JsonProperty(@"ruleset_id")]
+            public int RulesetId;
+        }
+
         [JsonProperty(@"rank_history")]
         private APIRankHistory rankHistory
         {

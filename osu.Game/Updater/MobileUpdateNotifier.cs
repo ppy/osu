@@ -9,8 +9,10 @@ using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 
 namespace osu.Game.Updater
@@ -57,8 +59,7 @@ namespace osu.Game.Updater
                 {
                     Notifications.Post(new UpdateAvailableNotification(cancellationToken)
                     {
-                        Text = $"A newer release of osu! has been found ({version} → {latestTagName}).\n\n"
-                               + "Click here to download the new version, which can be installed over the top of your existing installation",
+                        Text = LocalisableString.Interpolate($"{NotificationsStrings.UpdateAvailable(version, latestTagName)}\n\n{NotificationsStrings.UpdateAvailableManualInstall}"),
                         Icon = FontAwesome.Solid.Download,
                         Activated = () =>
                         {

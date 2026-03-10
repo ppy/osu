@@ -10,7 +10,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Filter;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
-using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Tests.NonVisual.Filtering
@@ -509,7 +508,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 ("Another One", "diff ]with [[ brackets]]]"),
                 ("Diff in title", "a"),
                 ("a", "Diff in diff"),
-            }).Select(info => new CarouselBeatmap(new BeatmapInfo
+            }).Select(info => new FilterMatchingTest.CarouselBeatmap(new BeatmapInfo
             {
                 Metadata = new BeatmapMetadata
                 {
@@ -738,6 +737,16 @@ namespace osu.Game.Tests.NonVisual.Filtering
             new object[] { "submitted=99999", false },
             new object[] { "submitted>=2012-03-05-04", false },
             new object[] { "submitted>=2012/03.05-04", false },
+
+            new object[] { "created<2012", true },
+            new object[] { "created<2012.03", true },
+            new object[] { "created<2012/03/05", true },
+            new object[] { "created<2012-3-5", true },
+
+            new object[] { "created<0", false },
+            new object[] { "created=99999", false },
+            new object[] { "created>=2012-03-05-04", false },
+            new object[] { "created>=2012/03.05-04", false },
         };
 
         [Test]

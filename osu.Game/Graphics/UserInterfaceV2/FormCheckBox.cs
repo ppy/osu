@@ -1,25 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Localisation;
 using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public partial class FormCheckBox : CompositeDrawable, IHasCurrentValue<bool>
+    public partial class FormCheckBox : CompositeDrawable, IHasCurrentValue<bool>, IFormControl
     {
         public Bindable<bool> Current
         {
@@ -39,54 +35,47 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public LocalisableString HintText { get; init; }
 
-        private Box background = null!;
+        private FormControlBackground background = null!;
         private FormFieldCaption caption = null!;
-        private OsuSpriteText text = null!;
-        private Nub checkbox = null!;
 
-        private Sample? sampleChecked;
-        private Sample? sampleUnchecked;
+        private SwitchButton switchButton = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
             RelativeSizeAxes = Axes.X;
-            Height = 50;
-
-            Masking = true;
-            CornerRadius = 5;
-            CornerExponent = 2.5f;
+            AutoSizeAxes = Axes.Y;
 
             InternalChildren = new Drawable[]
             {
-                background = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
-                },
+                background = new FormControlBackground(),
                 new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding(9),
                     Children = new Drawable[]
                     {
-                        caption = new FormFieldCaption
+                        new Container
                         {
-                            Caption = Caption,
-                            TooltipText = HintText,
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopLeft,
-                        },
-                        text = new OsuSpriteText
-                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
                             RelativeSizeAxes = Axes.X,
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
+                            AutoSizeAxes = Axes.Y,
+                            Padding = new MarginPadding { Right = SwitchButton.WIDTH + 5 },
+                            Children = new Drawable[]
+                            {
+                                caption = new FormFieldCaption
+                                {
+                                    Caption = Caption,
+                                    TooltipText = HintText,
+                                },
+                            },
                         },
-                        checkbox = new Nub
+                        switchButton = new SwitchButton
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
@@ -95,9 +84,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     },
                 },
             };
-
-            sampleChecked = audio.Samples.Get(@"UI/check-on");
-            sampleUnchecked = audio.Samples.Get(@"UI/check-off");
         }
 
         protected override void LoadComplete()
@@ -107,18 +93,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
             current.BindValueChanged(_ =>
             {
                 updateState();
-                playSamples();
-                background.FlashColour(ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark2), 800, Easing.OutQuint);
+                background.Flash();
+
+                ValueChanged?.Invoke();
             });
             current.BindDisabledChanged(_ => updateState(), true);
-        }
-
-        private void playSamples()
-        {
-            if (Current.Value)
-                sampleChecked?.Play();
-            else
-                sampleUnchecked?.Play();
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -135,27 +114,32 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (!Current.Disabled)
-                Current.Value = !Current.Value;
+            switchButton.TriggerClick();
             return true;
         }
 
         private void updateState()
         {
-            background.Colour = Current.Disabled ? colourProvider.Background4 : colourProvider.Background5;
-            caption.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
-            checkbox.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
-            text.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
+            caption.Colour = Current.Disabled ? colourProvider.Background1 : colourProvider.Content2;
 
-            text.Text = Current.Value ? CommonStrings.Enabled : CommonStrings.Disabled;
-
-            if (!Current.Disabled)
-            {
-                BorderThickness = IsHovered ? 2 : 0;
-
-                if (IsHovered)
-                    BorderColour = colourProvider.Light4;
-            }
+            if (IsDisabled)
+                background.VisualStyle = VisualStyle.Disabled;
+            else if (IsHovered)
+                background.VisualStyle = VisualStyle.Hovered;
+            else
+                background.VisualStyle = VisualStyle.Normal;
         }
+
+        public IEnumerable<LocalisableString> FilterTerms => Caption.Yield();
+
+        public event Action? ValueChanged;
+
+        public bool IsDefault => Current.IsDefault;
+
+        public void SetDefault() => Current.SetDefault();
+
+        public bool IsDisabled => Current.Disabled;
+
+        public float MainDrawHeight => DrawHeight;
     }
 }

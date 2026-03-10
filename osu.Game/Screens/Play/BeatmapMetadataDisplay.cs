@@ -19,6 +19,7 @@ using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
+using CommonStrings = osu.Game.Localisation.CommonStrings;
 
 namespace osu.Game.Screens.Play
 {
@@ -113,7 +114,10 @@ namespace osu.Game.Screens.Play
                                     Anchor = Anchor.Centre,
                                     FillMode = FillMode.Fill,
                                 },
-                                loading = new LoadingLayer(dimBackground: true, blockInput: false)
+                                loading = new LoadingLayer(dimBackground: true)
+                                {
+                                    BlockPositionalInput = false,
+                                }
                             }
                         },
                         versionFlow = new FillFlowContainer
@@ -165,7 +169,7 @@ namespace osu.Game.Screens.Play
                                 },
                                 new Drawable[]
                                 {
-                                    new MetadataLineLabel("Mapper"),
+                                    new MetadataLineLabel(CommonStrings.Mapper),
                                     new MetadataLineInfo(metadata.Author.Username)
                                 }
                             }

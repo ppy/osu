@@ -62,8 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [BackgroundDependencyLoader]
         private void load()
         {
-            var localBeatmap = beatmapManager.QueryBeatmap($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}",
-                PlaylistItem.Beatmap.OnlineID);
+            var localBeatmap = beatmapManager.QueryOnlineBeatmapId(PlaylistItem.Beatmap.OnlineID);
             itemBeatmap = beatmapManager.GetWorkingBeatmap(localBeatmap);
 
             AddInternal(new Container
