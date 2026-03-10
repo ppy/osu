@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
@@ -32,14 +32,21 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(new OsuSpriteText
+            // TODO: This should be customised for `MultiplayerSpectatorPlayer` to be static and only show the player name.
+            // Or maybe we should completely redesign this to show the user avatar and other things if that happens.
+            OsuTextFlowContainer message;
+            AddInternal(new ScrollingMessage(message = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Body))
             {
-                Text = $"Watching {score.ScoreInfo.User.Username} playing live!",
-                Font = OsuFont.Default.With(size: 30),
                 Y = 100,
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
             });
+
+            message.AddText("Watching ");
+            message.AddText(Score.ScoreInfo.User.Username, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+            message.AddText(" play ");
+            message.AddText(Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(), s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+            message.AddText(" live", s => s.Font = s.Font.With(weight: FontWeight.Bold));
         }
 
         protected override void LoadComplete()
