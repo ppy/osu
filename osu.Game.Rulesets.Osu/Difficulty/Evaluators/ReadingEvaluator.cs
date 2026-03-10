@@ -87,12 +87,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 if (nextObj.Preempt > currObj.Preempt && currObj.StartTime + nextObj.Preempt > nextObj.StartTime)
                 {
                     double preemptChangeDifficulty = DifficultyCalculationUtils.Smootherstep(nextObj.Preempt / currObj.Preempt, 1, 2);
-                    noteDensityDifficulty += preempt_change_multiplier * (Math.Pow(1 + preemptChangeDifficulty, 3) - 1);
+                    noteDensityDifficulty += (Math.Pow(1 + preemptChangeDifficulty, 3) - 1) * preempt_change_multiplier;
                 }
                 else if (nextObj.StartTime + currObj.Preempt > currObj.StartTime)
                 {
                     double preemptChangeDifficulty = DifficultyCalculationUtils.Smootherstep(currObj.Preempt / nextObj.Preempt, 1, 2);
-                    noteDensityDifficulty += preempt_change_multiplier * (Math.Pow(1 + preemptChangeDifficulty, 3) - 1);
+                    noteDensityDifficulty += (Math.Pow(1 + preemptChangeDifficulty, 3) - 1) * preempt_change_multiplier;
                 }
             }
 
