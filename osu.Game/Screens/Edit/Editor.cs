@@ -1425,7 +1425,7 @@ namespace osu.Game.Screens.Edit
             if (dialogOverlay == null)
                 delete();
             else
-                dialogOverlay.Push(new DeleteDifficultyConfirmationDialog(Beatmap.Value.BeatmapInfo, delete));
+                dialogOverlay.Push(new DeleteDifficultyConfirmationDialog(playableBeatmap.BeatmapInfo.DifficultyName, editorBeatmap.HitObjects.Count, delete));
 
             void delete()
             {

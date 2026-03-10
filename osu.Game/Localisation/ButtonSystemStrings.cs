@@ -93,6 +93,11 @@ Your experience will not be perfect, and may even feel subpar compared to games 
 
 Please bear with us as we continue to improve the game for you!");
 
+        /// <summary>
+        /// "Understood"
+        /// </summary>
+        public static LocalisableString MobileDisclaimerOkButton => new TranslatableString(getKey(@"mobile_disclaimer_ok_button"), @"Understood");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

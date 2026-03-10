@@ -30,6 +30,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Footer;
+using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.Gameplay;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Users;
@@ -378,7 +379,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 confirmDialog.PerformOkAction();
             else
             {
-                dialogOverlay.Push(new ConfirmDialog("Are you sure you want to leave this multiplayer match?", () =>
+                dialogOverlay.Push(new ConfirmExitMultiplayerMatchDialog(() =>
                 {
                     exitConfirmed = true;
                     if (this.IsCurrentScreen())
