@@ -317,7 +317,7 @@ namespace osu.Game.Online.API
 
                     userReq.Failure += ex =>
                     {
-                        if (ex is APIException)
+                        if (ex is APIException apiException && apiException.StatusCode < HttpStatusCode.InternalServerError)
                         {
                             LastLoginError = ex;
                             log.Add($@"Login failed for username {ProvidedUsername} on user retrieval ({LastLoginError.Message})!");
