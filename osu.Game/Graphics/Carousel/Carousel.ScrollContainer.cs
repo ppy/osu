@@ -33,6 +33,9 @@ namespace osu.Game.Graphics.Carousel
         /// </summary>
         protected partial class ScrollContainer : UserTrackingScrollContainer, IKeyBindingHandler<GlobalAction>
         {
+            public Action? OnPageUp { get; init; }
+            public Action? OnPageDown { get; init; }
+
             public readonly Container Panels;
 
             public void SetLayoutHeight(float height) => Panels.Height = height;
@@ -127,6 +130,22 @@ namespace osu.Game.Graphics.Carousel
 
             protected override bool IsDragging => base.IsDragging || AbsoluteScrolling;
 
+            protected override bool OnKeyDown(KeyDownEvent e)
+            {
+                switch (e.Key)
+                {
+                    case Key.PageUp:
+                        OnPageUp?.Invoke();
+                        return true;
+
+                    case Key.PageDown:
+                        OnPageDown?.Invoke();
+                        return true;
+                }
+
+                return base.OnKeyDown(e);
+            }
+
             public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {
                 switch (e.Action)
@@ -201,6 +220,8 @@ namespace osu.Game.Graphics.Carousel
 
                 private readonly Drawable box;
 
+                private bool capturingMouseDown;
+
                 protected override float MinimumDimSize => SCROLL_BAR_WIDTH * 3;
 
                 private const float expanded_size_ratio = 2;
@@ -261,6 +282,7 @@ namespace osu.Game.Graphics.Carousel
                 {
                     if (!base.OnMouseDown(e)) return false;
 
+                    capturingMouseDown = true;
                     updateVisuals(e);
                     return true;
                 }
@@ -275,13 +297,14 @@ namespace osu.Game.Graphics.Carousel
                 {
                     if (e.Button != MouseButton.Left) return;
 
+                    capturingMouseDown = false;
                     updateVisuals(e);
                     base.OnMouseUp(e);
                 }
 
                 private void updateVisuals(MouseEvent e)
                 {
-                    if (IsDragged || e.PressedButtons.Contains(MouseButton.Left))
+                    if (capturingMouseDown)
                         box.FadeColour(highlightColour, 100);
                     else if (IsHovered)
                         box.FadeColour(hoverColour, 100);

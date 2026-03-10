@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Beatmaps;
 
@@ -34,6 +35,8 @@ namespace osu.Game.Rulesets.Mania.Mods
         {
             var maniaBeatmap = (ManiaBeatmap)beatmap;
 
+            double mostCommonBeatLengthBefore = beatmap.GetMostCommonBeatLength();
+
             var newObjects = new List<ManiaHitObject>();
 
             foreach (var h in beatmap.HitObjects.OfType<HoldNote>())
@@ -48,6 +51,17 @@ namespace osu.Game.Rulesets.Mania.Mods
             }
 
             maniaBeatmap.HitObjects = maniaBeatmap.HitObjects.OfType<Note>().Concat(newObjects).OrderBy(h => h.StartTime).ToList();
+
+            double mostCommonBeatLengthAfter = beatmap.GetMostCommonBeatLength();
+
+            // the process of removing hold notes can result in shortening the beatmap's play time,
+            // and therefore, as a side effect, changing the most common BPM, which will change scroll speed.
+            // to compensate for this, apply a multiplier to effect points in order to maintain the beatmap's original intended scroll speed.
+            if (!Precision.AlmostEquals(mostCommonBeatLengthBefore, mostCommonBeatLengthAfter))
+            {
+                foreach (var effectPoint in beatmap.ControlPointInfo.EffectPoints)
+                    effectPoint.ScrollSpeed *= mostCommonBeatLengthBefore / mostCommonBeatLengthAfter;
+            }
         }
     }
 }

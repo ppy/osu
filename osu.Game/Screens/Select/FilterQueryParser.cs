@@ -68,6 +68,7 @@ namespace osu.Game.Screens.Select
                 case "ranked":
                     return tryUpdateRankedDateRange(ref criteria.DateRanked, op, value);
 
+                case "created":
                 case "submitted":
                     return tryUpdateRankedDateRange(ref criteria.DateSubmitted, op, value);
 

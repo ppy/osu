@@ -11,7 +11,6 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Filter;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
-using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Tests.NonVisual.Filtering
@@ -299,6 +298,23 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual(filtered, carouselItem.Filtered.Value);
         }
 
+        [Test]
+        [TestCase("artist")]
+        [TestCase("unicode")]
+        public void TestCriteriaNotMatchingArtist(string excludedTerm)
+        {
+            var beatmap = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                Artist = new FilterCriteria.OptionalTextFilter { SearchTerm = excludedTerm, ExcludeTerm = true }
+            };
+
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            Assert.True(carouselItem.Filtered.Value);
+        }
+
         [TestCase("simple", false)]
         [TestCase("\"style/clean\"", false)]
         [TestCase("\"style/clean\"!", false)]
@@ -342,6 +358,41 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 [
                     new FilterCriteria.OptionalTextFilter { SearchTerm = "\"song representation/simple\"!" },
                     new FilterCriteria.OptionalTextFilter { SearchTerm = "\"style/dirty\"!" }
+                ]
+            };
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            Assert.AreEqual(true, carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        public void TestCriteriaMatchingTagExcluded()
+        {
+            var beatmap = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                UserTags =
+                [
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"song representation/simple\"!", ExcludeTerm = true },
+                ]
+            };
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            Assert.AreEqual(true, carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        public void TestCriteriaOneTagIncludedAndOneTagExcluded()
+        {
+            var beatmap = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                UserTags =
+                [
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"song representation/simple\"!" },
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"style/clean\"!", ExcludeTerm = true }
                 ]
             };
             var carouselItem = new CarouselBeatmap(beatmap);
@@ -534,6 +585,26 @@ namespace osu.Game.Tests.NonVisual.Filtering
                                     .Select(b => carouselBeatmaps.IndexOf(b)).ToArray();
 
             Assert.That(visibleBeatmaps, Is.EqualTo(expectedBeatmapIndexes));
+        }
+
+        // This is a temporary class that emulates what these tests originally used from song select v1.
+        // If anyone ever ends up tidying up these test, here's a starting point:
+        // https://gist.github.com/peppy/67fda38f6483fd1dd01ef845ed5bf932
+        public class CarouselBeatmap
+        {
+            public readonly BeatmapInfo BeatmapInfo;
+
+            public BindableBool Filtered = new BindableBool();
+
+            public CarouselBeatmap(BeatmapInfo beatmapInfo)
+            {
+                BeatmapInfo = beatmapInfo;
+            }
+
+            public void Filter(FilterCriteria criteria)
+            {
+                Filtered.Value = !BeatmapCarouselFilterMatching.CheckCriteriaMatch(BeatmapInfo, criteria);
+            }
         }
 
         private class CustomCriteria : IRulesetFilterCriteria

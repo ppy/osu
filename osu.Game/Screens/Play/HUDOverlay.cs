@@ -73,6 +73,7 @@ namespace osu.Game.Screens.Play
         private readonly DrawableRuleset drawableRuleset;
 
         private readonly IReadOnlyList<Mod> mods;
+        private readonly PlayerConfiguration configuration;
 
         /// <summary>
         /// Whether the elements that can optionally be hidden should be visible.
@@ -113,12 +114,13 @@ namespace osu.Game.Screens.Play
         /// </summary>
         internal readonly Drawable PlayfieldSkinLayer;
 
-        public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
+        public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, PlayerConfiguration configuration)
         {
             Container rightSettings;
 
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
+            this.configuration = configuration;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -173,7 +175,10 @@ namespace osu.Game.Screens.Play
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        PlayerSettingsOverlay = new PlayerSettingsOverlay(),
+                        PlayerSettingsOverlay = new PlayerSettingsOverlay
+                        {
+                            Alpha = 0,
+                        }
                     }
                 },
                 TopLeftElements = new FillFlowContainer
@@ -344,6 +349,11 @@ namespace osu.Game.Screens.Play
 
         private void updateVisibility()
         {
+            if (configSettingsOverlay.Value && replayLoaded.Value)
+                PlayerSettingsOverlay.Show();
+            else
+                PlayerSettingsOverlay.Hide();
+
             if (ShowHud.Disabled)
                 return;
 
@@ -352,11 +362,6 @@ namespace osu.Game.Screens.Play
                 ShowHud.Value = true;
                 return;
             }
-
-            if (configSettingsOverlay.Value && replayLoaded.Value)
-                PlayerSettingsOverlay.Show();
-            else
-                PlayerSettingsOverlay.Hide();
 
             switch (configVisibilityMode.Value)
             {
@@ -391,7 +396,7 @@ namespace osu.Game.Screens.Play
             ShowHealth = { BindTarget = ShowHealthBar }
         };
 
-        protected HoldForMenuButton CreateHoldForMenuButton() => new HoldForMenuButton
+        protected HoldForMenuButton CreateHoldForMenuButton() => new HoldForMenuButton(!configuration.AllowRestart)
         {
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,

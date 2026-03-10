@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
@@ -29,17 +30,17 @@ namespace osu.Game.Tests.Online.Matchmaking
                 new SoloScoreInfo { UserID = 3, TotalScore = 750 },
             ], placement_points);
 
-            Assert.AreEqual(8, state.Users[1].Points);
-            Assert.AreEqual(1, state.Users[1].Placement);
-            Assert.AreEqual(1, state.Users[1].Rounds[1].Placement);
+            Assert.AreEqual(8, state.Users.GetOrAdd(1).Points);
+            Assert.AreEqual(1, state.Users.GetOrAdd(1).Placement);
+            Assert.AreEqual(1, state.Users.GetOrAdd(1).Rounds.GetOrAdd(1).Placement);
 
-            Assert.AreEqual(6, state.Users[2].Points);
-            Assert.AreEqual(3, state.Users[2].Placement);
-            Assert.AreEqual(3, state.Users[2].Rounds[1].Placement);
+            Assert.AreEqual(6, state.Users.GetOrAdd(2).Points);
+            Assert.AreEqual(3, state.Users.GetOrAdd(2).Placement);
+            Assert.AreEqual(3, state.Users.GetOrAdd(2).Rounds.GetOrAdd(1).Placement);
 
-            Assert.AreEqual(7, state.Users[3].Points);
-            Assert.AreEqual(2, state.Users[3].Placement);
-            Assert.AreEqual(2, state.Users[3].Rounds[1].Placement);
+            Assert.AreEqual(7, state.Users.GetOrAdd(3).Points);
+            Assert.AreEqual(2, state.Users.GetOrAdd(3).Placement);
+            Assert.AreEqual(2, state.Users.GetOrAdd(3).Rounds.GetOrAdd(1).Placement);
 
             // 2 -> 1 -> 3
 
@@ -51,17 +52,17 @@ namespace osu.Game.Tests.Online.Matchmaking
                 new SoloScoreInfo { UserID = 3, TotalScore = 500 },
             ], placement_points);
 
-            Assert.AreEqual(15, state.Users[1].Points);
-            Assert.AreEqual(1, state.Users[1].Placement);
-            Assert.AreEqual(2, state.Users[1].Rounds[2].Placement);
+            Assert.AreEqual(15, state.Users.GetOrAdd(1).Points);
+            Assert.AreEqual(1, state.Users.GetOrAdd(1).Placement);
+            Assert.AreEqual(2, state.Users.GetOrAdd(1).Rounds.GetOrAdd(2).Placement);
 
-            Assert.AreEqual(14, state.Users[2].Points);
-            Assert.AreEqual(2, state.Users[2].Placement);
-            Assert.AreEqual(1, state.Users[2].Rounds[2].Placement);
+            Assert.AreEqual(14, state.Users.GetOrAdd(2).Points);
+            Assert.AreEqual(2, state.Users.GetOrAdd(2).Placement);
+            Assert.AreEqual(1, state.Users.GetOrAdd(2).Rounds.GetOrAdd(2).Placement);
 
-            Assert.AreEqual(13, state.Users[3].Points);
-            Assert.AreEqual(3, state.Users[3].Placement);
-            Assert.AreEqual(3, state.Users[3].Rounds[2].Placement);
+            Assert.AreEqual(13, state.Users.GetOrAdd(3).Points);
+            Assert.AreEqual(3, state.Users.GetOrAdd(3).Placement);
+            Assert.AreEqual(3, state.Users.GetOrAdd(3).Rounds.GetOrAdd(2).Placement);
         }
 
         [Test]
@@ -80,21 +81,21 @@ namespace osu.Game.Tests.Online.Matchmaking
                 new SoloScoreInfo { UserID = 4, TotalScore = 500 },
             ], placement_points);
 
-            Assert.AreEqual(7, state.Users[1].Points);
-            Assert.AreEqual(1, state.Users[1].Placement);
-            Assert.AreEqual(2, state.Users[1].Rounds[1].Placement);
+            Assert.AreEqual(7, state.Users.GetOrAdd(1).Points);
+            Assert.AreEqual(1, state.Users.GetOrAdd(1).Placement);
+            Assert.AreEqual(2, state.Users.GetOrAdd(1).Rounds.GetOrAdd(1).Placement);
 
-            Assert.AreEqual(7, state.Users[2].Points);
-            Assert.AreEqual(2, state.Users[2].Placement);
-            Assert.AreEqual(2, state.Users[2].Rounds[1].Placement);
+            Assert.AreEqual(7, state.Users.GetOrAdd(2).Points);
+            Assert.AreEqual(2, state.Users.GetOrAdd(2).Placement);
+            Assert.AreEqual(2, state.Users.GetOrAdd(2).Rounds.GetOrAdd(1).Placement);
 
-            Assert.AreEqual(5, state.Users[3].Points);
-            Assert.AreEqual(3, state.Users[3].Placement);
-            Assert.AreEqual(4, state.Users[3].Rounds[1].Placement);
+            Assert.AreEqual(5, state.Users.GetOrAdd(3).Points);
+            Assert.AreEqual(3, state.Users.GetOrAdd(3).Placement);
+            Assert.AreEqual(4, state.Users.GetOrAdd(3).Rounds.GetOrAdd(1).Placement);
 
-            Assert.AreEqual(5, state.Users[4].Points);
-            Assert.AreEqual(4, state.Users[4].Placement);
-            Assert.AreEqual(4, state.Users[4].Rounds[1].Placement);
+            Assert.AreEqual(5, state.Users.GetOrAdd(4).Points);
+            Assert.AreEqual(4, state.Users.GetOrAdd(4).Placement);
+            Assert.AreEqual(4, state.Users.GetOrAdd(4).Rounds.GetOrAdd(1).Placement);
         }
 
         [Test]
@@ -120,8 +121,8 @@ namespace osu.Game.Tests.Online.Matchmaking
                 new SoloScoreInfo { UserID = 2, TotalScore = 1000 },
             ], placement_points);
 
-            Assert.AreEqual(1, state.Users[1].Placement);
-            Assert.AreEqual(2, state.Users[2].Placement);
+            Assert.AreEqual(1, state.Users.GetOrAdd(1).Placement);
+            Assert.AreEqual(2, state.Users.GetOrAdd(2).Placement);
         }
 
         [Test]
@@ -142,12 +143,40 @@ namespace osu.Game.Tests.Online.Matchmaking
                 new SoloScoreInfo { UserID = 5, TotalScore = 1000 },
             ], placement_points);
 
-            Assert.AreEqual(1, state.Users[1].Placement);
-            Assert.AreEqual(2, state.Users[2].Placement);
-            Assert.AreEqual(3, state.Users[3].Placement);
-            Assert.AreEqual(4, state.Users[4].Placement);
-            Assert.AreEqual(5, state.Users[5].Placement);
-            Assert.AreEqual(6, state.Users[6].Placement);
+            Assert.AreEqual(1, state.Users.GetOrAdd(1).Placement);
+            Assert.AreEqual(2, state.Users.GetOrAdd(2).Placement);
+            Assert.AreEqual(3, state.Users.GetOrAdd(3).Placement);
+            Assert.AreEqual(4, state.Users.GetOrAdd(4).Placement);
+            Assert.AreEqual(5, state.Users.GetOrAdd(5).Placement);
+            Assert.AreEqual(6, state.Users.GetOrAdd(6).Placement);
+        }
+
+        [Test]
+        public void AbandonOrder()
+        {
+            var state = new MatchmakingRoomState();
+
+            state.AdvanceRound();
+            state.RecordScores(
+            [
+                new SoloScoreInfo { UserID = 1, TotalScore = 1000 },
+                new SoloScoreInfo { UserID = 2, TotalScore = 500 },
+            ], placement_points);
+
+            Assert.AreEqual(1, state.Users.GetOrAdd(1).Placement);
+            Assert.AreEqual(2, state.Users.GetOrAdd(2).Placement);
+
+            state.Users.GetOrAdd(1).AbandonedAt = DateTimeOffset.Now;
+            state.RecordScores([], placement_points);
+
+            Assert.AreEqual(2, state.Users.GetOrAdd(1).Placement);
+            Assert.AreEqual(1, state.Users.GetOrAdd(2).Placement);
+
+            state.Users.GetOrAdd(2).AbandonedAt = DateTimeOffset.Now - TimeSpan.FromMinutes(1);
+            state.RecordScores([], placement_points);
+
+            Assert.AreEqual(1, state.Users.GetOrAdd(1).Placement);
+            Assert.AreEqual(2, state.Users.GetOrAdd(2).Placement);
         }
     }
 }
