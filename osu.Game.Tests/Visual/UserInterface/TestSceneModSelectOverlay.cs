@@ -699,6 +699,26 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestTouchDeviceDoesNotInterefereWithDeselectAll()
+        {
+            createScreen();
+            changeRuleset(0);
+
+            AddAssert("deselect all button disabled", () => !this.ChildrenOfType<DeselectAllModsButton>().Single().Enabled.Value);
+
+            AddStep("select TD", () => SelectedMods.Value = new Mod[] { new OsuModTouchDevice() });
+            AddAssert("deselect all button still disabled", () => !this.ChildrenOfType<DeselectAllModsButton>().Single().Enabled.Value);
+
+            AddStep("click deselect all button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<DeselectAllModsButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("touch mod still present", () => SelectedMods.Value, () => Is.EqualTo(new Mod[] { new OsuModTouchDevice() }));
+        }
+
+        [Test]
         public void TestDeselectAllViaButton()
         {
             createScreen();
