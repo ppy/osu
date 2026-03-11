@@ -26,15 +26,10 @@ namespace osu.Game.Tests.Visual.Beatmaps
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
-        [SetUp]
-        public void SetUp()
-        {
-            Clear();
-        }
-
         [SetUpSteps]
         public void SetUpSteps()
         {
+            AddStep("clear", Clear);
             AddStep("import beatmaps", () => beatmaps.Import(TestResources.GetTestBeatmapForImport()).WaitSafely());
         }
 
