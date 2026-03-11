@@ -27,6 +27,7 @@ namespace osu.Game.Online
             (typeof(ChangeTeamRequest), typeof(MatchUserRequest)),
             (typeof(StartMatchCountdownRequest), typeof(MatchUserRequest)),
             (typeof(StopCountdownRequest), typeof(MatchUserRequest)),
+            (typeof(SetLockStateRequest), typeof(MatchUserRequest)),
             (typeof(CountdownStartedEvent), typeof(MatchServerEvent)),
             (typeof(CountdownStoppedEvent), typeof(MatchServerEvent)),
             (typeof(TeamVersusRoomState), typeof(MatchRoomState)),
