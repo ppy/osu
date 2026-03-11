@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 using osuTK;
@@ -18,8 +19,24 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         public const float CENTERED_CARD_SCALE = 1.2f;
 
         public readonly Bindable<Visibility> CornerPieceVisibility = new Bindable<Visibility>(Visibility.Visible);
+        protected readonly Bindable<Visibility> CountdownVisibility = new Bindable<Visibility>(Visibility.Visible);
 
         public virtual bool ShowBeatmapBackground => false;
+
+        /// <summary>
+        /// Heading text to be displayed indicating the purpose of the current stage.
+        /// </summary>
+        protected abstract LocalisableString StageHeading { get; }
+
+        /// <summary>
+        /// Subtitle text to be displayed indicating the action a user should take in the current stage.
+        /// </summary>
+        protected abstract LocalisableString StageCaption { get; }
+
+        /// <summary>
+        /// The colour scheme commonly used for components of this screen.
+        /// </summary>
+        protected virtual RankedPlayColourScheme ColourScheme => RankedPlayColourScheme.Blue;
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
@@ -27,10 +44,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         protected MultiplayerClient Client => client;
 
         protected override Container<Drawable> Content { get; }
-
         protected readonly Container CenterColumn;
-
         protected readonly FillFlowContainer ButtonsContainer;
+        protected readonly RankedPlayStageDisplay StageDisplay;
 
         protected RankedPlaySubScreen()
         {
@@ -61,6 +77,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     Y = -110,
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(8)
+                },
+                StageDisplay = new RankedPlayStageDisplay(ColourScheme)
+                {
+                    Heading = StageHeading,
+                    Caption = StageCaption,
+                    Margin = new MarginPadding { Top = 60 },
+                    State = { BindTarget = CountdownVisibility }
                 },
             ];
         }
