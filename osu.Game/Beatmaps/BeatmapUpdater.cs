@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -53,13 +52,11 @@ namespace osu.Game.Beatmaps
 
                 foreach (BeatmapInfo beatmap in beatmapSet.Beatmaps)
                 {
-                    difficultyCache.Invalidate(beatmap);
-
                     var working = workingBeatmapCache.GetWorkingBeatmap(beatmap);
+
+                    difficultyCache.Invalidate(beatmap, working.BeatmapInfo);
+
                     var ruleset = working.BeatmapInfo.Ruleset.CreateInstance();
-
-                    Debug.Assert(ruleset != null);
-
                     var calculator = ruleset.CreateDifficultyCalculator(working);
 
                     beatmap.StarRating = calculator.Calculate().StarRating;

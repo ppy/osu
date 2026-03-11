@@ -43,7 +43,18 @@ namespace osu.Game.Screens.OnlinePlay
             }
         }
 
-        private void updateSubScreenTitle() => title.Screen = stack?.CurrentScreen as IOnlinePlaySubScreen;
+        private void updateSubScreenTitle()
+        {
+            IOnlinePlaySubScreen? screen = stack?.CurrentScreen as IOnlinePlaySubScreen;
+
+            if (screen?.ShowHeaderLine == true)
+            {
+                title.FadeIn(200, Easing.OutQuint);
+                title.Screen = screen;
+            }
+            else
+                title.FadeOut(200, Easing.OutQuint);
+        }
 
         private partial class MultiHeaderTitle : CompositeDrawable
         {

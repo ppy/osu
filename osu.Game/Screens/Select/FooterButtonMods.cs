@@ -1,143 +1,420 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Game.Screens.Play.HUD;
-using osu.Game.Rulesets.Mods;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Footer;
+using osu.Game.Screens.Play.HUD;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
-using osu.Game.Input.Bindings;
-using osu.Game.Localisation;
-using osu.Game.Utils;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
-    public partial class FooterButtonMods : FooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
+    public partial class FooterButtonMods : ScreenFooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
     {
+        public Action? RequestDeselectAllMods { get; init; }
+
+        public const float BAR_HEIGHT = 30f;
+
+        private const float mod_display_portion = 0.65f;
+
+        private readonly BindableWithCurrent<IReadOnlyList<Mod>> current = new BindableWithCurrent<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
         public Bindable<IReadOnlyList<Mod>> Current
         {
-            get => modDisplay.Current;
-            set => modDisplay.Current = value;
+            get => current.Current;
+            set => current.Current = value;
         }
 
-        protected OsuSpriteText MultiplierText { get; private set; } = null!;
-        protected Container UnrankedBadge { get; private set; } = null!;
+        private Container modDisplayBar = null!;
 
-        private readonly ModDisplay modDisplay;
+        private Drawable unrankedBadge = null!;
 
-        private ModSettingChangeTracker? modSettingChangeTracker;
+        private ModDisplay modDisplay = null!;
 
-        private Color4 lowMultiplierColour;
-        private Color4 highMultiplierColour;
+        private OsuSpriteText multiplierText { get; set; } = null!;
 
-        public FooterButtonMods()
+        private Container modContainer = null!;
+
+        private ModCountText overflowModCountDisplay = null!;
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        [Resolved]
+        private OsuGameBase game { get; set; } = null!;
+
+        private IBindable<Language> currentLanguage = null!;
+
+        public FooterButtonMods(ModSelectOverlay overlay)
+            : base(overlay)
         {
-            // must be created in ctor for correct operation of `Current`.
-            modDisplay = new ModDisplay
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Scale = new Vector2(0.8f),
-                ExpansionMode = ExpansionMode.AlwaysContracted,
-            };
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            SelectedColour = colours.Yellow;
-            DeselectedColour = SelectedColour.Opacity(0.5f);
-            lowMultiplierColour = colours.Green;
-            highMultiplierColour = colours.Red;
-            Text = @"mods";
-            Hotkey = GlobalAction.ToggleModSelection;
+            Text = SongSelectStrings.Mods;
+            Icon = FontAwesome.Solid.ExchangeAlt;
+            AccentColour = colours.Lime1;
 
-            ButtonContentContainer.AddRange(new Drawable[]
+            AddRange(new[]
             {
-                modDisplay,
-                MultiplierText = new OsuSpriteText
+                unrankedBadge = new UnrankedBadge(),
+                modDisplayBar = new InputBlockingContainer
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                },
-                UnrankedBadge = new Container
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    AutoSizeAxes = Axes.Both,
+                    Y = -5f,
+                    Depth = float.MaxValue,
+                    Origin = Anchor.BottomLeft,
+                    Shear = OsuGame.SHEAR,
+                    CornerRadius = CORNER_RADIUS,
+                    Size = new Vector2(BUTTON_WIDTH, BAR_HEIGHT),
+                    Masking = true,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Radius = 4,
+                        // Figma says 50% opacity, but it does not match up visually if taken at face value, and looks bad.
+                        Colour = Colour4.Black.Opacity(0.25f),
+                        Offset = new Vector2(0, 2),
+                    },
                     Children = new Drawable[]
                     {
-                        new Circle
+                        new Box
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Colour = colours.Yellow,
+                            Colour = colourProvider.Background4,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new OsuSpriteText
+                        new Container
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Colour = colours.Gray2,
-                            Padding = new MarginPadding(5),
-                            UseFullGlyphHeight = false,
-                            Text = ModSelectOverlayStrings.Unranked.ToLower()
-                        }
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            RelativeSizeAxes = Axes.Both,
+                            Width = 1f - mod_display_portion,
+                            Masking = true,
+                            Child = multiplierText = new OsuSpriteText
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Shear = -OsuGame.SHEAR,
+                                UseFullGlyphHeight = false,
+                                Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Bold)
+                            }
+                        },
+                        modContainer = new Container
+                        {
+                            CornerRadius = CORNER_RADIUS,
+                            RelativeSizeAxes = Axes.Both,
+                            Width = mod_display_portion,
+                            Masking = true,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    Colour = colourProvider.Background3,
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                modDisplay = new ModDisplay(showExtendedInformation: true)
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Shear = -OsuGame.SHEAR,
+                                    Scale = new Vector2(0.5f),
+                                    Current = { BindTarget = Current },
+                                    ExpansionMode = ExpansionMode.AlwaysContracted,
+                                },
+                                overflowModCountDisplay = new ModCountText { Mods = { BindTarget = Current }, },
+                            }
+                        },
                     }
                 },
             });
         }
 
+        private ModSettingChangeTracker? modSettingChangeTracker;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Current.BindValueChanged(mods =>
+            currentLanguage = game.CurrentLanguage.GetBoundCopy();
+            currentLanguage.BindValueChanged(_ => ScheduleAfterChildren(updateDisplay));
+
+            Current.BindValueChanged(m =>
             {
                 modSettingChangeTracker?.Dispose();
 
-                updateMultiplierText();
+                updateDisplay();
 
-                if (mods.NewValue != null)
+                if (m.NewValue != null)
                 {
-                    modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
-                    modSettingChangeTracker.SettingChanged += _ => updateMultiplierText();
+                    modSettingChangeTracker = new ModSettingChangeTracker(m.NewValue);
+                    modSettingChangeTracker.SettingChanged += _ => updateDisplay();
                 }
             }, true);
+
+            FinishTransforms(true);
         }
 
-        private void updateMultiplierText() => Schedule(() =>
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
+            // should probably be OnClick but right mouse button clicks isn't setup well.
+            if (e.Button == MouseButton.Right)
+            {
+                RequestDeselectAllMods?.Invoke();
+                return true;
+            }
+
+            return base.OnMouseDown(e);
+        }
+
+        private const double duration = 240;
+        private const Easing easing = Easing.OutQuint;
+
+        private void updateDisplay()
+        {
+            if (Current.Value.Count == 0)
+            {
+                modDisplayBar.MoveToY(20, duration, easing);
+                modDisplayBar.FadeOut(duration, easing);
+                modDisplay.FadeOut(duration, easing);
+                overflowModCountDisplay.FadeOut(duration, easing);
+
+                unrankedBadge.MoveToY(20, duration, easing);
+                unrankedBadge.FadeOut(duration, easing);
+
+                // add delay to let unranked indicator hide first before resizing the button back to its original width.
+                this.Delay(duration).ResizeWidthTo(BUTTON_WIDTH, duration, easing);
+            }
+            else
+            {
+                if (Current.Value.Any(m => !m.Ranked))
+                {
+                    unrankedBadge.MoveToX(0, duration, easing);
+                    unrankedBadge.FadeIn(duration, easing);
+
+                    this.ResizeWidthTo(BUTTON_WIDTH + 5 + unrankedBadge.DrawWidth, duration, easing);
+                }
+                else
+                {
+                    unrankedBadge.MoveToX(-unrankedBadge.DrawWidth, duration, easing);
+                    unrankedBadge.FadeOut(duration, easing);
+
+                    this.ResizeWidthTo(BUTTON_WIDTH, duration, easing);
+                }
+
+                modDisplayBar.MoveToY(-5, duration, Easing.OutQuint);
+                unrankedBadge.MoveToY(-5, duration, easing);
+                modDisplayBar.FadeIn(duration, easing);
+                modDisplay.FadeIn(duration, easing);
+            }
+
             double multiplier = Current.Value?.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier) ?? 1;
-            MultiplierText.Text = multiplier == 1 ? string.Empty : ModUtils.FormatScoreMultiplier(multiplier);
+            multiplierText.Text = ModUtils.FormatScoreMultiplier(multiplier);
 
             if (multiplier > 1)
-                MultiplierText.FadeColour(highMultiplierColour, 200);
+                multiplierText.FadeColour(colours.Red1, duration, easing);
             else if (multiplier < 1)
-                MultiplierText.FadeColour(lowMultiplierColour, 200);
+                multiplierText.FadeColour(colours.Lime1, duration, easing);
             else
-                MultiplierText.FadeColour(Color4.White, 200);
+                multiplierText.FadeColour(Color4.White, duration, easing);
+        }
 
-            if (Current.Value?.Count > 0)
-                modDisplay.FadeIn();
+        protected override void Update()
+        {
+            base.Update();
+
+            if (Current.Value.Count == 0)
+                return;
+
+            if (modDisplay.DrawWidth * modDisplay.Scale.X > modContainer.DrawWidth)
+                overflowModCountDisplay.Show();
             else
-                modDisplay.FadeOut();
+                overflowModCountDisplay.Hide();
+        }
 
-            bool anyUnrankedMods = Current.Value?.Any(m => !m.Ranked) == true;
-            UnrankedBadge.FadeTo(anyUnrankedMods ? 1 : 0);
-        });
+        public partial class ModCountText : VisibilityContainer, IHasCustomTooltip<IReadOnlyList<Mod>>
+        {
+            public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>();
+
+            private LocalisableString? customText;
+
+            /// <summary>
+            /// When set, this will be shown instead of a mod count.
+            /// </summary>
+            public LocalisableString? CustomText
+            {
+                get => customText;
+                set
+                {
+                    customText = value;
+                    if (IsLoaded)
+                        updateText();
+                }
+            }
+
+            private OsuSpriteText text = null!;
+
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                RelativeSizeAxes = Axes.Both;
+
+                InternalChildren = new Drawable[]
+                {
+                    new Box
+                    {
+                        Colour = colourProvider.Background3,
+                        Alpha = 0.8f,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    text = new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Bold),
+                        Shear = -OsuGame.SHEAR,
+                    }
+                };
+
+                Mods.BindValueChanged(_ => updateText(), true);
+            }
+
+            public ITooltip<IReadOnlyList<Mod>> GetCustomTooltip() => new ModOverflowTooltip(colourProvider);
+
+            public IReadOnlyList<Mod>? TooltipContent => Mods.Value;
+
+            protected override void PopIn() => this.FadeIn(300, Easing.OutExpo);
+            protected override void PopOut() => this.FadeOut(300, Easing.OutExpo);
+
+            private void updateText()
+            {
+                if (CustomText != null)
+                    text.Text = CustomText.Value;
+                else
+                    text.Text = ModSelectOverlayStrings.Mods(Mods.Value.Count).ToUpper();
+            }
+
+            public partial class ModOverflowTooltip : VisibilityContainer, ITooltip<IReadOnlyList<Mod>>
+            {
+                private ModFlowDisplay extendedModDisplay = null!;
+
+                [Cached]
+                private OverlayColourProvider colourProvider;
+
+                public ModOverflowTooltip(OverlayColourProvider colourProvider)
+                {
+                    this.colourProvider = colourProvider;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load()
+                {
+                    AutoSizeAxes = Axes.Both;
+                    CornerRadius = CORNER_RADIUS;
+                    Masking = true;
+
+                    InternalChildren = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colourProvider.Background5,
+                        },
+                        extendedModDisplay = new ModFlowDisplay
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            MaximumSize = new Vector2(400, 0),
+                            Margin = new MarginPadding { Vertical = 2f, Horizontal = 10f },
+                            Scale = new Vector2(0.6f),
+                        },
+                    };
+                }
+
+                public void SetContent(IReadOnlyList<Mod> content)
+                {
+                    extendedModDisplay.Current.Value = content;
+                }
+
+                public void Move(Vector2 pos) => Position = pos;
+
+                protected override void PopIn() => this.FadeIn(240, Easing.OutQuint);
+                protected override void PopOut() => this.FadeOut(240, Easing.OutQuint);
+            }
+        }
+
+        internal partial class UnrankedBadge : InputBlockingContainer, IHasTooltip
+        {
+            public LocalisableString TooltipText { get; }
+
+            public UnrankedBadge()
+            {
+                Margin = new MarginPadding { Left = BUTTON_WIDTH + 5f };
+                Y = -5f;
+                Depth = float.MaxValue;
+                Origin = Anchor.BottomLeft;
+                Shear = OsuGame.SHEAR;
+                CornerRadius = CORNER_RADIUS;
+                AutoSizeAxes = Axes.X;
+                Height = BAR_HEIGHT;
+                Masking = true;
+                BorderColour = Color4.White;
+                BorderThickness = 2f;
+                TooltipText = ModSelectOverlayStrings.UnrankedExplanation;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                InternalChildren = new Drawable[]
+                {
+                    new Box
+                    {
+                        Colour = colours.Orange2,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Shear = -OsuGame.SHEAR,
+                        Text = ModSelectOverlayStrings.Unranked.ToUpper(),
+                        Margin = new MarginPadding { Horizontal = 15 },
+                        UseFullGlyphHeight = false,
+                        Font = OsuFont.Torus.With(size: 14f, weight: FontWeight.Bold),
+                        Colour = Color4.Black,
+                    }
+                };
+            }
+        }
     }
 }

@@ -176,15 +176,20 @@ namespace osu.Game.Rulesets.Catch
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetCatch };
 
-        protected override IEnumerable<HitResult> GetValidHitResults()
+        public override IEnumerable<HitResult> GetValidHitResults()
         {
             return new[]
             {
                 HitResult.Great,
+                HitResult.Miss,
 
                 HitResult.LargeTickHit,
+                HitResult.LargeTickMiss,
                 HitResult.SmallTickHit,
+                HitResult.SmallTickMiss,
                 HitResult.LargeBonus,
+                HitResult.IgnoreHit,
+                HitResult.IgnoreMiss,
             };
         }
 
@@ -300,7 +305,7 @@ namespace osu.Game.Rulesets.Catch
                 Description = "Affects how early fruits fade in on the screen.",
                 AdditionalMetrics =
                 [
-                    new RulesetBeatmapAttribute.AdditionalMetric("Fade-in time", LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(effectiveDifficulty.ApproachRate, CatchHitObject.PREEMPT_RANGE):#,0.##} ms"))
+                    new RulesetBeatmapAttribute.AdditionalMetric("Fade-in time", LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRangeInt(effectiveDifficulty.ApproachRate, CatchHitObject.PREEMPT_RANGE):#,0.##} ms"))
                 ]
             };
             yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, effectiveDifficulty.DrainRate, 10)

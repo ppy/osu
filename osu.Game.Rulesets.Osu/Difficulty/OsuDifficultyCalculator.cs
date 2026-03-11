@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
-        public override int Version => 20250306;
+        public override int Version => 20251020;
 
         public OsuDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             var simulator = new OsuLegacyScoreSimulator();
             var scoreAttributes = simulator.Simulate(WorkingBeatmap, beatmap);
 
-            double baseAimPerformance = OsuStrainSkill.DifficultyToPerformance(aimRating);
+            double baseAimPerformance = OsuPerformanceCalculator.DifficultyToPerformance(aimRating);
             double baseSpeedPerformance = HarmonicSkill.DifficultyToPerformance(speedRating);
             double baseReadingPerformance = HarmonicSkill.DifficultyToPerformance(readingRating);
             double baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);

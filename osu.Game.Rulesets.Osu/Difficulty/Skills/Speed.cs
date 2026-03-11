@@ -5,12 +5,13 @@ using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
+using osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed;
+using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {

@@ -116,6 +116,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double? Angle { get; private set; }
 
+        public double? AngularVelocity { get; private set; }
+
+        /// <summary>
+        /// Angle of the vector created between current and current-1
+        /// normalised to consider symmetrical vectors in any axis to be the same angle.
+        /// </summary>
+        public double? NormalisedVectorAngle { get; private set; }
+
         /// <summary>
         /// Selective bonus for maps with higher circle size.
         /// </summary>
@@ -134,7 +142,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             AdjustedDeltaTime = Math.Max(DeltaTime, MIN_DELTA_TIME);
             LastObjectEndDeltaTime = lastDifficultyObject != null ? Math.Max(StartTime - lastDifficultyObject.EndTime, MIN_DELTA_TIME) : AdjustedDeltaTime;
 
-            SmallCircleBonus = Math.Max(1.0, 1.0 + (30 - BaseObject.Radius) / 60);
+            SmallCircleBonus = Math.Max(1.0, 1.0 + (30 - BaseObject.Radius) / 70);
 
             Preempt = BaseObject.TimePreempt / clockRate;
 
@@ -259,7 +267,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double angle = calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition);
                 double sliderAngle = calculateSliderAngle(lastDifficultyObject!, lastLastCursorPosition);
 
+                Vector2 v = BaseObject.StackedPosition - lastCursorPosition;
+                NormalisedVectorAngle = Math.Atan2(Math.Abs(v.Y), Math.Abs(v.X));
+
                 Angle = Math.Min(angle, sliderAngle);
+
+                if (lastLastDifficultyObject.Angle != null)
+                {
+                    double angleDifference = Math.Abs(Angle.Value - lastLastDifficultyObject.Angle.Value);
+                    double angleDifferenceAdjusted = Math.Sin(angleDifference / 2) * 180.0;
+                    AngularVelocity = angleDifferenceAdjusted / (AdjustedDeltaTime * 0.1);
+                }
             }
         }
 
