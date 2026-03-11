@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double density_difficulty_base = 2.5;
         private const double preempt_balancing_factor = 140000;
         private const double preempt_starting_point = 500; // AR 9.66 in milliseconds
-        private const double preempt_change_multiplier = 6;
+        private const double preempt_change_multiplier = 6.5;
         private const double minimum_angle_relevancy_time = 2000; // 2 seconds
         private const double maximum_angle_relevancy_time = 200;
 
@@ -84,16 +84,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // so we account for that.
             if (nextObj.Preempt != currObj.Preempt)
             {
-                if (nextObj.Preempt > currObj.Preempt && currObj.StartTime + nextObj.Preempt > nextObj.StartTime)
+                double preemptChangeDifficulty = 0;
+
+                if ((nextObj.Preempt > currObj.Preempt && currObj.StartTime + nextObj.Preempt > nextObj.StartTime) // existing combo, next object is slower
+                    || nextObj.StartTime + currObj.Preempt > currObj.StartTime) // new combo, next object fades in faster
                 {
-                    double preemptChangeDifficulty = DifficultyCalculationUtils.Smootherstep(nextObj.Preempt / currObj.Preempt, 1, 2);
-                    noteDensityDifficulty += (Math.Pow(1 + preemptChangeDifficulty, 3) - 1) * preempt_change_multiplier;
+                    preemptChangeDifficulty = DifficultyCalculationUtils.Smootherstep(Math.Max(nextObj.Preempt / currObj.Preempt, currObj.Preempt / nextObj.Preempt), 1, 2);
                 }
-                else if (nextObj.StartTime + currObj.Preempt > currObj.StartTime)
-                {
-                    double preemptChangeDifficulty = DifficultyCalculationUtils.Smootherstep(currObj.Preempt / nextObj.Preempt, 1, 2);
-                    noteDensityDifficulty += (Math.Pow(1 + preemptChangeDifficulty, 3) - 1) * preempt_change_multiplier;
-                }
+
+                preemptChangeDifficulty *= DifficultyCalculationUtils.Smootherstep(velocity, 0.5, 1.5);
+                // Increased time between objects makes reading much easier.
+                preemptChangeDifficulty *= DifficultyCalculationUtils.Smootherstep(currObj.DeltaTime, 500, 250);
+                noteDensityDifficulty += (Math.Pow(1 + preemptChangeDifficulty, 3.3) - 1) * preempt_change_multiplier;
             }
 
             // Award only denser than average maps.
