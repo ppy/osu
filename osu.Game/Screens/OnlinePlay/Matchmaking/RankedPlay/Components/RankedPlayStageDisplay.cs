@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -21,23 +20,19 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 {
-    public partial class RankedPlayStageDisplay : CompositeDrawable
+    public partial class RankedPlayStageDisplay : VisibilityContainer
     {
-        public required LocalisableString Heading { get; init; }
-
-        public required LocalisableString Caption { get; init; }
-
-        public Color4? CaptionColour { get; init; }
-
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
         private readonly RankedPlayColourScheme colourScheme;
 
         private Drawable headingTextBackground = null!;
-        private OsuSpriteText headingText = null!;
         private Drawable progressBar = null!;
         private OsuSpriteText progressText = null!;
+
+        private OsuSpriteText? headingText;
+        private OsuSpriteText? captionText;
 
         private DateTimeOffset countdownStartTime;
         private DateTimeOffset countdownEndTime;
@@ -50,7 +45,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
             const float phase_text_background_height = 55;
             Vector2 progressBarSize = new Vector2(300, 25);
@@ -162,7 +157,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                         }
                     ]
                 },
-                new OsuSpriteText
+                captionText = new OsuSpriteText
                 {
                     Margin = new MarginPadding
                     {
@@ -174,6 +169,54 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                     Font = OsuFont.TorusAlternate.With(size: 24, weight: FontWeight.SemiBold)
                 }
             };
+        }
+
+        private LocalisableString heading;
+
+        /// <summary>
+        /// Heading text to be displayed indicating the purpose of the current stage.
+        /// </summary>
+        public LocalisableString Heading
+        {
+            get => heading;
+            set
+            {
+                heading = value;
+                if (headingText != null)
+                    headingText.Text = value;
+            }
+        }
+
+        private LocalisableString caption;
+
+        /// <summary>
+        /// Subtitle text to be displayed indicating the action a user should take in the current stage.
+        /// </summary>
+        public LocalisableString Caption
+        {
+            get => caption;
+            set
+            {
+                caption = value;
+                if (captionText != null)
+                    captionText.Text = value;
+            }
+        }
+
+        private Color4? captionColour;
+
+        /// <summary>
+        /// Overrides the default caption colour from the colour scheme with a custom one.
+        /// </summary>
+        public Color4? CaptionColour
+        {
+            get => captionColour;
+            set
+            {
+                captionColour = value;
+                if (captionText != null)
+                    captionText.Colour = value ?? colourScheme.Primary;
+            }
         }
 
         protected override void LoadComplete()
@@ -194,7 +237,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         {
             base.Update();
 
-            headingTextBackground.Width = headingText.DrawWidth + 80;
+            headingTextBackground.Width = headingText!.DrawWidth + 80;
 
             TimeSpan duration = countdownEndTime - countdownStartTime;
             TimeSpan remaining = countdownEndTime - DateTimeOffset.Now;
@@ -225,6 +268,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
             countdownEndTime = DateTimeOffset.Now;
         });
+
+        protected override void PopIn()
+        {
+            this.FadeIn();
+        }
+
+        protected override void PopOut()
+        {
+            this.FadeOut();
+        }
 
         protected override void Dispose(bool isDisposing)
         {

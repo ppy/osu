@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
@@ -21,6 +22,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
     public partial class OpponentPickScreen : RankedPlaySubScreen
     {
         public CardFlow CenterRow { get; private set; } = null!;
+
+        protected override LocalisableString StageHeading => "Pick Phase";
+        protected override LocalisableString StageCaption => "Waiting for your opponent...";
+
+        protected override RankedPlayColourScheme ColourScheme => RankedPlayColourScheme.Red;
 
         private PlayerHandOfCards playerHand = null!;
         private OpponentHandOfCards opponentHand = null!;
@@ -45,12 +51,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                },
-                new RankedPlayStageDisplay(RankedPlayColourScheme.Red)
-                {
-                    Heading = "Pick Phase",
-                    Caption = "Waiting for your opponent...",
-                    Margin = new MarginPadding { Top = 60 },
                 },
             ];
 

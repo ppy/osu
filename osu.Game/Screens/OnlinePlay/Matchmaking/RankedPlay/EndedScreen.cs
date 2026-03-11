@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -23,6 +24,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         /// Invoked when the user requests to exit this screen.
         /// </summary>
         public Action<bool>? ExitRequested { get; init; }
+
+        protected override LocalisableString StageHeading => "Results";
+        protected override LocalisableString StageCaption => string.Empty;
 
         [Resolved]
         private RankedPlayMatchInfo matchInfo { get; set; } = null!;
