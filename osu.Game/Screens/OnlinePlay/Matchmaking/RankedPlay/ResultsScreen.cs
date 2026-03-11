@@ -161,6 +161,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
             AddInternal(new ResultScreenContent
             {
+                RelativeSizeAxes = Axes.Both,
+                // A little bit of room for the countdown timer...
+                Margin = new MarginPadding { Top = 45 },
                 PlayerScore = playerScore,
                 OpponentScore = opponentScore,
                 PlayerDamageInfo = matchInfo.RoomState.Users[playerId].DamageInfo!,
@@ -210,8 +213,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                             .Select(it => it.Value.DamageInfo)
                                             .OfType<RankedPlayDamageInfo>()
                                             .MaxBy(it => it.Damage)!;
-
-                RelativeSizeAxes = Axes.Both;
 
                 AddInternal(panelScaffold = new PanelScaffold
                 {
