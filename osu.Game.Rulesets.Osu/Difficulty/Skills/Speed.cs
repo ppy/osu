@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : HarmonicSkill
     {
-        private double totalMultiplier => 0.82;
+        private double totalMultiplier => 0.80;
         private double burstMultiplier => 2.45;
         private double streamMultiplier => 0.2;
         private double staminaMultiplier => 0.05;
@@ -61,10 +61,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (WithoutStamina)
             {
-                if (current.BaseObject is Slider)
-                    sliderStrains.Add(totalBurstStrain);
+                double totalWithoutStamina = totalBurstStrain * totalMultiplier;
 
-                return totalBurstStrain * totalMultiplier;
+                if (current.BaseObject is Slider)
+                    sliderStrains.Add(totalWithoutStamina);
+
+                return totalWithoutStamina;
             }
 
             double staminaValue = StaminaEvaluator.EvaluateDifficultyOf(current);
@@ -78,12 +80,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double totalValue = DifficultyCalculationUtils.Norm(meanExponent,
                 totalBurstStrain,
                 //currentStreamStrain,
-                currentStaminaStrain);
+                currentStaminaStrain) * totalMultiplier;
 
             if (current.BaseObject is Slider)
                 sliderStrains.Add(totalValue);
 
-            return totalValue * totalMultiplier;
+            return totalValue;
         }
 
         public double RelevantNoteCount()
