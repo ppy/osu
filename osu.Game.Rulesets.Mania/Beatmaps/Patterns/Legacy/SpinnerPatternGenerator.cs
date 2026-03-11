@@ -85,7 +85,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     Duration = endTime - HitObject.StartTime,
                     Column = column,
                     Samples = HitObject.Samples,
-                    NodeSamples = (HitObject as IHasRepeats)?.NodeSamples
+                    NodeSamples =
+                    [
+                        HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_NORMAL).ToList(),
+                        HitObject.Samples
+                    ]
                 };
             }
             else

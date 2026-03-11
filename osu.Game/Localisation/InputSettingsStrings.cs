@@ -15,6 +15,11 @@ namespace osu.Game.Localisation
         public static LocalisableString InputSectionHeader => new TranslatableString(getKey(@"input_section_header"), @"Input");
 
         /// <summary>
+        /// "Device: {0}"
+        /// </summary>
+        public static LocalisableString Device(LocalisableString text) => new TranslatableString(getKey(@"device"), @"Device: {0}", text);
+
+        /// <summary>
         /// "Global"
         /// </summary>
         public static LocalisableString GlobalKeyBindingHeader => new TranslatableString(getKey(@"global_key_binding_header"), @"Global");
@@ -72,7 +77,8 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "The binding you&#39;ve selected conflicts with another existing binding."
         /// </summary>
-        public static LocalisableString KeyBindingConflictDetected => new TranslatableString(getKey(@"key_binding_conflict_detected"), @"The binding you've selected conflicts with another existing binding.");
+        public static LocalisableString KeyBindingConflictDetected =>
+            new TranslatableString(getKey(@"key_binding_conflict_detected"), @"The binding you've selected conflicts with another existing binding.");
 
         /// <summary>
         /// "Keep existing"

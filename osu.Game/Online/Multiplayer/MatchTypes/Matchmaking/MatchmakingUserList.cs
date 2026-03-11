@@ -22,25 +22,22 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
         public IDictionary<int, MatchmakingUser> UserDictionary { get; set; } = new Dictionary<int, MatchmakingUser>();
 
         /// <summary>
-        /// Creates or retrieves the user for the given id.
-        /// </summary>
-        /// <param name="userId">The user id.</param>
-        public MatchmakingUser this[int userId]
-        {
-            get
-            {
-                if (UserDictionary.TryGetValue(userId, out MatchmakingUser? user))
-                    return user;
-
-                return UserDictionary[userId] = new MatchmakingUser { UserId = userId };
-            }
-        }
-
-        /// <summary>
         /// The total number of users.
         /// </summary>
         [IgnoreMember]
         public int Count => UserDictionary.Count;
+
+        /// <summary>
+        /// Retrieves or adds a <see cref="MatchmakingUser"/> entry to this list.
+        /// </summary>
+        /// <param name="userId">The user ID.</param>
+        public MatchmakingUser GetOrAdd(int userId)
+        {
+            if (UserDictionary.TryGetValue(userId, out MatchmakingUser? user))
+                return user;
+
+            return UserDictionary[userId] = new MatchmakingUser { UserId = userId };
+        }
 
         public IEnumerator<MatchmakingUser> GetEnumerator() => UserDictionary.Values.GetEnumerator();
 

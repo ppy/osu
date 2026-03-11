@@ -96,8 +96,17 @@ namespace osu.Game.Screens.Play
                         break;
 
                     default:
-                        button.TooltipText = @"save score";
-                        button.Enabled.Value = true;
+                        if (importFailedScore != null)
+                        {
+                            button.TooltipText = @"save score";
+                            button.Enabled.Value = true;
+                        }
+                        else
+                        {
+                            button.TooltipText = @"replay unavailable";
+                            button.Enabled.Value = false;
+                        }
+
                         break;
                 }
             }, true);

@@ -13,17 +13,11 @@ using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
-using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.Play
 {
     public abstract partial class SpectatorPlayer : Player
     {
-        // TODO: maybe consider giving this proper scores.
-        // `SoloGameplayLeaderboardProvider` doesn't immediately work because there's no guarantee that `LeaderboardManager` global state matches the currently spectated beatmap.
-        [Cached(typeof(IGameplayLeaderboardProvider))]
-        private readonly EmptyGameplayLeaderboardProvider leaderboardProvider = new EmptyGameplayLeaderboardProvider();
-
         [Resolved]
         protected SpectatorClient SpectatorClient { get; private set; } = null!;
 

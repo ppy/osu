@@ -50,11 +50,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 ColumnDimensions = new[]
                 {
                     new Dimension(),
+                    new Dimension(GridSizeMode.Absolute, 5),
                     new Dimension(GridSizeMode.AutoSize)
                 },
                 Content = new[]
                 {
-                    new Drawable[]
+                    new Drawable?[]
                     {
                         readyButton = new MultiplayerReadyButton
                         {
@@ -62,6 +63,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                             Size = Vector2.One,
                             Action = onReadyButtonClick,
                         },
+                        null,
                         countdownButton = new MultiplayerCountdownButton
                         {
                             RelativeSizeAxes = Axes.Y,

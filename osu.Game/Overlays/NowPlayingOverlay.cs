@@ -29,6 +29,8 @@ namespace osu.Game.Overlays
 {
     public partial class NowPlayingOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
+        public const double TRACK_DRAG_SEEK_DEBOUNCE = 40;
+
         public IconUsage Icon => OsuIcon.Music;
         public LocalisableString Title => NowPlayingStrings.HeaderTitle;
         public LocalisableString Description => NowPlayingStrings.HeaderDescription;
@@ -121,6 +123,7 @@ namespace osu.Game.Overlays
                                         Origin = Anchor.Centre,
                                     },
                                     NonOverflowingContentAnchor = Anchor.Centre,
+                                    Padding = new MarginPadding { Horizontal = 15 },
                                 },
                                 artist = new MarqueeContainer
                                 {
@@ -136,6 +139,7 @@ namespace osu.Game.Overlays
                                         Origin = Anchor.Centre,
                                     },
                                     NonOverflowingContentAnchor = Anchor.Centre,
+                                    Padding = new MarginPadding { Horizontal = 15 },
                                 },
                                 new Container
                                 {
@@ -205,7 +209,8 @@ namespace osu.Game.Overlays
                                     Height = progress_height / 2,
                                     FillColour = colours.Yellow,
                                     BackgroundColour = colours.YellowDarker.Opacity(0.5f),
-                                    OnSeek = musicController.SeekTo
+                                    OnSeek = onSeek,
+                                    OnCommit = onCommit,
                                 }
                             },
                         },
@@ -217,6 +222,29 @@ namespace osu.Game.Overlays
                     }
                 },
             };
+        }
+
+        private double? lastSeekGameTime;
+        private double? lastSeekAudioTargetTime;
+
+        private void onSeek(double progress)
+        {
+            if (!musicController.IsPlaying || lastSeekGameTime == null || Time.Current - lastSeekGameTime > TRACK_DRAG_SEEK_DEBOUNCE)
+            {
+                musicController.SeekTo(progress);
+                lastSeekGameTime = Time.Current;
+                lastSeekAudioTargetTime = progress;
+            }
+        }
+
+        private void onCommit(double progress)
+        {
+            // Avoid a second seek to the same location, which could occur when using keyboard navigation from `OnSeek` and subsequent `OnCommit` calls.
+            if (progress != lastSeekAudioTargetTime)
+                musicController.SeekTo(progress);
+
+            lastSeekGameTime = null;
+            lastSeekAudioTargetTime = null;
         }
 
         private void togglePlaylist()
@@ -302,18 +330,21 @@ namespace osu.Game.Overlays
 
             var track = musicController.CurrentTrack;
 
-            if (!track.IsDummyDevice)
+            if (!progressBar.Seeking)
             {
-                progressBar.EndTime = track.Length;
-                progressBar.CurrentTime = track.CurrentTime;
+                if (!track.IsDummyDevice)
+                {
+                    progressBar.EndTime = track.Length;
+                    progressBar.CurrentTime = track.CurrentTime;
 
-                playButton.Icon = track.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
-            }
-            else
-            {
-                progressBar.CurrentTime = 0;
-                progressBar.EndTime = 1;
-                playButton.Icon = FontAwesome.Regular.PlayCircle;
+                    playButton.Icon = track.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
+                }
+                else
+                {
+                    progressBar.CurrentTime = 0;
+                    progressBar.EndTime = 1;
+                    playButton.Icon = FontAwesome.Regular.PlayCircle;
+                }
             }
         }
 
@@ -493,6 +524,8 @@ namespace osu.Game.Overlays
 
         private partial class HoverableProgressBar : ProgressBar
         {
+            public override bool HandleNonPositionalInput => IsHovered;
+
             public HoverableProgressBar()
                 : base(true)
             {

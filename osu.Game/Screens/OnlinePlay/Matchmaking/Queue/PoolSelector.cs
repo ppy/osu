@@ -22,9 +22,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 {
     public partial class PoolSelector : CompositeDrawable
     {
-        private const float icon_size = 48;
+        private const float icon_size = 34;
 
-        public readonly Bindable<MatchmakingPool[]> AvailablePools = new Bindable<MatchmakingPool[]>();
+        public readonly Bindable<MatchmakingPool[]> AvailablePools = new Bindable<MatchmakingPool[]>([]);
         public readonly Bindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
 
         private FillFlowContainer<SelectorButton> poolFlow = null!;
@@ -40,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             InternalChild = poolFlow = new FillFlowContainer<SelectorButton>
             {
                 AutoSizeAxes = Axes.X,
-                Height = icon_size * 1.2f,
+                Height = SelectorButton.SIZE.Y + 10,
                 Direction = FillDirection.Horizontal,
                 Spacing = new Vector2(5),
             };
@@ -92,6 +92,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private partial class SelectorButton : OsuAnimatedButton
         {
+            public static readonly Vector2 SIZE = new Vector2(84, 78);
+
             public bool IsSelected => SelectedPool.Value?.Equals(pool) == true;
 
             public readonly Bindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
@@ -109,15 +111,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             {
                 this.pool = pool;
 
-                Size = new Vector2(icon_size);
+                Size = SIZE;
             }
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
                 Content.Masking = true;
-                Content.CornerRadius = 20;
+                Content.CornerRadius = 16;
                 Content.CornerExponent = 10;
+
+                Ruleset? rulesetInstance = rulesetStore.GetRuleset(pool.RulesetId)?.CreateInstance();
+
+                string rulesetName = rulesetInstance?.Description ?? string.Empty;
+                if (pool.Variant != 0)
+                    rulesetName += $" {pool.Variant}K";
 
                 Children = new Drawable[]
                 {
@@ -134,13 +142,46 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         Alpha = 0,
                         RelativeSizeAxes = Axes.Both,
                     },
-                    new Container
+                    new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding(10),
-                        Children = new[]
+                        Direction = FillDirection.Vertical,
+                        Padding = new MarginPadding(5) { Top = 8 },
+                        Children = new Drawable[]
                         {
-                            iconSprite = createIcon(),
+                            new Container
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                Size = new Vector2(icon_size),
+                                Padding = new MarginPadding(2),
+                                Children = new[]
+                                {
+                                    iconSprite = createIcon(),
+                                }
+                            },
+                            new FillFlowContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Direction = FillDirection.Vertical,
+                                Children = new Drawable[]
+                                {
+                                    new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                        Font = OsuFont.Style.Caption1.With(weight: FontWeight.Bold),
+                                        Text = rulesetName,
+                                    },
+                                    new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                        Font = OsuFont.Style.Caption2,
+                                        Text = pool.Name
+                                    }
+                                }
+                            }
                         }
                     },
                 };
