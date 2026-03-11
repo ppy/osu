@@ -311,7 +311,7 @@ namespace osu.Game.Screens.Play
                     {
                         // underlay and gameplay should have access to the skinning sources.
                         createUnderlayComponents(Beatmap.Value),
-                        createGameplayComponents(Beatmap.Value)
+                        createGameplayComponents()
                     }
                 },
                 FailOverlay = new FailOverlay
@@ -426,6 +426,11 @@ namespace osu.Game.Screens.Play
             IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
         }
 
+        /// <summary>
+        /// Implement to add any components which should exist above gameplay but below the HUD.
+        /// </summary>
+        protected virtual Drawable CreateOverlayComponents() => Empty();
+
         protected virtual GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart);
 
         private Drawable createUnderlayComponents(WorkingBeatmap working)
@@ -451,7 +456,7 @@ namespace osu.Game.Screens.Play
             return container;
         }
 
-        private Drawable createGameplayComponents(IWorkingBeatmap working) => new ScalingContainer(ScalingMode.Gameplay)
+        private Drawable createGameplayComponents() => new ScalingContainer(ScalingMode.Gameplay)
         {
             Children = new Drawable[]
             {
@@ -474,6 +479,7 @@ namespace osu.Game.Screens.Play
                 Children = new[]
                 {
                     DimmableStoryboard.OverlayLayerContainer.CreateProxy(),
+                    CreateOverlayComponents(),
                     HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods, Configuration)
                     {
                         HoldToQuit =
