@@ -8,6 +8,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
@@ -23,6 +24,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
     public partial class GameplayWarmupScreen : RankedPlaySubScreen
     {
         public override bool ShowBeatmapBackground => true;
+
+        protected override LocalisableString StageHeading => "Gameplay";
+        protected override LocalisableString StageCaption => string.Empty;
 
         [Cached(typeof(IBindable<SongSelect.BeatmapSetLookupResult?>))]
         private readonly Bindable<SongSelect.BeatmapSetLookupResult?> lastLookupResult = new Bindable<SongSelect.BeatmapSetLookupResult?>();
