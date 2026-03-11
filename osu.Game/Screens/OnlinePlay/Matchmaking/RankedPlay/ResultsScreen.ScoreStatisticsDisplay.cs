@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Scoring;
@@ -48,7 +49,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                             Children = score.GetStatisticsForDisplay().Select(it => new BeatmapTitleWedge.StatisticDifficulty
                             {
                                 Width = 80,
-                                Value = new BeatmapTitleWedge.StatisticDifficulty.Data(it.DisplayName, it.Count, it.Count, it.MaxCount ?? it.Count),
+                                Value = new BeatmapTitleWedge.StatisticDifficulty.Data(it.DisplayName.ToTitle(), it.Count, it.Count, it.MaxCount ?? it.Count),
                                 AccentColour = colours.PrimaryDarker,
                             }).ToArray(),
                         }
