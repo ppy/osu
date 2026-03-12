@@ -169,7 +169,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public double GetClosestSnappedTime(double time, int beatDivisor, double? referenceTime = null)
         {
             var timingPoint = TimingPointAt(referenceTime ?? time);
-            double snappedTime = getClosestSnappedTime(timingPoint, time, beatDivisor);
+            double snappedTime = getClosestPositiveSnappedTime(timingPoint, time, beatDivisor);
 
             if (referenceTime.HasValue)
                 return snappedTime;
@@ -209,7 +209,7 @@ namespace osu.Game.Beatmaps.ControlPoints
 
             foreach (int divisor in BindableBeatDivisor.PREDEFINED_DIVISORS)
             {
-                double distanceFromSnap = Math.Abs(time - getClosestSnappedTime(timingPoint, time, divisor));
+                double distanceFromSnap = Math.Abs(time - getClosestPositiveSnappedTime(timingPoint, time, divisor));
 
                 if (Precision.DefinitelyBigger(closestTime, distanceFromSnap))
                 {
@@ -221,7 +221,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             return closestDivisor;
         }
 
-        private static double getClosestSnappedTime(TimingControlPoint timingPoint, double time, int beatDivisor)
+        private static double getClosestPositiveSnappedTime(TimingControlPoint timingPoint, double time, int beatDivisor)
         {
             double beatLength = timingPoint.BeatLength / beatDivisor;
             double beats = (Math.Max(time, 0) - timingPoint.Time) / beatLength;
