@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -71,7 +72,7 @@ namespace osu.Game.Replays
 
             dependencies.CacheAs(healthProcessor);
 
-            var rulesetSkinProvider = new HeadlessRulesetSkinProvidingContainer(ruleset, playableBeatmap, null);
+            var rulesetSkinProvider = new HeadlessSkinProvidingContainer(ruleset, playableBeatmap);
             InternalChild = gameplayClockContainer = new GameplayClockContainer(clock, false, false);
 
             gameplayClockContainer.Add(rulesetSkinProvider);
@@ -209,13 +210,39 @@ namespace osu.Game.Replays
             public bool IsRunning { get; private set; } = true;
         }
 
-        private partial class HeadlessRulesetSkinProvidingContainer : RulesetSkinProvidingContainer
+        private partial class HeadlessSkinProvidingContainer : SkinProvidingContainer
         {
+            private readonly Ruleset ruleset;
+            private readonly IBeatmap beatmap;
+
+            public HeadlessSkinProvidingContainer(Ruleset ruleset, IBeatmap beatmap)
+            {
+                this.ruleset = ruleset;
+                this.beatmap = beatmap;
+            }
+
             protected override bool AllowSampleLookup(ISampleInfo sampleInfo) => false;
 
-            public HeadlessRulesetSkinProvidingContainer(Ruleset ruleset, IBeatmap beatmap, ISkin? beatmapSkin)
-                : base(ruleset, beatmap, beatmapSkin)
+            protected override bool AllowFallingBackToParent => false;
+
+            protected override void RefreshSources()
             {
+                Debug.Assert(ParentSource != null);
+
+                // TODO: this should use a custom skin which has no animations/transforms/etc.
+                //       currently argon is enforced as a default.
+                var sources = ParentSource.AllSources
+                                          .Where(s => s is ArgonSkin)
+                                          .Select(GetRulesetTransformedSkin);
+
+                SetSources(sources);
+            }
+
+            protected ISkin GetRulesetTransformedSkin(ISkin skin)
+            {
+                var rulesetTransformed = ruleset.CreateSkinTransformer(skin, beatmap);
+
+                return rulesetTransformed ?? skin;
             }
         }
     }
