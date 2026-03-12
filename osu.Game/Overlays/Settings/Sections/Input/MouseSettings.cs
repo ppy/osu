@@ -32,15 +32,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private FormCheckBox highPrecisionMouse = null!;
 
-        private FormCheckBox enableSensitivityRelativeToPlayfield = null!;
-
         private readonly Bindable<SettingsNote.Data?> highPrecisionMouseNote = new Bindable<SettingsNote.Data?>();
 
         protected override bool IsToggleable => false;
         private Bindable<float> scalingSizeX = null!;
         private Bindable<float> scalingSizeY = null!;
-        private float playfieldScale = 0.8f;
-        private float defaultScale = 0.8f;
+        private float playfieldScale;
+        private float defaultScale;
 
         // A entry guard that prevents the two callbacks from ping-ponging off each other.
         private bool isSyncing;
@@ -66,7 +64,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             scalingSizeX = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX);
             scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
             playfieldScale = Math.Min(scalingSizeX.Value, scalingSizeY.Value);
-            float defaultScale = Math.Min(scalingSizeX.Default, scalingSizeY.Default);
+            defaultScale = Math.Min(scalingSizeX.Default, scalingSizeY.Default);
 
             AddRange(new Drawable[]
             {
@@ -92,7 +90,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     Keywords = new[] { "speed", "velocity" },
                 },
-                new SettingsItemV2(enableSensitivityRelativeToPlayfield = new FormCheckBox
+                new SettingsItemV2(new FormCheckBox
                 {
                     Caption = MouseSettingsStrings.EnableCursorSensitivityRelativeToPlayfield,
                     HintText = MouseSettingsStrings.EnableCursorSensitivityRelativeToPlayfieldToolTip,

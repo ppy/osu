@@ -381,11 +381,6 @@ namespace osu.Game.Configuration
         ConfineMouseMode,
 
         /// <summary>
-        /// Adjusts cursor sensitivity to playfield size.
-        /// </summary>
-        SensitivityScaleWithPlayfieldSize,
-
-        /// <summary>
         /// Globally applied audio offset.
         /// This is added to the audio track's current time. Higher values will cause gameplay to occur earlier, relative to the audio track.
         /// </summary>
@@ -499,5 +494,11 @@ namespace osu.Game.Configuration
 
         DashboardSortMode,
         DashboardDisplayStyle,
+
+        /// <summary>
+        /// Adjusts cursor sensitivity to playfield size.
+        /// </summary>
+        SensitivityScaleWithPlayfieldSize,
+
     }
 }
