@@ -404,7 +404,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                     EditPlaylist = () =>
                                     {
                                         if (this.IsCurrentScreen())
-                                            this.Push(new PlaylistsSongSelectV2(room));
+                                            this.Push(new PlaylistsSongSelect(room));
                                     }
                                 }
                             }
@@ -696,7 +696,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             if (!this.IsCurrentScreen() || SelectedItem.Value == null)
                 return;
 
-            this.Push(new PlaylistsRoomFreestyleSelectV2(SelectedItem.Value)
+            this.Push(new PlaylistsRoomFreestyleSelect(SelectedItem.Value)
             {
                 Beatmap = { BindTarget = UserBeatmap },
                 Ruleset = { BindTarget = UserRuleset }

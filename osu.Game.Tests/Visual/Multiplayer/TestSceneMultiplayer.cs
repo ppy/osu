@@ -228,7 +228,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // edit playlist item
             AddStep("Press select", () => InputManager.Key(Key.Enter));
-            AddUntilStep("wait for song select", () => InputManager.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            waitForSongSelect();
 
             // select beatmap
             AddStep("Press select", () => InputManager.Key(Key.Enter));
@@ -451,7 +451,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 ((MultiplayerMatchSubScreen)currentSubScreen).ShowSongSelect(item);
             });
 
-            AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            waitForSongSelect();
 
             AddUntilStep("Beatmap matches current item", () => Beatmap.Value.BeatmapInfo.OnlineID == multiplayerClient.ClientRoom?.Playlist.First().BeatmapID);
 
@@ -492,7 +492,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 ((MultiplayerMatchSubScreen)currentSubScreen).ShowSongSelect(item);
             });
 
-            AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            waitForSongSelect();
 
             AddUntilStep("Ruleset matches current item", () => Ruleset.Value.OnlineID == multiplayerClient.ClientRoom?.Playlist.First().RulesetID);
 
@@ -533,7 +533,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 ((MultiplayerMatchSubScreen)currentSubScreen).ShowSongSelect(item);
             });
 
-            AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            waitForSongSelect();
 
             AddUntilStep("Mods match current item",
                 () => SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(multiplayerClient.ClientRoom.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
@@ -1051,7 +1051,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("press edit on second item", () => this.ChildrenOfType<DrawableRoomPlaylistItem>().Single(i => i.Item.RulesetID == 1)
                                                            .ChildrenOfType<DrawableRoomPlaylistItem.PlaylistEditButton>().Single().TriggerClick());
 
-            AddUntilStep("wait for song select", () => InputManager.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            waitForSongSelect();
             AddAssert("ruleset is taiko", () => Ruleset.Value.OnlineID == 1);
 
             AddStep("start match", () => multiplayerClient.StartMatch().WaitSafely());
@@ -1153,7 +1153,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddStep("open user style selection", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().ShowUserStyleSelect());
-            AddUntilStep("style selection screen opened", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelectV2>().SingleOrDefault()?.IsCurrentScreen() == true);
+            AddUntilStep("style selection screen opened", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() == true);
 
             AddStep("change beatmap", () =>
             {
@@ -1166,7 +1166,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddWaitStep("wait for potential beatmap change", 2);
-            AddAssert("style selection screen still open", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelectV2>().SingleOrDefault()?.IsCurrentScreen() == true);
+            AddAssert("style selection screen still open", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() == true);
         }
 
         /// <summary>
@@ -1190,7 +1190,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddStep("open user style selection", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().ShowUserStyleSelect());
-            AddUntilStep("style selection screen opened", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelectV2>().SingleOrDefault()?.IsCurrentScreen() == true);
+            AddUntilStep("style selection screen opened", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() == true);
 
             AddStep("change beatmap set", () =>
             {
@@ -1203,7 +1203,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("selected beatmap changed", () => Beatmap.Value.BeatmapInfo.Equals(importedSet2.Beatmaps.First()));
-            AddUntilStep("style selection screen closed", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelectV2>().SingleOrDefault()?.IsCurrentScreen() != true);
+            AddUntilStep("style selection screen closed", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() != true);
         }
 
         private void enterGameplay()
@@ -1247,6 +1247,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
 
             AddUntilStep("wait for join", () => multiplayerClient.RoomJoined);
+        }
+
+        private void waitForSongSelect()
+        {
+            AddUntilStep("wait for song select", () =>
+            {
+                var songSelect = InputManager.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault();
+                return songSelect != null && songSelect.IsCurrentScreen() && !songSelect.IsFiltering;
+            });
         }
 
         protected override void Dispose(bool isDisposing)

@@ -7,6 +7,8 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions;
 using osu.Framework.Input.Events;
+using osu.Game.Audio;
+using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -19,20 +21,20 @@ namespace osu.Game.Graphics.UserInterface
         private Sample? sampleClick;
         private Sample? sampleClickDisabled;
 
-        private readonly osuTK.Input.MouseButton[] buttons;
+        private readonly MouseButton[] buttons;
 
         /// <summary>
-        /// a container which plays sounds on hover and click for any specified <see cref="osuTK.Input.MouseButton"/>s.
+        /// a container which plays sounds on hover and click for any specified <see cref="MouseButton"/>s.
         /// </summary>
         /// <param name="sampleSet">Set of click samples to play.</param>
         /// <param name="buttons">
         /// Array of button codes which should trigger the click sound.
         /// If this optional parameter is omitted or set to <code>null</code>, the click sound will only be played on left click.
         /// </param>
-        public HoverClickSounds(HoverSampleSet sampleSet = HoverSampleSet.Default, osuTK.Input.MouseButton[]? buttons = null)
+        public HoverClickSounds(HoverSampleSet sampleSet = HoverSampleSet.Default, MouseButton[]? buttons = null)
             : base(sampleSet)
         {
-            this.buttons = buttons ?? new[] { osuTK.Input.MouseButton.Left };
+            this.buttons = buttons ?? new[] { MouseButton.Left };
         }
 
         [BackgroundDependencyLoader]
@@ -53,15 +55,7 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnClick(e);
         }
 
-        public void PlayClickSample()
-        {
-            var channel = Enabled.Value ? sampleClick?.GetChannel() : sampleClickDisabled?.GetChannel();
-
-            if (channel != null)
-            {
-                channel.Frequency.Value = 0.99 + osu.Framework.Utils.RNG.NextDouble(0.02);
-                channel.Play();
-            }
-        }
+        public void PlayClickSample() =>
+            SamplePlaybackHelper.PlayWithRandomPitch(Enabled.Value ? sampleClick : sampleClickDisabled, pitchVariation: 0.01);
     }
 }

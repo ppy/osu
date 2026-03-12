@@ -215,6 +215,7 @@ namespace osu.Game.Overlays.Volume
                 new Container
                 {
                     Size = LABEL_SIZE,
+                    AutoSizeAxes = Axes.X,
                     CornerRadius = 10,
                     Masking = true,
                     Margin = new MarginPadding { Left = CircleSize + 10 },
@@ -229,6 +230,10 @@ namespace osu.Game.Overlays.Volume
                         },
                         new OsuSpriteText
                         {
+                            Margin = new MarginPadding
+                            {
+                                Horizontal = 32,
+                            },
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold),

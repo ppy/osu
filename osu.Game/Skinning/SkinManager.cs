@@ -158,11 +158,11 @@ namespace osu.Game.Skinning
 
                 var userSkins = realm.All<SkinInfo>()
                                      .Where(s => !s.DeletePending && !s.Protected)
-                                     .OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase)
                                      .AsEnumerable()
+                                     .OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase)
                                      .Select(s => s.ToLive(Realm));
 
-                foreach (var s in userSkins.Where(s => !s.Value.Protected))
+                foreach (var s in userSkins)
                     skins.Add(s);
             });
 
