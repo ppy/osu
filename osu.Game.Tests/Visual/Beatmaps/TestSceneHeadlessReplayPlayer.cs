@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -18,8 +17,6 @@ namespace osu.Game.Tests.Visual.Beatmaps
 {
     public partial class TestSceneHeadlessReplayPlayer : OsuTestScene
     {
-        private HeadlessReplayPlayer player = null!;
-
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
@@ -46,16 +43,16 @@ namespace osu.Game.Tests.Visual.Beatmaps
             });
             AddStep("create player", () =>
             {
+                completed = false;
+
                 // Component isn't hidden in tests to allow for visually checking if everything works correctly.
-                LoadComponentAsync(player = new HeadlessReplayPlayer(score, beatmaps.GetWorkingBeatmap(score.ScoreInfo.BeatmapInfo))
+                LoadComponentAsync(new HeadlessReplayPlayer(score, beatmaps.GetWorkingBeatmap(score.ScoreInfo.BeatmapInfo))
                 {
                     Width = 1024,
                     Height = 768,
                     PlaybackCompleted = _ => completed = true,
                 }, Add);
             });
-            AddUntilStep("wait for load", () => player.IsLoaded, () => Is.True);
-            AddStep("start playback", () => Task.Run(() => player.Start()));
             AddUntilStep("wait until completed", () => completed, () => Is.True);
             AddAssert("hit events exist", () => score.ScoreInfo.HitEvents.Any());
         }
@@ -73,15 +70,15 @@ namespace osu.Game.Tests.Visual.Beatmaps
             });
             AddStep("create player", () =>
             {
-                LoadComponentAsync(player = new HeadlessReplayPlayer(score, beatmaps.GetWorkingBeatmap(score.ScoreInfo.BeatmapInfo))
+                completed = false;
+
+                LoadComponentAsync(new HeadlessReplayPlayer(score, beatmaps.GetWorkingBeatmap(score.ScoreInfo.BeatmapInfo))
                 {
                     Width = 1024,
                     Height = 768,
                     PlaybackCompleted = _ => completed = true,
                 }, Add);
             });
-            AddUntilStep("wait for load", () => player.IsLoaded, () => Is.True);
-            AddStep("start playback", () => Task.Run(() => player.Start()));
             AddUntilStep("wait until completed", () => completed, () => Is.True);
             AddAssert("hit events exist", () => score.ScoreInfo.HitEvents.Any());
         }

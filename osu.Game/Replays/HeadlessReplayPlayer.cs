@@ -123,6 +123,8 @@ namespace osu.Game.Replays
 
             scoreProcessor.NewJudgement += _ => scoreProcessor.PopulateScore(score.ScoreInfo);
             scoreProcessor.OnResetFromReplayFrame += () => scoreProcessor.PopulateScore(score.ScoreInfo);
+
+            startPlayback();
         }
 
         private void checkScoreCompleted()
@@ -147,7 +149,7 @@ namespace osu.Game.Replays
             return true;
         }
 
-        public void Start()
+        private void startPlayback()
         {
             if (!IsLoaded)
                 return;
