@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual.Online
                     bool hasNextPage;
 
                     bool shouldConsumeQueuedResponses = consumeQueuedResponses
-                                                       && searchControl.General.Contains(SearchGeneral.HideAlreadyDownloaded);
+                                    && searchControl.General.Contains(SearchGeneral.HideAlreadyDownloaded);
 
                     if (shouldConsumeQueuedResponses && queuedResponses.TryDequeue(out var queuedResponse))
                     {
