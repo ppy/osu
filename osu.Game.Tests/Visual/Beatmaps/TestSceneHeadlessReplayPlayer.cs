@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
 
             AddStep("import replay", () =>
             {
-                using (var replayStream = TestResources.OpenResource($"Replays/osu-renatus-replay.osr"))
+                using (var replayStream = TestResources.OpenResource("Replays/osu-renatus-replay.osr"))
                     score = new DatabasedLegacyScoreDecoder(rulesets, beatmaps).Parse(replayStream);
             });
             AddStep("create player", () =>
@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
 
             AddStep("import replay", () =>
             {
-                using (var replayStream = TestResources.OpenResource($"Replays/osu-renatus-replay-failed.osr"))
+                using (var replayStream = TestResources.OpenResource("Replays/osu-renatus-replay-failed.osr"))
                     score = new DatabasedLegacyScoreDecoder(rulesets, beatmaps).Parse(replayStream);
             });
             AddStep("create player", () =>
