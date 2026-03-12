@@ -230,7 +230,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             switch (sampleName)
             {
                 case HitSampleInfo.HIT_CLAP:
-                    return new SpriteIcon { Icon = FontAwesome.Solid.Hands };
+                    return new SpriteIcon { Icon = OsuIcon.EditorClap };
 
                 case HitSampleInfo.HIT_WHISTLE:
                     return new SpriteIcon { Icon = OsuIcon.EditorWhistle };
