@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Allocation;
 using System.Collections.Generic;
+using Microsoft.Toolkit.HighPerformance;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Bindables;
 
@@ -180,17 +181,27 @@ namespace osu.Game.Graphics.Backgrounds
             if (seed != null)
                 stableRandom = new Random(seed.Value);
 
-            parts.Clear();
-
             // Limited by the maximum size of QuadVertexBuffer for safety.
             const int max_triangles = ushort.MaxValue / (IRenderer.VERTICES_PER_QUAD + 2);
 
             AimCount = (int)Math.Min(max_triangles, DrawWidth * DrawHeight * 0.002f / (TriangleScale * TriangleScale) * SpawnRatio);
 
-            for (int i = 0; i < AimCount; i++)
-                parts.Add(createTriangle(true));
+            if (parts.Count == AimCount)
+            {
+                var span = parts.AsSpan();
 
-            parts.Sort(Comparer<TriangleParticle>.Default);
+                for (int i = 0; i < span.Length; i++)
+                    span[i].Position = getRandomPosition(true, span[i].Scale);
+            }
+            else
+            {
+                parts.Clear();
+
+                for (int i = 0; i < AimCount; i++)
+                    parts.Add(createTriangle(true));
+
+                parts.Sort(Comparer<TriangleParticle>.Default);
+            }
 
             Invalidate(Invalidation.DrawNode);
         }
