@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Math;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -27,12 +29,22 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private Bindable<bool> minimiseOnFocusLoss = null!;
         private FormEnumDropdown<OsuConfineMouseMode> confineMouseModeSetting = null!;
         private Bindable<bool> relativeMode = null!;
+        private Bindable<bool> enabledPlayfieldRelative = null!;
 
         private FormCheckBox highPrecisionMouse = null!;
+
+        private FormCheckBox enableSensitivityRelativeToPlayfield = null!;
 
         private readonly Bindable<SettingsNote.Data?> highPrecisionMouseNote = new Bindable<SettingsNote.Data?>();
 
         protected override bool IsToggleable => false;
+        private Bindable<float> scalingSizeX = null!;
+        private Bindable<float> scalingSizeY = null!;
+        private float playfieldScale = 0.8f;
+        private float defaultScale = 0.8f;
+
+        // A entry guard that prevents the two callbacks from ping-ponging off each other.
+        private bool isSyncing;
 
         public MouseSettings(MouseHandler mouseHandler)
             : base(mouseHandler)
@@ -50,6 +62,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             relativeMode = mouseHandler.UseRelativeMode.GetBoundCopy();
             windowMode = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
             minimiseOnFocusLoss = config.GetBindable<bool>(FrameworkSetting.MinimiseOnFocusLossInFullscreen);
+
+            enabledPlayfieldRelative = osuConfig.GetBindable<bool>(OsuSetting.SensitivityScaleWithPlayfieldSize);
+            scalingSizeX = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX);
+            scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
+            playfieldScale = Math.Min(scalingSizeX.Value, scalingSizeY.Value);
+            float defaultScale = Math.Min(scalingSizeX.Default, scalingSizeY.Default);
 
             AddRange(new Drawable[]
             {
@@ -75,6 +93,15 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     Keywords = new[] { "speed", "velocity" },
                 },
+                new SettingsItemV2(enableSensitivityRelativeToPlayfield = new FormCheckBox
+                {
+                    Caption = MouseSettingsStrings.EnableCursorSensitivityRelativeToPlayfield,
+                    HintText = MouseSettingsStrings.EnableCursorSensitivityRelativeToPlayfieldToolTip,
+                    Current = enabledPlayfieldRelative
+                })
+                {
+                    Keywords = new[] { "speed", "velocity", "cursor" },
+                },
                 new SettingsItemV2(confineMouseModeSetting = new FormEnumDropdown<OsuConfineMouseMode>
                 {
                     Caption = MouseSettingsStrings.ConfineMouseMode,
@@ -98,21 +125,53 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             base.LoadComplete();
 
-            relativeMode.BindValueChanged(relative => localSensitivity.Disabled = !relative.NewValue, true);
+            relativeMode.BindValueChanged(relative =>
+            {
+                localSensitivity.Disabled = !relative.NewValue;
+                enabledPlayfieldRelative.Disabled = !relative.NewValue;
+            }, true);
 
             handlerSensitivity.BindValueChanged(val =>
             {
+                if (isSyncing) return;
+
+                isSyncing = true;
+
                 bool disabled = localSensitivity.Disabled;
 
                 localSensitivity.Disabled = false;
-                localSensitivity.Value = val.NewValue;
+
+                if (enabledPlayfieldRelative.Value)
+                    localSensitivity.Value = val.NewValue / (playfieldScale / defaultScale);
+                else
+                    localSensitivity.Value = val.NewValue;
+
                 localSensitivity.Disabled = disabled;
+
+                isSyncing = false;
             }, true);
 
-            localSensitivity.BindValueChanged(val => handlerSensitivity.Value = val.NewValue);
+            localSensitivity.BindValueChanged(val =>
+            {
+                if (isSyncing) return;
+
+                isSyncing = true;
+
+                if (enabledPlayfieldRelative.Value)
+                    handlerSensitivity.Value = val.NewValue * (playfieldScale / defaultScale);
+                else
+                    handlerSensitivity.Value = val.NewValue;
+
+                isSyncing = false;
+            });
+
+            enabledPlayfieldRelative.BindValueChanged(_ => syncToHandler());
 
             windowMode.BindValueChanged(_ => updateConfineMouseModeSettingVisibility());
             minimiseOnFocusLoss.BindValueChanged(_ => updateConfineMouseModeSettingVisibility(), true);
+
+            scalingSizeX.BindValueChanged(_ => updatePlayfieldScale());
+            scalingSizeY.BindValueChanged(_ => updatePlayfieldScale(), true);
 
             highPrecisionMouse.Current.BindValueChanged(highPrecision =>
             {
@@ -129,6 +188,33 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         break;
                 }
             }, true);
+        }
+
+        /// <summary>
+        /// Pushes the current slider value (<see cref="localSensitivity"/>) to the actual cursor sensitivity
+        /// (<see cref="handlerSensitivity"/>) used by the framework.
+        /// When playfield-relative scaling is enabled, the handler value is adjusted by the ratio of current
+        /// playfield scale to the default, so cursor speed stays proportional to the play area.
+        /// Called when the playfield-relative toggle changes or when playfield scale sliders are adjusted.
+        /// </summary>
+        private void syncToHandler()
+        {
+            if (isSyncing) return;
+
+            isSyncing = true;
+
+            if (enabledPlayfieldRelative.Value)
+                handlerSensitivity.Value = localSensitivity.Value * (playfieldScale / defaultScale);
+            else
+                handlerSensitivity.Value = localSensitivity.Value;
+
+            isSyncing = false;
+        }
+
+        private void updatePlayfieldScale()
+        {
+            playfieldScale = Math.Min(scalingSizeX.Value, scalingSizeY.Value);
+            syncToHandler();
         }
 
         /// <summary>
