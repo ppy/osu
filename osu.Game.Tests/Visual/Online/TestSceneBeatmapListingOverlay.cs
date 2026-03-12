@@ -252,7 +252,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestExcludeDownloadedFilterHidesLocalBeatmaps()
         {
-            int downloadedSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
+            const int downloadedSetId = 100;
 
             AddStep("mark local set as downloaded", () => addLocalBeatmapSet(downloadedSetId));
             setHideDownloadedFilter(true);
@@ -276,11 +276,8 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestExcludeDownloadedFilterCanPaginatePastFilteredFirstPage()
         {
-            int downloadedSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
-            int expectedSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
-
-            if (expectedSetId == downloadedSetId)
-                expectedSetId++;
+            const int downloadedSetId = 110;
+            const int expectedSetId = 111;
 
             AddStep("mark local set as downloaded", () => addLocalBeatmapSet(downloadedSetId));
 
@@ -309,15 +306,9 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestExcludeDownloadedFilterAutoPaginatesWhenFirstPageHasSingleVisibleResult()
         {
-            int downloadedSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
-            int firstVisibleSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
-            int secondVisibleSetId = Math.Max(1, Guid.NewGuid().GetHashCode());
-
-            if (firstVisibleSetId == downloadedSetId)
-                firstVisibleSetId++;
-
-            if (secondVisibleSetId == downloadedSetId || secondVisibleSetId == firstVisibleSetId)
-                secondVisibleSetId += 2;
+            const int downloadedSetId = 120;
+            const int firstVisibleSetId = 121;
+            const int secondVisibleSetId = 122;
 
             AddStep("mark one set as downloaded", () => addLocalBeatmapSet(downloadedSetId));
             AddStep("set paged search responses", () =>
@@ -350,12 +341,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestExcludeDownloadedFilterStopsFetchingWhenAllPagedResultsAreDownloaded()
         {
-            int[] downloadedSetIds =
-            {
-                Math.Max(1, Guid.NewGuid().GetHashCode()),
-                Math.Max(1, Guid.NewGuid().GetHashCode()),
-                Math.Max(1, Guid.NewGuid().GetHashCode()),
-            };
+            int[] downloadedSetIds = { 130, 131, 132 };
 
             AddStep("mark all paged sets as downloaded", () =>
             {
@@ -390,9 +376,9 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set many paged downloaded-only responses", () =>
             {
                 var responses = Enumerable.Range(0, downloaded_filter_auto_fetch_cap * 2)
-                                          .Select(_ =>
+                                          .Select(i =>
                                           {
-                                              int onlineId = Math.Max(1, Guid.NewGuid().GetHashCode());
+                                              int onlineId = 200 + i;
                                               addLocalBeatmapSet(onlineId);
                                               return (beatmaps: (IEnumerable<APIBeatmapSet>)new[] { new APIBeatmapSet { OnlineID = onlineId } }, hasNextPage: true);
                                           })
@@ -421,9 +407,9 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set paged downloaded-only responses then a non-downloaded one", () =>
             {
                 var downloadedResponses = Enumerable.Range(0, downloaded_filter_auto_fetch_cap)
-                                                   .Select(_ =>
+                                                   .Select(i =>
                                                    {
-                                                       int onlineId = Math.Max(1, Guid.NewGuid().GetHashCode());
+                                                       int onlineId = 300 + i;
                                                        addLocalBeatmapSet(onlineId);
                                                        return (beatmaps: (IEnumerable<APIBeatmapSet>)new[] { new APIBeatmapSet { OnlineID = onlineId } }, hasNextPage: true);
                                                    });
@@ -447,7 +433,7 @@ namespace osu.Game.Tests.Visual.Online
         public void TestExcludeDownloadedFilterShowsPromptWhenCapHitAfterResultsAreVisible()
         {
             int[] downloadedIds = Enumerable.Range(0, downloaded_filter_auto_fetch_cap)
-                                            .Select(_ => Math.Max(1, Guid.NewGuid().GetHashCode()))
+                                            .Select(i => 400 + i)
                                             .ToArray();
 
             AddStep("mark later pages as downloaded", () =>
