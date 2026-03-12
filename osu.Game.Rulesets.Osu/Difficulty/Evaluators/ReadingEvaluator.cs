@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double density_difficulty_base = 2.5;
         private const double preempt_balancing_factor = 140000;
         private const double preempt_starting_point = 500; // AR 9.66 in milliseconds
+        private const double preempt_change_multiplier = 6.5;
         private const double minimum_angle_relevancy_time = 2000; // 2 seconds
         private const double maximum_angle_relevancy_time = 200;
 
@@ -38,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double constantAngleNerfFactor = getConstantAngleNerfFactor(currObj);
 
-            double noteDensityDifficulty = calculateDensityDifficulty(nextObj, velocity, constantAngleNerfFactor, pastObjectDifficultyInfluence, currentVisibleObjectDensity);
+            double noteDensityDifficulty = calculateDensityDifficulty(currObj, nextObj, velocity, constantAngleNerfFactor, pastObjectDifficultyInfluence, currentVisibleObjectDensity);
 
             double hiddenDifficulty = hidden
                 ? calculateHiddenDifficulty(currObj, pastObjectDifficultyInfluence, currentVisibleObjectDensity, velocity, constantAngleNerfFactor)
@@ -60,13 +61,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// <item><description>density of objects visible when the current object needs to be clicked,</description></item>
         /// /// </list>
         /// </summary>
-        private static double calculateDensityDifficulty(OsuDifficultyHitObject? nextObj, double velocity, double constantAngleNerfFactor,
+        private static double calculateDensityDifficulty(OsuDifficultyHitObject currObj, OsuDifficultyHitObject? nextObj, double velocity, double constantAngleNerfFactor,
                                                          double pastObjectDifficultyInfluence, double currentVisibleObjectDensity)
         {
+            if (nextObj == null)
+            {
+                return 0;
+            }
+
             // Consider future densities too because it can make the path the cursor takes less clear
             double futureObjectDifficultyInfluence = Math.Sqrt(currentVisibleObjectDensity);
 
-            if (nextObj != null)
             {
                 // Reduce difficulty if movement to next object is small
                 futureObjectDifficultyInfluence *= DifficultyCalculationUtils.Smootherstep(nextObj.LazyJumpDistance, 15, distance_influence_threshold);
@@ -74,6 +79,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Value higher note densities exponentially
             double noteDensityDifficulty = Math.Pow(pastObjectDifficultyInfluence + futureObjectDifficultyInfluence, 1.7) * 0.4 * constantAngleNerfFactor * velocity;
+
+            // Freeze Frame adds additional difficulty due to the changing preempt time between objects,
+            // so we account for that.
+            if (nextObj.Preempt != currObj.Preempt)
+            {
+                double preemptChangeDifficulty = 0;
+
+                if ((nextObj.Preempt > currObj.Preempt && currObj.StartTime + nextObj.Preempt > nextObj.StartTime) // existing combo, next object is slower
+                    || nextObj.StartTime + currObj.Preempt > currObj.StartTime) // new combo, next object fades in faster
+                {
+                    preemptChangeDifficulty = DifficultyCalculationUtils.Smootherstep(Math.Max(nextObj.Preempt / currObj.Preempt, currObj.Preempt / nextObj.Preempt), 1, 2);
+                }
+
+                preemptChangeDifficulty *= DifficultyCalculationUtils.Smootherstep(velocity, 0.5, 1.5);
+                // Increased time between objects makes reading much easier.
+                preemptChangeDifficulty *= DifficultyCalculationUtils.Smootherstep(currObj.DeltaTime, 500, 250);
+                noteDensityDifficulty += (Math.Pow(1 + preemptChangeDifficulty, 3.3) - 1) * preempt_change_multiplier;
+            }
 
             // Award only denser than average maps.
             noteDensityDifficulty = Math.Max(0, noteDensityDifficulty - density_difficulty_base);
