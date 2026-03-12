@@ -111,7 +111,7 @@ namespace osu.Game.Audio
             {
                 string? url = (beatmapSetInfo as IBeatmapSetOnlineInfo)?.Preview;
                 if (string.IsNullOrEmpty(url))
-                    url = $"https://b.ppy.sh/preview/{beatmapSetInfo.OnlineID}";
+                    url = $"https://b.ppy.sh/preview/{beatmapSetInfo.OnlineID}.mp3";
                 return trackManager.Get(url);
             }
         }
