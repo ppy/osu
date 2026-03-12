@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -522,12 +523,33 @@ namespace osu.Game
         /// By default, will keep persisting until an exit occurs (exit may be blocked multiple times).
         /// May be interrupted (see <see cref="OsuGame"/>'s override).
         /// </summary>
-        public virtual void AttemptExit()
+        /// <param name="action">An optional action to run after exit is confirmed.</param>
+        public virtual void AttemptExit([CanBeNull] Action action = null)
         {
+            if (action != null)
+                OnExitingBegan = action;
+
             if (!OnExiting())
                 Exit();
             else
-                Scheduler.AddDelayed(AttemptExit, 2000);
+                Scheduler.AddDelayed(() => AttemptExit(action), 2000);
+        }
+
+        /// <summary>
+        /// A special case action which is intended to restart or update the application on exit.
+        ///
+        /// It will be started as the main menu outro animation begins displaying, allowing a short window of
+        /// time which it can run tasks before the application quits.
+        /// </summary>
+        [CanBeNull]
+        protected Action OnExitingBegan { private get; set; }
+
+        public void CancelExit() => OnExitingBegan = null;
+
+        protected void RunPrepareForExitAction()
+        {
+            OnExitingBegan?.Invoke();
+            OnExitingBegan = null;
         }
 
         /// <summary>
@@ -732,6 +754,8 @@ namespace osu.Game
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
+            RunPrepareForExitAction();
 
             RulesetStore?.Dispose();
             LocalConfig?.Dispose();
