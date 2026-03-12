@@ -518,21 +518,19 @@ namespace osu.Game
             host.ExceptionThrown += onExceptionThrown;
         }
 
+        #region Exit handling
+
         /// <summary>
         /// Use to programatically exit the game as if the user was triggering via alt-f4.
         /// By default, will keep persisting until an exit occurs (exit may be blocked multiple times).
         /// May be interrupted (see <see cref="OsuGame"/>'s override).
         /// </summary>
-        /// <param name="action">An optional action to run after exit is confirmed.</param>
-        public virtual void AttemptExit([CanBeNull] Action action = null)
+        public virtual void AttemptExit()
         {
-            if (action != null)
-                OnExitingBegan = action;
-
             if (!OnExiting())
                 Exit();
             else
-                Scheduler.AddDelayed(() => AttemptExit(action), 2000);
+                Scheduler.AddDelayed(AttemptExit, 2000);
         }
 
         /// <summary>
@@ -542,14 +540,21 @@ namespace osu.Game
         /// time which it can run tasks before the application quits.
         /// </summary>
         [CanBeNull]
-        protected Action OnExitingBegan { private get; set; }
+        public Action RunOnExiting { private get; set; }
 
-        public void CancelExit() => OnExitingBegan = null;
+        /// <summary>
+        /// After an exit has been attempted via <see cref="AttemptExit"/>, this method can be called to
+        /// signal that the exit attempt has been cancelled.
+        /// </summary>
+        public void CancelExit() => RunOnExiting = null;
 
-        protected void RunPrepareForExitAction()
+        /// <summary>
+        /// When exiting has been confirmed, this should be called to run any pending exit action.
+        /// </summary>
+        protected void ConfirmExit()
         {
-            OnExitingBegan?.Invoke();
-            OnExitingBegan = null;
+            RunOnExiting?.Invoke();
+            RunOnExiting = null;
         }
 
         /// <summary>
@@ -557,6 +562,8 @@ namespace osu.Game
         /// </summary>
         /// <returns>Whether a restart operation was queued.</returns>
         public virtual bool RestartAppWhenExited() => false;
+
+        #endregion
 
         /// <summary>
         /// Perform migration of user data to a specified path.
@@ -755,7 +762,7 @@ namespace osu.Game
         {
             base.Dispose(isDisposing);
 
-            RunPrepareForExitAction();
+            ConfirmExit();
 
             RulesetStore?.Dispose();
             LocalConfig?.Dispose();
