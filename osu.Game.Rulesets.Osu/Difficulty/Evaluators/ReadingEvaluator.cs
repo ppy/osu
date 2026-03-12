@@ -185,7 +185,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             while (hitObject != null)
             {
                 if (hitObject.StartTime - current.StartTime > reading_window_size ||
-                    current.StartTime + hitObject.Preempt < hitObject.StartTime) // Object not visible at the time current object needs to be clicked.
+                    current.StartTime < hitObject.StartTime - hitObject.Preempt) // Object not visible at the time current object needs to be clicked.
                     break;
 
                 double timeBetweenCurrAndLoopObj = hitObject.StartTime - current.StartTime;
