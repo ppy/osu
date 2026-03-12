@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 if (hitObject.IsNull() ||
                     current.StartTime - hitObject.StartTime > reading_window_size ||
-                    hitObject.StartTime + hitObject.Preempt < current.StartTime) // Current object not visible at the time object needs to be clicked
+                    hitObject.StartTime < current.StartTime - current.Preempt) // Current object not visible at the time object needs to be clicked
                     break;
 
                 yield return hitObject;
