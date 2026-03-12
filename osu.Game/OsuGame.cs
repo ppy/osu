@@ -996,11 +996,8 @@ namespace osu.Game
             Add(performFromMainMenuTask = new PerformFromMenuRunner(action, validScreens, () => ScreenStack.CurrentScreen));
         }
 
-        public override void AttemptExit(Action action = null)
+        public override void AttemptExit()
         {
-            if (action != null)
-                OnExitingBegan = action;
-
             // The main menu exit implementation gives the user a chance to interrupt the exit process if needed.
             PerformFromScreen(menu => menu.Exit(), new[] { typeof(MainMenu) });
         }
@@ -1760,7 +1757,7 @@ namespace osu.Game
             ScreenChanged((OsuScreen)lastScreen, (OsuScreen)newScreen);
 
             if (lastScreen is MainMenu)
-                RunPrepareForExitAction();
+                ConfirmExit();
 
             if (newScreen == null)
                 Exit();

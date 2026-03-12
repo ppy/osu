@@ -149,7 +149,11 @@ namespace osu.Desktop.Updater
 
         private void restartToApplyUpdate(Velopack.UpdateManager updateManager, UpdateInfo update) => Task.Run(() =>
         {
-            Schedule(() => game.AttemptExit(() => Task.Run(() => updateManager.WaitExitThenApplyUpdates(update.TargetFullRelease)).FireAndForget()));
+            Schedule(() =>
+            {
+                game.RunOnExiting = () => Task.Run(() => updateManager.WaitExitThenApplyUpdates(update.TargetFullRelease)).FireAndForget();
+                game.AttemptExit();
+            });
             return Task.CompletedTask;
         });
 
