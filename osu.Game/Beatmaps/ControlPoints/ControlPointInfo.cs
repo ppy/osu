@@ -197,6 +197,16 @@ namespace osu.Game.Beatmaps.ControlPoints
             int closestDivisor = 0;
             double closestTime = double.MaxValue;
 
+            // `getClosestSnappedTime()` only returns positive time values.
+            // due to that, if `time` is allowed to be negative, the loop lower below could return bogus results
+            // as the "snapped time" will not necessarily be "closest" at that point.
+            // compensate for this by moving `time` by enough beat lengths to go back to the positives.
+            if (time < 0)
+            {
+                int offsetBeats = (int)Math.Ceiling(-time / timingPoint.BeatLength);
+                time += offsetBeats * timingPoint.BeatLength;
+            }
+
             foreach (int divisor in BindableBeatDivisor.PREDEFINED_DIVISORS)
             {
                 double distanceFromSnap = Math.Abs(time - getClosestSnappedTime(timingPoint, time, divisor));
