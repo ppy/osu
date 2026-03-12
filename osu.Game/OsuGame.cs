@@ -193,7 +193,7 @@ namespace osu.Game
 
         protected readonly Bindable<LocalUserPlayingState> UserPlayingState = new Bindable<LocalUserPlayingState>();
 
-        protected OsuScreenStack ScreenStack;
+        public OsuScreenStack ScreenStack { get; private set; }
 
         protected BackButton BackButton => screenStackFooter.BackButton;
         protected ScreenFooter ScreenFooter => screenStackFooter.Footer;
@@ -996,8 +996,11 @@ namespace osu.Game
             Add(performFromMainMenuTask = new PerformFromMenuRunner(action, validScreens, () => ScreenStack.CurrentScreen));
         }
 
-        public override void AttemptExit()
+        public override void AttemptExit(Action action = null)
         {
+            if (action != null)
+                OnExitingBegan = action;
+
             // The main menu exit implementation gives the user a chance to interrupt the exit process if needed.
             PerformFromScreen(menu => menu.Exit(), new[] { typeof(MainMenu) });
         }
@@ -1755,6 +1758,9 @@ namespace osu.Game
         private void screenExited(IScreen lastScreen, IScreen newScreen)
         {
             ScreenChanged((OsuScreen)lastScreen, (OsuScreen)newScreen);
+
+            if (lastScreen is MainMenu)
+                RunPrepareForExitAction();
 
             if (newScreen == null)
                 Exit();

@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
@@ -146,10 +147,10 @@ namespace osu.Desktop.Updater
             action();
         }
 
-        private void restartToApplyUpdate(Velopack.UpdateManager updateManager, UpdateInfo update) => Task.Run(async () =>
+        private void restartToApplyUpdate(Velopack.UpdateManager updateManager, UpdateInfo update) => Task.Run(() =>
         {
-            await updateManager.WaitExitThenApplyUpdatesAsync(update.TargetFullRelease).ConfigureAwait(false);
-            Schedule(() => game.AttemptExit());
+            Schedule(() => game.AttemptExit(() => Task.Run(() => updateManager.WaitExitThenApplyUpdates(update.TargetFullRelease)).FireAndForget()));
+            return Task.CompletedTask;
         });
 
         private static void log(string text) => Logger.Log($"VelopackUpdateManager: {text}");
