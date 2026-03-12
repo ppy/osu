@@ -165,8 +165,6 @@ namespace osu.Game.Replays
             return dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
         }
 
-        protected override DrawNode CreateDrawNode() => new DrawNode(this);
-
         private class ManualAdjustableClock : IAdjustableClock
         {
             public double CurrentTime { get; set; }
