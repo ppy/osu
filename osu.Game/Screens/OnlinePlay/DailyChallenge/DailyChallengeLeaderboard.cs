@@ -17,7 +17,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.DailyChallenge
@@ -164,7 +164,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
                         if (s.UserID == api.LocalUser.Value.Id)
                             highlightType = BeatmapLeaderboardScore.HighlightType.Own;
-                        else if (api.Friends.Any(r => r.TargetID == s.UserID))
+                        else if (api.LocalUserState.Friends.Any(r => r.TargetID == s.UserID))
                             highlightType = BeatmapLeaderboardScore.HighlightType.Friend;
 
                         return new BeatmapLeaderboardScore(s, sheared: false)

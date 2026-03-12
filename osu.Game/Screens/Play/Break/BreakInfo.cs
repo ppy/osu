@@ -1,10 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 using osuTK;
@@ -32,7 +34,7 @@ namespace osu.Game.Screens.Play.Break
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Text = "current progress".ToUpperInvariant(),
+                        Text = BreakInfoStrings.CurrentProgressTitle.ToUpper(),
                         Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15),
                     },
                     new FillFlowContainer
@@ -46,7 +48,7 @@ namespace osu.Game.Screens.Play.Break
                             AccuracyDisplay = new PercentageBreakInfoLine(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy),
                             // See https://github.com/ppy/osu/discussions/15185
                             // RankDisplay = new BreakInfoLine<int>("Rank"),
-                            GradeDisplay = new BreakInfoLine<ScoreRank>("Grade"),
+                            GradeDisplay = new BreakInfoLine<ScoreRank>(BreakInfoStrings.ShowInfoGrade),
                         },
                     }
                 },

@@ -106,6 +106,9 @@ namespace osu.Game.Skinning
                                         spectatorList.Origin = Anchor.BottomLeft;
                                         spectatorList.Position = new Vector2(screen_edge_padding, -(song_progress_offset_height + screen_edge_padding));
                                     }
+
+                                    foreach (var d in container.OfType<ISerialisableDrawable>())
+                                        d.UsesFixedAnchor = true;
                                 })
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -178,6 +181,9 @@ namespace osu.Game.Skinning
                                     keyCounter.Origin = Anchor.BottomRight;
                                     keyCounter.Position = new Vector2(-screen_edge_padding, -(song_progress_offset_height + screen_edge_padding));
                                 }
+
+                                foreach (var d in container.OfType<ISerialisableDrawable>())
+                                    d.UsesFixedAnchor = true;
                             })
                             {
                                 Children = new Drawable[]

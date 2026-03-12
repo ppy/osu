@@ -95,7 +95,7 @@ namespace osu.Game.Beatmaps
         protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap? defaultBeatmap,
                                                                         GameHost? host)
         {
-            return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host);
+            return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host, Realm);
         }
 
         protected virtual BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm) => new BeatmapImporter(storage, realm);
@@ -154,7 +154,11 @@ namespace osu.Game.Beatmaps
             {
                 DifficultyName = NamingUtils.GetNextBestName(targetBeatmapSet.Beatmaps.Select(b => b.DifficultyName), "New Difficulty")
             };
-            var newBeatmap = new Beatmap { BeatmapInfo = newBeatmapInfo };
+            var newBeatmap = new Beatmap
+            {
+                BeatmapInfo = newBeatmapInfo,
+                Bookmarks = referenceWorkingBeatmap.Beatmap.Bookmarks.ToArray()
+            };
 
             foreach (var timingPoint in referenceWorkingBeatmap.Beatmap.ControlPointInfo.TimingPoints)
                 newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
@@ -329,6 +333,18 @@ namespace osu.Game.Beatmaps
              .FirstOrDefault()?.Detach());
 
         /// <summary>
+        /// Perform a lookup query on available <see cref="BeatmapInfo"/>s for a specific online ID.
+        /// </summary>
+        /// <returns>A matching local beatmap info if existing and in a valid state.</returns>
+        public BeatmapInfo? QueryOnlineBeatmapId(int id) => Realm.Run(r =>
+            r.All<BeatmapInfo>()
+             .ForOnlineId(id)
+             // See https://github.com/ppy/osu/issues/36234 for why this isn't a SingleOrDefault().
+             .FirstOrDefault()
+             ?.Detach()
+        );
+
+        /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
         /// </summary>
         public IWorkingBeatmap DefaultBeatmap => workingBeatmapCache.DefaultBeatmap;
@@ -476,9 +492,11 @@ namespace osu.Game.Beatmaps
         public Task<ExternalEditOperation<BeatmapSetInfo>> BeginExternalEditing(BeatmapSetInfo model) =>
             beatmapImporter.BeginExternalEditing(model);
 
-        public Task Export(BeatmapSetInfo beatmap) => beatmapExporter.ExportAsync(beatmap.ToLive(Realm));
+        public Task Export(BeatmapSetInfo beatmapSet) => beatmapExporter.ExportAsync(beatmapSet.ToLive(Realm));
 
-        public Task ExportLegacy(BeatmapSetInfo beatmap) => legacyBeatmapExporter.ExportAsync(beatmap.ToLive(Realm));
+        public Task ExportLegacy(BeatmapSetInfo beatmapSet) => legacyBeatmapExporter.ExportAsync(beatmapSet.ToLive(Realm));
+
+        public Task ExportLegacy(BeatmapInfo beatmap) => legacyBeatmapExporter.ExportAsync(beatmap.ToLive(Realm));
 
         private void updateHashAndMarkDirty(BeatmapSetInfo setInfo)
         {
@@ -568,6 +586,16 @@ namespace osu.Game.Beatmaps
             transaction.Commit();
         });
 
+        public void MarkNotPlayed(BeatmapInfo beatmapSetInfo) => Realm.Run(r =>
+        {
+            using var transaction = r.BeginWrite();
+
+            var beatmap = r.Find<BeatmapInfo>(beatmapSetInfo.ID)!;
+            beatmap.LastPlayed = null;
+
+            transaction.Commit();
+        });
+
         #region Implementation of ICanAcceptFiles
 
         public Task Import(params string[] paths) => beatmapImporter.Import(paths);
@@ -633,6 +661,14 @@ namespace osu.Game.Beatmaps
         }
 
         public override bool IsAvailableLocally(BeatmapSetInfo model) => Realm.Run(realm => realm.All<BeatmapSetInfo>().Any(s => s.OnlineID == model.OnlineID && !s.DeletePending));
+
+        public bool IsAvailableLocally(IBeatmapInfo model)
+        {
+            return Realm.Run(r => r.All<BeatmapInfo>()
+                                   .Filter($@"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false")
+                                   .Filter($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}", model.OnlineID)
+                                   .Any());
+        }
 
         #endregion
 

@@ -30,6 +30,16 @@ namespace osu.Game.Localisation
         public static LocalisableString Prefer24HourTimeDisplay => new TranslatableString(getKey(@"prefer_24_hour_time_display"), @"Prefer 24-hour time display");
 
         /// <summary>
+        /// "Installation"
+        /// </summary>
+        public static LocalisableString InstallationHeader => new TranslatableString(getKey(@"installation_header"), @"Installation");
+
+        /// <summary>
+        /// "Quick Actions"
+        /// </summary>
+        public static LocalisableString QuickActionsHeader => new TranslatableString(getKey(@"quick_actions_header"), @"Quick Actions");
+
+        /// <summary>
         /// "Updates"
         /// </summary>
         public static LocalisableString UpdateHeader => new TranslatableString(getKey(@"update_header"), @"Updates");
@@ -78,6 +88,16 @@ namespace osu.Game.Localisation
         /// "Check out the feature comparison and FAQ"
         /// </summary>
         public static LocalisableString LearnMoreAboutLazerTooltip => new TranslatableString(getKey(@"check_out_the_feature_comparison"), @"Check out the feature comparison and FAQ");
+
+        /// <summary>
+        /// "Report an issue"
+        /// </summary>
+        public static LocalisableString ReportIssue => new TranslatableString(getKey(@"report_issue"), @"Report an issue");
+
+        /// <summary>
+        /// "Report a problem with the game to the developers."
+        /// </summary>
+        public static LocalisableString ReportIssueTooltip => new TranslatableString(getKey(@"report_issue_tooltip"), @"Report a problem with the game to the developers.");
 
         /// <summary>
         /// "Check with your package manager / provider for other release streams."
