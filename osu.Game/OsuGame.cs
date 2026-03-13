@@ -1756,6 +1756,9 @@ namespace osu.Game
         {
             ScreenChanged((OsuScreen)lastScreen, (OsuScreen)newScreen);
 
+            // Calling ConfirmExit() here allows it to run tasks in the background while the `IntroScreen` plays the outro on quit.
+            // Note that the user can early exit the outro sequence, so there is no guarantee for how long this task has.
+            // But let's assume that anything important is run inline in `ConfirmExit`.
             if (lastScreen is MainMenu)
                 ConfirmExit();
 
