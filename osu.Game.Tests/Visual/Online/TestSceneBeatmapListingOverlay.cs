@@ -77,8 +77,7 @@ namespace osu.Game.Tests.Visual.Online
                     List<APIBeatmapSet> beatmaps;
                     bool hasNextPage;
 
-                    bool shouldConsumeQueuedResponses = consumeQueuedResponses
-                                    && searchControl.General.Contains(SearchGeneral.HideAlreadyDownloaded);
+                    bool shouldConsumeQueuedResponses = consumeQueuedResponses && searchControl.General.Contains(SearchGeneral.HideAlreadyDownloaded);
 
                     if (shouldConsumeQueuedResponses && queuedResponses.TryDequeue(out var queuedResponse))
                     {
@@ -252,15 +251,15 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestExcludeDownloadedFilterHidesLocalBeatmaps()
         {
-            const int downloadedSetId = 100;
+            const int downloaded_set_id = 100;
 
-            AddStep("mark local set as downloaded", () => addLocalBeatmapSet(downloadedSetId));
+            AddStep("mark local set as downloaded", () => addLocalBeatmapSet(downloaded_set_id));
             setHideDownloadedFilter(true);
 
             AddStep("show one downloaded and one not-downloaded result", () =>
             {
                 var downloaded = CreateAPIBeatmapSet(Ruleset.Value);
-                downloaded.OnlineID = downloadedSetId;
+                downloaded.OnlineID = downloaded_set_id;
                 downloaded.Title = "Downloaded set";
 
                 var notDownloaded = CreateAPIBeatmapSet(Ruleset.Value);
@@ -270,24 +269,24 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             AddUntilStep("only one card shown", () => this.ChildrenOfType<BeatmapCard>().Count() == 1);
-            AddAssert("downloaded set filtered out", () => this.ChildrenOfType<BeatmapCard>().Single().BeatmapSet.OnlineID != downloadedSetId);
+            AddAssert("downloaded set filtered out", () => this.ChildrenOfType<BeatmapCard>().Single().BeatmapSet.OnlineID != downloaded_set_id);
         }
 
         [Test]
         public void TestExcludeDownloadedFilterCanPaginatePastFilteredFirstPage()
         {
-            const int downloadedSetId = 110;
-            const int expectedSetId = 111;
+            const int downloaded_set_id = 110;
+            const int expected_set_id = 111;
 
-            AddStep("mark local set as downloaded", () => addLocalBeatmapSet(downloadedSetId));
+            AddStep("mark local set as downloaded", () => addLocalBeatmapSet(downloaded_set_id));
 
             AddStep("set paged search responses", () =>
             {
                 var downloaded = CreateAPIBeatmapSet(Ruleset.Value);
-                downloaded.OnlineID = downloadedSetId;
+                downloaded.OnlineID = downloaded_set_id;
 
                 var notDownloaded = CreateAPIBeatmapSet(Ruleset.Value);
-                notDownloaded.OnlineID = expectedSetId;
+                notDownloaded.OnlineID = expected_set_id;
 
                 setSearchResponses(
                     (new[] { downloaded }, true),
@@ -298,7 +297,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("capture request baseline", () => requestsBeforeSearch = searchRequestsHandled);
             AddStep("enable queued responses", () => consumeQueuedResponses = true);
             setHideDownloadedFilter(true);
-            AddUntilStep("non-downloaded result loaded", () => this.ChildrenOfType<BeatmapCard>().Any(c => c.BeatmapSet.OnlineID == expectedSetId));
+            AddUntilStep("non-downloaded result loaded", () => this.ChildrenOfType<BeatmapCard>().Any(c => c.BeatmapSet.OnlineID == expected_set_id));
             AddAssert("paged search requests were made", () => searchRequestsHandled >= requestsBeforeSearch + 2);
             noPlaceholderShown();
         }
@@ -306,22 +305,22 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestExcludeDownloadedFilterAutoPaginatesWhenFirstPageHasSingleVisibleResult()
         {
-            const int downloadedSetId = 120;
-            const int firstVisibleSetId = 121;
-            const int secondVisibleSetId = 122;
+            const int downloaded_set_id = 120;
+            const int first_visible_set_id = 121;
+            const int second_visible_set_id = 122;
 
-            AddStep("mark one set as downloaded", () => addLocalBeatmapSet(downloadedSetId));
+            AddStep("mark one set as downloaded", () => addLocalBeatmapSet(downloaded_set_id));
             AddStep("set paged search responses", () =>
             {
                 setSearchResponses(
                     (new[]
                     {
-                        new APIBeatmapSet { OnlineID = firstVisibleSetId },
-                        new APIBeatmapSet { OnlineID = downloadedSetId },
+                        new APIBeatmapSet { OnlineID = first_visible_set_id },
+                        new APIBeatmapSet { OnlineID = downloaded_set_id },
                     }, true),
                     (new[]
                     {
-                        new APIBeatmapSet { OnlineID = secondVisibleSetId },
+                        new APIBeatmapSet { OnlineID = second_visible_set_id },
                     }, false));
             });
 
@@ -333,7 +332,7 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("both visible results loaded", () =>
             {
                 var visibleIds = this.ChildrenOfType<BeatmapCard>().Select(c => c.BeatmapSet.OnlineID).ToHashSet();
-                return visibleIds.Contains(firstVisibleSetId) && visibleIds.Contains(secondVisibleSetId);
+                return visibleIds.Contains(first_visible_set_id) && visibleIds.Contains(second_visible_set_id);
             });
             AddAssert("second page was requested", () => searchRequestsHandled >= requestsBeforeSearch + 2);
         }
@@ -406,13 +405,14 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("set paged downloaded-only responses then a non-downloaded one", () =>
             {
-                var downloadedResponses = Enumerable.Range(0, downloaded_filter_auto_fetch_cap)
-                                                   .Select(i =>
-                                                   {
-                                                       int onlineId = 300 + i;
-                                                       addLocalBeatmapSet(onlineId);
-                                                       return (beatmaps: (IEnumerable<APIBeatmapSet>)new[] { new APIBeatmapSet { OnlineID = onlineId } }, hasNextPage: true);
-                                                   });
+                var downloadedResponses = new List<(IEnumerable<APIBeatmapSet> beatmaps, bool hasNextPage)>();
+
+                foreach (int i in Enumerable.Range(0, downloaded_filter_auto_fetch_cap))
+                {
+                    int onlineId = 300 + i;
+                    addLocalBeatmapSet(onlineId);
+                    downloadedResponses.Add((new[] { new APIBeatmapSet { OnlineID = onlineId } }, true));
+                }
 
                 var notDownloaded = new APIBeatmapSet { OnlineID = expected_set_id };
 
