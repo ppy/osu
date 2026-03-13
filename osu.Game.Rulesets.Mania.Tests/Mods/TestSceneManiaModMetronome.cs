@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Mania.Mods;
 
 namespace osu.Game.Rulesets.Mania.Tests.Mods
 {
-    public partial class TestSceneManiaModMetronome : ManiaModTestScene
+    public partial class TestSceneManiaModMetronome : ModTestScene
     {
         [TestCase(0.1)]
         [TestCase(0.5)]

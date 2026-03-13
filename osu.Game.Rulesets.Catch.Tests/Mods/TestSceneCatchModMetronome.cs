@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Catch.Mods;
 
 namespace osu.Game.Rulesets.Catch.Tests.Mods
 {
-    public partial class TestSceneCatchModMetronome : CatchModTestScene
+    public partial class TestSceneCatchModMetronome : ModTestScene
     {
         [TestCase(0.1)]
         [TestCase(0.5)]
