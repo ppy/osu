@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Catch
                     return new Mod[]
                     {
                         new CatchModHardRock(),
-                        new MultiMod(new CatchModSuddenDeath(), new CatchModPerfect()),
+                        new MultiMod(new CatchModSuddenDeath(), new CatchModPerfect(), new CatchModComboThreshold()),
                         new MultiMod(new CatchModDoubleTime(), new CatchModNightcore()),
                         new CatchModHidden(),
                         new CatchModFlashlight(),
