@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm;
 using osu.Game.Rulesets.Taiko.Difficulty.Skills;
 using osu.Game.Rulesets.Taiko.Mods;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
@@ -39,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods)
         {
             isConvert = beatmap.BeatmapInfo.Ruleset.OnlineID == 0;
             isRelax = mods.Any(h => h is TaikoModRelax);
@@ -62,12 +63,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             new TaikoModHardRock(),
         };
 
-        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
+        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Mod[] mods)
         {
             var difficultyHitObjects = new List<DifficultyHitObject>();
             var centreObjects = new List<TaikoDifficultyHitObject>();
             var rimObjects = new List<TaikoDifficultyHitObject>();
             var noteObjects = new List<TaikoDifficultyHitObject>();
+
+            double clockRate = ModUtils.CalculateRateWithMods(mods);
 
             // Generate TaikoDifficultyHitObjects from the beatmap's hit objects.
             for (int i = 2; i < beatmap.HitObjects.Count; i++)
@@ -92,7 +95,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return difficultyHitObjects;
         }
 
-        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills)
         {
             if (beatmap.HitObjects.Count == 0)
                 return new TaikoDifficultyAttributes { Mods = mods };
