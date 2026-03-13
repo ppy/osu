@@ -11,12 +11,12 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Database;
 using osu.Game.Extensions;
-using osu.Game.Rulesets;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
 
