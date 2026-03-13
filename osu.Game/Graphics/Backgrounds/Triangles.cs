@@ -14,8 +14,8 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Allocation;
 using System.Collections.Generic;
+using Microsoft.Toolkit.HighPerformance;
 using osu.Framework.Graphics.Rendering;
-using osu.Framework.Lists;
 using osu.Framework.Bindables;
 
 namespace osu.Game.Graphics.Backgrounds
@@ -94,7 +94,7 @@ namespace osu.Game.Graphics.Backgrounds
         /// </summary>
         public float Velocity = 1;
 
-        private readonly SortedList<TriangleParticle> parts = new SortedList<TriangleParticle>(Comparer<TriangleParticle>.Default);
+        private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
 
         private Random stableRandom;
         private IShader shader;
@@ -127,9 +127,6 @@ namespace osu.Game.Graphics.Backgrounds
         {
             base.Update();
 
-            if (CreateNewTriangles)
-                addTriangles(false);
-
             float adjustedAlpha = HideAlphaDiscrepancies
                 // Cubically scale alpha to make it drop off more sharply.
                 ? MathF.Pow(DrawColourInfo.Colour.AverageColour.Linear.A, 3)
@@ -145,19 +142,31 @@ namespace osu.Game.Graphics.Backgrounds
             // dividing by triangleScale.
             float movedDistance = -elapsedSeconds * Velocity * base_velocity / (DrawHeight * TriangleScale);
 
-            for (int i = 0; i < parts.Count; i++)
+            for (int i = parts.Count - 1; i >= 0; i--)
             {
-                TriangleParticle newParticle = parts[i];
+                TriangleParticle particle = parts[i];
 
                 // Scale moved distance by the size of the triangle. Smaller triangles should move more slowly.
-                newParticle.Position.Y += Math.Max(0.5f, parts[i].Scale) * movedDistance;
-                newParticle.Colour.A = adjustedAlpha;
+                float newY = particle.Position.Y + Math.Max(0.5f, particle.Scale) * movedDistance;
+                float bottomY = newY + triangle_size * particle.Scale * equilateral_triangle_ratio / DrawHeight;
 
-                parts[i] = newParticle;
+                if (bottomY < 0)
+                {
+                    if (!CreateNewTriangles)
+                    {
+                        parts.RemoveAt(i);
+                        continue;
+                    }
 
-                float bottomPos = parts[i].Position.Y + triangle_size * parts[i].Scale * equilateral_triangle_ratio / DrawHeight;
-                if (bottomPos < 0)
-                    parts.RemoveAt(i);
+                    particle.Position = getRandomPosition(false, particle.Scale);
+                }
+                else
+                {
+                    particle.Position.Y = newY;
+                }
+
+                particle.Colour.A = adjustedAlpha;
+                parts[i] = particle;
             }
 
             Invalidate(Invalidation.DrawNode);
@@ -172,29 +181,32 @@ namespace osu.Game.Graphics.Backgrounds
             if (seed != null)
                 stableRandom = new Random(seed.Value);
 
-            parts.Clear();
-            addTriangles(true);
-        }
-
-        protected int AimCount { get; private set; }
-
-        private void addTriangles(bool randomY)
-        {
             // Limited by the maximum size of QuadVertexBuffer for safety.
             const int max_triangles = ushort.MaxValue / (IRenderer.VERTICES_PER_QUAD + 2);
 
             AimCount = (int)Math.Min(max_triangles, DrawWidth * DrawHeight * 0.002f / (TriangleScale * TriangleScale) * SpawnRatio);
 
-            int currentCount = parts.Count;
+            if (parts.Count == AimCount)
+            {
+                var span = parts.AsSpan();
 
-            if (AimCount - currentCount == 0)
-                return;
+                for (int i = 0; i < span.Length; i++)
+                    span[i].Position = getRandomPosition(true, span[i].Scale);
+            }
+            else
+            {
+                parts.Clear();
 
-            for (int i = 0; i < AimCount - currentCount; i++)
-                parts.Add(createTriangle(randomY));
+                for (int i = 0; i < AimCount; i++)
+                    parts.Add(createTriangle(true));
+
+                parts.Sort(Comparer<TriangleParticle>.Default);
+            }
 
             Invalidate(Invalidation.DrawNode);
         }
+
+        protected int AimCount { get; private set; }
 
         private TriangleParticle createTriangle(bool randomY)
         {
