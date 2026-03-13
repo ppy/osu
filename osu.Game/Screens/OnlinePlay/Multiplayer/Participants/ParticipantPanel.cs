@@ -282,7 +282,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 Schedule(() => userModsDisplay.Current.Value = userRuleset == null ? Array.Empty<Mod>() : user.Mods.Select(m => m.ToMod(userRuleset)).ToList());
             }
 
-            userStateDisplay.UpdateStatus(user.State, user.BeatmapAvailability);
+            userStateDisplay.UpdateStatus(user);
 
             if (user.BeatmapAvailability.State == DownloadState.LocallyAvailable && user.State != MultiplayerUserState.Spectating)
             {
