@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Game.Models;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 using osu.Game.Users;
 using osu.Game.Utils;
 using Realms;

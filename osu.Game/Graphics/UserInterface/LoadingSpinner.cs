@@ -80,7 +80,7 @@ namespace osu.Game.Graphics.UserInterface
                         spinner = new SpriteIcon
                         {
                             Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
+                            Origin = Anchor.Custom,
                             Colour = inverted ? Color4.Black : Color4.White,
                             Scale = new Vector2(0.6f),
                             RelativeSizeAxes = Axes.Both,
@@ -103,7 +103,7 @@ namespace osu.Game.Graphics.UserInterface
                             spinner = new SpriteIcon
                             {
                                 Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
+                                Origin = Anchor.Custom,
                                 Colour = inverted ? Color4.Black : Color4.White,
                                 RelativeSizeAxes = Axes.Both,
                                 Icon = FontAwesome.Solid.CircleNotch
@@ -148,6 +148,9 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
+
+            // Font awesome icon isn't centered perfectly.
+            spinner.OriginPosition = spinner.DrawSize * 0.4963333333f;
 
             if (withBox)
             {

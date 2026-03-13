@@ -54,6 +54,6 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
         /// <summary>
         /// All rounds have completed. Users may still be chatting.
         /// </summary>
-        Ended
+        Ended,
     }
 }

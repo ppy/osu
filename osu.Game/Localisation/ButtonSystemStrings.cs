@@ -70,6 +70,11 @@ namespace osu.Game.Localisation
         public static LocalisableString QuickPlay => new TranslatableString(getKey(@"quick_play"), @"quick play");
 
         /// <summary>
+        /// "ranked play"
+        /// </summary>
+        public static LocalisableString RankedPlay => new TranslatableString(getKey(@"ranked_play"), @"ranked play");
+
+        /// <summary>
         /// "A few important words from your dev team!"
         /// </summary>
         public static LocalisableString MobileDisclaimerHeader => new TranslatableString(getKey(@"mobile_disclaimer_header"), @"A few important words from your dev team!");
@@ -87,6 +92,11 @@ namespace osu.Game.Localisation
 Your experience will not be perfect, and may even feel subpar compared to games which are made mobile-first.
 
 Please bear with us as we continue to improve the game for you!");
+
+        /// <summary>
+        /// "Understood"
+        /// </summary>
+        public static LocalisableString MobileDisclaimerOkButton => new TranslatableString(getKey(@"mobile_disclaimer_ok_button"), @"Understood");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
