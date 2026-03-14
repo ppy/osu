@@ -19,6 +19,7 @@ namespace osu.Game.Online.Multiplayer
     [Union(1, typeof(CountdownStoppedEvent))]
     [Union(2, typeof(MatchmakingAvatarActionEvent))]
     [Union(3, typeof(RankedPlayCardHandReplayEvent))]
+    [Union(4, typeof(RollEvent))]
     public abstract class MatchServerEvent
     {
     }
