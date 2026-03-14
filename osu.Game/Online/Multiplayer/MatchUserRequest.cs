@@ -21,6 +21,8 @@ namespace osu.Game.Online.Multiplayer
     [Union(2, typeof(StopCountdownRequest))]
     [Union(3, typeof(MatchmakingAvatarActionRequest))]
     [Union(4, typeof(RankedPlayCardHandReplayRequest))]
+    [Union(5, typeof(SetLockStateRequest))]
+    [Union(6, typeof(RollRequest))]
     public abstract class MatchUserRequest
     {
     }
