@@ -243,6 +243,29 @@ namespace osu.Game
         private IBindable<LocalisationParameters> localisationParameters = null!;
 
         /// <summary>
+        /// All available locale mappings for l10n initialisation.
+        /// </summary>
+        protected static IEnumerable<LocaleMapping> LocalisationMappings => Enum.GetValues<Language>().Select(language =>
+        {
+#if DEBUG
+            if (language == Language.debug)
+                return new LocaleMapping("debug", new DebugLocalisationStore());
+#endif
+
+            string cultureCode = language.ToCultureCode();
+
+            try
+            {
+                return new LocaleMapping(new ResourceManagerLocalisationStore(cultureCode));
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, $"Could not load localisations for language \"{cultureCode}\"");
+                return null;
+            }
+        }).Where(m => m != null);
+
+        /// <summary>
         /// Number of unhandled exceptions to allow before aborting execution.
         /// </summary>
         /// <remarks>
@@ -305,13 +328,7 @@ namespace osu.Game
 
             MessageFormatter.WebsiteRootUrl = endpoints.WebsiteUrl;
 
-            frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
-            frameworkLocale.BindValueChanged(_ => updateLanguage());
-
-            localisationParameters = Localisation.CurrentParameters.GetBoundCopy();
-            localisationParameters.BindValueChanged(_ => updateLanguage(), true);
-
-            CurrentLanguage.BindValueChanged(val => frameworkLocale.Value = val.NewValue.ToCultureCode());
+            InitialiseLocalisation(frameworkConfig);
 
             dependencies.CacheAs(API ??= new APIAccess(this, LocalConfig, endpoints, VersionHash));
 
@@ -498,6 +515,17 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Venera/Venera-Black");
 
             Fonts.AddStore(new OsuIcon.OsuIconStore(Textures));
+        }
+
+        protected void InitialiseLocalisation(FrameworkConfigManager frameworkConfig)
+        {
+            frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
+            frameworkLocale.BindValueChanged(_ => updateLanguage());
+
+            localisationParameters = Localisation.CurrentParameters.GetBoundCopy();
+            localisationParameters.BindValueChanged(_ => updateLanguage(), true);
+
+            CurrentLanguage.BindValueChanged(val => frameworkLocale.Value = val.NewValue.ToCultureCode());
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
