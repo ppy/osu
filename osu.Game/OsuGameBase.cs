@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -517,6 +518,8 @@ namespace osu.Game
             host.ExceptionThrown += onExceptionThrown;
         }
 
+        #region Exit handling
+
         /// <summary>
         /// Use to programatically exit the game as if the user was triggering via alt-f4.
         /// By default, will keep persisting until an exit occurs (exit may be blocked multiple times).
@@ -531,10 +534,36 @@ namespace osu.Game
         }
 
         /// <summary>
+        /// A special case action which is intended to restart or update the application on exit.
+        ///
+        /// It will be started as the main menu outro animation begins displaying, allowing a short window of
+        /// time which it can run tasks before the application quits.
+        /// </summary>
+        [CanBeNull]
+        public Action RunOnExiting { private get; set; }
+
+        /// <summary>
+        /// After an exit has been attempted via <see cref="AttemptExit"/>, this method can be called to
+        /// signal that the exit attempt has been cancelled.
+        /// </summary>
+        public void CancelExit() => RunOnExiting = null;
+
+        /// <summary>
+        /// When exiting has been confirmed, this should be called to run any pending exit action.
+        /// </summary>
+        protected void ConfirmExit()
+        {
+            RunOnExiting?.Invoke();
+            RunOnExiting = null;
+        }
+
+        /// <summary>
         /// If supported by the platform, the game will automatically restart after the next exit.
         /// </summary>
         /// <returns>Whether a restart operation was queued.</returns>
         public virtual bool RestartAppWhenExited() => false;
+
+        #endregion
 
         /// <summary>
         /// Perform migration of user data to a specified path.
@@ -732,6 +761,8 @@ namespace osu.Game
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
+            ConfirmExit();
 
             RulesetStore?.Dispose();
             LocalConfig?.Dispose();
