@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
 {
     public partial class FriendsList : CompositeDrawable
     {
-        public readonly IBindable<OnlineStatus> OnlineStream = new Bindable<OnlineStatus>();
+        public readonly IBindable<OnlineStatus> StatusFilter = new Bindable<OnlineStatus>();
         public readonly IBindable<UserSortCriteria> SortCriteria = new Bindable<UserSortCriteria>();
         public readonly IBindable<string> SearchText = new Bindable<string>();
 
@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             friendPresences.BindCollectionChanged(onFriendPresencesChanged);
 
             SearchText.BindValueChanged(onSearchTextChanged, true);
-            OnlineStream.BindValueChanged(onFriendsStreamChanged, true);
+            StatusFilter.BindValueChanged(onStatusFilterChanged, true);
         }
 
         private void onFriendPresencesChanged(object? sender, NotifyDictionaryChangedEventArgs<int, UserPresence> e)
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
             searchContainer.SearchTerm = search.NewValue;
         }
 
-        private void onFriendsStreamChanged(ValueChangedEvent<OnlineStatus> stream)
+        private void onStatusFilterChanged(ValueChangedEvent<OnlineStatus> status)
         {
             updatePanelVisibilities();
         }
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
         {
             foreach (var panel in searchContainer)
             {
-                switch (OnlineStream.Value)
+                switch (StatusFilter.Value)
                 {
                     case OnlineStatus.All:
                         panel.CanBeShown.Value = true;
