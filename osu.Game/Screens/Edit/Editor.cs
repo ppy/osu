@@ -582,7 +582,7 @@ namespace osu.Game.Screens.Edit
         {
             if (!canSave)
             {
-                notifications?.Post(new SimpleErrorNotification { Text = "Saving is not supported for this ruleset yet, sorry!" });
+                notifications?.Post(new SimpleErrorNotification { Text = EditorStrings.RulesetNotSupportSaving });
                 return false;
             }
 
