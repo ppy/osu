@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Localisation;
@@ -148,6 +148,11 @@ namespace osu.Game.Localisation
         /// "Restore all hidden"
         /// </summary>
         public static LocalisableString RestoreAllHidden => new TranslatableString(getKey(@"restore_all_hidden"), @"Restore all hidden");
+
+        /// <summary>
+        /// "Delete all in group"
+        /// </summary>
+        public static LocalisableString DeleteAllInGroup => new TranslatableString(getKey(@"delete_all_in_group"), @"Delete all in group");
 
         /// <summary>
         /// "{0} stars"
