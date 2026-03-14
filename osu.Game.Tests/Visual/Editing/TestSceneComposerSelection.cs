@@ -765,5 +765,50 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("release alt", () => InputManager.ReleaseKey(Key.AltLeft));
         }
+
+        [Test]
+        public void TestNoteLock()
+        {
+            HitCircle addedCircle = null!;
+
+            AddStep("add hitobjects", () =>
+            {
+                EditorBeatmap.Add(addedCircle = new HitCircle { StartTime = 100, Position = new Vector2(150, 150) });
+            });
+
+            AddStep("enable notelock", () =>
+            {
+                blueprintContainer.NoteLock.Value = TernaryState.True;
+            });
+
+            AddStep("select objects", () => EditorBeatmap.SelectedHitObjects.Add(addedCircle));
+
+            moveMouseToObject(() => addedCircle);
+
+            AddStep("begin drag", () => InputManager.PressButton(MouseButton.Left));
+
+            AddStep("move mouse", () => InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(50, 0)));
+
+            AddAssert("circle didn't move", () => addedCircle.Position == new Vector2(150, 150));
+
+            AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddStep("disable notelock", () =>
+            {
+                blueprintContainer.NoteLock.Value = TernaryState.False;
+            });
+
+            AddStep("select objects", () => EditorBeatmap.SelectedHitObjects.Add(addedCircle));
+
+            moveMouseToObject(() => addedCircle);
+
+            AddStep("begin drag", () => InputManager.PressButton(MouseButton.Left));
+
+            AddStep("move mouse", () => InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(50, 0)));
+
+            AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddAssert("circle moved", () => addedCircle.Position != new Vector2(150, 150));
+        }
     }
 }
