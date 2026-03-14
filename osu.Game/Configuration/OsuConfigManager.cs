@@ -115,6 +115,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.MenuCursorSize, 1.0f, 0.5f, 2f, 0.01f);
             SetDefault(OsuSetting.GameplayCursorSize, 1.0f, 0.1f, 2f, 0.01f);
             SetDefault(OsuSetting.GameplayCursorDuringTouch, false);
+            SetDefault(OsuSetting.SensitivityScaleWithPlayfieldSize, false);
             SetDefault(OsuSetting.AutoCursorSize, false);
 
             SetDefault(OsuSetting.MouseDisableButtons, false);
@@ -493,5 +494,11 @@ namespace osu.Game.Configuration
 
         DashboardSortMode,
         DashboardDisplayStyle,
+
+        /// <summary>
+        /// Adjusts cursor sensitivity to playfield size.
+        /// </summary>
+        SensitivityScaleWithPlayfieldSize,
+
     }
 }

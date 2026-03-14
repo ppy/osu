@@ -60,6 +60,16 @@ namespace osu.Game.Localisation
         public static LocalisableString CursorSensitivity => new TranslatableString(getKey(@"cursor_sensitivity"), @"Cursor sensitivity");
 
         /// <summary>
+        /// "Cursor sensitivity relative to Playfield"
+        /// </summary>
+        public static LocalisableString EnableCursorSensitivityRelativeToPlayfield => new TranslatableString(getKey(@"enable_cursor_sensitivity_relative_to_playfield"), @"Cursor sensitivity relative to Playfield");
+
+        /// <summary>
+        /// "Automatically adjusts cursor speed to stay proportional to the play area."
+        /// </summary>
+        public static LocalisableString EnableCursorSensitivityRelativeToPlayfieldToolTip => new TranslatableString(getKey(@"enable_cursor_sensitivity_relative_to_playfield_tooltip"), @"Automatically adjusts cursor speed to stay proportional to the play area.");
+
+        /// <summary>
         /// "This setting has known issues on your platform. If you encounter problems, it is recommended to adjust sensitivity externally and keep this disabled for now."
         /// </summary>
         public static LocalisableString HighPrecisionPlatformWarning => new TranslatableString(getKey(@"high_precision_platform_warning"), @"This setting has known issues on your platform. If you encounter problems, it is recommended to adjust sensitivity externally and keep this disabled for now.");
