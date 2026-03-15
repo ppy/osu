@@ -267,6 +267,136 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString CollectionBeatmapsAdded(string name, int beatmapsCount) => new TranslatableString(getKey(@"collection_beatmaps_added"), @"Added {0} beatmaps to collection ""{1}"".", beatmapsCount, name);
 
+        /// <summary>
+        /// "Reprocessing star rating for beatmaps"
+        /// </summary>
+        public static LocalisableString ReprocessStarRatingRunning => new TranslatableString(getKey(@"reprocess_star_rating_running"), @"Reprocessing star rating for beatmaps");
+
+        /// <summary>
+        /// "{0} beatmaps&#39; star ratings have been updated."
+        /// </summary>
+        public static LocalisableString ReprocessStarRatingCompleted(int processedCount) => new TranslatableString(getKey(@"reprocess_star_rating_completed"), @"{0} beatmaps' star ratings have been updated.", processedCount);
+
+        /// <summary>
+        /// "{0} of {1} beatmaps&#39; star ratings have been updated."
+        /// </summary>
+        public static LocalisableString ReprocessStarRatingIncompleted(int processedCount, int totalCount) => new TranslatableString(getKey(@"reprocess_star_rating_incompleted"), @"{0} of {1} beatmaps' star ratings have been updated.", processedCount, totalCount);
+
+        /// <summary>
+        /// "Updating online data for beatmaps"
+        /// </summary>
+        public static LocalisableString UpdateOnlineDataRunning => new TranslatableString(getKey(@"update_online_data_running"), @"Updating online data for beatmaps");
+
+        /// <summary>
+        /// "{0} beatmaps&#39; online data have been updated."
+        /// </summary>
+        public static LocalisableString UpdateOnlineDataCompleted(int processedCount) => new TranslatableString(getKey(@"update_online_data_completed"), @"{0} beatmaps' online data have been updated.", processedCount);
+
+        /// <summary>
+        /// "{0} of {1} beatmaps&#39; online data have been updated."
+        /// </summary>
+        public static LocalisableString UpdateOnlineDataIncompleted(int processedCount, int totalCount) => new TranslatableString(getKey(@"update_online_data_incompleted"), @"{0} of {1} beatmaps' online data have been updated.", processedCount, totalCount);
+
+        /// <summary>
+        /// "Populating missing statistics for beatmaps"
+        /// </summary>
+        public static LocalisableString PopulateBeatmapsStatsRunning => new TranslatableString(getKey(@"populate_beatmaps_stats_running"), @"Populating missing statistics for beatmaps");
+
+        /// <summary>
+        /// "{0} beatmaps have been populated with missing statistics."
+        /// </summary>
+        public static LocalisableString PopulateBeatmapsStatsCompleted(int processedCount) => new TranslatableString(getKey(@"populate_beatmaps_stats_completed"), @"{0} beatmaps have been populated with missing statistics.", processedCount);
+
+        /// <summary>
+        /// "{0} of {1} beatmaps have been populated with missing statistics."
+        /// </summary>
+        public static LocalisableString PopulateBeatmapsStatsIncompleted(int processedCount, int totalCount) => new TranslatableString(getKey(@"populate_beatmaps_stats_incompleted"), @"{0} of {1} beatmaps have been populated with missing statistics.", processedCount, totalCount);
+
+        /// <summary>
+        /// "Populating missing statistics for scores"
+        /// </summary>
+        public static LocalisableString PopulateScoresStatsRunning => new TranslatableString(getKey(@"populate_scores_stats_running"), @"Populating missing statistics for scores");
+
+        /// <summary>
+        /// "{0} scores have been populated with missing statistics."
+        /// </summary>
+        public static LocalisableString PopulateScoresStatsCompleted(int processedCount) => new TranslatableString(getKey(@"populate_scores_stats_completed"), @"{0} scores have been populated with missing statistics.", processedCount);
+
+        /// <summary>
+        /// "{0} of {1} scores have been populated with missing statistics."
+        /// </summary>
+        public static LocalisableString PopulateScoresStatsIncompleted(int processedCount, int totalCount) => new TranslatableString(getKey(@"populate_scores_stats_incompleted"), @"{0} of {1} scores have been populated with missing statistics.", processedCount, totalCount);
+
+        /// <summary>
+        /// "Upgrading scores to new scoring algorithm"
+        /// </summary>
+        public static LocalisableString UpgradeScoringAlgorithmRunning => new TranslatableString(getKey(@"upgrade_scoring_algorithm_running"), @"Upgrading scores to new scoring algorithm");
+
+        /// <summary>
+        /// "{0} scores have been upgraded to the new scoring algorithm."
+        /// </summary>
+        public static LocalisableString UpgradeScoringAlgorithmCompleted(int processedCount) => new TranslatableString(getKey(@"upgrade_scoring_algorithm_completed"), @"{0} scores have been upgraded to the new scoring algorithm.", processedCount);
+
+        /// <summary>
+        /// "{0} of {1} scores have been upgraded to the new scoring algorithm."
+        /// </summary>
+        public static LocalisableString UpgradeScoringAlgorithmIncompleted(int processedCount, int totalCount) => new TranslatableString(getKey(@"upgrade_scoring_algorithm_incompleted"), @"{0} of {1} scores have been upgraded to the new scoring algorithm.", processedCount, totalCount);
+
+        /// <summary>
+        /// "Adjusting ranks of scores"
+        /// </summary>
+        public static LocalisableString AdjustScoresRanksRunning => new TranslatableString(getKey(@"adjust_scores_ranks_running"), @"Adjusting ranks of scores");
+
+        /// <summary>
+        /// "{0} scores now have more correct ranks."
+        /// </summary>
+        public static LocalisableString AdjustScoresRanksCompleted(int processedCount) => new TranslatableString(getKey(@"adjust_scores_ranks_completed"), @"{0} scores now have more correct ranks.", processedCount);
+
+        /// <summary>
+        /// "{0} of {1} scores now have more correct ranks."
+        /// </summary>
+        public static LocalisableString AdjustScoresRanksIncompleted(int processedCount, int totalCount) => new TranslatableString(getKey(@"adjust_scores_ranks_incompleted"), @"{0} of {1} scores now have more correct ranks.", processedCount, totalCount);
+
+        /// <summary>
+        /// "Populating missing submission and rank dates"
+        /// </summary>
+        public static LocalisableString PopulateMissingDatesRunning => new TranslatableString(getKey(@"populate_missing_dates_running"), @"Populating missing submission and rank dates");
+
+        /// <summary>
+        /// "{0} beatmap sets now have correct submission and rank dates."
+        /// </summary>
+        public static LocalisableString PopulateMissingDatesCompleted(int processedCount) => new TranslatableString(getKey(@"populate_missing_dates_completed"), @"{0} beatmap sets now have correct submission and rank dates.", processedCount);
+
+        /// <summary>
+        /// "{0} of {1} beatmap sets now have correct submission and rank dates."
+        /// </summary>
+        public static LocalisableString PopulateMissingDatesIncompleted(int processedCount, int totalCount) => new TranslatableString(getKey(@"populate_missing_dates_incompleted"), @"{0} of {1} beatmap sets now have correct submission and rank dates.", processedCount, totalCount);
+
+        /// <summary>
+        /// "Populating missing user tags"
+        /// </summary>
+        public static LocalisableString PopulateMissingTagsRunning => new TranslatableString(getKey(@"populate_missing_tags_running"), @"Populating missing user tags");
+
+        /// <summary>
+        /// "{0} beatmaps have had their tags updated."
+        /// </summary>
+        public static LocalisableString PopulateMissingTagsCompleted(int processedCount) => new TranslatableString(getKey(@"populate_missing_tags_completed"), @"{0} beatmaps have had their tags updated.", processedCount);
+
+        /// <summary>
+        /// "{0} of {1} beatmaps have had their tags updated."
+        /// </summary>
+        public static LocalisableString PopulateMissingTagsIncompleted(int processedCount, int totalCount) => new TranslatableString(getKey(@"populate_missing_tags_incompleted"), @"{0} of {1} beatmaps have had their tags updated.", processedCount, totalCount);
+
+        /// <summary>
+        /// "({0} of {1})"
+        /// </summary>
+        public static LocalisableString BackgroundDataStoreProcessorItemsStatus(int processedItems, int totalItems) => new TranslatableString(getKey(@"data_store_processor_items_status"), @"({0} of {1})", processedItems, totalItems);
+
+        /// <summary>
+        /// "Check logs for issues with {0} failed items."
+        /// </summary>
+        public static LocalisableString BackgroundDataStoreProcessorFailedItems(int failedCount) => new TranslatableString(getKey(@"data_store_processor_failed_items"), @"Check logs for issues with {0} failed items.", failedCount);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
