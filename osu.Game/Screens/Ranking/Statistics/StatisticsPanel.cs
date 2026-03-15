@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -245,13 +246,26 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                 // We may want to iterate on the following conditions further in the future
 
-                var localUserScore = AchievedScore ?? realm.Run(r =>
-                    r.GetAllLocalScoresForUser(api.LocalUser.Value.Id)
-                     .Filter($@"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0", newScore.BeatmapInfo.ID)
-                     .AsEnumerable()
-                     .OrderByDescending(score => score.Ruleset.MatchesOnlineID(newScore.BeatmapInfo.Ruleset))
-                     .ThenByDescending(score => score.Rank)
-                     .FirstOrDefault());
+                var localUserScore = AchievedScore;
+
+                if (localUserScore == null)
+                {
+                    var localUserScores = realm.Run(r =>
+                        r.GetAllLocalScoresForUser(api.LocalUser.Value.Id)
+                         .Filter($@"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0", newScore.BeatmapInfo.ID)
+                         .AsEnumerable()
+                         .OrderByDescending(score => score.Ruleset.MatchesOnlineID(newScore.BeatmapInfo.Ruleset))
+                         .ThenByDescending(score => score.Rank)
+                         .ToArray());
+
+                    localUserScore = Array.Find(localUserScores, score =>
+                    {
+                        return (score.Ruleset.OnlineID == newScore.BeatmapInfo!.Ruleset.OnlineID)
+                            && (score.Rank >= ScoreRank.C)
+                            && (!score.Mods.Any(m => (m.Type == ModType.Conversion)
+                            || m is not ModClassic));
+                    }) ?? localUserScores.FirstOrDefault();
+                }
 
                 if (localUserScore == null)
                     preventTaggingReason = "Play the beatmap to contribute to beatmap tags!";
