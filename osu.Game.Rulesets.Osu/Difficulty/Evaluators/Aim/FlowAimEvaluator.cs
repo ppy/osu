@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             double angleChangeBonus = Math.Pow(Math.Sin((currAngle - lastAngle) / 2), 2) * bonusBase;
 
             // Take the largest of last 3 distances and if it's too small - decrease flow angle change bonus, because it's cheesable
-            angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(Math.Max(osuCurrObj.JumpDistance, osuLast1Obj.JumpDistance), 0, diameter);
+            angleChangeBonus *= DifficultyCalculationUtils.ReverseLerp(Math.Max(osuCurrObj.JumpDistance, osuLast1Obj.JumpDistance), radius, diameter);
 
             return angleChangeBonus * angle_change_bonus_multiplier;
         }
