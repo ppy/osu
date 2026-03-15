@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
-            const double flow_multiplier = 0.95;
+            const double flow_multiplier = 0.98;
 
             if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
                 return 0;
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         // This bonus accounts for the fact that flow is circular movement, therefore flowing on sharp angles is harder.
         public static double CalculateFlowAcuteAngleBonus(DifficultyHitObject current)
         {
-            const double acute_angle_bonus_multiplier = 1.05;
+            const double acute_angle_bonus_multiplier = 0.3;
 
             if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
                 return 0;
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         // This bonus accounts for flow aim being harder when angle is changing.
         public static double CalculateFlowAngleChangeBonus(DifficultyHitObject current)
         {
-            const double angle_change_bonus_multiplier = 1.0;
+            const double angle_change_bonus_multiplier = 0.5;
 
             if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
                 return 0;
