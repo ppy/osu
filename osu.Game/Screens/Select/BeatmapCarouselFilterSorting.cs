@@ -102,6 +102,8 @@ namespace osu.Game.Screens.Select
                         comparison = compareUsingAggregateMax(a, b, static b => b.BPM);
                     else
                         comparison = a.BPM.CompareTo(b.BPM);
+                    if (comparison == 0)
+                        goto case SortMode.Title;
                     break;
 
                 case SortMode.Length:
@@ -113,17 +115,6 @@ namespace osu.Game.Screens.Select
 
                 default:
                     throw new ArgumentOutOfRangeException();
-            }
-
-            // For certain sort modes, use title comparison as a fallback
-            // To begin with, I've only added the mode that concerns *me* but I'm sure there are more that could make use of this logic, down for you to decide which to add.
-            if (comparison == 0 && new List<SortMode> { SortMode.BPM }.Contains(sort))
-            {
-                // Review: I'm not sure whether to duplicate the comparing logic for titles or introduce a recursive call.
-                // We have the certainty that we won't go in an infinite recursion since the list in the if's condition excludes the mode that we're recursing on.
-
-                // comparison = OrdinalSortByCaseStringComparer.DEFAULT.Compare(a.BeatmapSet!.Metadata.Title, b.BeatmapSet!.Metadata.Title);
-                comparison = compare(a, b, SortMode.Title, aggregate);
             }
 
             // If the initial sort could not differentiate, attempt to use DateAdded to order sets in a stable fashion.
