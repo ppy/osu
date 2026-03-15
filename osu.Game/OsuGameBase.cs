@@ -245,7 +245,7 @@ namespace osu.Game
         /// <summary>
         /// All available locale mappings for l10n initialisation.
         /// </summary>
-        protected static IEnumerable<LocaleMapping> LocalisationMappings => Enum.GetValues<Language>().Select(language =>
+        private static IEnumerable<LocaleMapping> localisationMappings => Enum.GetValues<Language>().Select(language =>
         {
 #if DEBUG
             if (language == Language.debug)
@@ -328,7 +328,14 @@ namespace osu.Game
 
             MessageFormatter.WebsiteRootUrl = endpoints.WebsiteUrl;
 
-            InitialiseLocalisation(frameworkConfig);
+            // Initialise localisation
+            frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
+            frameworkLocale.BindValueChanged(_ => updateLanguage());
+
+            localisationParameters = Localisation.CurrentParameters.GetBoundCopy();
+            localisationParameters.BindValueChanged(_ => updateLanguage(), true);
+
+            CurrentLanguage.BindValueChanged(val => frameworkLocale.Value = val.NewValue.ToCultureCode());
 
             dependencies.CacheAs(API ??= new APIAccess(this, LocalConfig, endpoints, VersionHash));
 
@@ -517,15 +524,11 @@ namespace osu.Game
             Fonts.AddStore(new OsuIcon.OsuIconStore(Textures));
         }
 
-        protected void InitialiseLocalisation(FrameworkConfigManager frameworkConfig)
+        protected override void LoadComplete()
         {
-            frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
-            frameworkLocale.BindValueChanged(_ => updateLanguage());
+            base.LoadComplete();
 
-            localisationParameters = Localisation.CurrentParameters.GetBoundCopy();
-            localisationParameters.BindValueChanged(_ => updateLanguage(), true);
-
-            CurrentLanguage.BindValueChanged(val => frameworkLocale.Value = val.NewValue.ToCultureCode());
+            Localisation.AddLocaleMappings(localisationMappings);
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>

@@ -1052,8 +1052,6 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            Localisation.AddLocaleMappings(LocalisationMappings);
-
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
             // in the cursor being shown for a few frames during the intro.
             // This prevents the cursor from showing until we have a screen with CursorVisible = true
