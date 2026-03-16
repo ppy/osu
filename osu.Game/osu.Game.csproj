@@ -20,7 +20,6 @@
   <ItemGroup Label="Package References">
     <!-- Held back due to licencing change stupidness. Silenced vulnerability does not affect us. -->
     <PackageReference Include="AutoMapper" Version="13.0.1">
-      <PrivateAssets>all</PrivateAssets>
       <NoWarn>NU1903</NoWarn>
     </PackageReference>
     <PackageReference Include="DiffPlex" Version="1.9.0" />
