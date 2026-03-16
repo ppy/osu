@@ -3,6 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Formats;
@@ -25,73 +26,73 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var storyboard = decoder.Decode(stream);
 
-                Assert.IsTrue(storyboard.HasDrawable);
-                Assert.AreEqual(6, storyboard.Layers.Count());
+                ClassicAssert.True(storyboard.HasDrawable);
+                ClassicAssert.AreEqual(6, storyboard.Layers.Count());
 
                 StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
-                Assert.IsNotNull(background);
-                Assert.AreEqual(16, background.Elements.Count);
-                Assert.IsTrue(background.VisibleWhenFailing);
-                Assert.IsTrue(background.VisibleWhenPassing);
-                Assert.AreEqual("Background", background.Name);
+                ClassicAssert.NotNull(background);
+                ClassicAssert.AreEqual(16, background.Elements.Count);
+                ClassicAssert.True(background.VisibleWhenFailing);
+                ClassicAssert.True(background.VisibleWhenPassing);
+                ClassicAssert.AreEqual("Background", background.Name);
 
                 StoryboardLayer fail = storyboard.Layers.Single(l => l.Depth == 2);
-                Assert.IsNotNull(fail);
-                Assert.AreEqual(0, fail.Elements.Count);
-                Assert.IsTrue(fail.VisibleWhenFailing);
-                Assert.IsFalse(fail.VisibleWhenPassing);
-                Assert.AreEqual("Fail", fail.Name);
+                ClassicAssert.NotNull(fail);
+                ClassicAssert.AreEqual(0, fail.Elements.Count);
+                ClassicAssert.True(fail.VisibleWhenFailing);
+                ClassicAssert.False(fail.VisibleWhenPassing);
+                ClassicAssert.AreEqual("Fail", fail.Name);
 
                 StoryboardLayer pass = storyboard.Layers.Single(l => l.Depth == 1);
-                Assert.IsNotNull(pass);
-                Assert.AreEqual(0, pass.Elements.Count);
-                Assert.IsFalse(pass.VisibleWhenFailing);
-                Assert.IsTrue(pass.VisibleWhenPassing);
-                Assert.AreEqual("Pass", pass.Name);
+                ClassicAssert.NotNull(pass);
+                ClassicAssert.AreEqual(0, pass.Elements.Count);
+                ClassicAssert.False(pass.VisibleWhenFailing);
+                ClassicAssert.True(pass.VisibleWhenPassing);
+                ClassicAssert.AreEqual("Pass", pass.Name);
 
                 StoryboardLayer foreground = storyboard.Layers.Single(l => l.Depth == 0);
-                Assert.IsNotNull(foreground);
-                Assert.AreEqual(151, foreground.Elements.Count);
-                Assert.IsTrue(foreground.VisibleWhenFailing);
-                Assert.IsTrue(foreground.VisibleWhenPassing);
-                Assert.AreEqual("Foreground", foreground.Name);
+                ClassicAssert.NotNull(foreground);
+                ClassicAssert.AreEqual(151, foreground.Elements.Count);
+                ClassicAssert.True(foreground.VisibleWhenFailing);
+                ClassicAssert.True(foreground.VisibleWhenPassing);
+                ClassicAssert.AreEqual("Foreground", foreground.Name);
 
                 StoryboardLayer overlay = storyboard.Layers.Single(l => l.Depth == int.MinValue);
-                Assert.IsNotNull(overlay);
-                Assert.IsEmpty(overlay.Elements);
-                Assert.IsTrue(overlay.VisibleWhenFailing);
-                Assert.IsTrue(overlay.VisibleWhenPassing);
-                Assert.AreEqual("Overlay", overlay.Name);
+                ClassicAssert.NotNull(overlay);
+                ClassicAssert.IsEmpty(overlay.Elements);
+                ClassicAssert.True(overlay.VisibleWhenFailing);
+                ClassicAssert.True(overlay.VisibleWhenPassing);
+                ClassicAssert.AreEqual("Overlay", overlay.Name);
 
                 int spriteCount = background.Elements.Count(x => x.GetType() == typeof(StoryboardSprite));
                 int animationCount = background.Elements.Count(x => x.GetType() == typeof(StoryboardAnimation));
                 int sampleCount = background.Elements.Count(x => x.GetType() == typeof(StoryboardSampleInfo));
 
-                Assert.AreEqual(15, spriteCount);
-                Assert.AreEqual(1, animationCount);
-                Assert.AreEqual(0, sampleCount);
-                Assert.AreEqual(background.Elements.Count, spriteCount + animationCount + sampleCount);
+                ClassicAssert.AreEqual(15, spriteCount);
+                ClassicAssert.AreEqual(1, animationCount);
+                ClassicAssert.AreEqual(0, sampleCount);
+                ClassicAssert.AreEqual(background.Elements.Count, spriteCount + animationCount + sampleCount);
 
                 var sprite = background.Elements.ElementAt(0) as StoryboardSprite;
-                Assert.NotNull(sprite);
-                Assert.IsTrue(sprite!.HasCommands);
-                Assert.AreEqual(new Vector2(320, 240), sprite.InitialPosition);
-                Assert.IsTrue(sprite.IsDrawable);
-                Assert.AreEqual(Anchor.Centre, sprite.Origin);
-                Assert.AreEqual("SB/lyric/ja-21.png", sprite.Path);
+                ClassicAssert.NotNull(sprite);
+                ClassicAssert.True(sprite!.HasCommands);
+                ClassicAssert.AreEqual(new Vector2(320, 240), sprite.InitialPosition);
+                ClassicAssert.True(sprite.IsDrawable);
+                ClassicAssert.AreEqual(Anchor.Centre, sprite.Origin);
+                ClassicAssert.AreEqual("SB/lyric/ja-21.png", sprite.Path);
 
                 var animation = background.Elements.OfType<StoryboardAnimation>().First();
-                Assert.NotNull(animation);
-                Assert.AreEqual(141175, animation.EndTime);
-                Assert.AreEqual(10, animation.FrameCount);
-                Assert.AreEqual(30, animation.FrameDelay);
-                Assert.IsTrue(animation.HasCommands);
-                Assert.AreEqual(new Vector2(320, 240), animation.InitialPosition);
-                Assert.IsTrue(animation.IsDrawable);
-                Assert.AreEqual(AnimationLoopType.LoopForever, animation.LoopType);
-                Assert.AreEqual(Anchor.Centre, animation.Origin);
-                Assert.AreEqual("SB/red jitter/red_0000.jpg", animation.Path);
-                Assert.AreEqual(78993, animation.StartTime);
+                ClassicAssert.NotNull(animation);
+                ClassicAssert.AreEqual(141175, animation.EndTime);
+                ClassicAssert.AreEqual(10, animation.FrameCount);
+                ClassicAssert.AreEqual(30, animation.FrameDelay);
+                ClassicAssert.True(animation.HasCommands);
+                ClassicAssert.AreEqual(new Vector2(320, 240), animation.InitialPosition);
+                ClassicAssert.True(animation.IsDrawable);
+                ClassicAssert.AreEqual(AnimationLoopType.LoopForever, animation.LoopType);
+                ClassicAssert.AreEqual(Anchor.Centre, animation.Origin);
+                ClassicAssert.AreEqual("SB/red jitter/red_0000.jpg", animation.Path);
+                ClassicAssert.AreEqual(78993, animation.StartTime);
             }
         }
 
@@ -106,13 +107,13 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var storyboard = decoder.Decode(stream);
 
                 StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
-                Assert.AreEqual(1, background.Elements.Count);
+                ClassicAssert.AreEqual(1, background.Elements.Count);
 
-                Assert.AreEqual(2000, background.Elements[0].StartTime);
-                Assert.AreEqual(2000, (background.Elements[0] as StoryboardAnimation)?.EarliestTransformTime);
+                ClassicAssert.AreEqual(2000, background.Elements[0].StartTime);
+                ClassicAssert.AreEqual(2000, (background.Elements[0] as StoryboardAnimation)?.EarliestTransformTime);
 
-                Assert.AreEqual(3000, (background.Elements[0] as StoryboardAnimation)?.GetEndTime());
-                Assert.AreEqual(12000, (background.Elements[0] as StoryboardAnimation)?.EndTimeForDisplay);
+                ClassicAssert.AreEqual(3000, (background.Elements[0] as StoryboardAnimation)?.GetEndTime());
+                ClassicAssert.AreEqual(12000, (background.Elements[0] as StoryboardAnimation)?.EndTimeForDisplay);
             }
         }
 
@@ -127,11 +128,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var storyboard = decoder.Decode(stream);
 
                 StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
-                Assert.AreEqual(1, background.Elements.Count);
+                ClassicAssert.AreEqual(1, background.Elements.Count);
 
-                Assert.AreEqual(2000, background.Elements[0].StartTime);
+                ClassicAssert.AreEqual(2000, background.Elements[0].StartTime);
                 // This property should be used in DrawableStoryboardAnimation as a starting point for animation playback.
-                Assert.AreEqual(1000, (background.Elements[0] as StoryboardAnimation)?.EarliestTransformTime);
+                ClassicAssert.AreEqual(1000, (background.Elements[0] as StoryboardAnimation)?.EarliestTransformTime);
             }
         }
 
@@ -146,10 +147,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var storyboard = decoder.Decode(stream);
 
                 StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
-                Assert.AreEqual(2, background.Elements.Count);
+                ClassicAssert.AreEqual(2, background.Elements.Count);
 
-                Assert.AreEqual(1500, background.Elements[0].StartTime);
-                Assert.AreEqual(1500, background.Elements[1].StartTime);
+                ClassicAssert.AreEqual(1500, background.Elements[0].StartTime);
+                ClassicAssert.AreEqual(1500, background.Elements[1].StartTime);
             }
         }
 
@@ -164,12 +165,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var storyboard = decoder.Decode(stream);
 
                 StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
-                Assert.AreEqual(2, background.Elements.Count);
+                ClassicAssert.AreEqual(2, background.Elements.Count);
 
-                Assert.AreEqual(1500, background.Elements[0].StartTime);
-                Assert.AreEqual(1000, background.Elements[1].StartTime);
+                ClassicAssert.AreEqual(1500, background.Elements[0].StartTime);
+                ClassicAssert.AreEqual(1000, background.Elements[1].StartTime);
 
-                Assert.AreEqual(1000, storyboard.EarliestEventTime);
+                ClassicAssert.AreEqual(1000, storyboard.EarliestEventTime);
             }
         }
 
@@ -184,12 +185,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var storyboard = decoder.Decode(stream);
 
                 StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
-                Assert.AreEqual(2, background.Elements.Count);
+                ClassicAssert.AreEqual(2, background.Elements.Count);
 
-                Assert.AreEqual(1000, background.Elements[0].StartTime);
-                Assert.AreEqual(1000, background.Elements[1].StartTime);
+                ClassicAssert.AreEqual(1000, background.Elements[0].StartTime);
+                ClassicAssert.AreEqual(1000, background.Elements[1].StartTime);
 
-                Assert.AreEqual(1000, storyboard.EarliestEventTime);
+                ClassicAssert.AreEqual(1000, storyboard.EarliestEventTime);
             }
         }
 
@@ -204,7 +205,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var storyboard = decoder.Decode(stream);
 
                 StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
-                Assert.AreEqual(3456, ((StoryboardSprite)background.Elements.Single()).InitialPosition.X);
+                ClassicAssert.AreEqual(3456, ((StoryboardSprite)background.Elements.Single()).InitialPosition.X);
             }
         }
 
@@ -221,7 +222,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 StoryboardLayer video = storyboard.Layers.Single(l => l.Name == "Video");
                 Assert.That(video.Elements.Count, Is.EqualTo(1));
 
-                Assert.AreEqual("Video.avi", ((StoryboardVideo)video.Elements[0]).Path);
+                ClassicAssert.AreEqual("Video.avi", ((StoryboardVideo)video.Elements[0]).Path);
             }
         }
 
@@ -238,7 +239,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 StoryboardLayer video = storyboard.Layers.Single(l => l.Name == "Video");
                 Assert.That(video.Elements.Count, Is.EqualTo(1));
 
-                Assert.AreEqual("Video.AVI", ((StoryboardVideo)video.Elements[0]).Path);
+                ClassicAssert.AreEqual("Video.AVI", ((StoryboardVideo)video.Elements[0]).Path);
             }
         }
 
@@ -268,12 +269,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var storyboard = decoder.Decode(stream);
 
                 StoryboardLayer foreground = storyboard.Layers.Single(l => l.Depth == 0);
-                Assert.AreEqual(AnimationLoopType.LoopForever, ((StoryboardAnimation)foreground.Elements[0]).LoopType);
-                Assert.AreEqual(AnimationLoopType.LoopOnce, ((StoryboardAnimation)foreground.Elements[1]).LoopType);
-                Assert.AreEqual(AnimationLoopType.LoopForever, ((StoryboardAnimation)foreground.Elements[2]).LoopType);
-                Assert.AreEqual(AnimationLoopType.LoopOnce, ((StoryboardAnimation)foreground.Elements[3]).LoopType);
-                Assert.AreEqual(AnimationLoopType.LoopForever, ((StoryboardAnimation)foreground.Elements[4]).LoopType);
-                Assert.AreEqual(AnimationLoopType.LoopForever, ((StoryboardAnimation)foreground.Elements[5]).LoopType);
+                ClassicAssert.AreEqual(AnimationLoopType.LoopForever, ((StoryboardAnimation)foreground.Elements[0]).LoopType);
+                ClassicAssert.AreEqual(AnimationLoopType.LoopOnce, ((StoryboardAnimation)foreground.Elements[1]).LoopType);
+                ClassicAssert.AreEqual(AnimationLoopType.LoopForever, ((StoryboardAnimation)foreground.Elements[2]).LoopType);
+                ClassicAssert.AreEqual(AnimationLoopType.LoopOnce, ((StoryboardAnimation)foreground.Elements[3]).LoopType);
+                ClassicAssert.AreEqual(AnimationLoopType.LoopForever, ((StoryboardAnimation)foreground.Elements[4]).LoopType);
+                ClassicAssert.AreEqual(AnimationLoopType.LoopForever, ((StoryboardAnimation)foreground.Elements[5]).LoopType);
             }
         }
 

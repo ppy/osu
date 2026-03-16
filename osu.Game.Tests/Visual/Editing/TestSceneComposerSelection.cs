@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
@@ -662,11 +663,11 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("move mouse", () => InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(50, 0)));
 
-            AddStep("aspect ratio does not equal", () => Assert.AreNotEqual(aspectRatioBeforeDrag, getAspectRatio()));
+            AddStep("aspect ratio does not equal", () => ClassicAssert.AreNotEqual(aspectRatioBeforeDrag, getAspectRatio()));
 
             AddStep("press shift", () => InputManager.PressKey(Key.ShiftLeft));
 
-            AddStep("aspect ratio does equal", () => Assert.AreEqual(aspectRatioBeforeDrag, getAspectRatio()));
+            AddStep("aspect ratio does equal", () => ClassicAssert.AreEqual(aspectRatioBeforeDrag, getAspectRatio()));
 
             AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
 
@@ -701,11 +702,11 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("move mouse", () => InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(50, 0)));
 
-            AddStep("center does not equal", () => Assert.AreNotEqual(centerBeforeDrag, getCenter()));
+            AddStep("center does not equal", () => ClassicAssert.AreNotEqual(centerBeforeDrag, getCenter()));
 
             AddStep("press alt", () => InputManager.PressKey(Key.AltLeft));
 
-            AddStep("center does equal", () => Assert.AreEqual(centerBeforeDrag, getCenter()));
+            AddStep("center does equal", () => ClassicAssert.AreEqual(centerBeforeDrag, getCenter()));
 
             AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
 
@@ -745,19 +746,19 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("move mouse", () => InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(50, 0)));
 
-            AddStep("aspect ratio does not equal", () => Assert.AreNotEqual(aspectRatioBeforeDrag, getAspectRatio()));
+            AddStep("aspect ratio does not equal", () => ClassicAssert.AreNotEqual(aspectRatioBeforeDrag, getAspectRatio()));
 
-            AddStep("center does not equal", () => Assert.AreNotEqual(centerBeforeDrag, getCenter()));
+            AddStep("center does not equal", () => ClassicAssert.AreNotEqual(centerBeforeDrag, getCenter()));
 
             AddStep("press shift", () => InputManager.PressKey(Key.ShiftLeft));
 
-            AddStep("aspect ratio does equal", () => Assert.AreEqual(aspectRatioBeforeDrag, getAspectRatio()));
+            AddStep("aspect ratio does equal", () => ClassicAssert.AreEqual(aspectRatioBeforeDrag, getAspectRatio()));
 
-            AddStep("center does not equal", () => Assert.AreNotEqual(centerBeforeDrag, getCenter()));
+            AddStep("center does not equal", () => ClassicAssert.AreNotEqual(centerBeforeDrag, getCenter()));
 
             AddStep("press alt", () => InputManager.PressKey(Key.AltLeft));
 
-            AddStep("center does equal", () => Assert.AreEqual(centerBeforeDrag, getCenter()));
+            AddStep("center does equal", () => ClassicAssert.AreEqual(centerBeforeDrag, getCenter()));
 
             AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
 
