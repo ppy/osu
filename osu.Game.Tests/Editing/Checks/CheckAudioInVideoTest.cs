@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
@@ -44,7 +45,7 @@ namespace osu.Game.Tests.Editing.Checks
         public void TestRegularVideoFile()
         {
             using (var resourceStream = TestResources.OpenResource("Videos/test-video.mp4"))
-                Assert.IsEmpty(check.Run(getContext(resourceStream)));
+                ClassicAssert.IsEmpty(check.Run(getContext(resourceStream)));
         }
 
         [Test]

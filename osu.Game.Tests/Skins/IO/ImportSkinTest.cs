@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Game.Database;
@@ -243,21 +244,21 @@ namespace osu.Game.Tests.Skins.IO
 
             await skinManager.CurrentSkinInfo.Value.PerformRead(async s =>
             {
-                Assert.IsFalse(s.Protected);
-                Assert.AreEqual(typeof(ArgonSkin), s.CreateInstance(skinManager).GetType());
+                ClassicAssert.False(s.Protected);
+                ClassicAssert.AreEqual(typeof(ArgonSkin), s.CreateInstance(skinManager).GetType());
 
                 await new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportToStreamAsync(skinManager.CurrentSkinInfo.Value, exportStream);
 
-                Assert.Greater(exportStream.Length, 0);
+                ClassicAssert.Greater(exportStream.Length, 0);
             });
 
             var imported = await skinManager.Import(new ImportTask(exportStream, "exported.osk"));
 
             imported.PerformRead(s =>
             {
-                Assert.IsFalse(s.Protected);
-                Assert.AreNotEqual(originalSkinId, s.ID);
-                Assert.AreEqual(typeof(ArgonSkin), s.CreateInstance(skinManager).GetType());
+                ClassicAssert.False(s.Protected);
+                ClassicAssert.AreNotEqual(originalSkinId, s.ID);
+                ClassicAssert.AreEqual(typeof(ArgonSkin), s.CreateInstance(skinManager).GetType());
             });
         });
 
@@ -276,21 +277,21 @@ namespace osu.Game.Tests.Skins.IO
 
             await skinManager.CurrentSkinInfo.Value.PerformRead(async s =>
             {
-                Assert.IsFalse(s.Protected);
-                Assert.AreEqual(typeof(DefaultLegacySkin), s.CreateInstance(skinManager).GetType());
+                ClassicAssert.False(s.Protected);
+                ClassicAssert.AreEqual(typeof(DefaultLegacySkin), s.CreateInstance(skinManager).GetType());
 
                 await new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportToStreamAsync(skinManager.CurrentSkinInfo.Value, exportStream);
 
-                Assert.Greater(exportStream.Length, 0);
+                ClassicAssert.Greater(exportStream.Length, 0);
             });
 
             var imported = await skinManager.Import(new ImportTask(exportStream, "exported.osk"));
 
             imported.PerformRead(s =>
             {
-                Assert.IsFalse(s.Protected);
-                Assert.AreNotEqual(originalSkinId, s.ID);
-                Assert.AreEqual(typeof(DefaultLegacySkin), s.CreateInstance(skinManager).GetType());
+                ClassicAssert.False(s.Protected);
+                ClassicAssert.AreNotEqual(originalSkinId, s.ID);
+                ClassicAssert.AreEqual(typeof(DefaultLegacySkin), s.CreateInstance(skinManager).GetType());
             });
         });
 
