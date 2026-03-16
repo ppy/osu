@@ -9,12 +9,14 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
@@ -243,5 +245,19 @@ namespace osu.Game.Scoring
         }
 
         #endregion
+
+        protected override LocalisableString DeleteModelsAbortedText => NotificationsStrings.DeleteScoresAborted;
+
+        protected override LocalisableString DeleteModelsStartingText => NotificationsStrings.DeleteScoresStarting;
+
+        protected override LocalisableString DeleteModelsRunningText(int processedCount, int totalCount) => NotificationsStrings.DeleteScoresRunning(processedCount, totalCount);
+
+        protected override LocalisableString DeleteModelsCompletedText => NotificationsStrings.DeleteScoresCompleted;
+
+        protected override LocalisableString RestoreModelsAbortedText => NotificationsStrings.RestoreScoresAborted;
+
+        protected override LocalisableString RestoreModelsRunningText(int processedCount, int totalCount) => NotificationsStrings.RestoreScoresRunning(processedCount, totalCount);
+
+        protected override LocalisableString RestoreModelsCompletedText => NotificationsStrings.RestoreScoresCompleted;
     }
 }

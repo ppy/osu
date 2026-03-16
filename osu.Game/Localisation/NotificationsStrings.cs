@@ -397,6 +397,136 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString BackgroundDataStoreProcessorFailedItems(int failedCount) => new TranslatableString(getKey(@"data_store_processor_failed_items"), @"Check logs for issues with {0} failed items.", failedCount);
 
+        /// <summary>
+        /// "All offsets have been reset!"
+        /// </summary>
+        public static LocalisableString RestoreBeatmapOffsetsCompleted => new TranslatableString(getKey(@"restore_beatmap_offsets_completed"), @"All offsets have been reset!");
+
+        /// <summary>
+        /// "No videos found to delete!"
+        /// </summary>
+        public static LocalisableString DeleteBeatmapVideosAborted => new TranslatableString(getKey(@"delete_beatmap_videos_aborted"), @"No videos found to delete!");
+
+        /// <summary>
+        /// "Preparing to delete all beatmap videos..."
+        /// </summary>
+        public static LocalisableString DeleteBeatmapVideosStarting => new TranslatableString(getKey(@"delete_beatmap_videos_starting"), @"Preparing to delete all beatmap videos...");
+
+        /// <summary>
+        /// "Deleting videos from beatmaps ({0} deleted)"
+        /// </summary>
+        public static LocalisableString DeleteBeatmapVideosRunning(int deletedCount) => new TranslatableString(getKey(@"delete_beatmap_videos_running"), @"Deleting videos from beatmaps ({0} deleted)", deletedCount);
+
+        /// <summary>
+        /// "Deleted {0} beatmap video(s)!"
+        /// </summary>
+        public static LocalisableString DeleteBeatmapVideosCompleted(int deletedCount) => new TranslatableString(getKey(@"delete_beatmap_videos_completed"), @"Deleted {0} beatmap video(s)!", deletedCount);
+
+        /// <summary>
+        /// "No beatmaps found to delete!"
+        /// </summary>
+        public static LocalisableString DeleteBeatmapsAborted => new TranslatableString(getKey(@"delete_beatmaps_aborted"), @"No beatmaps found to delete!");
+
+        /// <summary>
+        /// "Preparing to delete all beatmaps..."
+        /// </summary>
+        public static LocalisableString DeleteBeatmapsStarting => new TranslatableString(getKey(@"delete_beatmaps_starting"), @"Preparing to delete all beatmaps...");
+
+        /// <summary>
+        /// "Deleting beatmaps ({0} of {1})"
+        /// </summary>
+        public static LocalisableString DeleteBeatmapsRunning(int processedCount, int totalCount) => new TranslatableString(getKey(@"delete_beatmaps_running"), @"Deleting beatmaps ({0} of {1})", processedCount, totalCount);
+
+        /// <summary>
+        /// "Deleted all beatmaps!"
+        /// </summary>
+        public static LocalisableString DeleteBeatmapsCompleted => new TranslatableString(getKey(@"delete_beatmaps_completed"), @"Deleted all beatmaps!");
+
+        /// <summary>
+        /// "No beatmaps found to restore!"
+        /// </summary>
+        public static LocalisableString RestoreBeatmapsAborted => new TranslatableString(getKey(@"restore_beatmaps_aborted"), @"No beatmaps found to restore!");
+
+        /// <summary>
+        /// "Restoring deleted beatmaps ({0} of {1})"
+        /// </summary>
+        public static LocalisableString RestoreBeatmapsRunning(int processedCount, int totalCount) => new TranslatableString(getKey(@"restore_beatmaps_running"), @"Restoring deleted beatmaps ({0} of {1})", processedCount, totalCount);
+
+        /// <summary>
+        /// "Restored all deleted beatmaps!"
+        /// </summary>
+        public static LocalisableString RestoreBeatmapsCompleted => new TranslatableString(getKey(@"restore_beatmaps_completed"), @"Restored all deleted beatmaps!");
+
+        /// <summary>
+        /// "No scores found to delete!"
+        /// </summary>
+        public static LocalisableString DeleteScoresAborted => new TranslatableString(getKey(@"delete_scores_aborted"), @"No scores found to delete!");
+
+        /// <summary>
+        /// "Preparing to delete all scores..."
+        /// </summary>
+        public static LocalisableString DeleteScoresStarting => new TranslatableString(getKey(@"delete_scores_starting"), @"Preparing to delete all scores...");
+
+        /// <summary>
+        /// "Deleting scores ({0} of {1})"
+        /// </summary>
+        public static LocalisableString DeleteScoresRunning(int processedCount, int totalCount) => new TranslatableString(getKey(@"delete_scores_running"), @"Deleting scores ({0} of {1})", processedCount, totalCount);
+
+        /// <summary>
+        /// "Deleted all scores!"
+        /// </summary>
+        public static LocalisableString DeleteScoresCompleted => new TranslatableString(getKey(@"delete_scores_completed"), @"Deleted all scores!");
+
+        /// <summary>
+        /// "No scores found to restore!"
+        /// </summary>
+        public static LocalisableString RestoreScoresAborted => new TranslatableString(getKey(@"restore_scores_aborted"), @"No scores found to restore!");
+
+        /// <summary>
+        /// "Restoring deleted scores ({0} of {1})"
+        /// </summary>
+        public static LocalisableString RestoreScoresRunning(int processedCount, int totalCount) => new TranslatableString(getKey(@"restore_scores_running"), @"Restoring deleted scores ({0} of {1})", processedCount, totalCount);
+
+        /// <summary>
+        /// "Restored all deleted scores!"
+        /// </summary>
+        public static LocalisableString RestoreScoresCompleted => new TranslatableString(getKey(@"restore_scores_completed"), @"Restored all deleted scores!");
+
+        /// <summary>
+        /// "No skins found to delete!"
+        /// </summary>
+        public static LocalisableString DeleteSkinsAborted => new TranslatableString(getKey(@"delete_skins_aborted"), @"No skins found to delete!");
+
+        /// <summary>
+        /// "Preparing to delete all skins..."
+        /// </summary>
+        public static LocalisableString DeleteSkinsStarting => new TranslatableString(getKey(@"delete_skins_starting"), @"Preparing to delete all skins...");
+
+        /// <summary>
+        /// "Deleting skins ({0} of {1})"
+        /// </summary>
+        public static LocalisableString DeleteSkinsRunning(int processedCount, int totalCount) => new TranslatableString(getKey(@"delete_skins_running"), @"Deleting skins ({0} of {1})", processedCount, totalCount);
+
+        /// <summary>
+        /// "Deleted all skins!"
+        /// </summary>
+        public static LocalisableString DeleteSkinsCompleted => new TranslatableString(getKey(@"delete_skins_completed"), @"Deleted all skins!");
+
+        /// <summary>
+        /// "No skins found to restore!"
+        /// </summary>
+        public static LocalisableString RestoreSkinsAborted => new TranslatableString(getKey(@"restore_skins_aborted"), @"No skins found to restore!");
+
+        /// <summary>
+        /// "Restoring deleted skins ({0} of {1})"
+        /// </summary>
+        public static LocalisableString RestoreSkinsRunning(int processedCount, int totalCount) => new TranslatableString(getKey(@"restore_skins_running"), @"Restoring deleted skins ({0} of {1})", processedCount, totalCount);
+
+        /// <summary>
+        /// "Restored all deleted skins!"
+        /// </summary>
+        public static LocalisableString RestoreSkinsCompleted => new TranslatableString(getKey(@"restore_skins_completed"), @"Restored all deleted skins!");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
