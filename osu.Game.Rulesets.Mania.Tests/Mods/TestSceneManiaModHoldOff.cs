@@ -3,6 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Tests.Visual;
@@ -20,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         public void TestMapHasNoHoldNotes()
         {
             var testBeatmap = createModdedBeatmap();
-            Assert.False(testBeatmap.HitObjects.OfType<HoldNote>().Any());
+            ClassicAssert.False(testBeatmap.HitObjects.OfType<HoldNote>().Any());
         }
 
         [Test]
