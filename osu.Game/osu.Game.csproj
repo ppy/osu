@@ -18,7 +18,11 @@
     </None>
   </ItemGroup>
   <ItemGroup Label="Package References">
-    <PackageReference Include="AutoMapper" Version="16.1.1" />
+    <!-- Held back due to licencing change stupidness. Silenced vulnerability does not affect us. -->
+    <PackageReference Include="AutoMapper" Version="13.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <NoWarn>NU1903</NoWarn>
+    </PackageReference>
     <PackageReference Include="DiffPlex" Version="1.9.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
     <PackageReference Include="Humanizer" Version="3.0.10" />
