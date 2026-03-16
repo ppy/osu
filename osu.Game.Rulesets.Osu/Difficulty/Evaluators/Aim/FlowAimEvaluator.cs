@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 flowDifficulty += overlapVelocityBuff * distRatio * velocity_change_multiplier;
             }
 
-            if (osuCurrObj.BaseObject is Slider)
+            if (osuCurrObj.BaseObject is Slider && withSliderTravelDistance)
             {
                 // Include slider velocity to make velocity more consistent with snap
                 flowDifficulty += osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
