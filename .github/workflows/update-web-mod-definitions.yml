@@ -38,8 +38,12 @@ jobs:
       run: ./UseLocalOsu.sh
       working-directory: ./osu-tools
 
+    - name: Build tools
+      run: dotnet build PerformanceCalculator --nologo --verbosity quiet
+      working-directory: ./osu-tools
+
     - name: Regenerate mod definitions
-      run: dotnet run --project PerformanceCalculator -- mods > ../osu-web/database/mods.json
+      run: dotnet run --project PerformanceCalculator --no-build -- mods > ../osu-web/database/mods.json
       working-directory: ./osu-tools
 
     - name: Create pull request with changes
