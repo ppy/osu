@@ -25,7 +25,8 @@
     </PackageReference>
     <PackageReference Include="DiffPlex" Version="1.9.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
-    <PackageReference Include="Humanizer" Version="3.0.10" />
+    <!-- Held back due to .NET 9 requirement. See https://github.com/Humanizr/Humanizer?tab=readme-ov-file#supported-frameworks-->
+    <PackageReference Include="Humanizer" Version="2.14.1" />
     <PackageReference Include="MessagePack" Version="3.1.4" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="10.0.5" />
