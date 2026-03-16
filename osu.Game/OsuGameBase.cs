@@ -534,27 +534,17 @@ namespace osu.Game
         }
 
         /// <summary>
-        /// A special case action which is intended to restart or update the application on exit.
-        ///
-        /// It will be started as the main menu outro animation begins displaying, allowing a short window of
-        /// time which it can run tasks before the application quits.
+        /// An action that restarts the application after it has exited.
         /// </summary>
         [CanBeNull]
-        public Action RunOnExiting { private get; set; }
+        public Action RestartOnExitAction { private get; set; }
 
         /// <summary>
-        /// After an exit has been attempted via <see cref="AttemptExit"/>, this method can be called to
-        /// signal that the exit attempt has been cancelled.
+        /// Signals that the application should not be restarted after it is exited.
         /// </summary>
-        public void CancelExit() => RunOnExiting = null;
-
-        /// <summary>
-        /// When exiting has been confirmed, this should be called to run any pending exit action.
-        /// </summary>
-        protected void ConfirmExit()
+        public void CancelRestartOnExit()
         {
-            RunOnExiting?.Invoke();
-            RunOnExiting = null;
+            RestartOnExitAction = null;
         }
 
         /// <summary>
@@ -762,8 +752,6 @@ namespace osu.Game
         {
             base.Dispose(isDisposing);
 
-            ConfirmExit();
-
             RulesetStore?.Dispose();
             LocalConfig?.Dispose();
 
@@ -773,6 +761,8 @@ namespace osu.Game
 
             if (Host != null)
                 Host.ExceptionThrown -= onExceptionThrown;
+
+            RestartOnExitAction?.Invoke();
         }
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => Beatmap.Value.BeatmapLoaded ? Beatmap.Value.Beatmap.ControlPointInfo : null;

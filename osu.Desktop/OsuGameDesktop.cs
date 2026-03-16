@@ -5,7 +5,6 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
-using System.Threading.Tasks;
 using Microsoft.Win32;
 using osu.Desktop.Performance;
 using osu.Desktop.Security;
@@ -20,7 +19,6 @@ using osu.Framework.Allocation;
 using osu.Game.Configuration;
 using osu.Game.IO;
 using osu.Game.IPC;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Performance;
 using osu.Game.Utils;
 
@@ -123,7 +121,7 @@ namespace osu.Desktop
 
         public override bool RestartAppWhenExited()
         {
-            RunOnExiting = () => Task.Run(() => Velopack.UpdateExe.Start(waitPid: (uint)Environment.ProcessId)).FireAndForget();
+            RestartOnExitAction = () => Velopack.UpdateExe.Start(waitPid: (uint)Environment.ProcessId);
             return true;
         }
 
