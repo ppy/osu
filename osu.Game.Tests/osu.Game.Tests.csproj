@@ -3,7 +3,6 @@
   <ItemGroup Label="Package References">
     <PackageReference Include="Bogus" Version="35.6.5" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
-    <PackageReference Include="DeepEqual" Version="5.1.0" />
     <PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
     <PackageReference Include="NUnit" Version="4.5.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="6.1.0" />

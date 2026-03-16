@@ -5,7 +5,6 @@
 
 using System.IO;
 using System.Linq;
-using DeepEqual.Syntax;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using osu.Game.Audio;
@@ -16,7 +15,6 @@ using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Tests.Resources;
 using osuTK;
 
@@ -151,20 +149,20 @@ namespace osu.Game.Tests.Beatmaps.Formats
             ClassicAssert.True(beatmap.HitObjects[1].Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP));
         }
 
-        [TestCase(normal)]
-        [TestCase(marathon)]
-        [Ignore("temporarily disabled pending DeepEqual fix (https://github.com/jamesfoster/DeepEqual/pull/35)")]
-        // Currently fails:
-        // [TestCase(with_sb)]
-        public void TestParity(string beatmap)
-        {
-            var legacy = decode(beatmap, out Beatmap json);
-            json.WithDeepEqual(legacy)
-                .IgnoreProperty(r => r.DeclaringType == typeof(HitWindows)
-                                     // Todo: CustomSampleBank shouldn't exist going forward, we need a conversion mechanism
-                                     || r.Name == nameof(LegacyDecoder<Beatmap>.LegacySampleControlPoint.CustomSampleBank))
-                .Assert();
-        }
+        // [TestCase(normal)]
+        // [TestCase(marathon)]
+        // [Ignore("temporarily disabled pending DeepEqual fix (https://github.com/jamesfoster/DeepEqual/pull/35)")]
+        // // Currently fails:
+        // // [TestCase(with_sb)]
+        // public void TestParity(string beatmap)
+        // {
+        //     var legacy = decode(beatmap, out Beatmap json);
+        //     json.WithDeepEqual(legacy)
+        //         .IgnoreProperty(r => r.DeclaringType == typeof(HitWindows)
+        //                              // Todo: CustomSampleBank shouldn't exist going forward, we need a conversion mechanism
+        //                              || r.Name == nameof(LegacyDecoder<Beatmap>.LegacySampleControlPoint.CustomSampleBank))
+        //         .Assert();
+        // }
 
         [Test]
         public void TestGetJsonDecoder()
