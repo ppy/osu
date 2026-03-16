@@ -9,12 +9,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Notifications;
 using Realms;
 
@@ -280,5 +282,21 @@ namespace osu.Game.Skinning
 
             return hadChanges;
         }
+
+        protected override LocalisableString ImportAbortedText => NotificationsStrings.ImportSkinsAborted;
+
+        protected override LocalisableString ImportStartingText => NotificationsStrings.ImportSkinsStarting;
+
+        protected override LocalisableString ImportRunningText(int processedCount, int totalCount) => NotificationsStrings.ImportSkinsRunning(processedCount, totalCount);
+
+        protected override LocalisableString ImportCompletedText(int totalCount) => NotificationsStrings.ImportSkinsCompleted(totalCount);
+
+        protected override LocalisableString ImportIncompletedText(int processedCount, int totalCount) => NotificationsStrings.ImportSkinsIncompleted(processedCount, totalCount);
+
+        protected override LocalisableString ImportFailedText => NotificationsStrings.ImportSkinsFailed;
+
+        protected override LocalisableString ImportPausedText => NotificationsStrings.ImportSkinsPaused;
+
+        protected override LocalisableString ImportResumingText => NotificationsStrings.ImportSkinsResuming;
     }
 }

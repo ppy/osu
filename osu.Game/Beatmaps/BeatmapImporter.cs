@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.Formats;
@@ -18,6 +19,7 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects.Types;
@@ -455,5 +457,21 @@ namespace osu.Game.Beatmaps
 
             return beatmaps;
         }
+
+        protected override LocalisableString ImportAbortedText => NotificationsStrings.ImportBeatmapsAborted;
+
+        protected override LocalisableString ImportStartingText => NotificationsStrings.ImportBeatmapsStarting;
+
+        protected override LocalisableString ImportRunningText(int processedCount, int totalCount) => NotificationsStrings.ImportBeatmapsRunning(processedCount, totalCount);
+
+        protected override LocalisableString ImportCompletedText(int totalCount) => NotificationsStrings.ImportBeatmapsCompleted(totalCount);
+
+        protected override LocalisableString ImportIncompletedText(int processedCount, int totalCount) => NotificationsStrings.ImportBeatmapsIncompleted(processedCount, totalCount);
+
+        protected override LocalisableString ImportFailedText => NotificationsStrings.ImportBeatmapsFailed;
+
+        protected override LocalisableString ImportPausedText => NotificationsStrings.ImportBeatmapsPaused;
+
+        protected override LocalisableString ImportResumingText => NotificationsStrings.ImportBeatmapsResuming;
     }
 }
