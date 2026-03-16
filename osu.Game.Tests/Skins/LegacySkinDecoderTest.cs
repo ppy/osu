@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Skins
 
                 ClassicAssert.AreEqual(expectedColors.Count, comboColors?.Count);
                 for (int i = 0; i < expectedColors.Count; i++)
-                    ClassicAssert.AreEqual(expectedColors[i], comboColors[i]);
+                    ClassicAssert.AreEqual(expectedColors[i], comboColors![i]);
             }
         }
 
@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Skins
 
                 ClassicAssert.AreEqual(expectedColors.Count, comboColors?.Count);
                 for (int i = 0; i < expectedColors.Count; i++)
-                    ClassicAssert.AreEqual(expectedColors[i], comboColors[i]);
+                    ClassicAssert.AreEqual(expectedColors[i], comboColors![i]);
             }
         }
 

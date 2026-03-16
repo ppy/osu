@@ -26,7 +26,7 @@ namespace osu.Game.Tests.NonVisual.Ranking
 
             var unstableRate = new UnstableRate(events);
 
-            ClassicAssert.NotNull(unstableRate.Value);
+            Assert.That(unstableRate.Value, Is.Not.Null);
             ClassicAssert.AreEqual(unstableRate.Value.Value, 10 * Math.Sqrt(10), Precision.DOUBLE_EPSILON);
         }
 

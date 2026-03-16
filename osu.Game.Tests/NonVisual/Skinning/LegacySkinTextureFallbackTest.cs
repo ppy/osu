@@ -94,7 +94,7 @@ namespace osu.Game.Tests.NonVisual.Skinning
 
             var texture = legacySkin.GetTexture(requestedComponent);
 
-            ClassicAssert.NotNull(texture);
+            Assert.That(texture, Is.Not.Null);
             ClassicAssert.AreEqual(textureStore.Textures[expectedTexture].Width, texture.Width);
             ClassicAssert.AreEqual(expectedScale, texture.ScaleAdjust);
         }
@@ -118,12 +118,12 @@ namespace osu.Game.Tests.NonVisual.Skinning
 
             var texture = legacySkin.GetTexture("hitcircle");
 
-            ClassicAssert.NotNull(texture);
+            Assert.That(texture, Is.Not.Null);
             Assert.That(texture.ScaleAdjust, Is.EqualTo(1));
 
             var twoTimesTexture = legacySkin.GetTexture("hitcircle@2x");
 
-            ClassicAssert.NotNull(twoTimesTexture);
+            Assert.That(twoTimesTexture, Is.Not.Null);
             Assert.That(twoTimesTexture.ScaleAdjust, Is.EqualTo(1));
 
             ClassicAssert.AreNotEqual(texture, twoTimesTexture);
@@ -137,12 +137,12 @@ namespace osu.Game.Tests.NonVisual.Skinning
 
             var texture = legacySkin.GetTexture("hitcircle");
 
-            ClassicAssert.NotNull(texture);
+            Assert.That(texture, Is.Not.Null);
             Assert.That(texture.ScaleAdjust, Is.EqualTo(2));
 
             var twoTimesTexture = legacySkin.GetTexture("hitcircle@2x");
 
-            ClassicAssert.NotNull(twoTimesTexture);
+            Assert.That(twoTimesTexture, Is.Not.Null);
             Assert.That(twoTimesTexture.ScaleAdjust, Is.EqualTo(2));
 
             ClassicAssert.AreEqual(texture, twoTimesTexture);

@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Online
 
             var converted = deserialized?.ToMod(new TestRuleset());
 
-            ClassicAssert.NotNull(converted);
+            Assert.That(converted, Is.Not.Null);
             Assert.That(converted, Is.TypeOf(typeof(UnknownMod)));
             Assert.That(converted.Type, Is.EqualTo(ModType.System));
             Assert.That(converted.Acronym, Is.EqualTo("WNG??"));

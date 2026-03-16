@@ -111,8 +111,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var curveData = beatmap.HitObjects[0] as IHasPathWithRepeats;
             var positionData = beatmap.HitObjects[0] as IHasPosition;
 
-            ClassicAssert.NotNull(positionData);
-            ClassicAssert.NotNull(curveData);
+            Assert.That(positionData, Is.Not.Null);
+            Assert.That(curveData, Is.Not.Null);
             ClassicAssert.AreEqual(90, curveData.Path.Distance);
             ClassicAssert.AreEqual(new Vector2(192, 168), positionData.Position);
             ClassicAssert.AreEqual(956, beatmap.HitObjects[0].StartTime);
@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             positionData = beatmap.HitObjects[1] as IHasPosition;
 
-            ClassicAssert.NotNull(positionData);
+            Assert.That(positionData, Is.Not.Null);
             ClassicAssert.AreEqual(new Vector2(304, 56), positionData.Position);
             ClassicAssert.AreEqual(1285, beatmap.HitObjects[1].StartTime);
             ClassicAssert.True(beatmap.HitObjects[1].Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP));
@@ -134,8 +134,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var curveData = beatmap.HitObjects[0] as IHasPathWithRepeats;
             var positionData = beatmap.HitObjects[0] as IHasPosition;
 
-            ClassicAssert.NotNull(positionData);
-            ClassicAssert.NotNull(curveData);
+            Assert.That(positionData, Is.Not.Null);
+            Assert.That(curveData, Is.Not.Null);
             ClassicAssert.AreEqual(90, curveData.Path.Distance);
             ClassicAssert.AreEqual(new Vector2(192, 168), positionData.Position);
             ClassicAssert.AreEqual(956, beatmap.HitObjects[0].StartTime);
@@ -143,7 +143,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             positionData = beatmap.HitObjects[1] as IHasPosition;
 
-            ClassicAssert.NotNull(positionData);
+            Assert.That(positionData, Is.Not.Null);
             ClassicAssert.AreEqual(new Vector2(304, 56), positionData.Position);
             ClassicAssert.AreEqual(1285, beatmap.HitObjects[1].StartTime);
             ClassicAssert.True(beatmap.HitObjects[1].Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP));
