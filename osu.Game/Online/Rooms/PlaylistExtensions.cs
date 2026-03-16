@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
+using Humanizer.Localisation;
 using osu.Game.Rulesets;
 using osu.Game.Utils;
 

@@ -4,6 +4,7 @@
 using System;
 using System.Globalization;
 using Humanizer;
+using Humanizer.Localisation;
 
 namespace osu.Game.Utils
 {
