@@ -292,7 +292,7 @@ namespace osu.Game.Tests.Database
 
                 try
                 {
-                    using (var zip = ZipArchive.Open(temp))
+                    using (var zip = ZipArchive.OpenArchive(temp))
                         zip.WriteToDirectory(extractedFolder);
 
                     foreach (var file in new DirectoryInfo(extractedFolder).GetFiles("*.osu"))
@@ -333,10 +333,10 @@ namespace osu.Game.Tests.Database
 
                     string hashBefore = hashFile(temp);
 
-                    using (var zip = ZipArchive.Open(temp))
+                    using (var zip = ZipArchive.OpenArchive(temp))
                         zip.WriteToDirectory(extractedFolder);
 
-                    using (var zip = ZipArchive.Create())
+                    using (var zip = ZipArchive.CreateArchive())
                     {
                         zip.AddAllFromDirectory(extractedFolder);
                         zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
@@ -382,7 +382,7 @@ namespace osu.Game.Tests.Database
 
                     await createScoreForBeatmap(realm.Realm, imported.Beatmaps.First());
 
-                    using (var zip = ZipArchive.Open(temp))
+                    using (var zip = ZipArchive.OpenArchive(temp))
                         zip.WriteToDirectory(extractedFolder);
 
                     // arbitrary write to hashed file
@@ -390,7 +390,7 @@ namespace osu.Game.Tests.Database
                     using (var sw = new FileInfo(Directory.GetFiles(extractedFolder, "*.osu").First()).AppendText())
                         await sw.WriteLineAsync("// changed");
 
-                    using (var zip = ZipArchive.Create())
+                    using (var zip = ZipArchive.CreateArchive())
                     {
                         zip.AddAllFromDirectory(extractedFolder);
                         zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
@@ -533,14 +533,14 @@ namespace osu.Game.Tests.Database
                 {
                     var imported = await LoadOszIntoStore(importer, realm.Realm);
 
-                    using (var zip = ZipArchive.Open(temp))
+                    using (var zip = ZipArchive.OpenArchive(temp))
                         zip.WriteToDirectory(extractedFolder);
 
                     // arbitrary write to non-hashed file
                     using (var sw = new FileInfo(Directory.GetFiles(extractedFolder, "*.mp3").First()).AppendText())
                         await sw.WriteLineAsync("text");
 
-                    using (var zip = ZipArchive.Create())
+                    using (var zip = ZipArchive.CreateArchive())
                     {
                         zip.AddAllFromDirectory(extractedFolder);
                         zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
@@ -581,14 +581,14 @@ namespace osu.Game.Tests.Database
                 {
                     var imported = await LoadOszIntoStore(importer, realm.Realm);
 
-                    using (var zip = ZipArchive.Open(temp))
+                    using (var zip = ZipArchive.OpenArchive(temp))
                         zip.WriteToDirectory(extractedFolder);
 
                     // change filename
                     var firstFile = new FileInfo(Directory.GetFiles(extractedFolder).First());
                     firstFile.MoveTo(Path.Combine(firstFile.DirectoryName.AsNonNull(), $"{firstFile.Name}-changed{firstFile.Extension}"));
 
-                    using (var zip = ZipArchive.Create())
+                    using (var zip = ZipArchive.CreateArchive())
                     {
                         zip.AddAllFromDirectory(extractedFolder);
                         zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
@@ -659,7 +659,7 @@ namespace osu.Game.Tests.Database
 
                 var zipStream = new MemoryStream();
 
-                using (var zip = ZipArchive.Create())
+                using (var zip = ZipArchive.CreateArchive())
                     zip.SaveTo(zipStream, new ZipWriterOptions(CompressionType.Deflate));
 
                 var imported = await importer.Import(
@@ -709,7 +709,7 @@ namespace osu.Game.Tests.Database
                 File.Delete(brokenTempFilename);
 
                 using (var outStream = File.Open(brokenTempFilename, FileMode.CreateNew))
-                using (var zip = ZipArchive.Open(brokenOsz))
+                using (var zip = ZipArchive.OpenArchive(brokenOsz))
                 {
                     foreach (var entry in zip.Entries.ToArray())
                     {
@@ -787,13 +787,13 @@ namespace osu.Game.Tests.Database
 
                 try
                 {
-                    using (var zip = ZipArchive.Open(pathOriginal))
+                    using (var zip = ZipArchive.OpenArchive(pathOriginal))
                         zip.WriteToDirectory(extractedFolder);
 
                     // remove one difficulty before first import
                     new FileInfo(Directory.GetFiles(extractedFolder, "*.osu").First()).Delete();
 
-                    using (var zip = ZipArchive.Create())
+                    using (var zip = ZipArchive.CreateArchive())
                     {
                         zip.AddAllFromDirectory(extractedFolder);
                         zip.SaveTo(pathMissingOneBeatmap, new ZipWriterOptions(CompressionType.Deflate));
@@ -994,10 +994,10 @@ namespace osu.Game.Tests.Database
 
                 try
                 {
-                    using (var zip = ZipArchive.Open(temp))
+                    using (var zip = ZipArchive.OpenArchive(temp))
                         zip.WriteToDirectory(extractedFolder);
 
-                    using (var zip = ZipArchive.Create())
+                    using (var zip = ZipArchive.CreateArchive())
                     {
                         zip.AddAllFromDirectory(extractedFolder);
                         zip.AddEntry("duplicate.osu", Directory.GetFiles(extractedFolder, "*.osu").First());
@@ -1030,7 +1030,7 @@ namespace osu.Game.Tests.Database
 
                 try
                 {
-                    using (var zip = ZipArchive.Open(temp))
+                    using (var zip = ZipArchive.OpenArchive(temp))
                         zip.WriteToDirectory(extractedFolder);
 
                     var subdirectory = Directory.CreateDirectory(Path.Combine(extractedFolder, "subdir"));
@@ -1041,7 +1041,7 @@ namespace osu.Game.Tests.Database
                     using (var textWriter = new StreamWriter(stream))
                         await textWriter.WriteLineAsync("# adding a comment so that the hashes are different");
 
-                    using (var zip = ZipArchive.Create())
+                    using (var zip = ZipArchive.CreateArchive())
                     {
                         zip.AddAllFromDirectory(extractedFolder);
                         zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
@@ -1075,10 +1075,10 @@ namespace osu.Game.Tests.Database
 
                 try
                 {
-                    using (var zip = ZipArchive.Open(temp))
+                    using (var zip = ZipArchive.OpenArchive(temp))
                         zip.WriteToDirectory(subfolder);
 
-                    using (var zip = ZipArchive.Create())
+                    using (var zip = ZipArchive.CreateArchive())
                     {
                         zip.AddAllFromDirectory(extractedFolder);
                         zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
@@ -1125,10 +1125,10 @@ namespace osu.Game.Tests.Database
 
                 try
                 {
-                    using (var zip = ZipArchive.Open(temp))
+                    using (var zip = ZipArchive.OpenArchive(temp))
                         zip.WriteToDirectory(dataFolder);
 
-                    using (var zip = ZipArchive.Create())
+                    using (var zip = ZipArchive.CreateArchive())
                     {
                         zip.AddAllFromDirectory(extractedFolder);
                         zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
