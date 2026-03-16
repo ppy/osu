@@ -9,6 +9,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -20,9 +21,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 {
     public partial class IntroScreen : RankedPlaySubScreen
     {
+        protected override LocalisableString StageHeading => string.Empty;
+        protected override LocalisableString StageCaption => string.Empty;
+
         public IntroScreen()
         {
             CornerPieceVisibility.Value = Visibility.Hidden;
+            CountdownVisibility.Value = Visibility.Hidden;
         }
 
         [Resolved]

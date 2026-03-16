@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Skins
                 mockResourceStore = new Mock<IResourceStore<byte[]>>();
                 mockResourceStore.Setup(r => r.Get(It.IsAny<string>()))
                                  .Callback<string>(n => lookedUpFileNames.Add(n))
-                                 .Returns<byte>(null);
+                                 .Returns<byte>(null!);
             });
 
             AddStep("query sample", () =>

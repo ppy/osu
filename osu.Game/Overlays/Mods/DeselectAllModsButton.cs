@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateEnabledState()
         {
-            Enabled.Value = selectedMods.Value.Any();
+            Enabled.Value = selectedMods.Value.Any(m => m.Type != ModType.System);
         }
     }
 }
