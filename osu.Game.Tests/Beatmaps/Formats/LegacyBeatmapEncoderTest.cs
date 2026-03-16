@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -100,7 +101,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 // emulate non-legacy control points by cloning the non-legacy portion.
                 // the assertion is that the encoder can recreate this losslessly from hitobject data.
-                Assert.IsInstanceOf<LegacyControlPointInfo>(controlPointInfo);
+                ClassicAssert.IsInstanceOf<LegacyControlPointInfo>(controlPointInfo);
 
                 var newControlPoints = new ControlPointInfo();
 
@@ -129,7 +130,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.That(actual.beatmap.HitObjects.Serialize(), Is.EqualTo(expected.beatmap.HitObjects.Serialize()));
 
             // Check skin.
-            Assert.IsTrue(areComboColoursEqual(expected.skin.Configuration, actual.skin.Configuration));
+            ClassicAssert.True(areComboColoursEqual(expected.skin.Configuration, actual.skin.Configuration));
         }
 
         [Test]

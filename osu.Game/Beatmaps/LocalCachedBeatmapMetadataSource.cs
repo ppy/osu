@@ -205,7 +205,7 @@ namespace osu.Game.Beatmaps
                         // ensure to clobber any and all existing data to avoid accidental corruption.
                         outStream.SetLength(0);
 
-                        using (var bz2 = new BZip2Stream(stream, CompressionMode.Decompress, false))
+                        using (var bz2 = BZip2Stream.Create(stream, CompressionMode.Decompress, false))
                             bz2.CopyTo(outStream);
                     }
 

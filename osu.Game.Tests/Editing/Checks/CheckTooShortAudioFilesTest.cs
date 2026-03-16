@@ -7,6 +7,7 @@ using System.Linq;
 using ManagedBass;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
@@ -52,7 +53,7 @@ namespace osu.Game.Tests.Editing.Checks
             beatmap.BeatmapInfo.BeatmapSet.Files.Add(CheckTestHelpers.CreateMockFile("jpg"));
 
             // Should fail to load, but not produce an error due to the extension not being expected to load.
-            Assert.IsEmpty(check.Run(getContext(null)));
+            ClassicAssert.IsEmpty(check.Run(getContext(null)));
         }
 
         [Test]
@@ -60,7 +61,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             using (var resourceStream = TestResources.OpenResource("Samples/test-sample.mp3"))
             {
-                Assert.IsEmpty(check.Run(getContext(resourceStream)));
+                ClassicAssert.IsEmpty(check.Run(getContext(resourceStream)));
             }
         }
 
@@ -70,7 +71,7 @@ namespace osu.Game.Tests.Editing.Checks
             using (var resourceStream = TestResources.OpenResource("Samples/blank.wav"))
             {
                 // This is a 0 ms duration audio file, commonly used to silence sliderslides/ticks, and so should be fine.
-                Assert.IsEmpty(check.Run(getContext(resourceStream)));
+                ClassicAssert.IsEmpty(check.Run(getContext(resourceStream)));
             }
         }
 
@@ -91,13 +92,13 @@ namespace osu.Game.Tests.Editing.Checks
         {
             using (var resourceStream = TestResources.OpenResource("Samples/missing.mp3"))
             {
-                Assert.IsEmpty(check.Run(getContext(resourceStream)));
+                ClassicAssert.IsEmpty(check.Run(getContext(resourceStream)));
             }
         }
 
         private BeatmapVerifierContext getContext(Stream? resourceStream)
         {
-            var mockWorkingBeatmap = new Mock<TestWorkingBeatmap>(beatmap, null, null);
+            var mockWorkingBeatmap = new Mock<TestWorkingBeatmap>(beatmap, null!, null!);
             mockWorkingBeatmap.Setup(w => w.GetStream(It.IsAny<string>())).Returns(resourceStream);
 
             return new BeatmapVerifierContext(beatmap, mockWorkingBeatmap.Object);

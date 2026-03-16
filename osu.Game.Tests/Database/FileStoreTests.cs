@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Logging;
 using osu.Game.Database;
 using osu.Game.Extensions;
@@ -26,8 +27,8 @@ namespace osu.Game.Tests.Database
 
                 realm.Write(() => files.Add(testData, realm));
 
-                Assert.True(files.Storage.Exists("0/05/054edec1d0211f624fed0cbca9d4f9400b0e491c43742af2c5b0abebf0c990d8"));
-                Assert.True(files.Storage.Exists(realm.All<RealmFile>().First().GetStoragePath()));
+                ClassicAssert.True(files.Storage.Exists("0/05/054edec1d0211f624fed0cbca9d4f9400b0e491c43742af2c5b0abebf0c990d8"));
+                ClassicAssert.True(files.Storage.Exists(realm.All<RealmFile>().First().GetStoragePath()));
             });
         }
 
@@ -44,7 +45,7 @@ namespace osu.Game.Tests.Database
                 realm.Write(() => files.Add(testData, realm));
                 realm.Write(() => files.Add(testData, realm));
 
-                Assert.AreEqual(1, realm.All<RealmFile>().Count());
+                ClassicAssert.AreEqual(1, realm.All<RealmFile>().Count());
             });
         }
 
@@ -75,15 +76,15 @@ namespace osu.Game.Tests.Database
 
                 string path = file.GetStoragePath();
 
-                Assert.True(realm.All<RealmFile>().Any());
-                Assert.True(files.Storage.Exists(path));
+                ClassicAssert.True(realm.All<RealmFile>().Any());
+                ClassicAssert.True(files.Storage.Exists(path));
 
                 files.Cleanup();
                 Logger.Log($"Cleanup complete at {timer.ElapsedMilliseconds}");
 
-                Assert.True(realm.All<RealmFile>().Any());
-                Assert.True(file.IsValid);
-                Assert.True(files.Storage.Exists(path));
+                ClassicAssert.True(realm.All<RealmFile>().Any());
+                ClassicAssert.True(file.IsValid);
+                ClassicAssert.True(files.Storage.Exists(path));
             });
         }
 
@@ -99,14 +100,14 @@ namespace osu.Game.Tests.Database
 
                 string path = file.GetStoragePath();
 
-                Assert.True(realm.All<RealmFile>().Any());
-                Assert.True(files.Storage.Exists(path));
+                ClassicAssert.True(realm.All<RealmFile>().Any());
+                ClassicAssert.True(files.Storage.Exists(path));
 
                 files.Cleanup();
 
-                Assert.False(realm.All<RealmFile>().Any());
-                Assert.False(file.IsValid);
-                Assert.False(files.Storage.Exists(path));
+                ClassicAssert.False(realm.All<RealmFile>().Any());
+                ClassicAssert.False(file.IsValid);
+                ClassicAssert.False(files.Storage.Exists(path));
             });
         }
     }

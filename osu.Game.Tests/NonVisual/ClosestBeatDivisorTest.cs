@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
@@ -97,7 +98,7 @@ namespace osu.Game.Tests.NonVisual
             };
 
             for (int i = 0; i < divisors.Count; ++i)
-                Assert.AreEqual(closestDivisors[i], beatmap.ControlPointInfo.GetClosestBeatDivisor(beatmap.HitObjects[i].StartTime), $"at index {i}");
+                ClassicAssert.AreEqual(closestDivisors[i], beatmap.ControlPointInfo.GetClosestBeatDivisor(beatmap.HitObjects[i].StartTime), $"at index {i}");
         }
     }
 }

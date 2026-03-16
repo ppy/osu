@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -29,7 +30,7 @@ namespace osu.Game.Tests.Beatmaps
 
             working.ResetEvent.Set();
 
-            Assert.NotNull(working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo));
+            ClassicAssert.NotNull(working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo));
         }
 
         [Test]
@@ -48,11 +49,11 @@ namespace osu.Game.Tests.Beatmaps
                 loadCompleted.Set();
             }, TaskCreationOptions.LongRunning);
 
-            Assert.IsTrue(loadStarted.Wait(10000));
+            ClassicAssert.True(loadStarted.Wait(10000));
 
             cts.Cancel();
 
-            Assert.IsTrue(loadCompleted.Wait(10000));
+            ClassicAssert.True(loadCompleted.Wait(10000));
 
             working.ResetEvent.Set();
         }

@@ -9,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
@@ -58,18 +59,18 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var score = decoder.Parse(resourceStream);
 
-                Assert.AreEqual(3, score.ScoreInfo.Ruleset.OnlineID);
+                ClassicAssert.AreEqual(3, score.ScoreInfo.Ruleset.OnlineID);
 
-                Assert.AreEqual(2, score.ScoreInfo.Statistics[HitResult.Great]);
-                Assert.AreEqual(1, score.ScoreInfo.Statistics[HitResult.Good]);
+                ClassicAssert.AreEqual(2, score.ScoreInfo.Statistics[HitResult.Great]);
+                ClassicAssert.AreEqual(1, score.ScoreInfo.Statistics[HitResult.Good]);
 
-                Assert.AreEqual(829_931, score.ScoreInfo.LegacyTotalScore);
-                Assert.AreEqual(3, score.ScoreInfo.MaxCombo);
+                ClassicAssert.AreEqual(829_931, score.ScoreInfo.LegacyTotalScore);
+                ClassicAssert.AreEqual(3, score.ScoreInfo.MaxCombo);
 
                 Assert.That(score.ScoreInfo.APIMods.Select(m => m.Acronym), Is.EquivalentTo(new[] { "CL", "9K", "DS" }));
 
                 Assert.That((2 * 300d + 1 * 200) / (3 * 305d), Is.EqualTo(score.ScoreInfo.Accuracy).Within(0.0001));
-                Assert.AreEqual(ScoreRank.B, score.ScoreInfo.Rank);
+                ClassicAssert.AreEqual(ScoreRank.B, score.ScoreInfo.Rank);
 
                 Assert.That(score.Replay.Frames, Has.One.Matches<ManiaReplayFrame>(frame =>
                     frame.Time == 414 && frame.Actions.SequenceEqual(new[] { ManiaAction.Key1, ManiaAction.Key18 })));
@@ -85,10 +86,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var score = decoder.Parse(resourceStream);
 
-                Assert.AreEqual(1, score.ScoreInfo.Ruleset.OnlineID);
-                Assert.AreEqual(4, score.ScoreInfo.Statistics[HitResult.Great]);
-                Assert.AreEqual(2, score.ScoreInfo.Statistics[HitResult.LargeBonus]);
-                Assert.AreEqual(4, score.ScoreInfo.MaxCombo);
+                ClassicAssert.AreEqual(1, score.ScoreInfo.Ruleset.OnlineID);
+                ClassicAssert.AreEqual(4, score.ScoreInfo.Statistics[HitResult.Great]);
+                ClassicAssert.AreEqual(2, score.ScoreInfo.Statistics[HitResult.LargeBonus]);
+                ClassicAssert.AreEqual(4, score.ScoreInfo.MaxCombo);
 
                 Assert.That(score.Replay.Frames, Is.Not.Empty);
             }

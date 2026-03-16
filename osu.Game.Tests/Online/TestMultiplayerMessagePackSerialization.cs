@@ -3,6 +3,7 @@
 
 using MessagePack;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Online;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
@@ -24,7 +25,7 @@ namespace osu.Game.Tests.Online
 
             var deserialized = MessagePackSerializer.Deserialize<MultiplayerRoom>(serialized);
 
-            Assert.IsTrue(deserialized.MatchState is TeamVersusRoomState);
+            ClassicAssert.True(deserialized.MatchState is TeamVersusRoomState);
         }
 
         [Test]
@@ -35,7 +36,7 @@ namespace osu.Game.Tests.Online
             byte[] serialized = MessagePackSerializer.Serialize(typeof(MatchUserState), state);
             var deserialized = MessagePackSerializer.Deserialize<MatchUserState>(serialized);
 
-            Assert.IsTrue(deserialized is TeamVersusUserState);
+            ClassicAssert.True(deserialized is TeamVersusUserState);
         }
 
         [Test]
@@ -66,7 +67,7 @@ namespace osu.Game.Tests.Online
 
             // works with custom resolver.
             var deserialized = MessagePackSerializer.Deserialize<MatchUserState>(serialized, SignalRUnionWorkaroundResolver.OPTIONS);
-            Assert.IsTrue(deserialized is TeamVersusUserState);
+            ClassicAssert.True(deserialized is TeamVersusUserState);
         }
     }
 }

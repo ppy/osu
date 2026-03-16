@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -36,7 +37,7 @@ namespace osu.Game.Tests.Online
 
             var converted = deserialized?.ToMod(new TestRuleset());
 
-            Assert.NotNull(converted);
+            Assert.That(converted, Is.Not.Null);
             Assert.That(converted, Is.TypeOf(typeof(UnknownMod)));
             Assert.That(converted.Type, Is.EqualTo(ModType.System));
             Assert.That(converted.Acronym, Is.EqualTo("WNG??"));
@@ -157,7 +158,7 @@ namespace osu.Game.Tests.Online
 
             mod.TestSetting.Value = mod.TestSetting.Default;
             JObject serialised = JObject.Parse(JsonConvert.SerializeObject(new APIMod(mod)));
-            Assert.False(serialised.ContainsKey("settings"));
+            ClassicAssert.False(serialised.ContainsKey("settings"));
         }
 
         private class TestRuleset : Ruleset

@@ -120,7 +120,7 @@ namespace osu.Game.Scoring.Legacy
 
             using (var outStream = new MemoryStream())
             {
-                using (var lzma = new LzmaStream(new LzmaEncoderProperties(false, 1 << 21, 255), false, outStream))
+                using (var lzma = LzmaStream.Create(new LzmaEncoderProperties(false, 1 << 21, 255), false, outStream))
                 {
                     outStream.Write(lzma.Properties);
 
