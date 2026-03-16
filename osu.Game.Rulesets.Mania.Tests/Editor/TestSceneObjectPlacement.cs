@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             AddStep("change seek setting to true", () => config.SetValue(OsuSetting.EditorAutoSeekOnPlacement, true));
             placeObject();
             AddUntilStep("wait for seek to complete", () => !EditorClock.IsSeeking);
-            AddAssert("seeked forward to object", () => EditorClock.CurrentTime, () => Is.GreaterThan(initialTime));
+            AddAssert("seeked forward to object", () => EditorClock.CurrentTime, () => Is.GreaterThan(initialTime!));
         }
 
         [Test]

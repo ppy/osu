@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
@@ -174,7 +175,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeBonus, HitResult.IgnoreMiss)]
         public void TestMinResults(HitResult hitResult, HitResult expectedMinResult)
         {
-            Assert.AreEqual(expectedMinResult, new TestJudgement(hitResult).MinResult);
+            ClassicAssert.AreEqual(expectedMinResult, new TestJudgement(hitResult).MinResult);
         }
 
         [TestCase(HitResult.None, false)]
@@ -195,7 +196,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeBonus, false)]
         public void TestAffectsCombo(HitResult hitResult, bool expectedReturnValue)
         {
-            Assert.AreEqual(expectedReturnValue, hitResult.AffectsCombo());
+            ClassicAssert.AreEqual(expectedReturnValue, hitResult.AffectsCombo());
         }
 
         [TestCase(HitResult.None, false)]
@@ -216,7 +217,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeBonus, false)]
         public void TestAffectsAccuracy(HitResult hitResult, bool expectedReturnValue)
         {
-            Assert.AreEqual(expectedReturnValue, hitResult.AffectsAccuracy());
+            ClassicAssert.AreEqual(expectedReturnValue, hitResult.AffectsAccuracy());
         }
 
         [TestCase(HitResult.None, false)]
@@ -237,7 +238,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeBonus, true)]
         public void TestIsBonus(HitResult hitResult, bool expectedReturnValue)
         {
-            Assert.AreEqual(expectedReturnValue, hitResult.IsBonus());
+            ClassicAssert.AreEqual(expectedReturnValue, hitResult.IsBonus());
         }
 
         [TestCase(HitResult.None, false)]
@@ -258,7 +259,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeBonus, true)]
         public void TestIsHit(HitResult hitResult, bool expectedReturnValue)
         {
-            Assert.AreEqual(expectedReturnValue, hitResult.IsHit());
+            ClassicAssert.AreEqual(expectedReturnValue, hitResult.IsHit());
         }
 
         [TestCase(HitResult.None, false)]
@@ -279,7 +280,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeBonus, true)]
         public void TestIsScorable(HitResult hitResult, bool expectedReturnValue)
         {
-            Assert.AreEqual(expectedReturnValue, hitResult.IsScorable());
+            ClassicAssert.AreEqual(expectedReturnValue, hitResult.IsScorable());
         }
 
 #pragma warning disable CS0618

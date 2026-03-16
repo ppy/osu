@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Localisation;
 using osu.Game.Online.Rooms;
@@ -196,7 +197,7 @@ namespace osu.Game.Tests.Mods
             Assert.That(isValid, Is.EqualTo(expectedInvalid.Length == 0));
 
             if (isValid)
-                Assert.IsNull(invalid);
+                ClassicAssert.Null(invalid);
             else
                 Assert.That(invalid?.Select(t => t.GetType()), Is.EquivalentTo(expectedInvalid));
         }
@@ -214,21 +215,21 @@ namespace osu.Game.Tests.Mods
         [Test]
         public void TestFormatScoreMultiplier()
         {
-            Assert.AreEqual(ModUtils.FormatScoreMultiplier(0.9999).ToString(), "0.99x");
-            Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.0).ToString(), "1.00x");
-            Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.0001).ToString(), "1.01x");
+            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(0.9999).ToString(), "0.99x");
+            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(1.0).ToString(), "1.00x");
+            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(1.0001).ToString(), "1.01x");
 
-            Assert.AreEqual(ModUtils.FormatScoreMultiplier(0.899999999999999).ToString(), "0.90x");
-            Assert.AreEqual(ModUtils.FormatScoreMultiplier(0.9).ToString(), "0.90x");
-            Assert.AreEqual(ModUtils.FormatScoreMultiplier(0.900000000000001).ToString(), "0.90x");
+            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(0.899999999999999).ToString(), "0.90x");
+            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(0.9).ToString(), "0.90x");
+            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(0.900000000000001).ToString(), "0.90x");
 
-            Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.099999999999999).ToString(), "1.10x");
-            Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.1).ToString(), "1.10x");
-            Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.100000000000001).ToString(), "1.10x");
+            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(1.099999999999999).ToString(), "1.10x");
+            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(1.1).ToString(), "1.10x");
+            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(1.100000000000001).ToString(), "1.10x");
 
-            Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.045).ToString(), "1.05x");
-            Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.05).ToString(), "1.05x");
-            Assert.AreEqual(ModUtils.FormatScoreMultiplier(1.055).ToString(), "1.06x");
+            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(1.045).ToString(), "1.05x");
+            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(1.05).ToString(), "1.05x");
+            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(1.055).ToString(), "1.06x");
         }
 
         private static readonly object[] multiplayer_mod_test_scenarios =
@@ -309,7 +310,7 @@ namespace osu.Game.Tests.Mods
             Assert.That(isValid, Is.EqualTo(scenario.InvalidTypes.Length == 0));
 
             if (isValid)
-                Assert.IsNull(invalidMods);
+                ClassicAssert.Null(invalidMods);
             else
                 Assert.That(invalidMods?.Select(t => t.GetType()), Is.EquivalentTo(scenario.InvalidTypes));
         }
@@ -318,12 +319,12 @@ namespace osu.Game.Tests.Mods
         public void TestPlaylistsModScenarios()
         {
             // The rest are tested by TestMultiplayerModScenarios.
-            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), false, MatchType.Playlists, false));
-            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModHardRock(), true, MatchType.Playlists, false));
-            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModDoubleTime(), false, MatchType.Playlists, false));
-            Assert.IsTrue(ModUtils.IsValidModForMatch(new OsuModDoubleTime(), true, MatchType.Playlists, false));
-            Assert.IsTrue(ModUtils.IsValidModForMatch(new ModAdaptiveSpeed(), false, MatchType.Playlists, false));
-            Assert.IsTrue(ModUtils.IsValidModForMatch(new ModAdaptiveSpeed(), true, MatchType.Playlists, false));
+            ClassicAssert.True(ModUtils.IsValidModForMatch(new OsuModHardRock(), false, MatchType.Playlists, false));
+            ClassicAssert.True(ModUtils.IsValidModForMatch(new OsuModHardRock(), true, MatchType.Playlists, false));
+            ClassicAssert.True(ModUtils.IsValidModForMatch(new OsuModDoubleTime(), false, MatchType.Playlists, false));
+            ClassicAssert.True(ModUtils.IsValidModForMatch(new OsuModDoubleTime(), true, MatchType.Playlists, false));
+            ClassicAssert.True(ModUtils.IsValidModForMatch(new ModAdaptiveSpeed(), false, MatchType.Playlists, false));
+            ClassicAssert.True(ModUtils.IsValidModForMatch(new ModAdaptiveSpeed(), true, MatchType.Playlists, false));
         }
 
         [Test]

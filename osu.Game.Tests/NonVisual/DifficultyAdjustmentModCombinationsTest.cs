@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
@@ -141,7 +142,7 @@ namespace osu.Game.Tests.NonVisual
 
         private void assertCombinations(Type[][] expectedCombinations, Mod[] actualCombinations)
         {
-            Assert.AreEqual(expectedCombinations.Length, actualCombinations.Length);
+            ClassicAssert.AreEqual(expectedCombinations.Length, actualCombinations.Length);
 
             Assert.Multiple(() =>
             {

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
@@ -27,8 +28,8 @@ namespace osu.Game.Tests.Database
             {
                 using var rulesets = new RealmRulesetStore(realm, storage);
 
-                Assert.AreEqual(4, rulesets.AvailableRulesets.Count());
-                Assert.AreEqual(4, realm.Realm.All<RulesetInfo>().Count());
+                ClassicAssert.AreEqual(4, rulesets.AvailableRulesets.Count());
+                ClassicAssert.AreEqual(4, realm.Realm.All<RulesetInfo>().Count());
             });
         }
 
@@ -40,11 +41,11 @@ namespace osu.Game.Tests.Database
                 using var rulesets = new RealmRulesetStore(realm, storage);
                 using var rulesets2 = new RealmRulesetStore(realm, storage);
 
-                Assert.AreEqual(4, rulesets.AvailableRulesets.Count());
-                Assert.AreEqual(4, rulesets2.AvailableRulesets.Count());
+                ClassicAssert.AreEqual(4, rulesets.AvailableRulesets.Count());
+                ClassicAssert.AreEqual(4, rulesets2.AvailableRulesets.Count());
 
-                Assert.AreEqual(rulesets.AvailableRulesets.First(), rulesets2.AvailableRulesets.First());
-                Assert.AreEqual(4, realm.Realm.All<RulesetInfo>().Count());
+                ClassicAssert.AreEqual(rulesets.AvailableRulesets.First(), rulesets2.AvailableRulesets.First());
+                ClassicAssert.AreEqual(4, realm.Realm.All<RulesetInfo>().Count());
             });
         }
 
@@ -55,9 +56,9 @@ namespace osu.Game.Tests.Database
             {
                 using var rulesets = new RealmRulesetStore(realm, storage);
 
-                Assert.IsFalse(rulesets.AvailableRulesets.First().IsManaged);
-                Assert.IsFalse(rulesets.GetRuleset(0)?.IsManaged);
-                Assert.IsFalse(rulesets.GetRuleset("mania")?.IsManaged);
+                ClassicAssert.False(rulesets.AvailableRulesets.First().IsManaged);
+                ClassicAssert.False(rulesets.GetRuleset(0)?.IsManaged);
+                ClassicAssert.False(rulesets.GetRuleset("mania")?.IsManaged);
             });
         }
 

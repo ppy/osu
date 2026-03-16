@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -142,7 +143,7 @@ namespace osu.Game.Tests.Visual.Online
             AddRepeatStep("check background", () =>
             {
                 // +1 because the day separator take one index
-                Assert.AreEqual((checkCount + 1) % 2 == 0, drawableChannel.ChildrenOfType<ChatLine>().ToList()[checkCount].AlternatingBackground);
+                ClassicAssert.AreEqual((checkCount + 1) % 2 == 0, drawableChannel.ChildrenOfType<ChatLine>().ToList()[checkCount].AlternatingBackground);
                 checkCount++;
             }, 10);
         }
