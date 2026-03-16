@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Online.Multiplayer;
@@ -26,6 +27,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private const int warning_time_threshold = 10;
 
         public CardFlow CenterRow { get; private set; } = null!;
+
+        protected override LocalisableString StageHeading => "Pick Phase";
+        protected override LocalisableString StageCaption => "It's your turn to play a card!";
 
         private PlayerHandOfCards playerHand = null!;
         private OpponentHandOfCards opponentHand = null!;
@@ -64,12 +68,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                },
-                new RankedPlayStageDisplay(RankedPlayColourScheme.Blue)
-                {
-                    Heading = "Pick Phase",
-                    Caption = "It's your turn to play a card!",
-                    Margin = new MarginPadding { Top = 60 },
                 },
             ];
 

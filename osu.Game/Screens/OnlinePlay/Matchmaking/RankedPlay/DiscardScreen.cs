@@ -11,6 +11,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Localisation;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -32,6 +33,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private const int warning_time_threshold = 10;
 
         public CardFlow CenterRow { get; private set; } = null!;
+
+        protected override LocalisableString StageHeading => "Discard Phase";
+        protected override LocalisableString StageCaption => "Replace cards from your hand";
 
         private PlayerHandOfCards playerHand = null!;
         private ShearedButton discardButton = null!;
@@ -57,6 +61,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private DateTimeOffset stageEndTime;
         private TimeSpan stageDuration;
 
+        public DiscardScreen()
+        {
+            StageDisplay.CaptionColour = Color4.White;
+        }
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
@@ -71,13 +80,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                },
-                new RankedPlayStageDisplay(RankedPlayColourScheme.Blue)
-                {
-                    Heading = "Discard Phase",
-                    Caption = "Replace cards from your hand",
-                    CaptionColour = Color4.White,
-                    Margin = new MarginPadding { Top = 60 },
                 },
                 discardButton = new ShearedButton
                 {

@@ -4,12 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
+using osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 
@@ -18,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// <summary>
     /// Represents the skill required to correctly aim at every object in the map with a uniform CircleSize and normalized distances.
     /// </summary>
-    public class Aim : OsuStrainSkill
+    public class Aim : StrainSkill
     {
         public readonly bool IncludeSliders;
 
@@ -32,9 +33,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double skillMultiplierSnap => 71.0;
         private double skillMultiplierAgility => 2.0;
-        private double skillMultiplierFlow => 238.0;
+        private double skillMultiplierFlow => 245.0;
         private double skillMultiplierTotal => 1.1;
         private double meanExponent => 1.2;
+
+        /// <summary>
+        /// The number of sections with the highest strains, which the peak strain reductions will apply to.
+        /// This is done in order to decrease their impact on the overall difficulty of the map for this skill.
+        /// </summary>
+        private int reducedSectionCount => 10;
+
+        /// <summary>
+        /// The baseline multiplier applied to the section with the biggest strain.
+        /// </summary>
+        private double reducedStrainBaseline => 0.75;
 
         private readonly List<double> sliderStrains = new List<double>();
 
@@ -60,8 +72,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (Mods.Any(m => m is OsuModRelax))
             {
-                agilityDifficulty *= 0.0;
-                flowDifficulty *= 0.1;
+                agilityDifficulty *= 0.3;
             }
 
             double totalDifficulty = calculateTotalValue(snapDifficulty, agilityDifficulty, flowDifficulty);
@@ -126,6 +137,46 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         public double CountTopWeightedSliders(double difficultyValue)
-            => OsuStrainUtils.CountTopWeightedSliders(sliderStrains, difficultyValue);
+        {
+            if (sliderStrains.Count == 0)
+                return 0;
+
+            double consistentTopStrain = difficultyValue * (1 - DecayWeight); // What would the top strain be if all strain values were identical
+
+            if (consistentTopStrain == 0)
+                return 0;
+
+            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
+            return sliderStrains.Sum(s => DifficultyCalculationUtils.Logistic(s / consistentTopStrain, 0.88, 10, 1.1));
+        }
+
+        public override double DifficultyValue()
+        {
+            double difficulty = 0;
+            double weight = 1;
+
+            // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
+            // These sections will not contribute to the difficulty.
+            var peaks = GetCurrentStrainPeaks().Where(p => p > 0);
+
+            List<double> strains = peaks.OrderDescending().ToList();
+
+            // We are reducing the highest strains first to account for extreme difficulty spikes
+            for (int i = 0; i < Math.Min(strains.Count, reducedSectionCount); i++)
+            {
+                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((float)i / reducedSectionCount, 0, 1)));
+                strains[i] *= Interpolation.Lerp(reducedStrainBaseline, 1.0, scale);
+            }
+
+            // Difficulty is the weighted sum of the highest strains from every section.
+            // We're sorting from highest to lowest strain.
+            foreach (double strain in strains.OrderDescending())
+            {
+                difficulty += strain * weight;
+                weight *= DecayWeight;
+            }
+
+            return difficulty;
+        }
     }
 }

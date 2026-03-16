@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 
-namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
+namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 {
     public static class AgilityEvaluator
     {
@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double distanceScaled = Math.Min(distance, distance_cap) / distance_cap;
 
             double strain = distanceScaled * 1000 / osuCurrObj.AdjustedDeltaTime;
+
+            strain *= osuCurrObj.SmallCircleBonus;
 
             strain *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
 
