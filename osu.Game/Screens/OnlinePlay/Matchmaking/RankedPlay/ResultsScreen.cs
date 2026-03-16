@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -36,6 +37,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 {
     public partial class ResultsScreen : RankedPlaySubScreen
     {
+        protected override LocalisableString StageHeading => "Results";
+        protected override LocalisableString StageCaption => string.Empty;
+
         public override bool ShowBeatmapBackground => true;
 
         [Resolved]
@@ -63,14 +67,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         {
             CornerPieceVisibility.Value = Visibility.Hidden;
 
-            InternalChildren = new Drawable[]
+            AddInternal(loadingSpinner = new LoadingSpinner
             {
-                loadingSpinner = new LoadingSpinner
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                },
-            };
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre
+            });
         }
 
         protected override void LoadComplete()
@@ -160,6 +161,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
             AddInternal(new ResultScreenContent
             {
+                RelativeSizeAxes = Axes.Both,
+                // A little bit of room for the countdown timer...
+                Margin = new MarginPadding { Top = 45 },
                 PlayerScore = playerScore,
                 OpponentScore = opponentScore,
                 PlayerDamageInfo = matchInfo.RoomState.Users[playerId].DamageInfo!,
@@ -209,8 +213,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                             .Select(it => it.Value.DamageInfo)
                                             .OfType<RankedPlayDamageInfo>()
                                             .MaxBy(it => it.Damage)!;
-
-                RelativeSizeAxes = Axes.Both;
 
                 AddInternal(panelScaffold = new PanelScaffold
                 {
