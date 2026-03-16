@@ -50,10 +50,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             flowDifficulty *= 1 + Math.Min(0.25,
                 Math.Pow((Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) - Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) / 50, 4));
 
-            if (osuCurrObj.AngularVelocity != null)
+            if (osuCurrObj.Angle != null && osuLastObj.Angle != null)
             {
+                double angleDifference = Math.Abs(osuCurrObj.Angle.Value - osuLastObj.Angle.Value);
+                double angleDifferenceAdjusted = Math.Sin(angleDifference / 2) * 180.0;
+                double angularVelocity = angleDifferenceAdjusted / (osuCurrObj.AdjustedDeltaTime * 0.1);
+
                 // Low angular velocity flow (angles are consistent) is easier to follow than erratic flow
-                flowDifficulty *= 0.8 + Math.Sqrt(osuCurrObj.AngularVelocity.Value / 270.0);
+                flowDifficulty *= 0.8 + Math.Sqrt(angularVelocity / 270.0);
             }
 
             // If all three notes are overlapping - don't reward bonuses as you don't have to do additional movement
