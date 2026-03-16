@@ -188,15 +188,14 @@ namespace osu.Game.Screens.Edit
 
         private bool isNewBeatmap;
 
-        protected override UserActivity InitialActivity
-        {
-            get
-            {
-                if (Beatmap.Value.Metadata.Author.OnlineID == api.LocalUser.Value.OnlineID)
-                    return new UserActivity.EditingBeatmap(Beatmap.Value.BeatmapInfo);
+        protected override UserActivity InitialActivity => getCurrentUserActivity();
 
-                return new UserActivity.ModdingBeatmap(Beatmap.Value.BeatmapInfo);
-            }
+        private UserActivity getCurrentUserActivity()
+        {
+            if (Beatmap.Value.Metadata.Author.OnlineID == api.LocalUser.Value.OnlineID)
+                return new UserActivity.EditingBeatmap(Beatmap.Value.BeatmapInfo);
+
+            return new UserActivity.ModdingBeatmap(Beatmap.Value.BeatmapInfo);
         }
 
         protected override bool InitialBackButtonVisibility => false;
@@ -604,6 +603,9 @@ namespace osu.Game.Screens.Edit
             updateLastSavedHash();
             onScreenDisplay?.Display(new BeatmapEditorToast(ToastStrings.BeatmapSaved, editorBeatmap.BeatmapInfo.GetDisplayTitle()));
             Saved?.Invoke();
+
+            // This triggers an update to the window title post-save (ie if the difficulty name changed).
+            Activity.Value = getCurrentUserActivity();
             return true;
         }
 
@@ -1287,12 +1289,9 @@ namespace osu.Game.Screens.Edit
                 Hotkey = new Hotkey(GlobalAction.EditorDiscardUnsavedChanges)
             };
 
-            if (RuntimeInfo.OS != RuntimeInfo.Platform.Android)
-            {
-                var export = createExportMenu();
-                saveRelatedMenuItems.AddRange(export.Items);
-                yield return export;
-            }
+            var export = createExportMenu();
+            saveRelatedMenuItems.AddRange(export.Items);
+            yield return export;
 
             if (RuntimeInfo.IsDesktop)
             {
@@ -1428,7 +1427,7 @@ namespace osu.Game.Screens.Edit
             if (dialogOverlay == null)
                 delete();
             else
-                dialogOverlay.Push(new DeleteDifficultyConfirmationDialog(Beatmap.Value.BeatmapInfo, delete));
+                dialogOverlay.Push(new DeleteDifficultyConfirmationDialog(playableBeatmap.BeatmapInfo.DifficultyName, editorBeatmap.HitObjects.Count, delete));
 
             void delete()
             {
