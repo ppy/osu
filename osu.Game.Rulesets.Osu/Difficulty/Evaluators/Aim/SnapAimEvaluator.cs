@@ -36,7 +36,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
-            var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
             var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
 
             const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
