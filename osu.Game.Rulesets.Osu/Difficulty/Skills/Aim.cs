@@ -32,9 +32,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double currentStrain;
 
         private double skillMultiplierSnap => 71.0;
-        private double skillMultiplierAgility => 2.25;
-        private double skillMultiplierFlow => 240.0;
-        private double skillMultiplierTotal => 1.1;
+        private double skillMultiplierAgility => 2.2;
+        private double skillMultiplierFlow => 245.0;
+        private double skillMultiplierTotal => 1.12;
         private double meanExponent => 1.2;
 
         /// <summary>
@@ -77,10 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double totalDifficulty = calculateTotalValue(snapDifficulty, agilityDifficulty, flowDifficulty);
 
-            const double overcap_per_ms = 0.01;
-
             currentStrain *= decay;
-            currentStrain += overcap_per_ms * ((OsuDifficultyHitObject)current).AdjustedDeltaTime;
             currentStrain += totalDifficulty * (1 - decay);
 
             if (current.BaseObject is Slider)
