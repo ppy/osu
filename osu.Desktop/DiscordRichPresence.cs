@@ -58,6 +58,7 @@ namespace osu.Desktop
         private readonly RichPresence presence = new RichPresence
         {
             Assets = new Assets { LargeImageKey = "osu_logo_lazer" },
+            Timestamps = Timestamps.Now,
             Secrets = new Secrets
             {
                 JoinSecret = null,
