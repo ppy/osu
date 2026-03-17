@@ -3,7 +3,8 @@ name: Pack and nuget
 on:
   push:
     tags:
-      - '*'
+      - '*.*.*'
+      - '!*-*'
 
 jobs:
   notify_pending_production_deploy:
