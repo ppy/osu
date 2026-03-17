@@ -178,7 +178,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
             FriendsList newList = new FriendsList(userListToolbar.DisplayStyle.Value, apiFriends.Select(f => f.TargetUser!).ToArray())
             {
-                OnlineStream = { BindTarget = streamControl.Current },
+                StatusFilter = { BindTarget = streamControl.Current },
                 SortCriteria = { BindTarget = userListToolbar.SortCriteria },
                 SearchText = { BindTarget = searchTextBox.Current }
             };
