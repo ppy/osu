@@ -60,12 +60,16 @@ namespace osu.Game.Screens.Ranking
                         Size = new Vector2(400, 300),
                         Children = new Drawable[]
                         {
-                            searchBox = new SearchTextBox
+                            new Container
                             {
-                                HoldFocus = true,
                                 RelativeSizeAxes = Axes.X,
-                                Depth = float.MinValue,
                                 Padding = new MarginPadding { Horizontal = 20 },
+                                Child = searchBox = new SearchTextBox
+                                {
+                                    HoldFocus = true,
+                                    RelativeSizeAxes = Axes.X,
+                                    Depth = float.MinValue,
+                                },
                             },
                             new OsuScrollContainer
                             {
