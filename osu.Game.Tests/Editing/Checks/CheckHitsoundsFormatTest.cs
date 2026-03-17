@@ -139,7 +139,7 @@ namespace osu.Game.Tests.Editing.Checks
                         Metadata = new BeatmapMetadata { AudioFile = beatmapSet.Files[0].Filename }
                     }
                 };
-                var firstWorking = new Mock<TestWorkingBeatmap>(firstPlayable, null, null);
+                var firstWorking = new Mock<TestWorkingBeatmap>(firstPlayable, null!, null!);
                 firstWorking.Setup(w => w.GetStream(It.IsAny<string>())).Returns(resourceStream);
 
                 var secondPlayable = new Beatmap<HitObject>
@@ -150,7 +150,7 @@ namespace osu.Game.Tests.Editing.Checks
                         Metadata = new BeatmapMetadata { AudioFile = beatmapSet.Files[1].Filename }
                     }
                 };
-                var secondWorking = new Mock<TestWorkingBeatmap>(secondPlayable, null, null);
+                var secondWorking = new Mock<TestWorkingBeatmap>(secondPlayable, null!, null!);
                 secondWorking.Setup(w => w.GetStream(It.IsAny<string>())).Returns(resourceStream);
 
                 var context = new BeatmapVerifierContext(
@@ -165,7 +165,7 @@ namespace osu.Game.Tests.Editing.Checks
 
         private BeatmapVerifierContext getContext(Stream? resourceStream)
         {
-            var mockWorkingBeatmap = new Mock<TestWorkingBeatmap>(beatmap, null, null);
+            var mockWorkingBeatmap = new Mock<TestWorkingBeatmap>(beatmap, null!, null!);
             mockWorkingBeatmap.Setup(w => w.GetStream(It.IsAny<string>())).Returns(resourceStream);
 
             return new BeatmapVerifierContext(beatmap, mockWorkingBeatmap.Object);
