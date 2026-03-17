@@ -3,12 +3,10 @@
 
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -16,12 +14,8 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
-using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
-using osu.Game.Online;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Rooms;
@@ -57,9 +51,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         public override float BackgroundParallaxAmount => 0;
 
-        [Cached(typeof(OnlinePlayBeatmapAvailabilityTracker))]
-        private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new MultiplayerBeatmapAvailabilityTracker();
-
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
@@ -67,25 +58,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private BeatmapManager beatmapManager { get; set; } = null!;
-
-        [Resolved]
-        private RulesetStore rulesets { get; set; } = null!;
-
-        [Resolved]
-        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
-
-        [Resolved]
-        private BeatmapModelDownloader beatmapDownloader { get; set; } = null!;
-
-        [Resolved]
         private IDialogOverlay dialogOverlay { get; set; } = null!;
 
         [Resolved]
         private AudioManager audio { get; set; } = null!;
-
-        [Resolved]
-        private OsuConfigManager config { get; set; } = null!;
 
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; } = null!;
@@ -103,8 +79,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private IBindable<RankedPlayStage> stage = null!;
 
         private Sample? sampleStart;
-        private CancellationTokenSource? downloadCheckCancellation;
-        private int? lastDownloadCheckedBeatmapId;
 
         private readonly Bindable<Visibility> cornerPieceVisibility = new Bindable<Visibility>();
         private readonly Bindable<bool> showBeatmapBackground = new Bindable<bool>();
@@ -125,7 +99,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             InternalChildren = new Drawable[]
             {
                 matchInfo = new RankedPlayMatchInfo(),
-                beatmapAvailabilityTracker,
+                new RankedPlayBeatmapAvailabilityTracker(),
                 new GlobalScrollAdjustsVolume(),
                 new PopoverContainer
                 {
@@ -176,10 +150,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
             client.RoomUpdated += onRoomUpdated;
             client.UserStateChanged += onUserStateChanged;
-            client.SettingsChanged += onSettingsChanged;
             client.LoadRequested += onLoadRequested;
-
-            beatmapAvailabilityTracker.Availability.BindValueChanged(onBeatmapAvailabilityChanged, true);
 
             int localUserId = api.LocalUser.Value.OnlineID;
             int opponentUserId = ((RankedPlayRoomState)client.Room!.MatchState!).Users.Keys.Single(it => it != localUserId);
@@ -256,24 +227,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 this.MakeCurrent();
         }
 
-        private void onSettingsChanged(MultiplayerRoomSettings _) => Scheduler.Add(() =>
-        {
-            checkForAutomaticDownload();
-            updateGameplayState();
-        });
-
         private void onLoadRequested() => Scheduler.Add(() =>
         {
-            updateGameplayState();
-
-            if (Beatmap.IsDefault)
-            {
-                Logger.Log("Aborting gameplay start - beatmap not downloaded.");
-                return;
-            }
-
             sampleStart?.Play();
-
             this.Push(new MultiplayerPlayerLoader(() => new ScreenGameplay(new Room(room), new PlaylistItem(client.Room!.CurrentPlaylistItem), room.Users.ToArray())));
         });
 
@@ -327,92 +283,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     });
                     break;
             }
-        }
-
-        private void onBeatmapAvailabilityChanged(ValueChangedEvent<BeatmapAvailability> e) => Scheduler.Add(() =>
-        {
-            if (client.Room == null || client.LocalUser == null)
-                return;
-
-            client.ChangeBeatmapAvailability(e.NewValue).FireAndForget();
-
-            switch (e.NewValue.State)
-            {
-                case DownloadState.NotDownloaded:
-                case DownloadState.LocallyAvailable:
-                    updateGameplayState();
-                    break;
-            }
-        });
-
-        private void updateGameplayState()
-        {
-            MultiplayerPlaylistItem item = client.Room!.CurrentPlaylistItem;
-
-            if (item.Expired)
-                return;
-
-            RulesetInfo ruleset = rulesets.GetRuleset(item.RulesetID)!;
-            Ruleset rulesetInstance = ruleset.CreateInstance();
-
-            // Update global gameplay state to correspond to the new selection.
-            // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
-            var localBeatmap = beatmapManager.QueryBeatmap($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}", item.BeatmapID);
-
-            if (localBeatmap != null)
-            {
-                Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
-                Ruleset.Value = ruleset;
-                Mods.Value = item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
-
-                // Notify the server that the beatmap has been set and that we are ready to start gameplay.
-                if (client.LocalUser!.State == MultiplayerUserState.Idle)
-                    client.ChangeState(MultiplayerUserState.Ready).FireAndForget();
-            }
-            else
-            {
-                // Notify the server that we don't have the beatmap.
-                if (client.LocalUser!.State == MultiplayerUserState.Ready)
-                    client.ChangeState(MultiplayerUserState.Idle).FireAndForget();
-            }
-
-            client.ChangeBeatmapAvailability(beatmapAvailabilityTracker.Availability.Value).FireAndForget();
-        }
-
-        private void checkForAutomaticDownload()
-        {
-            if (client.Room == null)
-                return;
-
-            MultiplayerPlaylistItem item = client.Room.CurrentPlaylistItem;
-
-            // This method is called every time anything changes in the room.
-            // This could result in download requests firing far too often, when we only expect them to fire once per beatmap.
-            //
-            // Without this check, we would see especially egregious behaviour when a user has hit the download rate limit.
-            if (lastDownloadCheckedBeatmapId == item.BeatmapID)
-                return;
-
-            lastDownloadCheckedBeatmapId = item.BeatmapID;
-
-            downloadCheckCancellation?.Cancel();
-
-            if (beatmapManager.IsAvailableLocally(new APIBeatmap { OnlineID = item.BeatmapID }))
-                return;
-
-            // In a perfect world we'd use BeatmapAvailability, but there's no event-driven flow for when a selection changes.
-            // ie. if selection changes from "not downloaded" to another "not downloaded" we wouldn't get a value changed raised.
-            beatmapLookupCache
-                .GetBeatmapAsync(item.BeatmapID, (downloadCheckCancellation = new CancellationTokenSource()).Token)
-                .ContinueWith(resolved => Schedule(() =>
-                {
-                    APIBeatmapSet? beatmapSet = resolved.GetResultSafely()?.BeatmapSet;
-
-                    if (beatmapSet == null)
-                        return;
-
-                    beatmapDownloader.Download(beatmapSet, config.Get<bool>(OsuSetting.PreferNoVideo));
-                }));
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -527,7 +397,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         {
             client.RoomUpdated -= onRoomUpdated;
             client.UserStateChanged -= onUserStateChanged;
-            client.SettingsChanged -= onSettingsChanged;
             client.LoadRequested -= onLoadRequested;
 
             base.Dispose(isDisposing);
