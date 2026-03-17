@@ -32,8 +32,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public override bool DisplayResult => false;
 
         public IBindable<bool> IsHolding => isHolding;
-
         private readonly Bindable<bool> isHolding = new Bindable<bool>();
+
+        public IBindable<double?> MissingStartTime => missingStartTime;
+        private readonly Bindable<double?> missingStartTime = new Bindable<double?>();
 
         public DrawableHoldNoteHead Head => headContainer.Child;
         public DrawableHoldNoteTail Tail => tailContainer.Child;
@@ -126,6 +128,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             base.OnApply();
 
             sizingContainer.Size = Vector2.One;
+            missingStartTime.Value = null;
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -208,6 +211,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected override void Update()
         {
             base.Update();
+
+            if (Head.Judged && !Head.IsHit)
+                missingStartTime.Value ??= Head.Result.TimeAbsolute;
+            if (Body.HasHoldBreak)
+                missingStartTime.Value ??= Body.Result.TimeAbsolute;
+            if (Tail.Judged && !Tail.IsHit)
+                missingStartTime.Value ??= Tail.Result.TimeAbsolute;
 
             isHolding.Value = Result.IsHolding(Time.Current);
 
