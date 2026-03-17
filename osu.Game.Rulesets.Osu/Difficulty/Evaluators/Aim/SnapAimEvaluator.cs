@@ -16,7 +16,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         private const double acute_angle_multiplier = 2.41;
         private const double slider_multiplier = 1.5;
         private const double velocity_change_multiplier = 0.9;
-        private const double wiggle_multiplier = 1.02; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
+
+        private const double
+            wiggle_multiplier = 1.02; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
+
         private const double maximum_repetition_nerf = 0.15;
         private const double maximum_vector_influence = 0.5;
 
@@ -86,9 +89,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
                 wideAngleBonus = calcWideAngleBonus(currAngle);
 
-                // Penalize angle repetition.
-                wideAngleBonus *= 0.25 + 0.75 * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3)));
-
                 wideAngleBonus *= angleBonus;
 
                 // Apply wiggle bonus for jumps that are [radius, 3*diameter] in distance, with < 110 angle
@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             aimStrain += velocityChangeBonus * velocity_change_multiplier;
 
             // Add in acute angle bonus or wide angle bonus, whichever is larger.
-            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * wide_angle_multiplier);
+            aimStrain += Math.Max(acuteAngleBonus * acute_angle_multiplier, wideAngleBonus * 0.9);
 
             // Add in additional slider velocity bonus.
             if (withSliderTravelDistance)
