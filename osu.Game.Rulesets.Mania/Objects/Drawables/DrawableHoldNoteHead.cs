@@ -15,6 +15,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public partial class DrawableHoldNoteHead : DrawableNote
     {
+        /// <summary>
+        /// The time at which the user starting missing the hold note.
+        /// This could be the time at which they missed the head, broke on the body, or missed the tail.
+        /// </summary>
         public readonly IBindable<double?> MissingStartTime = new Bindable<double?>();
 
         protected override ManiaSkinComponents Component => ManiaSkinComponents.HoldNoteHead;

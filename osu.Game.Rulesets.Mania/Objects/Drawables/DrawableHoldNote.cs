@@ -31,10 +31,19 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     {
         public override bool DisplayResult => false;
 
+        /// <summary>
+        /// Whether the user is currently pressing the hold note.
+        /// </summary>
         public IBindable<bool> IsHolding => isHolding;
+
         private readonly Bindable<bool> isHolding = new Bindable<bool>();
 
+        /// <summary>
+        /// The time at which the user starting missing the hold note.
+        /// This could be the time at which they missed the head, broke on the body, or missed the tail.
+        /// </summary>
         public IBindable<double?> MissingStartTime => missingStartTime;
+
         private readonly Bindable<double?> missingStartTime = new Bindable<double?>();
 
         public DrawableHoldNoteHead Head => headContainer.Child;
