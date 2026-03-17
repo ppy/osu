@@ -37,9 +37,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             objectList.Add(current);
 
-            currentDifficulty *= strainDecay(current.DeltaTime);
+            double decay = strainDecay(current.DeltaTime);
 
-            currentDifficulty += ReadingEvaluator.EvaluateDifficultyOf(current, hasHiddenMod) * skillMultiplier;
+            currentDifficulty *= decay;
+
+            currentDifficulty += ReadingEvaluator.EvaluateDifficultyOf(current, hasHiddenMod) * (1 - decay) * skillMultiplier;
 
             return currentDifficulty;
         }
