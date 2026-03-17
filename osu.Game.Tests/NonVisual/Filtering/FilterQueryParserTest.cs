@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Filter;
@@ -23,8 +24,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "looking for a beatmap";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("looking for a beatmap", filterCriteria.SearchText);
-            Assert.AreEqual(4, filterCriteria.SearchTerms.Length);
+            ClassicAssert.AreEqual("looking for a beatmap", filterCriteria.SearchText);
+            ClassicAssert.AreEqual(4, filterCriteria.SearchTerms.Length);
         }
 
         [Test]
@@ -33,8 +34,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "looking for \"a beatmap\"! like \"this\"";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("looking for \"a beatmap\"! like \"this\"", filterCriteria.SearchText);
-            Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
+            ClassicAssert.AreEqual("looking for \"a beatmap\"! like \"this\"", filterCriteria.SearchText);
+            ClassicAssert.AreEqual(5, filterCriteria.SearchTerms.Length);
 
             Assert.That(filterCriteria.SearchTerms[0].SearchTerm, Is.EqualTo("a beatmap"));
             Assert.That(filterCriteria.SearchTerms[0].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.FullPhrase));
@@ -58,8 +59,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "looking for \"circles!\"!";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("looking for \"circles!\"!", filterCriteria.SearchText);
-            Assert.AreEqual(3, filterCriteria.SearchTerms.Length);
+            ClassicAssert.AreEqual("looking for \"circles!\"!", filterCriteria.SearchText);
+            ClassicAssert.AreEqual(3, filterCriteria.SearchTerms.Length);
 
             Assert.That(filterCriteria.SearchTerms[0].SearchTerm, Is.EqualTo("circles!"));
             Assert.That(filterCriteria.SearchTerms[0].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.FullPhrase));
@@ -77,8 +78,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "\"!";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("\"!", filterCriteria.SearchText);
-            Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
+            ClassicAssert.AreEqual("\"!", filterCriteria.SearchText);
+            ClassicAssert.AreEqual(1, filterCriteria.SearchTerms.Length);
 
             Assert.That(filterCriteria.SearchTerms[0].SearchTerm, Is.EqualTo("!"));
             Assert.That(filterCriteria.SearchTerms[0].MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
@@ -91,11 +92,11 @@ namespace osu.Game.Tests.NonVisual.Filtering
             string query = $"{variant}<4 easy";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("easy", filterCriteria.SearchText.Trim());
-            Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
-            Assert.IsNotNull(filterCriteria.StarDifficulty.Max);
-            Assert.AreEqual(filterCriteria.StarDifficulty.Max, 4.00d);
-            Assert.IsNull(filterCriteria.StarDifficulty.Min);
+            ClassicAssert.AreEqual("easy", filterCriteria.SearchText.Trim());
+            ClassicAssert.AreEqual(1, filterCriteria.SearchTerms.Length);
+            ClassicAssert.NotNull(filterCriteria.StarDifficulty.Max);
+            ClassicAssert.AreEqual(filterCriteria.StarDifficulty.Max!, 4.00d);
+            ClassicAssert.Null(filterCriteria.StarDifficulty.Min);
         }
 
         [Test]
@@ -104,9 +105,9 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "stars>=6";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual(filterCriteria.StarDifficulty.Min, 6.00d);
-            Assert.True(filterCriteria.StarDifficulty.IsLowerInclusive);
-            Assert.IsNull(filterCriteria.StarDifficulty.Max);
+            ClassicAssert.AreEqual(filterCriteria.StarDifficulty.Min!, 6.00d);
+            ClassicAssert.True(filterCriteria.StarDifficulty.IsLowerInclusive);
+            ClassicAssert.Null(filterCriteria.StarDifficulty.Max);
         }
 
         /*
@@ -125,12 +126,12 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "ar>=9 difficult";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("difficult", filterCriteria.SearchText.Trim());
-            Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
-            Assert.IsNotNull(filterCriteria.ApproachRate.Min);
-            Assert.Greater(filterCriteria.ApproachRate.Min, 8.9f);
-            Assert.Less(filterCriteria.ApproachRate.Min, 9.0f);
-            Assert.IsNull(filterCriteria.ApproachRate.Max);
+            ClassicAssert.AreEqual("difficult", filterCriteria.SearchText.Trim());
+            ClassicAssert.AreEqual(1, filterCriteria.SearchTerms.Length);
+            ClassicAssert.NotNull(filterCriteria.ApproachRate.Min);
+            ClassicAssert.Greater(filterCriteria.ApproachRate.Min!, 8.9f);
+            ClassicAssert.Less(filterCriteria.ApproachRate.Min!, 9.0f);
+            ClassicAssert.Null(filterCriteria.ApproachRate.Max);
         }
 
         [Test]
@@ -139,12 +140,12 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "dr>2 quite specific dr<:6";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("quite specific", filterCriteria.SearchText.Trim());
-            Assert.AreEqual(2, filterCriteria.SearchTerms.Length);
-            Assert.Greater(filterCriteria.DrainRate.Min, 2.0f);
-            Assert.Less(filterCriteria.DrainRate.Min, 2.1f);
-            Assert.Greater(filterCriteria.DrainRate.Max, 6.0f);
-            Assert.Less(filterCriteria.DrainRate.Min, 6.1f);
+            ClassicAssert.AreEqual("quite specific", filterCriteria.SearchText.Trim());
+            ClassicAssert.AreEqual(2, filterCriteria.SearchTerms.Length);
+            ClassicAssert.Greater(filterCriteria.DrainRate.Min!, 2.0f);
+            ClassicAssert.Less(filterCriteria.DrainRate.Min!, 2.1f);
+            ClassicAssert.Greater(filterCriteria.DrainRate.Max!, 6.0f);
+            ClassicAssert.Less(filterCriteria.DrainRate.Min!, 6.1f);
         }
 
         [Test]
@@ -153,12 +154,12 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "hp>2 quite specific hp<=6";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("quite specific", filterCriteria.SearchText.Trim());
-            Assert.AreEqual(2, filterCriteria.SearchTerms.Length);
-            Assert.Greater(filterCriteria.DrainRate.Min, 2.0f);
-            Assert.Less(filterCriteria.DrainRate.Min, 2.1f);
-            Assert.Greater(filterCriteria.DrainRate.Max, 6.0f);
-            Assert.Less(filterCriteria.DrainRate.Min, 6.1f);
+            ClassicAssert.AreEqual("quite specific", filterCriteria.SearchText.Trim());
+            ClassicAssert.AreEqual(2, filterCriteria.SearchTerms.Length);
+            ClassicAssert.Greater(filterCriteria.DrainRate.Min!, 2.0f);
+            ClassicAssert.Less(filterCriteria.DrainRate.Min!, 2.1f);
+            ClassicAssert.Greater(filterCriteria.DrainRate.Max!, 6.0f);
+            ClassicAssert.Less(filterCriteria.DrainRate.Min!, 6.1f);
         }
 
         [Test]
@@ -167,12 +168,12 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "od>4 easy od<8";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("easy", filterCriteria.SearchText.Trim());
-            Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
-            Assert.Greater(filterCriteria.OverallDifficulty.Min, 4.0);
-            Assert.Less(filterCriteria.OverallDifficulty.Min, 4.1);
-            Assert.Greater(filterCriteria.OverallDifficulty.Max, 7.9);
-            Assert.Less(filterCriteria.OverallDifficulty.Max, 8.0);
+            ClassicAssert.AreEqual("easy", filterCriteria.SearchText.Trim());
+            ClassicAssert.AreEqual(1, filterCriteria.SearchTerms.Length);
+            ClassicAssert.Greater(filterCriteria.OverallDifficulty.Min!, 4.0);
+            ClassicAssert.Less(filterCriteria.OverallDifficulty.Min!, 4.1);
+            ClassicAssert.Greater(filterCriteria.OverallDifficulty.Max!, 7.9);
+            ClassicAssert.Less(filterCriteria.OverallDifficulty.Max!, 8.0);
         }
 
         [Test]
@@ -181,8 +182,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "bpm=200";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual(filterCriteria.BPM.Min, 199.5d);
-            Assert.AreEqual(filterCriteria.BPM.Max, 200.5d);
+            ClassicAssert.AreEqual(filterCriteria.BPM.Min!, 199.5d);
+            ClassicAssert.AreEqual(filterCriteria.BPM.Max!, 200.5d);
         }
 
         [Test]
@@ -191,11 +192,11 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "bpm>:200 gotta go fast";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("gotta go fast", filterCriteria.SearchText.Trim());
-            Assert.AreEqual(3, filterCriteria.SearchTerms.Length);
-            Assert.IsNotNull(filterCriteria.BPM.Min);
-            Assert.AreEqual(filterCriteria.BPM.Min, 199.5d);
-            Assert.IsNull(filterCriteria.BPM.Max);
+            ClassicAssert.AreEqual("gotta go fast", filterCriteria.SearchText.Trim());
+            ClassicAssert.AreEqual(3, filterCriteria.SearchTerms.Length);
+            ClassicAssert.NotNull(filterCriteria.BPM.Min);
+            ClassicAssert.AreEqual(filterCriteria.BPM.Min!, 199.5d);
+            ClassicAssert.Null(filterCriteria.BPM.Max);
         }
 
         private static readonly object[] correct_length_query_examples =
@@ -228,10 +229,10 @@ namespace osu.Game.Tests.NonVisual.Filtering
             string query = $"length={lengthQuery} time";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("time", filterCriteria.SearchText.Trim());
-            Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
-            Assert.AreEqual(expectedLength.TotalMilliseconds - scale.TotalMilliseconds / 2.0, filterCriteria.Length.Min);
-            Assert.AreEqual(expectedLength.TotalMilliseconds + scale.TotalMilliseconds / 2.0, filterCriteria.Length.Max);
+            ClassicAssert.AreEqual("time", filterCriteria.SearchText.Trim());
+            ClassicAssert.AreEqual(1, filterCriteria.SearchTerms.Length);
+            ClassicAssert.AreEqual(expectedLength.TotalMilliseconds - scale.TotalMilliseconds / 2.0, filterCriteria.Length.Min);
+            ClassicAssert.AreEqual(expectedLength.TotalMilliseconds + scale.TotalMilliseconds / 2.0, filterCriteria.Length.Max);
         }
 
         private static readonly object[] incorrect_length_query_examples =
@@ -254,7 +255,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             string query = $"length={lengthQuery} time";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual(false, filterCriteria.Length.HasFilter);
+            ClassicAssert.AreEqual(false, filterCriteria.Length.HasFilter);
         }
 
         [Test]
@@ -263,12 +264,12 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "that's a time signature alright! divisor:12";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("that's a time signature alright!", filterCriteria.SearchText.Trim());
-            Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
-            Assert.AreEqual(12, filterCriteria.BeatDivisor.Min);
-            Assert.IsTrue(filterCriteria.BeatDivisor.IsLowerInclusive);
-            Assert.AreEqual(12, filterCriteria.BeatDivisor.Max);
-            Assert.IsTrue(filterCriteria.BeatDivisor.IsUpperInclusive);
+            ClassicAssert.AreEqual("that's a time signature alright!", filterCriteria.SearchText.Trim());
+            ClassicAssert.AreEqual(5, filterCriteria.SearchTerms.Length);
+            ClassicAssert.AreEqual(12, filterCriteria.BeatDivisor.Min);
+            ClassicAssert.True(filterCriteria.BeatDivisor.IsLowerInclusive);
+            ClassicAssert.AreEqual(12, filterCriteria.BeatDivisor.Max);
+            ClassicAssert.True(filterCriteria.BeatDivisor.IsUpperInclusive);
         }
 
         [Test]
@@ -277,7 +278,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "status=r";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.IsNotEmpty(filterCriteria.OnlineStatus.Values);
+            ClassicAssert.IsNotEmpty(filterCriteria.OnlineStatus.Values);
             Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Ranked));
         }
 
@@ -287,9 +288,9 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "I want the pp status=ranked";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("I want the pp", filterCriteria.SearchText.Trim());
-            Assert.AreEqual(4, filterCriteria.SearchTerms.Length);
-            Assert.IsNotEmpty(filterCriteria.OnlineStatus.Values);
+            ClassicAssert.AreEqual("I want the pp", filterCriteria.SearchText.Trim());
+            ClassicAssert.AreEqual(4, filterCriteria.SearchTerms.Length);
+            ClassicAssert.IsNotEmpty(filterCriteria.OnlineStatus.Values);
             Assert.That(filterCriteria.OnlineStatus.Values, Contains.Item(BeatmapOnlineStatus.Ranked));
         }
 
@@ -308,7 +309,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "status!=r";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.IsNotEmpty(filterCriteria.OnlineStatus.Values);
+            ClassicAssert.IsNotEmpty(filterCriteria.OnlineStatus.Values);
             Assert.That(filterCriteria.OnlineStatus.Values, Does.Not.Contain(BeatmapOnlineStatus.Ranked));
         }
 
@@ -374,9 +375,9 @@ namespace osu.Game.Tests.NonVisual.Filtering
             string query = $"beatmap specifically by {keyword}=my_fav";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("beatmap specifically by", filterCriteria.SearchText.Trim());
-            Assert.AreEqual(3, filterCriteria.SearchTerms.Length);
-            Assert.AreEqual("my_fav", filterCriteria.Creator.SearchTerm);
+            ClassicAssert.AreEqual("beatmap specifically by", filterCriteria.SearchText.Trim());
+            ClassicAssert.AreEqual(3, filterCriteria.SearchTerms.Length);
+            ClassicAssert.AreEqual("my_fav", filterCriteria.Creator.SearchTerm);
         }
 
         [Test]
@@ -385,9 +386,9 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "find me songs with title=\"a certain title\" please";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("find me songs with  please", filterCriteria.SearchText.Trim());
-            Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
-            Assert.AreEqual("a certain title", filterCriteria.Title.SearchTerm);
+            ClassicAssert.AreEqual("find me songs with  please", filterCriteria.SearchText.Trim());
+            ClassicAssert.AreEqual(5, filterCriteria.SearchTerms.Length);
+            ClassicAssert.AreEqual("a certain title", filterCriteria.Title.SearchTerm);
             Assert.That(filterCriteria.Title.MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
         }
 
@@ -397,9 +398,9 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "find me songs by artist=singer please";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("find me songs by  please", filterCriteria.SearchText.Trim());
-            Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
-            Assert.AreEqual("singer", filterCriteria.Artist.SearchTerm);
+            ClassicAssert.AreEqual("find me songs by  please", filterCriteria.SearchText.Trim());
+            ClassicAssert.AreEqual(5, filterCriteria.SearchTerms.Length);
+            ClassicAssert.AreEqual("singer", filterCriteria.Artist.SearchTerm);
             Assert.That(filterCriteria.Artist.MatchMode, Is.EqualTo(FilterCriteria.MatchMode.Substring));
         }
 
@@ -409,9 +410,9 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "really like artist=\"name with space\" yes";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("really like  yes", filterCriteria.SearchText.Trim());
-            Assert.AreEqual(3, filterCriteria.SearchTerms.Length);
-            Assert.AreEqual("name with space", filterCriteria.Artist.SearchTerm);
+            ClassicAssert.AreEqual("really like  yes", filterCriteria.SearchText.Trim());
+            ClassicAssert.AreEqual(3, filterCriteria.SearchTerms.Length);
+            ClassicAssert.AreEqual("name with space", filterCriteria.Artist.SearchTerm);
             Assert.That(filterCriteria.Artist.MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
         }
 
@@ -422,8 +423,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.That(filterCriteria.SearchText.Trim(), Is.Empty);
-            Assert.AreEqual(0, filterCriteria.SearchTerms.Length);
-            Assert.AreEqual("The Only One", filterCriteria.Artist.SearchTerm);
+            ClassicAssert.AreEqual(0, filterCriteria.SearchTerms.Length);
+            ClassicAssert.AreEqual("The Only One", filterCriteria.Artist.SearchTerm);
             Assert.That(filterCriteria.Artist.MatchMode, Is.EqualTo(FilterCriteria.MatchMode.FullPhrase));
         }
 
@@ -433,9 +434,9 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "weird artist=double\"quote";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("weird", filterCriteria.SearchText.Trim());
-            Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
-            Assert.AreEqual("double\"quote", filterCriteria.Artist.SearchTerm);
+            ClassicAssert.AreEqual("weird", filterCriteria.SearchText.Trim());
+            ClassicAssert.AreEqual(1, filterCriteria.SearchTerms.Length);
+            ClassicAssert.AreEqual("double\"quote", filterCriteria.Artist.SearchTerm);
         }
 
         [Test]
@@ -444,7 +445,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "artist=><something";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("><something", filterCriteria.Artist.SearchTerm);
+            ClassicAssert.AreEqual("><something", filterCriteria.Artist.SearchTerm);
         }
 
         [Test]
@@ -453,7 +454,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "unrecognised=keyword";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("unrecognised=keyword", filterCriteria.SearchText);
+            ClassicAssert.AreEqual("unrecognised=keyword", filterCriteria.SearchText);
         }
 
         [TestCase("cs=nope")]
@@ -464,7 +465,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         {
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual(query, filterCriteria.SearchText);
+            ClassicAssert.AreEqual(query, filterCriteria.SearchText);
         }
 
         [Test]
@@ -474,8 +475,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "custom=readme unrecognised=keyword";
             var filterCriteria = new FilterCriteria { RulesetCriteria = customCriteria };
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("readme", customCriteria.CustomValue);
-            Assert.AreEqual("unrecognised=keyword", filterCriteria.SearchText.Trim());
+            ClassicAssert.AreEqual("readme", customCriteria.CustomValue);
+            ClassicAssert.AreEqual("unrecognised=keyword", filterCriteria.SearchText.Trim());
         }
 
         [TestCase("[1]", new[] { 0 })]
@@ -535,9 +536,9 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "find me songs with source=\"unit tests\" please";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual("find me songs with  please", filterCriteria.SearchText.Trim());
-            Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
-            Assert.AreEqual("unit tests", filterCriteria.Source.SearchTerm);
+            ClassicAssert.AreEqual("find me songs with  please", filterCriteria.SearchText.Trim());
+            ClassicAssert.AreEqual(5, filterCriteria.SearchTerms.Length);
+            ClassicAssert.AreEqual("unit tests", filterCriteria.Source.SearchTerm);
             Assert.That(filterCriteria.Source.MatchMode, Is.EqualTo(FilterCriteria.MatchMode.IsolatedPhrase));
         }
 
@@ -580,7 +581,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             string query = $"lastplayed<{dateQuery} time";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual(true, filterCriteria.LastPlayed.HasFilter);
+            ClassicAssert.AreEqual(true, filterCriteria.LastPlayed.HasFilter);
         }
 
         private static readonly object[] incorrect_date_query_examples =
@@ -605,7 +606,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             string query = $"played<{dateQuery} time";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual(false, filterCriteria.LastPlayed.HasFilter);
+            ClassicAssert.AreEqual(false, filterCriteria.LastPlayed.HasFilter);
         }
 
         [Test]
@@ -614,11 +615,11 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "lastplayed>50";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.That(filterCriteria.LastPlayed.Max, Is.Not.Null);
-            Assert.That(filterCriteria.LastPlayed.Min, Is.Null);
+            Assert.That(filterCriteria.LastPlayed.Max!, Is.Not.Null);
+            Assert.That(filterCriteria.LastPlayed.Min!, Is.Null);
             // the parser internally references `DateTimeOffset.Now`, so to not make things too annoying for tests, just assume some tolerance
             // (irrelevant in proportion to the actual filter proscribed).
-            Assert.That(filterCriteria.LastPlayed.Max, Is.EqualTo(DateTimeOffset.Now.AddDays(-50)).Within(TimeSpan.FromSeconds(5)));
+            Assert.That(filterCriteria.LastPlayed.Max!, Is.EqualTo(DateTimeOffset.Now.AddDays(-50)).Within(TimeSpan.FromSeconds(5)));
         }
 
         [Test]
@@ -627,11 +628,11 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "lastplayed<50";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.That(filterCriteria.LastPlayed.Max, Is.Null);
-            Assert.That(filterCriteria.LastPlayed.Min, Is.Not.Null);
+            Assert.That(filterCriteria.LastPlayed.Max!, Is.Null);
+            Assert.That(filterCriteria.LastPlayed.Min!, Is.Not.Null);
             // the parser internally references `DateTimeOffset.Now`, so to not make things too annoying for tests, just assume some tolerance
             // (irrelevant in proportion to the actual filter proscribed).
-            Assert.That(filterCriteria.LastPlayed.Min, Is.EqualTo(DateTimeOffset.Now.AddDays(-50)).Within(TimeSpan.FromSeconds(5)));
+            Assert.That(filterCriteria.LastPlayed.Min!, Is.EqualTo(DateTimeOffset.Now.AddDays(-50)).Within(TimeSpan.FromSeconds(5)));
         }
 
         [Test]
@@ -640,12 +641,12 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "lastplayed>3M lastplayed<1y6M";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.That(filterCriteria.LastPlayed.Min, Is.Not.Null);
-            Assert.That(filterCriteria.LastPlayed.Max, Is.Not.Null);
+            Assert.That(filterCriteria.LastPlayed.Min!, Is.Not.Null);
+            Assert.That(filterCriteria.LastPlayed.Max!, Is.Not.Null);
             // the parser internally references `DateTimeOffset.Now`, so to not make things too annoying for tests, just assume some tolerance
             // (irrelevant in proportion to the actual filter proscribed).
-            Assert.That(filterCriteria.LastPlayed.Min, Is.EqualTo(DateTimeOffset.Now.AddMonths(-6).AddYears(-1)).Within(TimeSpan.FromSeconds(5)));
-            Assert.That(filterCriteria.LastPlayed.Max, Is.EqualTo(DateTimeOffset.Now.AddMonths(-3)).Within(TimeSpan.FromSeconds(5)));
+            Assert.That(filterCriteria.LastPlayed.Min!, Is.EqualTo(DateTimeOffset.Now.AddMonths(-6).AddYears(-1)).Within(TimeSpan.FromSeconds(5)));
+            Assert.That(filterCriteria.LastPlayed.Max!, Is.EqualTo(DateTimeOffset.Now.AddMonths(-3)).Within(TimeSpan.FromSeconds(5)));
         }
 
         [Test]
@@ -654,7 +655,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "lastplayed=50";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual(false, filterCriteria.LastPlayed.HasFilter);
+            ClassicAssert.AreEqual(false, filterCriteria.LastPlayed.HasFilter);
         }
 
         [Test]
@@ -663,8 +664,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
             const string query = "lastplayed<10000y";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual(true, filterCriteria.LastPlayed.HasFilter);
-            Assert.AreEqual(DateTimeOffset.MinValue.AddMilliseconds(1), filterCriteria.LastPlayed.Min);
+            ClassicAssert.AreEqual(true, filterCriteria.LastPlayed.HasFilter);
+            ClassicAssert.AreEqual(DateTimeOffset.MinValue.AddMilliseconds(1), filterCriteria.LastPlayed.Min);
         }
 
         private static DateTimeOffset dateTimeOffsetFromDateOnly(int year, int month, int day) =>
@@ -706,8 +707,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
         {
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual(true, filterCriteria.DateRanked.HasFilter);
-            Assert.AreEqual(expected, f(filterCriteria));
+            ClassicAssert.AreEqual(true, filterCriteria.DateRanked.HasFilter);
+            ClassicAssert.AreEqual(expected, f(filterCriteria));
         }
 
         private static readonly object[] ranked_date_invalid_test_cases =
@@ -723,7 +724,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         {
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual(false, filterCriteria.DateRanked.HasFilter);
+            ClassicAssert.AreEqual(false, filterCriteria.DateRanked.HasFilter);
         }
 
         private static readonly object[] submitted_date_test_cases =
@@ -755,7 +756,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         {
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
-            Assert.AreEqual(expected, filterCriteria.DateSubmitted.HasFilter);
+            ClassicAssert.AreEqual(expected, filterCriteria.DateSubmitted.HasFilter);
         }
 
         private static readonly object[] played_query_tests =
@@ -781,8 +782,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
         {
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, $"played={query}");
-            Assert.AreEqual(true, filterCriteria.LastPlayed.HasFilter);
-            Assert.AreEqual(matched, filterCriteria.LastPlayed.IsInRange(reference));
+            ClassicAssert.AreEqual(true, filterCriteria.LastPlayed.HasFilter);
+            ClassicAssert.AreEqual(matched, filterCriteria.LastPlayed.IsInRange(reference));
         }
 
         [Test]
