@@ -15,7 +15,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
@@ -108,13 +107,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
         private void onMissingStartTimeChanged(ValueChangedEvent<double?> startTime)
         {
-            using (BeginAbsoluteSequence(startTime.NewValue ?? double.MinValue))
+            if (startTime.NewValue == null)
             {
-                if (startTime.NewValue == null)
-                    bodySprite?.FadeColour(Color4.White);
-                else
-                    bodySprite?.FadeColour(Colour4.DarkGray, 60);
+                // Colour revert handled by the DHO transform reset.
+                return;
             }
+
+            using (BeginAbsoluteSequence(startTime.NewValue.Value))
+                bodySprite?.FadeColour(Colour4.DarkGray, 60);
         }
 
         private void onIsHittingChanged(ValueChangedEvent<bool> isHitting)
