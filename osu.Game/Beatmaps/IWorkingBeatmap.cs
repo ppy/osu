@@ -139,6 +139,6 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Reads the correct track restart point from beatmap metadata and sets looping to enabled.
         /// </summary>
-        void PrepareTrackForPreview(bool looping, double offsetFromPreviewPoint = 0);
+        void PrepareTrackForPreview(bool looping, double? offsetFromPreviewPoint = null);
     }
 }
