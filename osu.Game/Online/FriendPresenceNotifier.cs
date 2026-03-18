@@ -25,6 +25,16 @@ namespace osu.Game.Online
 {
     public partial class FriendPresenceNotifier : Component
     {
+        /// <summary>
+        /// Minimum time between subsequent online/offline notifications.
+        /// </summary>
+        public double NotificationDebounceTime { get; set; } = 1000;
+
+        /// <summary>
+        /// Minimum time after a user has gone offline, before they're added to the offline alert queue.
+        /// </summary>
+        public double OfflineDebounceTime { get; set; } = 15000;
+
         [Resolved]
         private INotificationOverlay notifications { get; set; } = null!;
 
@@ -53,6 +63,12 @@ namespace osu.Game.Online
         private readonly HashSet<APIUser> offlineAlertQueue = new HashSet<APIUser>();
 
         /// <summary>
+        /// List of users that have gone offline, but we're waiting for them to potentially come online again before queueing them for notification.
+        /// For example, if a user is quickly toggling between the "Online" and "Appear Offline" states.
+        /// </summary>
+        private readonly HashSet<APIUser> pendingOfflineUsers = new HashSet<APIUser>();
+
+        /// <summary>
         /// The post time for the next online notification.
         /// </summary>
         private double? nextOnlineAlertTime;
@@ -61,8 +77,6 @@ namespace osu.Game.Online
         /// The post time for the next offline notification.
         /// </summary>
         private double? nextOfflineAlertTime;
-
-        private const double debounce_time_before_notification = 1000;
 
         protected override void LoadComplete()
         {
@@ -147,28 +161,55 @@ namespace osu.Game.Online
                         APIRelation? friend = friends.FirstOrDefault(f => f.TargetID == friendId);
 
                         if (friend?.TargetUser is APIUser user)
-                            markUserOffline(user);
+                            markUserOfflineDebounced(user);
                     }
 
                     break;
             }
         }
 
+        /// <summary>
+        /// Immediately registers a user for the next online notification alert.
+        /// </summary>
         private void markUserOnline(APIUser user)
         {
+            if (pendingOfflineUsers.Remove(user))
+                return;
+
             if (!offlineAlertQueue.Remove(user))
             {
                 onlineAlertQueue.Add(user);
-                nextOnlineAlertTime ??= Time.Current + debounce_time_before_notification;
+                nextOnlineAlertTime ??= Time.Current + NotificationDebounceTime;
             }
         }
 
+        /// <summary>
+        /// Waits <see cref="debounce_time_before_offline"/> before adding a user to the next offline notification alert.
+        /// </summary>
+        /// <param name="user"></param>
+        private void markUserOfflineDebounced(APIUser user)
+        {
+            pendingOfflineUsers.Add(user);
+
+            Scheduler.AddDelayed(() =>
+            {
+                // Check if the friend has come back online.
+                if (!pendingOfflineUsers.Remove(user))
+                    return;
+
+                markUserOffline(user);
+            }, OfflineDebounceTime);
+        }
+
+        /// <summary>
+        /// Immediately registers a user for the next offline notification alert.
+        /// </summary>
         private void markUserOffline(APIUser user)
         {
             if (!onlineAlertQueue.Remove(user))
             {
                 offlineAlertQueue.Add(user);
-                nextOfflineAlertTime ??= Time.Current + debounce_time_before_notification;
+                nextOfflineAlertTime ??= Time.Current + NotificationDebounceTime;
             }
         }
 
