@@ -21,7 +21,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
 
@@ -151,9 +150,6 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public void FilterLanguage(SearchLanguage language)
             => Schedule(() => searchControl.Language.Value = language);
-
-        public void SetRuleset(RulesetInfo ruleset)
-            => Schedule(() => searchControl.Ruleset.Value = ruleset);
 
         protected override void LoadComplete()
         {

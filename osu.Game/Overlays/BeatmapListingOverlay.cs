@@ -26,7 +26,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
 
@@ -88,11 +87,6 @@ namespace osu.Game.Overlays
             filterControl.TypingStarted = onTypingStarted;
             filterControl.SearchStarted = onSearchStarted;
             filterControl.SearchFinished = onSearchFinished;
-        }
-
-        public void FilterRuleset(RulesetInfo ruleset)
-        {
-            filterControl.SetRuleset(ruleset);
         }
 
         protected override void LoadComplete()
