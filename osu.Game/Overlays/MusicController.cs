@@ -37,8 +37,8 @@ namespace osu.Game.Overlays
         /// </summary>
         private const double restart_cutoff_point = 5000;
 
-        public const double TRACK_FADE_IN_TIME = 500;
-        public const double TRACK_FADE_OUT_TIME = 300;
+        public const double TRACK_FADE_IN_TIME = 250;
+        public const double TRACK_FADE_OUT_TIME = 100;
 
         /// <summary>
         /// Whether the user has requested the track to be paused. Use <see cref="IsPlaying"/> to determine whether the track is still playing.
@@ -530,8 +530,9 @@ namespace osu.Game.Overlays
 
                 if (queuedTrack == CurrentTrack)
                 {
+                    queuedTrack.Volume.Value = 0;
                     AddInternal(queuedTrack);
-                    queuedTrack.VolumeTo(0).Then().VolumeTo(1, TRACK_FADE_IN_TIME, Easing.Out);
+                    queuedTrack.Delay(50).VolumeTo(1, TRACK_FADE_IN_TIME, Easing.Out);
                 }
                 else
                 {
