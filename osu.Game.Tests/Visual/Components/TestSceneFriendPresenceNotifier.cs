@@ -25,6 +25,7 @@ namespace osu.Game.Tests.Visual.Components
         private NotificationOverlay notificationOverlay = null!;
         private ChatOverlay chatOverlay = null!;
         private TestMetadataClient metadataClient = null!;
+        private FriendPresenceNotifier notifier = null!;
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -45,7 +46,11 @@ namespace osu.Game.Tests.Visual.Components
                     notificationOverlay,
                     chatOverlay,
                     metadataClient,
-                    new FriendPresenceNotifier()
+                    notifier = new FriendPresenceNotifier
+                    {
+                        // Speeds up tests that don't rely on this debounce a little bit.
+                        OfflineDebounceTime = 0
+                    }
                 }
             };
 
@@ -126,6 +131,28 @@ namespace osu.Game.Tests.Visual.Components
             });
 
             AddUntilStep("wait for notification", () => notificationOverlay.AllNotifications.Count(), () => Is.EqualTo(2));
+        }
+
+        [Test]
+        public void TestOfflineDebounce()
+        {
+            AddStep("set debounce time", () =>
+            {
+                notifier.NotificationDebounceTime = 0;
+                notifier.OfflineDebounceTime = 5000;
+            });
+
+            AddStep("bring friend online", () => metadataClient.FriendPresenceUpdated(1, new UserPresence { Status = UserStatus.Online }));
+            AddUntilStep("online notification posted", () => notificationOverlay.AllNotifications.Count(), () => Is.EqualTo(1));
+
+            for (int i = 0; i < 3; i++)
+            {
+                AddStep("bring friend online", () => metadataClient.FriendPresenceUpdated(1, new UserPresence { Status = UserStatus.Online }));
+                AddStep("bring friend offline", () => metadataClient.FriendPresenceUpdated(1, null));
+            }
+
+            AddUntilStep("online notification posted", () => notificationOverlay.AllNotifications.Count(), () => Is.EqualTo(1));
+            AddUntilStep("offline notification posted", () => notificationOverlay.AllNotifications.Count(), () => Is.EqualTo(2));
         }
     }
 }
