@@ -42,10 +42,24 @@ namespace osu.Game.Online
         private readonly IBindableList<APIRelation> friends = new BindableList<APIRelation>();
         private readonly IBindableDictionary<int, UserPresence> friendPresences = new BindableDictionary<int, UserPresence>();
 
+        /// <summary>
+        /// List of users that will be notified as having come online with the next notification.
+        /// </summary>
         private readonly HashSet<APIUser> onlineAlertQueue = new HashSet<APIUser>();
+
+        /// <summary>
+        /// List of users that will be notified as having gone offline with the next notification.
+        /// </summary>
         private readonly HashSet<APIUser> offlineAlertQueue = new HashSet<APIUser>();
 
+        /// <summary>
+        /// The post time for the next online notification.
+        /// </summary>
         private double? nextOnlineAlertTime;
+
+        /// <summary>
+        /// The post time for the next offline notification.
+        /// </summary>
         private double? nextOfflineAlertTime;
 
         private const double debounce_time_before_notification = 1000;
