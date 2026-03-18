@@ -28,6 +28,9 @@ namespace osu.Game.Tests.Visual.SongSelect
     {
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
         private DialogOverlay dialogOverlay = null!;
         private RulesetStore rulesets = null!;
         private BeatmapManager beatmapManager = null!;
