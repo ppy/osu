@@ -37,6 +37,9 @@ namespace osu.Game.Overlays
         /// </summary>
         private const double restart_cutoff_point = 5000;
 
+        public const double TRACK_FADE_IN_TIME = 250;
+        public const double TRACK_FADE_OUT_TIME = 100;
+
         /// <summary>
         /// Whether the user has requested the track to be paused. Use <see cref="IsPlaying"/> to determine whether the track is still playing.
         /// </summary>
@@ -518,25 +521,20 @@ namespace osu.Game.Overlays
 
             CurrentTrack = queuedTrack;
 
-            // At this point we may potentially be in an async context from tests. This is extremely dangerous but we have to make do for now.
-            // CurrentTrack is immediately updated above for situations where a immediate knowledge about the new track is required,
-            // but the mutation of the hierarchy is scheduled to avoid exceptions.
-            Schedule(() =>
-            {
-                lastTrack.VolumeTo(0, 500, Easing.Out).Expire();
+            lastTrack.VolumeTo(0, TRACK_FADE_OUT_TIME, Easing.Out).Expire();
 
-                if (queuedTrack == CurrentTrack)
-                {
-                    AddInternal(queuedTrack);
-                    queuedTrack.VolumeTo(0).Then().VolumeTo(1, 300, Easing.Out);
-                }
-                else
-                {
-                    // If the track has changed since the call to changeTrack, it is safe to dispose the
-                    // queued track rather than consume it.
-                    queuedTrack.Dispose();
-                }
-            });
+            if (queuedTrack == CurrentTrack)
+            {
+                queuedTrack.Volume.Value = 0;
+                AddInternal(queuedTrack);
+                queuedTrack.Delay(50).VolumeTo(1, TRACK_FADE_IN_TIME, Easing.Out);
+            }
+            else
+            {
+                // If the track has changed since the call to changeTrack, it is safe to dispose the
+                // queued track rather than consume it.
+                queuedTrack.Dispose();
+            }
         }
 
         private DrawableTrack getQueuedTrack()
