@@ -37,6 +37,9 @@ namespace osu.Game.Overlays
         /// </summary>
         private const double restart_cutoff_point = 5000;
 
+        public const double TRACK_FADE_IN_TIME = 500;
+        public const double TRACK_FADE_OUT_TIME = 300;
+
         /// <summary>
         /// Whether the user has requested the track to be paused. Use <see cref="IsPlaying"/> to determine whether the track is still playing.
         /// </summary>
@@ -523,12 +526,12 @@ namespace osu.Game.Overlays
             // but the mutation of the hierarchy is scheduled to avoid exceptions.
             Schedule(() =>
             {
-                lastTrack.VolumeTo(0, 500, Easing.Out).Expire();
+                lastTrack.VolumeTo(0, TRACK_FADE_OUT_TIME, Easing.Out).Expire();
 
                 if (queuedTrack == CurrentTrack)
                 {
                     AddInternal(queuedTrack);
-                    queuedTrack.VolumeTo(0).Then().VolumeTo(1, 300, Easing.Out);
+                    queuedTrack.VolumeTo(0).Then().VolumeTo(1, TRACK_FADE_IN_TIME, Easing.Out);
                 }
                 else
                 {
