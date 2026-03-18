@@ -193,7 +193,7 @@ namespace osu.Game
 
         protected readonly Bindable<LocalUserPlayingState> UserPlayingState = new Bindable<LocalUserPlayingState>();
 
-        protected OsuScreenStack ScreenStack;
+        public OsuScreenStack ScreenStack { get; private set; }
 
         protected BackButton BackButton => screenStackFooter.BackButton;
         protected ScreenFooter ScreenFooter => screenStackFooter.Footer;
