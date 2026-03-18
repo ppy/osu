@@ -9,14 +9,14 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Game.Input.Bindings;
-using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Screens.Footer;
+using osu.Game.Rulesets;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
-    public partial class FooterButtonOptions : ScreenFooterButton, IHasPopover
+    public partial class FooterButtonSearch : ScreenFooterButton, IHasPopover
     {
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -34,14 +34,21 @@ namespace osu.Game.Screens.Select
         private BeatmapListingOverlay beatmapListing { get; set; } = null!;
 
         private Live<BeatmapInfo> beatmap = null!;
+        private bool f4WasPressedLastFrame;
+
+        public IBindable<WorkingBeatmap> WorkingBeatmap => workingBeatmap;
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
+
+        public IBindable<RulesetInfo> RulesetBindable => ruleset;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
         {
-            Text = SongSelectStrings.Options;
-            Icon = FontAwesome.Solid.Cog;
+            Text = "Search";
+            Icon = FontAwesome.Solid.Search;
             AccentColour = colour.Purple1;
-            Hotkey = GlobalAction.ToggleBeatmapOptions;
 
             Action = this.ShowPopover;
         }
@@ -52,6 +59,20 @@ namespace osu.Game.Screens.Select
             workingBeatmap.BindValueChanged(_ => beatmapChanged(), true);
         }
 
+        protected override void Update()
+        {
+            base.Update();
+            var inputManager = GetContainingInputManager();
+            if (inputManager == null) return;
+
+            var keyboard = inputManager.CurrentState.Keyboard;
+            bool f4Pressed = keyboard.Keys.IsPressed(Key.F4);
+            if (f4Pressed && !f4WasPressedLastFrame)
+                Action?.Invoke();
+
+            f4WasPressedLastFrame = f4Pressed;
+        }
+
         private void beatmapChanged()
         {
             this.HidePopover();
@@ -60,6 +81,9 @@ namespace osu.Game.Screens.Select
                 beatmap = realm.Run(r => r.Find<BeatmapInfo>(workingBeatmap.Value.BeatmapInfo.ID)!.ToLive(realm));
         }
 
-        public Framework.Graphics.UserInterface.Popover GetPopover() => new Popover(this, beatmap.Value.Detach(), colourProvider, beatmapListing, songSelect);
+        public Framework.Graphics.UserInterface.Popover GetPopover()
+        {
+            return new SearchPopover(this, beatmap.Value.Detach(), colourProvider, beatmapListing, songSelect);
+        }
     }
 }
