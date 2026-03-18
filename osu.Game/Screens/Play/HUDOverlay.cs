@@ -51,7 +51,6 @@ namespace osu.Game.Screens.Play
 
         public readonly ModDisplay ModDisplay;
         public readonly HoldForMenuButton HoldToQuit;
-        public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
         [Cached]
         private readonly ClicksPerSecondController clicksPerSecondController;
@@ -77,7 +76,6 @@ namespace osu.Game.Screens.Play
 
         private Bindable<HUDVisibilityMode> configVisibilityMode;
         private Bindable<bool> configLeaderboardVisibility;
-        private Bindable<bool> configSettingsOverlay;
 
         private readonly BindableBool replayLoaded = new BindableBool();
 
@@ -111,8 +109,6 @@ namespace osu.Game.Screens.Play
 
         public HUDOverlay([CanBeNull] DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods, PlayerConfiguration configuration)
         {
-            Container rightSettings;
-
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
             this.configuration = configuration;
@@ -165,17 +161,6 @@ namespace osu.Game.Screens.Play
                         HoldToQuit = CreateHoldForMenuButton(),
                     }
                 },
-                rightSettings = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        PlayerSettingsOverlay = new PlayerSettingsOverlay
-                        {
-                            Alpha = 0,
-                        }
-                    }
-                },
                 TopLeftElements = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
@@ -185,7 +170,7 @@ namespace osu.Game.Screens.Play
                 },
             };
 
-            hideTargets = new List<Drawable> { mainComponents, TopRightElements, rightSettings };
+            hideTargets = new List<Drawable> { mainComponents, TopRightElements };
 
             if (rulesetComponents != null)
                 hideTargets.Add(rulesetComponents);
@@ -205,7 +190,6 @@ namespace osu.Game.Screens.Play
 
             configVisibilityMode = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode);
             configLeaderboardVisibility = config.GetBindable<bool>(OsuSetting.GameplayLeaderboard);
-            configSettingsOverlay = config.GetBindable<bool>(OsuSetting.ReplaySettingsOverlay);
 
             if (configVisibilityMode.Value == HUDVisibilityMode.Never && !hasShownNotificationOnce)
             {
@@ -233,7 +217,6 @@ namespace osu.Game.Screens.Play
             holdingForHUD.BindValueChanged(_ => updateVisibility());
             IsPlaying.BindValueChanged(_ => updateVisibility());
             configVisibilityMode.BindValueChanged(_ => updateVisibility());
-            configSettingsOverlay.BindValueChanged(_ => updateVisibility());
 
             replayLoaded.BindValueChanged(e =>
             {
@@ -344,11 +327,6 @@ namespace osu.Game.Screens.Play
 
         private void updateVisibility()
         {
-            if (configSettingsOverlay.Value && replayLoaded.Value)
-                PlayerSettingsOverlay.Show();
-            else
-                PlayerSettingsOverlay.Hide();
-
             if (ShowHud.Disabled)
                 return;
 
@@ -410,10 +388,6 @@ namespace osu.Game.Screens.Play
 
             switch (e.Action)
             {
-                case GlobalAction.ToggleReplaySettings:
-                    configSettingsOverlay.Value = !configSettingsOverlay.Value;
-                    return true;
-
                 case GlobalAction.HoldForHUD:
                     holdingForHUD.Value = true;
                     return false;
