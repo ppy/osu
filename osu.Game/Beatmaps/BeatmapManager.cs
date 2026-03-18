@@ -296,7 +296,7 @@ namespace osu.Game.Beatmaps
             return Realm.Run(r =>
             {
                 r.Refresh();
-                return r.All<BeatmapSetInfo>().Where(b => !b.DeletePending).Detach();
+                return r.All<BeatmapSetInfo>().Where(b => !b.DeletePending).AsEnumerable().Detach();
             });
         }
 

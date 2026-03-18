@@ -688,11 +688,11 @@ namespace osu.Game.Graphics
 
             public class Glyph : ITexturedCharacterGlyph
             {
-                public float XOffset => default;
-                public float YOffset => default;
-                public float XAdvance => default;
-                public float Baseline => default;
-                public char Character => default;
+                public float XOffset => 0;
+                public float YOffset => 0;
+                public float XAdvance => 0;
+                public float Baseline => 0;
+                public char Character => '\0';
 
                 public float GetKerning<T>(T lastGlyph) where T : ICharacterGlyph => throw new NotImplementedException();
 

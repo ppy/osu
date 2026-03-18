@@ -175,7 +175,7 @@ namespace osu.Game.Online.Metadata
         public override Task<BeatmapUpdates> GetChangesSince(int queueId)
         {
             if (connector?.IsConnected.Value != true)
-                return Task.FromCanceled<BeatmapUpdates>(default);
+                return Task.FromCanceled<BeatmapUpdates>(CancellationToken.None);
 
             Logger.Log($"Requesting any changes since last known queue id {queueId}");
 
