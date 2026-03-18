@@ -3,28 +3,25 @@
   "isRoot": true,
   "tools": {
     "jetbrains.resharper.globaltools": {
-      "version": "2023.3.3",
+      "version": "2025.2.3",
       "commands": [
         "jb"
-      ]
-    },
-    "nvika": {
-      "version": "4.0.0",
-      "commands": [
-        "nvika"
-      ]
+      ],
+      "rollForward": false
     },
     "codefilesanity": {
       "version": "0.0.37",
       "commands": [
         "CodeFileSanity"
-      ]
+      ],
+      "rollForward": false
     },
     "ppy.localisationanalyser.tools": {
       "version": "2025.1208.0",
       "commands": [
         "localisation"
-      ]
+      ],
+      "rollForward": false
     }
   }
 }

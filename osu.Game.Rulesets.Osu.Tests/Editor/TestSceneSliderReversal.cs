@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             Vector2 oldStartPos = default;
             Vector2 oldEndPos = default;
-            double oldDistance = default;
+            double oldDistance = 0;
             var oldControlPointTypes = controlPoints.Select(p => p.Type);
 
             AddStep("Add slider", () =>
@@ -255,7 +255,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             Vector2 oldStartPos = default;
             Vector2 oldEndPos = default;
-            double oldDistance = default;
+            double oldDistance = 0;
 
             var oldControlPointTypes = segmentedSliderPath.Select(p => p.Type);
 

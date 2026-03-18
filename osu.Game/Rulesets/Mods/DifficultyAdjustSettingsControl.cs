@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Mods
                 }
             }
 
-            public DifficultyBindableWithCurrent(float? defaultValue = default)
+            public DifficultyBindableWithCurrent(float? defaultValue = null)
                 : base(defaultValue)
             {
             }

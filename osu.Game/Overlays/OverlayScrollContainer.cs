@@ -71,7 +71,7 @@ namespace osu.Game.Overlays
             Button.State = Target > button_scroll_position || lastScrollTarget.Value != null ? Visibility.Visible : Visibility.Hidden;
         }
 
-        protected override void OnUserScroll(double value, bool animated = true, double? distanceDecay = default)
+        protected override void OnUserScroll(double value, bool animated = true, double? distanceDecay = null)
         {
             base.OnUserScroll(value, animated, distanceDecay);
 

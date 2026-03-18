@@ -193,20 +193,20 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             public Color4 HyperDashColour
             {
-                get => Configuration.CustomColours[CatchSkinColour.HyperDash.ToString()];
-                set => Configuration.CustomColours[CatchSkinColour.HyperDash.ToString()] = value;
+                get => Configuration.CustomColours[nameof(CatchSkinColour.HyperDash)];
+                set => Configuration.CustomColours[nameof(CatchSkinColour.HyperDash)] = value;
             }
 
             public Color4 HyperDashAfterImageColour
             {
-                get => Configuration.CustomColours[CatchSkinColour.HyperDashAfterImage.ToString()];
-                set => Configuration.CustomColours[CatchSkinColour.HyperDashAfterImage.ToString()] = value;
+                get => Configuration.CustomColours[nameof(CatchSkinColour.HyperDashAfterImage)];
+                set => Configuration.CustomColours[nameof(CatchSkinColour.HyperDashAfterImage)] = value;
             }
 
             public Color4 HyperDashFruitColour
             {
-                get => Configuration.CustomColours[CatchSkinColour.HyperDashFruit.ToString()];
-                set => Configuration.CustomColours[CatchSkinColour.HyperDashFruit.ToString()] = value;
+                get => Configuration.CustomColours[nameof(CatchSkinColour.HyperDashFruit)];
+                set => Configuration.CustomColours[nameof(CatchSkinColour.HyperDashFruit)] = value;
             }
 
             public TestSkin()

@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.UI
 
             applyRulesetMods(Mods, config);
 
-            loadObjects(cancellationToken ?? default);
+            loadObjects(cancellationToken ?? CancellationToken.None);
         }
 
         /// <summary>

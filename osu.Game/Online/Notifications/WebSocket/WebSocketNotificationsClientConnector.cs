@@ -46,7 +46,7 @@ namespace osu.Game.Online.Notifications.WebSocket
             return client;
         }
 
-        public Task SendAsync(SocketMessage message, CancellationToken? cancellationToken = default)
+        public Task SendAsync(SocketMessage message, CancellationToken? cancellationToken = null)
         {
             if (CurrentConnection is not WebSocketNotificationsClient webSocketClient)
                 return Task.CompletedTask;
