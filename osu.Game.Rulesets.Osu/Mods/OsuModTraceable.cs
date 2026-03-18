@@ -16,7 +16,7 @@ using osu.Game.Rulesets.Osu.Skinning.Default;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModTraceable : ModWithVisibilityAdjustment, IRequiresApproachCircles
+    public class OsuModTraceable : ModTraceable, IRequiresApproachCircles
     {
         public override string Name => "Traceable";
         public override string Acronym => "TC";
