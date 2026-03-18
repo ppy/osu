@@ -184,7 +184,7 @@ namespace osu.Game.Online
         }
 
         /// <summary>
-        /// Waits <see cref="debounce_time_before_offline"/> before adding a user to the next offline notification alert.
+        /// Waits <see cref="OfflineDebounceTime"/> before adding a user to the next offline notification alert.
         /// </summary>
         /// <param name="user"></param>
         private void markUserOfflineDebounced(APIUser user)
