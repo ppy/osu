@@ -17,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Select;
 using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Input;
