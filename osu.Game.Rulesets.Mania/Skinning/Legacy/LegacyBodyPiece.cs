@@ -103,18 +103,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             direction.BindValueChanged(onDirectionChanged, true);
             isHitting.BindValueChanged(onIsHittingChanged, true);
             missingStartTime.BindValueChanged(onMissingStartTimeChanged, true);
-        }
 
-        private void onMissingStartTimeChanged(ValueChangedEvent<double?> startTime)
-        {
-            if (startTime.NewValue == null)
-            {
-                // Colour revert handled by the DHO transform reset.
-                return;
-            }
-
-            using (BeginAbsoluteSequence(startTime.NewValue.Value))
-                bodySprite?.FadeColour(Colour4.DarkGray, 60);
+            holdNote.ApplyCustomUpdateState += onApplyCustomUpdateState;
         }
 
         private void onIsHittingChanged(ValueChangedEvent<bool> isHitting)
@@ -171,6 +161,21 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 if (light != null)
                     light.Anchor = Anchor.BottomCentre;
             }
+        }
+
+        private void onMissingStartTimeChanged(ValueChangedEvent<double?> startTime)
+            => applyMissingDim();
+
+        private void onApplyCustomUpdateState(DrawableHitObject obj, ArmedState state)
+            => applyMissingDim();
+
+        private void applyMissingDim()
+        {
+            if (missingStartTime.Value == null)
+                return;
+
+            using (BeginAbsoluteSequence(missingStartTime.Value.Value))
+                this.FadeColour(Colour4.DarkGray, 60);
         }
 
         protected override void Update()

@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -15,28 +16,31 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
     {
         private readonly IBindable<double?> missingStartTime = new Bindable<double?>();
 
-        [BackgroundDependencyLoader]
-        private void load(DrawableHitObject drawableObject)
-        {
-            missingStartTime.BindTo(((DrawableHoldNoteTail)drawableObject).MissingStartTime);
-        }
+        [Resolved]
+        private DrawableHitObject drawableObject { get; set; } = null!;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
+            missingStartTime.BindTo(((DrawableHoldNoteTail)drawableObject).MissingStartTime);
             missingStartTime.BindValueChanged(onMissingStartTimeChanged, true);
+
+            drawableObject.ApplyCustomUpdateState += onApplyCustomUpdateState;
         }
 
         private void onMissingStartTimeChanged(ValueChangedEvent<double?> startTime)
-        {
-            if (startTime.NewValue == null)
-            {
-                // Colour revert handled by the DHO transform reset.
-                return;
-            }
+            => applyMissingDim();
 
-            using (BeginAbsoluteSequence(startTime.NewValue.Value))
+        private void onApplyCustomUpdateState(DrawableHitObject obj, ArmedState state)
+            => applyMissingDim();
+
+        private void applyMissingDim()
+        {
+            if (missingStartTime.Value == null)
+                return;
+
+            using (BeginAbsoluteSequence(missingStartTime.Value.Value))
                 this.FadeColour(Colour4.DarkGray, 60);
         }
 
@@ -54,6 +58,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             return GetAnimationFromLookup(skin, LegacyManiaSkinConfigurationLookups.HoldNoteTailImage)
                    ?? GetAnimationFromLookup(skin, LegacyManiaSkinConfigurationLookups.HoldNoteHeadImage)
                    ?? GetAnimationFromLookup(skin, LegacyManiaSkinConfigurationLookups.NoteImage);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (drawableObject.IsNotNull())
+                drawableObject.ApplyCustomUpdateState -= onApplyCustomUpdateState;
         }
     }
 }
