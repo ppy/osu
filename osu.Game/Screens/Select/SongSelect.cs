@@ -370,7 +370,8 @@ namespace osu.Game.Screens.Select
             new FooterButtonOptions
             {
                 Hotkey = GlobalAction.ToggleBeatmapOptions,
-            }
+            },
+            new FooterButtonSearch {}
         };
 
         protected override void LoadComplete()

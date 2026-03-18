@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -38,11 +39,16 @@ namespace osu.Game.Screens.Select
             // PopoverContainer.
             public ISongSelect? SongSelect { get; init; }
             public required OverlayColourProvider ColourProvider { get; init; }
+            public required BeatmapListingOverlay BeatmapListing { get; init; }
 
-            public Popover(FooterButtonOptions footerButton, BeatmapInfo beatmap)
+            [SetsRequiredMembers]
+            public Popover(FooterButtonOptions footerButton, BeatmapInfo beatmap, OverlayColourProvider colourProvider, BeatmapListingOverlay beatmapListing, ISongSelect? songSelect = null)
             {
                 this.footerButton = footerButton;
                 this.beatmap = beatmap;
+                ColourProvider = colourProvider;
+                BeatmapListing = beatmapListing;
+                SongSelect = songSelect;
             }
 
             [BackgroundDependencyLoader]
