@@ -38,11 +38,6 @@ namespace osu.Game.Screens.Play
 
         public const Easing FADE_EASING = Easing.OutQuint;
 
-        /// <summary>
-        /// The total height of all the bottom of screen scoring elements.
-        /// </summary>
-        public float BottomScoringElementsHeight { get; private set; }
-
         protected override bool ShouldBeConsideredForInput(Drawable child)
         {
             // HUD uses AlwaysVisible on child components so they can be in an updated state for next display.
@@ -295,7 +290,7 @@ namespace osu.Game.Screens.Play
                 TopLeftElements.Y = 0;
 
             if (highestBottomScreenSpace.HasValue && DrawHeight - BottomRightElements.DrawHeight > 0)
-                BottomRightElements.Y = BottomScoringElementsHeight = -Math.Clamp(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y, 0, DrawHeight - BottomRightElements.DrawHeight);
+                BottomRightElements.Y = -Math.Clamp(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y, 0, DrawHeight - BottomRightElements.DrawHeight);
             else
                 BottomRightElements.Y = 0;
 
