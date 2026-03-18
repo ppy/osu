@@ -320,33 +320,32 @@ namespace osu.Game.Screens.Play
                     OnRetry = Configuration.AllowUserInteraction ? () => Restart() : null,
                     OnQuit = () => PerformExitWithConfirmation(),
                 },
-                exitOverlay = new HotkeyExitOverlay
+            });
+
+            if (cancellationToken.IsCancellationRequested)
+                return;
+
+            GameplayClockContainer.Add(exitOverlay = new HotkeyExitOverlay
+            {
+                Depth = float.MinValue,
+                Action = () =>
+                {
+                    if (!this.IsCurrentScreen()) return;
+
+                    PerformExit(skipTransition: true);
+                },
+            });
+
+            if (Configuration.AllowRestart)
+            {
+                GameplayClockContainer.Add(retryOverlay = new HotkeyRetryOverlay
                 {
                     Depth = float.MinValue,
                     Action = () =>
                     {
                         if (!this.IsCurrentScreen()) return;
 
-                        PerformExit(skipTransition: true);
-                    },
-                },
-            });
-
-            if (cancellationToken.IsCancellationRequested)
-                return;
-
-            if (Configuration.AllowRestart)
-            {
-                rulesetSkinProvider.AddRange(new Drawable[]
-                {
-                    retryOverlay = new HotkeyRetryOverlay
-                    {
-                        Action = () =>
-                        {
-                            if (!this.IsCurrentScreen()) return;
-
-                            Restart(true);
-                        },
+                        Restart(true);
                     },
                 });
             }
