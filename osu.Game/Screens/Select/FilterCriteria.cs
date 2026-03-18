@@ -219,7 +219,7 @@ namespace osu.Game.Screens.Select
                         break;
 
                     case MatchMode.IsolatedPhrase:
-                        result = Regex.IsMatch(value, $@"(^|\s){Regex.Escape(searchTerm)}($|\s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+                        result = Regex.IsMatch(value, $@"(^|[\s\p{{P}}]){Regex.Escape(searchTerm)}($|[\s\p{{P}}])", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
                         break;
 
                     case MatchMode.FullPhrase:
