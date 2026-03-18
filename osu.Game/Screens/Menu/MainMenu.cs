@@ -429,6 +429,7 @@ namespace osu.Game.Screens.Menu
                     }, () =>
                     {
                         holdToExitGameOverlay.Abort();
+                        Game.CancelRestartOnExit();
                     }));
                 }
 
