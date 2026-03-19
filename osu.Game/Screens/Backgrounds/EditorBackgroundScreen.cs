@@ -6,11 +6,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Screens.Edit;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Backgrounds
 {
@@ -25,6 +28,7 @@ namespace osu.Game.Screens.Backgrounds
         private BeatmapBackgroundWithStoryboard? background;
 
         private readonly Container content;
+        private readonly Box blackBox;
 
         // We retrieve IBindable<WorkingBeatmap> from our dependency cache instead of passing WorkingBeatmap directly into EditorBackgroundScreen.
         // Otherwise, DummyWorkingBeatmap will be erroneously passed in whenever creating a new beatmap (since the Schedule() in the Editor that populates
@@ -37,9 +41,19 @@ namespace osu.Game.Screens.Backgrounds
             InternalChild = dimContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = content = new EditorSkinProvidingContainer(editorBeatmap)
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    // This adds overdraw but makes transitions not suck.
+                    // There's probably a better way to do this, but it's high effort.
+                    blackBox = new Box
+                    {
+                        Colour = Color4.Black,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    content = new EditorSkinProvidingContainer(editorBeatmap)
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
                 },
             };
         }
@@ -62,6 +76,20 @@ namespace osu.Game.Screens.Backgrounds
             showStoryboard.BindValueChanged(_ => updateState());
 
             updateState(withAnimation: false);
+        }
+
+        public override void OnEntering(ScreenTransitionEvent e)
+        {
+            base.OnEntering(e);
+            blackBox.Delay(TRANSITION_LENGTH).Expire();
+        }
+
+        public override bool OnExiting(ScreenExitEvent e)
+        {
+            // The storyboard will do weird things with clock time changing on exit, so let's just hide it instead.
+            background?.UnloadStoryboard();
+
+            return base.OnExiting(e);
         }
 
         public void RefreshBackgroundAsync()
