@@ -358,7 +358,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 score.BeatmapInfo = beatmapInfo;
                 score.BeatmapHash = beatmapInfo.Hash;
                 score.Ruleset = beatmapInfo.Ruleset;
-                score.Rank = ScoreRank.D;
+                score.Rank = ScoreRank.S;
                 score.User = new APIUser { Username = "notme", Id = 5678 };
                 scoreManager.Import(score);
             });
@@ -368,7 +368,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 var score = TestResources.CreateTestScoreInfo();
                 score.BeatmapInfo = beatmapInfo;
                 score.BeatmapHash = beatmapInfo.Hash;
-                score.TotalScore = 999998;
+                score.Rank = ScoreRank.A;
                 score.Ruleset = new OsuRuleset().RulesetInfo;
                 score.User = API.LocalUser.Value;
                 scoreManager.Import(score);
@@ -379,7 +379,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 var score = TestResources.CreateTestScoreInfo();
                 score.BeatmapInfo = beatmapInfo;
                 score.BeatmapHash = beatmapInfo.Hash;
-                score.TotalScore = 999997;
+                score.Rank = ScoreRank.B;
                 score.Ruleset = beatmapInfo.Ruleset;
                 score.Mods = [new CatchModMirror()];
                 score.User = API.LocalUser.Value;
