@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
+using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -128,6 +129,36 @@ namespace osu.Game.Tests.Beatmaps.IO
                 using var archiveReader = new ZipArchiveReader(memoryStream);
                 byte[] fileContent = archiveReader.GetStream(filename).ReadAllBytesToArray();
                 return Encoding.UTF8.GetString(fileContent);
+            }
+        }
+
+        [Test]
+        public void TestExportUsesCarriageReturnLineFeed()
+        {
+            IWorkingBeatmap beatmap = null!;
+            MemoryStream outStream = null!;
+
+            AddStep("import beatmap", () => beatmap = importBeatmapFromArchives(@"legacy-export-stability-test.olz"));
+            AddStep("export", () =>
+            {
+                outStream = new MemoryStream();
+
+                new LegacyBeatmapExporter(LocalStorage)
+                    .ExportToStream((BeatmapSetInfo)beatmap.BeatmapInfo.BeatmapSet!, outStream, null);
+            });
+
+            const string osu_filename = @"legacy export - stability test (spaceman_atlas) [].osu";
+
+            AddAssert(".osu file uses CRLF line endings",
+                () => hasBareLineFeed(osu_filename, outStream.GetBuffer()),
+                () => Is.False);
+
+            bool hasBareLineFeed(string filename, byte[] archiveBytes)
+            {
+                using var memoryStream = new MemoryStream(archiveBytes);
+                using var archiveReader = new ZipArchiveReader(memoryStream);
+                byte[] content = archiveReader.GetStream(filename).ReadAllBytesToArray();
+                return content.Prepend((byte)0).Zip(content).Any(pair => pair.Second == '\n' && pair.First != '\r');
             }
         }
 

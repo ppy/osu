@@ -71,8 +71,12 @@ namespace osu.Game.Database
 
             // Encode to legacy format
             var stream = new MemoryStream();
+
             using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+            {
+                sw.NewLine = "\r\n";
                 new LegacyBeatmapEncoder(playableBeatmap, beatmapSkin).Encode(sw);
+            }
 
             stream.Seek(0, SeekOrigin.Begin);
 
