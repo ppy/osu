@@ -37,10 +37,6 @@ namespace osu.Game.Screens.Backgrounds
             InternalChild = dimContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                // one reason for this kooky container nesting being here is that the storyboard needs a custom clock
-                // but also needs it on an isolated-enough level that doesn't break screen stack expiry logic (which happens if the clock was put on `this`),
-                // or doesn't make it literally impossible to fade the storyboard in/out in real time (which happens if the fade transforms were to be applied directly to the storyboard).
-                // another is that we need `EditorSkinProvidingContainer` so that storyboard sample lookups succeed.
                 Child = content = new EditorSkinProvidingContainer(editorBeatmap)
                 {
                     RelativeSizeAxes = Axes.Both,
