@@ -47,11 +47,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public readonly double Preempt;
 
         /// <summary>
-        /// Beatmap playback rate.
-        /// </summary>
-        public readonly double ClockRate;
-
-        /// <summary>
         /// Normalised distance from the start position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
         public double JumpDistance { get; private set; }
@@ -122,9 +117,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double? Angle { get; private set; }
 
         /// <summary>
-        /// Retrieves the full hit window for a Great <see cref="HitResult"/>.
+        /// Angle of the vector created between current and current-1
+        /// normalised to consider symmetrical vectors in any axis to be the same angle.
         /// </summary>
-        public double HitWindowGreat { get; private set; }
+        public double? NormalisedVectorAngle { get; private set; }
 
         /// <summary>
         /// Selective bonus for maps with higher circle size.
@@ -144,19 +140,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             AdjustedDeltaTime = Math.Max(DeltaTime, MIN_DELTA_TIME);
             LastObjectEndDeltaTime = lastDifficultyObject != null ? Math.Max(StartTime - lastDifficultyObject.EndTime, MIN_DELTA_TIME) : AdjustedDeltaTime;
 
-            SmallCircleBonus = Math.Max(1.0, 1.0 + (30 - BaseObject.Radius) / 40);
+            SmallCircleBonus = Math.Max(1.0, 1.0 + (30 - BaseObject.Radius) / 70);
 
-            ClockRate = clockRate;
             Preempt = BaseObject.TimePreempt / clockRate;
-
-            if (BaseObject is Slider sliderObject)
-            {
-                HitWindowGreat = 2 * sliderObject.HeadCircle.HitWindows.WindowFor(HitResult.Great) / clockRate;
-            }
-            else
-            {
-                HitWindowGreat = 2 * BaseObject.HitWindows.WindowFor(HitResult.Great) / clockRate;
-            }
 
             computeSliderCursorPosition();
             setDistances(clockRate);
@@ -206,7 +192,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double deltaDifference = Math.Abs(nextDeltaTime - currDeltaTime);
 
                 double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
-                double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / HitWindowGreat), 5);
+                double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / HitWindow(HitResult.Great)), 5);
 
                 return 1.0 - Math.Pow(speedRatio, 1 - windowRatio);
             }
@@ -219,7 +205,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (BaseObject is Slider currentSlider)
             {
                 // Bonus for repeat sliders until a better per nested object strain system can be achieved.
-                TravelDistance = LazyTravelDistance * Math.Pow(1 + currentSlider.RepeatCount / 2.5, 1.0 / 2.5);
+                TravelDistance = LazyTravelDistance * Math.Max(1, Math.Pow(currentSlider.RepeatCount, 0.3));
                 TravelTime = Math.Max(LazyTravelTime / clockRate, MIN_DELTA_TIME);
             }
 
@@ -278,6 +264,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                 double angle = calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition);
                 double sliderAngle = calculateSliderAngle(lastDifficultyObject!, lastLastCursorPosition);
+
+                Vector2 v = BaseObject.StackedPosition - lastCursorPosition;
+                NormalisedVectorAngle = Math.Atan2(Math.Abs(v.Y), Math.Abs(v.X));
 
                 Angle = Math.Min(angle, sliderAngle);
             }

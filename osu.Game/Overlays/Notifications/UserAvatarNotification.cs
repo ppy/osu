@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -11,14 +12,13 @@ namespace osu.Game.Overlays.Notifications
 {
     public abstract partial class UserAvatarNotification : SimpleNotification
     {
-        private readonly APIUser? user;
+        protected readonly APIUser User;
 
         protected DrawableAvatar Avatar { get; private set; } = null!;
 
-        protected UserAvatarNotification(APIUser? user, LocalisableString text = default)
+        protected UserAvatarNotification(APIUser user, LocalisableString text = default)
         {
-            this.user = user;
-
+            User = user;
             Icon = default;
             Text = text;
         }
@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Notifications
             IconContent.CornerRadius = CORNER_RADIUS;
             IconContent.ChangeChildDepth(IconDrawable, float.MinValue);
 
-            LoadComponentAsync(Avatar = new DrawableAvatar(user)
+            LoadComponentAsync(Avatar = new DrawableAvatar(User)
             {
                 FillMode = FillMode.Fill,
             }, IconContent.Add);
@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Notifications
         protected override void Update()
         {
             base.Update();
-            IconContent.Width = IconContent.DrawHeight;
+            IconContent.Width = Math.Min(78, IconContent.DrawHeight);
         }
     }
 }

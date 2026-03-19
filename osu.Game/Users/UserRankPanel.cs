@@ -27,7 +27,7 @@ namespace osu.Game.Users
         private const int padding = 10;
         private const int main_content_height = 80;
 
-        private ProfileValueDisplay globalRankDisplay = null!;
+        private GlobalRankDisplay globalRankDisplay = null!;
         private ProfileValueDisplay countryRankDisplay = null!;
         private LoadingLayer loadingLayer = null!;
 
@@ -71,8 +71,13 @@ namespace osu.Game.Users
             var statistics = statisticsProvider?.GetStatisticsFor(ruleset.Value);
 
             loadingLayer.State.Value = statistics == null ? Visibility.Visible : Visibility.Hidden;
-            globalRankDisplay.Content = statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? "-";
-            countryRankDisplay.Content = statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? "-";
+
+            // TODO: implement highest rank tooltip
+            // `RankHighest` resides in `APIUser`, but `api.LocalUser` doesn't update
+            // maybe move to `UserStatistics` in api, so `UserStatisticsWatcher` can update the value
+            globalRankDisplay.UserStatistics.Value = statistics;
+
+            countryRankDisplay.Content.Text = statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? "-";
         }
 
         protected override Drawable CreateLayout()
@@ -187,13 +192,7 @@ namespace osu.Game.Users
                         {
                             new Drawable[]
                             {
-                                globalRankDisplay = new ProfileValueDisplay(true)
-                                {
-                                    Title = UsersStrings.ShowRankGlobalSimple,
-                                    // TODO: implement highest rank tooltip
-                                    // `RankHighest` resides in `APIUser`, but `api.LocalUser` doesn't update
-                                    // maybe move to `UserStatistics` in api, so `UserStatisticsWatcher` can update the value
-                                },
+                                globalRankDisplay = new GlobalRankDisplay(),
                                 countryRankDisplay = new ProfileValueDisplay(true)
                                 {
                                     Title = UsersStrings.ShowRankCountrySimple,

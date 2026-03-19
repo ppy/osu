@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.Editing
             SaveEditor();
 
             ReloadEditorToSameBeatmap();
-            AddAssert("beatmap marked as locally modified", () => EditorBeatmap.BeatmapInfo.Status, () => Is.EqualTo(BeatmapOnlineStatus.LocallyModified));
+            AddUntilStep("beatmap marked as locally modified", () => EditorBeatmap.BeatmapInfo.Status, () => Is.EqualTo(BeatmapOnlineStatus.LocallyModified));
             AddAssert("beatmap hash changed", () => EditorBeatmap.BeatmapInfo.MD5Hash, () => Is.Not.EqualTo(initialHash));
         }
     }

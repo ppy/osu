@@ -131,8 +131,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var previousObj = (OsuDifficultyHitObject)currObj.Previous(0);
 
             // Buff perfect stacks only if current note is completely invisible at the time you click the previous note.
-            if (currObj.LazyJumpDistance == 0 && currObj.OpacityAt(previousObj.BaseObject.StartTime + previousObj.Preempt, true) == 0 && previousObj.StartTime + previousObj.Preempt > currObj.StartTime)
-                hiddenDifficulty += hidden_multiplier * 7500 / Math.Pow(currObj.AdjustedDeltaTime, 1.5); // Perfect stacks are harder the less time between notes
+            if (currObj.LazyJumpDistance == 0 && currObj.OpacityAt(previousObj.BaseObject.StartTime, true) == 0 && previousObj.StartTime > currObj.StartTime - currObj.Preempt)
+                hiddenDifficulty += hidden_multiplier * 2500 / Math.Pow(currObj.AdjustedDeltaTime, 1.5); // Perfect stacks are harder the less time between notes
 
             return hiddenDifficulty;
         }
@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 if (hitObject.IsNull() ||
                     current.StartTime - hitObject.StartTime > reading_window_size ||
-                    hitObject.StartTime + hitObject.Preempt < current.StartTime) // Current object not visible at the time object needs to be clicked
+                    hitObject.StartTime < current.StartTime - current.Preempt) // Current object not visible at the time object needs to be clicked
                     break;
 
                 yield return hitObject;
@@ -185,7 +185,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             while (hitObject != null)
             {
                 if (hitObject.StartTime - current.StartTime > reading_window_size ||
-                    current.StartTime + hitObject.Preempt < hitObject.StartTime) // Object not visible at the time current object needs to be clicked.
+                    current.StartTime < hitObject.StartTime - hitObject.Preempt) // Object not visible at the time current object needs to be clicked.
                     break;
 
                 double timeBetweenCurrAndLoopObj = hitObject.StartTime - current.StartTime;

@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Play
 {
     public partial class FailOverlay : GameplayMenuOverlay
     {
-        public Func<Task<ScoreInfo>>? SaveReplay;
+        public Func<Task<ScoreInfo>>? SaveReplay { get; init; }
 
         public override LocalisableString Header => GameplayMenuOverlayStrings.FailedHeader;
 

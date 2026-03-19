@@ -14,6 +14,11 @@ namespace osu.Game.Skinning
 {
     public sealed partial class LegacySpriteText : OsuSpriteText
     {
+        /// <summary>
+        /// The Private Use Area character for internally representing the "pp" suffix for performance counters.
+        /// </summary>
+        public const char PP_SUFFIX_CHAR = '\uebd9';
+
         public Vector2? MaxSizePerGlyph { get; init; }
         public bool FixedWidth { get; init; }
 
@@ -23,7 +28,7 @@ namespace osu.Game.Skinning
 
         protected override char FixedWidthReferenceCharacter => '5';
 
-        protected override char[] FixedWidthExcludeCharacters => new[] { ',', '.', '%', 'x' };
+        protected override char[] FixedWidthExcludeCharacters => new[] { ',', '.', '%', 'x', PP_SUFFIX_CHAR };
 
         // ReSharper disable once UnusedMember.Global
         // being unused is the point here
@@ -115,6 +120,9 @@ namespace osu.Game.Skinning
 
                     case '%':
                         return "percent";
+
+                    case PP_SUFFIX_CHAR:
+                        return "pp";
 
                     default:
                         return character.ToString();

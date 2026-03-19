@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -23,6 +24,7 @@ namespace osu.Game.Collections
 {
     /// <summary>
     /// A dropdown to select the collection to be used to filter results.
+    /// WARNING: TODO: we have TWO `CollectionDropdowns` with diverging functionality. This is not good.
     /// </summary>
     public partial class CollectionDropdown : OsuDropdown<CollectionFilterMenuItem>
     {
@@ -263,11 +265,11 @@ namespace osu.Game.Collections
             {
                 Debug.Assert(collection != null);
 
-                collection.PerformWrite(c =>
+                Task.Run(() => collection.PerformWrite(c =>
                 {
                     if (!c.BeatmapMD5Hashes.Remove(beatmap.Value.BeatmapInfo.MD5Hash))
                         c.BeatmapMD5Hashes.Add(beatmap.Value.BeatmapInfo.MD5Hash);
-                });
+                }));
             }
 
             protected override Drawable CreateContent() => (Content)base.CreateContent();

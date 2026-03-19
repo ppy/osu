@@ -138,6 +138,8 @@ namespace osu.Game.Screens.Edit.Compose
             // regardless of whether anything was even selected at all.
             // UX-wise this is generally strange and unexpected, but make it work anyways to preserve muscle memory.
             // note that this means that `getTimestamp()` must handle no-selection case, too.
+            // additionally, note we're intentionally not using `OsuGame.CopyToClipboard()`
+            // because we do not want toasts to pop up on every Ctrl-C press - it'd be disruptive to mappers.
             hostClipboard.SetText(getTimestamp());
 
             if (CanCopy.Value)

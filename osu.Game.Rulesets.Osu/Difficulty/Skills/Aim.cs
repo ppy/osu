@@ -4,11 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
+using osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Mods;
@@ -29,12 +30,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             IncludeSliders = includeSliders;
         }
 
-        private double currentAimStrain;
-        private double currentSpeedStrain;
+        private double currentStrain;
 
-        private double skillMultiplierAim => 130.0;
-        private double skillMultiplierSpeed => 6.5;
-        private double skillMultiplierTotal => 0.94;
+        private double skillMultiplierSnap => 355.0;
+        private double skillMultiplierAgility => 10.0;
+        private double skillMultiplierFlow => 1225;
+        private double skillMultiplierTotal => 1.02;
         private double meanExponent => 1.2;
 
         private readonly List<double> sliderStrains = new List<double>();
@@ -49,33 +50,74 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainDecayAim(double ms) => Math.Pow(0.15, ms / 1000);
         private double strainDecaySpeed(double ms) => Math.Pow(0.3, ms / 1000);
+        private double strainDecay(double ms) => Math.Pow(0.15, ms / 1000);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            double decayAim = strainDecayAim(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
-            double decaySpeed = strainDecaySpeed(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
+            double decay = strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
 
-            double aimDifficulty = AimEvaluator.EvaluateDifficultyOf(current, IncludeSliders);
-            double speedDifficulty = SpeedAimEvaluator.EvaluateDifficultyOf(current);
+            double snapDifficulty = SnapAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierSnap;
+            double agilityDifficulty = AgilityEvaluator.EvaluateDifficultyOf(current) * skillMultiplierAgility;
+            double flowDifficulty = FlowAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierFlow;
 
             if (Mods.Any(m => m is OsuModTouchDevice))
             {
-                aimDifficulty = Math.Pow(aimDifficulty, 0.8);
-                speedDifficulty = Math.Pow(speedDifficulty, 0.95);
+                snapDifficulty = Math.Pow(snapDifficulty, 0.89);
+                // we don't adjust agility here since agility represents TD difficulty in a decent enough way
+                flowDifficulty = Math.Pow(flowDifficulty, 1.1);
             }
 
-            currentAimStrain *= decayAim;
-            currentAimStrain += aimDifficulty * (1 - decayAim) * skillMultiplierAim;
+            if (Mods.Any(m => m is OsuModRelax))
+            {
+                agilityDifficulty *= 0.3;
+            }
 
-            currentSpeedStrain *= decaySpeed;
-            currentSpeedStrain += speedDifficulty * (1 - decaySpeed) * skillMultiplierSpeed;
+            double totalDifficulty = calculateTotalValue(snapDifficulty, agilityDifficulty, flowDifficulty);
 
-            double totalStrain = DifficultyCalculationUtils.Norm(meanExponent, currentAimStrain, currentSpeedStrain);
+            currentStrain *= decay;
+            currentStrain += totalDifficulty * (1 - decay);
 
             if (current.BaseObject is Slider)
-                sliderStrains.Add(totalStrain);
+                sliderStrains.Add(currentStrain);
 
-            return totalStrain * skillMultiplierTotal;
+            return currentStrain;
+        }
+
+        private double calculateTotalValue(double snapDifficulty, double agilityDifficulty, double flowDifficulty)
+        {
+            // We compare flow to combined snap and agility because snap by itself doesn't have enough difficulty to be above flow on streams
+            // Agility on the other hand is supposed to measure the rate of cursor velocity changes while snapping
+            // So snapping every circle on a stream requires an enormous amount of agility at which point it's easier to flow
+            double combinedSnapDifficulty = DifficultyCalculationUtils.Norm(meanExponent, snapDifficulty, agilityDifficulty);
+
+            double pSnap = calculateSnapFlowProbability(flowDifficulty / combinedSnapDifficulty);
+            double pFlow = 1 - pSnap;
+
+            double totalDifficulty = combinedSnapDifficulty * pSnap + flowDifficulty * pFlow;
+
+            double totalStrain = totalDifficulty * skillMultiplierTotal;
+
+            return totalStrain;
+        }
+
+        // A function that turns the ratio of snap : flow into the probability of snapping/flowing
+        // It has the constraints:
+        // P(snap) + P(flow) = 1 (the object is always either snapped or flowed)
+        // P(snap) = f(snap/flow), P(flow) = f(flow/snap) (ie snap and flow are symmetric and reversible)
+        // Therefore: f(x) + f(1/x) = 1
+        // 0 <= f(x) <= 1 (cannot have negative or greater than 100% probability of snapping or flowing)
+        // This logistic function is a solution, which fits nicely with the general idea of interpolation and provides a tuneable constant
+        private static double calculateSnapFlowProbability(double ratio)
+        {
+            const double k = 7.27;
+
+            if (ratio == 0)
+                return 0;
+
+            if (double.IsNaN(ratio))
+                return 1;
+
+            return DifficultyCalculationUtils.Logistic(-k * Math.Log(ratio));
         }
 
         public double GetDifficultSliders()
@@ -92,6 +134,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         public double CountTopWeightedSliders(double difficultyValue)
-            => OsuStrainUtils.CountTopWeightedSliders(sliderStrains, difficultyValue);
+        {
+            if (sliderStrains.Count == 0)
+                return 0;
+
+            double consistentTopStrain = difficultyValue * (1 - 0.9); // What would the top strain be if all strain values were identical
+
+            if (consistentTopStrain == 0)
+                return 0;
+
+            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
+            return sliderStrains.Sum(s => DifficultyCalculationUtils.Logistic(s / consistentTopStrain, 0.88, 10, 1.1));
+        }
     }
 }
