@@ -43,6 +43,8 @@ using osu.Game.Screens.Ranking.Statistics.User;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK;
+using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Catch.Mods;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
@@ -305,6 +307,29 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        public void TestTaggingConversionMods()
+        {
+            var score = TestResources.CreateTestScoreInfo();
+            score.Mods = [new OsuModRandom()];
+
+            setUpTaggingRequests(() => score.BeatmapInfo);
+            AddStep("load panel", () =>
+            {
+                Child = new PopoverContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = new StatisticsPanel
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        State = { Value = Visibility.Visible },
+                        Score = { Value = score },
+                        AchievedScore = score,
+                    }
+                };
+            });
+        }
+
+        [Test]
         public void TestTaggingInteractionWithLocalScores()
         {
             BeatmapInfo beatmapInfo = null!;
@@ -321,6 +346,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 score.BeatmapInfo = beatmapInfo;
                 score.BeatmapHash = beatmapInfo.Hash;
                 score.Ruleset = beatmapInfo.Ruleset;
+                score.TotalScore = 999999;
                 score.Rank = ScoreRank.D;
                 score.User = API.LocalUser.Value;
                 scoreManager.Import(score);
@@ -342,7 +368,76 @@ namespace osu.Game.Tests.Visual.Ranking
                 var score = TestResources.CreateTestScoreInfo();
                 score.BeatmapInfo = beatmapInfo;
                 score.BeatmapHash = beatmapInfo.Hash;
+                score.TotalScore = 999998;
                 score.Ruleset = new OsuRuleset().RulesetInfo;
+                score.User = API.LocalUser.Value;
+                scoreManager.Import(score);
+            });
+
+            AddStep("import incompatible mod score", () =>
+            {
+                var score = TestResources.CreateTestScoreInfo();
+                score.BeatmapInfo = beatmapInfo;
+                score.BeatmapHash = beatmapInfo.Hash;
+                score.TotalScore = 999997;
+                score.Ruleset = beatmapInfo.Ruleset;
+                score.Mods = [new CatchModMirror()];
+                score.User = API.LocalUser.Value;
+                scoreManager.Import(score);
+            });
+
+            AddStep("import correct score", () =>
+            {
+                var score = TestResources.CreateTestScoreInfo();
+                score.BeatmapInfo = beatmapInfo;
+                score.BeatmapHash = beatmapInfo.Hash;
+                score.TotalScore = 1;
+                score.Rank = ScoreRank.C;
+                score.Ruleset = beatmapInfo.Ruleset;
+                score.User = API.LocalUser.Value;
+                scoreManager.Import(score);
+            });
+
+            setUpTaggingRequests(() => beatmapInfo);
+            AddStep("load panel", () =>
+            {
+                var score = TestResources.CreateTestScoreInfo();
+                score.BeatmapInfo = beatmapInfo;
+
+                Child = new PopoverContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = new StatisticsPanel
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        State = { Value = Visibility.Visible },
+                        Score = { Value = score },
+                    }
+                };
+            });
+        }
+
+        [Test]
+        public void TestTaggingScoreWithClassicMod()
+        {
+            BeatmapInfo beatmapInfo = null!;
+
+            AddStep(@"Import beatmap", () =>
+            {
+                beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+                beatmapInfo = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
+                beatmapInfo.Ruleset = new OsuRuleset().RulesetInfo;
+            });
+
+            AddStep("import incompatible score", () =>
+            {
+                var score = TestResources.CreateTestScoreInfo();
+                score.BeatmapInfo = beatmapInfo;
+                score.BeatmapHash = beatmapInfo.Hash;
+                score.Ruleset = beatmapInfo.Ruleset;
+                score.TotalScore = 1000000;
+                score.Rank = ScoreRank.S;
+                score.Mods = [new OsuModRandom()];
                 score.User = API.LocalUser.Value;
                 scoreManager.Import(score);
             });
@@ -353,6 +448,9 @@ namespace osu.Game.Tests.Visual.Ranking
                 score.BeatmapInfo = beatmapInfo;
                 score.BeatmapHash = beatmapInfo.Hash;
                 score.Ruleset = beatmapInfo.Ruleset;
+                score.TotalScore = 999999;
+                score.Rank = ScoreRank.C;
+                score.Mods = [new OsuModClassic()];
                 score.User = API.LocalUser.Value;
                 scoreManager.Import(score);
             });
