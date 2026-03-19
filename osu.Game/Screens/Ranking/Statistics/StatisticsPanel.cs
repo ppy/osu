@@ -262,11 +262,11 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                 var localUserScores = realm.Run(r =>
                     r.GetAllLocalScoresForUser(api.LocalUser.Value.Id)
-                        .Filter($@"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0", newScore.BeatmapInfo.ID)
-                        .AsEnumerable()
-                        .OrderByDescending(score => score.Ruleset.MatchesOnlineID(newScore.BeatmapInfo.Ruleset))
-                        .ThenByDescending(score => score.Rank)
-                        .ToArray());
+                     .Filter($@"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0", newScore.BeatmapInfo.ID)
+                     .AsEnumerable()
+                     .OrderByDescending(score => score.Ruleset.MatchesOnlineID(newScore.BeatmapInfo.Ruleset))
+                     .ThenByDescending(score => score.Rank)
+                     .ToArray());
 
                 if (localUserScores.Length == 0)
                     preventTaggingReason = getReasonFromPreventingTagging(newScore, AchievedScore);
