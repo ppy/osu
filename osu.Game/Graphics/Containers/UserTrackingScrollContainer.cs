@@ -35,7 +35,7 @@ namespace osu.Game.Graphics.Containers
         {
         }
 
-        protected override void OnUserScroll(double value, bool animated = true, double? distanceDecay = default)
+        protected override void OnUserScroll(double value, bool animated = true, double? distanceDecay = null)
         {
             UserScrolling = true;
             base.OnUserScroll(value, animated, distanceDecay);

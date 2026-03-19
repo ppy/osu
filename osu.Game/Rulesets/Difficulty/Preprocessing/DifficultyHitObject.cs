@@ -67,13 +67,13 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         public DifficultyHitObject Previous(int backwardsIndex)
         {
             int index = Index - (backwardsIndex + 1);
-            return index >= 0 && index < difficultyHitObjects.Count ? difficultyHitObjects[index] : default;
+            return index >= 0 && index < difficultyHitObjects.Count ? difficultyHitObjects[index] : null;
         }
 
         public DifficultyHitObject Next(int forwardsIndex)
         {
             int index = Index + (forwardsIndex + 1);
-            return index >= 0 && index < difficultyHitObjects.Count ? difficultyHitObjects[index] : default;
+            return index >= 0 && index < difficultyHitObjects.Count ? difficultyHitObjects[index] : null;
         }
     }
 }
