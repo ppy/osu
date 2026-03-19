@@ -35,13 +35,13 @@ namespace osu.Game.Rulesets.Catch.Mods
             Color4? timingBasedColour = null;
 
             d.HitObjectApplied += _ =>
+            {
+                 // Block bananas from getting coloured.
+                if (d.HitObject is not Banana)
                 {
-                    // Block bananas from getting coloured.
-                    if (d.HitObject is not Banana)
-                    {
-                        timingBasedColour = BindableBeatDivisor.GetColourFor(currentBeatmap.ControlPointInfo.GetClosestBeatDivisor(d.HitObject.StartTime), colours);
-                    }
-                };
+                    timingBasedColour = BindableBeatDivisor.GetColourFor(currentBeatmap.ControlPointInfo.GetClosestBeatDivisor(d.HitObject.StartTime), colours);
+                }
+            };
 
             // Need to set this every update to ensure it doesn't get overwritten by DrawableHitObject.OnApply() -> UpdateComboColour().
             d.OnUpdate += _ =>
