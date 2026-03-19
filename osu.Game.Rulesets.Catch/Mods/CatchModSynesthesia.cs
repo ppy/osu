@@ -41,10 +41,11 @@ namespace osu.Game.Rulesets.Catch.Mods
                 {
                     timingBasedColour = BindableBeatDivisor.GetColourFor(currentBeatmap.ControlPointInfo.GetClosestBeatDivisor(d.HitObject.StartTime), colours);
                 }
+
                 // Colour droplets into a solid colour, as droplets aren't generated snapped to timeline ticks.
                 if (d.HitObject is Droplet)
                 {
-                    timingBasedColour = Color4.Aqua;
+                    timingBasedColour = Color4.LightGreen;
                 }
             };
 
