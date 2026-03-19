@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -128,6 +130,42 @@ namespace osu.Game.Tests.Beatmaps.IO
                 using var archiveReader = new ZipArchiveReader(memoryStream);
                 byte[] fileContent = archiveReader.GetStream(filename).ReadAllBytesToArray();
                 return Encoding.UTF8.GetString(fileContent);
+            }
+        }
+
+        [Test]
+        public void TestExportUsesCarriageReturnLineFeed()
+        {
+            IWorkingBeatmap beatmap = null!;
+            MemoryStream outStream = null!;
+
+            AddStep("import beatmap", () => beatmap = importBeatmapFromArchives(@"legacy-export-stability-test.olz"));
+            AddStep("export", () =>
+            {
+                outStream = new MemoryStream();
+
+                new LegacyBeatmapExporter(LocalStorage)
+                    .ExportToStream((BeatmapSetInfo)beatmap.BeatmapInfo.BeatmapSet!, outStream, null);
+            });
+
+            AddAssert(".osu file uses CRLF line endings",
+                () => hasBareLineFeed(outStream.GetBuffer()),
+                () => Is.False);
+
+            bool hasBareLineFeed(byte[] archiveBytes)
+            {
+                using var memoryStream = new MemoryStream(archiveBytes);
+                using var archiveReader = new ZipArchiveReader(memoryStream);
+
+                foreach (string filename in archiveReader.Filenames.Where(f => f.EndsWith(".osu", StringComparison.Ordinal)))
+                {
+                    byte[] content = archiveReader.GetStream(filename).ReadAllBytesToArray();
+
+                    if (content.Prepend((byte)0).Zip(content).Any(pair => pair.Second == '\n' && pair.First != '\r'))
+                        return true;
+                }
+
+                return false;
             }
         }
 
