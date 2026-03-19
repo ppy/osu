@@ -17,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Select;
 using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Input;
@@ -26,6 +27,9 @@ namespace osu.Game.Tests.Visual.SongSelect
     public partial class TestSceneManageCollectionsDialog : OsuManualInputManagerTestScene
     {
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         private DialogOverlay dialogOverlay = null!;
         private RulesetStore rulesets = null!;
