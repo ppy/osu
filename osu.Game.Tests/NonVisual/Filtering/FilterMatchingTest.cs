@@ -220,14 +220,14 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
-        [TestCase(""quoted words"", false)]
-        [TestCase(""the artist"", false)]
-        [TestCase("the artist "quoted words"", false)]
-        [TestCase(""unknown"", true)]
+        [TestCase("\"quoted words\"", false)]
+        [TestCase("\"the artist\"", false)]
+        [TestCase("the artist \"quoted words\"", false)]
+        [TestCase("\"unknown\"", true)]
         public void TestCriteriaMatchingTermsAdjacentToPunctuation(string terms, bool filtered)
         {
             var exampleBeatmapInfo = getExampleBeatmap();
-            exampleBeatmapInfo.Metadata.Title = "the artist "quoted words"";
+            exampleBeatmapInfo.Metadata.Title = "the artist \"quoted words\"";
             var criteria = new FilterCriteria
             {
                 Ruleset = new RulesetInfo { OnlineID = 6 },
