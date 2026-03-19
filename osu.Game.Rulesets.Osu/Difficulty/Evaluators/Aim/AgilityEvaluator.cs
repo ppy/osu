@@ -38,6 +38,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             return strain * DifficultyCalculationUtils.Smootherstep(distance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
         }
 
-        private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.3, Math.Pow(ms / 1000, 0.9)));
+        private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.15, ms / 1000));
     }
 }
