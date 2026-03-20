@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Beatmaps
 {
-    public readonly struct StarDifficulty
+    public readonly record struct StarDifficulty
     {
         /// <summary>
         /// The star difficulty rating for the given beatmap.
