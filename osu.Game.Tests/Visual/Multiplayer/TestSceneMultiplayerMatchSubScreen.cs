@@ -17,6 +17,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -57,6 +58,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
             Dependencies.CacheAs<BeatmapStore>(new RealmDetachedBeatmapStore());
+            Dependencies.Cache(new ChannelManager(API));
 
             beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
 
@@ -437,6 +439,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("countdown started", () => MultiplayerClient.ServerRoom!.ActiveCountdowns.Any());
+        }
+
+        [Test]
+        public void TestRoll()
+        {
+            AddStep("set playlist", () =>
+            {
+                room.Playlist =
+                [
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ];
+            });
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+            AddStep("set channel", () => room.ChannelId = 1);
+
+            AddUntilStep("wait for room join", () => RoomJoined);
+
+            AddStep("roll", () => MultiplayerClient.SendMatchRequest(new RollRequest()));
         }
 
         [Test]
