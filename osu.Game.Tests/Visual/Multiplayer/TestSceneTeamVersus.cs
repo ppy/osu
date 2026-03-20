@@ -117,6 +117,55 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestTeamChangesLocked()
+        {
+            createRoom(() => new Room
+            {
+                Name = "Test Room",
+                Type = MatchType.TeamVersus,
+                Playlist =
+                [
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ]
+            });
+
+            AddUntilStep("user on team 0", () => (multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
+            AddStep("add another user", () => multiplayerClient.AddUser(new APIUser { Username = "otheruser", Id = 44 }));
+
+            AddStep("lock room", () =>
+            {
+                var roomState = TeamVersusRoomState.CreateDefault();
+                roomState.Locked = true;
+                multiplayerClient.ChangeMatchRoomState(roomState).WaitSafely();
+            });
+            AddStep("press own button", () =>
+            {
+                InputManager.MoveMouseTo(multiplayerComponents.ChildrenOfType<TeamDisplay>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("user on team 0", () => (multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
+
+            AddStep("unlock room", () =>
+            {
+                var roomState = TeamVersusRoomState.CreateDefault();
+                roomState.Locked = false;
+                multiplayerClient.ChangeMatchRoomState(roomState).WaitSafely();
+            });
+            AddStep("press own button", () =>
+            {
+                InputManager.MoveMouseTo(multiplayerComponents.ChildrenOfType<TeamDisplay>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("user on team 1", () => (multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 1);
+
+            AddStep("press own button again", () => InputManager.Click(MouseButton.Left));
+            AddUntilStep("user on team 0", () => (multiplayerClient.ClientRoom?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
+        }
+
+        [Test]
         public void TestSettingsUpdatedWhenChangingMatchType()
         {
             createRoom(() => new Room

@@ -57,6 +57,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestAddReferee()
+        {
+            AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.Current.Value).Distinct().Count() == 1);
+
+            AddStep("add user", () => MultiplayerClient.AddUser(new MultiplayerRoomUser(3)
+            {
+                User = new APIUser
+                {
+                    Id = 3,
+                    Username = "Second",
+                    CoverUrl = TestResources.COVER_IMAGE_3,
+                },
+                Role = MultiplayerRoomUserRole.Referee
+            }));
+
+            AddAssert("two unique panels", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.Current.Value).Distinct().Count() == 2);
+        }
+
+        [Test]
         public void TestAddUnresolvedUser()
         {
             AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.Current.Value).Distinct().Count() == 1);
