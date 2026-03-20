@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using JetBrains.Annotations;
+using Microsoft.AspNetCore.SignalR;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -18,6 +20,7 @@ using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.Chat.Listing;
 
 namespace osu.Game.Online.Chat
@@ -69,6 +72,10 @@ namespace osu.Game.Online.Chat
 
         [Resolved]
         private UserLookupCache users { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        [CanBeNull]
+        private MultiplayerClient multiplayerClient { get; set; }
 
         private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
@@ -264,11 +271,11 @@ namespace osu.Game.Online.Chat
 
             switch (command.ToLowerInvariant())
             {
-                case "np":
+                case @"np":
                     AddInternal(new NowPlayingCommand(target));
                     break;
 
-                case "me":
+                case @"me":
                     if (string.IsNullOrWhiteSpace(content))
                     {
                         target.AddNewMessages(new ErrorMessage("Usage: /me [action]"));
@@ -278,7 +285,7 @@ namespace osu.Game.Online.Chat
                     PostMessage(content, true, target);
                     break;
 
-                case "join":
+                case @"join":
                     if (string.IsNullOrWhiteSpace(content))
                     {
                         target.AddNewMessages(new ErrorMessage("Usage: /join [channel]"));
@@ -296,9 +303,9 @@ namespace osu.Game.Online.Chat
                     JoinChannel(channel);
                     break;
 
-                case "chat":
-                case "msg":
-                case "query":
+                case @"chat":
+                case @"msg":
+                case @"query":
                     if (string.IsNullOrWhiteSpace(content))
                     {
                         target.AddNewMessages(new ErrorMessage($"Usage: /{command} [user]"));
@@ -323,8 +330,36 @@ namespace osu.Game.Online.Chat
                     api.Queue(request);
                     break;
 
-                case "help":
-                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /chat [user], /np"));
+                case @"roll":
+                    if (target.Type != ChannelType.Multiplayer || multiplayerClient?.Room?.ChannelID != target.Id)
+                    {
+                        target.AddNewMessages(new ErrorMessage("Cannot roll when not in a multiplayer room."));
+                        break;
+                    }
+
+                    uint max = 100;
+
+                    if (!string.IsNullOrEmpty(content))
+                    {
+                        if (!uint.TryParse(content, out max) || max < 2 || max > 100)
+                        {
+                            target.AddNewMessages(new ErrorMessage("Usage: /roll [2-100]"));
+                            break;
+                        }
+                    }
+
+                    var rollRequest = new RollRequest { Max = max };
+                    multiplayerClient.SendMatchRequest(rollRequest).FireAndForget(onError: ex =>
+                    {
+                        string message = ex is HubException
+                            ? $"Failed to roll: {ex.Message}"
+                            : "Failed to roll.";
+                        target.AddNewMessages(new ErrorMessage(message));
+                    });
+                    break;
+
+                case @"help":
+                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /chat [user], /np, /roll [2-100] (multiplayer only)"));
                     break;
 
                 default:
