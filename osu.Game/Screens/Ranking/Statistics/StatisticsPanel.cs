@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -95,7 +94,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         {
             if (localScore == null)
                 return "Play the beatmap to contribute to beatmap tags!";
-            if (localScore.Ruleset.OnlineID != newScore.BeatmapInfo!.Ruleset.OnlineID)
+            else if (localScore.Ruleset.OnlineID != newScore.BeatmapInfo!.Ruleset.OnlineID)
                 return "Play the beatmap in its original ruleset to contribute to beatmap tags!";
             else if (localScore.Rank < ScoreRank.C)
                 return "Set a better score to contribute to beatmap tags!";
