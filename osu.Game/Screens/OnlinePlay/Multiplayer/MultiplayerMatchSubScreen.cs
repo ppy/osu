@@ -155,6 +155,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private long lastPlaylistItemId;
         private bool isRoomJoined;
 
+        private MultiplayerParticipantsSortTabControl participantsSortControl = null!;
+
+        private ParticipantsList participantsList = null!;
+
         public MultiplayerMatchSubScreen(Room room)
         {
             this.room = room;
@@ -243,7 +247,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                     RelativeSizeAxes = Axes.Both,
                                                                     RowDimensions = new[]
                                                                     {
-                                                                        new Dimension(GridSizeMode.AutoSize)
+                                                                        new Dimension(GridSizeMode.AutoSize),
+                                                                        new Dimension(GridSizeMode.AutoSize),
+                                                                        new Dimension(),
                                                                     },
                                                                     Content = new[]
                                                                     {
@@ -253,11 +259,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                         },
                                                                         new Drawable[]
                                                                         {
-                                                                            new ParticipantsList
+                                                                            participantsSortControl = new MultiplayerParticipantsSortTabControl
+                                                                            {
+                                                                                Anchor = Anchor.TopLeft,
+                                                                                Origin = Anchor.TopLeft,
+                                                                                Margin = new MarginPadding { Bottom = 10 }
+                                                                            }
+                                                                        },
+                                                                        new Drawable[]
+                                                                        {
+                                                                            participantsList = new ParticipantsList
                                                                             {
                                                                                 RelativeSizeAxes = Axes.Both
-                                                                            },
-                                                                        }
+                                                                            }
+                                                                        },
                                                                     }
                                                                 },
                                                                 null,
@@ -438,6 +453,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             client.MatchEvent += onMatchEvent;
 
             beatmapAvailabilityTracker.Availability.BindValueChanged(onBeatmapAvailabilityChanged, true);
+
+            participantsList.SortMode.BindTo(participantsSortControl.Current);
+            participantsList.SortDirection.BindTo(participantsSortControl.SortDirection);
 
             onRoomUpdated();
             updateGameplayState();
