@@ -22,7 +22,7 @@ namespace osu.Game.Online
         /// <summary>
         /// The current connection opened by this connector.
         /// </summary>
-        public PersistentEndpointClient? CurrentConnection { get; private set; }
+        protected PersistentEndpointClient? CurrentConnection { get; private set; }
 
         protected readonly IAPIProvider API;
 
@@ -128,7 +128,7 @@ namespace osu.Game.Online
                     }
                     catch (Exception e)
                     {
-                        await handleErrorAndDelay(e, cancellationToken).ConfigureAwait(false);
+                        await HandleErrorAndDelay(e, cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
@@ -141,7 +141,7 @@ namespace osu.Game.Online
         /// <summary>
         /// Handles an exception and delays an async flow.
         /// </summary>
-        private async Task handleErrorAndDelay(Exception exception, CancellationToken cancellationToken)
+        protected virtual async Task HandleErrorAndDelay(Exception exception, CancellationToken cancellationToken)
         {
             // random stagger factor to avoid mass incidental synchronisation
             // compare: https://github.com/peppy/osu-stable-reference/blob/013c3010a9d495e3471a9c59518de17006f9ad89/osu!/Online/BanchoClient.cs#L331
@@ -167,7 +167,7 @@ namespace osu.Game.Online
             await disconnect(true).ConfigureAwait(false);
 
             if (ex != null)
-                await handleErrorAndDelay(ex, CancellationToken.None).ConfigureAwait(false);
+                await HandleErrorAndDelay(ex, CancellationToken.None).ConfigureAwait(false);
             else
                 Logger.Log($"{ClientName} disconnected", LoggingTarget.Network);
 

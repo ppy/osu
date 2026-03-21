@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using osu.Framework.Bindables;
@@ -16,12 +17,7 @@ namespace osu.Game.Online
     public interface IHubClientConnector : IDisposable
     {
         /// <summary>
-        /// The current connection opened by this connector.
-        /// </summary>
-        HubConnection? CurrentConnection { get; }
-
-        /// <summary>
-        /// Whether this is connected to the hub, use <see cref="CurrentConnection"/> to access the connection, if this is <c>true</c>.
+        /// Whether the user is connected.
         /// </summary>
         IBindable<bool> IsConnected { get; }
 
@@ -39,5 +35,9 @@ namespace osu.Game.Online
         /// Reconnect if already connected.
         /// </summary>
         Task Reconnect();
+
+        Task InvokeAsync(string name, object?[]? args = null, CancellationToken cancellationToken = default);
+        Task<TResult> InvokeAsync<TResult>(string name, object?[]? args = null, CancellationToken cancellationToken = default);
+        Task SendAsync(string name, object?[]? args = null, CancellationToken cancellationToken = default);
     }
 }

@@ -31,8 +31,6 @@ namespace osu.Game.Online.Multiplayer
 
         public override IBindable<bool> IsConnected { get; } = new BindableBool();
 
-        private HubConnection? connection => connector?.CurrentConnection;
-
         public OnlineMultiplayerClient(EndpointConfiguration endpoints)
         {
             endpoint = endpoints.MultiplayerUrl;
@@ -101,18 +99,16 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 throw new OperationCanceledException();
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
             try
             {
-                return await connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.CreateRoom), room).ConfigureAwait(false);
+                return await connector.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.CreateRoom), [room]).ConfigureAwait(false);
             }
             catch (HubException exception)
             {
                 if (exception.GetHubExceptionMessage() == HubClientConnector.SERVER_SHUTDOWN_MESSAGE)
                 {
-                    Debug.Assert(connector != null);
-
                     await connector.Reconnect().ConfigureAwait(false);
                     return await CreateRoomInternal(room).ConfigureAwait(false);
                 }
@@ -126,18 +122,16 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 throw new OperationCanceledException();
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
             try
             {
-                return await connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.JoinRoomWithPassword), roomId, password ?? string.Empty).ConfigureAwait(false);
+                return await connector.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.JoinRoomWithPassword), [roomId, password ?? string.Empty]).ConfigureAwait(false);
             }
             catch (HubException exception)
             {
                 if (exception.GetHubExceptionMessage() == HubClientConnector.SERVER_SHUTDOWN_MESSAGE)
                 {
-                    Debug.Assert(connector != null);
-
                     await connector.Reconnect().ConfigureAwait(false);
                     return await JoinRoomInternal(roomId, password).ConfigureAwait(false);
                 }
@@ -151,9 +145,9 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.FromCanceled(new CancellationToken(true));
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.LeaveRoom));
+            return connector.InvokeAsync(nameof(IMultiplayerServer.LeaveRoom));
         }
 
         public override async Task InvitePlayer(int userId)
@@ -161,11 +155,11 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
             try
             {
-                await connection.InvokeAsync(nameof(IMultiplayerServer.InvitePlayer), userId).ConfigureAwait(false);
+                await connector.InvokeAsync(nameof(IMultiplayerServer.InvitePlayer), [userId]).ConfigureAwait(false);
             }
             catch (HubException exception)
             {
@@ -187,9 +181,9 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.TransferHost), userId);
+            return connector.InvokeAsync(nameof(IMultiplayerServer.TransferHost), [userId]);
         }
 
         public override Task KickUser(int userId)
@@ -197,9 +191,9 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.KickUser), userId);
+            return connector.InvokeAsync(nameof(IMultiplayerServer.KickUser), [userId]);
         }
 
         public override Task ChangeSettings(MultiplayerRoomSettings settings)
@@ -207,9 +201,9 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeSettings), settings);
+            return connector.InvokeAsync(nameof(IMultiplayerServer.ChangeSettings), [settings]);
         }
 
         public override Task ChangeState(MultiplayerUserState newState)
@@ -217,9 +211,9 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeState), newState);
+            return connector.InvokeAsync(nameof(IMultiplayerServer.ChangeState), [newState]);
         }
 
         public override Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability)
@@ -227,9 +221,9 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeBeatmapAvailability), newBeatmapAvailability);
+            return connector.InvokeAsync(nameof(IMultiplayerServer.ChangeBeatmapAvailability), [newBeatmapAvailability]);
         }
 
         public override Task ChangeUserStyle(int? beatmapId, int? rulesetId)
@@ -237,9 +231,9 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeUserStyle), beatmapId, rulesetId);
+            return connector.InvokeAsync(nameof(IMultiplayerServer.ChangeUserStyle), [beatmapId, rulesetId]);
         }
 
         public override Task ChangeUserMods(IEnumerable<APIMod> newMods)
@@ -247,9 +241,9 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeUserMods), newMods);
+            return connector.InvokeAsync(nameof(IMultiplayerServer.ChangeUserMods), [newMods]);
         }
 
         public override Task SendMatchRequest(MatchUserRequest request)
@@ -257,9 +251,9 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.SendMatchRequest), request);
+            return connector.InvokeAsync(nameof(IMultiplayerServer.SendMatchRequest), [request]);
         }
 
         public override Task StartMatch()
@@ -267,9 +261,9 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.StartMatch));
+            return connector.InvokeAsync(nameof(IMultiplayerServer.StartMatch));
         }
 
         public override Task AbortGameplay()
@@ -277,9 +271,9 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.AbortGameplay));
+            return connector.InvokeAsync(nameof(IMultiplayerServer.AbortGameplay));
         }
 
         public override Task AbortMatch()
@@ -287,9 +281,9 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.AbortMatch));
+            return connector.InvokeAsync(nameof(IMultiplayerServer.AbortMatch));
         }
 
         public override Task AddPlaylistItem(MultiplayerPlaylistItem item)
@@ -297,9 +291,9 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.AddPlaylistItem), item);
+            return connector.InvokeAsync(nameof(IMultiplayerServer.AddPlaylistItem), [item]);
         }
 
         public override Task EditPlaylistItem(MultiplayerPlaylistItem item)
@@ -307,9 +301,9 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.EditPlaylistItem), item);
+            return connector.InvokeAsync(nameof(IMultiplayerServer.EditPlaylistItem), [item]);
         }
 
         public override Task RemovePlaylistItem(long playlistItemId)
@@ -317,9 +311,9 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.RemovePlaylistItem), playlistItemId);
+            return connector.InvokeAsync(nameof(IMultiplayerServer.RemovePlaylistItem), [playlistItemId]);
         }
 
         public override Task VoteToSkipIntro()
@@ -327,9 +321,9 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
+            Debug.Assert(connector != null);
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.VoteToSkipIntro));
+            return connector.InvokeAsync(nameof(IMultiplayerServer.VoteToSkipIntro));
         }
 
         public override Task DisconnectInternal()
@@ -365,8 +359,8 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.FromResult(Array.Empty<MatchmakingPool>());
 
-            Debug.Assert(connection != null);
-            return connection.InvokeAsync<MatchmakingPool[]>(nameof(IMatchmakingServer.GetMatchmakingPoolsOfType), type);
+            Debug.Assert(connector != null);
+            return connector.InvokeAsync<MatchmakingPool[]>(nameof(IMatchmakingServer.GetMatchmakingPoolsOfType), [type]);
         }
 
         public override Task MatchmakingJoinLobby()
@@ -374,8 +368,8 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
-            return connection.InvokeAsync(nameof(IMatchmakingServer.MatchmakingJoinLobby));
+            Debug.Assert(connector != null);
+            return connector.InvokeAsync(nameof(IMatchmakingServer.MatchmakingJoinLobby));
         }
 
         public override Task MatchmakingLeaveLobby()
@@ -383,8 +377,8 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
-            return connection.InvokeAsync(nameof(IMatchmakingServer.MatchmakingLeaveLobby));
+            Debug.Assert(connector != null);
+            return connector.InvokeAsync(nameof(IMatchmakingServer.MatchmakingLeaveLobby));
         }
 
         public override Task MatchmakingJoinQueue(int poolId)
@@ -392,8 +386,8 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
-            return connection.InvokeAsync(nameof(IMatchmakingServer.MatchmakingJoinQueue), poolId);
+            Debug.Assert(connector != null);
+            return connector.InvokeAsync(nameof(IMatchmakingServer.MatchmakingJoinQueue), [poolId]);
         }
 
         public override Task MatchmakingLeaveQueue()
@@ -401,8 +395,8 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
-            return connection.InvokeAsync(nameof(IMatchmakingServer.MatchmakingLeaveQueue));
+            Debug.Assert(connector != null);
+            return connector.InvokeAsync(nameof(IMatchmakingServer.MatchmakingLeaveQueue));
         }
 
         public override Task MatchmakingAcceptInvitation()
@@ -410,8 +404,8 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
-            return connection.InvokeAsync(nameof(IMatchmakingServer.MatchmakingAcceptInvitation));
+            Debug.Assert(connector != null);
+            return connector.InvokeAsync(nameof(IMatchmakingServer.MatchmakingAcceptInvitation));
         }
 
         public override Task MatchmakingDeclineInvitation()
@@ -419,8 +413,8 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
-            return connection.InvokeAsync(nameof(IMatchmakingServer.MatchmakingDeclineInvitation));
+            Debug.Assert(connector != null);
+            return connector.InvokeAsync(nameof(IMatchmakingServer.MatchmakingDeclineInvitation));
         }
 
         public override Task MatchmakingToggleSelection(long playlistItemId)
@@ -428,8 +422,8 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
-            return connection.InvokeAsync(nameof(IMatchmakingServer.MatchmakingToggleSelection), playlistItemId);
+            Debug.Assert(connector != null);
+            return connector.InvokeAsync(nameof(IMatchmakingServer.MatchmakingToggleSelection), [playlistItemId]);
         }
 
         public override Task MatchmakingSkipToNextStage()
@@ -437,8 +431,8 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            Debug.Assert(connection != null);
-            return connection.InvokeAsync(nameof(IMatchmakingServer.MatchmakingSkipToNextStage));
+            Debug.Assert(connector != null);
+            return connector.InvokeAsync(nameof(IMatchmakingServer.MatchmakingSkipToNextStage));
         }
 
         protected override void Dispose(bool isDisposing)
