@@ -503,27 +503,27 @@ namespace osu.Game.Tests.Visual.Gameplay
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddStep("Right-click TopLeft anchor", () =>
+            AddStep("Click TopLeft anchor", () =>
             {
                 InputManager.MoveMouseTo(getMenuItemByText("TopLeft"));
-                InputManager.Click(MouseButton.Right);
+                InputManager.Click(MouseButton.Left);
             });
 
             AddAssert("TopLeft item checked", () => (getMenuItemByText("TopLeft").Item as TernaryStateRadioMenuItem)?.State.Value == TernaryState.True);
 
-            AddStep("Right-click Centre anchor", () =>
+            AddStep("Click Centre anchor", () =>
             {
                 InputManager.MoveMouseTo(getMenuItemByText("Centre"));
-                InputManager.Click(MouseButton.Right);
+                InputManager.Click(MouseButton.Left);
             });
 
             AddAssert("Centre item checked", () => (getMenuItemByText("Centre").Item as TernaryStateRadioMenuItem)?.State.Value == TernaryState.True);
             AddAssert("TopLeft item unchecked", () => (getMenuItemByText("TopLeft").Item as TernaryStateRadioMenuItem)?.State.Value == TernaryState.False);
 
-            AddStep("Right-click Closest anchor", () =>
+            AddStep("Click Closest anchor", () =>
             {
                 InputManager.MoveMouseTo(getMenuItemByText("Closest"));
-                InputManager.Click(MouseButton.Right);
+                InputManager.Click(MouseButton.Left);
             });
 
             AddAssert("Closest item checked", () => (getMenuItemByText("Closest").Item as TernaryStateRadioMenuItem)?.State.Value == TernaryState.True);
