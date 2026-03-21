@@ -31,10 +31,10 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
-        [SetUp]
-        public void SetUp()
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            base.Content.Child = new Container
+            AddStep("create components", () => base.Content.Child = new Container
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.Online
                         RelativeSizeAxes = Axes.Both,
                     }
                 }
-            };
+            });
         }
 
         [Test]
