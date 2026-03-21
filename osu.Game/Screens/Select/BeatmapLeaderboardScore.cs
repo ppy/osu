@@ -44,6 +44,7 @@ namespace osu.Game.Screens.Select
     public sealed partial class BeatmapLeaderboardScore : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
     {
         public const int HEIGHT = 50;
+        public const int TRANSITION_DURATION = 200;
 
         public readonly ScoreInfo Score;
 
@@ -57,14 +58,11 @@ namespace osu.Game.Screens.Select
         public Func<Mod, bool> IsValidMod { get; set; } = _ => true;
 
         public int? Rank { get; init; }
-        public HighlightType? Highlight { get; init; }
+        public LeaderboardRankDisplay.HighlightType? Highlight { get; init; }
         public Action<ScoreInfo>? ShowReplay { get; init; }
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
-
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
@@ -86,13 +84,8 @@ namespace osu.Game.Screens.Select
         private const float username_min_width = 120;
         private const float statistics_regular_min_width = 165;
         private const float statistics_compact_min_width = 90;
-        private const float rank_label_width = 40;
 
         private const int corner_radius = 10;
-        private const int transition_duration = 200;
-
-        private static readonly Color4 personal_best_gradient_left = Color4Extensions.FromHex("#66FFCC");
-        private static readonly Color4 personal_best_gradient_right = Color4Extensions.FromHex("#51A388");
 
         private Colour4 foregroundColour;
         private Colour4 backgroundColour;
@@ -113,8 +106,7 @@ namespace osu.Game.Screens.Select
         private Box totalScoreBackground = null!;
 
         private FillFlowContainer statisticsContainer = null!;
-        private Container highlightGradient = null!;
-        private Container rankLabelStandalone = null!;
+        private LeaderboardRankDisplay rankLabelStandalone = null!;
         private Container rankLabelOverlay = null!;
 
         private readonly bool sheared;
@@ -159,26 +151,7 @@ namespace osu.Game.Screens.Select
                         RelativeSizeAxes = Axes.Both,
                         Colour = backgroundColour
                     },
-                    rankLabelStandalone = new Container
-                    {
-                        Width = rank_label_width,
-                        RelativeSizeAxes = Axes.Y,
-                        Children = new Drawable[]
-                        {
-                            highlightGradient = new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Right = -10f },
-                                Alpha = Highlight != null ? 1 : 0,
-                                Colour = getHighlightColour(Highlight),
-                                Child = new Box { RelativeSizeAxes = Axes.Both },
-                            },
-                            new RankLabel(Rank, sheared, darkText: Highlight == HighlightType.Own)
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                            }
-                        },
-                    },
+                    rankLabelStandalone = new LeaderboardRankDisplay(Rank, sheared, Highlight),
                     centreContent = new Container
                     {
                         Name = @"Centre container",
@@ -465,21 +438,6 @@ namespace osu.Game.Screens.Select
             innerAvatar.OnLoadComplete += d => d.FadeInFromZero(200);
         }
 
-        private ColourInfo getHighlightColour(HighlightType? highlightType, float lightenAmount = 0)
-        {
-            switch (highlightType)
-            {
-                case HighlightType.Own:
-                    return ColourInfo.GradientHorizontal(personal_best_gradient_left.Lighten(lightenAmount), personal_best_gradient_right.Lighten(lightenAmount));
-
-                case HighlightType.Friend:
-                    return ColourInfo.GradientHorizontal(colours.Pink1.Lighten(lightenAmount), colours.Pink3.Lighten(lightenAmount));
-
-                default:
-                    return Colour4.White;
-            }
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -538,15 +496,15 @@ namespace osu.Game.Screens.Select
         {
             var lightenedGradient = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0).Lighten(0.2f), backgroundColour.Lighten(0.2f));
 
-            foreground.FadeColour(IsHovered ? foregroundColour.Lighten(0.2f) : foregroundColour, transition_duration, Easing.OutQuint);
-            background.FadeColour(IsHovered ? backgroundColour.Lighten(0.2f) : backgroundColour, transition_duration, Easing.OutQuint);
-            totalScoreBackground.FadeColour(IsHovered ? lightenedGradient : totalScoreBackgroundGradient, transition_duration, Easing.OutQuint);
-            highlightGradient.FadeColour(getHighlightColour(Highlight, IsHovered ? 0.2f : 0), transition_duration, Easing.OutQuint);
+            foreground.FadeColour(IsHovered ? foregroundColour.Lighten(0.2f) : foregroundColour, TRANSITION_DURATION, Easing.OutQuint);
+            background.FadeColour(IsHovered ? backgroundColour.Lighten(0.2f) : backgroundColour, TRANSITION_DURATION, Easing.OutQuint);
+            totalScoreBackground.FadeColour(IsHovered ? lightenedGradient : totalScoreBackgroundGradient, TRANSITION_DURATION, Easing.OutQuint);
+            rankLabelStandalone.UpdateHighlightState(IsHovered);
 
             if (IsHovered && currentMode != DisplayMode.Full)
-                rankLabelOverlay.FadeIn(transition_duration, Easing.OutQuint);
+                rankLabelOverlay.FadeIn(TRANSITION_DURATION, Easing.OutQuint);
             else
-                rankLabelOverlay.FadeOut(transition_duration, Easing.OutQuint);
+                rankLabelOverlay.FadeOut(TRANSITION_DURATION, Easing.OutQuint);
         }
 
         private DisplayMode? currentMode;
@@ -569,11 +527,12 @@ namespace osu.Game.Screens.Select
 
         private void updateDisplayMode(DisplayMode mode)
         {
-            double duration = currentMode == null ? 0 : transition_duration;
             if (mode >= DisplayMode.Full)
-                rankLabelStandalone.FadeIn(duration, Easing.OutQuint).ResizeWidthTo(rank_label_width, duration, Easing.OutQuint);
+                rankLabelStandalone.Show();
             else
-                rankLabelStandalone.FadeOut(duration, Easing.OutQuint).ResizeWidthTo(0, duration, Easing.OutQuint);
+                rankLabelStandalone.Hide();
+
+            double duration = currentMode == null ? 0 : TRANSITION_DURATION;
 
             if (mode >= DisplayMode.Regular)
             {
@@ -595,7 +554,7 @@ namespace osu.Game.Screens.Select
 
         private DisplayMode getCurrentDisplayMode()
         {
-            if (DrawWidth >= username_min_width + statistics_regular_min_width + expanded_right_content_width + rank_label_width)
+            if (DrawWidth >= username_min_width + statistics_regular_min_width + expanded_right_content_width + LeaderboardRankDisplay.WIDTH)
                 return DisplayMode.Full;
 
             if (DrawWidth >= username_min_width + statistics_regular_min_width + expanded_right_content_width)
@@ -737,12 +696,6 @@ namespace osu.Game.Screens.Select
             }
 
             public LocalisableString TooltipText { get; }
-        }
-
-        public enum HighlightType
-        {
-            Own,
-            Friend,
         }
     }
 }
