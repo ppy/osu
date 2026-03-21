@@ -324,9 +324,9 @@ namespace osu.Game.Screens.Select
                                                     Direction = FillDirection.Horizontal,
                                                     Children = new Drawable[]
                                                     {
-                                                        new ScoreComponentLabel(BeatmapsetsStrings.ShowScoreboardHeadersCombo.ToUpper(), $"{Score.MaxCombo.ToString()}x",
+                                                        new LeaderboardStatistic(BeatmapsetsStrings.ShowScoreboardHeadersCombo.ToUpper(), $"{Score.MaxCombo.ToString()}x",
                                                             Score.MaxCombo == Score.GetMaximumAchievableCombo(), 60),
-                                                        new ScoreComponentLabel(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper(), Score.DisplayAccuracy, Score.Accuracy == 1,
+                                                        new LeaderboardStatistic(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper(), Score.DisplayAccuracy, Score.Accuracy == 1,
                                                             55),
                                                     },
                                                     Alpha = 0,
@@ -423,35 +423,21 @@ namespace osu.Game.Screens.Select
                                                 RelativeSizeAxes = Axes.Both,
                                                 Colour = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0), OsuColour.ForRank(Score.Rank).Opacity(0.5f)),
                                             },
-                                            new FillFlowContainer
+                                            new LeaderboardScoreDisplay
                                             {
                                                 AutoSizeAxes = Axes.Both,
                                                 Anchor = Anchor.CentreRight,
                                                 Origin = Anchor.CentreRight,
-                                                Direction = FillDirection.Vertical,
                                                 Padding = new MarginPadding { Horizontal = corner_radius },
-                                                Spacing = new Vector2(0f, -2f),
-                                                Children = new Drawable[]
+                                                Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
+                                                Current = scoreManager.GetBindableTotalScoreString(Score),
+                                                Child = modsContainer = new FillFlowContainer<Drawable>
                                                 {
-                                                    new OsuSpriteText
-                                                    {
-                                                        Anchor = Anchor.TopRight,
-                                                        Origin = Anchor.TopRight,
-                                                        UseFullGlyphHeight = false,
-                                                        Current = scoreManager.GetBindableTotalScoreString(Score),
-                                                        Spacing = new Vector2(-1.5f),
-                                                        Font = OsuFont.Style.Subtitle.With(weight: FontWeight.Light, fixedWidth: true),
-                                                        Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
-                                                    },
-                                                    modsContainer = new FillFlowContainer<Drawable>
-                                                    {
-                                                        Anchor = Anchor.TopRight,
-                                                        Origin = Anchor.TopRight,
-                                                        AutoSizeAxes = Axes.Both,
-                                                        Direction = FillDirection.Horizontal,
-                                                        Spacing = new Vector2(-10, 0),
-                                                        Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
-                                                    },
+                                                    Anchor = Anchor.TopRight,
+                                                    Origin = Anchor.TopRight,
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Direction = FillDirection.Horizontal,
+                                                    Spacing = new Vector2(-10, 0),
                                                 }
                                             }
                                         }
@@ -657,55 +643,6 @@ namespace osu.Game.Screens.Select
             }
 
             protected override LocalisableString Format() => Date.ToShortRelativeTime(TimeSpan.FromSeconds(30));
-        }
-
-        private partial class ScoreComponentLabel : Container
-        {
-            private readonly LocalisableString name;
-            private readonly LocalisableString value;
-            private readonly bool perfect;
-            private readonly float minWidth;
-
-            private FillFlowContainer content = null!;
-            public override bool Contains(Vector2 screenSpacePos) => content.Contains(screenSpacePos);
-
-            public ScoreComponentLabel(LocalisableString name, LocalisableString value, bool perfect, float minWidth)
-            {
-                this.name = name;
-                this.value = value;
-                this.perfect = perfect;
-                this.minWidth = minWidth;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours, OverlayColourProvider colourProvider)
-            {
-                AutoSizeAxes = Axes.Both;
-                Child = content = new FillFlowContainer
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Children = new[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Colour = colourProvider.Content2,
-                            Text = name,
-                            Font = OsuFont.Style.Caption2.With(weight: FontWeight.SemiBold),
-                        },
-                        new OsuSpriteText
-                        {
-                            // We don't want the value setting the horizontal size, since it leads to wonky accuracy container length,
-                            // since the accuracy is sometimes longer than its name.
-                            BypassAutoSizeAxes = Axes.X,
-                            Text = value,
-                            Font = OsuFont.Style.Body,
-                            Colour = perfect ? colours.Lime1 : Color4.White,
-                        },
-                        Empty().With(d => d.Width = minWidth),
-                    }
-                };
-            }
         }
 
         private partial class RankLabel : Container, IHasTooltip
