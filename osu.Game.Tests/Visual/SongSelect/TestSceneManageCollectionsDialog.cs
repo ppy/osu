@@ -379,6 +379,133 @@ namespace osu.Game.Tests.Visual.SongSelect
             assertCollectionCount(1);
         }
 
+        [Test]
+        public void TestBatchAddButtonVisibility()
+        {
+            AddStep("add collection", () => Realm.Write(r => r.Add(new BeatmapCollection(name: "Test collection"))));
+
+            AddAssert("batch add button displayed", () =>
+                dialog.ChildrenOfType<DrawableCollectionListItem.BatchAddToCollectionButton>().Any());
+        }
+
+        [Test]
+        public void TestBatchAddButtonWithNoFilteredBeatmaps()
+        {
+            AddStep("add collection", () => Realm.Write(r => r.Add(new BeatmapCollection(name: "Test collection"))));
+            AddStep("set null filtered beatmaps provider", () => dialog.FilteredBeatmapsProvider = null);
+
+            AddStep("click batch add button", () =>
+            {
+                var button = dialog.ChildrenOfType<DrawableCollectionListItem.BatchAddToCollectionButton>().First();
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("no dialog shown", () => dialogOverlay.CurrentDialog == null);
+        }
+
+        [Test]
+        public void TestBatchAddAllBeatmaps()
+        {
+            BeatmapCollection collection = null!;
+
+            AddStep("add collection and set filtered beatmaps", () =>
+            {
+                Realm.Write(r => r.Add(collection = new BeatmapCollection(name: "Test collection")));
+                var beatmaps = beatmapManager.GetAllUsableBeatmapSets().SelectMany(s => s.Beatmaps).Take(5).ToList();
+                dialog.FilteredBeatmapsProvider = () => beatmaps;
+            });
+
+            AddStep("click batch add button", () =>
+            {
+                var button = dialog.ChildrenOfType<DrawableCollectionListItem.BatchAddToCollectionButton>().First();
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("add dialog shown", () => dialogOverlay.CurrentDialog != null && dialogOverlay.CurrentDialog.GetType().Name == "AddFilteredResultsDialog");
+            AddStep("confirm add all", () =>
+            {
+                InputManager.MoveMouseTo(dialogOverlay.CurrentDialog!.ChildrenOfType<PopupDialogButton>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("beatmaps added to collection", () =>
+                collection.BeatmapMD5Hashes.Count > 0);
+        }
+
+        [Test]
+        public void TestBatchRemoveAllBeatmaps()
+        {
+            BeatmapCollection collection = null!;
+
+            AddStep("add collection with all beatmaps", () =>
+            {
+                var beatmaps = beatmapManager.GetAllUsableBeatmapSets().SelectMany(s => s.Beatmaps).Take(5).ToList();
+                var hashes = beatmaps.Select(b => b.MD5Hash).Where(h => !string.IsNullOrEmpty(h)).ToList();
+                Realm.Write(r =>
+                {
+                    r.Add(collection = new BeatmapCollection(name: "Test collection"));
+                    foreach (string hash in hashes)
+                        collection.BeatmapMD5Hashes.Add(hash);
+                });
+                dialog.FilteredBeatmapsProvider = () => beatmaps;
+            });
+
+            AddStep("click batch add button", () =>
+            {
+                var button = dialog.ChildrenOfType<DrawableCollectionListItem.BatchAddToCollectionButton>().First();
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("remove dialog shown", () => dialogOverlay.CurrentDialog != null && dialogOverlay.CurrentDialog.GetType().Name == "RemoveFilteredResultsDialog");
+            AddStep("confirm remove all", () =>
+            {
+                InputManager.MoveMouseTo(dialogOverlay.CurrentDialog!.ChildrenOfType<PopupDialogButton>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("beatmaps removed from collection", () =>
+                collection.BeatmapMD5Hashes.Count == 0);
+        }
+
+        [Test]
+        public void TestBatchAddPartialOverlap()
+        {
+            BeatmapCollection collection;
+
+            AddStep("add collection with some beatmaps", () =>
+            {
+                var allBeatmaps = beatmapManager.GetAllUsableBeatmapSets().SelectMany(s => s.Beatmaps).Take(10).ToList();
+                var halfBeatmaps = allBeatmaps.Take(5).ToList();
+                var hashes = halfBeatmaps.Select(b => b.MD5Hash).Where(h => !string.IsNullOrEmpty(h)).ToList();
+                Realm.Write(r =>
+                {
+                    r.Add(collection = new BeatmapCollection(name: "Test collection"));
+                    foreach (string hash in hashes)
+                        collection.BeatmapMD5Hashes.Add(hash);
+                });
+                dialog.FilteredBeatmapsProvider = () => allBeatmaps;
+            });
+
+            AddStep("click batch add button", () =>
+            {
+                var button = dialog.ChildrenOfType<DrawableCollectionListItem.BatchAddToCollectionButton>().First();
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("partial overlap dialog shown", () => dialogOverlay.CurrentDialog != null && dialogOverlay.CurrentDialog.GetType().Name == "PartialOverlapFilteredResultsDialog");
+            AddStep("cancel operation", () =>
+            {
+                InputManager.MoveMouseTo(dialogOverlay.CurrentDialog!.ChildrenOfType<PopupDialogButton>().Last());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("dialog closed", () => dialogOverlay.CurrentDialog == null);
+        }
+
         private void assertCollectionCount(int count)
             => AddUntilStep($"{count} collections shown", () => dialog.ChildrenOfType<DrawableCollectionListItem>().Count(i => i.IsPresent) == count + 1); // +1 for placeholder
 
