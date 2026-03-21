@@ -114,6 +114,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString TouchOverlay => new TranslatableString(getKey(@"touch_overlay"), @"Touch overlay");
 
+        /// <summary>
+        /// "Hit animation"
+        /// </summary>
+        public static LocalisableString HitAnimation => new TranslatableString(getKey(@"hit_animation"), @"Hit animation");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
