@@ -12,7 +12,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModBadApple : Mod, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<CatchHitObject>
+    public class CatchModBadApple : Mod, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<CatchHitObject>, IUpdatableByPlayfield
     {
         public override string Name => "Bad Apple";
         public override LocalisableString Description => "Dodge the beat!";
@@ -25,6 +25,9 @@ namespace osu.Game.Rulesets.Catch.Mods
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
             catcher = ((CatchPlayfield)drawableRuleset.Playfield).Catcher;
+
+            // Don't show caught fruits as they aren't technically being caught.
+            catcher.CatchFruitOnPlate = false;
         }
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
@@ -33,6 +36,12 @@ namespace osu.Game.Rulesets.Catch.Mods
             {
                 catchHitObject.CheckPosition = hitObject => !catcher.CanCatch(hitObject);
             }
+        }
+
+        public void Update(Playfield playfield)
+        {
+            // Block hyperdashing to avoid hyperdashes when two objects appear at the same time.
+            catcher.SetHyperDashState(1, -1);
         }
     }
 }
