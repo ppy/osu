@@ -91,6 +91,38 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public async Task TestSortByBpmUsesTitleAsTiebreaker()
+        {
+            List<BeatmapSetInfo> beatmapSets = [];
+
+            // 2 sets with same BPM but different titles
+            const int diff_count = 1;
+            {
+                var set = TestResources.CreateTestBeatmapSetInfo(diff_count);
+                set.Beatmaps.ForEach(b =>
+                {
+                    b.BPM = 175;
+                    b.Metadata.Title = "ZZZ";
+                });
+                beatmapSets.Add(set);
+            }
+            {
+                var set = TestResources.CreateTestBeatmapSetInfo(diff_count);
+                set.Beatmaps.ForEach(b =>
+                {
+                    b.BPM = 175;
+                    b.Metadata.Title = "AAA";
+                });
+                beatmapSets.Add(set);
+            }
+
+            var results = (await runSorting(SortMode.BPM, beatmapSets)).ToList();
+
+            Assert.AreEqual("AAA", results[0].Metadata.Title);
+            Assert.AreEqual("ZZZ", results[1].Metadata.Title);
+        }
+
+        [Test]
         public async Task TestSortByArtistUsesTitleAsTiebreaker()
         {
             List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
