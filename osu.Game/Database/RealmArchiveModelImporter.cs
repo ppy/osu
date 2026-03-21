@@ -10,11 +10,13 @@ using System.Threading.Tasks;
 using Humanizer;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Extensions;
 using osu.Game.IO.Archives;
+using osu.Game.Localisation;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Utils;
@@ -100,7 +102,7 @@ namespace osu.Game.Database
         {
             if (tasks.Length == 0)
             {
-                notification.CompletionText = $"No {HumanisedModelName}s were found to import!";
+                notification.CompletionText = ImportAbortedText;
                 notification.State = ProgressNotificationState.Completed;
                 return Enumerable.Empty<RealmLive<TModel>>();
             }
@@ -113,7 +115,7 @@ namespace osu.Game.Database
 
             parameters.Batch |= tasks.Length >= minimum_items_considered_batch_import;
 
-            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
+            notification.Text = ImportStartingText;
             notification.State = ProgressNotificationState.Active;
 
             await pauseIfNecessaryAsync(parameters, notification, notification.CancellationToken).ConfigureAwait(false);
@@ -136,7 +138,7 @@ namespace osu.Game.Database
                                 imported.Add(model);
                             current++;
 
-                            notification.Text = $"Imported {current} of {tasks.Length} {HumanisedModelName}s";
+                            notification.Text = ImportRunningText(current, tasks.Length);
                             notification.Progress = (float)current / tasks.Length;
                         }
                     }
@@ -165,27 +167,33 @@ namespace osu.Game.Database
                     }
                     else
                     {
-                        notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed! Check logs for more information.";
+                        notification.Text = ImportFailedText;
                         notification.State = ProgressNotificationState.Cancelled;
                     }
                 }
                 else
                 {
+                    LocalisableString importedText;
+
                     if (tasks.Length > imported.Count)
-                        notification.CompletionText = $"Imported {imported.Count} of {tasks.Length} {HumanisedModelName}s.";
+                        importedText = ImportIncompletedText(imported.Count, tasks.Length);
                     else if (imported.Count > 1)
-                        notification.CompletionText = $"Imported {imported.Count} {HumanisedModelName}s!";
+                        importedText = ImportCompletedText(imported.Count);
                     else
-                        notification.CompletionText = $"Imported {imported.First().GetDisplayString()}!";
+                        importedText = CommonStrings.Imported(imported.First().GetDisplayString());
 
                     if (imported.Count > 0 && PresentImport != null)
                     {
-                        notification.CompletionText += " Click to view.";
+                        notification.CompletionText = LocalisableString.Interpolate($"{importedText} {CommonStrings.ClickToView}");
                         notification.CompletionClickAction = () =>
                         {
                             PresentImport?.Invoke(imported);
                             return true;
                         };
+                    }
+                    else
+                    {
+                        notification.CompletionText = importedText;
                     }
 
                     notification.State = ProgressNotificationState.Completed;
@@ -625,7 +633,7 @@ namespace osu.Game.Database
 
             // A paused state could obviously be entered mid-import (during the `Task.WhenAll` below),
             // but in order to keep things simple let's focus on the most common scenario.
-            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is paused due to gameplay...";
+            notification.Text = ImportPausedText;
             notification.State = ProgressNotificationState.Queued;
 
             while (PauseImports)
@@ -637,7 +645,7 @@ namespace osu.Game.Database
             cancellationToken.ThrowIfCancellationRequested();
             Logger.Log($@"{GetType().Name} is being resumed.");
 
-            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is resuming...";
+            notification.Text = ImportResumingText;
             notification.State = ProgressNotificationState.Active;
         }
 
@@ -654,5 +662,21 @@ namespace osu.Game.Database
         }
 
         public virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLowerInvariant()}";
+
+        protected virtual LocalisableString ImportAbortedText => $"No {HumanisedModelName}s were found to import!";
+
+        protected virtual LocalisableString ImportStartingText => $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
+
+        protected virtual LocalisableString ImportRunningText(int processedCount, int totalCount) => $"Importing {HumanisedModelName}s ({processedCount} of {totalCount})";
+
+        protected virtual LocalisableString ImportCompletedText(int totalCount) => $"Imported {totalCount} {HumanisedModelName}s!";
+
+        protected virtual LocalisableString ImportIncompletedText(int processedCount, int totalCount) => $"Imported {processedCount} of {totalCount} {HumanisedModelName}s!";
+
+        protected virtual LocalisableString ImportFailedText => $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed! Check logs for more information.";
+
+        protected virtual LocalisableString ImportPausedText => $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is paused due to gameplay...";
+
+        protected virtual LocalisableString ImportResumingText => $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is resuming...";
     }
 }

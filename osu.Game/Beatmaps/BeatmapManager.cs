@@ -14,12 +14,14 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO.Archives;
+using osu.Game.Localisation;
 using osu.Game.Models;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -372,7 +374,6 @@ namespace osu.Game.Beatmaps
 
         public void ResetAllOffsets()
         {
-            const string reset_complete_message = "All offsets have been reset!";
             Realm.Write(r =>
             {
                 var items = r.All<BeatmapInfo>();
@@ -383,7 +384,7 @@ namespace osu.Game.Beatmaps
                         beatmap.UserSettings.Offset = 0;
                 }
 
-                PostNotification?.Invoke(new ProgressCompletionNotification { Text = reset_complete_message });
+                PostNotification?.Invoke(new ProgressCompletionNotification { Text = NotificationsStrings.RestoreBeatmapOffsetsCompleted });
             });
         }
 
@@ -435,20 +436,18 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public void DeleteVideos(List<BeatmapSetInfo> items, bool silent = false)
         {
-            const string no_videos_message = "No videos found to delete!";
-
             if (items.Count == 0)
             {
                 if (!silent)
-                    PostNotification?.Invoke(new ProgressCompletionNotification { Text = no_videos_message });
+                    PostNotification?.Invoke(new ProgressCompletionNotification { Text = NotificationsStrings.DeleteBeatmapVideosAborted });
                 return;
             }
 
             var notification = new ProgressNotification
             {
                 Progress = 0,
-                Text = $"Preparing to delete all {HumanisedModelName} videos...",
-                CompletionText = no_videos_message,
+                Text = NotificationsStrings.DeleteBeatmapVideosStarting,
+                CompletionText = NotificationsStrings.DeleteBeatmapVideosAborted,
                 State = ProgressNotificationState.Active,
             };
 
@@ -470,10 +469,10 @@ namespace osu.Game.Beatmaps
                 {
                     DeleteFile(b, video);
                     deleted++;
-                    notification.CompletionText = $"Deleted {deleted} {HumanisedModelName} video(s)!";
+                    notification.CompletionText = NotificationsStrings.DeleteBeatmapVideosCompleted(deleted);
                 }
 
-                notification.Text = $"Deleting videos from {HumanisedModelName}s ({deleted} deleted)";
+                notification.Text = NotificationsStrings.DeleteBeatmapVideosRunning(deleted);
 
                 notification.Progress = (float)++i / items.Count;
             }
@@ -682,6 +681,20 @@ namespace osu.Game.Beatmaps
         #endregion
 
         public override string HumanisedModelName => "beatmap";
+
+        protected override LocalisableString DeleteModelsAbortedText => NotificationsStrings.DeleteBeatmapsAborted;
+
+        protected override LocalisableString DeleteModelsStartingText => NotificationsStrings.DeleteBeatmapsStarting;
+
+        protected override LocalisableString DeleteModelsRunningText(int processedCount, int totalCount) => NotificationsStrings.DeleteBeatmapsRunning(processedCount, totalCount);
+
+        protected override LocalisableString DeleteModelsCompletedText => NotificationsStrings.DeleteBeatmapsCompleted;
+
+        protected override LocalisableString RestoreModelsAbortedText => NotificationsStrings.RestoreBeatmapsAborted;
+
+        protected override LocalisableString RestoreModelsRunningText(int processedCount, int totalCount) => NotificationsStrings.RestoreBeatmapsRunning(processedCount, totalCount);
+
+        protected override LocalisableString RestoreModelsCompletedText => NotificationsStrings.RestoreBeatmapsCompleted;
     }
 
     /// <summary>

@@ -7,11 +7,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
+using osu.Game.Localisation;
 using osu.Game.Rulesets;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Online.API;
@@ -212,5 +214,21 @@ namespace osu.Game.Scoring
 
             return null;
         }
+
+        protected override LocalisableString ImportAbortedText => NotificationsStrings.ImportScoresAborted;
+
+        protected override LocalisableString ImportStartingText => NotificationsStrings.ImportScoresStarting;
+
+        protected override LocalisableString ImportRunningText(int processedCount, int totalCount) => NotificationsStrings.ImportScoresRunning(processedCount, totalCount);
+
+        protected override LocalisableString ImportCompletedText(int totalCount) => NotificationsStrings.ImportScoresCompleted(totalCount);
+
+        protected override LocalisableString ImportIncompletedText(int processedCount, int totalCount) => NotificationsStrings.ImportScoresIncompleted(processedCount, totalCount);
+
+        protected override LocalisableString ImportFailedText => NotificationsStrings.ImportScoresFailed;
+
+        protected override LocalisableString ImportPausedText => NotificationsStrings.ImportScoresPaused;
+
+        protected override LocalisableString ImportResumingText => NotificationsStrings.ImportScoresResuming;
     }
 }
