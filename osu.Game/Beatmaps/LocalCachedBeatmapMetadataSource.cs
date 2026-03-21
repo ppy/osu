@@ -98,11 +98,11 @@ namespace osu.Game.Beatmaps
 
             try
             {
-                using (var db = getConnection())
+                using (var db = GetConnection())
                 {
                     db.Open();
 
-                    switch (getCacheVersion(db))
+                    switch (GetCacheVersion(db))
                     {
                         case 2:
                             // can be removed 20260123
@@ -111,6 +111,68 @@ namespace osu.Game.Beatmaps
                         case 3:
                             return queryCacheVersion3(db, beatmapInfo, out onlineMetadata);
                     }
+                }
+
+                onlineMetadata = null;
+                return false;
+            }
+            catch (SqliteException sqliteException)
+            {
+                onlineMetadata = null;
+
+                // There have been cases where the user's local database is corrupt.
+                // Let's attempt to identify these cases and re-initialise the local cache.
+                switch (sqliteException.SqliteErrorCode)
+                {
+                    case 26: // SQLITE_NOTADB
+                    case 11: // SQLITE_CORRUPT
+                        // only attempt purge & re-download if there is no other refetch in progress
+                        if (cacheDownloadRequest != null)
+                            return false;
+
+                        tryPurgeCache();
+                        FetchCache();
+                        return false;
+                }
+
+                logForModel(beatmapInfo.BeatmapSet, $@"Cached local retrieval for {beatmapInfo} failed with unhandled sqlite error {sqliteException}.");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                logForModel(beatmapInfo.BeatmapSet, $@"Cached local retrieval for {beatmapInfo} failed with {ex}.");
+                onlineMetadata = null;
+                return false;
+            }
+        }
+
+        public bool TryLookup(SqliteConnection db, int version, BeatmapInfo beatmapInfo, [NotNullWhen(true)] out OnlineBeatmapMetadata? onlineMetadata)
+        {
+            Debug.Assert(beatmapInfo.BeatmapSet != null);
+
+            if (!Available)
+            {
+                onlineMetadata = null;
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(beatmapInfo.MD5Hash)
+                && string.IsNullOrEmpty(beatmapInfo.Path))
+            {
+                onlineMetadata = null;
+                return false;
+            }
+
+            try
+            {
+                switch (version)
+                {
+                    case 2:
+                        // can be removed 20260123
+                        return queryCacheVersion2(db, beatmapInfo, out onlineMetadata);
+
+                    case 3:
+                        return queryCacheVersion3(db, beatmapInfo, out onlineMetadata);
                 }
 
                 onlineMetadata = null;
@@ -162,7 +224,7 @@ namespace osu.Game.Beatmaps
             log(@"Local metadata cache purged due to corruption.");
         }
 
-        private SqliteConnection getConnection() =>
+        public SqliteConnection GetConnection() =>
             new SqliteConnection(string.Concat(@"Data Source=", storage.GetFullPath(@"online.db", true)));
 
         public Task FetchCache()
@@ -242,10 +304,10 @@ namespace osu.Game.Beatmaps
         {
             try
             {
-                using (var connection = getConnection())
+                using (var connection = GetConnection())
                 {
                     connection.Open();
-                    return getCacheVersion(connection) >= version;
+                    return GetCacheVersion(connection) >= version;
                 }
             }
             catch (SqliteException ex) when (ex.SqliteErrorCode == 26 || ex.SqliteErrorCode == 11) // SQLITE_NOTADB, SQLITE_CORRUPT
@@ -255,7 +317,7 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        private int getCacheVersion(SqliteConnection connection)
+        public int GetCacheVersion(SqliteConnection connection)
         {
             using (var cmd = connection.CreateCommand())
             {
