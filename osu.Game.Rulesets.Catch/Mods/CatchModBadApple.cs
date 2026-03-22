@@ -2,7 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
 using osu.Framework.Localisation;
+using osu.Framework.Audio;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.UI;
@@ -20,7 +23,11 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override string Acronym => "BA";
         public override Type[] IncompatibleMods => new[] { typeof(CatchModAutoplay) };
 
+        [SettingSource("Mute hit sounds", "Hit sounds become muted.")]
+        public BindableBool AffectsHitSounds { get; } = new BindableBool(true);
+
         private Catcher catcher = null!;
+        private readonly BindableNumber<double> hitSoundVolume = new BindableDouble(0);
 
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
@@ -28,6 +35,11 @@ namespace osu.Game.Rulesets.Catch.Mods
 
             // Don't show caught fruits as they aren't technically being caught.
             catcher.CatchFruitOnPlate = false;
+
+            if (AffectsHitSounds.Value)
+            {
+                drawableRuleset.Audio.AddAdjustment(AdjustableProperty.Volume, hitSoundVolume);
+            }
         }
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
