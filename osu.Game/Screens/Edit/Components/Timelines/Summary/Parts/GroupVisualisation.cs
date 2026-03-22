@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
                         case EffectControlPoint:
                             if (!showScrollSpeed)
-                                return;
+                                continue;
 
                             AddInternal(new ControlPointVisualisation(point)
                             {
