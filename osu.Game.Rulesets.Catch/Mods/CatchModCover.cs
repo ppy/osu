@@ -45,7 +45,8 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            if (hitObject is not DrawableCatchHitObject catchDrawable) return;
+            if (hitObject is not DrawableCatchHitObject catchDrawable) 
+                return;
 
             if (Direction.Value == CoverExpandDirection.AlongScroll && state != ArmedState.Idle)
                 return;
@@ -78,7 +79,6 @@ namespace osu.Game.Rulesets.Catch.Mods
                 double boundaryTime = spawnTime + (preempt * Coverage.Value);
                 double fadeStartTime = boundaryTime - fade_duration;
 
-                drawable.Alpha = 0;
                 using (drawable.BeginAbsoluteSequence(double.MinValue))
                     drawable.FadeTo(0);
 
@@ -88,9 +88,6 @@ namespace osu.Game.Rulesets.Catch.Mods
             else
             {
                 double boundaryTime = spawnTime + (preempt * (1 - Coverage.Value));
-
-                using (drawable.BeginAbsoluteSequence(spawnTime))
-                    drawable.FadeIn();
 
                 using (drawable.BeginAbsoluteSequence(boundaryTime))
                     drawable.FadeOut(fade_duration);
