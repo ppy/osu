@@ -10,6 +10,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Objects;
@@ -503,6 +504,29 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddAssert("hold note hit", () => judgementResults.Where(j => beatmap.HitObjects[0].NestedHitObjects.Contains(j.HitObject))
                                                              .All(j => j.Type.IsHit()));
+        }
+
+        /// <summary>
+        /// This ensures that the value of <see cref="DrawableHoldNote.MissingStartTime"/>
+        /// will be set correctly when the body receives a judgment during the hold.
+        ///
+        ///     -----[           ]-----
+        ///          x     o
+        /// </summary>
+        [Test]
+        public void TestReleaseDuringHoldMissingStartTime()
+        {
+            performTest([
+                new ManiaReplayFrame(time_head, ManiaAction.Key1),
+                new ManiaReplayFrame(time_during_hold_1)
+            ]);
+
+            assertHeadJudgement(HitResult.Perfect);
+            assertTailJudgement(HitResult.Miss);
+            assertNoteJudgement(HitResult.IgnoreMiss);
+
+            AddAssert("body judgement is miss", () => !judgementResults.Single(j => j.HitObject is HoldNoteBody).IsHit);
+            AddAssert("body judgement time indicates during hold", () => judgementResults.Single(j => j.HitObject is HoldNoteBody).TimeAbsolute, () => Is.EqualTo(time_during_hold_1).Within(100));
         }
 
         private void assertHitObjectJudgement(HitObject hitObject, HitResult result)
