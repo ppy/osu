@@ -34,7 +34,6 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
-using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 using CommonStrings = osu.Game.Localisation.CommonStrings;
@@ -221,7 +220,7 @@ namespace osu.Game.Screens.Select
                                                                 RelativeSizeAxes = Axes.Both,
                                                                 Colour = Colour4.Black.Opacity(0.5f),
                                                             },
-                                                            new RankLabel(Rank, sheared, false)
+                                                            new LeaderboardRankLabel(Rank, sheared, false)
                                                             {
                                                                 AutoSizeAxes = Axes.Both,
                                                                 Anchor = Anchor.Centre,
@@ -665,37 +664,6 @@ namespace osu.Game.Screens.Select
                     }
                 };
             }
-        }
-
-        private partial class RankLabel : Container, IHasTooltip
-        {
-            private readonly bool darkText;
-            private readonly OsuSpriteText text;
-
-            public RankLabel(int? rank, bool sheared, bool darkText)
-            {
-                this.darkText = darkText;
-                if (rank >= 1000)
-                    TooltipText = $"#{rank:N0}";
-
-                Child = text = new OsuSpriteText
-                {
-                    Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Font = OsuFont.Style.Heading2,
-                    Text = rank?.FormatRank().Insert(0, "#") ?? "-",
-                    Shadow = !darkText,
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                text.Colour = darkText ? colourProvider.Background3 : colourProvider.Content1;
-            }
-
-            public LocalisableString TooltipText { get; }
         }
     }
 }
