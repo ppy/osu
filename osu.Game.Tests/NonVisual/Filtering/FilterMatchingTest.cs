@@ -220,6 +220,46 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
+        [TestCase("\"quoted words\"", false)]
+        [TestCase("\"the artist\"", false)]
+        [TestCase("the artist \"quoted words\"", false)]
+        [TestCase("\"unknown\"", true)]
+        public void TestCriteriaMatchingTermsAdjacentToPunctuation(string terms, bool filtered)
+        {
+            var exampleBeatmapInfo = getExampleBeatmap();
+            exampleBeatmapInfo.Metadata.Title = "the artist \"quoted words\"";
+            var criteria = new FilterCriteria
+            {
+                Ruleset = new RulesetInfo { OnlineID = 6 },
+                AllowConvertedBeatmaps = true,
+                SearchText = terms
+            };
+            var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
+            carouselItem.Filter(criteria);
+            ClassicAssert.AreEqual(filtered, carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        [TestCase("~quoted words~", false)]
+        [TestCase("the artist", false)]
+        [TestCase("the artist ~quoted words~", false)]
+        [TestCase("~unknown~", true)]
+        public void TestCriteriaMatchingTermsAdjacentToMathSymbols(string terms, bool filtered)
+        {
+            var exampleBeatmapInfo = getExampleBeatmap();
+            exampleBeatmapInfo.Metadata.Title = "the artist ~quoted words~";
+            var criteria = new FilterCriteria
+            {
+                Ruleset = new RulesetInfo { OnlineID = 6 },
+                AllowConvertedBeatmaps = true,
+                SearchText = terms
+            };
+            var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
+            carouselItem.Filter(criteria);
+            ClassicAssert.AreEqual(filtered, carouselItem.Filtered.Value);
+        }
+
+        [Test]
         [TestCase("", false)]
         [TestCase("Goes", false)]
         [TestCase("GOES", false)]
