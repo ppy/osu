@@ -1,36 +1,34 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Timing;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Screens.Edit;
-using osu.Game.Storyboards.Drawables;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Backgrounds
 {
     public partial class EditorBackgroundScreen : BackgroundScreen
     {
-        private readonly EditorBeatmap editorBeatmap;
         private readonly Container dimContainer;
 
         private CancellationTokenSource? cancellationTokenSource;
         private Bindable<float> dimLevel = null!;
         private Bindable<bool> showStoryboard = null!;
 
-        private BeatmapBackground background = null!;
-        private Container storyboardContainer = null!;
+        private BeatmapBackgroundWithStoryboard? background;
 
-        private IFrameBasedClock? clockSource;
+        private readonly Container content;
+        private readonly Box blackBox;
 
         // We retrieve IBindable<WorkingBeatmap> from our dependency cache instead of passing WorkingBeatmap directly into EditorBackgroundScreen.
         // Otherwise, DummyWorkingBeatmap will be erroneously passed in whenever creating a new beatmap (since the Schedule() in the Editor that populates
@@ -40,40 +38,35 @@ namespace osu.Game.Screens.Backgrounds
 
         public EditorBackgroundScreen(EditorBeatmap editorBeatmap)
         {
-            this.editorBeatmap = editorBeatmap;
             InternalChild = dimContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    // This adds overdraw but makes transitions not suck.
+                    // There's probably a better way to do this, but it's high effort.
+                    blackBox = new Box
+                    {
+                        Colour = Color4.Black,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    content = new EditorSkinProvidingContainer(editorBeatmap)
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                },
             };
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            dimContainer.AddRange(createContent());
-            background = dimContainer.OfType<BeatmapBackground>().Single();
-            storyboardContainer = dimContainer.OfType<Container>().Single();
-
             dimLevel = config.GetBindable<float>(OsuSetting.EditorDim);
             showStoryboard = config.GetBindable<bool>(OsuSetting.EditorShowStoryboard);
-        }
 
-        private IEnumerable<Drawable> createContent() =>
-        [
-            new BeatmapBackground(beatmap.Value) { RelativeSizeAxes = Axes.Both, },
-            // one reason for this kooky container nesting being here is that the storyboard needs a custom clock
-            // but also needs it on an isolated-enough level that doesn't break screen stack expiry logic (which happens if the clock was put on `this`),
-            // or doesn't make it literally impossible to fade the storyboard in/out in real time (which happens if the fade transforms were to be applied directly to the storyboard).
-            // another is that we need `EditorSkinProvidingContainer` so that storyboard sample lookups succeed.
-            new EditorSkinProvidingContainer(editorBeatmap)
-            {
-                RelativeSizeAxes = Axes.Both,
-                Child = new DrawableStoryboard(beatmap.Value.Storyboard)
-                {
-                    Clock = clockSource ?? Clock,
-                }
-            }
-        ];
+            content.Child = createContent();
+            updateState(withAnimation: false);
+        }
 
         protected override void LoadComplete()
         {
@@ -81,36 +74,43 @@ namespace osu.Game.Screens.Backgrounds
 
             dimLevel.BindValueChanged(_ => dimContainer.FadeColour(OsuColour.Gray(1 - dimLevel.Value), 500, Easing.OutQuint), true);
             showStoryboard.BindValueChanged(_ => updateState());
-            updateState(0);
+
+            updateState(withAnimation: false);
         }
 
-        private void updateState(double duration = 500)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            storyboardContainer.FadeTo(showStoryboard.Value ? 1 : 0, duration, Easing.OutQuint);
-            // yes, this causes overdraw, but is also a (crude) fix for bad-looking transitions on screen entry
-            // caused by the previous background on the background stack poking out from under this one and then instantly fading out
-            background.FadeColour(beatmap.Value.Storyboard.ReplacesBackground && showStoryboard.Value ? Colour4.Black : Colour4.White, duration, Easing.OutQuint);
+            base.OnEntering(e);
+            blackBox.LifetimeEnd = LatestTransformEndTime;
         }
 
-        public void ChangeClockSource(IFrameBasedClock frameBasedClock)
+        public override bool OnExiting(ScreenExitEvent e)
         {
-            clockSource = frameBasedClock;
-            if (IsLoaded)
-                storyboardContainer.Child.Clock = frameBasedClock;
+            // The storyboard will do weird things with clock time changing on exit, so let's just hide it instead.
+            background?.UnloadStoryboard();
+
+            return base.OnExiting(e);
         }
 
-        public void RefreshBackground()
+        public void RefreshBackgroundAsync()
         {
             cancellationTokenSource?.Cancel();
-            LoadComponentsAsync(createContent(), loaded =>
+            LoadComponentAsync(createContent(), loaded =>
             {
-                dimContainer.Clear();
-                dimContainer.AddRange(loaded);
-
-                background = dimContainer.OfType<BeatmapBackground>().Single();
-                storyboardContainer = dimContainer.OfType<Container>().Single();
-                updateState(0);
+                content.Child = loaded;
+                updateState(withAnimation: false);
             }, (cancellationTokenSource = new CancellationTokenSource()).Token);
+        }
+
+        private Drawable createContent() => background = new BeatmapBackgroundWithStoryboard(beatmap.Value)
+        {
+            RelativeSizeAxes = Axes.Both,
+            StoryboardLoaded = () => updateState(withAnimation: false)
+        };
+
+        private void updateState(bool withAnimation = true)
+        {
+            background?.Storyboard.FadeTo(showStoryboard.Value ? 1 : 0, withAnimation ? 500 : 0, Easing.OutQuint);
         }
 
         public override bool Equals(BackgroundScreen? other)
