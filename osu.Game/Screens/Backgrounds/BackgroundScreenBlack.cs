@@ -10,18 +10,24 @@ namespace osu.Game.Screens.Backgrounds
 {
     public partial class BackgroundScreenBlack : BackgroundScreen
     {
-        public BackgroundScreenBlack()
+        private readonly double delayBeforeBlack;
+
+        public BackgroundScreenBlack(double delayBeforeBlack = 0)
         {
+            this.delayBeforeBlack = delayBeforeBlack;
+
             InternalChild = new Box
             {
                 Colour = Color4.Black,
                 RelativeSizeAxes = Axes.Both,
             };
+
+            Alpha = 0;
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
-            Show();
+            this.Delay(delayBeforeBlack).FadeIn(200);
         }
     }
 }
