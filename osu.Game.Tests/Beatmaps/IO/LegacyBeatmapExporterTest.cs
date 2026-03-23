@@ -161,8 +161,14 @@ namespace osu.Game.Tests.Beatmaps.IO
                 {
                     byte[] content = archiveReader.GetStream(filename).ReadAllBytesToArray();
 
-                    if (content.Prepend((byte)0).Zip(content).Any(pair => pair.Second == '\n' && pair.First != '\r'))
-                        return true;
+                    for (int i = 0; i < content.Length; i++)
+                    {
+                        if (content[i] != '\n')
+                            continue;
+
+                        if (i == 0 || content[i - 1] != '\r')
+                            return true;
+                    }
                 }
 
                 return false;
