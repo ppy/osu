@@ -90,21 +90,6 @@ namespace osu.Game.Screens.Ranking.Statistics
             popOutSample = audio.Samples.Get(@"Results/statistics-panel-pop-out");
         }
 
-        private string? getReasonFromPreventingTagging(ScoreInfo? score, int expectedRulesetId)
-        {
-            // We may want to iterate on the following conditions further in the future
-            if (score == null)
-                return "Play the beatmap to contribute to beatmap tags!";
-            else if (score.Ruleset.OnlineID != expectedRulesetId)
-                return "Play the beatmap in its original ruleset to contribute to beatmap tags!";
-            else if (score.Rank < ScoreRank.C)
-                return "Set a better score to contribute to beatmap tags!";
-            else if (score.Mods.Any(m => (m.Type == ModType.Conversion) && !(m is ModClassic)))
-                return "Play this beatmap without conversion mods to contribute to beatmap tags!";
-            else
-                return null;
-        }
-
         private void populateStatistics(ValueChangedEvent<ScoreInfo?> score)
         {
             loadCancellation?.Cancel();
@@ -257,7 +242,6 @@ namespace osu.Game.Screens.Ranking.Statistics
                 && api.IsLoggedIn)
             {
                 string? preventTaggingReason = null;
-                int expectedRulesetID = newScore.BeatmapInfo.Ruleset.OnlineID;
 
                 var localUserScores = realm.Run(r =>
                     r.GetAllLocalScoresForUser(api.LocalUser.Value.Id)
@@ -268,16 +252,23 @@ namespace osu.Game.Screens.Ranking.Statistics
                      .ToArray());
 
                 if (localUserScores.Length == 0)
-                    preventTaggingReason = getReasonFromPreventingTagging(AchievedScore, expectedRulesetID);
+                    preventTaggingReason = "Play the beatmap to contribute to beatmap tags!";
                 else
-                {
                     foreach (ScoreInfo score in localUserScores)
                     {
-                        preventTaggingReason = getReasonFromPreventingTagging(score, expectedRulesetID);
-                        if (preventTaggingReason == null)
+                        // We may want to iterate on the following conditions further in the future
+                        if (score.Ruleset.OnlineID != newScore.BeatmapInfo.Ruleset.OnlineID)
+                            preventTaggingReason = "Play the beatmap in its original ruleset to contribute to beatmap tags!";
+                        else if (score.Rank < ScoreRank.C)
+                            preventTaggingReason = "Set a better score to contribute to beatmap tags!";
+                        else if (score.Mods.Any(m => (m.Type == ModType.Conversion) && !(m is ModClassic)))
+                            preventTaggingReason = "Play this beatmap without conversion mods to contribute to beatmap tags!";
+                        else
+                        {
+                            preventTaggingReason = null;
                             break;
+                        }
                     }
-                }
 
                 if (preventTaggingReason == null)
                 {
