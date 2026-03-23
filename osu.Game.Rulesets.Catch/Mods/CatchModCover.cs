@@ -25,6 +25,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override LocalisableString Description => @"Decrease the playfield's viewing area.";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(CatchModHidden), typeof(CatchModFlashlight)};
+        public override bool Ranked => false;
 
         [SettingSource("Coverage", "The proportion of playfield height that notes will be hidden for.")]
         public BindableNumber<float> Coverage { get; } = new BindableFloat(0.5f)
