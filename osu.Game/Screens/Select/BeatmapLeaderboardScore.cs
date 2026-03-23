@@ -43,7 +43,6 @@ namespace osu.Game.Screens.Select
     public sealed partial class BeatmapLeaderboardScore : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
     {
         public const int HEIGHT = 50;
-        public const int TRANSITION_DURATION = 200;
 
         public readonly ScoreInfo Score;
 
@@ -85,6 +84,7 @@ namespace osu.Game.Screens.Select
         private const float statistics_compact_min_width = 90;
 
         private const int corner_radius = 10;
+        private const int transition_duration = 200;
 
         private Colour4 foregroundColour;
         private Colour4 backgroundColour;
@@ -495,15 +495,15 @@ namespace osu.Game.Screens.Select
         {
             var lightenedGradient = ColourInfo.GradientHorizontal(backgroundColour.Opacity(0).Lighten(0.2f), backgroundColour.Lighten(0.2f));
 
-            foreground.FadeColour(IsHovered ? foregroundColour.Lighten(0.2f) : foregroundColour, TRANSITION_DURATION, Easing.OutQuint);
-            background.FadeColour(IsHovered ? backgroundColour.Lighten(0.2f) : backgroundColour, TRANSITION_DURATION, Easing.OutQuint);
-            totalScoreBackground.FadeColour(IsHovered ? lightenedGradient : totalScoreBackgroundGradient, TRANSITION_DURATION, Easing.OutQuint);
-            rankLabelStandalone.UpdateHighlightState(IsHovered);
+            foreground.FadeColour(IsHovered ? foregroundColour.Lighten(0.2f) : foregroundColour, transition_duration, Easing.OutQuint);
+            background.FadeColour(IsHovered ? backgroundColour.Lighten(0.2f) : backgroundColour, transition_duration, Easing.OutQuint);
+            totalScoreBackground.FadeColour(IsHovered ? lightenedGradient : totalScoreBackgroundGradient, transition_duration, Easing.OutQuint);
+            rankLabelStandalone.UpdateHighlightState(IsHovered, transition_duration);
 
             if (IsHovered && currentMode != DisplayMode.Full)
-                rankLabelOverlay.FadeIn(TRANSITION_DURATION, Easing.OutQuint);
+                rankLabelOverlay.FadeIn(transition_duration, Easing.OutQuint);
             else
-                rankLabelOverlay.FadeOut(TRANSITION_DURATION, Easing.OutQuint);
+                rankLabelOverlay.FadeOut(transition_duration, Easing.OutQuint);
         }
 
         private DisplayMode? currentMode;
@@ -526,12 +526,12 @@ namespace osu.Game.Screens.Select
 
         private void updateDisplayMode(DisplayMode mode)
         {
-            if (mode >= DisplayMode.Full)
-                rankLabelStandalone.Show();
-            else
-                rankLabelStandalone.Hide();
+            double duration = currentMode == null ? 0 : transition_duration;
 
-            double duration = currentMode == null ? 0 : TRANSITION_DURATION;
+            if (mode >= DisplayMode.Full)
+                rankLabelStandalone.Appear(duration);
+            else
+                rankLabelStandalone.Disappear(duration);
 
             if (mode >= DisplayMode.Regular)
             {

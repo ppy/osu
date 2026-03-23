@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Screens.Select;
 using osuTK.Graphics;
 
 namespace osu.Game.Online.Leaderboards
@@ -26,12 +25,9 @@ namespace osu.Game.Online.Leaderboards
         private static readonly Color4 personal_best_gradient_left = Color4Extensions.FromHex("#66FFCC");
         private static readonly Color4 personal_best_gradient_right = Color4Extensions.FromHex("#51A388");
 
-        private const int transition_duration = BeatmapLeaderboardScore.TRANSITION_DURATION;
-
         private Container highlightGradient = null!;
 
         private readonly bool sheared;
-        private bool firstTransition = true;
 
         public LeaderboardRankDisplay(int? rank, bool sheared = false, HighlightType? highlight = null)
         {
@@ -78,27 +74,19 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        public void UpdateHighlightState(bool isHovered)
+        public void UpdateHighlightState(bool isHovered, double duration)
         {
-            highlightGradient.FadeColour(getHighlightColour(Highlight, isHovered ? 0.2f : 0), transition_duration, Easing.OutQuint);
+            highlightGradient.FadeColour(getHighlightColour(Highlight, isHovered ? 0.2f : 0), duration, Easing.OutQuint);
         }
 
-        private int transitionDuration() => firstTransition ? 0 : transition_duration;
-
-        public override void Show()
+        public void Appear(double duration)
         {
-            this.FadeIn(transitionDuration(), Easing.OutQuint)
-                .ResizeWidthTo(WIDTH, transitionDuration(), Easing.OutQuint);
-
-            firstTransition = false;
+            this.FadeIn(duration, Easing.OutQuint).ResizeWidthTo(WIDTH, duration, Easing.OutQuint);
         }
 
-        public override void Hide()
+        public void Disappear(double duration)
         {
-            this.FadeOut(transitionDuration(), Easing.OutQuint)
-                .ResizeWidthTo(0, transitionDuration(), Easing.OutQuint);
-
-            firstTransition = false;
+            this.FadeOut(duration, Easing.OutQuint).ResizeWidthTo(0, duration, Easing.OutQuint);
         }
 
         public enum HighlightType
