@@ -90,15 +90,16 @@ namespace osu.Game.Screens.Ranking.Statistics
             popOutSample = audio.Samples.Get(@"Results/statistics-panel-pop-out");
         }
 
-        private string? getReasonFromPreventingTagging(ScoreInfo newScore, ScoreInfo? localScore)
+        private string? getReasonFromPreventingTagging(ScoreInfo? score, int expectedRulesetId)
         {
-            if (localScore == null)
+            // We may want to iterate on the following conditions further in the future
+            if (score == null)
                 return "Play the beatmap to contribute to beatmap tags!";
-            else if (localScore.Ruleset.OnlineID != newScore.BeatmapInfo!.Ruleset.OnlineID)
+            else if (score.Ruleset.OnlineID != expectedRulesetId)
                 return "Play the beatmap in its original ruleset to contribute to beatmap tags!";
-            else if (localScore.Rank < ScoreRank.C)
+            else if (score.Rank < ScoreRank.C)
                 return "Set a better score to contribute to beatmap tags!";
-            else if (localScore.Mods.Any(m => (m.Type == ModType.Conversion) && !(m is ModClassic)))
+            else if (score.Mods.Any(m => (m.Type == ModType.Conversion) && !(m is ModClassic)))
                 return "Play this beatmap without conversion mods to contribute to beatmap tags!";
             else
                 return null;
@@ -256,25 +257,23 @@ namespace osu.Game.Screens.Ranking.Statistics
                 && api.IsLoggedIn)
             {
                 string? preventTaggingReason = null;
-
-                // We may want to iterate on the following conditions further in the future
+                int expectedRulesetID = newScore.BeatmapInfo.Ruleset.OnlineID;
 
                 var localUserScores = realm.Run(r =>
                     r.GetAllLocalScoresForUser(api.LocalUser.Value.Id)
                      .Filter($@"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0", newScore.BeatmapInfo.ID)
                      .AsEnumerable()
                      .OrderByDescending(score => score.Ruleset.MatchesOnlineID(newScore.BeatmapInfo.Ruleset))
-                     .ThenByDescending(score => score.Rank)
+                     .ThenBy(score => score.Rank)
                      .ToArray());
 
                 if (localUserScores.Length == 0)
-                    preventTaggingReason = getReasonFromPreventingTagging(newScore, AchievedScore);
+                    preventTaggingReason = getReasonFromPreventingTagging(AchievedScore, expectedRulesetID);
                 else
                 {
-                    // Iterate backwards so we end up with the reason from the top score
-                    foreach (ScoreInfo score in localUserScores.Reverse())
+                    foreach (ScoreInfo score in localUserScores)
                     {
-                        preventTaggingReason = getReasonFromPreventingTagging(newScore, score);
+                        preventTaggingReason = getReasonFromPreventingTagging(score, expectedRulesetID);
                         if (preventTaggingReason == null)
                             break;
                     }
