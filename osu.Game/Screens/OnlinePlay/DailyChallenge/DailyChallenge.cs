@@ -252,7 +252,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                             {
                                                                 new Drawable[]
                                                                 {
-                                                                    new SectionHeader("Chat")
+                                                                    new SectionHeader(OnlinePlayStrings.Chat)
                                                                 },
                                                                 [new MatchChatDisplay(room) { RelativeSizeAxes = Axes.Both }]
                                                             },

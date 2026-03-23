@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -14,7 +15,15 @@ namespace osu.Game.Graphics.UserInterface
 {
     public partial class SectionHeader : CompositeDrawable
     {
+        public Bindable<string> Details = new Bindable<string>();
+
         private readonly LocalisableString text;
+
+        private OsuTextFlowContainer textFlow = null!;
+        private ITextPart? detailsPart;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public SectionHeader(LocalisableString text)
         {
@@ -27,7 +36,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
             InternalChild = new FillFlowContainer
             {
@@ -37,7 +46,7 @@ namespace osu.Game.Graphics.UserInterface
                 Spacing = new Vector2(2),
                 Children = new Drawable[]
                 {
-                    new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 16, weight: FontWeight.SemiBold))
+                    textFlow = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 16, weight: FontWeight.SemiBold))
                     {
                         Text = text,
                         RelativeSizeAxes = Axes.X,
@@ -50,6 +59,21 @@ namespace osu.Game.Graphics.UserInterface
                     }
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Details.BindValueChanged(updateDetails);
+        }
+
+        private void updateDetails(ValueChangedEvent<string> details)
+        {
+            if (detailsPart != null)
+                textFlow.RemovePart(detailsPart);
+
+            detailsPart = textFlow.AddText($" {details.NewValue}", t => t.Colour = colourProvider.Highlight1);
         }
     }
 }
