@@ -105,8 +105,8 @@ namespace osu.Game.Screens.Select
         private Box totalScoreBackground = null!;
 
         private FillFlowContainer statisticsContainer = null!;
-        private LeaderboardRankDisplay rankLabelStandalone = null!;
-        private Container rankLabelOverlay = null!;
+        private LeaderboardRankDisplay rankDisplay = null!;
+        private Container rankOverlay = null!;
 
         private readonly bool sheared;
 
@@ -150,7 +150,7 @@ namespace osu.Game.Screens.Select
                         RelativeSizeAxes = Axes.Both,
                         Colour = backgroundColour
                     },
-                    rankLabelStandalone = new LeaderboardRankDisplay(Rank, sheared, Highlight),
+                    rankDisplay = new LeaderboardRankDisplay(Rank, sheared, Highlight),
                     centreContent = new Container
                     {
                         Name = @"Centre container",
@@ -209,7 +209,7 @@ namespace osu.Game.Screens.Select
                                                         RelativeSizeAxes = Axes.None,
                                                         Size = new Vector2(HEIGHT)
                                                     },
-                                                    rankLabelOverlay = new Container
+                                                    rankOverlay = new Container
                                                     {
                                                         RelativeSizeAxes = Axes.Both,
                                                         Alpha = 0,
@@ -498,12 +498,12 @@ namespace osu.Game.Screens.Select
             foreground.FadeColour(IsHovered ? foregroundColour.Lighten(0.2f) : foregroundColour, transition_duration, Easing.OutQuint);
             background.FadeColour(IsHovered ? backgroundColour.Lighten(0.2f) : backgroundColour, transition_duration, Easing.OutQuint);
             totalScoreBackground.FadeColour(IsHovered ? lightenedGradient : totalScoreBackgroundGradient, transition_duration, Easing.OutQuint);
-            rankLabelStandalone.UpdateHighlightState(IsHovered, transition_duration);
+            rankDisplay.UpdateHighlightState(IsHovered, transition_duration);
 
             if (IsHovered && currentMode != DisplayMode.Full)
-                rankLabelOverlay.FadeIn(transition_duration, Easing.OutQuint);
+                rankOverlay.FadeIn(transition_duration, Easing.OutQuint);
             else
-                rankLabelOverlay.FadeOut(transition_duration, Easing.OutQuint);
+                rankOverlay.FadeOut(transition_duration, Easing.OutQuint);
         }
 
         private DisplayMode? currentMode;
@@ -519,7 +519,7 @@ namespace osu.Game.Screens.Select
 
             centreContent.Padding = new MarginPadding
             {
-                Left = rankLabelStandalone.DrawWidth,
+                Left = rankDisplay.DrawWidth,
                 Right = rightContent.DrawWidth,
             };
         }
@@ -529,9 +529,9 @@ namespace osu.Game.Screens.Select
             double duration = currentMode == null ? 0 : transition_duration;
 
             if (mode >= DisplayMode.Full)
-                rankLabelStandalone.Appear(duration);
+                rankDisplay.Appear(duration);
             else
-                rankLabelStandalone.Disappear(duration);
+                rankDisplay.Disappear(duration);
 
             if (mode >= DisplayMode.Regular)
             {
