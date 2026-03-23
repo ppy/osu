@@ -254,6 +254,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 if (localUserScores.Length == 0)
                     preventTaggingReason = "Play the beatmap to contribute to beatmap tags!";
                 else
+                {
                     foreach (ScoreInfo score in localUserScores)
                     {
                         // We may want to iterate on the following conditions further in the future
@@ -269,6 +270,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                             break;
                         }
                     }
+                }
 
                 if (preventTaggingReason == null)
                 {
