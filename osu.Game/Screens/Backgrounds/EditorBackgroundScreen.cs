@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Backgrounds
         public override void OnEntering(ScreenTransitionEvent e)
         {
             base.OnEntering(e);
-            blackBox.Delay(TRANSITION_LENGTH).Expire();
+            blackBox.LifetimeEnd = LatestTransformEndTime;
         }
 
         public override bool OnExiting(ScreenExitEvent e)
