@@ -3,22 +3,33 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
+using osu.Game.Input;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Resources.Localisation.Web;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 {
-    public class RankedPlayChatDisplay : CompositeDrawable
+    public class RankedPlayChatDisplay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         [Resolved]
-        private ChannelManager? channelManager { get; set; }
+        private ChannelManager channelManager { get; set; } = null!;
+
+        [Resolved]
+        private RealmKeyBindingStore keyBindingStore { get; set; } = null!;
 
         private readonly MultiplayerRoom room;
 
         private StandAloneChatDisplay chat = null!;
+        private ChatTextBox textbox = null!;
 
         private Channel? channel;
 
@@ -34,24 +45,75 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             {
                 chat = new StandAloneChatDisplay(false)
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0,
+                },
+                textbox = new ChatTextBox
+                {
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    RelativeSizeAxes = Axes.X,
+                    Height = 30,
+                    CornerRadius = 10,
+                    ReleaseFocusOnCommit = false,
+                    HoldFocus = false,
+                    Focus = () => textbox.PlaceholderText = ChatStrings.InputPlaceholder,
+                    FocusLost = resetPlaceholderText
                 }
             };
+
+            resetPlaceholderText();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            channel = channelManager?.JoinChannel(new Channel { Id = room.ChannelID, Type = ChannelType.Multiplayer, Name = $"#lazermp_{room.RoomID}" });
-
-            if (channel != null)
-                channel.NewMessagesArrived += onNewMessagesArrived;
+            channel = channelManager.JoinChannel(new Channel { Id = room.ChannelID, Type = ChannelType.Multiplayer, Name = $"#lazermp_{room.RoomID}" });
+            channel.NewMessagesArrived += onNewMessagesArrived;
 
             chat.Channel.Value = channel;
         }
 
         private void onNewMessagesArrived(IEnumerable<Message> obj)
+        {
+        }
+
+        private void resetPlaceholderText()
+        {
+            textbox.PlaceholderText = Localisation.ChatStrings.InGameInputPlaceholder(keyBindingStore.GetBindingsStringFor(GlobalAction.ToggleChatFocus));
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                case GlobalAction.Back:
+                    if (textbox.HasFocus)
+                    {
+                        Schedule(() => textbox.KillFocus());
+                        return true;
+                    }
+
+                    break;
+
+                case GlobalAction.ToggleChatFocus:
+                    if (textbox.HasFocus)
+                    {
+                        Schedule(() => textbox.KillFocus());
+                    }
+                    else
+                    {
+                        Schedule(() => textbox.TakeFocus());
+                    }
+
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
 
@@ -79,6 +141,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
             if (channel != null)
                 channel.NewMessagesArrived -= onNewMessagesArrived;
+        }
+
+        private class ChatTextBox : StandAloneChatDisplay.ChatTextBox
+        {
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                BackgroundFocused = Colour4.FromHex("222228");
+                BackgroundUnfocused = BackgroundFocused.Opacity(0.7f);
+                Placeholder.Colour = Color4.White;
+            }
         }
     }
 }
