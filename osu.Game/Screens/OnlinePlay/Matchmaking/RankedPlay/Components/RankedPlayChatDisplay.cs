@@ -2,18 +2,24 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Users.Drawables;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
@@ -28,8 +34,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         private readonly MultiplayerRoom room;
 
-        private StandAloneChatDisplay chat = null!;
         private ChatTextBox textbox = null!;
+        private BubbleChatHistory chatHistory = null!;
 
         private Channel? channel;
 
@@ -43,11 +49,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         {
             InternalChildren = new Drawable[]
             {
-                chat = new StandAloneChatDisplay(false)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0,
-                },
                 textbox = new ChatTextBox
                 {
                     Anchor = Anchor.BottomRight,
@@ -57,26 +58,50 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                     CornerRadius = 10,
                     ReleaseFocusOnCommit = false,
                     HoldFocus = false,
-                    Focus = () => textbox.PlaceholderText = ChatStrings.InputPlaceholder,
-                    FocusLost = resetPlaceholderText
+                    Focus = onFocusGained,
+                    FocusLost = onFocusLost
+                },
+                new Container
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding { Bottom = 35 },
+                    Child = chatHistory = new BubbleChatHistory
+                    {
+                        RelativeSizeAxes = Axes.X
+                    }
                 }
             };
-
-            resetPlaceholderText();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
+            resetPlaceholderText();
+
             channel = channelManager.JoinChannel(new Channel { Id = room.ChannelID, Type = ChannelType.Multiplayer, Name = $"#lazermp_{room.RoomID}" });
             channel.NewMessagesArrived += onNewMessagesArrived;
-
-            chat.Channel.Value = channel;
         }
 
-        private void onNewMessagesArrived(IEnumerable<Message> obj)
+        private void onNewMessagesArrived(IEnumerable<Message> bundle)
         {
+            foreach (var message in bundle)
+                chatHistory.PostMessage(message.Sender, message.Content);
+        }
+
+        private void onFocusGained()
+        {
+            textbox.PlaceholderText = ChatStrings.InputPlaceholder;
+            chatHistory.Expand();
+        }
+
+        private void onFocusLost()
+        {
+            resetPlaceholderText();
+            chatHistory.Collapse();
         }
 
         private void resetPlaceholderText()
@@ -152,6 +177,186 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 BackgroundFocused = Colour4.FromHex("222228");
                 BackgroundUnfocused = BackgroundFocused.Opacity(0.7f);
                 Placeholder.Colour = Color4.White;
+            }
+        }
+
+        public class BubbleChatHistory : CompositeDrawable
+        {
+            /// <summary>
+            /// Maximum number of recent messages to keep.
+            /// </summary>
+            private const int max_length = 10;
+
+            /// <summary>
+            /// The vertical spacing between messages.
+            /// </summary>
+            private const float message_spacing = 2;
+
+            /// <summary>
+            /// When in a collapsed state, the time before a newly-posted message disappears from view.
+            /// </summary>
+            private const float time_before_disappear = 3000;
+
+            private readonly Container<MessageBubble> messageContainer;
+
+            private bool expanded;
+
+            public BubbleChatHistory()
+            {
+                AutoSizeAxes = Axes.Y;
+
+                InternalChild = messageContainer = new Container<MessageBubble>
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                };
+            }
+
+            /// <summary>
+            /// Collapses the display such that only new messages are temporarily shown.
+            /// </summary>
+            public void Collapse()
+            {
+                expanded = false;
+
+                int index = 0;
+
+                // Hide the most recent messages.
+                foreach (var child in messageContainer.Reverse().Take(max_length).Reverse())
+                {
+                    using (BeginDelayedSequence(index * 20))
+                        child.Disappear();
+
+                    index++;
+                }
+            }
+
+            /// <summary>
+            /// Expands the display such that all historical messages are shown.
+            /// </summary>
+            public void Expand()
+            {
+                expanded = true;
+
+                int index = 0;
+
+                // Show the most recent messages.
+                foreach (var child in messageContainer.Reverse().Take(max_length))
+                {
+                    using (BeginDelayedSequence(index * 20))
+                        child.Appear();
+
+                    index++;
+                }
+            }
+
+            /// <summary>
+            /// Posts a message.
+            /// </summary>
+            /// <param name="user">The user that posted the message.</param>
+            /// <param name="content">The message content.</param>
+            public void PostMessage(APIUser user, string content)
+            {
+                var newMessage = new MessageBubble(user, content)
+                {
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                };
+
+                messageContainer.Add(newMessage);
+
+                float offset = 0;
+                int index = 0;
+
+                // Layout bubbles, pushing all others upwards to make room for the new one.
+                foreach (var child in messageContainer.Reverse())
+                {
+                    child.Delay(index * 10).MoveToY(-offset, 400, Easing.OutPow10);
+
+                    offset += child.DrawHeight + message_spacing;
+                    index++;
+                }
+
+                // Hide any overflowing message. Only need to handle the most-recently-overflowing one, because others would be handled in prior calls to this method.
+                if (messageContainer.Count > max_length)
+                    messageContainer[messageContainer.Count - max_length - 1].Disappear().Expire();
+
+                // Show the new message.
+                newMessage.Appear();
+
+                // If not in the expanded state, hide the new message after a short while.
+                if (!expanded)
+                {
+                    using (BeginDelayedSequence(time_before_disappear))
+                        newMessage.Disappear();
+                }
+            }
+
+            private class MessageBubble : CompositeDrawable
+            {
+                public MessageBubble(APIUser user, string message)
+                {
+                    AutoSizeAxes = Axes.Both;
+
+                    Scale = Vector2.Zero;
+                    Alpha = 0;
+
+                    InternalChildren = new Drawable[]
+                    {
+                        new CircularContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Masking = true,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Colour4.FromHex("222228")
+                                },
+                                new FillFlowContainer
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding { Horizontal = 16, Vertical = 8 },
+                                    Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(4),
+                                    Children = new Drawable[]
+                                    {
+                                        new CircularContainer
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            Size = new Vector2(16),
+                                            Masking = true,
+                                            Child = new UpdateableAvatar(user)
+                                            {
+                                                RelativeSizeAxes = Axes.Both
+                                            }
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            Text = message,
+                                            UseFullGlyphHeight = false
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    };
+                }
+
+                public TransformSequence<MessageBubble> Appear()
+                {
+                    return this.ScaleTo(1, 400, Easing.OutElasticQuarter)
+                               .FadeIn(200);
+                }
+
+                public TransformSequence<MessageBubble> Disappear()
+                {
+                    return this.FadeOut(200);
+                }
             }
         }
     }
