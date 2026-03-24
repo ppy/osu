@@ -244,29 +244,6 @@ namespace osu.Game
         private IBindable<LocalisationParameters> localisationParameters = null!;
 
         /// <summary>
-        /// All available locale mappings for l10n initialisation.
-        /// </summary>
-        private static IEnumerable<LocaleMapping> localisationMappings => Enum.GetValues<Language>().Select(language =>
-        {
-#if DEBUG
-            if (language == Language.debug)
-                return new LocaleMapping("debug", new DebugLocalisationStore());
-#endif
-
-            string cultureCode = language.ToCultureCode();
-
-            try
-            {
-                return new LocaleMapping(new ResourceManagerLocalisationStore(cultureCode));
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, $"Could not load localisations for language \"{cultureCode}\"");
-                return null;
-            }
-        }).Where(m => m != null);
-
-        /// <summary>
         /// Number of unhandled exceptions to allow before aborting execution.
         /// </summary>
         /// <remarks>
@@ -529,7 +506,27 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            Localisation.AddLocaleMappings(localisationMappings);
+            var localeMappings = Enum.GetValues<Language>().Select(language =>
+            {
+#if DEBUG
+                if (language == Language.debug)
+                    return new LocaleMapping("debug", new DebugLocalisationStore());
+#endif
+
+                string cultureCode = language.ToCultureCode();
+
+                try
+                {
+                    return new LocaleMapping(new ResourceManagerLocalisationStore(cultureCode));
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Could not load localisations for language \"{cultureCode}\"");
+                    return null;
+                }
+            }).Where(m => m != null);
+
+            Localisation.AddLocaleMappings(localeMappings);
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
