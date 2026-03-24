@@ -12,7 +12,7 @@ using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 
-namespace osu.Desktop.Updater
+namespace osu.Desktop.MacOS
 {
     /// <summary>
     /// Checks if the game is located at `Applications` folder and displays a warning notification if not so.

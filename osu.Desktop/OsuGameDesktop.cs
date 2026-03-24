@@ -14,6 +14,7 @@ using osu.Desktop.Updater;
 using osu.Framework;
 using osu.Framework.Logging;
 using osu.Game.Updater;
+using osu.Desktop.MacOS;
 using osu.Desktop.Windows;
 using osu.Framework.Allocation;
 using osu.Game.Configuration;
