@@ -6,12 +6,14 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Testing;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 using osu.Game.Tests.Visual.Multiplayer;
 
 namespace osu.Game.Tests.Visual.RankedPlay
@@ -22,6 +24,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
 
         private ChannelManager channelManager = null!;
         private Channel testChannel = null!;
+        private RankedPlayChatDisplay chat = null!;
         private int messageIdSequence;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -58,6 +61,8 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddStep("join other user", () => MultiplayerClient.AddUser(new APIUser { Id = 2 }));
 
             AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
+
+            AddStep("get chat display", () => chat = screen.ChildrenOfType<RankedPlayChatDisplay>().Single());
         }
 
         [Test]

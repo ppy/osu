@@ -175,14 +175,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 },
             ]);
 
-            cornerPieceVisibility.BindValueChanged(e =>
-            {
-                if (e.NewValue == Visibility.Visible)
-                    chat.Appear();
-                else
-                    chat.Disappear();
-            });
-
             stage.BindValueChanged(e => onStageChanged(e.NewValue));
         }
 
@@ -234,9 +226,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         private void onStageChanged(RankedPlayStage stage)
         {
+            chat.Appear();
+
             switch (stage)
             {
                 case RankedPlayStage.RoundWarmup when matchInfo.CurrentRound == 1:
+                    chat.Disappear();
                     ShowScreen(new IntroScreen());
                     break;
 
@@ -293,6 +288,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
+            chat.Disappear();
             endHandlingTrack();
 
             base.OnSuspending(e);
@@ -340,6 +336,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         {
             base.OnResuming(e);
 
+            chat.Appear();
             beginHandlingTrack();
 
             if (e.Last is not MultiplayerPlayerLoader playerLoader)
