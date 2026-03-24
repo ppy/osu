@@ -12,13 +12,14 @@ using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModBadApple : Mod, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<CatchHitObject>, IUpdatableByPlayfield
     {
         public override string Name => "Bad Apple";
-        public override LocalisableString Description => "Dodge the beat!";
+        public override LocalisableString Description => "The fruit has gone bad... dodge it!";
         public override double ScoreMultiplier => 1;
         public override string Acronym => "BA";
         public override Type[] IncompatibleMods => new[] { typeof(CatchModAutoplay) };
@@ -48,8 +49,17 @@ namespace osu.Game.Rulesets.Catch.Mods
             {
                 catchHitObject.CheckPosition = hitObject => !catcher.CanCatch(hitObject);
             }
-        }
 
+            drawable.ApplyCustomUpdateState += (dho, state) =>
+            {
+                // Keep the existing transforms when hit.
+                if (state is not ArmedState.Hit)
+                    return;
+
+                // When "hit", the DHO is faded out, so to let fruits fall after being caught we fade them back in.
+                dho.FadeIn();
+            };
+        }
         public void Update(Playfield playfield)
         {
             // Block hyperdashing to avoid hyperdashes when two objects appear at the same time.
