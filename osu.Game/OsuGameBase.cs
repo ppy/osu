@@ -306,6 +306,7 @@ namespace osu.Game
 
             MessageFormatter.WebsiteRootUrl = endpoints.WebsiteUrl;
 
+            // Initialise localisation
             frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
             frameworkLocale.BindValueChanged(_ => updateLanguage());
 
@@ -499,6 +500,33 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Venera/Venera-Black");
 
             Fonts.AddStore(new OsuIcon.OsuIconStore(Textures));
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            var localeMappings = Enum.GetValues<Language>().Select(language =>
+            {
+#if DEBUG
+                if (language == Language.debug)
+                    return new LocaleMapping("debug", new DebugLocalisationStore());
+#endif
+
+                string cultureCode = language.ToCultureCode();
+
+                try
+                {
+                    return new LocaleMapping(new ResourceManagerLocalisationStore(cultureCode));
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Could not load localisations for language \"{cultureCode}\"");
+                    return null;
+                }
+            }).Where(m => m != null);
+
+            Localisation.AddLocaleMappings(localeMappings);
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
