@@ -36,6 +36,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Target Practice";
         public override string Acronym => "TP";
+        public override bool Ranked => false;
         public override ModType Type => ModType.Conversion;
         public override IconUsage? Icon => OsuIcon.ModTargetPractice;
         public override LocalisableString Description => @"Practice keeping up with the beat of the song.";
