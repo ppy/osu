@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
 
@@ -223,7 +224,7 @@ namespace osu.Game.Tests.NonVisual
             // no frames are arrived yet
             setTime(0, null);
             setTime(1000, null);
-            Assert.IsTrue(handler.WaitingForFrame, "Should be waiting for the first frame");
+            ClassicAssert.True(handler.WaitingForFrame, "Should be waiting for the first frame");
 
             replay.Frames.Add(new TestReplayFrame(0));
             replay.Frames.Add(new TestReplayFrame(1000));
@@ -231,11 +232,11 @@ namespace osu.Game.Tests.NonVisual
             // should always play from beginning
             setTime(1000, 0);
             confirmCurrentFrame(0);
-            Assert.IsFalse(handler.WaitingForFrame, "Should not be waiting yet");
+            ClassicAssert.False(handler.WaitingForFrame, "Should not be waiting yet");
             setTime(1000, 1000);
             confirmCurrentFrame(1);
             confirmNextFrame(null);
-            Assert.IsTrue(handler.WaitingForFrame, "Should be waiting");
+            ClassicAssert.True(handler.WaitingForFrame, "Should be waiting");
 
             // cannot seek beyond the last frame
             setTime(1500, null);
@@ -359,17 +360,17 @@ namespace osu.Game.Tests.NonVisual
 
         private void setTime(double set, double? expect)
         {
-            Assert.AreEqual(expect, handler.SetFrameFromTime(set), "Unexpected return value");
+            ClassicAssert.AreEqual(expect, handler.SetFrameFromTime(set), "Unexpected return value");
         }
 
         private void confirmCurrentFrame(int? frame)
         {
-            Assert.AreEqual(frame is int x ? replay.Frames[x].Time : null, handler.CurrentFrame?.Time, "Unexpected current frame");
+            ClassicAssert.AreEqual(frame is int x ? replay.Frames[x].Time : null, handler.CurrentFrame?.Time, "Unexpected current frame");
         }
 
         private void confirmNextFrame(int? frame)
         {
-            Assert.AreEqual(frame is int x ? replay.Frames[x].Time : null, handler.NextFrame?.Time, "Unexpected next frame");
+            ClassicAssert.AreEqual(frame is int x ? replay.Frames[x].Time : null, handler.NextFrame?.Time, "Unexpected next frame");
         }
 
         private class TestReplayFrame : ReplayFrame

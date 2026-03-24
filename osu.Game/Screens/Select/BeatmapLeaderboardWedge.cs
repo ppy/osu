@@ -256,7 +256,9 @@ namespace osu.Game.Screens.Select
                 {
                     // only bind this after the first fetch to avoid reading stale scores.
                     fetchedScores.BindTo(leaderboardManager.Scores);
-                    fetchedScores.BindValueChanged(_ => updateScores(), true);
+
+                    // Schedule is important here to avoid handling changes after this drawable is disposed.
+                    fetchedScores.BindValueChanged(_ => Schedule(updateScores), true);
                     initialFetchComplete = true;
                 }
             }, initialFetchComplete && fetchScope != BeatmapLeaderboardScope.Local ? 300 : 0);
@@ -308,7 +310,12 @@ namespace osu.Game.Screens.Select
                     Rank = i + 1,
                     Highlight = highlightType,
                     SelectedMods = { BindTarget = mods },
-                    Action = () => onLeaderboardScoreClicked(s),
+                    Action = songSelect?.CanPresentScore == true
+                        ? () => songSelect.PresentScore(s)
+                        : null,
+                    ShowReplay = songSelect?.CanPresentScore == true
+                        ? info => songSelect.PresentScore(info, ScorePresentType.Gameplay)
+                        : null
                 };
             }), loadedScores =>
             {

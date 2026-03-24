@@ -258,6 +258,6 @@ namespace osu.Game.Tests.Gameplay
         }
 
         private void disableLayeredHitSounds()
-            => AddStep("set LayeredHitSounds to false", () => Skin.Configuration.ConfigDictionary[LegacySetting.LayeredHitSounds.ToString()] = "0");
+            => AddStep("set LayeredHitSounds to false", () => Skin.Configuration.ConfigDictionary[nameof(LegacySetting.LayeredHitSounds)] = "0");
     }
 }

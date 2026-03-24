@@ -10,6 +10,7 @@ using MessagePack;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
 using osu.Game.Online.API;
@@ -19,7 +20,9 @@ using osu.Game.Online.Matchmaking.Events;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
+using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
+using osu.Game.Online.RankedPlay;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Tests.Visual.OnlinePlay;
@@ -122,6 +125,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                     user.MatchState = new TeamVersusUserState { TeamID = bestTeam };
                     ((IMultiplayerClient)this).MatchUserStateChanged(clone(user.UserID), clone(user.MatchState)).WaitSafely();
+                    break;
+
+                case RankedPlayRoomState:
+                    ((RankedPlayRoomState)ServerRoom!.MatchState!).Users[user.UserID] = new RankedPlayUserInfo
+                    {
+                        Rating = 1500,
+                        Hand = Enumerable.Range(0, 5).Select(_ => new RankedPlayCardItem()).ToList()
+                    };
+
+                    ((IMultiplayerClient)this).MatchRoomStateChanged(clone(ServerRoom.MatchState)).WaitSafely();
                     break;
             }
         }
@@ -421,11 +434,29 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     await StopCountdown(ServerRoom.ActiveCountdowns.First(c => c.ID == stopCountdown.ID)).ConfigureAwait(false);
                     break;
 
+                case RollRequest rollRequest:
+                    int max = (int)(rollRequest.Max ?? 100);
+                    await ((IMultiplayerClient)this).MatchEvent(new RollEvent
+                    {
+                        UserID = userId,
+                        Max = (uint)max,
+                        Result = (uint)RNG.Next(1, max + 1)
+                    }).ConfigureAwait(false);
+                    break;
+
                 case MatchmakingAvatarActionRequest avatarAction:
                     await ((IMultiplayerClient)this).MatchEvent(new MatchmakingAvatarActionEvent
                     {
                         UserId = userId,
                         Action = avatarAction.Action
+                    }).ConfigureAwait(false);
+                    break;
+
+                case RankedPlayCardHandReplayRequest cardHandState:
+                    await ((IMultiplayerClient)this).MatchEvent(new RankedPlayCardHandReplayEvent
+                    {
+                        UserId = userId,
+                        Frames = cardHandState.Frames,
                     }).ConfigureAwait(false);
                     break;
             }
@@ -625,6 +656,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     }
 
                     break;
+
+                case MatchType.RankedPlay:
+                    ServerRoom.MatchState = new RankedPlayRoomState();
+
+                    foreach (var user in ServerRoom.Users)
+                    {
+                        ((RankedPlayRoomState)ServerRoom.MatchState).Users[user.UserID] = new RankedPlayUserInfo
+                        {
+                            Rating = 1500,
+                            Hand = Enumerable.Range(0, 5).Select(_ => new RankedPlayCardItem()).ToList()
+                        };
+                    }
+
+                    await ((IMultiplayerClient)this).MatchRoomStateChanged(clone(ServerRoom.MatchState)).ConfigureAwait(false);
+
+                    foreach (var user in ServerRoom.Users)
+                    {
+                        user.MatchState = null;
+                        await ((IMultiplayerClient)this).MatchUserStateChanged(clone(user.UserID), clone(user.MatchState)).ConfigureAwait(false);
+                    }
+
+                    break;
             }
         }
 
@@ -782,6 +835,33 @@ namespace osu.Game.Tests.Visual.Multiplayer
             await ((IMultiplayerClient)this).MatchRoomStateChanged(clone(ServerRoom.MatchState)).ConfigureAwait(false);
         }
 
+        public override Task DiscardCards(RankedPlayCardItem[] cards)
+            => DiscardCards(_ => cards);
+
+        public Task DiscardCards(Func<RankedPlayCardItem[], IEnumerable<RankedPlayCardItem>> selector)
+            => DiscardUserCards(api.LocalUser.Value.OnlineID, selector);
+
+        public async Task DiscardUserCards(int userId, Func<RankedPlayCardItem[], IEnumerable<RankedPlayCardItem>> selector)
+        {
+            RankedPlayUserInfo info = ((RankedPlayRoomState)ServerRoom!.MatchState!).Users[userId];
+            RankedPlayCardItem[] cards = selector(info.Hand.ToArray()).ToArray();
+
+            await RankedPlayRemoveUserCards(userId, _ => cards).ConfigureAwait(false);
+            await RankedPlayAddUserCards(userId, Enumerable.Range(0, cards.Length).Select(_ => new RankedPlayCardItem()).ToArray()).ConfigureAwait(false);
+        }
+
+        public override Task PlayCard(RankedPlayCardItem card)
+            => PlayCard(_ => card);
+
+        public Task PlayCard(Func<RankedPlayCardItem[], RankedPlayCardItem> selector)
+            => PlayUserCard(api.LocalUser.Value.OnlineID, selector);
+
+        public async Task PlayUserCard(int userId, Func<RankedPlayCardItem[], RankedPlayCardItem> selector)
+        {
+            RankedPlayCardItem card = selector(((RankedPlayRoomState)ServerRoom!.MatchState!).Users[userId].Hand.ToArray());
+            await ((IRankedPlayClient)this).RankedPlayCardPlayed(clone(card)).ConfigureAwait(false);
+        }
+
         public override Task<MatchmakingPool[]> GetMatchmakingPoolsOfType(MatchmakingPoolType type)
         {
             return Task.FromResult<MatchmakingPool[]>(
@@ -863,6 +943,93 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Stage = stage,
                 TimeRemaining = TimeSpan.FromSeconds(stage == MatchmakingStage.UserBeatmapSelect ? 30 : 10)
             }).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Adds a card to the local user's hand.
+        /// </summary>
+        public Task RankedPlayAddCards(RankedPlayCardItem[] cards)
+            => RankedPlayAddUserCards(api.LocalUser.Value.OnlineID, cards);
+
+        /// <summary>
+        /// Adds a card to the given user's hand.
+        /// </summary>
+        public async Task RankedPlayAddUserCards(int userId, RankedPlayCardItem[] cards)
+        {
+            foreach (var card in cards)
+            {
+                ((RankedPlayRoomState)ServerRoom!.MatchState!).Users[userId].Hand.Add(card);
+                await ((IRankedPlayClient)this).RankedPlayCardAdded(userId, clone(card)).ConfigureAwait(false);
+            }
+
+            await ((IMultiplayerClient)this).MatchRoomStateChanged(clone(ServerRoom!.MatchState)).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Removes a card from the local user's hand.
+        /// </summary>
+        public Task RankedPlayRemoveCards(Func<RankedPlayCardItem[], RankedPlayCardItem[]> selector)
+            => RankedPlayRemoveUserCards(api.LocalUser.Value.OnlineID, selector);
+
+        /// <summary>
+        /// Removes a card from the given user's hand.
+        /// </summary>
+        public async Task RankedPlayRemoveUserCards(int userId, Func<RankedPlayCardItem[], RankedPlayCardItem[]> selector)
+        {
+            RankedPlayCardItem[] cards = selector(((RankedPlayRoomState)ServerRoom!.MatchState!).Users[userId].Hand.ToArray());
+
+            foreach (var card in cards)
+            {
+                ((RankedPlayRoomState)ServerRoom!.MatchState!).Users[userId].Hand.Remove(card);
+                await ((IRankedPlayClient)this).RankedPlayCardRemoved(userId, clone(card)).ConfigureAwait(false);
+            }
+
+            await ((IMultiplayerClient)this).MatchRoomStateChanged(clone(ServerRoom!.MatchState)).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Reveals a card in the local user's hand.
+        /// </summary>
+        public Task RankedPlayRevealCard(Func<RankedPlayCardItem[], RankedPlayCardItem> selector, MultiplayerPlaylistItem item)
+            => RankedPlayRevealUserCard(api.LocalUser.Value.OnlineID, selector, item);
+
+        /// <summary>
+        /// Reveals a card in the given user's hand.
+        /// </summary>
+        public async Task RankedPlayRevealUserCard(int userId, Func<RankedPlayCardItem[], RankedPlayCardItem> selector, MultiplayerPlaylistItem item)
+        {
+            RankedPlayCardItem card = selector(((RankedPlayRoomState)ServerRoom!.MatchState!).Users[userId].Hand.ToArray());
+            await ((IRankedPlayClient)this).RankedPlayCardRevealed(clone(card), clone(item)).ConfigureAwait(false);
+        }
+
+        public async Task RankedPlayChangeStage(RankedPlayStage stage, Action<RankedPlayRoomState>? prepare = null)
+        {
+            RankedPlayRoomState state = clone((RankedPlayRoomState)ServerRoom!.MatchState!);
+
+            state.Stage = stage;
+
+            if (stage == RankedPlayStage.RoundWarmup)
+                state.CurrentRound++;
+
+            prepare?.Invoke(state);
+
+            await ChangeMatchRoomState(state).ConfigureAwait(false);
+            await StartCountdown(new RankedPlayStageCountdown
+            {
+                Stage = stage,
+                TimeRemaining = TimeSpan.FromSeconds(stage == RankedPlayStage.CardPlay ? 30 : 10)
+            }).ConfigureAwait(false);
+        }
+
+        public async Task RankedPlayChangeUserState(int userId, Action<RankedPlayUserInfo> prepare)
+        {
+            Debug.Assert(ServerRoom != null);
+
+            var userInfo = clone(((RankedPlayRoomState)ServerRoom!.MatchState!).Users[userId]);
+            prepare(userInfo);
+
+            ((RankedPlayRoomState)ServerRoom!.MatchState!).Users[userId] = userInfo;
+            await ((IMultiplayerClient)this).MatchRoomStateChanged(clone(ServerRoom!.MatchState)).ConfigureAwait(false);
         }
 
         #region API Room Handling

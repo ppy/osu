@@ -7,7 +7,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions;
 using osu.Framework.Input.Events;
-using osu.Framework.Utils;
+using osu.Game.Audio;
 using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
@@ -55,15 +55,7 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnClick(e);
         }
 
-        public void PlayClickSample()
-        {
-            var channel = Enabled.Value ? sampleClick?.GetChannel() : sampleClickDisabled?.GetChannel();
-
-            if (channel != null)
-            {
-                channel.Frequency.Value = 0.99 + RNG.NextDouble(0.02);
-                channel.Play();
-            }
-        }
+        public void PlayClickSample() =>
+            SamplePlaybackHelper.PlayWithRandomPitch(Enabled.Value ? sampleClick : sampleClickDisabled, pitchVariation: 0.01);
     }
 }

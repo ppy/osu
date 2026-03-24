@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -21,6 +22,7 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -144,6 +146,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private FillFlowContainer userStyleSection = null!;
         private Container<DrawableRoomPlaylistItem> userStyleDisplayContainer = null!;
+
+        private MatchChatDisplay chat = null!;
 
         private Sample? sampleStart;
         private IDisposable? userModsSelectOverlayRegistration;
@@ -370,7 +374,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                         },
                                                                         new Drawable[]
                                                                         {
-                                                                            new MatchChatDisplay(room)
+                                                                            chat = new MatchChatDisplay(room)
                                                                             {
                                                                                 RelativeSizeAxes = Axes.Both
                                                                             }
@@ -431,6 +435,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             client.UserStyleChanged += onUserStyleChanged;
             client.UserModsChanged += onUserModsChanged;
             client.LoadRequested += onLoadRequested;
+            client.MatchEvent += onMatchEvent;
 
             beatmapAvailabilityTracker.Availability.BindValueChanged(onBeatmapAvailabilityChanged, true);
 
@@ -590,6 +595,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
                 default:
                     targetScreen.Push(new MultiplayerPlayerLoader(() => new MultiplayerPlayer(room, new PlaylistItem(client.Room.CurrentPlaylistItem), users)));
+                    break;
+            }
+        }
+
+        private void onMatchEvent(MatchServerEvent ev)
+        {
+            switch (ev)
+            {
+                case RollEvent rollEvent:
+                    var user = client.Room?.Users.SingleOrDefault(u => u.UserID == rollEvent.UserID)?.User ?? new APIUser { Username = "Unknown user" };
+                    string text = $"{user.Username} rolled {"point".ToQuantity(rollEvent.Result)} out of {rollEvent.Max}.";
+                    chat.Channel.Value?.AddNewMessages(new InfoMessage(text));
                     break;
             }
         }
@@ -878,7 +895,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     confirmDialog.PerformOkAction();
                 else
                 {
-                    dialogOverlay.Push(new ConfirmDialog("Are you sure you want to leave this multiplayer match?", () =>
+                    dialogOverlay.Push(new ConfirmExitMultiplayerMatchDialog(() =>
                     {
                         ExitConfirmed = true;
                         this.Exit();

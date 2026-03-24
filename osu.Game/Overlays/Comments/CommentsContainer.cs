@@ -188,7 +188,7 @@ namespace osu.Game.Overlays.Comments
         protected override void LoadComplete()
         {
             User.BindValueChanged(_ => refetchComments());
-            User.BindValueChanged(e => avatar.User = e.NewValue);
+            User.BindValueChanged(e => avatar.User = e.NewValue, true);
             Sort.BindValueChanged(_ => refetchComments(), true);
             base.LoadComplete();
         }

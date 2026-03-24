@@ -10,7 +10,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Utils;
+using osu.Game.Audio;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -52,12 +52,8 @@ namespace osu.Game.Graphics.Containers
             if (Time.Current - sampleLastPlaybackTime <= 35)
                 return;
 
-            var channel = sampleSwap?.GetChannel();
-            if (channel == null)
-                return;
+            SamplePlaybackHelper.PlayWithRandomPitch(sampleSwap, pitchVariation: 0.04);
 
-            channel.Frequency.Value = 0.96 + RNG.NextDouble(0.08);
-            channel.Play();
             sampleLastPlaybackTime = Time.Current;
         }
 

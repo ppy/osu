@@ -71,8 +71,15 @@ namespace osu.Game.Database
 
             // Encode to legacy format
             var stream = new MemoryStream();
+
             using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+            {
+                // Maintain line endings in windows style.
+                // If we don't do that, uploads to BSS may show changes where there are none.
+                sw.NewLine = "\r\n";
+
                 new LegacyBeatmapEncoder(playableBeatmap, beatmapSkin).Encode(sw);
+            }
 
             stream.Seek(0, SeekOrigin.Begin);
 
