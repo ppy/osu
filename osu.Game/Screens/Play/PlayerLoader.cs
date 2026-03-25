@@ -120,22 +120,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private bool readyForPush =>
-            !playerConsumed
-            // don't push unless the player is completely loaded
-            && CurrentPlayer?.LoadState == LoadState.Ready
-            // don't push unless the player is ready to start gameplay
-            && ReadyForGameplay;
-
-        protected virtual bool ReadyForGameplay =>
-            // not ready if the user is hovering one of the panes (logo is excluded), unless they are idle.
-            (IsHovered || osuLogo?.IsHovered == true || idleTracker.IsIdle.Value)
-            // not ready if the user is dragging a slider or otherwise.
-            && (inputManager.DraggedDrawable == null || inputManager.DraggedDrawable is OsuLogo)
-            // not ready if a focused overlay is visible, like settings.
-            && inputManager.FocusedDrawable is not OsuFocusedOverlayContainer
-            // or if a child of a focused overlay is focused, like settings' search textbox.
-            && inputManager.FocusedDrawable?.FindClosestParent<OsuFocusedOverlayContainer>() == null;
+        protected virtual bool ReadyForGameplay { get; private set; }
 
         private bool holdForMenuExitButton => !AllowUserExit;
 
@@ -490,6 +475,18 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
+            ReadyForGameplay =
+                // not ready if the user is hovering one of the panes (logo is excluded), unless they are idle.
+                (IsHovered || osuLogo?.IsHovered == true || idleTracker.IsIdle.Value)
+                // not ready if the user is dragging a slider or otherwise.
+                && (inputManager.DraggedDrawable == null || inputManager.DraggedDrawable is OsuLogo)
+                // not ready if a focused overlay is visible, like settings.
+                && inputManager.FocusedDrawable is not OsuFocusedOverlayContainer
+                // or if a child of a focused overlay is focused, like settings' search textbox.
+                && inputManager.FocusedDrawable?.FindClosestParent<OsuFocusedOverlayContainer>() == null;
+
+            MetadataInfo.UserBlocked = !ReadyForGameplay && CurrentPlayer?.LoadState == LoadState.Ready;
+
             // We need to perform this check here rather than in OnHover as any number of children of VisualSettings
             // may also be handling the hover events.
             if (inputManager.HoveredDrawables.Contains(VisualSettings) || QuickRestart)
@@ -653,6 +650,13 @@ namespace osu.Game.Screens.Play
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
             if (!this.IsCurrentScreen()) return;
+
+            bool readyForPush =
+                !playerConsumed
+                // don't push unless the player is completely loaded
+                && CurrentPlayer?.LoadState == LoadState.Ready
+                // don't push unless the player is ready to start gameplay
+                && ReadyForGameplay;
 
             if (!readyForPush)
             {
