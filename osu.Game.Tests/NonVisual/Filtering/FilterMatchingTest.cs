@@ -5,13 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Filter;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
-using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Tests.NonVisual.Filtering
@@ -62,7 +62,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var criteria = new FilterCriteria();
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
-            Assert.IsFalse(carouselItem.Filtered.Value);
+            ClassicAssert.False(carouselItem.Filtered.Value);
         }
 
         [Test]
@@ -75,7 +75,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
-            Assert.IsTrue(carouselItem.Filtered.Value);
+            ClassicAssert.True(carouselItem.Filtered.Value);
         }
 
         [Test]
@@ -89,7 +89,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
-            Assert.IsFalse(carouselItem.Filtered.Value);
+            ClassicAssert.False(carouselItem.Filtered.Value);
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
-            Assert.IsFalse(carouselItem.Filtered.Value);
+            ClassicAssert.False(carouselItem.Filtered.Value);
         }
 
         [Test]
@@ -124,7 +124,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
-            Assert.AreEqual(!inclusive, carouselItem.Filtered.Value);
+            ClassicAssert.AreEqual(!inclusive, carouselItem.Filtered.Value);
         }
 
         [Test]
@@ -145,7 +145,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
-            Assert.AreEqual(!inclusive, carouselItem.Filtered.Value);
+            ClassicAssert.AreEqual(!inclusive, carouselItem.Filtered.Value);
         }
 
         [Test]
@@ -167,7 +167,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
-            Assert.AreEqual(filtered, carouselItem.Filtered.Value);
+            ClassicAssert.AreEqual(filtered, carouselItem.Filtered.Value);
         }
 
         [Test]
@@ -196,7 +196,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
-            Assert.AreEqual(filtered, carouselItem.Filtered.Value);
+            ClassicAssert.AreEqual(filtered, carouselItem.Filtered.Value);
         }
 
         [Test]
@@ -216,7 +216,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
-            Assert.AreEqual(filtered, carouselItem.Filtered.Value);
+            ClassicAssert.AreEqual(filtered, carouselItem.Filtered.Value);
         }
 
         [Test]
@@ -237,7 +237,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
-            Assert.AreEqual(filtered, carouselItem.Filtered.Value);
+            ClassicAssert.AreEqual(filtered, carouselItem.Filtered.Value);
         }
 
         [Test]
@@ -261,7 +261,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
-            Assert.AreEqual(filtered, carouselItem.Filtered.Value);
+            ClassicAssert.AreEqual(filtered, carouselItem.Filtered.Value);
         }
 
         [Test]
@@ -279,7 +279,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
-            Assert.AreEqual(filtered, carouselItem.Filtered.Value);
+            ClassicAssert.AreEqual(filtered, carouselItem.Filtered.Value);
         }
 
         [TestCase("202010", true)]
@@ -296,7 +296,24 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var carouselItem = new CarouselBeatmap(beatmap);
             carouselItem.Filter(criteria);
 
-            Assert.AreEqual(filtered, carouselItem.Filtered.Value);
+            ClassicAssert.AreEqual(filtered, carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        [TestCase("artist")]
+        [TestCase("unicode")]
+        public void TestCriteriaNotMatchingArtist(string excludedTerm)
+        {
+            var beatmap = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                Artist = new FilterCriteria.OptionalTextFilter { SearchTerm = excludedTerm, ExcludeTerm = true }
+            };
+
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            ClassicAssert.True(carouselItem.Filtered.Value);
         }
 
         [TestCase("simple", false)]
@@ -311,7 +328,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var carouselItem = new CarouselBeatmap(beatmap);
             carouselItem.Filter(criteria);
 
-            Assert.AreEqual(filtered, carouselItem.Filtered.Value);
+            ClassicAssert.AreEqual(filtered, carouselItem.Filtered.Value);
         }
 
         [Test]
@@ -329,7 +346,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var carouselItem = new CarouselBeatmap(beatmap);
             carouselItem.Filter(criteria);
 
-            Assert.AreEqual(false, carouselItem.Filtered.Value);
+            ClassicAssert.AreEqual(false, carouselItem.Filtered.Value);
         }
 
         [Test]
@@ -347,7 +364,42 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var carouselItem = new CarouselBeatmap(beatmap);
             carouselItem.Filter(criteria);
 
-            Assert.AreEqual(true, carouselItem.Filtered.Value);
+            ClassicAssert.AreEqual(true, carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        public void TestCriteriaMatchingTagExcluded()
+        {
+            var beatmap = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                UserTags =
+                [
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"song representation/simple\"!", ExcludeTerm = true },
+                ]
+            };
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            ClassicAssert.AreEqual(true, carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        public void TestCriteriaOneTagIncludedAndOneTagExcluded()
+        {
+            var beatmap = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                UserTags =
+                [
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"song representation/simple\"!" },
+                    new FilterCriteria.OptionalTextFilter { SearchTerm = "\"style/clean\"!", ExcludeTerm = true }
+                ]
+            };
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            ClassicAssert.AreEqual(true, carouselItem.Filtered.Value);
         }
 
         [Test]
@@ -359,7 +411,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             carouselItem.BeatmapInfo.Metadata.UserTags.Clear();
             carouselItem.Filter(criteria);
 
-            Assert.True(carouselItem.Filtered.Value);
+            ClassicAssert.True(carouselItem.Filtered.Value);
         }
 
         [Test]
@@ -372,7 +424,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var carouselItem = new CarouselBeatmap(beatmap);
             carouselItem.Filter(criteria);
 
-            Assert.AreEqual(matchCustomCriteria == false, carouselItem.Filtered.Value);
+            ClassicAssert.AreEqual(matchCustomCriteria == false, carouselItem.Filtered.Value);
         }
 
         [TestCase("title!=Title", new[] { 2, 4, 6 })]
@@ -534,6 +586,26 @@ namespace osu.Game.Tests.NonVisual.Filtering
                                     .Select(b => carouselBeatmaps.IndexOf(b)).ToArray();
 
             Assert.That(visibleBeatmaps, Is.EqualTo(expectedBeatmapIndexes));
+        }
+
+        // This is a temporary class that emulates what these tests originally used from song select v1.
+        // If anyone ever ends up tidying up these test, here's a starting point:
+        // https://gist.github.com/peppy/67fda38f6483fd1dd01ef845ed5bf932
+        public class CarouselBeatmap
+        {
+            public readonly BeatmapInfo BeatmapInfo;
+
+            public BindableBool Filtered = new BindableBool();
+
+            public CarouselBeatmap(BeatmapInfo beatmapInfo)
+            {
+                BeatmapInfo = beatmapInfo;
+            }
+
+            public void Filter(FilterCriteria criteria)
+            {
+                Filtered.Value = !BeatmapCarouselFilterMatching.CheckCriteriaMatch(BeatmapInfo, criteria);
+            }
         }
 
         private class CustomCriteria : IRulesetFilterCriteria

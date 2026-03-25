@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
@@ -141,7 +142,7 @@ namespace osu.Game.Tests.NonVisual
 
         private void assertCombinations(Type[][] expectedCombinations, Mod[] actualCombinations)
         {
-            Assert.AreEqual(expectedCombinations.Length, actualCombinations.Length);
+            ClassicAssert.AreEqual(expectedCombinations.Length, actualCombinations.Length);
 
             Assert.Multiple(() =>
             {
@@ -222,17 +223,17 @@ namespace osu.Game.Tests.NonVisual
 
             protected override Mod[] DifficultyAdjustmentMods { get; }
 
-            protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+            protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills)
             {
                 throw new NotImplementedException();
             }
 
-            protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
+            protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Mod[] mods)
             {
                 throw new NotImplementedException();
             }
 
-            protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
+            protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods)
             {
                 throw new NotImplementedException();
             }

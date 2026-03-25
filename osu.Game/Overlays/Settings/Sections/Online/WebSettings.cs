@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Online
@@ -18,28 +19,34 @@ namespace osu.Game.Overlays.Settings.Sections.Online
         {
             Children = new Drawable[]
             {
-                new SettingsCheckbox
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = OnlineSettingsStrings.ExternalLinkWarning,
+                    Caption = OnlineSettingsStrings.ExternalLinkWarning,
                     Current = config.GetBindable<bool>(OsuSetting.ExternalLinkWarning)
-                },
-                new SettingsCheckbox
+                }),
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = OnlineSettingsStrings.PreferNoVideo,
-                    Keywords = new[] { "no-video" },
+                    Caption = OnlineSettingsStrings.PreferNoVideo,
                     Current = config.GetBindable<bool>(OsuSetting.PreferNoVideo)
-                },
-                new SettingsCheckbox
+                })
                 {
-                    LabelText = OnlineSettingsStrings.AutomaticallyDownloadMissingBeatmaps,
-                    Keywords = new[] { "spectator", "replay" },
+                    Keywords = new[] { "no-video" },
+                },
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = OnlineSettingsStrings.AutomaticallyDownloadMissingBeatmaps,
                     Current = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadMissingBeatmaps),
-                },
-                new SettingsCheckbox
+                })
                 {
-                    LabelText = OnlineSettingsStrings.ShowExplicitContent,
-                    Keywords = new[] { "nsfw", "18+", "offensive" },
+                    Keywords = new[] { "spectator", "replay" },
+                },
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = OnlineSettingsStrings.ShowExplicitContent,
                     Current = config.GetBindable<bool>(OsuSetting.ShowOnlineExplicitContent),
+                })
+                {
+                    Keywords = new[] { "nsfw", "18+", "offensive" },
                 }
             };
         }

@@ -99,6 +99,21 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString AdjustBeatmapOffsetAutomaticallyTooltip => new TranslatableString(getKey(@"adjust_beatmap_offset_automatically_tooltip"), @"If enabled, the offset suggested from last play on a beatmap is automatically applied.");
 
+        /// <summary>
+        /// "Use experimental audio mode"
+        /// </summary>
+        public static LocalisableString WasapiLabel => new TranslatableString(getKey(@"wasapi_label"), @"Use experimental audio mode");
+
+        /// <summary>
+        /// "This will attempt to initialise the audio engine in a lower latency mode."
+        /// </summary>
+        public static LocalisableString WasapiTooltip => new TranslatableString(getKey(@"wasapi_tooltip"), @"This will attempt to initialise the audio engine in a lower latency mode.");
+
+        /// <summary>
+        /// "Due to reduced latency, your audio offset will need to be adjusted when enabling this setting. Generally expect to subtract 20 - 60 ms from your known value."
+        /// </summary>
+        public static LocalisableString WasapiNotice => new TranslatableString(getKey(@"wasapi_notice"), @"Due to reduced latency, your audio offset will need to be adjusted when enabling this setting. Generally expect to subtract 20 - 60 ms from your known value.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
@@ -40,7 +41,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestNonZeroBytes()
         {
-            Assert.IsEmpty(check.Run(getContext(byteLength: 44)));
+            ClassicAssert.IsEmpty(check.Run(getContext(byteLength: 44)));
         }
 
         [Test]
@@ -55,7 +56,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestMissing()
         {
-            Assert.IsEmpty(check.Run(getContextMissing()));
+            ClassicAssert.IsEmpty(check.Run(getContextMissing()));
         }
 
         private BeatmapVerifierContext getContext(long byteLength)

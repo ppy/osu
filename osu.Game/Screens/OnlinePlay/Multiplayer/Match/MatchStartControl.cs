@@ -12,6 +12,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
+using osu.Game.Localisation;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Overlays;
@@ -50,11 +51,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 ColumnDimensions = new[]
                 {
                     new Dimension(),
+                    new Dimension(GridSizeMode.Absolute, 5),
                     new Dimension(GridSizeMode.AutoSize)
                 },
                 Content = new[]
                 {
-                    new Drawable[]
+                    new Drawable?[]
                     {
                         readyButton = new MultiplayerReadyButton
                         {
@@ -62,6 +64,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                             Size = Vector2.One,
                             Action = onReadyButtonClick,
                         },
+                        null,
                         countdownButton = new MultiplayerCountdownButton
                         {
                             RelativeSizeAxes = Axes.Y,
@@ -257,7 +260,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             public ConfirmAbortDialog(Action abortMatch, Action cancel)
             {
-                HeaderText = "Are you sure you want to abort the match?";
+                HeaderText = DialogStrings.ConfirmAbortMatchHeaderText;
 
                 DangerousAction = abortMatch;
                 CancelAction = cancel;

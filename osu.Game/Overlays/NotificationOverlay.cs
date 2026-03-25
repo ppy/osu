@@ -162,16 +162,17 @@ namespace osu.Game.Overlays
         private int runningDepth;
 
         private readonly Scheduler postScheduler = new Scheduler();
+        private readonly Scheduler criticalPostScheduler = new Scheduler();
 
         public override bool IsPresent =>
             // Delegate presence as we need to consider the toast tray in addition to the main overlay.
-            State.Value == Visibility.Visible || mainContent.IsPresent || toastTray.IsPresent || postScheduler.HasPendingTasks;
+            State.Value == Visibility.Visible || mainContent.IsPresent || toastTray.IsPresent || postScheduler.HasPendingTasks || criticalPostScheduler.HasPendingTasks;
 
         private bool processingPosts = true;
 
         private double? lastSamplePlayback;
 
-        public void Post(Notification notification) => postScheduler.Add(() =>
+        public void Post(Notification notification) => (notification.IsCritical ? criticalPostScheduler : postScheduler).Add(() =>
         {
             ++runningDepth;
 
@@ -219,6 +220,8 @@ namespace osu.Game.Overlays
         protected override void Update()
         {
             base.Update();
+
+            criticalPostScheduler.Update();
 
             if (processingPosts)
                 postScheduler.Update();

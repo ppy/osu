@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Name => "Traceable";
         public override string Acronym => "TC";
         public override IconUsage? Icon => OsuIcon.ModTraceable;
-        public override ModType Type => ModType.Fun;
+        public override ModType Type => ModType.DifficultyIncrease;
         public override LocalisableString Description => "Put your faith in the approach circles...";
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;

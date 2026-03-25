@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -102,12 +103,13 @@ namespace osu.Game.Collections
                                 new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                    Masking = true,
                                     Children = new Drawable[]
                                     {
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = colours.GreySeaFoamDarker
+                                            Colour = colours.GreySeaFoamDarker,
                                         },
                                         new Container
                                         {
@@ -115,23 +117,30 @@ namespace osu.Game.Collections
                                             Padding = new MarginPadding(10),
                                             Children = new Drawable[]
                                             {
+                                                list = new DrawableCollectionList
+                                                {
+                                                    Padding = new MarginPadding { Vertical = 50 },
+                                                    RelativeSizeAxes = Axes.Both,
+                                                },
                                                 searchTextBox = new BasicSearchTextBox
                                                 {
                                                     RelativeSizeAxes = Axes.X,
-                                                    Y = 10,
                                                     Height = 40,
                                                     ReleaseFocusOnCommit = false,
                                                     HoldFocus = true,
                                                     PlaceholderText = HomeStrings.SearchPlaceholder,
                                                 },
-                                                list = new DrawableCollectionList
+                                                new Container
                                                 {
-                                                    Padding = new MarginPadding
+                                                    RelativeSizeAxes = Axes.X,
+                                                    AutoSizeAxes = Axes.Y,
+                                                    Anchor = Anchor.BottomLeft,
+                                                    Origin = Anchor.BottomLeft,
+                                                    Children = new Drawable[]
                                                     {
-                                                        Top = 60,
-                                                    },
-                                                    RelativeSizeAxes = Axes.Both,
-                                                }
+                                                        new NewCollectionEntryItem()
+                                                    }
+                                                },
                                             }
                                         },
                                     }
@@ -183,6 +192,31 @@ namespace osu.Game.Collections
 
             // Ensure that textboxes commit
             GetContainingFocusManager()?.TriggerFocusContention(this);
+        }
+
+        private partial class NewCollectionEntryItem : DrawableCollectionListItem
+        {
+            [Resolved]
+            private RealmAccess realm { get; set; } = null!;
+
+            public NewCollectionEntryItem()
+                : base(new BeatmapCollection().ToLiveUnmanaged(), false)
+            {
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                TextBox.OnCommit += (_, _) =>
+                {
+                    if (string.IsNullOrEmpty(TextBox.Text))
+                        return;
+
+                    realm.Write(r => r.Add(new BeatmapCollection(TextBox.Text)));
+                    TextBox.Text = string.Empty;
+                };
+            }
         }
     }
 }
