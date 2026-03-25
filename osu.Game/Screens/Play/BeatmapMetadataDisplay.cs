@@ -62,11 +62,16 @@ namespace osu.Game.Screens.Play
 
                 if (userBlocked)
                 {
-                    blockingLoadLayer
-                        .FadeIn(300, Easing.Out)
-                        .Then()
-                        .FadeTo(0.5f, 1000, Easing.In)
-                        .Loop();
+                    using (BeginDelayedSequence(500))
+                    {
+                        blockingLoadLayer
+                            // Slight delay to avoid this flashing briefly during multiplayer load and other scenarios where
+                            // load may be blocked for a short period.
+                            .FadeIn(300, Easing.Out)
+                            .Then()
+                            .FadeTo(0.6f, 1000, Easing.In)
+                            .Loop();
+                    }
                 }
                 else
                     blockingLoadLayer.FadeOut(500, Easing.OutQuint);
