@@ -29,7 +29,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
     public partial class RankedPlayChatDisplay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         [Resolved]
-        private ChannelManager channelManager { get; set; } = null!;
+        private ChannelManager? channelManager { get; set; }
 
         [Resolved]
         private RealmKeyBindingStore keyBindingStore { get; set; } = null!;
@@ -85,8 +85,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             resetPlaceholderText();
             textbox.OnCommit += onCommit;
 
-            channel = channelManager.JoinChannel(new Channel { Id = room.ChannelID, Type = ChannelType.Multiplayer, Name = $"#lazermp_{room.RoomID}" });
-            channel.NewMessagesArrived += onNewMessagesArrived;
+            channel = channelManager?.JoinChannel(new Channel { Id = room.ChannelID, Type = ChannelType.Multiplayer, Name = $"#lazermp_{room.RoomID}" });
+            if (channel != null)
+                channel.NewMessagesArrived += onNewMessagesArrived;
         }
 
         private void onCommit(TextBox sender, bool newText)
@@ -97,9 +98,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 return;
 
             if (text[0] == '/')
-                channelManager.PostCommand(text[1..], channel);
+                channelManager?.PostCommand(text[1..], channel);
             else
-                channelManager.PostMessage(text, target: channel);
+                channelManager?.PostMessage(text, target: channel);
 
             textbox.Text = string.Empty;
         }
