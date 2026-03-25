@@ -44,7 +44,13 @@ namespace osu.Game.Tests.Online
             availableBeatmap = importedSet.Beatmaps[0];
             unavailableBeatmap = importedSet.Beatmaps[1];
 
-            Realm.Write(r => r.Remove(r.Find<BeatmapInfo>(unavailableBeatmap.ID)!));
+            Realm.Write(r =>
+            {
+                BeatmapInfo available = r.Find<BeatmapInfo>(availableBeatmap.ID)!;
+                available.OnlineMD5Hash = available.MD5Hash;
+
+                r.Remove(r.Find<BeatmapInfo>(unavailableBeatmap.ID)!);
+            });
         }
 
         public override void SetUpSteps()

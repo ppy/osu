@@ -150,7 +150,7 @@ namespace osu.Game.Online
             // compare: https://github.com/peppy/osu-stable-reference/blob/013c3010a9d495e3471a9c59518de17006f9ad89/osu!/Online/BanchoClient.cs#L539
             retryDelay = Math.Min(120000, (int)(retryDelay * 1.5));
 
-            Logger.Log($"{ClientName} connect attempt failed: {exception.Message}. Next attempt in {thisDelay / 1000:N0} seconds.", LoggingTarget.Network);
+            Logger.Log($"{ClientName} connect attempt failed. Next attempt in {thisDelay / 1000:N0} seconds.\n{exception}", LoggingTarget.Network);
             await Task.Delay(thisDelay, cancellationToken).ConfigureAwait(false);
         }
 

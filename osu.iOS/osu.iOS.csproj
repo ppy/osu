@@ -22,6 +22,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Maui.Essentials" Version="8.0.3" />
   </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Assets.car" />
+    <BundleResource Include="AppIcon60x60@2x.png" />
+    <BundleResource Include="AppIcon76x76@2x~ipad.png" />
+  </ItemGroup>
   <!-- https://github.com/dotnet/macios/blob/eabcdee2ac43a0cc8324396a1bf75f8797d71810/msbuild/Xamarin.Shared/Xamarin.Shared.targets#L1328 -->
   <Target Name="AddOsuVersionToBundle" AfterTargets="_CreateAppBundle">
     <PropertyGroup>

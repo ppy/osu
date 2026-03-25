@@ -1,15 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Localisation;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
@@ -19,30 +20,63 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         protected override LocalisableString Header => AudioSettingsStrings.AudioDevicesHeader;
 
         [Resolved]
-        private AudioManager audio { get; set; }
+        private AudioManager audio { get; set; } = null!;
 
-        private SettingsDropdown<string> dropdown;
+        private AudioDeviceDropdown dropdown = null!;
+
+        private FormCheckBox? wasapiExperimental;
+
+        private readonly Bindable<SettingsNote.Data?> wasapiExperimentalNote = new Bindable<SettingsNote.Data?>();
 
         [BackgroundDependencyLoader]
         private void load()
         {
             Children = new Drawable[]
             {
-                dropdown = new AudioDeviceSettingsDropdown
+                new SettingsItemV2(dropdown = new AudioDeviceDropdown
                 {
-                    LabelText = AudioSettingsStrings.OutputDevice,
+                    Caption = AudioSettingsStrings.OutputDevice,
+                })
+                {
                     Keywords = new[] { "speaker", "headphone", "output" }
-                }
+                },
             };
 
-            updateItems();
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+            {
+                Add(new SettingsItemV2(wasapiExperimental = new FormCheckBox
+                {
+                    Caption = AudioSettingsStrings.WasapiLabel,
+                    HintText = AudioSettingsStrings.WasapiTooltip,
+                    Current = audio.UseExperimentalWasapi,
+                })
+                {
+                    Keywords = new[] { "wasapi", "latency", "exclusive" },
+                    Note = { BindTarget = wasapiExperimentalNote },
+                });
+
+                wasapiExperimental.Current.ValueChanged += _ => onDeviceChanged(string.Empty);
+            }
 
             audio.OnNewDevice += onDeviceChanged;
             audio.OnLostDevice += onDeviceChanged;
             dropdown.Current = audio.AudioDevice;
+
+            onDeviceChanged(string.Empty);
         }
 
-        private void onDeviceChanged(string name) => updateItems();
+        private void onDeviceChanged(string _)
+        {
+            updateItems();
+
+            if (wasapiExperimental != null)
+            {
+                if (wasapiExperimental.Current.Value)
+                    wasapiExperimentalNote.Value = new SettingsNote.Data(AudioSettingsStrings.WasapiNotice, SettingsNote.Type.Warning);
+                else
+                    wasapiExperimentalNote.Value = null;
+            }
+        }
 
         private void updateItems()
         {
@@ -61,7 +95,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             // functionality would require involved OS-specific code.
             dropdown.Items = deviceItems
                              // Dropdown doesn't like null items. Somehow we are seeing some arrive here (see https://github.com/ppy/osu/issues/21271)
-                             .Where(i => i != null)
+                             .Where(i => i.IsNotNull())
                              .Distinct()
                              .ToList();
         }
@@ -70,22 +104,17 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         {
             base.Dispose(isDisposing);
 
-            if (audio != null)
+            if (audio.IsNotNull())
             {
                 audio.OnNewDevice -= onDeviceChanged;
                 audio.OnLostDevice -= onDeviceChanged;
             }
         }
 
-        private partial class AudioDeviceSettingsDropdown : SettingsDropdown<string>
+        private partial class AudioDeviceDropdown : FormDropdown<string>
         {
-            protected override OsuDropdown<string> CreateDropdown() => new AudioDeviceDropdownControl();
-
-            private partial class AudioDeviceDropdownControl : DropdownControl
-            {
-                protected override LocalisableString GenerateItemText(string item)
-                    => string.IsNullOrEmpty(item) ? CommonStrings.Default : base.GenerateItemText(item);
-            }
+            protected override LocalisableString GenerateItemText(string item)
+                => string.IsNullOrEmpty(item) ? CommonStrings.Default : base.GenerateItemText(item);
         }
     }
 }

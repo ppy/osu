@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModAutopilot))
                 return 0;
 
-            double aimRating = CalculateDifficultyRating(aimDifficultyValue);
+            double aimRating = Math.Pow(aimDifficultyValue, 0.63) * 0.02275;
 
             if (mods.Any(m => m is OsuModRelax))
                 aimRating *= 0.9;
@@ -76,9 +76,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 readingRating = Math.Pow(readingRating, 0.8);
 
             if (mods.Any(m => m is OsuModRelax))
-                readingRating *= 0.7;
+                readingRating *= 0.6;
             else if (mods.Any(m => m is OsuModAutopilot))
-                readingRating *= 0.4;
+                readingRating *= 0.3;
 
             if (mods.Any(m => m is OsuModMagnetised))
             {
