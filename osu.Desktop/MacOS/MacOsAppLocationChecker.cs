@@ -34,6 +34,8 @@ namespace osu.Desktop.MacOS
             bool inUserApp = asmPath.StartsWith(userApp, StringComparison.Ordinal);
             if (!(inRootApp || inUserApp))
                 notification.Post(new MacOSAppLocationNotification());
+
+            Expire();
         }
 
         private partial class MacOSAppLocationNotification : SimpleNotification
