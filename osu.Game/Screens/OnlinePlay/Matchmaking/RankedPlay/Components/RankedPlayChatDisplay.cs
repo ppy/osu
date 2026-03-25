@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -238,7 +239,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 // Hide the most recent messages.
                 foreach (var child in messageContainer.Reverse().Take(max_length).Reverse())
                 {
-                    using (BeginDelayedSequence(index * 20))
+                    // Normally we wait an amount of time to preview messages before they disappear.
+                    // When quickly toggling expanded and collapsed states, we want to still consider this preview window.
+                    double previewTimeRemaining = Math.Max(0, time_before_disappear - (Time.Current - child.PostTime));
+
+                    using (BeginDelayedSequence(previewTimeRemaining + index * 20))
                         child.Disappear();
 
                     index++;
@@ -275,6 +280,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
+                    PostTime = Time.Current
                 };
 
                 messageContainer.Add(newMessage);
@@ -308,6 +314,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
             private class MessageBubble : CompositeDrawable
             {
+                /// <summary>
+                /// The time at which this message was posted.
+                /// </summary>
+                public required double PostTime { get; init; }
+
                 public MessageBubble(APIUser user, string message)
                 {
                     AutoSizeAxes = Axes.Both;
