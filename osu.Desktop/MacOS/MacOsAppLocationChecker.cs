@@ -29,10 +29,10 @@ namespace osu.Desktop.MacOS
             string asmPath = RuntimeInfo.EntryAssembly.Location;
             string userHome = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             string userApp = Path.Combine(userHome, "Applications/");
-            if (!(
-                asmPath.StartsWith("/Applications/", StringComparison.Ordinal)
-                || asmPath.StartsWith(userApp, StringComparison.Ordinal)
-            ))
+
+            bool inRootApp = asmPath.StartsWith("/Applications", StringComparison.Ordinal);
+            bool inUserApp = asmPath.StartsWith(userApp, StringComparison.Ordinal);
+            if (!(inRootApp || inUserApp))
                 notification.Post(new MacOSAppLocationNotification());
         }
 
