@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Sprites;
@@ -56,7 +57,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                     RelativeSizeAxes = Axes.X,
                     Height = 30,
                     CornerRadius = 10,
-                    ReleaseFocusOnCommit = false,
+                    ReleaseFocusOnCommit = true,
                     HoldFocus = false,
                     Focus = onFocusGained,
                     FocusLost = onFocusLost
@@ -81,9 +82,25 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             base.LoadComplete();
 
             resetPlaceholderText();
+            textbox.OnCommit += onCommit;
 
             channel = channelManager.JoinChannel(new Channel { Id = room.ChannelID, Type = ChannelType.Multiplayer, Name = $"#lazermp_{room.RoomID}" });
             channel.NewMessagesArrived += onNewMessagesArrived;
+        }
+
+        private void onCommit(TextBox sender, bool newText)
+        {
+            string text = textbox.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(text))
+                return;
+
+            if (text[0] == '/')
+                channelManager.PostCommand(text[1..], channel);
+            else
+                channelManager.PostMessage(text, target: channel);
+
+            textbox.Text = string.Empty;
         }
 
         private void onNewMessagesArrived(IEnumerable<Message> bundle)
@@ -123,16 +140,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                     break;
 
                 case GlobalAction.ToggleChatFocus:
-                    if (textbox.HasFocus)
-                    {
-                        Schedule(() => textbox.KillFocus());
-                    }
-                    else
+                    if (!textbox.HasFocus)
                     {
                         Schedule(() => textbox.TakeFocus());
+                        return true;
                     }
 
-                    return true;
+                    break;
             }
 
             return false;
