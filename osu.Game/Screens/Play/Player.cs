@@ -427,6 +427,11 @@ namespace osu.Game.Screens.Play
         }
 
         /// <summary>
+        /// Components which were created via <see cref="CreateOverlayComponents"/>.
+        /// </summary>
+        public Drawable OverlayComponents { get; private set; }
+
+        /// <summary>
         /// Implement to add any components which should exist above gameplay but below the HUD.
         /// </summary>
         protected virtual Drawable CreateOverlayComponents() => Empty();
@@ -479,7 +484,7 @@ namespace osu.Game.Screens.Play
                 Children = new[]
                 {
                     DimmableStoryboard.OverlayLayerContainer.CreateProxy(),
-                    CreateOverlayComponents(),
+                    OverlayComponents = CreateOverlayComponents(),
                     HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods, Configuration)
                     {
                         HoldToQuit =
