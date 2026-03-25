@@ -26,13 +26,12 @@ namespace osu.Desktop.MacOS
         {
             base.LoadComplete();
 
-            string asmPath = RuntimeInfo.EntryAssembly.Location;
-            string userHome = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string userApp = Path.Combine(userHome, "Applications/");
+            string assemblyPath = RuntimeInfo.EntryAssembly.Location;
 
-            bool inRootApp = asmPath.StartsWith("/Applications", StringComparison.Ordinal);
-            bool inUserApp = asmPath.StartsWith(userApp, StringComparison.Ordinal);
-            if (!(inRootApp || inUserApp))
+            bool inRootApp = assemblyPath.StartsWith("/Applications/", StringComparison.Ordinal);
+            bool inUserApp = assemblyPath.StartsWith(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Applications/"), StringComparison.Ordinal);
+
+            if (!inRootApp && !inUserApp)
                 notification.Post(new MacOSAppLocationNotification());
 
             Expire();
