@@ -119,6 +119,9 @@ namespace osu.Game.Screens.Play
 
         protected override Drawable CreateOverlayComponents()
         {
+            if (Mods.Value.Any(m => m is ModCinema))
+                return Empty();
+
             OsuTextFlowContainer message = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Body) { AutoSizeAxes = Axes.Both };
             message.AddText("Watching ");
             message.AddText(Score.ScoreInfo.User.Username, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
