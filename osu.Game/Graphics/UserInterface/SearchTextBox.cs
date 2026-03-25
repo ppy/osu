@@ -54,7 +54,13 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     case Key.KeypadEnter:
                     case Key.Enter:
-                        return false;
+                        // even if committing per se is not allowed for this textbox,
+                        // the commit flow is also responsible for terminating any active IME.
+                        // ensure that the Enter press terminates IME correctly
+                        // and is also handled if it needs to be, so that it doesn't leak to some other non-focused drawable and cause breakage.
+                        bool wasImeComposing = ImeCompositionActive;
+                        FinalizeImeComposition(true);
+                        return wasImeComposing;
                 }
             }
 

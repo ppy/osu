@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private readonly Dictionary<ScoreRank, ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, ScoreRankInfo>();
         private ProfileValueDisplay medalInfo = null!;
         private ProfileValueDisplay ppInfo = null!;
-        private ProfileValueDisplay detailGlobalRank = null!;
+        private GlobalRankDisplay detailGlobalRank = null!;
         private ProfileValueDisplay detailCountryRank = null!;
         private RankGraph rankGraph = null!;
 
@@ -64,10 +64,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         {
                             new[]
                             {
-                                detailGlobalRank = new ProfileValueDisplay(true)
-                                {
-                                    Title = UsersStrings.ShowRankGlobalSimple,
-                                },
+                                detailGlobalRank = new GlobalRankDisplay(),
                                 Empty(),
                                 detailCountryRank = new ProfileValueDisplay(true)
                                 {
@@ -156,57 +153,20 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             var user = data?.User;
 
-            medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
-            ppInfo.Content = user?.Statistics?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";
+            medalInfo.Content.Text = user?.Achievements?.Length.ToString() ?? "0";
+            ppInfo.Content.Text = user?.Statistics?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";
+            ppInfo.Content.TooltipText = getPPInfoTooltipText(user);
 
             foreach (var scoreRankInfo in scoreRankInfos)
                 scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
 
-            detailGlobalRank.Content = user?.Statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
-            detailGlobalRank.ContentTooltipText = getGlobalRankTooltipText(user);
+            detailGlobalRank.HighestRank.Value = user?.RankHighest;
+            detailGlobalRank.UserStatistics.Value = user?.Statistics;
 
-            detailCountryRank.Content = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
-            detailCountryRank.ContentTooltipText = getCountryRankTooltipText(user);
+            detailCountryRank.Content.Text = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
+            detailCountryRank.Content.TooltipText = getCountryRankTooltipText(user);
 
             rankGraph.Statistics.Value = user?.Statistics;
-        }
-
-        private static LocalisableString getGlobalRankTooltipText(APIUser? user)
-        {
-            var rankHighest = user?.RankHighest;
-            var variants = user?.Statistics?.Variants;
-
-            LocalisableString? result = null;
-
-            if (variants?.Count > 0)
-            {
-                foreach (var variant in variants)
-                {
-                    if (variant.GlobalRank != null)
-                    {
-                        var variantText = LocalisableString.Interpolate($"{variant.VariantType.GetLocalisableDescription()}: {variant.GlobalRank.ToLocalisableString("\\##,##0")}");
-
-                        if (result == null)
-                            result = variantText;
-                        else
-                            result = LocalisableString.Interpolate($"{result}\n{variantText}");
-                    }
-                }
-            }
-
-            if (rankHighest != null)
-            {
-                var rankHighestText = UsersStrings.ShowRankHighest(
-                    rankHighest.Rank.ToLocalisableString("\\##,##0"),
-                    rankHighest.UpdatedAt.ToLocalisableString(@"d MMM yyyy"));
-
-                if (result == null)
-                    result = rankHighestText;
-                else
-                    result = LocalisableString.Interpolate($"{result}\n{rankHighestText}");
-            }
-
-            return result ?? default;
         }
 
         private static LocalisableString getCountryRankTooltipText(APIUser? user)
@@ -228,6 +188,28 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         else
                             result = LocalisableString.Interpolate($"{result}\n{variantText}");
                     }
+                }
+            }
+
+            return result ?? default;
+        }
+
+        private static LocalisableString getPPInfoTooltipText(APIUser? user)
+        {
+            var variants = user?.Statistics?.Variants;
+
+            LocalisableString? result = null;
+
+            if (variants?.Count > 0)
+            {
+                foreach (var variant in variants)
+                {
+                    var variantText = LocalisableString.Interpolate($"{variant.VariantType.GetLocalisableDescription()}: {variant.PP.ToLocalisableString("#,##0")}");
+
+                    if (result == null)
+                        result = variantText;
+                    else
+                        result = LocalisableString.Interpolate($"{result}\n{variantText}");
                 }
             }
 

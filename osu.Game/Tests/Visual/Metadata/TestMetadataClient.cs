@@ -128,6 +128,8 @@ namespace osu.Game.Tests.Visual.Metadata
 
         public override Task EndWatchingMultiplayerRoom(long id) => Task.CompletedTask;
 
+        public override Task RefreshFriends() => Task.CompletedTask;
+
         public void Disconnect()
         {
             isConnected.Value = false;

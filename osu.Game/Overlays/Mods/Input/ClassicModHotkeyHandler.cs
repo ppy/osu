@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Mods.Input
             this.allowIncompatibleSelection = allowIncompatibleSelection;
         }
 
-        public bool HandleHotkeyPressed(KeyDownEvent e, IEnumerable<ModState> availableMods)
+        public bool HandleModHotkeyPressed(KeyDownEvent e, IEnumerable<ModState> availableMods)
         {
             if (!mod_type_lookup.TryGetValue(e.Key, out var typesToMatch))
                 return false;

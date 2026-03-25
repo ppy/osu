@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
@@ -203,7 +204,7 @@ namespace osu.Game.Online.Spectator
 
         Task IStatefulUserHubClient.DisconnectRequested()
         {
-            Schedule(() => DisconnectInternal());
+            Schedule(() => DisconnectInternal().FireAndForget());
             return Task.CompletedTask;
         }
 
@@ -290,7 +291,7 @@ namespace osu.Game.Online.Spectator
                 else
                     currentState.State = SpectatedUserState.Quit;
 
-                EndPlayingInternal(currentState);
+                EndPlayingInternal(currentState).FireAndForget();
             });
         }
 
@@ -304,7 +305,7 @@ namespace osu.Game.Online.Spectator
                 return;
             }
 
-            WatchUserInternal(userId);
+            WatchUserInternal(userId).FireAndForget();
         }
 
         public void StopWatchingUser(int userId)
@@ -321,7 +322,7 @@ namespace osu.Game.Online.Spectator
 
                 watchedUsersRefCounts.Remove(userId);
                 watchedUserStates.Remove(userId);
-                StopWatchingUserInternal(userId);
+                StopWatchingUserInternal(userId).FireAndForget();
             });
         }
 

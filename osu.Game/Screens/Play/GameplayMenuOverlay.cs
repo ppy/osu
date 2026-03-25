@@ -22,6 +22,8 @@ using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Resources.Localisation.Web;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Play
 {
@@ -230,6 +232,14 @@ namespace osu.Game.Screens.Play
                 playInfoText.NewLine();
                 playInfoText.AddText(GameplayMenuOverlayStrings.SongProgress);
                 playInfoText.AddText($"{progress}%", cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
+            }
+
+            if (gameplayState != null)
+            {
+                playInfoText.NewLine();
+                playInfoText.AddText(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy);
+                playInfoText.AddText(": ");
+                playInfoText.AddText(gameplayState!.ScoreProcessor.Accuracy.Value.FormatAccuracy(), cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
             }
         }
 

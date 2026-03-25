@@ -110,6 +110,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
                     state.CandidateItems = beatmaps.Select(b => b.ID).ToArray();
                     state.CandidateItem = beatmaps[0].ID;
+                    state.GameplayItem = beatmaps[0].ID;
                 }, waitTime: 35);
 
                 changeStage(MatchmakingStage.WaitingForClientsBeatmapDownload);
@@ -120,12 +121,16 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             changeStage(MatchmakingStage.Ended, state =>
             {
-                int localUserId = API.LocalUser.Value.OnlineID;
+                int i = 1;
 
-                state.Users[localUserId].Placement = 1;
-                state.Users[localUserId].Rounds[1].Placement = 1;
-                state.Users[localUserId].Rounds[1].TotalScore = 1;
-                state.Users[localUserId].Rounds[1].Statistics[HitResult.LargeBonus] = 1;
+                foreach (var user in MultiplayerClient.ServerRoom!.Users.OrderBy(_ => RNG.Next()))
+                {
+                    state.Users.GetOrAdd(user.UserID).Placement = i++;
+                    state.Users.GetOrAdd(user.UserID).Points = (8 - i) * 7;
+                    state.Users.GetOrAdd(user.UserID).Rounds.GetOrAdd(1).Placement = 1;
+                    state.Users.GetOrAdd(user.UserID).Rounds.GetOrAdd(1).TotalScore = 1;
+                    state.Users.GetOrAdd(user.UserID).Rounds.GetOrAdd(1).Statistics[HitResult.LargeBonus] = 1;
+                }
             });
         }
 
