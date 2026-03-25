@@ -20,7 +20,9 @@ using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
@@ -218,7 +220,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                     new GridContainer
                                                     {
                                                         RelativeSizeAxes = Axes.Both,
-                                                        Padding = new MarginPadding(content_padding),
+                                                        Padding = new MarginPadding(content_padding) { Top = 10 },
                                                         ColumnDimensions = new[]
                                                         {
                                                             new Dimension(),
@@ -244,7 +246,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                     {
                                                                         new Drawable[]
                                                                         {
-                                                                            new OverlinedPlaylistHeader(room),
+                                                                            new PlaylistHeader(room),
                                                                         },
                                                                         new Drawable[]
                                                                         {
@@ -291,7 +293,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                                 Alpha = 0,
                                                                                 Children = new Drawable[]
                                                                                 {
-                                                                                    new OverlinedHeader("Extra mods"),
+                                                                                    new SectionHeader("Extra mods"),
                                                                                     new FillFlowContainer
                                                                                     {
                                                                                         AutoSizeAxes = Axes.Both,
@@ -330,7 +332,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                                 Alpha = 0,
                                                                                 Children = new Drawable[]
                                                                                 {
-                                                                                    new OverlinedHeader("Difficulty"),
+                                                                                    new SectionHeader(OnlinePlayStrings.Difficulty),
                                                                                     userStyleDisplayContainer = new Container<DrawableRoomPlaylistItem>
                                                                                     {
                                                                                         RelativeSizeAxes = Axes.X,
@@ -350,14 +352,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                                 Direction = FillDirection.Vertical,
                                                                                 Children = new Drawable[]
                                                                                 {
-                                                                                    new OverlinedHeader("Progress"),
-                                                                                    new RoomLocalUserInfo(room),
+                                                                                    new SectionHeader(OnlinePlayStrings.PlaylistProgress),
+                                                                                    new RoomLocalUserInfo(room) { Margin = new MarginPadding { Horizontal = 5 } },
                                                                                 }
                                                                             }
                                                                         },
                                                                         new Drawable[]
                                                                         {
-                                                                            new OverlinedHeader("Leaderboard")
+                                                                            new SectionHeader(OnlinePlayStrings.PlaylistLeaderboard)
                                                                         },
                                                                         new Drawable[]
                                                                         {
@@ -380,7 +382,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                     {
                                                                         new Drawable[]
                                                                         {
-                                                                            new OverlinedHeader("Chat")
+                                                                            new SectionHeader(OnlinePlayStrings.Chat)
                                                                         },
                                                                         new Drawable[]
                                                                         {
