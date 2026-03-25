@@ -132,10 +132,17 @@ namespace osu.Desktop
 
             LoadComponentAsync(new DiscordRichPresence(), Add);
 
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
-                LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.macOS && !IsPackageManaged)
-                LoadComponentAsync(new MacOSAppLocationChecker(), Add);
+            switch (RuntimeInfo.OS)
+            {
+                case RuntimeInfo.Platform.Windows:
+                    LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
+                    break;
+
+                case RuntimeInfo.Platform.macOS when !IsPackageManaged && IsDeployedBuild:
+                    if (!IsPackageManaged && IsDeployedBuild)
+                        LoadComponentAsync(new MacOSAppLocationChecker(), Add);
+                    break;
+            }
 
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
 
