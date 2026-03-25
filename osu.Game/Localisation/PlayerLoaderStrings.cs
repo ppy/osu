@@ -44,9 +44,9 @@ Leaderboards may be reset.");
 Leaderboards will be reset when the beatmap is ranked.");
 
         /// <summary>
-        /// "Loading paused.."
+        /// "Loading paused..."
         /// </summary>
-        public static LocalisableString LoadingPaused => new TranslatableString(getKey(@"loading_paused"), @"Loading paused..");
+        public static LocalisableString LoadingPaused => new TranslatableString(getKey(@"loading_paused"), @"Loading paused...");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
