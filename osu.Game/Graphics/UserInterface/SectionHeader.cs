@@ -15,7 +15,11 @@ namespace osu.Game.Graphics.UserInterface
 {
     public partial class SectionHeader : CompositeDrawable
     {
-        public Bindable<string> Details = new Bindable<string>();
+        /// <summary>
+        /// Extra text to be shown in brackets next to the header.
+        /// Unlike the header itself, this can be updated during runtime.
+        /// </summary>
+        public readonly Bindable<string> DetailsText = new Bindable<string>();
 
         private readonly LocalisableString text;
 
@@ -65,7 +69,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            Details.BindValueChanged(updateDetails);
+            DetailsText.BindValueChanged(updateDetails, true);
         }
 
         private void updateDetails(ValueChangedEvent<string> details)
@@ -73,7 +77,8 @@ namespace osu.Game.Graphics.UserInterface
             if (detailsPart != null)
                 textFlow.RemovePart(detailsPart);
 
-            detailsPart = textFlow.AddText($" {details.NewValue}", t => t.Colour = colourProvider.Highlight1);
+            if (!string.IsNullOrEmpty(details.NewValue))
+                detailsPart = textFlow.AddText($" ({details.NewValue})", t => t.Colour = colourProvider.Highlight1);
         }
     }
 }

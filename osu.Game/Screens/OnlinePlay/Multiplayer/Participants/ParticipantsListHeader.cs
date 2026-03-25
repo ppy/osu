@@ -26,7 +26,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             if (room == null)
                 return;
 
-            Details.Value = $"({room.Users.Count})";
+            DetailsText.Value = $"{room.Users.Count}";
         }
     }
 }
