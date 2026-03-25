@@ -6,25 +6,20 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
-using osu.Framework.Testing;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
-using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 using osu.Game.Tests.Visual.Multiplayer;
 
 namespace osu.Game.Tests.Visual.RankedPlay
 {
-    public class TestSceneRankedPlayChat : MultiplayerTestScene
+    public partial class TestSceneRankedPlayChat : MultiplayerTestScene
     {
-        private RankedPlayScreen screen = null!;
-
         private ChannelManager channelManager = null!;
         private Channel testChannel = null!;
-        private RankedPlayChatDisplay chat = null!;
         private int messageIdSequence;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -60,9 +55,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
 
             AddStep("join other user", () => MultiplayerClient.AddUser(new APIUser { Id = 2 }));
 
-            AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
-
-            AddStep("get chat display", () => chat = screen.ChildrenOfType<RankedPlayChatDisplay>().Single());
+            AddStep("load screen", () => LoadScreen(new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
         }
 
         [Test]
@@ -70,8 +63,8 @@ namespace osu.Game.Tests.Visual.RankedPlay
         {
             AddStep("set discard phase", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.CardDiscard).WaitSafely());
 
-            postLocalUserMessage("wang");
-            postOpponentMessage("wang2");
+            postLocalUserMessage("this is a message from the local user");
+            postOpponentMessage("this is a message from the opponent");
         }
 
         [Test]

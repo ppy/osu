@@ -26,7 +26,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 {
-    public class RankedPlayChatDisplay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+    public partial class RankedPlayChatDisplay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         [Resolved]
         private ChannelManager channelManager { get; set; } = null!;
@@ -183,7 +183,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 channel.NewMessagesArrived -= onNewMessagesArrived;
         }
 
-        private class ChatTextBox : StandAloneChatDisplay.ChatTextBox
+        private partial class ChatTextBox : StandAloneChatDisplay.ChatTextBox
         {
             protected override void LoadComplete()
             {
@@ -195,7 +195,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             }
         }
 
-        public class BubbleChatHistory : CompositeDrawable
+        public partial class BubbleChatHistory : CompositeDrawable
         {
             /// <summary>
             /// Maximum number of recent messages to keep.
@@ -312,7 +312,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 }
             }
 
-            private class MessageBubble : CompositeDrawable
+            private partial class MessageBubble : CompositeDrawable
             {
                 /// <summary>
                 /// The time at which this message was posted.

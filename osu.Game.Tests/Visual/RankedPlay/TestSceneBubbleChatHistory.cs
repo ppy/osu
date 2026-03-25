@@ -6,9 +6,9 @@ using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 
-namespace osu.Game.Tests.Visual
+namespace osu.Game.Tests.Visual.RankedPlay
 {
-    public class TestSceneBubbleChatHistory : OsuTestScene
+    public partial class TestSceneBubbleChatHistory : OsuTestScene
     {
         private RankedPlayChatDisplay.BubbleChatHistory history = null!;
 
