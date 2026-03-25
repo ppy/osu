@@ -43,6 +43,11 @@ Leaderboards may be reset.");
         public static LocalisableString QualifiedBeatmapDisclaimerContent => new TranslatableString(getKey(@"qualified_beatmap_disclaimer_content"), @"No performance points will be awarded.
 Leaderboards will be reset when the beatmap is ranked.");
 
+        /// <summary>
+        /// "Loading paused..."
+        /// </summary>
+        public static LocalisableString LoadingPaused => new TranslatableString(getKey(@"loading_paused"), @"Loading paused...");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
