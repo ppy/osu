@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Select
                         Scale = new Vector2(-1, 1),
                     }
                 },
-                new FillFlowContainer
+                new ReverseChildIDFillFlowContainer<Drawable>
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
