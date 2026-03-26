@@ -109,99 +109,108 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0f, 5f),
                     Padding = new MarginPadding { Top = corner_radius + 5, Bottom = 2, Right = 40f, Left = 2f },
                     Children = new Drawable[]
                     {
-                        new Container
+                        new ReverseChildIDFillFlowContainer<Drawable>
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Shear = -OsuGame.SHEAR,
-                            Child = searchTextBox = new SongSelectSearchTextBox
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0f, 5f),
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.X,
-                                HoldFocus = true,
-                                ScopedBeatmapSet = { BindTarget = ScopedBeatmapSet },
-                            },
-                        },
-                        new GridContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Shear = -OsuGame.SHEAR,
-                            RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                            ColumnDimensions = new[]
-                            {
-                                new Dimension(),
-                                new Dimension(GridSizeMode.Absolute), // can probably be removed?
-                                new Dimension(GridSizeMode.AutoSize),
-                            },
-                            Content = new[]
-                            {
-                                new[]
+                                new Container
                                 {
-                                    difficultyRangeSlider = new DifficultyRangeSlider
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Shear = -OsuGame.SHEAR,
+                                    Child = searchTextBox = new SongSelectSearchTextBox
                                     {
                                         RelativeSizeAxes = Axes.X,
-                                        MinRange = 0.1f,
-                                    },
-                                    Empty(),
-                                    showConvertedBeatmapsButton = new ShearedToggleButton
-                                    {
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        AutoSizeAxes = Axes.X,
-                                        Text = UserInterfaceStrings.ShowConverts,
-                                        Height = 30f,
+                                        HoldFocus = true,
+                                        ScopedBeatmapSet = { BindTarget = ScopedBeatmapSet },
                                     },
                                 },
-                            }
-                        },
-                        new GridContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 30,
-                            Shear = -OsuGame.SHEAR,
-                            RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                            ColumnDimensions = new[]
-                            {
-                                new Dimension(maxSize: 180),
-                                new Dimension(GridSizeMode.Absolute, 5),
-                                new Dimension(maxSize: 180),
-                                new Dimension(GridSizeMode.Absolute, 5),
-                                new Dimension(),
-                                new Dimension(GridSizeMode.AutoSize),
-                            },
-                            Content = new[]
-                            {
-                                new[]
+                                new GridContainer
                                 {
-                                    sortDropdown = new ShearedDropdown<SortMode>(SongSelectStrings.Sort)
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Shear = -OsuGame.SHEAR,
+                                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                                    ColumnDimensions = new[]
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        Items = Enum.GetValues<SortMode>(),
+                                        new Dimension(),
+                                        new Dimension(GridSizeMode.Absolute), // can probably be removed?
+                                        new Dimension(GridSizeMode.AutoSize),
                                     },
-                                    Empty(),
-                                    groupDropdown = new ShearedDropdown<GroupMode>(SongSelectStrings.Group)
+                                    Content = new[]
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        Items = Enum.GetValues<GroupMode>(),
-                                    },
-                                    Empty(),
-                                    collectionDropdown = new CollectionDropdown
+                                        new[]
+                                        {
+                                            difficultyRangeSlider = new DifficultyRangeSlider
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                MinRange = 0.1f,
+                                            },
+                                            Empty(),
+                                            showConvertedBeatmapsButton = new ShearedToggleButton
+                                            {
+                                                Anchor = Anchor.Centre,
+                                                Origin = Anchor.Centre,
+                                                AutoSizeAxes = Axes.X,
+                                                Text = UserInterfaceStrings.ShowConverts,
+                                                Height = 30f,
+                                            },
+                                        },
+                                    }
+                                },
+                                new GridContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 30,
+                                    Shear = -OsuGame.SHEAR,
+                                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                                    ColumnDimensions = new[]
                                     {
-                                        RelativeSizeAxes = Axes.X,
+                                        new Dimension(maxSize: 180),
+                                        new Dimension(GridSizeMode.Absolute, 5),
+                                        new Dimension(maxSize: 180),
+                                        new Dimension(GridSizeMode.Absolute, 5),
+                                        new Dimension(),
+                                        new Dimension(GridSizeMode.AutoSize),
                                     },
-                                }
-                            }
+                                    Content = new[]
+                                    {
+                                        new[]
+                                        {
+                                            sortDropdown = new ShearedDropdown<SortMode>(SongSelectStrings.Sort)
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Items = Enum.GetValues<SortMode>(),
+                                            },
+                                            Empty(),
+                                            groupDropdown = new ShearedDropdown<GroupMode>(SongSelectStrings.Group)
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Items = Enum.GetValues<GroupMode>(),
+                                            },
+                                            Empty(),
+                                            collectionDropdown = new CollectionDropdown
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                            },
+                                        }
+                                    }
+                                },
+                            },
                         },
                         new ScopedBeatmapSetDisplay
                         {
                             ScopedBeatmapSet = { BindTarget = ScopedBeatmapSet },
                         }
                     },
-                }
+                },
             };
 
             localUser = api.LocalUser.GetBoundCopy();
