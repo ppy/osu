@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.TopCentre,
                             CornerRadius = 10,
                             Masking = true,
-                            Children = new Drawable[]
+                            Children = new[]
                             {
                                 new Sprite
                                 {
