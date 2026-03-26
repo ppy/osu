@@ -42,17 +42,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             double flowDifficulty = currVelocity;
 
-            // Apply high circle size bonus to the base velocity
-            flowDifficulty *= osuCurrObj.SmallCircleBonus;
+            // Apply high circle size bonus to the base velocity.
+            // We use reduced CS bonus here because the bonus was made for an evaluator with a different d/t scaling
+            flowDifficulty *= Math.Sqrt(osuCurrObj.SmallCircleBonus);
 
             // Rhythm changes are harder to flow
             flowDifficulty *= 1 + Math.Min(0.25,
                 Math.Pow((Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) - Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) / 50, 4));
 
-            if (osuCurrObj.AngularVelocity != null)
+            if (osuCurrObj.Angle != null && osuLastObj.Angle != null)
             {
+                double angleDifference = Math.Abs(osuCurrObj.Angle.Value - osuLastObj.Angle.Value);
+                double angleDifferenceAdjusted = Math.Sin(angleDifference / 2) * 180.0;
+                double angularVelocity = angleDifferenceAdjusted / (osuCurrObj.AdjustedDeltaTime * 0.1);
+
                 // Low angular velocity flow (angles are consistent) is easier to follow than erratic flow
-                flowDifficulty *= 0.8 + Math.Sqrt(osuCurrObj.AngularVelocity.Value / 270.0);
+                flowDifficulty *= 0.8 + Math.Sqrt(angularVelocity / 270.0);
             }
 
             // If all three notes are overlapping - don't reward bonuses as you don't have to do additional movement
@@ -67,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 overlappedNotesWeight = 1 - o1 * o2 * o3;
             }
 
-            if (osuCurrObj.Angle != null && osuLastObj.Angle != null)
+            if (osuCurrObj.Angle != null)
             {
                 // Acute angles are also hard to flow
                 // We square root velocity to make acute angle switches in streams aren't having difficulty higher than snap
@@ -81,7 +86,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 if (withSliderTravelDistance)
                 {
                     currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
-                    prevVelocity = prevDistance / osuLastObj.AdjustedDeltaTime;
                 }
 
                 // Scale with ratio of difference compared to 0.5 * max dist.
@@ -91,10 +95,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 double overlapVelocityBuff = Math.Min(OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25 / Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime),
                     Math.Abs(prevVelocity - currVelocity));
 
-                flowDifficulty += overlapVelocityBuff * distRatio * velocity_change_multiplier;
+                flowDifficulty += overlapVelocityBuff *
+                                  distRatio *
+                                  overlappedNotesWeight *
+                                  velocity_change_multiplier;
             }
 
-            if (osuCurrObj.BaseObject is Slider)
+            if (osuCurrObj.BaseObject is Slider && withSliderTravelDistance)
             {
                 // Include slider velocity to make velocity more consistent with snap
                 flowDifficulty += osuCurrObj.TravelDistance / osuCurrObj.TravelTime;

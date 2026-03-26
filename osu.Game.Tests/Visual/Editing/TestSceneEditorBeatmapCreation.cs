@@ -881,7 +881,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             try
             {
-                using (var zip = ZipArchive.Open(temp))
+                using (var zip = ZipArchive.OpenArchive(temp))
                     zip.WriteToDirectory(extractedFolder);
 
                 return func(extractedFolder);

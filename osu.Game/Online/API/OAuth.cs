@@ -67,7 +67,7 @@ namespace osu.Game.Online.API
                         // attempt to decode a displayable error string.
                         var error = JsonConvert.DeserializeObject<OAuthError>(accessTokenRequest.GetResponseString() ?? string.Empty);
                         if (error != null)
-                            throwableException = new APIException(error.UserDisplayableError, ex);
+                            throwableException = new APIException(error.UserDisplayableError, ex, accessTokenRequest.ResponseStatusCode);
                     }
                     catch
                     {

@@ -11,6 +11,7 @@ using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -104,12 +105,12 @@ namespace osu.Game.Overlays.Login
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Text = "An email has been sent to you with a verification code. Enter the code.",
+                    Text = LoginPanelStrings.CodeSent,
                 },
                 codeTextBox = new OsuTextBox
                 {
                     InputProperties = new TextInputProperties(TextInputType.Code),
-                    PlaceholderText = "Enter code",
+                    PlaceholderText = LoginPanelStrings.EnterCode,
                     RelativeSizeAxes = Axes.X,
                     TabbableContentContainer = this,
                 },
@@ -169,12 +170,12 @@ namespace osu.Game.Overlays.Login
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Text = "Please enter the code from your authenticator app.",
+                    Text = UserVerificationStrings.BoxTotpHeading,
                 },
                 codeTextBox = new OsuNumberBox
                 {
                     InputProperties = new TextInputProperties(TextInputType.NumericalPassword),
-                    PlaceholderText = "Enter code",
+                    PlaceholderText = LoginPanelStrings.EnterCode,
                     RelativeSizeAxes = Axes.X,
                     TabbableContentContainer = this,
                 },

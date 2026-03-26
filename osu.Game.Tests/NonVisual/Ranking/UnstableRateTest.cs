@@ -6,6 +6,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -25,8 +26,8 @@ namespace osu.Game.Tests.NonVisual.Ranking
 
             var unstableRate = new UnstableRate(events);
 
-            Assert.IsNotNull(unstableRate.Value);
-            Assert.AreEqual(unstableRate.Value.Value, 10 * Math.Sqrt(10), Precision.DOUBLE_EPSILON);
+            Assert.That(unstableRate.Value, Is.Not.Null);
+            ClassicAssert.AreEqual(unstableRate.Value.Value, 10 * Math.Sqrt(10), Precision.DOUBLE_EPSILON);
         }
 
         [Test]
@@ -50,8 +51,8 @@ namespace osu.Game.Tests.NonVisual.Ranking
 
             result = events.GetRange(0, 2).CalculateUnstableRate(result);
 
-            Assert.IsNotNull(result!.Result);
-            Assert.AreEqual(5, result.Result, Precision.DOUBLE_EPSILON);
+            ClassicAssert.NotNull(result!.Result);
+            ClassicAssert.AreEqual(5, result.Result, Precision.DOUBLE_EPSILON);
         }
 
         [Test]
@@ -73,8 +74,8 @@ namespace osu.Game.Tests.NonVisual.Ranking
                                .CalculateUnstableRate(result);
             }
 
-            Assert.IsNotNull(result!.Result);
-            Assert.AreEqual(10 * Math.Sqrt(10), result.Result, Precision.DOUBLE_EPSILON);
+            ClassicAssert.NotNull(result!.Result);
+            ClassicAssert.AreEqual(10 * Math.Sqrt(10), result.Result, Precision.DOUBLE_EPSILON);
         }
 
         [Test]
@@ -89,7 +90,7 @@ namespace osu.Game.Tests.NonVisual.Ranking
 
             var unstableRate = new UnstableRate(events);
 
-            Assert.AreEqual(0, unstableRate.Value);
+            ClassicAssert.AreEqual(0, unstableRate.Value);
         }
 
         [Test]
@@ -105,7 +106,7 @@ namespace osu.Game.Tests.NonVisual.Ranking
 
             var unstableRate = new UnstableRate(events);
 
-            Assert.AreEqual(10 * 100, unstableRate.Value);
+            ClassicAssert.AreEqual(10 * 100, unstableRate.Value);
         }
 
         [Test]
@@ -121,7 +122,7 @@ namespace osu.Game.Tests.NonVisual.Ranking
 
             var unstableRate = new UnstableRate(events);
 
-            Assert.AreEqual(10 * 100, unstableRate.Value);
+            ClassicAssert.AreEqual(10 * 100, unstableRate.Value);
         }
     }
 }
