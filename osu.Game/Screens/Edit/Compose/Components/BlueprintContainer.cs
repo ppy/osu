@@ -300,6 +300,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     }
 
                     break;
+
+                case GlobalAction.EditorInvertSelection:
+                    InvertSelection();
+                    return true;
             }
 
             return false;
@@ -516,6 +520,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Select all currently-present items.
         /// </summary>
         protected abstract void SelectAll();
+
+        /// <summary>
+        /// Invert the current selection, deselecting all selected items and selecting all unselected items.
+        /// </summary>
+        protected virtual void InvertSelection()
+        {
+        }
 
         /// <summary>
         /// Deselect all selected items.
