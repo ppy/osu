@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
@@ -105,6 +106,9 @@ namespace osu.Game.Screens.Play
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
+        [Resolved]
+        private GameHost host { get; set; } = null!;
+
         private const double quick_restart_initial_delay = 500;
 
         protected bool BackgroundBrightnessReduction
@@ -121,6 +125,7 @@ namespace osu.Game.Screens.Play
         }
 
         protected virtual bool ReadyForGameplay =>
+            host.IsActive.Value &&
             // not ready if the user is hovering one of the panes (logo is excluded), unless they are idle.
             (IsHovered || osuLogo?.IsHovered == true || idleTracker.IsIdle.Value)
             // not ready if the user is dragging a slider or otherwise.
