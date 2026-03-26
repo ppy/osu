@@ -47,6 +47,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             room.PropertyChanged += onRoomPropertyChanged;
             updateRoomUserScore();
+
+            Scheduler.AddDelayed(UpdateEnabledState, 1000, true);
+            UpdateEnabledState();
         }
 
         private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -63,13 +66,15 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             int remaining = room.MaxAttempts.Value - room.UserScore.PlaylistItemAttempts.Sum(a => a.Attempts);
 
             hasRemainingAttempts = remaining > 0;
+
+            UpdateEnabledState();
         }
 
-        protected override void Update()
+        protected override void UpdateEnabledState()
         {
-            base.Update();
+            base.UpdateEnabledState();
 
-            Enabled.Value = hasRemainingAttempts && enoughTimeLeft();
+            Enabled.Value &= hasRemainingAttempts && enoughTimeLeft();
         }
 
         public override LocalisableString TooltipText
