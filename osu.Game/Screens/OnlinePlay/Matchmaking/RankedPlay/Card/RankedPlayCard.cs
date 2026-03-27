@@ -97,6 +97,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                         Origin = Anchor.Centre,
                         Children =
                         [
+                            new RankedPlayCardBackSide(),
                             cardContent = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -123,9 +124,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
         {
             base.LoadComplete();
 
-            playlistItem.BindValueChanged(e => onPlaylistItemChanged(e.NewValue));
-            if (playlistItem.Value != null)
-                loadCardContent(playlistItem.Value, false);
+            playlistItem.BindValueChanged(e => onPlaylistItemChanged(e.NewValue), true);
         }
 
         protected override void UpdateAfterChildren()
@@ -147,14 +146,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
         {
             if (playlistItem == null)
             {
-                SetContent(new RankedPlayCardBackSide(), true);
+                SetContent(null);
                 return;
             }
 
-            loadCardContent(playlistItem, true);
+            loadCardContentAsync(playlistItem);
         }
 
-        private void loadCardContent(MultiplayerPlaylistItem playlistItem, bool flip) => Task.Run(async () =>
+        private void loadCardContentAsync(MultiplayerPlaylistItem playlistItem) => Task.Run(async () =>
         {
             var beatmap = await beatmapLookupCache.GetBeatmapAsync(playlistItem.BeatmapID).ConfigureAwait(false);
 
@@ -168,22 +167,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 
             Schedule(() =>
             {
-                SetContent(new RankedPlayCardContent(beatmap), flip);
+                SetContent(new RankedPlayCardContent(beatmap));
                 songPreviewContainer.LoadPreview(beatmap);
             });
         });
 
-        public void SetContent(Drawable newContent, bool flip)
+        public void SetContent(Drawable? newContent)
         {
-            if (!flip)
-            {
-                cardContent.Child = newContent;
-                return;
-            }
-
             content.ScaleTo(new Vector2(0, 1), 100, Easing.In)
                    .Then()
-                   .Schedule(() => cardContent.Child = newContent)
+                   .Schedule(() => cardContent.Child = newContent ?? Empty())
                    .ScaleTo(new Vector2(1), 300, Easing.OutElasticQuarter);
 
             SamplePlaybackHelper.PlayWithRandomPitch(cardFlipSample);
