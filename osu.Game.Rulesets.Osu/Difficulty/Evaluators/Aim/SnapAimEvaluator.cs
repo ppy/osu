@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 {
     public static class SnapAimEvaluator
     {
-        private const double wide_angle_multiplier = 0.8;
+        private const double wide_angle_multiplier = 0.85;
         private const double acute_angle_multiplier = 2.41;
         private const double slider_multiplier = 1.5;
         private const double velocity_change_multiplier = 0.9;
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                     acuteAngleBonus = CalcAcuteAngleBonus(currAngle);
 
                     // Penalize angle repetition.
-                    acuteAngleBonus *= 0.08 + 0.88 * (1 - Math.Min(acuteAngleBonus, Math.Pow(CalcAcuteAngleBonus(lastAngle), 3)));
+                    acuteAngleBonus *= 0.08 + 0.87 * (1 - Math.Min(acuteAngleBonus, Math.Pow(CalcAcuteAngleBonus(lastAngle), 3)));
 
                     // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
                     acuteAngleBonus *= angleBonus *
