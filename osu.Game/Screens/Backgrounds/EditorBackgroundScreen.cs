@@ -111,6 +111,9 @@ namespace osu.Game.Screens.Backgrounds
         private void updateState(bool withAnimation = true)
         {
             background?.Storyboard.FadeTo(showStoryboard.Value ? 1 : 0, withAnimation ? 500 : 0, Easing.OutQuint);
+            // if the storyboard is disabled, in some cases (e.g. involving `StoryboardReplacesBackground`)
+            // we still need to show the background sprite, because if we don't, then there will be no background shown at all
+            background?.Sprite.FadeTo(showStoryboard.Value ? 0 : 1, withAnimation ? 500 : 0, Easing.OutQuint);
         }
 
         public override bool Equals(BackgroundScreen? other)
