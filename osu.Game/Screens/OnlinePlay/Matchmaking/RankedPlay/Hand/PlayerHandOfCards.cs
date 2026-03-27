@@ -141,11 +141,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             }
         }
 
-        protected override void OnCardStateChanged(HandCard card, RankedPlayCardState state)
+        protected override void OnCardStateChanged(HandCard card, ValueChangedEvent<RankedPlayCardState> evt)
         {
             StateChanged?.Invoke();
 
-            base.OnCardStateChanged(card, state);
+            base.OnCardStateChanged(card, evt);
         }
 
         public Dictionary<Guid, RankedPlayCardState> State => Cards.Select(static card => new KeyValuePair<Guid, RankedPlayCardState>(card.Item.Card.ID, card.State)).ToDictionary();

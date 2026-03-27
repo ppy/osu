@@ -94,7 +94,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
             protected virtual void OnStateChanged(ValueChangedEvent<RankedPlayCardState> state)
             {
-                handOfCards.OnCardStateChanged(this, state.NewValue);
+                handOfCards.OnCardStateChanged(this, state);
 
                 Card.ShowSelectionOutline = state.NewValue.Selected;
 

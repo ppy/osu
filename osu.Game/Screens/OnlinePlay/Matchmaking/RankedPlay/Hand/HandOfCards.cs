@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -41,13 +42,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
         /// </summary>
         protected virtual bool Flipped => false;
 
-        private readonly Container<HandCard> cardContainer;
+        private readonly CardContainer cardContainer;
 
         private readonly Dictionary<RankedPlayCardItem, HandCard> cardLookup = new Dictionary<RankedPlayCardItem, HandCard>();
 
         protected HandOfCards()
         {
-            AddInternal(cardContainer = new Container<HandCard>
+            AddInternal(cardContainer = new CardContainer
             {
                 RelativeSizeAxes = Axes.Both,
             });
@@ -56,6 +57,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
         protected override void Update()
         {
             base.Update();
+
+            if (!cardOrderBacking.IsValid)
+            {
+                cardContainer.Sort();
+                cardOrderBacking.Validate();
+            }
 
             if (!layoutBacking.IsValid)
             {
@@ -102,7 +109,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             cardLookup[card.Item.Card] = drawable;
 
             cardContainer.Add(drawable);
-            layoutBacking.Invalidate();
+            InvalidateLayout(order: true);
 
             setupAction?.Invoke(drawable);
         }
@@ -115,7 +122,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 return false;
 
             cardContainer.Remove(drawable, true);
-            layoutBacking.Invalidate();
+            InvalidateLayout(order: true);
             return false;
         }
 
@@ -139,19 +146,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             card = drawable.Detach();
 
             cardContainer.Remove(drawable, true);
-            layoutBacking.Invalidate();
+            InvalidateLayout(order: true);
 
             return true;
         }
 
         protected virtual HandCard CreateHandCard(RankedPlayCard card) => new HandCard(card);
 
-        protected virtual void OnCardStateChanged(HandCard card, RankedPlayCardState state)
+        protected virtual void OnCardStateChanged(HandCard card, ValueChangedEvent<RankedPlayCardState> evt)
         {
-            InvalidateLayout();
+            InvalidateLayout(order: affectsDrawOrder(evt));
 
             // hovered state can be caused by keyboard focus, in which case we have to clean up after the other cards manually
-            if (state.Hovered)
+            if (evt.NewValue.Hovered)
             {
                 foreach (var c in cardContainer)
                 {
@@ -161,11 +168,27 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             }
         }
 
+        private static bool affectsDrawOrder(ValueChangedEvent<RankedPlayCardState> evt)
+        {
+            return evt.OldValue.Order != evt.NewValue.Order ||
+                   evt.OldValue.Dragged != evt.NewValue.Dragged;
+        }
+
         #region Layout
 
         private readonly Cached layoutBacking = new Cached();
+        private readonly Cached cardOrderBacking = new Cached();
 
-        protected void InvalidateLayout() => layoutBacking.Invalidate();
+        /// <summary>
+        /// Invalidates the layout of the hand of cards, causing a relayout to occur.
+        /// </summary>
+        /// <param name="order">If set to true, also invalidates the order of the cards.</param>
+        protected void InvalidateLayout(bool order = false)
+        {
+            layoutBacking.Invalidate();
+            if (order)
+                cardOrderBacking.Invalidate();
+        }
 
         public void UpdateLayout(double stagger = 0)
         {
@@ -306,6 +329,27 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             float angle = MathHelper.DegreesToRadians(rotation - 90);
 
             return new Vector2(MathF.Cos(angle), MathF.Sin(angle));
+        }
+
+        private partial class CardContainer : Container<HandCard>
+        {
+            protected override int Compare(Drawable x, Drawable y)
+            {
+                if (x is HandCard c1 && y is HandCard c2)
+                {
+                    if (c1.CardDragged)
+                        return 1;
+
+                    if (c2.CardDragged)
+                        return -1;
+
+                    return c1.Order.CompareTo(c2.Order);
+                }
+
+                return base.Compare(x, y);
+            }
+
+            public void Sort() => SortInternal();
         }
 
         #endregion
