@@ -16,10 +16,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
     {
         public partial class HandCard : CompositeDrawable
         {
-            public float LayoutScale => CardHoveredOrDragged ? HOVER_SCALE : 1;
-
-            public float LayoutWidth => RankedPlayCard.SIZE.X * LayoutScale;
-
             private readonly Bindable<RankedPlayCardState> state = new Bindable<RankedPlayCardState>();
 
             public RankedPlayCardState State
@@ -53,6 +49,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             }
 
             public bool CardHoveredOrDragged => CardHovered || CardDragged;
+
+            public Vector2 DragPosition
+            {
+                get => State.DragPosition;
+                set => State = State with { DragPosition = value };
+            }
 
             [Resolved]
             private HandOfCards handOfCards { get; set; } = null!;

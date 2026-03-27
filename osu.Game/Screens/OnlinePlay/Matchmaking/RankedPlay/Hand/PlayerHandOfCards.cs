@@ -12,7 +12,6 @@ using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Online.RankedPlay;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
-using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
@@ -215,14 +214,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
             if (SelectionMode == HandSelectionMode.Single && !card.Selected)
                 card.TriggerClick();
-        }
-
-        protected override void ApplyLayoutToCard(HandCard card, Vector2 position, float rotation, float scale, double delay)
-        {
-            if (card.IsDragged)
-                return;
-
-            base.ApplyLayoutToCard(card, position, rotation, scale, delay);
         }
     }
 }
