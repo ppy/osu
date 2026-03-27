@@ -23,7 +23,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
     [Cached]
     public abstract partial class HandOfCards : CompositeDrawable
     {
-        private const float hover_scale = 1.2f;
+        protected const float HOVER_SCALE = 1.2f;
 
         public IEnumerable<HandCard> Cards => cardContainer.Children;
 
@@ -238,16 +238,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
                 position *= Flipped ? -1 : 1;
 
-                child
-                    .Delay(delay)
-                    .MoveTo(position, 300, Easing.OutExpo)
-                    .RotateTo(rotation, 300, Easing.OutExpo)
-                    .ScaleTo(child.CardHovered ? hover_scale : 1f, 400, Easing.OutElasticQuarter);
+                float scale = child.CardHovered ? HOVER_SCALE : 1f;
+
+                ApplyLayoutToCard(child, position, rotation, scale, delay);
 
                 x += child.LayoutWidth / 2 + spacing;
 
                 delay += stagger;
             }
+        }
+
+        protected virtual void ApplyLayoutToCard(HandCard card, Vector2 position, float rotation, float scale, double delay)
+        {
+            card.Delay(delay)
+                .MoveTo(position, 300, Easing.OutExpo)
+                .RotateTo(rotation, 300, Easing.OutExpo)
+                .ScaleTo(scale, 400, Easing.OutElasticQuarter);
         }
 
         #endregion

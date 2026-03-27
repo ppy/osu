@@ -16,7 +16,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
     {
         public partial class HandCard : CompositeDrawable
         {
-            public float LayoutWidth => DrawWidth * (State.Hovered ? hover_scale : 1);
+            public float LayoutWidth => DrawWidth * (State.Hovered ? HOVER_SCALE : 1);
 
             private readonly Bindable<RankedPlayCardState> state = new Bindable<RankedPlayCardState>();
 

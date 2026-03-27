@@ -88,6 +88,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 AddInternal(new HoverSounds());
             }
 
+            protected override void Update()
+            {
+                base.Update();
+
+                if (IsDragged)
+                    updateDragMovement();
+            }
+
             protected override void OnStateChanged(ValueChangedEvent<RankedPlayCardState> state)
             {
                 base.OnStateChanged(state);
@@ -165,6 +173,34 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
                 CardHovered = false;
             }
+
+            #region Drag/Drop
+
+            private Vector2 dragOffset;
+            private Vector2 dragPosition;
+
+            protected override bool OnDragStart(DragStartEvent e)
+            {
+                ClearTransforms();
+                this.RotateTo(0, 400, Easing.Out)
+                    .ScaleTo(HOVER_SCALE, 400, Easing.Out);
+
+                dragOffset = DrawPosition + AnchorPosition - e.MouseDownPosition;
+
+                return true;
+            }
+
+            protected override void OnDrag(DragEvent e)
+            {
+                dragPosition = e.MousePosition - AnchorPosition + dragOffset;
+            }
+
+            private void updateDragMovement()
+            {
+                Position = Vector2.Lerp(dragPosition, Position, MathF.Exp(-0.03f * (float)Time.Elapsed));
+            }
+
+            #endregion
         }
     }
 }
