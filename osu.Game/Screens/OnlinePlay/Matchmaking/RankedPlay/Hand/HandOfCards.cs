@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
@@ -26,7 +27,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
         private const float card_spacing = -20;
 
-        public IEnumerable<HandCard> Cards => cardContainer.Children;
+        public IReadOnlyList<HandCard> Cards => cardContainer.Children;
 
         /// <summary>
         /// How far a card slides upwards when hovered.
@@ -179,45 +180,47 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
             double delay = 0;
 
-            int activeCardIndex = getActiveCardIndex();
+            var cards = cardContainer.Children.OrderBy(static c => c.State.Order).ToArray();
 
-            for (int i = 0; i < cardContainer.Count; i++)
+            int activeCardIndex = GetActiveCardIndex(cards);
+
+            for (int i = 0; i < cards.Length; i++)
             {
-                var child = cardContainer[i];
+                var card = cards[i];
 
                 Vector2 position;
                 float rotation;
                 float scale;
 
-                if (child.CardDragged)
-                    CalculateDraggedCardLayout(child.DragPosition, out position, out rotation, out scale);
+                if (card.CardDragged)
+                    CalculateDraggedCardLayout(card.DragPosition, out position, out rotation, out scale);
                 else
                     CalculateCardLayout(i, activeCardIndex, out position, out rotation, out scale);
 
                 if (Flipped)
                     position *= -1;
 
-                child.Delay(delay)
-                     .MoveTo(position, 300, Easing.OutExpo)
-                     .RotateTo(rotation, 300, Easing.OutExpo)
-                     .ScaleTo(scale, 400, Easing.OutElasticQuarter);
+                card.Delay(delay)
+                    .MoveTo(position, 300, Easing.OutExpo)
+                    .RotateTo(rotation, 300, Easing.OutExpo)
+                    .ScaleTo(scale, 400, Easing.OutElasticQuarter);
 
                 delay += stagger;
             }
         }
 
-        private int getActiveCardIndex()
+        protected int GetActiveCardIndex(IReadOnlyList<HandCard> cards)
         {
             // the mouse can temporarily leave the dragged card, so dragged card should take precedence
             for (int i = 0; i < cardContainer.Count; i++)
             {
-                if (cardContainer[i].CardDragged)
+                if (cards[i].CardDragged)
                     return i;
             }
 
             for (int i = 0; i < cardContainer.Count; i++)
             {
-                if (cardContainer[i].CardHovered)
+                if (cards[i].CardHovered)
                     return i;
             }
 

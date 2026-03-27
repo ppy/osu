@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -12,6 +13,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Online.RankedPlay;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
@@ -103,6 +105,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
         protected override HandCard CreateHandCard(RankedPlayCard card) => new PlayerHandCard(card)
         {
             Clicked = cardClicked,
+            Dragged = cardDragged,
             AllowSelection = allowSelection.GetBoundCopy(),
             PlayAction = PlayCardAction,
         };
@@ -214,6 +217,53 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
             if (SelectionMode == HandSelectionMode.Single && !card.Selected)
                 card.TriggerClick();
+        }
+
+        private void cardDragged(PlayerHandCard card, Vector2 screenSpacePosition)
+        {
+            var cards = Cards.OrderBy(static c => c.Order).ToArray();
+
+            int newIndex = cardIndexInLayout(cards, card.ScreenSpaceDrawQuad.Centre);
+
+            card.Order = newIndex;
+
+            int order = 0;
+
+            foreach (var c in cards)
+            {
+                if (order == newIndex)
+                    order++;
+
+                if (c == card)
+                    continue;
+
+                c.Order = order++;
+            }
+        }
+
+        private int cardIndexInLayout(HandCard[] cards, Vector2 screenSpacePosition)
+        {
+            Debug.Assert(cards.Length > 0);
+
+            var position = ToLocalSpace(screenSpacePosition) - DrawSize / 2;
+
+            int activeIndex = GetActiveCardIndex(cards);
+
+            int minIndex = 0;
+            float minDistance = float.MaxValue;
+
+            for (int i = 0; i < cards.Length; i++)
+            {
+                float distance = MathF.Abs(GetCardX(i, activeIndex) - position.X);
+
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    minIndex = i;
+                }
+            }
+
+            return minIndex;
         }
     }
 }

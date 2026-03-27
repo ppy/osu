@@ -24,9 +24,12 @@ namespace osu.Game.Online.RankedPlay
         public required bool Dragged { get; init; }
 
         [Key(4)]
-        public float DragX { get; init; }
+        public required int Order { get; init; }
 
         [Key(5)]
+        public float DragX { get; init; }
+
+        [Key(6)]
         public float DragY { get; init; }
 
         [IgnoreMember]

@@ -56,6 +56,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 set => State = State with { DragPosition = value };
             }
 
+            public int Order
+            {
+                get => State.Order;
+                set => State = State with { Order = value };
+            }
+
             [Resolved]
             private HandOfCards handOfCards { get; set; } = null!;
 
