@@ -111,7 +111,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Width = 1.0f,
                                 Margin = new MarginPadding { Vertical = 10 },
                                 Text = "Add beatmap",
-                                Action = () => beatmapEditor.CreateNew()
+                                Action = beatmapEditor.CreateNew
                             },
                             beatmapEditor
                         }

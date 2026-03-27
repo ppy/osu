@@ -7,7 +7,7 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mania.Configuration;
@@ -31,47 +31,45 @@ namespace osu.Game.Rulesets.Mania
 
             Children = new Drawable[]
             {
-                new SettingsEnumDropdown<ManiaScrollingDirection>
+                new SettingsItemV2(new FormEnumDropdown<ManiaScrollingDirection>
                 {
-                    LabelText = RulesetSettingsStrings.ScrollingDirection,
+                    Caption = RulesetSettingsStrings.ScrollingDirection,
                     Current = config.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection)
-                },
-                new SettingsSlider<double, ManiaScrollSlider>
+                }),
+                new SettingsItemV2(new FormSliderBar<double>
                 {
-                    LabelText = RulesetSettingsStrings.ScrollSpeed,
+                    Caption = RulesetSettingsStrings.ScrollSpeed,
                     Current = config.GetBindable<double>(ManiaRulesetSetting.ScrollSpeed),
-                    KeyboardStep = 1
-                },
-                new SettingsCheckbox
+                    KeyboardStep = 1,
+                    LabelFormat = v => RulesetSettingsStrings.ScrollSpeedTooltip((int)DrawableManiaRuleset.ComputeScrollTime(v), v),
+                }),
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = RulesetSettingsStrings.TimingBasedColouring,
+                    Current = config.GetBindable<bool>(ManiaRulesetSetting.TimingBasedNoteColouring),
+                })
                 {
                     Keywords = new[] { "color" },
-                    LabelText = RulesetSettingsStrings.TimingBasedColouring,
-                    Current = config.GetBindable<bool>(ManiaRulesetSetting.TimingBasedNoteColouring),
                 },
             };
 
-            Add(new SettingsCheckbox
+            Add(new SettingsItemV2(new FormCheckBox
             {
-                LabelText = RulesetSettingsStrings.TouchOverlay,
+                Caption = RulesetSettingsStrings.TouchOverlay,
                 Current = config.GetBindable<bool>(ManiaRulesetSetting.TouchOverlay)
-            });
+            }));
 
             if (RuntimeInfo.IsMobile)
             {
-                Add(new SettingsEnumDropdown<ManiaMobileLayout>
+                Add(new SettingsItemV2(new FormEnumDropdown<ManiaMobileLayout>
                 {
-                    LabelText = RulesetSettingsStrings.MobileLayout,
+                    Caption = RulesetSettingsStrings.MobileLayout,
                     Current = config.GetBindable<ManiaMobileLayout>(ManiaRulesetSetting.MobileLayout),
 #pragma warning disable CS0618 // Type or member is obsolete
                     Items = Enum.GetValues<ManiaMobileLayout>().Where(l => l != ManiaMobileLayout.LandscapeWithOverlay),
 #pragma warning restore CS0618 // Type or member is obsolete
-                });
+                }));
             }
-        }
-
-        private partial class ManiaScrollSlider : RoundedSliderBar<double>
-        {
-            public override LocalisableString TooltipText => RulesetSettingsStrings.ScrollSpeedTooltip((int)DrawableManiaRuleset.ComputeScrollTime(Current.Value), Current.Value);
         }
     }
 }

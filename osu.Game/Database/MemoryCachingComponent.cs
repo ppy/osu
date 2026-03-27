@@ -76,6 +76,15 @@ namespace osu.Game.Database
             statistics.Value.Usage = cache.Count;
         }
 
+        /// <summary>
+        /// Completely purge the cache.
+        /// </summary>
+        public virtual void Clear()
+        {
+            cache.Clear();
+            statistics.Value.Usage = 0;
+        }
+
         protected bool CheckExists(TLookup lookup, [MaybeNullWhen(false)] out TValue value) =>
             cache.TryGetValue(lookup, out value);
 

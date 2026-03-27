@@ -47,7 +47,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
     /// </summary>
     public partial class PlayerPanel : OsuClickableContainer, IHasContextMenu
     {
-        private static readonly Vector2 size_horizontal = new Vector2(250, 100);
+        private static readonly Vector2 size_horizontal = new Vector2(300, 100);
         private static readonly Vector2 size_vertical = new Vector2(150, 200);
         private static readonly Vector2 avatar_size = new Vector2(80);
 
@@ -236,13 +236,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                                         Text = "-",
                                         Font = OsuFont.Style.Title.With(size: 55),
                                     },
-                                    username = new OsuSpriteText
+                                    username = new TruncatingSpriteText
                                     {
                                         Alpha = 0,
                                         Anchor = Anchor.BottomCentre,
                                         Origin = Anchor.BottomCentre,
                                         Text = User.Username,
                                         Font = OsuFont.Style.Heading1,
+                                        MaxWidth = 120
                                     },
                                     scoreText = new OsuSpriteText
                                     {

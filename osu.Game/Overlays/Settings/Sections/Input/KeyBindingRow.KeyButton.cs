@@ -142,10 +142,17 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             /// <param name="triggerKey">The key which triggered this update, and should be used as the binding.</param>
             public void UpdateKeyCombination(KeyCombination fullState, InputKey triggerKey)
             {
-                var combination = fullState.Keys.Where(KeyCombination.IsModifierKey)
-                                           .Append(triggerKey)
-                                           .Select(k => k.GetVirtualKey() ?? k)
-                                           .ToArray();
+                var keys = fullState.Keys
+                                    .Where(KeyCombination.IsModifierKey)
+                                    .Append(triggerKey)
+                                    .ToArray();
+
+                // For gameplay bindings, users care about being able to use both left / right shift as different bindings.
+                // For global bindings, it's better to combine both of these into a virtual key which covers both side modifiers.
+                var combination = KeyBinding.Value.RulesetName == null
+                    ? keys.Select(k => k.GetVirtualKey() ?? k).ToArray()
+                    : keys;
+
                 UpdateKeyCombination(new KeyCombination(combination));
             }
 

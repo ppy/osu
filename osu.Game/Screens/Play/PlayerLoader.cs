@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
@@ -31,9 +32,11 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Volume;
 using osu.Game.Performance;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Play.PlayerSettings;
-using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Skinning;
 using osu.Game.Users;
 using osu.Game.Utils;
@@ -83,7 +86,7 @@ namespace osu.Game.Screens.Play
         protected Task? DisposalTask { get; private set; }
 
         private FillFlowContainer disclaimers = null!;
-        private OsuScrollContainer settingsScroll = null!;
+        private GridContainer sideContent = null!;
 
         private Bindable<bool> showStoryboards = null!;
 
@@ -103,6 +106,9 @@ namespace osu.Game.Screens.Play
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
+        [Resolved]
+        private GameHost host { get; set; } = null!;
+
         private const double quick_restart_initial_delay = 500;
 
         protected bool BackgroundBrightnessReduction
@@ -118,14 +124,8 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private bool readyForPush =>
-            !playerConsumed
-            // don't push unless the player is completely loaded
-            && CurrentPlayer?.LoadState == LoadState.Ready
-            // don't push unless the player is ready to start gameplay
-            && ReadyForGameplay;
-
         protected virtual bool ReadyForGameplay =>
+            host.IsActive.Value &&
             // not ready if the user is hovering one of the panes (logo is excluded), unless they are idle.
             (IsHovered || osuLogo?.IsHovered == true || idleTracker.IsIdle.Value)
             // not ready if the user is dragging a slider or otherwise.
@@ -134,6 +134,8 @@ namespace osu.Game.Screens.Play
             && inputManager.FocusedDrawable is not OsuFocusedOverlayContainer
             // or if a child of a focused overlay is focused, like settings' search textbox.
             && inputManager.FocusedDrawable?.FindClosestParent<OsuFocusedOverlayContainer>() == null;
+
+        private bool holdForMenuExitButton => !AllowUserExit;
 
         private readonly Func<Player> createPlayer;
 
@@ -225,27 +227,72 @@ namespace osu.Game.Screens.Play
                     Padding = new MarginPadding(padding),
                     Spacing = new Vector2(20),
                 },
-                settingsScroll = new OsuScrollContainer
+                sideContent = new GridContainer
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Y,
                     Width = SettingsToolboxGroup.CONTAINER_WIDTH + padding * 2,
-                    Padding = new MarginPadding { Vertical = padding },
-                    Masking = false,
-                    Child = PlayerSettings = new FillFlowContainer<PlayerSettingsGroup>
+                    Padding = new MarginPadding
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 20),
-                        Padding = new MarginPadding { Horizontal = padding },
-                        Children = new PlayerSettingsGroup[]
-                        {
-                            VisualSettings = new VisualSettings(),
-                            AudioSettings = new AudioSettings(),
-                            new InputSettings()
-                        }
+                        Bottom = ScreenFooter.HEIGHT
                     },
+                    RowDimensions =
+                    [
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize)
+                    ],
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            new OsuScrollContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Child = PlayerSettings = new FillFlowContainer<PlayerSettingsGroup>
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(0, 20),
+                                    Padding = new MarginPadding
+                                    {
+                                        Horizontal = padding,
+                                        Vertical = padding,
+                                    },
+                                    Children = new PlayerSettingsGroup[]
+                                    {
+                                        VisualSettings = new VisualSettings(),
+                                        AudioSettings = new AudioSettings(),
+                                        new InputSettings()
+                                    }
+                                },
+                            }
+                        },
+                        new Drawable[]
+                        {
+                            new Container
+                            {
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                Alpha = holdForMenuExitButton ? 1 : 0,
+                                AutoSizeAxes = Axes.Both,
+                                Child = new HoldForMenuButton(true)
+                                {
+                                    Margin = new MarginPadding
+                                    {
+                                        Top = 20,
+                                        Horizontal = padding,
+                                        Bottom = padding,
+                                    },
+                                    Action = () =>
+                                    {
+                                        if (this.IsCurrentScreen())
+                                            this.Exit();
+                                    }
+                                }
+                            }
+                        }
+                    }
                 },
                 idleTracker = new IdleTracker(1500),
                 sampleRestart = new SkinnableSound(new SampleInfo(@"Gameplay/restart", @"pause-retry-click"))
@@ -305,7 +352,7 @@ namespace osu.Game.Screens.Play
 
             // Start side content off-screen.
             disclaimers.MoveToX(-disclaimers.DrawWidth);
-            settingsScroll.MoveToX(settingsScroll.DrawWidth);
+            sideContent.MoveToX(sideContent.DrawWidth);
 
             content.ScaleTo(0.7f);
 
@@ -441,6 +488,8 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
+            MetadataInfo.UserBlocked = !ReadyForGameplay && CurrentPlayer?.LoadState == LoadState.Ready;
+
             // We need to perform this check here rather than in OnHover as any number of children of VisualSettings
             // may also be handling the hover events.
             if (inputManager.HoveredDrawables.Contains(VisualSettings) || QuickRestart)
@@ -551,8 +600,8 @@ namespace osu.Game.Screens.Play
 
                 using (BeginDelayedSequence(delayBeforeSideDisplays))
                 {
-                    settingsScroll.FadeInFromZero(500, Easing.Out)
-                                  .MoveToX(0, 500, Easing.OutQuint);
+                    sideContent.FadeInFromZero(500, Easing.Out)
+                               .MoveToX(0, 500, Easing.OutQuint);
 
                     disclaimers.FadeInFromZero(500, Easing.Out)
                                .MoveToX(0, 500, Easing.OutQuint);
@@ -592,8 +641,8 @@ namespace osu.Game.Screens.Play
 
             disclaimers.FadeOut(CONTENT_OUT_DURATION, Easing.Out)
                        .MoveToX(-disclaimers.DrawWidth, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
-            settingsScroll.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint)
-                          .MoveToX(settingsScroll.DrawWidth, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
+            sideContent.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint)
+                       .MoveToX(sideContent.DrawWidth, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
 
             lowPassFilter?.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, CONTENT_OUT_DURATION);
             highPassFilter?.CutoffTo(0, CONTENT_OUT_DURATION);
@@ -604,6 +653,13 @@ namespace osu.Game.Screens.Play
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
             if (!this.IsCurrentScreen()) return;
+
+            bool readyForPush =
+                !playerConsumed
+                // don't push unless the player is completely loaded
+                && CurrentPlayer?.LoadState == LoadState.Ready
+                // don't push unless the player is ready to start gameplay
+                && ReadyForGameplay;
 
             if (!readyForPush)
             {

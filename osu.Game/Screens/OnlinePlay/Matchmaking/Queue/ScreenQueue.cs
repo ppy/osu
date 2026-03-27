@@ -29,9 +29,10 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Dialog;
+using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
@@ -47,7 +48,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private Container mainContent = null!;
 
-        private MatchmakingScreenState state;
         private CloudVisualisation cloud = null!;
 
         [Resolved]
@@ -63,9 +63,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private MultiplayerClient client { get; set; } = null!;
 
         [Resolved]
-        private IDialogOverlay dialogOverlay { get; set; } = null!;
-
-        [Resolved]
         private QueueController controller { get; set; } = null!;
 
         [Resolved]
@@ -79,8 +76,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private readonly IBindable<MatchmakingScreenState> currentState = new Bindable<MatchmakingScreenState>();
 
-        private readonly Bindable<MatchmakingPool[]> availablePools = new Bindable<MatchmakingPool[]>();
+        private readonly Bindable<MatchmakingPool[]> availablePools = new Bindable<MatchmakingPool[]>([]);
         private readonly Bindable<MatchmakingPool?> selectedPool = new Bindable<MatchmakingPool?>();
+
+        private readonly MatchmakingPoolType poolType;
 
         private CancellationTokenSource userLookupCancellation = new CancellationTokenSource();
 
@@ -91,6 +90,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private SampleChannel? waitingLoopChannel;
         private ScheduledDelegate? startLoopPlaybackDelegate;
 
+        public ScreenQueue(MatchmakingPoolType poolType)
+        {
+            this.poolType = poolType;
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -100,6 +104,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
+                    new GlobalScrollAdjustsVolume(),
                     cloud = new CloudVisualisation
                     {
                         Y = -100,
@@ -156,7 +161,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private async Task populateAvailablePools()
         {
-            MatchmakingPool[] pools = await client.GetMatchmakingPools().ConfigureAwait(false);
+            MatchmakingPool[] pools = await client.GetMatchmakingPoolsOfType(poolType).ConfigureAwait(false);
 
             Schedule(() =>
             {
@@ -215,9 +220,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             client.MatchmakingLeaveLobby().FireAndForget();
         }
 
-        private bool exitConfirmed;
-        private bool isBackgrounded;
-
         public override bool OnExiting(ScreenExitEvent e)
         {
             if (base.OnExiting(e))
@@ -225,31 +227,24 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             client.MatchmakingLeaveLobby().FireAndForget();
 
-            if (isBackgrounded)
-                return false;
-
-            if (exitConfirmed)
+            switch (currentState.Value)
             {
-                client.MatchmakingLeaveQueue().FireAndForget();
-                return false;
+                default:
+                    return false;
+
+                case MatchmakingScreenState.Queueing:
+                    controller.SearchInBackground();
+                    return false;
+
+                case MatchmakingScreenState.PendingAccept:
+                case MatchmakingScreenState.AcceptedWaitingForRoom:
+                    controller.LeaveQueue();
+                    return true;
+
+                case MatchmakingScreenState.InRoom:
+                    // Block exit until it's initiated from inside the matchmaking screen.
+                    return true;
             }
-
-            if (currentState.Value == MatchmakingScreenState.Idle)
-                return false;
-
-            if (dialogOverlay.CurrentDialog is ConfirmDialog confirmDialog)
-                confirmDialog.PerformOkAction();
-            else
-            {
-                dialogOverlay.Push(new ConfirmDialog("Are you sure you want to leave the matchmaking queue?", () =>
-                {
-                    exitConfirmed = true;
-                    if (this.IsCurrentScreen())
-                        this.Exit();
-                }));
-            }
-
-            return true;
         }
 
         public APIUser[] Users
@@ -259,8 +254,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         public void SetState(MatchmakingScreenState newState)
         {
-            state = newState;
-
             mainContent.FadeInFromZero(500, Easing.OutQuint);
             mainContent.Clear();
 
@@ -286,17 +279,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                 AvailablePools = { BindTarget = availablePools },
                                 SelectedPool = { BindTarget = selectedPool }
                             },
-                            new BeginQueueingButton(200)
+                            new BeginQueueingButton
                             {
                                 DarkerColour = colours.Blue2,
                                 LighterColour = colours.Blue1,
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
+                                Width = 200,
                                 SelectedPool = { BindTarget = selectedPool },
                                 Action = () =>
                                 {
                                     Debug.Assert(selectedPool.Value != null);
-                                    client.MatchmakingJoinQueue(selectedPool.Value.Id).FireAndForget();
+                                    controller.JoinQueue(selectedPool.Value);
                                 },
                                 Text = "Begin queueing",
                             }
@@ -305,8 +299,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     break;
 
                 case MatchmakingScreenState.Queueing:
-                    ShearedButton sendToBackgroundButton;
-
                     mainContent.Child = new FillFlowContainer
                     {
                         Anchor = Anchor.Centre,
@@ -327,33 +319,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                             {
                                 State = { Value = Visibility.Visible },
                             },
-                            sendToBackgroundButton = new ShearedButton(200)
+                            new ShearedButton
                             {
-                                DarkerColour = colours.Orange3,
-                                LighterColour = colours.Orange4,
+                                DarkerColour = colours.Red3,
+                                LighterColour = colours.Red4,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Text = "Queue in background",
-                                Action = () =>
-                                {
-                                    controller.SearchInBackground();
-                                    isBackgrounded = true;
-                                    this.Exit();
-                                },
-                                Enabled = { Value = false },
-                                TooltipText = "Wait 5 seconds for this option to become available."
+                                Width = 200,
+                                Text = "Stop queueing",
+                                Action = () => controller.LeaveQueue()
                             }
                         }
                     };
-
-                    Scheduler.AddDelayed(() =>
-                    {
-                        if (state != newState)
-                            return;
-
-                        sendToBackgroundButton.Enabled.Value = true;
-                        sendToBackgroundButton.TooltipText = "You will receive a notification when your game is ready. Make sure to watch out for it!";
-                    }, 5000);
 
                     enqueueSample?.Play();
                     startLoopPlaybackDelegate = Scheduler.AddDelayed(startWaitingLoopPlayback, 2000);
@@ -416,7 +393,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     };
 
                     using (BeginDelayedSequence(2000))
-                        Schedule(() => this.Push(new ScreenMatchmaking(client.Room!)));
+                    {
+                        Schedule(() =>
+                        {
+                            switch (poolType)
+                            {
+                                case MatchmakingPoolType.QuickPlay:
+                                    this.Push(new ScreenMatchmaking(client.Room!));
+                                    break;
+
+                                case MatchmakingPoolType.RankedPlay:
+                                    this.Push(new RankedPlayScreen(client.Room!));
+                                    break;
+                            }
+                        });
+                    }
+
                     break;
 
                 default:
@@ -465,11 +457,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             public readonly IBindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
 
-            public BeginQueueingButton(float? width = null)
-                : base(width)
-            {
-            }
-
             protected override void LoadComplete()
             {
                 base.LoadComplete();
@@ -480,11 +467,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private partial class SelectionButton : ShearedButton, IKeyBindingHandler<GlobalAction>
         {
-            protected SelectionButton(float? width = null, float height = DEFAULT_HEIGHT)
-                : base(width, height)
-            {
-            }
-
             public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {
                 if (e.Action == GlobalAction.Select && !e.Repeat)

@@ -94,6 +94,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Action = i => ItemSelected?.Invoke(i),
+                    Depth = -(float)item.PlaylistItem.StarRating
                 };
 
                 panelGridContainer.Add(panel);

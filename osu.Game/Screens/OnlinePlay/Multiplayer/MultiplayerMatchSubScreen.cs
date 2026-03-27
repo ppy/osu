@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -18,9 +19,12 @@ using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -145,6 +149,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private FillFlowContainer userStyleSection = null!;
         private Container<DrawableRoomPlaylistItem> userStyleDisplayContainer = null!;
 
+        private MatchChatDisplay chat = null!;
+
         private Sample? sampleStart;
         private IDisposable? userModsSelectOverlayRegistration;
 
@@ -221,7 +227,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                     new GridContainer
                                                     {
                                                         RelativeSizeAxes = Axes.Both,
-                                                        Padding = new MarginPadding(content_padding),
+                                                        Padding = new MarginPadding(content_padding) { Top = 10 },
                                                         ColumnDimensions = new[]
                                                         {
                                                             new Dimension(),
@@ -273,7 +279,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                     {
                                                                         new Drawable[]
                                                                         {
-                                                                            new OverlinedHeader("Beatmap queue")
+                                                                            new SectionHeader(OnlinePlayStrings.MultiplayerBeatmapQueue)
                                                                         },
                                                                         new Drawable[]
                                                                         {
@@ -305,7 +311,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                                 Alpha = 0,
                                                                                 Children = new Drawable[]
                                                                                 {
-                                                                                    new OverlinedHeader("Extra mods"),
+                                                                                    new SectionHeader("Extra mods"),
                                                                                     new FillFlowContainer
                                                                                     {
                                                                                         AutoSizeAxes = Axes.Both,
@@ -343,7 +349,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                                 Alpha = 0,
                                                                                 Children = new Drawable[]
                                                                                 {
-                                                                                    new OverlinedHeader("Difficulty"),
+                                                                                    new SectionHeader(OnlinePlayStrings.Difficulty),
                                                                                     userStyleDisplayContainer = new Container<DrawableRoomPlaylistItem>
                                                                                     {
                                                                                         RelativeSizeAxes = Axes.X,
@@ -366,11 +372,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                     {
                                                                         new Drawable[]
                                                                         {
-                                                                            new OverlinedHeader("Chat")
+                                                                            new SectionHeader(OnlinePlayStrings.Chat)
                                                                         },
                                                                         new Drawable[]
                                                                         {
-                                                                            new MatchChatDisplay(room)
+                                                                            chat = new MatchChatDisplay(room)
                                                                             {
                                                                                 RelativeSizeAxes = Axes.Both
                                                                             }
@@ -431,6 +437,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             client.UserStyleChanged += onUserStyleChanged;
             client.UserModsChanged += onUserModsChanged;
             client.LoadRequested += onLoadRequested;
+            client.MatchEvent += onMatchEvent;
 
             beatmapAvailabilityTracker.Availability.BindValueChanged(onBeatmapAvailabilityChanged, true);
 
@@ -594,6 +601,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
         }
 
+        private void onMatchEvent(MatchServerEvent ev)
+        {
+            switch (ev)
+            {
+                case RollEvent rollEvent:
+                    var user = client.Room?.Users.SingleOrDefault(u => u.UserID == rollEvent.UserID)?.User ?? new APIUser { Username = "Unknown user" };
+                    string text = $"{user.Username} rolled {"point".ToQuantity(rollEvent.Result)} out of {rollEvent.Max}.";
+                    chat.Channel.Value?.AddNewMessages(new InfoMessage(text));
+                    break;
+            }
+        }
+
         /// <summary>
         /// Responds to changes in the local user's beatmap availability to notify the server and prepare the gameplay session.
         /// </summary>
@@ -722,7 +741,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
 
             MultiplayerPlaylistItem item = client.Room.CurrentPlaylistItem;
-            this.Push(new MultiplayerMatchFreestyleSelect(room, new PlaylistItem(item)));
+            this.Push(new MultiplayerMatchFreestyleSelect(new PlaylistItem(item)));
         }
 
         /// <summary>
@@ -878,7 +897,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     confirmDialog.PerformOkAction();
                 else
                 {
-                    dialogOverlay.Push(new ConfirmDialog("Are you sure you want to leave this multiplayer match?", () =>
+                    dialogOverlay.Push(new ConfirmExitMultiplayerMatchDialog(() =>
                     {
                         ExitConfirmed = true;
                         this.Exit();

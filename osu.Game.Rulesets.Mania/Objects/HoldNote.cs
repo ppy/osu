@@ -118,7 +118,8 @@ namespace osu.Game.Rulesets.Mania.Objects
             AddNested(Body = new HoldNoteBody
             {
                 StartTime = StartTime,
-                Column = Column
+                Column = Column,
+                Duration = Duration
             });
         }
 

@@ -16,6 +16,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -119,7 +120,7 @@ namespace osu.Game.Beatmaps
             return track;
         }
 
-        public void PrepareTrackForPreview(bool looping, double offsetFromPreviewPoint = 0)
+        public void PrepareTrackForPreview(bool looping, double? offsetFromPreviewPoint = null)
         {
             Track.Looping = looping;
             Track.RestartPoint = Metadata.PreviewTime;
@@ -133,7 +134,9 @@ namespace osu.Game.Beatmaps
             if (Track.RestartPoint < 0 || Track.RestartPoint > Track.Length)
                 Track.RestartPoint = 0.4f * Track.Length;
 
-            Track.RestartPoint = Math.Clamp(Track.RestartPoint + offsetFromPreviewPoint, 0, Track.Length);
+            offsetFromPreviewPoint ??= -MusicController.DELAY_BEFORE_FADE;
+
+            Track.RestartPoint = Math.Clamp(Track.RestartPoint + offsetFromPreviewPoint.Value, 0, Track.Length);
         }
 
         /// <summary>
@@ -262,7 +265,7 @@ namespace osu.Game.Beatmaps
                 using (var cancellationTokenSource = new CancellationTokenSource(10_000))
                 {
                     // don't apply the default timeout when debugger is attached (may be breakpointing / debugging).
-                    return GetPlayableBeatmap(ruleset, mods ?? Array.Empty<Mod>(), Debugger.IsAttached ? new CancellationToken() : cancellationTokenSource.Token);
+                    return GetPlayableBeatmap(ruleset, mods ?? Array.Empty<Mod>(), Debugger.IsAttached ? CancellationToken.None : cancellationTokenSource.Token);
                 }
             }
             catch (OperationCanceledException)
