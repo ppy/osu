@@ -54,6 +54,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private RulesetStore rulesets { get; set; } = null!;
 
         [Resolved]
+        private MusicController musicController { get; set; } = null!;
+
+        [Resolved]
         private Bindable<WorkingBeatmap> globalBeatmap { get; set; } = null!;
 
         [Resolved]
@@ -163,6 +166,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             globalBeatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
             globalRuleset.Value = ruleset;
             globalMods.Value = item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+
+            // Play the new track from its preview point.
+            globalBeatmap.Value.PrepareTrackForPreview(false);
+            musicController.Play(true);
 
             Client.ChangeState(MultiplayerUserState.Ready).FireAndForget();
         }
