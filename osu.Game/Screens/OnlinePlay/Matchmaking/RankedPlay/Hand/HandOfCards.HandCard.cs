@@ -16,7 +16,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
     {
         public partial class HandCard : CompositeDrawable
         {
-            public float LayoutWidth => DrawWidth * (State.Hovered ? HOVER_SCALE : 1);
+            public float LayoutScale => CardHoveredOrDragged ? HOVER_SCALE : 1;
+
+            public float LayoutWidth => RankedPlayCard.SIZE.X * LayoutScale;
 
             private readonly Bindable<RankedPlayCardState> state = new Bindable<RankedPlayCardState>();
 
@@ -49,6 +51,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 get => State.Dragged;
                 set => State = State with { Dragged = value };
             }
+
+            public bool CardHoveredOrDragged => CardHovered || CardDragged;
 
             [Resolved]
             private HandOfCards handOfCards { get; set; } = null!;
@@ -112,7 +116,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             {
                 base.Update();
 
-                Card.Elevation = float.Lerp(CardHovered ? 1 : 0, Card.Elevation, (float)Math.Exp(-0.03f * Time.Elapsed));
+                Card.Elevation = float.Lerp(CardHoveredOrDragged ? 1 : 0, Card.Elevation, (float)Math.Exp(-0.03f * Time.Elapsed));
             }
         }
     }

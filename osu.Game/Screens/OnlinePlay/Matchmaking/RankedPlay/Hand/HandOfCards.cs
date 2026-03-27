@@ -187,10 +187,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
             for (int i = 0; i < cardContainer.Count; i++)
             {
-                if (cardContainer[i].CardHovered)
+                // the mouse can temporarily leave the currently dragged card and hover a different card.
+                // in that case the hovered card should take precedence here
+                if (cardContainer[i].CardDragged)
                 {
                     hoverIndex = i;
                     break;
+                }
+
+                if (cardContainer[i].CardHovered)
+                {
+                    hoverIndex = i;
                 }
             }
 
@@ -238,7 +245,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
                 position *= Flipped ? -1 : 1;
 
-                float scale = child.CardHovered ? HOVER_SCALE : 1f;
+                float scale = child.LayoutScale;
 
                 ApplyLayoutToCard(child, position, rotation, scale, delay);
 
