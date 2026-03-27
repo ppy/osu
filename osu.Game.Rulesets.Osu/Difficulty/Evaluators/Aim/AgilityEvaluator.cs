@@ -12,6 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
     public static class AgilityEvaluator
     {
         private const double distance_cap = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25; // 1.25 circles distance between centers
+        private const double wide_angle_multiplier = 0.5;
 
         /// <summary>
         /// Evaluates the difficulty of fast aiming
@@ -30,6 +31,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             double distanceScaled = Math.Min(distance, distance_cap) / distance_cap;
 
             double strain = distanceScaled * 1000 / osuCurrObj.AdjustedDeltaTime;
+
+            if (osuCurrObj.Angle != null)
+            {
+                strain *= 1 + SnapAimEvaluator.CalcWideAngleBonus(osuCurrObj.Angle.Value) * wide_angle_multiplier;
+            }
 
             strain *= Math.Pow(osuCurrObj.SmallCircleBonus, 1.5);
 
