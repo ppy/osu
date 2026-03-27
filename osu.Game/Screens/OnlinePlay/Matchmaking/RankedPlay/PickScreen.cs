@@ -73,6 +73,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
             CenterColumn.Children =
             [
+                opponentHand = new OpponentHandOfCards
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.Both,
+                    Height = 0.5f,
+                    Y = -100,
+                },
                 playerHand = new PlayerHandOfCards
                 {
                     Anchor = Anchor.BottomCentre,
@@ -81,14 +89,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     Height = 0.5f,
                     SelectionMode = HandSelectionMode.Single,
                     PlayCardAction = onPlayButtonClicked
-                },
-                opponentHand = new OpponentHandOfCards
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.5f,
-                    Y = -100,
                 },
                 new HandReplayRecorder(playerHand),
                 new HandReplayPlayer(matchInfo.OpponentId, opponentHand),
