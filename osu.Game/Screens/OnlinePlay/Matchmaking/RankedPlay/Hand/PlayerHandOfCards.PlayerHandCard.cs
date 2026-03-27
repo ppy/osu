@@ -187,12 +187,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
                 dragOffset = DrawPosition + AnchorPosition - e.MouseDownPosition;
 
+                CardDragged = true;
+
                 return true;
             }
 
             protected override void OnDrag(DragEvent e)
             {
                 dragPosition = e.MousePosition - AnchorPosition + dragOffset;
+            }
+
+            protected override void OnDragEnd(DragEndEvent e)
+            {
+                base.OnDragEnd(e);
+
+                CardDragged = false;
             }
 
             private void updateDragMovement()

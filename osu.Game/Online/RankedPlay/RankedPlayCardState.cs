@@ -18,5 +18,8 @@ namespace osu.Game.Online.RankedPlay
 
         [Key(2)]
         public required bool Selected { get; init; }
+
+        [Key(3)]
+        public required bool Dragged { get; init; }
     }
 }

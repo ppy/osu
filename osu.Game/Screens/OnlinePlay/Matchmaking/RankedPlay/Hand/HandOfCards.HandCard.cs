@@ -44,6 +44,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 set => State = State with { Pressed = value };
             }
 
+            public bool CardDragged
+            {
+                get => State.Dragged;
+                set => State = State with { Dragged = value };
+            }
+
             [Resolved]
             private HandOfCards handOfCards { get; set; } = null!;
 
