@@ -67,9 +67,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private PreviewTrackManager previewTrackManager { get; set; } = null!;
 
         [Resolved]
-        private MusicController music { get; set; } = null!;
-
-        [Resolved]
         private QueueController? controller { get; set; }
 
         private readonly MultiplayerRoom room;
@@ -285,16 +282,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             }
         }
 
-        public override void OnEntering(ScreenTransitionEvent e)
-        {
-            base.OnEntering(e);
-
-            beginHandlingTrack();
-        }
-
         public override void OnSuspending(ScreenTransitionEvent e)
         {
-            endHandlingTrack();
+            previewTrackManager.StopAnyPlaying(this);
 
             base.OnSuspending(e);
         }
@@ -312,7 +302,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     return true;
                 }
 
-                endHandlingTrack();
+                previewTrackManager.StopAnyPlaying(this);
 
                 client.LeaveRoom().FireAndForget();
 
@@ -341,8 +331,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         {
             base.OnResuming(e);
 
-            beginHandlingTrack();
-
             if (e.Last is not MultiplayerPlayerLoader playerLoader)
                 return;
 
@@ -353,38 +341,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             }
 
             client.ChangeState(MultiplayerUserState.Idle).FireAndForget();
-        }
-
-        /// <summary>
-        /// Handles changes in the track to keep it looping while active.
-        /// </summary>
-        private void beginHandlingTrack()
-        {
-            Beatmap.BindValueChanged(applyLoopingToTrack, true);
-        }
-
-        /// <summary>
-        /// Stops looping the current track and stops handling further changes to the track.
-        /// </summary>
-        private void endHandlingTrack()
-        {
-            Beatmap.ValueChanged -= applyLoopingToTrack;
-            Beatmap.Value.Track.Looping = false;
-
-            previewTrackManager.StopAnyPlaying(this);
-        }
-
-        /// <summary>
-        /// Invoked on changes to the beatmap to loop the track. See: <see cref="beginHandlingTrack"/>.
-        /// </summary>
-        /// <param name="beatmap">The beatmap change event.</param>
-        private void applyLoopingToTrack(ValueChangedEvent<WorkingBeatmap> beatmap)
-        {
-            if (!this.IsCurrentScreen())
-                return;
-
-            beatmap.NewValue.PrepareTrackForPreview(true);
-            music.EnsurePlayingSomething();
         }
 
         public void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset)
