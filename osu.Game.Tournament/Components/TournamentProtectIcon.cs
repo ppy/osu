@@ -2,12 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Utils;
 using osu.Game.Tournament.Models;
 using osuTK.Graphics;
 
@@ -18,7 +17,7 @@ namespace osu.Game.Tournament.Components
         private SpriteIcon protectIcon = null!;
         private Box background = null!;
 
-        private ColourInfo backgroundColour;
+        private Color4 backgroundColour;
 
         private TeamColour? teamColour;
 
@@ -89,7 +88,7 @@ namespace osu.Game.Tournament.Components
 
             backgroundColour = TournamentGame.GetTeamColour(TeamColour.Value);
 
-            protectIcon.Colour = Interpolation.ValueAt<Color4>(0.1f, Color4.Black, backgroundColour, 0, 1);
+            protectIcon.Colour = backgroundColour.Darken(2f);
             background.Colour = backgroundColour;
             Alpha = 1;
         }

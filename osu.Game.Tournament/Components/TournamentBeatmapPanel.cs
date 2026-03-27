@@ -31,7 +31,6 @@ namespace osu.Game.Tournament.Components
         private Box flash = null!;
         private Container borderBox = null!;
         private TournamentProtectIcon protectIcon = null!;
-        private FillFlowContainer modIconContainer = null!;
 
         public TournamentBeatmapPanel(IBeatmapInfo? beatmap, string mod = "")
         {
@@ -118,15 +117,6 @@ namespace osu.Game.Tournament.Components
                         },
                     }
                 },
-                modIconContainer = new FillFlowContainer
-                {
-                    Name = "Mod icon container",
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
-                    Padding = new MarginPadding { Vertical = 10, Right = 20 },
-                    RelativeSizeAxes = Axes.Y,
-                    Direction = FillDirection.Horizontal,
-                },
                 protectIcon = new TournamentProtectIcon
                 {
                     Anchor = Anchor.CentreRight,
@@ -146,10 +136,11 @@ namespace osu.Game.Tournament.Components
 
             if (!string.IsNullOrEmpty(mod))
             {
-                modIconContainer.Insert(-1, new TournamentModIcon(mod)
+                AddInternal(new TournamentModIcon(mod)
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
+                    Margin = new MarginPadding { Right = 20 },
                 });
             }
         }
@@ -157,9 +148,16 @@ namespace osu.Game.Tournament.Components
         private void matchChanged(ValueChangedEvent<TournamentMatch?> match)
         {
             if (match.OldValue != null)
+            {
                 match.OldValue.PicksBans.CollectionChanged -= picksBansOnCollectionChanged;
+                match.OldValue.Protects.CollectionChanged -= picksBansOnCollectionChanged;
+            }
+
             if (match.NewValue != null)
+            {
                 match.NewValue.PicksBans.CollectionChanged += picksBansOnCollectionChanged;
+                match.NewValue.Protects.CollectionChanged += picksBansOnCollectionChanged;
+            }
 
             Scheduler.AddOnce(updateState);
         }
@@ -177,14 +175,14 @@ namespace osu.Game.Tournament.Components
             }
 
             // protected?
-            var protectedChoice = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID && p.Type == ChoiceType.Protect);
+            var protectedChoice = currentMatch.Value.Protects.FirstOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
 
             if (protectedChoice != null)
                 protectIcon.TeamColour = protectedChoice.Team;
             else
                 protectIcon.TeamColour = null;
 
-            var newChoice = currentMatch.Value.PicksBans.LastOrDefault(p => p.BeatmapID == Beatmap?.OnlineID && p.Type != ChoiceType.Protect);
+            var newChoice = currentMatch.Value.PicksBans.LastOrDefault(p => p.BeatmapID == Beatmap?.OnlineID);
 
             bool shouldFlash = newChoice != choice;
 

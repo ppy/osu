@@ -34,9 +34,10 @@ namespace osu.Game.Tournament.Tests.Screens
             Ladder.CurrentMatch.Value = new TournamentMatch();
             Ladder.CurrentMatch.Value = Ladder.Matches.First();
             Ladder.CurrentMatch.Value.PicksBans.Clear();
+            Ladder.CurrentMatch.Value.Protects.Clear();
             Ladder.CurrentMatch.Value.Round.Value!.BanCount.Value = 2;
             Ladder.CurrentMatch.Value.Round.Value!.ProtectCount.Value = 0;
-            Ladder.CurrentMatch.Value!.Round.Value!.AllowPickOpponentProtect.Value = true;
+            Ladder.CurrentMatch.Value!.Round.Value!.AllowPickingOpponentProtects.Value = true;
         }
 
         [SetUp]
@@ -186,6 +187,7 @@ namespace osu.Game.Tournament.Tests.Screens
                 Ladder.CurrentMatch.Value = new TournamentMatch();
                 Ladder.CurrentMatch.Value = Ladder.Matches.First();
                 Ladder.CurrentMatch.Value.PicksBans.Clear();
+                Ladder.CurrentMatch.Value.Protects.Clear();
             });
         }
 
@@ -269,6 +271,7 @@ namespace osu.Game.Tournament.Tests.Screens
                 Ladder.CurrentMatch.Value = new TournamentMatch();
                 Ladder.CurrentMatch.Value = Ladder.Matches.First();
                 Ladder.CurrentMatch.Value.PicksBans.Clear();
+                Ladder.CurrentMatch.Value.Protects.Clear();
             });
         }
 
@@ -285,7 +288,7 @@ namespace osu.Game.Tournament.Tests.Screens
             AddStep("click first map", () => clickBeatmapPanel(0));
 
             AddAssert("protect registered",
-                () => Ladder.CurrentMatch.Value!.PicksBans.Count(pb => pb.Type == ChoiceType.Protect),
+                () => Ladder.CurrentMatch.Value!.Protects.Count,
                 () => Is.EqualTo(1));
 
             AddStep("click 3 more maps", () =>
@@ -296,7 +299,7 @@ namespace osu.Game.Tournament.Tests.Screens
             });
 
             AddAssert("four protects registered",
-                () => Ladder.CurrentMatch.Value!.PicksBans.Count(pb => pb.Type == ChoiceType.Protect),
+                () => Ladder.CurrentMatch.Value!.Protects.Count,
                 () => Is.EqualTo(4));
 
             AddStep("click 2 more maps", () =>
@@ -314,7 +317,7 @@ namespace osu.Game.Tournament.Tests.Screens
         public void TestDisallowPickOpponentProtect()
         {
             AddStep("set protect count to 1", () => Ladder.CurrentMatch.Value!.Round.Value!.ProtectCount.Value = 1);
-            AddStep("opponent protect pick = false", () => Ladder.CurrentMatch.Value!.Round.Value!.AllowPickOpponentProtect.Value = false);
+            AddStep("opponent protect pick = false", () => Ladder.CurrentMatch.Value!.Round.Value!.AllowPickingOpponentProtects.Value = false);
             loadMaps(5);
 
             AddStep("add protects", () =>
@@ -366,7 +369,7 @@ namespace osu.Game.Tournament.Tests.Screens
         public void TestAllowPickOpponentProtect()
         {
             AddStep("set protect count to 1", () => Ladder.CurrentMatch.Value!.Round.Value!.ProtectCount.Value = 2);
-            AddStep("opponent protect pick = true", () => Ladder.CurrentMatch.Value!.Round.Value!.AllowPickOpponentProtect.Value = true);
+            AddStep("opponent protect pick = true", () => Ladder.CurrentMatch.Value!.Round.Value!.AllowPickingOpponentProtects.Value = true);
             loadMaps(5);
 
             AddStep("add protects", () =>
@@ -428,7 +431,7 @@ namespace osu.Game.Tournament.Tests.Screens
             });
 
             AddAssert("map was protected",
-                () => Ladder.CurrentMatch.Value!.PicksBans.Count(pb => pb.Type == ChoiceType.Protect),
+                () => Ladder.CurrentMatch.Value!.Protects.Count,
                 () => Is.EqualTo(1));
 
             AddStep("pick a map", () =>
@@ -447,13 +450,13 @@ namespace osu.Game.Tournament.Tests.Screens
                 () => Ladder.CurrentMatch.Value!.PicksBans.Count(pb => pb.Type == ChoiceType.Pick),
                 () => Is.EqualTo(0));
             AddAssert("protect remains",
-                () => Ladder.CurrentMatch.Value!.PicksBans.Count(pb => pb.Type == ChoiceType.Protect),
+                () => Ladder.CurrentMatch.Value!.Protects.Count,
                 () => Is.EqualTo(1));
 
             AddStep("remove protect", () => clickBeatmapPanel(0, MouseButton.Right));
 
             AddAssert("protect was removed",
-                () => Ladder.CurrentMatch.Value!.PicksBans.Count(pb => pb.Type == ChoiceType.Protect),
+                () => Ladder.CurrentMatch.Value!.Protects.Count,
                 () => Is.EqualTo(0));
         }
 

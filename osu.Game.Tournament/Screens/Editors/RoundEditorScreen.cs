@@ -95,10 +95,10 @@ namespace osu.Game.Tournament.Screens.Editors
                             },
                             new SettingsCheckbox
                             {
-                                LabelText = "Allow picking opponent's protect",
+                                LabelText = "Allow picking opponent's protects",
                                 Width = 0.24f,
                                 Margin = new MarginPadding { Top = 8 },
-                                Current = Model.AllowPickOpponentProtect
+                                Current = Model.AllowPickingOpponentProtects
                             },
                             new SettingsSlider<int>
                             {
