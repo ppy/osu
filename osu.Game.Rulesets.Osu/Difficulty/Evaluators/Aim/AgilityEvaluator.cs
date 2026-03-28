@@ -36,6 +36,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             {
                 double wideAngleBonus = SnapAimEvaluator.CalcWideAngleBonus(osuCurrObj.Angle.Value);
                 wideAngleBonus *= DifficultyCalculationUtils.ReverseLerp(osuPrevObj.AdjustedDeltaTime, osuCurrObj.AdjustedDeltaTime * 0.5, osuCurrObj.AdjustedDeltaTime * 0.75);
+                wideAngleBonus *= DifficultyCalculationUtils.Smootherstep(distance, 0, OsuDifficultyHitObject.NORMALISED_DIAMETER);
                 strain *= 1 + wideAngleBonus * wide_angle_multiplier;
             }
 
