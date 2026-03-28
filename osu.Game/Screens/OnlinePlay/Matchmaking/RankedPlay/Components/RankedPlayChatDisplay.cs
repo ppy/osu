@@ -304,6 +304,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
             private partial class MessageBubble : CompositeDrawable
             {
+                private readonly APIUser user;
+                private readonly string message;
+
                 /// <summary>
                 /// The time at which this message was posted.
                 /// </summary>
@@ -311,11 +314,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
                 public MessageBubble(APIUser user, string message)
                 {
+                    this.user = user;
+                    this.message = message;
                     AutoSizeAxes = Axes.Both;
 
                     Scale = Vector2.Zero;
                     Alpha = 0;
+                }
 
+                [BackgroundDependencyLoader]
+                private void load()
+                {
                     InternalChildren = new Drawable[]
                     {
                         new CircularContainer
@@ -332,7 +341,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                 new FillFlowContainer
                                 {
                                     AutoSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding { Horizontal = 8, Vertical = 8 },
+                                    Padding = new MarginPadding(8),
                                     Direction = FillDirection.Horizontal,
                                     Spacing = new Vector2(4),
                                     Children = new Drawable[]
@@ -345,6 +354,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                             Masking = true,
                                             Child = new UpdateableAvatar(user)
                                             {
+                                                DelayedLoad = false,
                                                 RelativeSizeAxes = Axes.Both
                                             }
                                         },
