@@ -101,7 +101,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                             cardContent = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Child = new RankedPlayCardBackSide()
+                                Child = Empty(),
                             },
                             selectionOutline = new SelectionOutline
                             {
@@ -172,8 +172,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
             });
         });
 
+        private bool hasContent;
+
         public void SetContent(Drawable? newContent)
         {
+            if (newContent == null && !hasContent)
+                return;
+
+            hasContent = newContent != null;
             content.ScaleTo(new Vector2(0, 1), 100, Easing.In)
                    .Then()
                    .Schedule(() => cardContent.Child = newContent ?? Empty())
