@@ -211,7 +211,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             /// <summary>
             /// When in a collapsed state, the time before a newly-posted message disappears from view.
             /// </summary>
-            private const float time_before_disappear = 3000;
+            private const float time_before_disappear = 5000;
 
             private readonly Container<MessageBubble> messageContainer;
 
@@ -235,19 +235,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             {
                 expanded = false;
 
-                int index = 0;
-
-                // Hide the most recent messages.
                 foreach (var child in messageContainer.Reverse().Take(max_length).Reverse())
                 {
                     // Normally we wait an amount of time to preview messages before they disappear.
                     // When quickly toggling expanded and collapsed states, we want to still consider this preview window.
                     double previewTimeRemaining = Math.Max(0, time_before_disappear - (Time.Current - child.PostTime));
 
-                    using (BeginDelayedSequence(previewTimeRemaining + index * 20))
-                        child.Disappear();
-
-                    index++;
+                    using (BeginDelayedSequence(previewTimeRemaining))
+                        child.Hide();
                 }
             }
 
@@ -258,16 +253,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             {
                 expanded = true;
 
-                int index = 0;
-
-                // Show the most recent messages.
                 foreach (var child in messageContainer.Reverse().Take(max_length))
-                {
-                    using (BeginDelayedSequence(index * 20))
-                        child.Appear();
-
-                    index++;
-                }
+                    child.Show();
             }
 
             /// <summary>
@@ -287,29 +274,31 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 messageContainer.Add(newMessage);
 
                 float offset = 0;
-                int index = 0;
 
                 // Layout bubbles, pushing all others upwards to make room for the new one.
                 foreach (var child in messageContainer.Reverse())
                 {
-                    child.Delay(index * 10).MoveToY(-offset, 400, Easing.OutPow10);
-
+                    child.MoveToY(-offset, 400, Easing.OutPow10);
                     offset += child.DrawHeight + message_spacing;
-                    index++;
                 }
 
-                // Hide any overflowing message. Only need to handle the most-recently-overflowing one, because others would be handled in prior calls to this method.
+                // Hide any overflowing message.
+                // Only need to handle the most-recently-overflowing one, because others would be handled in prior calls to this method.
                 if (messageContainer.Count > max_length)
-                    messageContainer[messageContainer.Count - max_length - 1].Disappear().Expire();
+                {
+                    var lastBubble = messageContainer[messageContainer.Count - max_length - 1];
 
-                // Show the new message.
-                newMessage.Appear();
+                    lastBubble.Hide();
+                    lastBubble.Expire();
+                }
+
+                newMessage.Show();
 
                 // If not in the expanded state, hide the new message after a short while.
                 if (!expanded)
                 {
                     using (BeginDelayedSequence(time_before_disappear))
-                        newMessage.Disappear();
+                        newMessage.Hide();
                 }
             }
 
@@ -343,7 +332,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                 new FillFlowContainer
                                 {
                                     AutoSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding { Horizontal = 16, Vertical = 8 },
+                                    Padding = new MarginPadding { Horizontal = 8, Vertical = 8 },
                                     Direction = FillDirection.Horizontal,
                                     Spacing = new Vector2(4),
                                     Children = new Drawable[]
@@ -373,15 +362,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                     };
                 }
 
-                public TransformSequence<MessageBubble> Appear()
+                public override void Show()
                 {
-                    return this.ScaleTo(1, 400, Easing.OutElasticQuarter)
-                               .FadeIn(200);
+                    this.ScaleTo(1, 400, Easing.OutElasticQuarter)
+                        .FadeIn(200, Easing.OutQuint);
                 }
 
-                public TransformSequence<MessageBubble> Disappear()
+                public override void Hide()
                 {
-                    return this.FadeOut(200);
+                    this.FadeOut(200, Easing.OutQuint);
                 }
             }
         }
