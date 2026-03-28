@@ -116,7 +116,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                             {
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
-                                Size = new Vector2(320, 160),
                                 Margin = new MarginPadding
                                 {
                                     Bottom = 10,

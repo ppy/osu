@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
@@ -42,8 +43,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         private Channel? channel;
 
+        private const float width = 320;
+
         public RankedPlayChatDisplay(MultiplayerRoom room)
         {
+            Size = new Vector2(width, 160);
             this.room = room;
         }
 
@@ -276,12 +280,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
                 float offset = 0;
 
-                // Layout bubbles, pushing all others upwards to make room for the new one.
-                foreach (var child in messageContainer.Reverse())
+                ScheduleAfterChildren(() =>
                 {
-                    child.MoveToY(-offset, 400, Easing.OutPow10);
-                    offset += child.DrawHeight + message_spacing;
-                }
+                    // Layout bubbles, pushing all others upwards to make room for the new one.
+                    foreach (var child in messageContainer.Reverse())
+                    {
+                        child.MoveToY(-offset, 400, Easing.OutPow10);
+                        offset += child.DrawHeight + message_spacing;
+                    }
+                });
 
                 // Hide any overflowing message.
                 // Only need to handle the most-recently-overflowing one, because others would be handled in prior calls to this method.
@@ -331,9 +338,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 {
                     InternalChildren = new Drawable[]
                     {
-                        new CircularContainer
+                        new Container
                         {
                             AutoSizeAxes = Axes.Both,
+                            CornerRadius = 8,
                             Masking = true,
                             Children = new Drawable[]
                             {
@@ -344,12 +352,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                         ? RankedPlayColourScheme.Blue.PrimaryDarkest
                                         : RankedPlayColourScheme.Red.PrimaryDarkest,
                                 },
-                                new FillFlowContainer
+                                new Container
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Padding = new MarginPadding(8),
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(4),
                                     Children = new Drawable[]
                                     {
                                         new CircularContainer
@@ -364,12 +370,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                                 RelativeSizeAxes = Axes.Both
                                             }
                                         },
-                                        new OsuSpriteText
+                                        new OsuTextFlowContainer
                                         {
+                                            X = 20,
+                                            MaximumSize = new Vector2(width * 1.5f, 0),
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
+                                            AutoSizeAxes = Axes.Both,
                                             Text = message,
-                                            UseFullGlyphHeight = false
                                         }
                                     }
                                 }
