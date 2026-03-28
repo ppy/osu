@@ -16,6 +16,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
@@ -322,6 +323,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                     Alpha = 0;
                 }
 
+                [Resolved]
+                private IAPIProvider api { get; set; } = null!;
+
                 [BackgroundDependencyLoader]
                 private void load()
                 {
@@ -336,7 +340,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = Colour4.FromHex("222228")
+                                    Colour = api.LocalUser.Value.Id == user.Id
+                                        ? RankedPlayColourScheme.Blue.PrimaryDarkest
+                                        : RankedPlayColourScheme.Red.PrimaryDarkest,
                                 },
                                 new FillFlowContainer
                                 {
