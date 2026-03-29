@@ -34,6 +34,30 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestClassicMod(double expectedStarRating, int expectedMaxCombo, string name)
             => Test(expectedStarRating, expectedMaxCombo, name, new OsuModClassic());
 
+        [TestCase(239, "diffcalc-test")]
+        [TestCase(54, "zero-length-sliders")]
+        [TestCase(4, "very-fast-slider")]
+        public void TestOffsetChanges(int expectedMaxCombo, string name)
+        {
+            const double offset_iterations = 400;
+            var beatmap = GetBeatmap(name);
+
+            var attributes = CreateDifficultyCalculator(beatmap).Calculate();
+            double expectedStarRating = attributes.StarRating;
+
+            for (int i = 0; i < offset_iterations; i++)
+            {
+                foreach (var beatmapHitObject in beatmap.Beatmap.HitObjects)
+                    beatmapHitObject.StartTime++;
+
+                attributes = CreateDifficultyCalculator(beatmap).Calculate();
+
+                // Platform-dependent math functions (Pow, Cbrt, Exp, etc) may result in minute differences.
+                Assert.That(attributes.StarRating, Is.EqualTo(expectedStarRating).Within(0.00001));
+                Assert.That(attributes.MaxCombo, Is.EqualTo(expectedMaxCombo));
+            }
+        }
+
         protected override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new OsuDifficultyCalculator(new OsuRuleset().RulesetInfo, beatmap);
 
         protected override Ruleset CreateRuleset() => new OsuRuleset();
