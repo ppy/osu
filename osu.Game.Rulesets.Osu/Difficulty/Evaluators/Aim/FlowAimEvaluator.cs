@@ -27,9 +27,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
 
             double currDistance = osuCurrObj.GetDistance(withSliderTravelDistance);
-            double prevDistance = withSliderTravelDistance ? osuLastObj.TailDistance : osuLastObj.GetDistance(false);
+            double prevDistance = withSliderTravelDistance ? osuLastObj.TailJumpDistance : osuLastObj.GetDistance(false);
 
-            double currFakeDistance = withSliderTravelDistance ? osuCurrObj.TailDistance : osuCurrObj.GetDistance(false); // Keeping to preserve values
+            double currFakeDistance = withSliderTravelDistance ? osuCurrObj.TailJumpDistance : osuCurrObj.GetDistance(false); // Keeping to preserve values
 
             double currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
             double prevVelocity = prevDistance / osuLastObj.AdjustedDeltaTime;
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             if (osuCurrObj.BaseObject is Slider && withSliderTravelDistance)
             {
                 // Include slider velocity to make velocity more consistent with snap
-                flowDifficulty += osuCurrObj.SliderBonusDistance / osuCurrObj.SliderTime;
+                flowDifficulty += osuCurrObj.SliderBonusDistance / osuCurrObj.SliderTravelTime;
             }
 
             // Final velocity is being raised to a power because flow difficulty scales harder with both high distance and time, and we want to account for that

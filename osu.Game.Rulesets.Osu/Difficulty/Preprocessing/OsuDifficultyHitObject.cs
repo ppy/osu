@@ -52,24 +52,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// The "lazy" end position is the position at which the cursor ends up if the previous hitobject is followed with as minimal movement as possible (i.e. on the edge of slider follow circles).
         /// </para>
         /// </summary>
-        public double TailDistance { get; private set; }
+        public double TailJumpDistance { get; private set; }
 
         /// <summary>
         /// Amount of time elapsed between the end of <see cref="BaseObject"/> and the start of <see cref="LastObject"/>,
         /// adjusted by clockrate and capped to a minimum of <see cref="MIN_DELTA_TIME"/>ms.
         /// </summary>
-        public double TailTime;
+        public double AdjustedTailDeltaTime;
 
         /// <summary>
         /// The distance travelled by the cursor upon completion of this <see cref="OsuDifficultyHitObject"/> if it is a <see cref="Slider"/>
         /// and was hit with as few movements as possible.
         /// </summary>
-        public double SliderDistance { get; private set; }
+        public double SliderBodyDistance { get; private set; }
 
         /// <summary>
         /// The time taken to travel through <see cref="SliderBonusDistance"/>, with a minimum value of 25ms for <see cref="Slider"/> objects.
         /// </summary>
-        public double SliderTime { get; private set; }
+        public double SliderTravelTime { get; private set; }
 
         /// <summary>
         /// Normalised distance between the start and end position of this <see cref="OsuDifficultyHitObject"/>.
@@ -188,10 +188,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (BaseObject is Slider currentSlider)
             {
                 // Bonus for repeat sliders until a better per nested object strain system can be achieved.
-                SliderBonusDistance = SliderDistance * Math.Max(1, Math.Pow(currentSlider.RepeatCount, 0.3));
+                SliderBonusDistance = SliderBodyDistance * Math.Max(1, Math.Pow(currentSlider.RepeatCount, 0.3));
             }
 
-            TailTime = AdjustedDeltaTime;
+            AdjustedTailDeltaTime = AdjustedDeltaTime;
 
             // We don't need to calculate either angle or distance when one of the last->curr objects is a spinner
             if (BaseObject is Spinner || LastObject is Spinner)
@@ -203,12 +203,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             Vector2 lastCursorPosition = lastDifficultyObject != null ? getEndCursorPosition(lastDifficultyObject) : LastObject.StackedPosition;
 
             distanceWithoutSlider = (BaseObject.StackedPosition - LastObject.StackedPosition).Length * scalingFactor;
-            TailDistance = (BaseObject.StackedPosition - lastCursorPosition).Length * scalingFactor;
+            TailJumpDistance = (BaseObject.StackedPosition - lastCursorPosition).Length * scalingFactor;
 
             if (LastObject is Slider && lastDifficultyObject != null)
             {
-                TailTime = Math.Max(TailTime - lastDifficultyObject.SliderTime, MIN_DELTA_TIME);
-                distanceWithSlider = TailDistance + lastDifficultyObject.SliderDistance;
+                AdjustedTailDeltaTime = Math.Max(AdjustedTailDeltaTime - lastDifficultyObject.SliderTravelTime, MIN_DELTA_TIME);
+                distanceWithSlider = TailJumpDistance + lastDifficultyObject.SliderBodyDistance;
             }
             else
             {
@@ -285,7 +285,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             double lazyTravelTime = trackingEndTime - slider.StartTime;
-            SliderTime = Math.Max(lazyTravelTime / clockRate, MIN_DELTA_TIME);
+            SliderTravelTime = Math.Max(lazyTravelTime / clockRate, MIN_DELTA_TIME);
 
             double endTimeMin = lazyTravelTime / slider.SpanDuration;
             if (endTimeMin % 2 >= 1)
@@ -333,7 +333,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     // this finds the positional delta from the required radius and the current position, and updates the currCursorPosition accordingly, as well as rewarding distance.
                     currCursorPosition = Vector2.Add(currCursorPosition, Vector2.Multiply(currMovement, (float)((currMovementLength - requiredMovement) / currMovementLength)));
                     currMovementLength *= (currMovementLength - requiredMovement) / currMovementLength;
-                    SliderDistance += currMovementLength;
+                    SliderBodyDistance += currMovementLength;
                 }
 
                 if (i == nestedObjects.Count - 1)
