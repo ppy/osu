@@ -26,15 +26,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
             var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
 
-            double currDistance = withSliderTravelDistance ? osuCurrObj.LazyJumpDistance : osuCurrObj.JumpDistance;
-            double prevDistance = withSliderTravelDistance ? osuLastObj.LazyJumpDistance : osuLastObj.JumpDistance;
+            double currDistance = withSliderTravelDistance ? osuCurrObj.TailDistance : osuCurrObj.HeadDistance;
+            double prevDistance = withSliderTravelDistance ? osuLastObj.TailDistance : osuLastObj.HeadDistance;
 
             double currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
 
             if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
             {
                 // If the last object is a slider, then we extend the travel velocity through the slider into the current object.
-                double sliderDistance = osuLastObj.LazyTravelDistance + osuCurrObj.LazyJumpDistance;
+                double sliderDistance = osuLastObj.LazyTravelDistance + osuCurrObj.TailDistance;
                 currVelocity = Math.Max(currVelocity, sliderDistance / osuCurrObj.AdjustedDeltaTime);
             }
 

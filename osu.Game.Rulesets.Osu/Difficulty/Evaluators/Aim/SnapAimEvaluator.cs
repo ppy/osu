@@ -42,17 +42,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
-            double currDistance = withSliderTravelDistance ? osuCurrObj.LazyJumpDistance : osuCurrObj.JumpDistance;
+            double currDistance = withSliderTravelDistance ? osuCurrObj.TailDistance : osuCurrObj.HeadDistance;
             double currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
 
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
             if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
             {
-                double sliderDistance = osuLastObj.LazyTravelDistance + osuCurrObj.LazyJumpDistance;
+                double sliderDistance = osuLastObj.LazyTravelDistance + osuCurrObj.TailDistance;
                 currVelocity = Math.Max(currVelocity, sliderDistance / osuCurrObj.AdjustedDeltaTime);
             }
 
-            double prevDistance = withSliderTravelDistance ? osuLastObj.LazyJumpDistance : osuLastObj.JumpDistance;
+            double prevDistance = withSliderTravelDistance ? osuLastObj.TailDistance : osuLastObj.HeadDistance;
             double prevVelocity = prevDistance / osuLastObj.AdjustedDeltaTime;
 
             double wideAngleBonus = 0;
@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             // Apply high circle size bonus
             aimStrain *= osuCurrObj.SmallCircleBonus;
 
-            aimStrain *= highBpmBonus(osuCurrObj.AdjustedDeltaTime, osuCurrObj.LazyJumpDistance);
+            aimStrain *= highBpmBonus(osuCurrObj.AdjustedDeltaTime, osuCurrObj.TailDistance);
 
             return aimStrain;
         }
@@ -201,7 +201,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             double vectorRepetition = Math.Pow(Math.Min(0.5 / constantAngleCount, 1), 2);
 
-            double stackFactor = DifficultyCalculationUtils.Smootherstep(current.LazyJumpDistance, 0, OsuDifficultyHitObject.NORMALISED_DIAMETER);
+            double stackFactor = DifficultyCalculationUtils.Smootherstep(current.TailDistance, 0, OsuDifficultyHitObject.NORMALISED_DIAMETER);
 
             double currAngle = current.Angle.Value;
             double lastAngle = previous.Angle.Value;

@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// Normalised distance from the start position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
-        public double JumpDistance { get; private set; }
+        public double HeadDistance { get; private set; }
 
         /// <summary>
         /// Normalised distance from the "lazy" end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// The "lazy" end position is the position at which the cursor ends up if the previous hitobject is followed with as minimal movement as possible (i.e. on the edge of slider follow circles).
         /// </para>
         /// </summary>
-        public double LazyJumpDistance { get; private set; }
+        public double TailDistance { get; private set; }
 
         /// <summary>
         /// Amount of time elapsed between the end of <see cref="BaseObject"/> and the start of <see cref="LastObject"/>,
@@ -203,8 +203,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             Vector2 lastCursorPosition = lastDifficultyObject != null ? getEndCursorPosition(lastDifficultyObject) : LastObject.StackedPosition;
 
-            JumpDistance = (LastObject.StackedPosition - BaseObject.StackedPosition).Length * scalingFactor;
-            LazyJumpDistance = (BaseObject.StackedPosition - lastCursorPosition).Length * scalingFactor;
+            HeadDistance = (LastObject.StackedPosition - BaseObject.StackedPosition).Length * scalingFactor;
+            TailDistance = (BaseObject.StackedPosition - lastCursorPosition).Length * scalingFactor;
 
             if (LastObject is Slider && lastDifficultyObject != null)
             {
