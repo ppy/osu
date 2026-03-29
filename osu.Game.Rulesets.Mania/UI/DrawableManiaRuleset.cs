@@ -11,7 +11,6 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Input;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Input.Handlers;
@@ -148,7 +147,7 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override void Update()
         {
             base.Update();
-            updateTimeRange();
+            TimeRange.Value = TargetTimeRange;
         }
 
         private ScheduledDelegate? pendingSkinChange;
@@ -169,19 +168,6 @@ namespace osu.Game.Rulesets.Mania.UI
                           ?? Stage.HIT_TARGET_POSITION;
 
             pendingSkinChange = null;
-        }
-
-        private void updateTimeRange()
-        {
-            const float length_to_default_hit_position = 768 - LegacyManiaSkinConfiguration.DEFAULT_HIT_POSITION;
-            float lengthToHitPosition = 768 - hitPosition;
-
-            // This scaling factor preserves the scroll speed as the scroll length varies from changes to the hit position.
-            float scale = lengthToHitPosition / length_to_default_hit_position;
-
-            // we're intentionally using the game host's update clock here to decouple the time range tween from the gameplay clock (which can be arbitrarily paused, or even rewinding)
-            currentTimeRange = Interpolation.DampContinuously(currentTimeRange, TargetTimeRange, 50, gameHost.UpdateThread.Clock.ElapsedFrameTime);
-            TimeRange.Value = currentTimeRange * speedAdjustmentTrack.AggregateTempo.Value * speedAdjustmentTrack.AggregateFrequency.Value * scale;
         }
 
         /// <summary>
