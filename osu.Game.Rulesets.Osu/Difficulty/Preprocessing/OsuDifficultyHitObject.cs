@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// Amount of time elapsed between the end of <see cref="BaseObject"/> and the start of <see cref="LastObject"/>,
         /// adjusted by clockrate and capped to a minimum of <see cref="MIN_DELTA_TIME"/>ms.
         /// </summary>
-        public double AdjustedTailDeltaTime;
+        public double TailDeltaTime;
 
         /// <summary>
         /// The distance travelled by the cursor upon completion of this <see cref="OsuDifficultyHitObject"/> if it is a <see cref="Slider"/>
@@ -191,7 +191,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 SliderBonusDistance = SliderBodyDistance * Math.Max(1, Math.Pow(currentSlider.RepeatCount, 0.3));
             }
 
-            AdjustedTailDeltaTime = AdjustedDeltaTime;
+            TailDeltaTime = AdjustedDeltaTime;
 
             // We don't need to calculate either angle or distance when one of the last->curr objects is a spinner
             if (BaseObject is Spinner || LastObject is Spinner)
@@ -207,7 +207,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (LastObject is Slider && lastDifficultyObject != null)
             {
-                AdjustedTailDeltaTime = Math.Max(AdjustedTailDeltaTime - lastDifficultyObject.SliderTravelTime, MIN_DELTA_TIME);
+                TailDeltaTime = Math.Max(TailDeltaTime - lastDifficultyObject.SliderTravelTime, MIN_DELTA_TIME);
                 distanceWithSlider = TailJumpDistance + lastDifficultyObject.SliderBodyDistance;
             }
             else
