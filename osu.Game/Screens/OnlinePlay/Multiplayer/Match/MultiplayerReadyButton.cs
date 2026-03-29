@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.ObjectExtensions;
-using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
@@ -226,22 +225,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             if (multiplayerClient.IsNotNull())
                 multiplayerClient.RoomUpdated -= onRoomUpdated;
-        }
-
-        public override LocalisableString TooltipText
-        {
-            get
-            {
-                if (room?.ActiveCountdowns.Any(c => c is MatchStartCountdown) == true
-                    && multiplayerClient.IsHost
-                    && multiplayerClient.LocalUser?.State == MultiplayerUserState.Ready
-                    && !room.Settings.AutoStartEnabled)
-                {
-                    return "Cancel countdown";
-                }
-
-                return base.TooltipText;
-            }
         }
     }
 }
