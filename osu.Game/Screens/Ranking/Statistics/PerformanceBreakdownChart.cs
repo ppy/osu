@@ -39,6 +39,9 @@ namespace osu.Game.Screens.Ranking.Statistics
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
+        private const int achieved_pp_font_size = 18;
+        private const int horizontal_padding = 25;
+
         public PerformanceBreakdownChart(ScoreInfo score, IBeatmap playableBeatmap)
         {
             this.score = score;
@@ -54,86 +57,88 @@ namespace osu.Game.Screens.Ranking.Statistics
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre
                 },
-                content = new FillFlowContainer
+                content = new GridContainer
                 {
                     Alpha = 0,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Width = 0.6f,
                     Origin = Anchor.TopCentre,
                     Anchor = Anchor.TopCentre,
-                    Spacing = new Vector2(15, 15),
-                    Children = new Drawable[]
+                    Padding = new MarginPadding
                     {
-                        new GridContainer
+                        Horizontal = horizontal_padding,
+                    },
+                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension()
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Width = 0.8f,
-                            AutoSizeAxes = Axes.Y,
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            ColumnDimensions = new[]
+                            new FillFlowContainer
                             {
-                                new Dimension(),
-                                new Dimension(GridSizeMode.AutoSize)
-                            },
-                            RowDimensions = new[]
-                            {
-                                new Dimension(GridSizeMode.AutoSize),
-                                new Dimension(GridSizeMode.AutoSize)
-                            },
-                            Content = new[]
-                            {
-                                new Drawable[]
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Vertical,
+                                Margin = new MarginPadding
                                 {
-                                    new OsuSpriteText
-                                    {
-                                        Origin = Anchor.CentreLeft,
-                                        Anchor = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
-                                        Text = "Achieved PP",
-                                        Colour = Color4Extensions.FromHex("#66FFCC")
-                                    },
-                                    achievedPerformance = new OsuSpriteText
-                                    {
-                                        Origin = Anchor.CentreRight,
-                                        Anchor = Anchor.CentreRight,
-                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: StatisticItem.FONT_SIZE),
-                                        Colour = Color4Extensions.FromHex("#66FFCC")
-                                    }
+                                    Right = horizontal_padding * 2,
                                 },
-                                new Drawable[]
+                                Children = new Drawable[]
                                 {
                                     new OsuSpriteText
                                     {
-                                        Origin = Anchor.CentreLeft,
-                                        Anchor = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
-                                        Text = "Maximum",
-                                        Colour = OsuColour.Gray(0.7f)
+                                        Origin = Anchor.Centre,
+                                        Anchor = Anchor.Centre,
+                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: achieved_pp_font_size),
+                                        Text = "Achieved PP",
                                     },
-                                    maximumPerformance = new OsuSpriteText
+                                    new FillFlowContainer()
                                     {
-                                        Origin = Anchor.CentreLeft,
-                                        Anchor = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
-                                        Colour = OsuColour.Gray(0.7f)
+                                        Origin = Anchor.Centre,
+                                        Anchor = Anchor.Centre,
+                                        Direction = FillDirection.Horizontal,
+                                        Spacing = new Vector2(5),
+                                        AutoSizeAxes = Axes.Both,
+                                        Children = new[]
+                                        {
+                                            achievedPerformance = new OsuSpriteText
+                                            {
+                                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: achieved_pp_font_size),
+                                                Colour = Color4Extensions.FromHex("#66FFCC")
+                                            },
+                                            new OsuSpriteText
+                                            {
+                                                Font = OsuFont.GetFont(weight: FontWeight.Regular, size: achieved_pp_font_size),
+                                                Text = "/",
+                                                Colour = OsuColour.Gray(0.7f)
+                                            },
+                                            maximumPerformance = new OsuSpriteText
+                                            {
+                                                Font = OsuFont.GetFont(weight: FontWeight.Regular, size: achieved_pp_font_size),
+                                                Colour = OsuColour.Gray(0.7f)
+                                            },
+                                        }
                                     }
                                 }
-                            }
-                        },
-                        chart = new GridContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            ColumnDimensions = new[]
+                            },
+                            chart = new GridContainer
                             {
-                                new Dimension(GridSizeMode.AutoSize),
-                                new Dimension(),
-                                new Dimension(GridSizeMode.AutoSize)
-                            }
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                ColumnDimensions = new[]
+                                {
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(),
+                                    new Dimension(GridSizeMode.AutoSize)
+                                }
+                            },
                         }
                     }
                 }
