@@ -135,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             if (osuCurrObj.BaseObject is Slider)
             {
                 // Reward sliders based on velocity.
-                sliderBonus = osuCurrObj.SliderBonusDistance / osuCurrObj.TravelTime;
+                sliderBonus = osuCurrObj.SliderBonusDistance / osuCurrObj.SliderTime;
             }
 
             // Penalize angle repetition.

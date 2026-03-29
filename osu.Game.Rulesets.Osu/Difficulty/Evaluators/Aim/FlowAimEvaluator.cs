@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             if (osuCurrObj.BaseObject is Slider && withSliderTravelDistance)
             {
                 // Include slider velocity to make velocity more consistent with snap
-                flowDifficulty += osuCurrObj.SliderBonusDistance / osuCurrObj.TravelTime;
+                flowDifficulty += osuCurrObj.SliderBonusDistance / osuCurrObj.SliderTime;
             }
 
             // Final velocity is being raised to a power because flow difficulty scales harder with both high distance and time, and we want to account for that
