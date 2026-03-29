@@ -29,6 +29,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             double currDistance = osuCurrObj.GetDistance(withSliderTravelDistance);
             double prevDistance = withSliderTravelDistance ? osuLastObj.TailDistance : osuLastObj.GetDistance(false);
 
+            double currFakeDistance = withSliderTravelDistance ? osuCurrObj.TailDistance : osuCurrObj.GetDistance(false); // Keeping to preserve values
+
             double currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
             double prevVelocity = prevDistance / osuLastObj.AdjustedDeltaTime;
 
@@ -77,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             {
                 if (withSliderTravelDistance)
                 {
-                    currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
+                    currVelocity = currFakeDistance / osuCurrObj.AdjustedDeltaTime;
                 }
 
                 // Scale with ratio of difference compared to 0.5 * max dist.

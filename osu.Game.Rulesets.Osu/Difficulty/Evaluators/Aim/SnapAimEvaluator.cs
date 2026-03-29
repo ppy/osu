@@ -45,6 +45,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             double currDistance = osuCurrObj.GetDistance(withSliderTravelDistance);
             double prevDistance = withSliderTravelDistance ? osuLastObj.TailDistance : osuLastObj.GetDistance(false);
 
+            double currFakeDistance = withSliderTravelDistance ? osuCurrObj.TailDistance : osuCurrObj.GetDistance(false); // Keeping to preserve values
+
             double currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
             double prevVelocity = prevDistance / osuLastObj.AdjustedDeltaTime;
 
@@ -87,8 +89,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 // Apply wiggle bonus for jumps that are [radius, 3*diameter] in distance, with < 110 angle
                 // https://www.desmos.com/calculator/dp0v0nvowc
                 wiggleBonus = angleBonus
-                              * DifficultyCalculationUtils.Smootherstep(currDistance, radius, diameter)
-                              * Math.Pow(DifficultyCalculationUtils.ReverseLerp(currDistance, diameter * 3, diameter), 1.8)
+                              * DifficultyCalculationUtils.Smootherstep(currFakeDistance, radius, diameter)
+                              * Math.Pow(DifficultyCalculationUtils.ReverseLerp(currFakeDistance, diameter * 3, diameter), 1.8)
                               * DifficultyCalculationUtils.Smootherstep(currAngle, double.DegreesToRadians(110), double.DegreesToRadians(60))
                               * DifficultyCalculationUtils.Smootherstep(prevDistance, radius, diameter)
                               * Math.Pow(DifficultyCalculationUtils.ReverseLerp(prevDistance, diameter * 3, diameter), 1.8)
@@ -116,8 +118,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 {
                     // We want to use just the object jump without slider velocity when awarding differences
                     // This is objectively incorrect in some cases, but kept for now to preserve values
-                    double velocityChangeDistance = withSliderTravelDistance ? osuCurrObj.TailDistance : osuCurrObj.GetDistance(false);
-                    currVelocity = velocityChangeDistance / osuCurrObj.AdjustedDeltaTime;
+                    currVelocity = currFakeDistance / osuCurrObj.AdjustedDeltaTime;
                 }
 
                 // Scale with ratio of difference compared to 0.5 * max dist.
