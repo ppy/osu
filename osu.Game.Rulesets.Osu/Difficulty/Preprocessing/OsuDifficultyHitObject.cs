@@ -47,11 +47,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public readonly double Preempt;
 
         /// <summary>
-        /// Normalised distance from the start position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
-        /// </summary>
-        public double HeadDistance { get; private set; }
-
-        /// <summary>
         /// Normalised distance from the "lazy" end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
         /// <para>
         /// The "lazy" end position is the position at which the cursor ends up if the previous hitobject is followed with as minimal movement as possible (i.e. on the edge of slider follow circles).
@@ -66,32 +61,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double TailTime;
 
         /// <summary>
-        /// Normalised distance between the start and end position of this <see cref="OsuDifficultyHitObject"/>.
+        /// The distance travelled by the cursor upon completion of this <see cref="OsuDifficultyHitObject"/> if it is a <see cref="Slider"/>
+        /// and was hit with as few movements as possible.
         /// </summary>
         public double TravelDistance { get; private set; }
 
         /// <summary>
-        /// The time taken to travel through <see cref="TravelDistance"/>, with a minimum value of 25ms for <see cref="Slider"/> objects.
+        /// The time taken to travel through <see cref="SliderBonusDistance"/>, with a minimum value of 25ms for <see cref="Slider"/> objects.
         /// </summary>
         public double TravelTime { get; private set; }
+
+        /// <summary>
+        /// Normalised distance between the start and end position of this <see cref="OsuDifficultyHitObject"/>.
+        /// </summary>
+        public double SliderBonusDistance { get; private set; }
 
         /// <summary>
         /// The position of the cursor at the point of completion of this <see cref="OsuDifficultyHitObject"/> if it is a <see cref="Slider"/>
         /// and was hit with as few movements as possible.
         /// </summary>
         public Vector2? LazyEndPosition { get; private set; }
-
-        /// <summary>
-        /// The distance travelled by the cursor upon completion of this <see cref="OsuDifficultyHitObject"/> if it is a <see cref="Slider"/>
-        /// and was hit with as few movements as possible.
-        /// </summary>
-        public double LazyTravelDistance { get; private set; }
-
-        /// <summary>
-        /// The time taken by the cursor upon completion of this <see cref="OsuDifficultyHitObject"/> if it is a <see cref="Slider"/>
-        /// and was hit with as few movements as possible.
-        /// </summary>
-        public double LazyTravelTime { get; private set; }
 
         /// <summary>
         /// Angle the player has to take to hit this <see cref="OsuDifficultyHitObject"/>.
@@ -110,6 +99,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double SmallCircleBonus { get; private set; }
 
+        /// <summary>
+        /// Normalised distance the cursor travels from the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>,
+        /// including the slider body.
+        /// </summary>
+        private double distanceWithSlider { get; set; }
+
+        /// <summary>
+        /// Normalised distance from the start position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
+        /// </summary>
+        private double distanceWithoutSlider { get; set; }
+
         private readonly OsuDifficultyHitObject? lastLastDifficultyObject;
         private readonly OsuDifficultyHitObject? lastDifficultyObject;
 
@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             Preempt = BaseObject.TimePreempt / clockRate;
 
-            computeSliderCursorPosition();
+            computeSliderCursorPosition(clockRate);
             setDistances(clockRate);
         }
 
@@ -188,8 +188,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (BaseObject is Slider currentSlider)
             {
                 // Bonus for repeat sliders until a better per nested object strain system can be achieved.
-                TravelDistance = LazyTravelDistance * Math.Max(1, Math.Pow(currentSlider.RepeatCount, 0.3));
-                TravelTime = Math.Max(LazyTravelTime / clockRate, MIN_DELTA_TIME);
+                SliderBonusDistance = TravelDistance * Math.Max(1, Math.Pow(currentSlider.RepeatCount, 0.3));
             }
 
             TailTime = AdjustedDeltaTime;
@@ -203,18 +202,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             Vector2 lastCursorPosition = lastDifficultyObject != null ? getEndCursorPosition(lastDifficultyObject) : LastObject.StackedPosition;
 
-            HeadDistance = (LastObject.StackedPosition - BaseObject.StackedPosition).Length * scalingFactor;
+            distanceWithoutSlider = (LastObject.StackedPosition - BaseObject.StackedPosition).Length * scalingFactor;
             TailDistance = (BaseObject.StackedPosition - lastCursorPosition).Length * scalingFactor;
 
             if (LastObject is Slider && lastDifficultyObject != null)
             {
-                double lastTravelTime = Math.Max(lastDifficultyObject.LazyTravelTime / clockRate, MIN_DELTA_TIME);
-                TailTime = Math.Max(AdjustedDeltaTime - lastTravelTime, MIN_DELTA_TIME);
+                TailTime = Math.Max(AdjustedDeltaTime - lastDifficultyObject.TravelTime, MIN_DELTA_TIME);
+                distanceWithSlider = distanceWithoutSlider + lastDifficultyObject.TravelDistance;
+            }
+            else
+            {
+                distanceWithSlider = distanceWithoutSlider;
             }
 
             if (lastLastDifficultyObject != null && lastLastDifficultyObject.BaseObject is not Spinner)
             {
-                if (lastDifficultyObject!.BaseObject is Slider prevSlider && lastDifficultyObject.TravelDistance > 0)
+                if (lastDifficultyObject!.BaseObject is Slider prevSlider && lastDifficultyObject.SliderBonusDistance > 0)
                     lastCursorPosition = prevSlider.HeadCircle.StackedPosition;
 
                 Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastDifficultyObject);
@@ -229,7 +232,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
         }
 
-        private void computeSliderCursorPosition()
+        private void computeSliderCursorPosition(double clockRate)
         {
             if (BaseObject is not Slider slider)
                 return;
@@ -281,9 +284,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 nestedObjects = reordered;
             }
 
-            LazyTravelTime = trackingEndTime - slider.StartTime;
+            double lazyTravelTime = trackingEndTime - slider.StartTime;
+            TravelTime = Math.Max(lazyTravelTime / clockRate, MIN_DELTA_TIME);
 
-            double endTimeMin = LazyTravelTime / slider.SpanDuration;
+            double endTimeMin = lazyTravelTime / slider.SpanDuration;
             if (endTimeMin % 2 >= 1)
                 endTimeMin = 1 - endTimeMin % 1;
             else
@@ -329,7 +333,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     // this finds the positional delta from the required radius and the current position, and updates the currCursorPosition accordingly, as well as rewarding distance.
                     currCursorPosition = Vector2.Add(currCursorPosition, Vector2.Multiply(currMovement, (float)((currMovementLength - requiredMovement) / currMovementLength)));
                     currMovementLength *= (currMovementLength - requiredMovement) / currMovementLength;
-                    LazyTravelDistance += currMovementLength;
+                    TravelDistance += currMovementLength;
                 }
 
                 if (i == nestedObjects.Count - 1)
@@ -341,7 +345,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         {
             Vector2 lastCursorPosition = getEndCursorPosition(lastDifficultyObject);
 
-            if (lastDifficultyObject.BaseObject is Slider prevSlider && lastDifficultyObject.TravelDistance > 0)
+            if (lastDifficultyObject.BaseObject is Slider prevSlider && lastDifficultyObject.SliderBonusDistance > 0)
             {
                 OsuHitObject secondLastNestedObject = (OsuHitObject)prevSlider.NestedHitObjects[^2];
                 lastLastCursorPosition = secondLastNestedObject.StackedPosition;
@@ -365,5 +369,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         {
             return difficultyHitObject.LazyEndPosition ?? difficultyHitObject.BaseObject.StackedPosition;
         }
+
+        public double GetDistance(bool withSlider) => withSlider ? distanceWithSlider : distanceWithoutSlider;
     }
 }

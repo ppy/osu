@@ -42,17 +42,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
-            double currDistance = withSliderTravelDistance ? osuCurrObj.TailDistance : osuCurrObj.HeadDistance;
+            double currDistance = osuCurrObj.GetDistance(withSliderTravelDistance);
+            double prevDistance = withSliderTravelDistance ? osuLastObj.TailDistance : osuLastObj.GetDistance(false);
+
             double currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
-
-            // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
-            if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
-            {
-                double sliderDistance = osuLastObj.LazyTravelDistance + osuCurrObj.TailDistance;
-                currVelocity = Math.Max(currVelocity, sliderDistance / osuCurrObj.AdjustedDeltaTime);
-            }
-
-            double prevDistance = withSliderTravelDistance ? osuLastObj.TailDistance : osuLastObj.HeadDistance;
             double prevVelocity = prevDistance / osuLastObj.AdjustedDeltaTime;
 
             double wideAngleBonus = 0;
@@ -122,7 +115,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 if (withSliderTravelDistance)
                 {
                     // We want to use just the object jump without slider velocity when awarding differences
-                    currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
+                    // This is objectively incorrect in some cases, but kept for now to preserve values
+                    double velocityChangeDistance = withSliderTravelDistance ? osuCurrObj.TailDistance : osuCurrObj.GetDistance(false);
+                    currVelocity = velocityChangeDistance / osuCurrObj.AdjustedDeltaTime;
                 }
 
                 // Scale with ratio of difference compared to 0.5 * max dist.
@@ -140,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             if (osuCurrObj.BaseObject is Slider)
             {
                 // Reward sliders based on velocity.
-                sliderBonus = osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
+                sliderBonus = osuCurrObj.SliderBonusDistance / osuCurrObj.TravelTime;
             }
 
             // Penalize angle repetition.
