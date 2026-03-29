@@ -19,6 +19,8 @@ using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -225,7 +227,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                     new GridContainer
                                                     {
                                                         RelativeSizeAxes = Axes.Both,
-                                                        Padding = new MarginPadding(content_padding),
+                                                        Padding = new MarginPadding(content_padding) { Top = 10 },
                                                         ColumnDimensions = new[]
                                                         {
                                                             new Dimension(),
@@ -277,7 +279,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                     {
                                                                         new Drawable[]
                                                                         {
-                                                                            new OverlinedHeader("Beatmap queue")
+                                                                            new SectionHeader(OnlinePlayStrings.MultiplayerBeatmapQueue)
                                                                         },
                                                                         new Drawable[]
                                                                         {
@@ -309,7 +311,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                                 Alpha = 0,
                                                                                 Children = new Drawable[]
                                                                                 {
-                                                                                    new OverlinedHeader("Extra mods"),
+                                                                                    new SectionHeader("Extra mods"),
                                                                                     new FillFlowContainer
                                                                                     {
                                                                                         AutoSizeAxes = Axes.Both,
@@ -347,7 +349,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                                 Alpha = 0,
                                                                                 Children = new Drawable[]
                                                                                 {
-                                                                                    new OverlinedHeader("Difficulty"),
+                                                                                    new SectionHeader(OnlinePlayStrings.Difficulty),
                                                                                     userStyleDisplayContainer = new Container<DrawableRoomPlaylistItem>
                                                                                     {
                                                                                         RelativeSizeAxes = Axes.X,
@@ -370,7 +372,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                     {
                                                                         new Drawable[]
                                                                         {
-                                                                            new OverlinedHeader("Chat")
+                                                                            new SectionHeader(OnlinePlayStrings.Chat)
                                                                         },
                                                                         new Drawable[]
                                                                         {
