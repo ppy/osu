@@ -208,7 +208,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (LastObject is Slider && lastDifficultyObject != null)
             {
                 TailTime = Math.Max(AdjustedDeltaTime - lastDifficultyObject.TravelTime, MIN_DELTA_TIME);
-                distanceWithSlider = distanceWithoutSlider + lastDifficultyObject.TravelDistance;
+                distanceWithSlider = TailDistance + lastDifficultyObject.TravelDistance;
             }
             else
             {
