@@ -343,7 +343,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                     if (c2.CardDragged)
                         return -1;
 
-                    return c1.Order.CompareTo(c2.Order);
+                    int result = c1.Order.CompareTo(c2.Order);
+                    if (result != 0)
+                        return result;
                 }
 
                 return base.Compare(x, y);
