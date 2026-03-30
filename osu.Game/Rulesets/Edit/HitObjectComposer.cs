@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using JetBrains.Annotations;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -180,7 +181,7 @@ namespace osu.Game.Rulesets.Edit
                                         Spacing = new Vector2(0, 5),
                                     },
                                 },
-                                new EditorToolboxGroup("bank (Shift/Alt-Q~R)")
+                                new EditorToolboxGroup($"bank (Shift/{AltKeyName}-Q~R)")
                                 {
                                     Child = new FillFlowContainer
                                     {
@@ -561,7 +562,7 @@ namespace osu.Game.Rulesets.Edit
         #endregion
     }
 
-    /// <summary>
+        /// <summary>
     /// A non-generic definition of a HitObject composer class.
     /// Generally used to access certain methods without requiring a generic type for <see cref="HitObjectComposer{T}" />.
     /// </summary>
@@ -609,5 +610,11 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="timestamp">The time instant to seek to, in milliseconds.</param>
         /// <param name="objectDescription">The ruleset-specific description of objects to select at the given timestamp.</param>
         public virtual void SelectFromTimestamp(double timestamp, string objectDescription) { }
+
+        /// <summary>
+        /// Returns the platform-specific Alt key name.
+        /// For macOS, this returns "Option". Otherwise returns "Alt".
+        /// </summary>
+        protected internal static string AltKeyName => !(RuntimeInfo.OS == RuntimeInfo.Platform.macOS) ? "Opt" : "Alt";
     }
 }
