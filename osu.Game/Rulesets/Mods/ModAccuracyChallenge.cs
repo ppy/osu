@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mods
             get
             {
                 if (!MinimumAccuracy.IsDefault)
-                    yield return ("Minimum accuracy", $"{MinimumAccuracy.Value:##%}");
+                    yield return ("Minimum accuracy", MinimumAccuracy.Value.ToLocalisableString(@"P1"));
 
                 if (!AccuracyJudgeMode.IsDefault)
                     yield return ("Accuracy mode", AccuracyJudgeMode.Value.ToLocalisableString());
