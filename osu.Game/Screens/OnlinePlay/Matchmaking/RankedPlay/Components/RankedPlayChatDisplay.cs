@@ -14,7 +14,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
