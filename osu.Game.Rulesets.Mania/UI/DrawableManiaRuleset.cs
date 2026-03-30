@@ -141,11 +141,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override void AdjustScrollSpeed(int amount) => configScrollSpeed.Value += amount;
 
-        protected override void Update()
-        {
-            base.Update();
-        }
-
         private ScheduledDelegate? pendingSkinChange;
         private float hitPosition;
 
