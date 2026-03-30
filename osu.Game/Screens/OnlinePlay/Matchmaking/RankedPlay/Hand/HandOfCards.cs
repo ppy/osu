@@ -106,6 +106,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             var drawable = CreateHandCard(card);
             drawable.Anchor = drawable.Origin = cardAnchor;
 
+            if (card.Item.DisplayOrder != null)
+                drawable.Order = card.Item.DisplayOrder.Value;
+            else if (cardContainer.Count > 0)
+                drawable.Order = cardContainer.Max(c => c.Order) + 1;
+
             cardLookup[card.Item.Card] = drawable;
 
             cardContainer.Add(drawable);

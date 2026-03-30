@@ -239,6 +239,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
                 c.Order = order++;
             }
+
+            foreach (var c in Cards)
+                c.Item.DisplayOrder = c.Order;
         }
 
         private int cardIndexInLayout(HandCard[] cards, Vector2 screenSpacePosition)
