@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Online.RankedPlay;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
 using osuTK;
@@ -65,6 +66,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             [Resolved]
             private HandOfCards handOfCards { get; set; } = null!;
 
+            private float previousX;
+
+            private readonly FloatSpring rotationSpring = new FloatSpring
+            {
+                NaturalFrequency = 2f,
+                Damping = 0.4f,
+                Response = 1.2f,
+            };
+
             public readonly RankedPlayCard Card;
 
             public RankedPlayCardWithPlaylistItem Item => Card.Item;
@@ -108,6 +118,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                         Card.ScaleTo(1f, 400, Easing.OutElasticHalf);
                         break;
                 }
+
+                rotationSpring.Parameters = state.NewValue.Dragged
+                    ? new SpringParameters(2f, 0.4f, 1.2f)
+                    : new SpringParameters(3f, 0.9f, 0.8f);
             }
 
             public RankedPlayCard Detach()
@@ -125,6 +139,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 base.Update();
 
                 Card.Elevation = float.Lerp(CardHoveredOrDragged ? 1 : 0, Card.Elevation, (float)Math.Exp(-0.03f * Time.Elapsed));
+
+                if (CardDragged && Time.Elapsed > 0)
+                {
+                    float velocityX = (X - previousX) / (float)Time.Elapsed;
+
+                    float targetRotation = velocityX * 5;
+
+                    Card.Rotation = rotationSpring.Update(Time.Elapsed, targetRotation);
+                }
+                else
+                {
+                    Card.Rotation = rotationSpring.Update(Time.Elapsed, 0);
+                }
+
+                previousX = X;
             }
         }
     }
