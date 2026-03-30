@@ -27,15 +27,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 
         public readonly int Column;
 
-        // Note indices used to determine where to start searching the note index from this note
-        private readonly int prevHeadIndex;
-        private readonly int nextHeadIndex;
-        private readonly int prevTailIndex;
-        private readonly int nextTailIndex;
-        private readonly int columnPrevHeadIndex;
-        private readonly int columnNextHeadIndex;
-        private readonly int columnPrevTailIndex;
-        private readonly int columnNextTailIndex;
+        private readonly int headIndex;
+        private readonly int tailIndex;
+        private readonly int columnHeadIndex;
+        private readonly int columnTailIndex;
+        private readonly bool isTail;
 
         private readonly ManiaMapState mapState;
 
@@ -56,47 +52,33 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             PreviousHeadObjects = new ManiaDifficultyHitObject[mapState.TotalColumns];
             ActualTime = base.StartTime;
 
+            // Get metrics up to this note from the current mapState, which only includes previous notes so far.
             int headCount = mapState.HeadCount;
             int tailCount = mapState.TailCount;
             int columnHeadCount = mapState.ColumnHeadCount(Column);
             int columnTailCount = mapState.ColumnTailCount(Column);
 
-            if (BaseObject is TailNote)
+            headIndex = headCount;
+            tailIndex = tailCount;
+            columnHeadIndex = columnHeadCount;
+            columnTailIndex = columnTailCount;
+            isTail = BaseObject is TailNote;
+
+            if (isTail)
             {
                 Tail = this;
                 Head = mapState.GetColumnHead(Column, columnHeadCount - 1);
 
+                // If the first note happens to be an LN, the head won't end up being processed, leaving this null.
                 if (Head is not null)
                 {
                     Head.Tail = this;
                     Head.EndTime = ActualTime;
                 }
-
-                // For a tail, the "next head" index is unchanged (this isn't a head),
-                // and the "next tail" index points past itself once added.
-                prevHeadIndex = headCount - 1;
-                nextHeadIndex = headCount;
-                prevTailIndex = tailCount - 1;
-                nextTailIndex = tailCount + 1;
-
-                columnPrevHeadIndex = columnHeadCount - 1;
-                columnNextHeadIndex = columnHeadCount;
-                columnPrevTailIndex = columnTailCount - 1;
-                columnNextTailIndex = columnTailCount + 1;
             }
             else
             {
                 Head = this;
-
-                prevHeadIndex = headCount - 1;
-                nextHeadIndex = headCount + 1;
-                prevTailIndex = tailCount - 1;
-                nextTailIndex = tailCount;
-
-                columnPrevHeadIndex = columnHeadCount - 1;
-                columnNextHeadIndex = columnHeadCount + 1;
-                columnPrevTailIndex = columnTailCount - 1;
-                columnNextTailIndex = columnTailCount;
             }
 
             StartTime = Head?.ActualTime ?? ActualTime;
@@ -129,42 +111,42 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
             }
         }
 
-        public ManiaDifficultyHitObject? PrevHead(int backwardsIndex) => mapState.GetHead(prevHeadIndex - backwardsIndex);
-        public ManiaDifficultyHitObject? NextHead(int forwardsIndex) => mapState.GetHead(nextHeadIndex + forwardsIndex);
+        public ManiaDifficultyHitObject? PrevHead(int backwardsIndex) => mapState.GetHead(headIndex - 1 - backwardsIndex);
+        public ManiaDifficultyHitObject? NextHead(int forwardsIndex) => mapState.GetHead(headIndex + (isTail ? 0 : 1) + forwardsIndex);
 
-        public ManiaDifficultyHitObject? PrevTail(int backwardsIndex) => mapState.GetTail(prevTailIndex - backwardsIndex);
-        public ManiaDifficultyHitObject? NextTail(int forwardsIndex) => mapState.GetTail(nextTailIndex + forwardsIndex);
+        public ManiaDifficultyHitObject? PrevTail(int backwardsIndex) => mapState.GetTail(tailIndex - 1 - backwardsIndex);
+        public ManiaDifficultyHitObject? NextTail(int forwardsIndex) => mapState.GetTail(tailIndex + (isTail ? 1 : 0) + forwardsIndex);
 
-        public ManiaDifficultyHitObject? PrevHeadInColumn(int backwardsIndex, int? column = null, bool inclusive = false)
+        public ManiaDifficultyHitObject? PrevHeadInColumn(int backwardsIndex, int? otherColumn = null, bool inclusive = false)
         {
-            if (column is null || column == Column)
-                return mapState.GetColumnHead(Column, columnPrevHeadIndex - backwardsIndex);
+            if (otherColumn is null || otherColumn == Column)
+                return mapState.GetColumnHead(Column, columnHeadIndex - 1 - backwardsIndex);
 
-            return mapState.SearchColumnHead(column.Value, ActualTime, backwardsIndex, inclusive, backward: true);
+            return mapState.SearchColumnHead(otherColumn.Value, ActualTime, backwardsIndex, inclusive, backward: true);
         }
 
-        public ManiaDifficultyHitObject? NextHeadInColumn(int forwardsIndex, int? column = null, bool inclusive = false)
+        public ManiaDifficultyHitObject? NextHeadInColumn(int forwardsIndex, int? otherColumn = null, bool inclusive = false)
         {
-            if (column is null || column == Column)
-                return mapState.GetColumnHead(Column, columnNextHeadIndex + forwardsIndex);
+            if (otherColumn is null || otherColumn == Column)
+                return mapState.GetColumnHead(Column, columnHeadIndex + (isTail ? 0 : 1) + forwardsIndex);
 
-            return mapState.SearchColumnHead(column.Value, ActualTime, forwardsIndex, inclusive, backward: false);
+            return mapState.SearchColumnHead(otherColumn.Value, ActualTime, forwardsIndex, inclusive, backward: false);
         }
 
-        public ManiaDifficultyHitObject? PrevTailInColumn(int backwardsIndex, int? column = null, bool inclusive = false)
+        public ManiaDifficultyHitObject? PrevTailInColumn(int backwardsIndex, int? otherColumn = null, bool inclusive = false)
         {
-            if (column is null || column == Column)
-                return mapState.GetColumnTail(Column, columnPrevTailIndex - backwardsIndex);
+            if (otherColumn is null || otherColumn == Column)
+                return mapState.GetColumnTail(Column, columnTailIndex - 1 - backwardsIndex);
 
-            return mapState.SearchColumnTail(column.Value, ActualTime, backwardsIndex, inclusive, backward: true);
+            return mapState.SearchColumnTail(otherColumn.Value, ActualTime, backwardsIndex, inclusive, backward: true);
         }
 
-        public ManiaDifficultyHitObject? NextTailInColumn(int forwardsIndex, int? column = null, bool inclusive = false)
+        public ManiaDifficultyHitObject? NextTailInColumn(int forwardsIndex, int? otherColumn = null, bool inclusive = false)
         {
-            if (column is null || column == Column)
-                return mapState.GetColumnTail(Column, columnNextTailIndex + forwardsIndex);
+            if (otherColumn is null || otherColumn == Column)
+                return mapState.GetColumnTail(Column, columnTailIndex + (isTail ? 1 : 0) + forwardsIndex);
 
-            return mapState.SearchColumnTail(column.Value, ActualTime, forwardsIndex, inclusive, backward: false);
+            return mapState.SearchColumnTail(otherColumn.Value, ActualTime, forwardsIndex, inclusive, backward: false);
         }
     }
 }

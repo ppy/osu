@@ -67,23 +67,49 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
                 return null;
 
             var list = lists[column];
-            int found = list.BinarySearch(null!, Comparer<ManiaDifficultyHitObject>.Create((x, _) => x.ActualTime.CompareTo(time)));
 
-            if (found < 0) found = ~found;
+            int foundIndex = binarySearch(list, time);
+
+            // Whether the found note matches the time of this note exactly.
+            bool exactMatch = foundIndex < list.Count && list[foundIndex].ActualTime == time;
 
             if (backward)
             {
-                int baseIndex = inclusive && found < list.Count && list[found].ActualTime == time ? found : found - 1;
+                // foundIndex points to the first note at or after `time`.
+                // Stepping back one gives us the last note strictly before `time`,
+                // which is the correct base unless we're inclusive and landed exactly on `time`.
+                int baseIndex = inclusive && exactMatch ? foundIndex : foundIndex - 1;
                 return GetByIndex(list, baseIndex - offset);
             }
             else
             {
-                int baseIndex = !inclusive && found < list.Count && list[found].ActualTime == time ? found + 1 : found;
+                // foundIndex points to the first note at or after `time`, which is already correct.
+                // The only adjustment needed is stepping forward one when we're non-inclusive
+                // and landed exactly on `time`.
+                int baseIndex = !inclusive && exactMatch ? foundIndex + 1 : foundIndex;
                 return GetByIndex(list, baseIndex + offset);
             }
         }
 
         public static ManiaDifficultyHitObject? GetByIndex(List<ManiaDifficultyHitObject> list, int index)
             => index >= 0 && index < list.Count ? list[index] : null;
+
+        /// <summary>
+        /// Returns the index of the first note at or after <paramref name="time"/>.
+        /// If no such note exists, returns <see cref="List{T}.Count"/>.
+        /// </summary>
+        private static int binarySearch(List<ManiaDifficultyHitObject> list, double time)
+        {
+            int lo = 0, hi = list.Count;
+
+            while (lo < hi)
+            {
+                int mid = (lo + hi) >> 1;
+                if (list[mid].ActualTime < time) lo = mid + 1;
+                else hi = mid;
+            }
+
+            return lo;
+        }
     }
 }
