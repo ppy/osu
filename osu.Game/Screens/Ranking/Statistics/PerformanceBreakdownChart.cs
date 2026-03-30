@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                     {
                                         Origin = Anchor.Centre,
                                         Anchor = Anchor.Centre,
-                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: achieved_pp_font_size),
+                                        Font = OsuFont.Style.Heading2,
                                         Text = "Achieved PP",
                                     },
                                     new FillFlowContainer
