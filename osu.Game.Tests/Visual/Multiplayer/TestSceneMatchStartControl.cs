@@ -415,12 +415,49 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestRefereeSpectating()
+        {
+            AddStep("set up referee", () =>
+            {
+                multiplayerClient.SetupGet(m => m.IsReferee).Returns(true);
+                multiplayerClient.SetupGet(m => m.IsHost).Returns(false);
+                multiplayerClient.Object.Room!.Users.Single().Role = MultiplayerRoomUserRole.Referee;
+                raiseRoomUpdated();
+            });
+
+            const int users = 10;
+
+            AddStep("add many users", () =>
+            {
+                for (int i = 0; i < users; i++)
+                    addUser(new APIUser { Id = i, Username = "Another user" });
+            });
+            AddAssert("button disabled", () => this.ChildrenOfType<MultiplayerReadyButton>().Single().Enabled.Value, () => Is.False);
+
+            AddStep("move to spectate", () => changeUserState(multiplayerClient.Object.LocalUser!.UserID, MultiplayerUserState.Spectating));
+
+            AddStep("ready up a user", () => changeUserState(9, MultiplayerUserState.Ready));
+            AddAssert("button enabled", () => this.ChildrenOfType<MultiplayerReadyButton>().Single().Enabled.Value, () => Is.True);
+
+            setUpMatchCallbacks();
+
+            // start match
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            AddUntilStep("countdown button disabled", () => !this.ChildrenOfType<MultiplayerCountdownButton>().Single().Enabled.Value);
+
+            // abort
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            AddStep("check abort request received", () => multiplayerClient.Verify(m => m.AbortMatch(), Times.Once));
+        }
+
+        [Test]
         public void TestRefereeFlowWithoutCountdown()
         {
             AddStep("set up referee", () =>
             {
                 multiplayerClient.SetupGet(m => m.IsReferee).Returns(true);
                 multiplayerClient.SetupGet(m => m.IsHost).Returns(false);
+                multiplayerClient.Object.Room!.Users.Single().Role = MultiplayerRoomUserRole.Referee;
                 raiseRoomUpdated();
             });
 
@@ -454,6 +491,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 multiplayerClient.SetupGet(m => m.IsReferee).Returns(true);
                 multiplayerClient.SetupGet(m => m.IsHost).Returns(false);
+                multiplayerClient.Object.Room!.Users.Single().Role = MultiplayerRoomUserRole.Referee;
                 raiseRoomUpdated();
             });
 
