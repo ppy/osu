@@ -676,8 +676,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Ruleset.Value = ruleset;
             Mods.Value = client.LocalUser.Mods.Concat(item.RequiredMods).Select(m => m.ToMod(rulesetInstance)).ToArray();
 
-            bool freemods = item.Freestyle || item.AllowedMods.Any();
-            bool freestyle = item.Freestyle;
+            bool freemods = !client.IsReferee && (item.Freestyle || item.AllowedMods.Any());
+            bool freestyle = !client.IsReferee && item.Freestyle;
 
             if (freemods)
                 userModsSection.Show();
