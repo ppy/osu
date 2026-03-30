@@ -240,13 +240,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
         protected int GetActiveCardIndex(IReadOnlyList<HandCard> cards)
         {
             // the mouse can temporarily leave the dragged card, so dragged card should take precedence
-            for (int i = 0; i < cardContainer.Count; i++)
+            for (int i = 0; i < cards.Count; i++)
             {
                 if (cards[i].CardDragged)
                     return i;
             }
 
-            for (int i = 0; i < cardContainer.Count; i++)
+            for (int i = 0; i < cards.Count; i++)
             {
                 if (cards[i].CardHovered)
                     return i;
