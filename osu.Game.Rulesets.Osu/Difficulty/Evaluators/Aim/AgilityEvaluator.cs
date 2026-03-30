@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
     public static class AgilityEvaluator
     {
         private const double distance_cap = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25; // 1.25 circles distance between centers
-        private const double wide_angle_multiplier = 0.6;
+        private const double wide_angle_multiplier = 0.65;
 
         /// <summary>
         /// Evaluates the difficulty of fast aiming
