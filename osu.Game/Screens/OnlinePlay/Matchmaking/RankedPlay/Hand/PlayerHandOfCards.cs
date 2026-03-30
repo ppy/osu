@@ -152,7 +152,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.Repeat || Contracted)
+            if (e.Repeat || Contracted || Cards.Any(static c => c.CardDragged))
                 return false;
 
             switch (e.Key)
