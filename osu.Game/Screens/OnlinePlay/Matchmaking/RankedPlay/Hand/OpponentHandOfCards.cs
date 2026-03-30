@@ -31,10 +31,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             float maxExtent = TotalLayoutWidth / 2;
 
             float x = float.Clamp(dragPosition.X, -maxExtent, maxExtent);
+            float arcRotation = GetArcRotation(x);
 
-            scale = HOVER_SCALE;
+            position = GetArcPosition(x) + GetCardUpwardsDirection(arcRotation) * 60;
             rotation = 0;
-            position = GetArcPosition(x) + GetCardUpwardsDirection(rotation) * 60;
+            scale = HOVER_SCALE;
         }
     }
 }
