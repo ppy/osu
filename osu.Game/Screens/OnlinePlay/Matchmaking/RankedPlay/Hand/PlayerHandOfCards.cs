@@ -199,8 +199,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             int newIndex = currentIndex + direction;
 
             if (newIndex < 0)
-                newIndex = Cards.Count() - 1;
-            else if (newIndex >= Cards.Count())
+                newIndex = Cards.Count - 1;
+            else if (newIndex >= Cards.Count)
                 newIndex = 0;
 
             focusCard(newIndex);
