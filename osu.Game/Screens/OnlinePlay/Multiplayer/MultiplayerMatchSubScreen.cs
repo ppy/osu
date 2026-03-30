@@ -596,7 +596,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     break;
 
                 default:
-                    targetScreen.Push(new MultiplayerPlayerLoader(() => new MultiplayerPlayer(room, new PlaylistItem(client.Room.CurrentPlaylistItem), users)));
+                    if (!client.IsReferee)
+                        targetScreen.Push(new MultiplayerPlayerLoader(() => new MultiplayerPlayer(room, new PlaylistItem(client.Room.CurrentPlaylistItem), users)));
                     break;
             }
         }
