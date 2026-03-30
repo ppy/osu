@@ -149,15 +149,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         {
             base.OnEntering(previous);
 
-            int delay = 0;
+            const double stagger = 50;
+            double delay = 0;
 
             foreach (var item in matchInfo.PlayerCards)
             {
+                double currentDelay = delay;
+
                 if ((previous as DiscardScreen)?.CenterRow.RemoveCard(item, out var card, out var drawQuad) == true)
                 {
                     playerHand.AddCard(card, c =>
                     {
                         c.MatchScreenSpaceDrawQuad(drawQuad, playerHand);
+                        c.DelayMovementOnEntering(currentDelay);
                     });
                 }
                 else
@@ -165,25 +169,31 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     playerHand.AddCard(item, c =>
                     {
                         c.Position = ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, DrawHeight), playerHand);
+                        c.DelayMovementOnEntering(currentDelay);
                     });
                     Scheduler.AddDelayed(() =>
                     {
                         SamplePlaybackHelper.PlayWithRandomPitch(cardAddSample);
-                    }, 50 * delay);
-                    delay++;
+                    }, delay);
                 }
+
+                delay += stagger;
             }
+
+            delay = 0;
 
             foreach (var item in matchInfo.OpponentCards)
             {
+                double currentDelay = delay;
+
                 opponentHand.AddCard(item, c =>
                 {
                     c.Position = ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), playerHand);
+                    c.DelayMovementOnEntering(currentDelay);
                 });
-            }
 
-            playerHand.UpdateLayout(stagger: 50);
-            opponentHand.UpdateLayout(stagger: 50);
+                delay += 50;
+            }
         }
 
         private void onCountdownStarted(MultiplayerCountdown countdown) => Scheduler.Add(() =>

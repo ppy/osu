@@ -34,6 +34,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         [Resolved]
         private RankedPlayMatchInfo matchInfo { get; set; } = null!;
 
+        private Sample? cardAddSample;
+
         private const int card_play_samples = 2;
         private Sample?[]? cardPlaySamples;
 
@@ -69,12 +71,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
-                    Y = 100,
-                    HoverYOffset = 90
                 },
                 new HandReplayRecorder(playerHand),
                 new HandReplayPlayer(matchInfo.OpponentId, opponentHand),
             ];
+
+            cardAddSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/card-add-1");
 
             cardPlaySamples = new Sample?[card_play_samples];
             for (int i = 0; i < card_play_samples; i++)
@@ -85,24 +87,49 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         {
             base.OnEntering(previous);
 
-            foreach (var card in matchInfo.PlayerCards)
+            const double stagger = 50;
+            double delay = 0;
+
+            foreach (var item in matchInfo.PlayerCards)
             {
-                playerHand.AddCard(card, c =>
+                double currentDelay = delay;
+
+                if ((previous as DiscardScreen)?.CenterRow.RemoveCard(item, out var card, out var drawQuad) == true)
                 {
-                    c.Position = ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, DrawHeight), playerHand);
-                });
+                    playerHand.AddCard(card, c =>
+                    {
+                        c.MatchScreenSpaceDrawQuad(drawQuad, playerHand);
+                        c.DelayMovementOnEntering(currentDelay);
+                    });
+                }
+                else
+                {
+                    playerHand.AddCard(item, c =>
+                    {
+                        c.Position = ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, DrawHeight), playerHand);
+                        c.DelayMovementOnEntering(currentDelay);
+                    });
+                    Scheduler.AddDelayed(() =>
+                    {
+                        SamplePlaybackHelper.PlayWithRandomPitch(cardAddSample);
+                    }, delay);
+                }
+
+                delay += stagger;
             }
+
+            delay = 0;
 
             foreach (var card in matchInfo.OpponentCards)
             {
+                double currentDelay = delay;
+
                 opponentHand.AddCard(card, c =>
                 {
                     c.Position = ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), playerHand);
+                    c.DelayMovementOnEntering(currentDelay);
                 });
             }
-
-            playerHand.UpdateLayout(stagger: 50);
-            opponentHand.UpdateLayout(stagger: 50);
         }
 
         protected override void LoadComplete()

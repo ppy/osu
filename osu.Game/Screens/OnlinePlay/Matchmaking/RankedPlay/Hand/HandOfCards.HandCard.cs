@@ -63,17 +63,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 set => State = State with { Order = value };
             }
 
+            public CardLayout LayoutTarget { get; set; }
+
             [Resolved]
             private HandOfCards handOfCards { get; set; } = null!;
-
-            private float previousX;
-
-            private readonly FloatSpring rotationSpring = new FloatSpring
-            {
-                NaturalFrequency = 2f,
-                Damping = 0.4f,
-                Response = 1.2f,
-            };
 
             public readonly RankedPlayCard Card;
 
@@ -91,13 +84,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
                 AddInternal(Card = card);
 
-                Anchor = Anchor.BottomCentre;
-                Origin = Anchor.BottomCentre;
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
+
+                positionSpring.Current = positionSpring.PreviousTarget = Position;
+                scaleSpring.Current = scaleSpring.PreviousTarget = 1;
+                rotationSpring.Current = rotationSpring.PreviousTarget = Rotation;
 
                 state.BindValueChanged(OnStateChanged, true);
             }
@@ -121,7 +118,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
                 rotationSpring.Parameters = state.NewValue.Dragged
                     ? new SpringParameters(2f, 0.4f, 1.2f)
-                    : new SpringParameters(3f, 0.9f, 0.8f);
+                    : new SpringParameters(3f, 0.75f, 0.8f);
             }
 
             public RankedPlayCard Detach()
@@ -134,26 +131,78 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 return Card;
             }
 
+            private readonly Vector2Spring positionSpring = new Vector2Spring
+            {
+                NaturalFrequency = 4f,
+                Response = 1.1f,
+                Damping = 0.8f
+            };
+
+            private readonly FloatSpring rotationSpring = new FloatSpring
+            {
+                NaturalFrequency = 2f,
+                Damping = 0.4f,
+                Response = 1.2f,
+            };
+
+            private readonly FloatSpring scaleSpring = new FloatSpring
+            {
+                NaturalFrequency = 4f,
+                Response = 1.3f,
+                Damping = 0.75f,
+                Current = 1,
+                PreviousTarget = 1,
+            };
+
+            public float MovementSpeed = 1;
+
             protected override void Update()
             {
                 base.Update();
 
+                if (MovementSpeed > 0)
+                    Position = positionSpring.Update(Time.Elapsed * MovementSpeed, LayoutTarget.Position);
+                Scale = new Vector2(scaleSpring.Update(Time.Elapsed, LayoutTarget.Scale));
+
+                float targetRotation = LayoutTarget.Rotation;
+
+                if (CardDragged)
+                {
+                    targetRotation += positionSpring.Velocity.X * 0.006f;
+                }
+
+                Rotation = rotationSpring.Update(Time.Elapsed, targetRotation);
+
                 Card.Elevation = float.Lerp(CardHoveredOrDragged ? 1 : 0, Card.Elevation, (float)Math.Exp(-0.03f * Time.Elapsed));
+            }
 
-                if (CardDragged && Time.Elapsed > 0)
-                {
-                    float velocityX = (X - previousX) / (float)Time.Elapsed;
+            public void DelayMovementOnEntering(double delay)
+            {
+                const double approximate_time_until_position_reached = 200;
 
-                    float targetRotation = velocityX * 5;
+                MovementSpeed = 0;
+                this.Delay(delay)
+                    .Schedule(() => MovementSpeed = 0.7f)
+                    .Delay(approximate_time_until_position_reached)
+                    .Schedule(() => MovementSpeed = 1f);
+            }
 
-                    Card.Rotation = rotationSpring.Update(Time.Elapsed, targetRotation);
-                }
-                else
-                {
-                    Card.Rotation = rotationSpring.Update(Time.Elapsed, 0);
-                }
+            public void EnterFromSide(Vector2 position)
+            {
+                const double approximate_time_until_position_reached = 200;
 
-                previousX = X;
+                Position = position;
+
+                MovementSpeed = 0.5f;
+                positionSpring.Damping = 1f;
+
+                this.Delay(approximate_time_until_position_reached)
+                    .Schedule(() =>
+                    {
+                        MovementSpeed = 0.5f;
+                        positionSpring.Damping = 0.8f;
+                    });
+                ;
             }
         }
     }

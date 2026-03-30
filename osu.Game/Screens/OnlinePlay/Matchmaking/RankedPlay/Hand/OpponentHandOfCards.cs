@@ -26,16 +26,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             }
         }
 
-        protected override void CalculateDraggedCardLayout(Vector2 dragPosition, out Vector2 position, out float rotation, out float scale)
+        protected override CardLayout CalculateDraggedCardLayout(Vector2 dragPosition)
         {
             float maxExtent = TotalLayoutWidth / 2;
 
             float x = float.Clamp(dragPosition.X, -maxExtent, maxExtent);
             float arcRotation = GetArcRotation(x);
 
-            position = GetArcPosition(x) + GetCardUpwardsDirection(arcRotation) * 60;
-            rotation = 0;
-            scale = HOVER_SCALE;
+            return new CardLayout
+            {
+                Position = GetArcPosition(x) + GetCardUpwardsDirection(arcRotation) * 60,
+                Rotation = 0,
+                Scale = HOVER_SCALE,
+            };
         }
     }
 }

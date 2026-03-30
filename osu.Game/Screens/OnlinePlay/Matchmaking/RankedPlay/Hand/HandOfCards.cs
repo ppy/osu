@@ -26,7 +26,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
     {
         protected const float HOVER_SCALE = 1.2f;
 
-        private const float card_spacing = -20;
+        private const float card_spacing = -15;
 
         public IReadOnlyList<HandCard> Cards => cardContainer.Children;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
         /// How far a card slides upwards when hovered.
         /// Used for making sure a card moves entirely into frame when the hand is partially off-screen.
         /// </summary>
-        public float HoverYOffset = 15;
+        public float HoverYOffset = 35;
 
         /// <summary>
         /// If true, card layout will be flipped on both axes for a card hand placed at the top edge of the screen, while keeping the cards upright.
@@ -85,16 +85,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
             foreach (var card in cardContainer)
             {
-                card.Delay(delay)
-                    .MoveTo(new Vector2(0, Flipped ? -220 : 220), 400, Easing.OutExpo)
-                    .RotateTo(0, 400, Easing.OutExpo)
-                    .ScaleTo(1, 400, Easing.OutExpo);
+                Scheduler.AddDelayed(() =>
+                {
+                    card.LayoutTarget = new CardLayout
+                    {
+                        Position = new Vector2(0, (DrawHeight + RankedPlayCard.SIZE.Y + 10) / 2 * (Flipped ? -1 : 1)),
+                        Rotation = 0,
+                        Scale = 1,
+                    };
+                }, delay);
 
                 delay += 50;
             }
         }
-
-        private Anchor cardAnchor => Flipped ? Anchor.TopCentre : Anchor.BottomCentre;
 
         public void AddCard(RankedPlayCardWithPlaylistItem item, Action<HandCard>? setupAction = null) => AddCard(new RankedPlayCard(item), setupAction);
 
@@ -104,14 +107,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 return;
 
             var drawable = CreateHandCard(card);
-            drawable.Anchor = drawable.Origin = cardAnchor;
+
+            cardLookup[card.Item.Card] = drawable;
+
+            drawable.Position = GetArcPosition(0);
 
             if (card.Item.DisplayOrder != null)
                 drawable.Order = card.Item.DisplayOrder.Value;
             else if (cardContainer.Count > 0)
                 drawable.Order = cardContainer.Max(c => c.Order) + 1;
-
-            cardLookup[card.Item.Card] = drawable;
 
             cardContainer.Add(drawable);
             InvalidateLayout(drawOrder: true);
@@ -193,18 +197,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 drawOrderBacking.Invalidate();
         }
 
-        public void UpdateLayout(double stagger = 0)
-        {
-            updateLayout(stagger);
-            layoutBacking.Validate();
-        }
-
-        private void updateLayout(double stagger = 0)
+        private void updateLayout()
         {
             if (Contracted)
                 return;
-
-            double delay = 0;
 
             var cards = cardContainer.Children.OrderBy(static c => c.State.Order).ToArray();
 
@@ -214,24 +210,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             {
                 var card = cards[i];
 
-                Vector2 position;
-                float rotation;
-                float scale;
-
-                if (card.CardDragged)
-                    CalculateDraggedCardLayout(card.DragPosition, out position, out rotation, out scale);
-                else
-                    CalculateCardLayout(i, activeCardIndex, out position, out rotation, out scale);
+                var layout = card.CardDragged
+                    ? CalculateDraggedCardLayout(card.DragPosition)
+                    : CalculateCardLayout(i, activeCardIndex);
 
                 if (Flipped)
-                    position *= -1;
+                    layout.Position *= -1;
 
-                card.Delay(delay)
-                    .MoveTo(position, 300, Easing.OutExpo)
-                    .RotateTo(rotation, 300, Easing.OutExpo)
-                    .ScaleTo(scale, 400, Easing.OutElasticQuarter);
-
-                delay += stagger;
+                card.LayoutTarget = layout;
             }
         }
 
@@ -253,28 +239,32 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             return -1;
         }
 
-        protected void CalculateCardLayout(
-            int index,
-            int activeIndex,
-            out Vector2 position,
-            out float rotation,
-            out float scale)
+        protected CardLayout CalculateCardLayout(int index, int activeIndex)
         {
             float x = GetCardX(index, activeIndex);
 
-            position = GetArcPosition(x);
-            rotation = GetArcRotation(x);
-            scale = index == activeIndex ? HOVER_SCALE : 1;
+            var position = GetArcPosition(x);
+            float rotation = GetArcRotation(x);
 
             if (index == activeIndex)
                 position += GetCardUpwardsDirection(rotation) * HoverYOffset;
+
+            return new CardLayout
+            {
+                Position = position,
+                Rotation = rotation,
+                Scale = index == activeIndex ? HOVER_SCALE : 1,
+            };
         }
 
-        protected virtual void CalculateDraggedCardLayout(Vector2 dragPosition, out Vector2 position, out float rotation, out float scale)
+        protected virtual CardLayout CalculateDraggedCardLayout(Vector2 dragPosition)
         {
-            position = dragPosition;
-            rotation = 0;
-            scale = HOVER_SCALE;
+            return new CardLayout
+            {
+                Position = dragPosition,
+                Rotation = 0,
+                Scale = HOVER_SCALE,
+            };
         }
 
         /// <summary>
@@ -322,8 +312,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             return x;
         }
 
-        protected static Vector2 GetArcPosition(float x) =>
-            new Vector2(x, MathF.Pow(MathF.Abs(x / 250), 2) * 20 - 10);
+        protected Vector2 GetArcPosition(float x)
+        {
+            float offset = (DrawHeight - RankedPlayCard.SIZE.Y) / 2;
+
+            return new Vector2(x, MathF.Pow(MathF.Abs(x / 250), 2) * 20 + offset);
+        }
 
         protected static float GetArcRotation(float x) => x * 0.03f;
 
@@ -355,6 +349,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             }
 
             public void Sort() => SortInternal();
+        }
+
+        public struct CardLayout
+        {
+            public required Vector2 Position { get; set; }
+            public required float Rotation { get; set; }
+            public required float Scale { get; set; }
         }
 
         #endregion

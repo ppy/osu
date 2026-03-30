@@ -174,10 +174,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
             protected override bool OnDragStart(DragStartEvent e)
             {
-                ClearTransforms();
-                this.RotateTo(0, 400, Easing.Out)
-                    .ScaleTo(HOVER_SCALE, 400, Easing.Out);
-
                 dragOffset = DrawPosition + AnchorPosition - e.MouseDownPosition;
 
                 CardDragged = true;
