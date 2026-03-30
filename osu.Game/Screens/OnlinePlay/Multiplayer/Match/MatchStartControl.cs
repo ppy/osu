@@ -225,7 +225,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             // When the local user is the host and spectating the match, the ready button should be enabled only if any users are ready.
             if (localUser?.State == MultiplayerUserState.Spectating)
-                readyButton.Enabled.Value &= client.IsHost && newCountReady > 0 && currentMatchStartCountdown == null;
+                readyButton.Enabled.Value &= (client.IsHost || client.IsReferee) && newCountReady > 0 && currentMatchStartCountdown == null;
 
             // When the local user is not the host or a referee, the button should only be enabled when no match is in progress.
             if (!client.IsHost && !client.IsReferee)
