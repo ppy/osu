@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var currObj = (OsuDifficultyHitObject)current;
             var nextObj = (OsuDifficultyHitObject)current.Next(0);
 
-            double velocity = Math.Max(1, currObj.TailJumpDistance / currObj.AdjustedDeltaTime); // Only allow velocity to buff
+            double velocity = Math.Max(1, currObj.GetDistance(true) / currObj.AdjustedDeltaTime); // Only allow velocity to buff
 
             double currentVisibleObjectDensity = retrieveCurrentVisibleObjectDensity(currObj);
             double pastObjectDifficultyInfluence = getPastObjectDifficultyInfluence(currObj);
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (nextObj != null)
             {
                 // Reduce difficulty if movement to next object is small
-                futureObjectDifficultyInfluence *= DifficultyCalculationUtils.Smootherstep(nextObj.TailJumpDistance, 15, distance_influence_threshold);
+                futureObjectDifficultyInfluence *= DifficultyCalculationUtils.Smootherstep(nextObj.GetDistance(true), 15, distance_influence_threshold);
             }
 
             // Value higher note densities exponentially
@@ -134,7 +134,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var previousObj = (OsuDifficultyHitObject)currObj.Previous(0);
 
             // Buff perfect stacks only if current note is completely invisible at the time you click the previous note.
-            if (currObj.TailJumpDistance == 0 && currObj.OpacityAt(previousObj.BaseObject.StartTime, true) == 0 && previousObj.StartTime > currObj.StartTime - currObj.Preempt)
+            // Distance without slider is deliberately used since perfectly stacked slider heads should also be buffed
+            if (currObj.GetDistance(false) == 0 && currObj.OpacityAt(previousObj.BaseObject.StartTime, true) == 0 && previousObj.StartTime > currObj.StartTime - currObj.Preempt)
                 hiddenDifficulty += hidden_multiplier * 2500 / Math.Pow(currObj.AdjustedDeltaTime, 1.5); // Perfect stacks are harder the less time between notes
 
             return hiddenDifficulty;
@@ -149,7 +150,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // When aiming an object small distances mean previous objects may be cheesed, so it doesn't matter whether they were arranged confusingly.
-                loopDifficulty *= DifficultyCalculationUtils.Smootherstep(loopObj.TailJumpDistance, 15, distance_influence_threshold);
+                loopDifficulty *= DifficultyCalculationUtils.Smootherstep(loopObj.GetDistance(true), 15, distance_influence_threshold);
 
                 // Account less for objects close to the max reading window
                 double timeBetweenCurrAndLoopObj = currObj.StartTime - loopObj.StartTime;
@@ -245,7 +246,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                         angleDifferenceAlternating = double.Lerp(Math.PI, 0.1 * angleDifferenceAlternating, weight);
                     }
 
-                    double stackFactor = DifficultyCalculationUtils.Smootherstep(loopObj.TailJumpDistance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
+                    double stackFactor = DifficultyCalculationUtils.Smootherstep(loopObj.GetDistance(true), 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
 
                     constantAngleCount += Math.Cos(3 * Math.Min(double.DegreesToRadians(30), Math.Min(angleDifference, angleDifferenceAlternating) * stackFactor)) * longIntervalFactor;
                 }
