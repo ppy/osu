@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
 
             double currDistance = osuCurrObj.GetDistance(withSliderTravelDistance);
-            double prevDistance = withSliderTravelDistance ? osuLastObj.TailJumpDistance : osuLastObj.GetDistance(false);
+            double prevDistance = osuLastObj.GetDistance(withSliderTravelDistance);
 
             double currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
             double prevVelocity = prevDistance / osuLastObj.AdjustedDeltaTime;

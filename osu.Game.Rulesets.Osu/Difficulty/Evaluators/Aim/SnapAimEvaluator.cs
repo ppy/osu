@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
             double currDistance = osuCurrObj.GetDistance(withSliderTravelDistance);
-            double prevDistance = withSliderTravelDistance ? osuLastObj.TailJumpDistance : osuLastObj.GetDistance(false);
+            double prevDistance = osuLastObj.GetDistance(withSliderTravelDistance);
 
             double currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
             double prevVelocity = prevDistance / osuLastObj.AdjustedDeltaTime;
