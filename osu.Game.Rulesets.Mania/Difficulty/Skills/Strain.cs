@@ -44,7 +44,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             overallStrain = applyDecay(overallStrain, maniaCurrent.HeadDeltaTime, overall_decay_base);
             overallStrain += OverallStrainEvaluator.EvaluateDifficultyOf(current);
 
-            // By subtracting CurrentStrain, this skill effectively only considers the maximum strain of any one hitobject within each strain section.
             return highestIndividualStrain + overallStrain;
         }
 
