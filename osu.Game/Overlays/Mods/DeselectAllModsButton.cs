@@ -15,8 +15,9 @@ namespace osu.Game.Overlays.Mods
         private readonly Bindable<IReadOnlyList<Mod>> selectedMods = new Bindable<IReadOnlyList<Mod>>();
 
         public DeselectAllModsButton(ModSelectOverlay modSelectOverlay)
-            : base(ModSelectOverlay.BUTTON_WIDTH)
         {
+            Width = ModSelectOverlay.BUTTON_WIDTH;
+
             Text = CommonStrings.DeselectAll;
             Action = modSelectOverlay.DeselectAll;
 
@@ -32,7 +33,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateEnabledState()
         {
-            Enabled.Value = selectedMods.Value.Any();
+            Enabled.Value = selectedMods.Value.Any(m => m.Type != ModType.System);
         }
     }
 }

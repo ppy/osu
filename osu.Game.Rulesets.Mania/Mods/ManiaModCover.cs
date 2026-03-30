@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             typeof(ManiaModFadeIn)
         }).ToArray();
 
-        public override bool Ranked => false;
+        public override bool Ranked => true;
 
         public override bool ValidForFreestyleAsRequiredMod => false;
 

@@ -49,7 +49,8 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
 
         public Drawable Icon { get; private set; } = null!;
 
-        public DrawableTernaryButton()
+        public DrawableTernaryButton(HoverSampleSet? hoverSampleSet = HoverSampleSet.Button)
+            : base(hoverSampleSet)
         {
             RelativeSizeAxes = Axes.X;
         }

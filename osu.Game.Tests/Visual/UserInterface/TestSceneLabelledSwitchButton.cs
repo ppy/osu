@@ -2,14 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
     public partial class TestSceneLabelledSwitchButton : OsuTestScene
     {
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
+
         [TestCase(false)]
         [TestCase(true)]
         public void TestSwitchButton(bool hasDescription) => createSwitchButton(hasDescription);

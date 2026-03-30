@@ -9,7 +9,7 @@ using UIKit;
 namespace osu.iOS
 {
     [Register("AppDelegate")]
-    public class AppDelegate : GameApplicationDelegate
+    public class AppDelegate : GameApplicationDelegate, IUIApplicationDelegate
     {
         private UIInterfaceOrientationMask? defaultOrientationsMask;
         private UIInterfaceOrientationMask? orientations;
@@ -41,7 +41,7 @@ namespace osu.iOS
 
         protected override Framework.Game CreateGame() => new OsuGameIOS(this);
 
-        public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations(UIApplication application, UIWindow forWindow)
+        public UIInterfaceOrientationMask GetSupportedInterfaceOrientations(UIApplication application, UIWindow forWindow)
         {
             if (orientations != null)
                 return orientations.Value;

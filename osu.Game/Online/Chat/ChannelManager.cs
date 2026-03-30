@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -69,7 +70,9 @@ namespace osu.Game.Online.Chat
         [Resolved]
         private UserLookupCache users { get; set; }
 
+        private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+        private readonly IBindableList<APIRelation> localUserBlocks = new BindableList<APIRelation>();
         private ScheduledDelegate scheduledAck;
 
         private IChatClient chatClient = null!;
@@ -93,8 +96,30 @@ namespace osu.Game.Online.Chat
             chatClient.PresenceReceived += () => Schedule(initializeChannels);
             chatClient.RequestPresence();
 
+            localUser.BindTo(api.LocalUser);
+            localUser.BindValueChanged(userChanged);
+
             apiState.BindTo(api.State);
             apiState.BindValueChanged(_ => SendAck(), true);
+
+            localUserBlocks.BindTo(api.LocalUserState.Blocks);
+            localUserBlocks.BindCollectionChanged((_, args) => Schedule(() => onBlocksChanged(args)));
+        }
+
+        private void userChanged(ValueChangedEvent<APIUser> userChange)
+        {
+            if (userChange.OldValue?.Equals(userChange.NewValue) == true)
+                return;
+
+            CurrentChannel.Value = null;
+
+            foreach (var joinedChannel in joinedChannels)
+                joinedChannel.Joined.Value = false;
+
+            joinedChannels.Clear();
+            // additionally clear the history of last joined channels so that the new user can't reopen the old user's channels
+            // (would likely fail web-side on perms anyway, but why even get that far)
+            closedChannels.Clear();
         }
 
         /// <summary>
@@ -311,8 +336,9 @@ namespace osu.Game.Online.Chat
         private void addMessages(List<Message> messages)
         {
             var channels = JoinedChannels.ToList();
+            var blockedUserIds = localUserBlocks.Select(b => b.TargetID).ToList();
 
-            foreach (var group in messages.GroupBy(m => m.ChannelId))
+            foreach (var group in messages.Where(m => !blockedUserIds.Contains(m.SenderId)).GroupBy(m => m.ChannelId))
                 channels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
 
             lastSilenceMessageId ??= messages.LastOrDefault()?.Id;
@@ -639,6 +665,18 @@ namespace osu.Game.Online.Chat
             req.Failure += e => Logger.Log($"Failed to mark channel {channel} up to '{message}' as read ({e.Message})", LoggingTarget.Network);
 
             api.Queue(req);
+        }
+
+        private void onBlocksChanged(NotifyCollectionChangedEventArgs args)
+        {
+            if (args.Action != NotifyCollectionChangedAction.Add)
+                return;
+
+            foreach (APIRelation newBlock in args.NewItems!)
+            {
+                foreach (var channel in joinedChannels)
+                    channel.RemoveMessagesFromUser(newBlock.TargetID);
+            }
         }
 
         protected override void Dispose(bool isDisposing)
