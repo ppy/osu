@@ -58,10 +58,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
         {
             base.Update();
 
-            if (!cardOrderBacking.IsValid)
+            if (!drawOrderBacking.IsValid)
             {
                 cardContainer.Sort();
-                cardOrderBacking.Validate();
+                drawOrderBacking.Validate();
             }
 
             if (!layoutBacking.IsValid)
@@ -114,7 +114,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             cardLookup[card.Item.Card] = drawable;
 
             cardContainer.Add(drawable);
-            InvalidateLayout(order: true);
+            InvalidateLayout(drawOrder: true);
 
             setupAction?.Invoke(drawable);
         }
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 return false;
 
             cardContainer.Remove(drawable, true);
-            InvalidateLayout(order: true);
+            InvalidateLayout(drawOrder: true);
             return true;
         }
 
@@ -151,7 +151,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             card = drawable.Detach();
 
             cardContainer.Remove(drawable, true);
-            InvalidateLayout(order: true);
+            InvalidateLayout(drawOrder: true);
 
             return true;
         }
@@ -160,7 +160,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
         protected virtual void OnCardStateChanged(HandCard card, ValueChangedEvent<RankedPlayCardState> evt)
         {
-            InvalidateLayout(order: affectsDrawOrder(evt));
+            InvalidateLayout(drawOrder: affectsDrawOrder(evt));
 
             // hovered state can be caused by keyboard focus, in which case we have to clean up after the other cards manually
             if (evt.NewValue.Hovered)
@@ -173,26 +173,24 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             }
         }
 
-        private static bool affectsDrawOrder(ValueChangedEvent<RankedPlayCardState> evt)
-        {
-            return evt.OldValue.Order != evt.NewValue.Order ||
-                   evt.OldValue.Dragged != evt.NewValue.Dragged;
-        }
+        private static bool affectsDrawOrder(ValueChangedEvent<RankedPlayCardState> evt) =>
+            evt.OldValue.Order != evt.NewValue.Order ||
+            evt.OldValue.Dragged != evt.NewValue.Dragged;
 
         #region Layout
 
         private readonly Cached layoutBacking = new Cached();
-        private readonly Cached cardOrderBacking = new Cached();
+        private readonly Cached drawOrderBacking = new Cached();
 
         /// <summary>
         /// Invalidates the layout of the hand of cards, causing a relayout to occur.
         /// </summary>
-        /// <param name="order">If set to true, also invalidates the order of the cards.</param>
-        protected void InvalidateLayout(bool order = false)
+        /// <param name="drawOrder">If set to true, also invalidates the draw order of the cards.</param>
+        protected void InvalidateLayout(bool drawOrder = false)
         {
             layoutBacking.Invalidate();
-            if (order)
-                cardOrderBacking.Invalidate();
+            if (drawOrder)
+                drawOrderBacking.Invalidate();
         }
 
         public void UpdateLayout(double stagger = 0)
