@@ -128,7 +128,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
             cardContainer.Remove(drawable, true);
             InvalidateLayout(order: true);
-            return false;
+            return true;
         }
 
         /// <summary>
