@@ -81,6 +81,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
+            ];
+
+            CenterColumn.Children =
+            [
                 discardButton = new ShearedButton
                 {
                     Name = "Discard Button",
@@ -89,11 +93,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     Width = 150,
                     Action = onDiscardButtonClicked,
                     Enabled = { Value = true },
-                }
-            ];
-
-            CenterColumn.Children =
-            [
+                },
                 playerHand = new PlayerHandOfCards
                 {
                     Anchor = Anchor.BottomCentre,
