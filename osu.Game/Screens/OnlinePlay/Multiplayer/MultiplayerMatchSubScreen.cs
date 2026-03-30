@@ -921,8 +921,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.Room.CanAddPlaylistItems(client.LocalUser) != true)
                 return;
 
-            // If there's only one playlist item and we are the host, assume we want to change it. Else add a new one.
-            PlaylistItem? itemToEdit = client.IsHost && room.Playlist.Count == 1 ? room.Playlist.Single() : null;
+            // If there's only one playlist item and we are the host / a referee, assume we want to change it. Else add a new one.
+            PlaylistItem? itemToEdit = (client.IsHost || client.IsReferee) && room.Playlist.Count == 1 ? room.Playlist.Single() : null;
 
             ShowSongSelect(itemToEdit);
 
