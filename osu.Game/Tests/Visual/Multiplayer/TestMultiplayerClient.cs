@@ -260,7 +260,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 },
                 Playlist = ServerAPIRoom.Playlist.Select(item => new MultiplayerPlaylistItem(item)).ToList(),
                 Users = { localUser },
-                Host = localUser
+                Host = localUser,
+                ChannelID = ServerAPIRoom.ChannelId
             };
 
             await changeMatchType(ServerRoom.Settings.MatchType).ConfigureAwait(false);
