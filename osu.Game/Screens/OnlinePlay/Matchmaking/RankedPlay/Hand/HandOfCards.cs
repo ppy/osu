@@ -42,6 +42,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
         /// </summary>
         protected virtual bool Flipped => false;
 
+        /// <summary>
+        /// Position to insert cards at so they are start moving from the bottom relative to the card layout
+        /// </summary>
+        public Vector2 BottomCardInsertPosition => new Vector2(0, (DrawHeight + RankedPlayCard.SIZE.Y) / 2 * (Flipped ? -1 : 1));
+
         private readonly CardContainer cardContainer;
 
         private readonly Dictionary<RankedPlayCardItem, HandCard> cardLookup = new Dictionary<RankedPlayCardItem, HandCard>();

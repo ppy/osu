@@ -179,8 +179,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         {
             base.OnEntering(previous);
 
-            var screenBottomCenter = new Vector2(DrawWidth / 2, DrawHeight);
-
             double delay = 0;
             const double stagger = 50;
 
@@ -190,7 +188,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
                 playerHand.AddCard(card, c =>
                 {
-                    c.Position = ToSpaceOfOtherDrawable(screenBottomCenter, playerHand) + new Vector2(0, playerHand.Height / 2);
+                    c.Position = playerHand.BottomCardInsertPosition;
                     c.DelayMovementOnEntering(currentDelay);
                 });
 
@@ -299,7 +297,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             {
                 playerHand.AddCard(card, d =>
                 {
-                    d.EnterFromSide(ToSpaceOfOtherDrawable(new Vector2(DrawWidth, DrawHeight * 0.5f), playerHand));
+                    // card should enter from centre-right of screen
+                    var cardEnterPosition = ToSpaceOfOtherDrawable(new Vector2(DrawWidth, DrawHeight * 0.5f), playerHand);
+                    d.SetupMovementForDrawnCard(cardEnterPosition);
                 });
 
                 SamplePlaybackHelper.PlayWithRandomPitch(cardAddSample);

@@ -106,7 +106,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 {
                     playerHand.AddCard(item, c =>
                     {
-                        c.Position = ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, DrawHeight), playerHand);
+                        c.Position = playerHand.BottomCardInsertPosition;
                         c.DelayMovementOnEntering(currentDelay);
                     });
                     Scheduler.AddDelayed(() =>
@@ -126,9 +126,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
                 opponentHand.AddCard(card, c =>
                 {
-                    c.Position = ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), playerHand);
+                    c.Position = opponentHand.BottomCardInsertPosition;
                     c.DelayMovementOnEntering(currentDelay);
                 });
+
+                delay += 50;
             }
         }
 

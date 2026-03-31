@@ -192,6 +192,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 }
             }
 
+            /// <summary>
+            /// Delays the time until a card starts to move to its layout position, intended to use for staggered movement when adding multiple cards to the hand at once.
+            /// Movement is slowed down a bit while it's moving towards the target position to make the transition appear less abrupt.
+            /// </summary>
             public void DelayMovementOnEntering(double delay)
             {
                 const double approximate_time_until_position_reached = 200;
@@ -211,7 +215,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                     });
             }
 
-            public void EnterFromSide(Vector2 position)
+            /// <summary>
+            /// Makes the card move towards its layout position from a given <paramref name="position"/> and updates
+            /// movement parameters so the card moves towards it's target position more slowly and less springy.
+            /// </summary>
+            public void SetupMovementForDrawnCard(Vector2 position)
             {
                 const double approximate_time_until_position_reached = 200;
 
