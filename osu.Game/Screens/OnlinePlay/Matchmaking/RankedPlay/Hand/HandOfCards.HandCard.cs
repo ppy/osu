@@ -1,12 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Utils;
 using osu.Game.Online.RankedPlay;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
 using osuTK;
@@ -188,7 +188,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
                     Rotation = rotationSpring.Update(Time.Elapsed, targetRotation);
 
-                    Card.Elevation = float.Lerp(CardHoveredOrDragged ? 1 : 0, Card.Elevation, (float)Math.Exp(-0.03f * Time.Elapsed));
+                    Card.Elevation = (float)Interpolation.DampContinuously(Card.Elevation, CardHoveredOrDragged ? 1 : 0, 25, Time.Elapsed);
                 }
             }
 
