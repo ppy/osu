@@ -143,12 +143,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 return Card;
             }
 
-            private readonly Vector2Spring positionSpring = new Vector2Spring
+            private bool updateMovement = true;
+
+            private static readonly SpringParameters default_position_spring_parameters = new SpringParameters
             {
                 NaturalFrequency = 4f,
                 Response = 1.1f,
                 Damping = 0.8f
             };
+
+            private readonly Vector2Spring positionSpring = new Vector2Spring { Parameters = default_position_spring_parameters };
 
             private readonly FloatSpring rotationSpring = new FloatSpring
             {
@@ -166,37 +170,45 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 PreviousTarget = 1,
             };
 
-            public float MovementSpeed = 1;
-
             protected override void Update()
             {
                 base.Update();
 
-                if (MovementSpeed > 0)
-                    Position = positionSpring.Update(Time.Elapsed * MovementSpeed, LayoutTarget.Position);
-                Scale = new Vector2(scaleSpring.Update(Time.Elapsed, LayoutTarget.Scale));
-
-                float targetRotation = LayoutTarget.Rotation;
-
-                if (CardDragged)
+                if (updateMovement)
                 {
-                    targetRotation += positionSpring.Velocity.X * 0.006f;
+                    Position = positionSpring.Update(Time.Elapsed, LayoutTarget.Position);
+                    Scale = new Vector2(scaleSpring.Update(Time.Elapsed, LayoutTarget.Scale));
+
+                    float targetRotation = LayoutTarget.Rotation;
+
+                    if (CardDragged)
+                    {
+                        targetRotation += positionSpring.Velocity.X * 0.006f;
+                    }
+
+                    Rotation = rotationSpring.Update(Time.Elapsed, targetRotation);
+
+                    Card.Elevation = float.Lerp(CardHoveredOrDragged ? 1 : 0, Card.Elevation, (float)Math.Exp(-0.03f * Time.Elapsed));
                 }
-
-                Rotation = rotationSpring.Update(Time.Elapsed, targetRotation);
-
-                Card.Elevation = float.Lerp(CardHoveredOrDragged ? 1 : 0, Card.Elevation, (float)Math.Exp(-0.03f * Time.Elapsed));
             }
 
             public void DelayMovementOnEntering(double delay)
             {
                 const double approximate_time_until_position_reached = 200;
 
-                MovementSpeed = 0;
+                updateMovement = false;
+
                 this.Delay(delay)
-                    .Schedule(() => MovementSpeed = 0.7f)
+                    .Schedule(() =>
+                    {
+                        updateMovement = true;
+                        positionSpring.NaturalFrequency = 2.5f;
+                    })
                     .Delay(approximate_time_until_position_reached)
-                    .Schedule(() => MovementSpeed = 1f);
+                    .Schedule(() =>
+                    {
+                        positionSpring.Parameters = default_position_spring_parameters;
+                    });
             }
 
             public void EnterFromSide(Vector2 position)
@@ -205,15 +217,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
                 Position = position;
 
-                MovementSpeed = 0.5f;
+                positionSpring.NaturalFrequency = 2f;
                 positionSpring.Damping = 1f;
 
-                this.Delay(approximate_time_until_position_reached)
-                    .Schedule(() =>
-                    {
-                        MovementSpeed = 0.5f;
-                        positionSpring.Damping = 0.8f;
-                    });
+                Scheduler.AddDelayed(() => positionSpring.Parameters = default_position_spring_parameters, approximate_time_until_position_reached);
             }
         }
     }
