@@ -9,7 +9,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Input;
-using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -19,7 +18,6 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
-using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -59,15 +57,11 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly BindableDouble configScrollSpeed = new BindableDouble();
         private readonly Bindable<ManiaMobileLayout> mobileLayout = new Bindable<ManiaMobileLayout>();
         private readonly Bindable<bool> touchOverlay = new Bindable<bool>();
-        public double CurrentTimeRange => TimeRange.Value;
 
         // Stores the current speed adjustment active in gameplay.
         private readonly Track speedAdjustmentTrack = new TrackVirtual(0);
 
         private ISkinSource currentSkin = null!;
-
-        [Resolved]
-        private GameHost gameHost { get; set; } = null!;
 
         public DrawableManiaRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
             : base(ruleset, beatmap, mods)
@@ -142,7 +136,6 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override void AdjustScrollSpeed(int amount) => configScrollSpeed.Value += amount;
 
         private ScheduledDelegate? pendingSkinChange;
-        private float hitPosition;
 
         private void onSkinChange()
         {
@@ -154,10 +147,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private void skinChanged()
         {
-            hitPosition = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(
-                              new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HitPosition))?.Value
-                          ?? Stage.HIT_TARGET_POSITION;
-
             pendingSkinChange = null;
         }
 
