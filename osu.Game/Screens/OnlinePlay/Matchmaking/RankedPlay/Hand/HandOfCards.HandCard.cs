@@ -116,9 +116,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                         break;
                 }
 
-                rotationSpring.Parameters = state.NewValue.Dragged
-                    ? new SpringParameters(2f, 0.4f, 1.2f)
-                    : new SpringParameters(3f, 0.75f, 0.8f);
+                if (state.NewValue.Dragged)
+                {
+                    // while card is being dragged card should slowly swing from side to side,
+                    // so frequency is lowered and elasticity is increased
+                    rotationSpring.NaturalFrequency = 2f;
+                    rotationSpring.Damping = 0.4f;
+                    rotationSpring.Response = 1.2f;
+                }
+                else
+                {
+                    // otherwise rotation should be more snappy and not feel elastic
+                    rotationSpring.NaturalFrequency = 3f;
+                    rotationSpring.Damping = 0.75f;
+                    rotationSpring.Response = 0.8f;
+                }
             }
 
             public RankedPlayCard Detach()

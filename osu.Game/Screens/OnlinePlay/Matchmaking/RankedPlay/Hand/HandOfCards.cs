@@ -202,6 +202,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             if (Contracted)
                 return;
 
+            // card container draws dragged card on top so we need to sort those separately
             var cards = cardContainer.Children.OrderBy(static c => c.State.Order).ToArray();
 
             int activeCardIndex = GetActiveCardIndex(cards);
@@ -312,6 +313,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             return x;
         }
 
+        /// <summary>
+        /// Calculates the position of a card at a given <paramref name="x" /> coordinate so all cards are laid out in an arc
+        /// </summary>
         protected Vector2 GetArcPosition(float x)
         {
             float offset = (DrawHeight - RankedPlayCard.SIZE.Y) / 2;
@@ -319,6 +323,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             return new Vector2(x, MathF.Pow(MathF.Abs(x / 250), 2) * 20 + offset);
         }
 
+        /// <summary>
+        /// Calculates the rotation of a card at a given <paramref name="x"/> coordinate
+        /// </summary>
         protected static float GetArcRotation(float x) => x * 0.03f;
 
         protected static Vector2 GetCardUpwardsDirection(float rotation)
@@ -334,6 +341,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             {
                 if (x is HandCard c1 && y is HandCard c2)
                 {
+                    // dragged cards should always be drawn on top
                     if (c1.CardDragged)
                         return 1;
 
