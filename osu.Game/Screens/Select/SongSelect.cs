@@ -560,6 +560,9 @@ namespace osu.Game.Screens.Select
             if (Beatmap.IsDefault)
                 return;
 
+            // disables input right before entering beatmap gameplay
+            FilterControl.RequestFocus(false);
+
             startAction();
         }
 
@@ -669,6 +672,9 @@ namespace osu.Game.Screens.Select
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
+            // allows keyboard input after returning to song select
+            FilterControl.RequestFocus(true);
+
             base.OnResuming(e);
 
             this.FadeIn(fade_duration, Easing.OutQuint);
@@ -1037,6 +1043,7 @@ namespace osu.Game.Screens.Select
             switch (e.Action)
             {
                 case GlobalAction.Select:
+
                     // in most circumstances this is handled already by the carousel itself, but there are cases where it will not be.
                     // one of which is filtering out all visible beatmaps and attempting to start gameplay.
                     // in that case, users still expect a `Select` press to advance to gameplay anyway, using the ambient selected beatmap if there is one,

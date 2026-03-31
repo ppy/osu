@@ -336,7 +336,10 @@ namespace osu.Game.Screens.Select
         {
             searchTextBox.Current.Value = query;
         }
-
+        public void RequestFocus(bool HoldFocus)
+        {
+            searchTextBox.HoldFocus = HoldFocus;
+        }
         protected override void PopIn()
         {
             this.MoveToX(0, SongSelect.ENTER_DURATION, Easing.OutQuint)
