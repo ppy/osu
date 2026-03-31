@@ -389,6 +389,16 @@ namespace osu.Game.Online.Spectator
             if (pendingFrames.Count == 0)
                 return;
 
+            if (!isPlaying)
+            {
+                // it is possible for this to happen if the `BeginPlayingInternal()` call takes a long time,
+                // the client accumulates a purgeable bundle of frames in the meantime,
+                // and then `BeginPlayingInternal()` finally fails and `clearScoreState()` is called to abort the streaming session.
+                Logger.Log($"{nameof(SpectatorClient)} dropping pending frames as the user is no longer considered to be playing.");
+                pendingFrames.Clear();
+                return;
+            }
+
             Debug.Assert(currentScore != null);
             Debug.Assert(currentScoreProcessor != null);
 
