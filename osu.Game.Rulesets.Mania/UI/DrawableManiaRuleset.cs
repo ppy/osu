@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
+using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -57,6 +58,8 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly BindableDouble configScrollSpeed = new BindableDouble();
         private readonly Bindable<ManiaMobileLayout> mobileLayout = new Bindable<ManiaMobileLayout>();
         private readonly Bindable<bool> touchOverlay = new Bindable<bool>();
+
+        public double TargetTimeRange { get; protected set; }
 
         // Stores the current speed adjustment active in gameplay.
         private readonly Track speedAdjustmentTrack = new TrackVirtual(0);
@@ -106,10 +109,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 if (!AllowScrollSpeedAdjustment)
                     return;
 
-                TimeRange.Value = ComputeScrollTime(speed.NewValue);
+                TargetTimeRange = ComputeScrollTime(speed.NewValue);
             });
 
-            TimeRange.Value = ComputeScrollTime(configScrollSpeed.Value);
+            TimeRange.Value = TargetTimeRange = ComputeScrollTime(configScrollSpeed.Value);
 
             Config.BindWith(ManiaRulesetSetting.MobileLayout, mobileLayout);
             mobileLayout.BindValueChanged(_ => updateMobileLayout(), true);
@@ -135,7 +138,14 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override void AdjustScrollSpeed(int amount) => configScrollSpeed.Value += amount;
 
+        protected override void Update()
+        {
+            base.Update();
+            updateTimeRange();
+        }
+
         private ScheduledDelegate? pendingSkinChange;
+        private float hitPosition;
 
         private void onSkinChange()
         {
@@ -147,7 +157,22 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private void skinChanged()
         {
+            hitPosition = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(
+                              new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.HitPosition))?.Value
+                          ?? Stage.HIT_TARGET_POSITION;
+
             pendingSkinChange = null;
+        }
+
+        private void updateTimeRange()
+        {
+            const float length_to_default_hit_position = 768 - LegacyManiaSkinConfiguration.DEFAULT_HIT_POSITION;
+            float lengthToHitPosition = 768 - hitPosition;
+
+            // This scaling factor preserves the scroll speed as the scroll length varies from changes to the hit position.
+            float scale = lengthToHitPosition / length_to_default_hit_position;
+
+            TimeRange.Value = TargetTimeRange * speedAdjustmentTrack.AggregateTempo.Value * speedAdjustmentTrack.AggregateFrequency.Value * scale;
         }
 
         /// <summary>
