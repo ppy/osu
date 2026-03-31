@@ -12,7 +12,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Localisation;
-using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -285,8 +284,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         private void cardAdded(RankedPlayCardWithPlaylistItem card)
         {
-            Logger.Log("Card added");
-
             if (discardedCards.Count > 0)
             {
                 playDiscardAnimation();
