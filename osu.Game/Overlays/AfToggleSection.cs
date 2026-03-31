@@ -257,7 +257,7 @@ namespace osu.Game.Overlays
                     val =>
                     {
                         if (val.NewValue)
-                            target.MoveToX(10, 500, Easing.OutQuad).Then().MoveToY(0, 500, Easing.InQuad);
+                            target.MoveToX(10, 500, Easing.OutQuad).Then().MoveToX(0, 500, Easing.InQuad);
                     },
                     val =>
                     {
