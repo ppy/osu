@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Edit
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, [CanBeNull] Editor editor)
+        private void load(OsuConfigManager config, [CanBeNull] Editor editor, ReadableKeyCombinationProvider keyCombinationProvider)
         {
             autoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
 
@@ -135,6 +135,9 @@ namespace osu.Game.Rulesets.Edit
                 dependencies.CacheAs(scrollingRuleset.ScrollingInfo);
 
             dependencies.CacheAs(Playfield);
+
+            string shiftDisplay = keyCombinationProvider.GetReadableString(new KeyCombination(InputKey.Shift));
+            string altDisplay = keyCombinationProvider.GetReadableString(new KeyCombination(InputKey.Alt));
 
             InternalChildren = new[]
             {
@@ -181,7 +184,7 @@ namespace osu.Game.Rulesets.Edit
                                         Spacing = new Vector2(0, 5),
                                     },
                                 },
-                                new EditorToolboxGroup($"bank (Shift/{AltKeyName}-Q~R)")
+                                new EditorToolboxGroup($"bank ({shiftDisplay}/{altDisplay}-Q~R)")
                                 {
                                     Child = new FillFlowContainer
                                     {
@@ -574,9 +577,6 @@ namespace osu.Game.Rulesets.Edit
 
         public readonly Ruleset Ruleset;
 
-        [Resolved]
-        private ReadableKeyCombinationProvider readableKeyCombinationProvider { get; set; } = null!;
-
         protected HitObjectComposer(Ruleset ruleset)
         {
             Ruleset = ruleset;
@@ -613,11 +613,5 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="timestamp">The time instant to seek to, in milliseconds.</param>
         /// <param name="objectDescription">The ruleset-specific description of objects to select at the given timestamp.</param>
         public virtual void SelectFromTimestamp(double timestamp, string objectDescription) { }
-
-        /// <summary>
-        /// Returns the platform-specific Alt key name.
-        /// For macOS, this returns "Option". Otherwise returns "Alt".
-        /// </summary>
-        protected internal string AltKeyName => readableKeyCombinationProvider.GetReadableString(new KeyCombination(InputKey.Alt));
     }
 }
