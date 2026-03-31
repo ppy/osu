@@ -202,7 +202,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                         MovementSpeed = 0.5f;
                         positionSpring.Damping = 0.8f;
                     });
-                ;
             }
         }
     }
