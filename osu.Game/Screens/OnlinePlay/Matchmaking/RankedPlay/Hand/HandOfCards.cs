@@ -293,13 +293,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
             switch (direction)
             {
-                // special case for the left card when there's only 2 cards
-                // too much offset looks kinda odd here so it's reduced
-                case -1 when cardContainer.Count == 2:
-                    x -= baseOffset + 3;
-                    break;
-
                 case -1:
+                    if (cardContainer.Count == 2)
+                    {
+                        // special case for the left card when there's only 2 cards
+                        // too much offset looks kinda odd here so it's reduced
+                        x -= baseOffset + 3;
+                        break;
+                    }
+
                     x -= baseOffset + 10 / MathF.Pow(distance, 2);
                     break;
 
