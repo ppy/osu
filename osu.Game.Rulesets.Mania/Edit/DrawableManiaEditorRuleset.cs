@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         protected override void Update()
         {
-            TargetTimeRange = TimelineTimeRange == null || ShowSpeedChanges.Value ? ComputeScrollTime(Config.Get<double>(ManiaRulesetSetting.ScrollSpeed)) : TimelineTimeRange.Value;
+            TimeRange.Value = TimelineTimeRange == null || ShowSpeedChanges.Value ? ComputeScrollTime(Config.Get<double>(ManiaRulesetSetting.ScrollSpeed)) : TimelineTimeRange.Value;
             base.Update();
         }
     }
