@@ -18,9 +18,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             private void load()
             {
                 Masking = true;
-                CornerRadius = 6;
-                BorderThickness = 2;
-                BorderColour = colours.PrimaryDarkest.Darken(0.35f);
+                CornerRadius = 4;
+                CornerExponent = 4;
 
                 InternalChildren =
                 [
@@ -48,9 +47,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                             Masking = true,
                             CornerRadius = 3,
                             Colour = ColourInfo.GradientHorizontal(Colour4.White, Colour4.White.Opacity(0)),
-                            BorderThickness = 3,
-                            BorderColour = ColourInfo.GradientVertical(Colour4.White, Colour4.White.Opacity(0)),
-                            Alpha = 0.25f,
                             Blending = BlendingParameters.Additive,
                             Child = new Box
                             {
