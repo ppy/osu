@@ -12,6 +12,7 @@ using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
@@ -23,29 +24,38 @@ namespace osu.Game.Screens.Play
 
         private readonly Score score;
 
+        public bool ShowSettingsOverlay { get; init; } = true;
+
         protected SpectatorPlayer(Score score, PlayerConfiguration? configuration = null)
             : base(configuration)
         {
             this.score = score;
         }
 
-        protected override Drawable CreateOverlayComponents()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            // TODO: This should be customised for `MultiplayerSpectatorPlayer` to be static and only show the player name.
-            // Or maybe we should completely redesign this to show the user avatar and other things if that happens.
-            OsuTextFlowContainer message = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Body) { AutoSizeAxes = Axes.Both };
-            message.AddText("Watching ");
-            message.AddText(Score.ScoreInfo.User.Username, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
-            message.AddText(" play ");
-            message.AddText(Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(), s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
-            message.AddText(" live", s => s.Font = s.Font.With(weight: FontWeight.Bold));
-
-            return new ScrollingMessage(message)
+            if (ShowSettingsOverlay)
             {
-                Y = 100,
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-            };
+                var replayOverlay = new ReplayOverlay();
+                GameplayClockContainer.Add(replayOverlay);
+
+                // TODO: This should be customised for `MultiplayerSpectatorPlayer` to be static and only show the player name.
+                // Or maybe we should completely redesign this to show the user avatar and other things if that happens.
+                OsuTextFlowContainer message = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Body) { AutoSizeAxes = Axes.Both };
+                message.AddText("Watching ");
+                message.AddText(Score.ScoreInfo.User.Username, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+                message.AddText(" play ");
+                message.AddText(Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(), s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+                message.AddText(" live", s => s.Font = s.Font.With(weight: FontWeight.Bold));
+
+                replayOverlay.SetMessage(new ScrollingMessage(message)
+                {
+                    Y = 96,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                });
+            }
         }
 
         protected override void LoadComplete()
