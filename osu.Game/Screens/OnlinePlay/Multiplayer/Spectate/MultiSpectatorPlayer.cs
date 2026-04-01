@@ -39,6 +39,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             : base(score, new PlayerConfiguration { AllowUserInteraction = false })
         {
             this.spectatorPlayerClock = spectatorPlayerClock;
+
+            ShowSettingsOverlay = false;
         }
 
         [BackgroundDependencyLoader]
@@ -54,7 +56,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             // also applied in `MultiplayerPlayer.load()`
             ScoreProcessor.ApplyNewJudgementsWhenFailed = true;
 
-            HUDOverlay.PlayerSettingsOverlay.Expire();
             HUDOverlay.HoldToQuit.Expire();
         }
 
