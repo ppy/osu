@@ -20,18 +20,18 @@ namespace osu.Game.Screens.Play.HUD
 
         private Bindable<bool> configSettingsOverlay = null!;
         private Container messageContainer = null!;
+        private Container content = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
             RelativeSizeAxes = Axes.Both;
-            AlwaysPresent = true;
-            Alpha = 0;
 
             configSettingsOverlay = config.GetBindable<bool>(OsuSetting.ReplaySettingsOverlay);
 
-            InternalChild = new Container
+            InternalChild = content = new Container
             {
+                Alpha = 0,
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
@@ -54,9 +54,9 @@ namespace osu.Game.Screens.Play.HUD
         private void updateVisibility()
         {
             if (configSettingsOverlay.Value)
-                Show();
+                content.FadeIn(fade_duration, Easing.OutQuint);
             else
-                Hide();
+                content.FadeOut(fade_duration, Easing.OutQuint);
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
