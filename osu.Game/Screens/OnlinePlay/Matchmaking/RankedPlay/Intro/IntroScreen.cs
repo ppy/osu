@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -81,8 +80,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 
         private StarRatingSequence? starRatingAnimation;
 
-        private IDisposable? duckOperation;
-
         public void PlayIntroSequence(UserWithRating player, UserWithRating opponent, double starRating)
         {
             double delay = 0;
@@ -111,16 +108,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
         {
             starRatingAnimation?.PopOut();
 
-            duckOperation?.Dispose();
-
             this.Delay(500).FadeOut();
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            duckOperation?.Dispose();
         }
     }
 }
