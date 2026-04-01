@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Play
         private ReplayFailIndicator? failIndicator;
         private PlaybackSettings? playbackSettings;
 
-        private ReplayOverlay replayOverlay = null!;
+        public ReplayOverlay ReplayOverlay { get; private set; } = null!;
 
         protected override bool CheckModsAllowFailure()
         {
@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Play
         /// Add a settings group to the HUD overlay. Intended to be used by rulesets to add replay-specific settings.
         /// </summary>
         /// <param name="settings">The settings group to be shown.</param>
-        public void AddSettings(PlayerSettingsGroup settings) => Schedule(() => replayOverlay.Settings.Add(settings));
+        public void AddSettings(PlayerSettingsGroup settings) => Schedule(() => ReplayOverlay.Settings.Add(settings));
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -93,7 +93,7 @@ namespace osu.Game.Screens.Play
 
             AddInternal(leaderboardProvider);
 
-            GameplayClockContainer.Add(replayOverlay = new ReplayOverlay());
+            GameplayClockContainer.Add(ReplayOverlay = new ReplayOverlay());
 
             playbackSettings = new PlaybackSettings
             {
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Play
             if (GameplayClockContainer is MasterGameplayClockContainer master)
                 playbackSettings.UserPlaybackRate.BindTo(master.UserPlaybackRate);
 
-            replayOverlay.Settings.AddAtStart(playbackSettings);
+            ReplayOverlay.Settings.AddAtStart(playbackSettings);
 
             OsuTextFlowContainer message = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Body) { AutoSizeAxes = Axes.Both };
             message.AddText("Watching ");
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Play
                 Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
             });
 
-            replayOverlay.SetMessage(new ScrollingMessage(message)
+            ReplayOverlay.SetMessage(new ScrollingMessage(message)
             {
                 Y = 96,
                 Anchor = Anchor.TopCentre,
