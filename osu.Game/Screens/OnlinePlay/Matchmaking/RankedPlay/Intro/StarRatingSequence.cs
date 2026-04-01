@@ -96,7 +96,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                     },
                     explainer = new OsuSpriteText
                     {
-                        Text = "There’s still a chance that you get maps outside of the selected match rating!",
+                        Text = "There's always a chance that you get maps outside this range",
                         Font = OsuFont.Style.Heading2,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
