@@ -14,7 +14,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
-using osu.Game.Overlays;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 {
@@ -34,9 +33,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
-
-        [Resolved]
-        private MusicController? musicController { get; set; }
 
         private Sample? windupSample;
         private Sample? impactSample;
