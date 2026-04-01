@@ -24,7 +24,6 @@ using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Components;
-using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.Gameplay;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
@@ -67,14 +66,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private PreviewTrackManager previewTrackManager { get; set; } = null!;
 
         [Resolved]
-        private MusicController music { get; set; } = null!;
-
-        [Resolved]
         private QueueController? controller { get; set; }
 
         private readonly MultiplayerRoom room;
         private readonly Container<RankedPlaySubScreen> screenContainer;
-        private readonly MatchmakingChatDisplay chat;
+        private readonly RankedPlayChatDisplay chat;
 
         private IBindable<RankedPlayStage> stage = null!;
 
@@ -113,11 +109,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
-                            chat = new MatchmakingChatDisplay(new Room(room))
+                            chat = new RankedPlayChatDisplay(room)
                             {
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
-                                Size = new Vector2(320, 160),
                                 Margin = new MarginPadding
                                 {
                                     Bottom = 10,
@@ -176,14 +171,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 },
             ]);
 
-            cornerPieceVisibility.BindValueChanged(e =>
-            {
-                if (e.NewValue == Visibility.Visible)
-                    chat.Appear();
-                else
-                    chat.Disappear();
-            });
-
             stage.BindValueChanged(e => onStageChanged(e.NewValue));
         }
 
@@ -235,9 +222,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         private void onStageChanged(RankedPlayStage stage)
         {
+            chat.Appear();
+
             switch (stage)
             {
                 case RankedPlayStage.RoundWarmup when matchInfo.CurrentRound == 1:
+                    chat.Disappear();
                     ShowScreen(new IntroScreen());
                     break;
 
@@ -285,16 +275,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             }
         }
 
-        public override void OnEntering(ScreenTransitionEvent e)
-        {
-            base.OnEntering(e);
-
-            beginHandlingTrack();
-        }
-
         public override void OnSuspending(ScreenTransitionEvent e)
         {
-            endHandlingTrack();
+            chat.Disappear();
+            previewTrackManager.StopAnyPlaying(this);
 
             base.OnSuspending(e);
         }
@@ -312,7 +296,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     return true;
                 }
 
-                endHandlingTrack();
+                previewTrackManager.StopAnyPlaying(this);
 
                 client.LeaveRoom().FireAndForget();
 
@@ -341,8 +325,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         {
             base.OnResuming(e);
 
-            beginHandlingTrack();
-
+            chat.Appear();
             if (e.Last is not MultiplayerPlayerLoader playerLoader)
                 return;
 
@@ -353,38 +336,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             }
 
             client.ChangeState(MultiplayerUserState.Idle).FireAndForget();
-        }
-
-        /// <summary>
-        /// Handles changes in the track to keep it looping while active.
-        /// </summary>
-        private void beginHandlingTrack()
-        {
-            Beatmap.BindValueChanged(applyLoopingToTrack, true);
-        }
-
-        /// <summary>
-        /// Stops looping the current track and stops handling further changes to the track.
-        /// </summary>
-        private void endHandlingTrack()
-        {
-            Beatmap.ValueChanged -= applyLoopingToTrack;
-            Beatmap.Value.Track.Looping = false;
-
-            previewTrackManager.StopAnyPlaying(this);
-        }
-
-        /// <summary>
-        /// Invoked on changes to the beatmap to loop the track. See: <see cref="beginHandlingTrack"/>.
-        /// </summary>
-        /// <param name="beatmap">The beatmap change event.</param>
-        private void applyLoopingToTrack(ValueChangedEvent<WorkingBeatmap> beatmap)
-        {
-            if (!this.IsCurrentScreen())
-                return;
-
-            beatmap.NewValue.PrepareTrackForPreview(true);
-            music.EnsurePlayingSomething();
         }
 
         public void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset)

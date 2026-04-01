@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -39,6 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
         private OsuClickableContainer clickableContent = null!;
         private Drawable box = null!;
+        private SpriteIcon lockIcon = null!;
         private Sample? sampleTeamSwap;
 
         public TeamDisplay()
@@ -57,20 +59,32 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 Alpha = 0,
                 Scale = new Vector2(0, 1),
                 RelativeSizeAxes = Axes.Y,
-                Child = box = new Container
+                Children = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    CornerRadius = 5,
-                    Masking = true,
-                    Scale = new Vector2(0, 1),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Child = new Box
+                    box = new Container
                     {
-                        Colour = Color4.White,
                         RelativeSizeAxes = Axes.Both,
+                        CornerRadius = 5,
+                        Masking = true,
+                        Scale = new Vector2(0, 1),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                        Child = new Box
+                        {
+                            Colour = Color4.White,
+                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        }
+                    },
+                    lockIcon = new SpriteIcon
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Size = new Vector2(12),
+                        Icon = FontAwesome.Solid.Lock,
+                        Colour = Colour4.Black,
+                        Alpha = 0,
                     }
                 }
             };
@@ -83,7 +97,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             base.LoadComplete();
 
             client.RoomUpdated += onRoomUpdated;
-            current.BindValueChanged(_ => updateUser(), true);
+            current.BindValueChanged(_ => updateState(false), true);
         }
 
         private void changeTeam()
@@ -96,19 +110,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
         public int? DisplayedTeam { get; private set; }
 
-        private void updateUser()
-        {
-            var user = current.Value;
-
-            if (client.LocalUser?.Equals(user) == true)
-            {
-                clickableContent.Action = changeTeam;
-                clickableContent.TooltipText = "Change team";
-            }
-
-            updateState(false);
-        }
-
         private void onRoomUpdated() => Scheduler.AddOnce(() => updateState(true));
 
         private void updateState(bool playSamples)
@@ -118,7 +119,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             var user = current.Value;
             var userRoomState = client.Room?.Users.FirstOrDefault(u => u.Equals(user))?.MatchState;
 
+            bool roomLocked = (client.Room?.MatchState as TeamVersusRoomState)?.Locked == true;
+
+            if (client.LocalUser?.Equals(user) == true && !roomLocked)
+            {
+                clickableContent.Action = changeTeam;
+                clickableContent.TooltipText = "Change team";
+            }
+            else
+            {
+                clickableContent.Action = null;
+                clickableContent.TooltipText = default;
+            }
+
             const double duration = 400;
+
+            lockIcon.FadeTo(roomLocked ? 0.4f : 0, duration, Easing.OutQuint);
 
             int? newTeam = (userRoomState as TeamVersusUserState)?.TeamID;
 

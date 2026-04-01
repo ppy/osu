@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Edit.Setup
                 (metadata, name) => metadata.BackgroundFile = name);
 
             headerBackground.UpdateBackground();
-            editor?.ApplyToBackground(bg => ((EditorBackgroundScreen)bg).RefreshBackground());
+            editor?.ApplyToBackground(bg => ((EditorBackgroundScreen)bg).RefreshBackgroundAsync());
             return true;
         }
 

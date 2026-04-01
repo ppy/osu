@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mods
             get
             {
                 if (!MinimumAccuracy.IsDefault)
-                    yield return ("Minimum accuracy", $"{MinimumAccuracy.Value:##%}");
+                    yield return ("Minimum accuracy", MinimumAccuracy.Value.ToLocalisableString(@"P1"));
 
                 if (!AccuracyJudgeMode.IsDefault)
                     yield return ("Accuracy mode", AccuracyJudgeMode.Value.ToLocalisableString());
@@ -57,8 +57,8 @@ namespace osu.Game.Rulesets.Mods
         public BindableNumber<double> MinimumAccuracy { get; } = new BindableDouble
         {
             MinValue = 0.60,
-            MaxValue = 0.99,
-            Precision = 0.01,
+            MaxValue = 0.999,
+            Precision = 0.001,
             Default = 0.9,
             Value = 0.9,
         };

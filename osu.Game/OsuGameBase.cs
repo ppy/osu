@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -305,6 +306,7 @@ namespace osu.Game
 
             MessageFormatter.WebsiteRootUrl = endpoints.WebsiteUrl;
 
+            // Initialise localisation
             frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
             frameworkLocale.BindValueChanged(_ => updateLanguage());
 
@@ -500,6 +502,33 @@ namespace osu.Game
             Fonts.AddStore(new OsuIcon.OsuIconStore(Textures));
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            var localeMappings = Enum.GetValues<Language>().Select(language =>
+            {
+#if DEBUG
+                if (language == Language.debug)
+                    return new LocaleMapping("debug", new DebugLocalisationStore());
+#endif
+
+                string cultureCode = language.ToCultureCode();
+
+                try
+                {
+                    return new LocaleMapping(new ResourceManagerLocalisationStore(cultureCode));
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Could not load localisations for language \"{cultureCode}\"");
+                    return null;
+                }
+            }).Where(m => m != null);
+
+            Localisation.AddLocaleMappings(localeMappings);
+        }
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
@@ -517,6 +546,8 @@ namespace osu.Game
             host.ExceptionThrown += onExceptionThrown;
         }
 
+        #region Exit handling
+
         /// <summary>
         /// Use to programatically exit the game as if the user was triggering via alt-f4.
         /// By default, will keep persisting until an exit occurs (exit may be blocked multiple times).
@@ -531,10 +562,26 @@ namespace osu.Game
         }
 
         /// <summary>
+        /// An action that restarts the application after it has exited.
+        /// </summary>
+        [CanBeNull]
+        public Action RestartOnExitAction { private get; set; }
+
+        /// <summary>
+        /// Signals that the application should not be restarted after it is exited.
+        /// </summary>
+        public void CancelRestartOnExit()
+        {
+            RestartOnExitAction = null;
+        }
+
+        /// <summary>
         /// If supported by the platform, the game will automatically restart after the next exit.
         /// </summary>
         /// <returns>Whether a restart operation was queued.</returns>
         public virtual bool RestartAppWhenExited() => false;
+
+        #endregion
 
         /// <summary>
         /// Perform migration of user data to a specified path.
@@ -742,6 +789,8 @@ namespace osu.Game
 
             if (Host != null)
                 Host.ExceptionThrown -= onExceptionThrown;
+
+            RestartOnExitAction?.Invoke();
         }
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => Beatmap.Value.BeatmapLoaded ? Beatmap.Value.Beatmap.ControlPointInfo : null;

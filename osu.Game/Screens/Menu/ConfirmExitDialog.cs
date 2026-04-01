@@ -38,7 +38,13 @@ namespace osu.Game.Screens.Menu
             if (notifications.HasOngoingOperations)
             {
                 var ongoingOperations = notifications.OngoingOperations.ToArray();
-                string ongoingOperationsText = ongoingOperations.Take(10).Aggregate(string.Empty, (current, n) => current + $"{n.Text} ({n.Progress:0%})\n");
+                string ongoingOperationsText = ongoingOperations.Take(10).Aggregate(string.Empty, (current, n) =>
+                {
+                    if (n.Progress > 0)
+                        return current + $"{n.Text} ({n.Progress:0%})\n";
+
+                    return current + $"{n.Text}\n";
+                });
 
                 LocalisableString ongoingOperationsLocalisableString;
 

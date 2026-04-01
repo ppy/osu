@@ -10,6 +10,7 @@ using MessagePack;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
 using osu.Game.Online.API;
@@ -259,7 +260,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 },
                 Playlist = ServerAPIRoom.Playlist.Select(item => new MultiplayerPlaylistItem(item)).ToList(),
                 Users = { localUser },
-                Host = localUser
+                Host = localUser,
+                ChannelID = ServerAPIRoom.ChannelId
             };
 
             await changeMatchType(ServerRoom.Settings.MatchType).ConfigureAwait(false);
@@ -431,6 +433,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 case StopCountdownRequest stopCountdown:
                     await StopCountdown(ServerRoom.ActiveCountdowns.First(c => c.ID == stopCountdown.ID)).ConfigureAwait(false);
+                    break;
+
+                case RollRequest rollRequest:
+                    int max = (int)(rollRequest.Max ?? 100);
+                    await ((IMultiplayerClient)this).MatchEvent(new RollEvent
+                    {
+                        UserID = userId,
+                        Max = (uint)max,
+                        Result = (uint)RNG.Next(1, max + 1)
+                    }).ConfigureAwait(false);
                     break;
 
                 case MatchmakingAvatarActionRequest avatarAction:
