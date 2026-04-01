@@ -32,8 +32,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// </summary>
         /// <param name="noteObject">The hit object to evaluate.</param>
         /// <param name="mods">The mods which were applied to the beatmap.</param>
+        /// <param name="isClassic">Whether the classic mod was applied to the beatmap.</param>
         /// <returns>The reading difficulty value for the given hit object.</returns>
-        public static double EvaluateDifficultyOf(TaikoDifficultyHitObject noteObject, Mod[] mods)
+        public static double EvaluateDifficultyOf(TaikoDifficultyHitObject noteObject, Mod[] mods, bool isClassic)
         {
             bool isHidden = mods.Any(m => m is TaikoModHidden);
             bool isFlashlight = mods.Any(m => m is TaikoModFlashlight);
@@ -42,7 +43,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             if (isHidden && isFlashlight)
                 return 1.0;
 
-            double velocityDifficulty = calculateVelocityDifficulty(noteObject, mods);
+            double velocityDifficulty = calculateVelocityDifficulty(noteObject, mods, isClassic);
             double densityDifficulty = calculateDensityDifficulty(noteObject);
 
             double difficulty = Math.Max(velocityDifficulty, densityDifficulty);
@@ -54,7 +55,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             return difficulty;
         }
 
-        private static double calculateVelocityDifficulty(TaikoDifficultyHitObject noteObject, Mod[] mods)
+        private static double calculateVelocityDifficulty(TaikoDifficultyHitObject noteObject, Mod[] mods, bool isClassic)
         {
             double highVelocityDifficulty = 0.0;
             double timeInvisibleDifficulty = 0.0;
@@ -69,7 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             );
 
             highVelocityDifficulty = DifficultyCalculationUtils.Logistic(
-                noteObject.EffectiveBPM * calculateHighVelocityModMultiplier(mods),
+                noteObject.EffectiveBPM * calculateHighVelocityModMultiplier(mods, isClassic),
                 highVelocity.Center,
                 10.0 / highVelocity.Range
             );
@@ -81,7 +82,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 var lowVelocity = new VelocityRange(280, 125);
 
                 timeInvisibleDifficulty = DifficultyCalculationUtils.Logistic(
-                    noteObject.EffectiveBPM * calculateTimeInvisibleModMultiplier(mods),
+                    noteObject.EffectiveBPM * calculateTimeInvisibleModMultiplier(mods, isClassic),
                     lowVelocity.Center,
                     10.0 / lowVelocity.Range
                 );
@@ -107,12 +108,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             return DifficultyCalculationUtils.Smoothstep(density, 0.9, 0.35);
         }
 
-        private static double calculateHighVelocityModMultiplier(Mod[] mods)
+        private static double calculateHighVelocityModMultiplier(Mod[] mods, bool isClassic)
         {
             bool isHidden = mods.Any(m => m is TaikoModHidden);
             bool isFlashlight = mods.Any(m => m is TaikoModFlashlight);
             bool isEasy = mods.Any(m => m is TaikoModEasy);
-            bool isClassic = mods.Any(m => m is TaikoModClassic);
 
             double multiplier = 1.0;
 
@@ -139,10 +139,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             return multiplier;
         }
 
-        private static double calculateTimeInvisibleModMultiplier(Mod[] mods)
+        private static double calculateTimeInvisibleModMultiplier(Mod[] mods, bool isClassic)
         {
             bool isEasy = mods.Any(m => m is TaikoModEasy);
-            bool isClassic = mods.Any(m => m is TaikoModClassic);
 
             double multiplier = 1.0;
 

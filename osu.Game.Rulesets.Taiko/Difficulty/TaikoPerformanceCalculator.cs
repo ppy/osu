@@ -27,6 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private double clockRate;
         private double greatHitWindow;
 
+        private double starRating;
         private double totalDifficultHits;
 
         public TaikoPerformanceCalculator()
@@ -58,14 +59,23 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 ? null
                 : computeDeviationUpperBound(countGreat / (double)totalHits) * 10;
 
-            // Total difficult hits measures the total difficulty of a map based on its consistency factor.
-            totalDifficultHits = totalHits * taikoAttributes.ConsistencyFactor;
-
             // Converts are detected and omitted from mod-specific bonuses due to the scope of current difficulty calculation.
             bool isConvert = score.BeatmapInfo!.Ruleset.OnlineID != 1;
 
+            // The classic mod is detected and used to account for differences between stable and lazer in difficulty.
+            if (score.Mods.Any(m => m is ModClassic))
+            {
+                starRating = taikoAttributes.StarRatingClassic;
+                totalDifficultHits = totalHits * taikoAttributes.ConsistencyFactorClassic;
+            }
+            else
+            {
+                starRating = taikoAttributes.StarRating;
+                totalDifficultHits = totalHits * taikoAttributes.ConsistencyFactor;
+            }
+
             double difficultyValue = computeDifficultyValue(score, taikoAttributes, isConvert) * 1.08;
-            double accuracyValue = computeAccuracyValue(score, taikoAttributes, isConvert) * 1.1;
+            double accuracyValue = computeAccuracyValue(score, isConvert) * 1.1;
 
             return new TaikoPerformanceAttributes
             {
@@ -89,7 +99,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double rhythmMaximumUnstableRate = computeDeviationUpperBound(0.8) * 10;
 
             // The fraction of star rating made up by rhythm difficulty, normalised to represent rhythm's perceived contribution to star rating.
-            double rhythmFactor = DifficultyCalculationUtils.ReverseLerp(attributes.RhythmDifficulty / attributes.StarRating, 0.15, 0.4);
+            double rhythmFactor = DifficultyCalculationUtils.ReverseLerp(attributes.RhythmDifficulty / starRating, 0.15, 0.4);
 
             // A penalty removing improperly played rhythm difficulty from star rating based on estimated unstable rate.
             double rhythmPenalty = 1 - DifficultyCalculationUtils.Logistic(
@@ -99,10 +109,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 maxValue: 0.25 * Math.Pow(rhythmFactor, 3)
             );
 
-            double baseDifficulty = 5 * Math.Max(1.0, attributes.StarRating * rhythmPenalty / 0.110) - 4.0;
+            double baseDifficulty = 5 * Math.Max(1.0, starRating * rhythmPenalty / 0.110) - 4.0;
             double difficultyValue = Math.Min(Math.Pow(baseDifficulty, 3) / 69052.51, Math.Pow(baseDifficulty, 2.25) / 1250.0);
 
-            difficultyValue *= 1 + 0.10 * Math.Max(0, attributes.StarRating - 10);
+            difficultyValue *= 1 + 0.10 * Math.Max(0, starRating - 10);
 
             // Applies a bonus to maps with more total difficulty.
             double lengthBonus = 1 + 0.25 * totalDifficultHits / (totalDifficultHits + 4000);
@@ -119,7 +129,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return difficultyValue * Math.Pow(DifficultyCalculationUtils.Erf(monoAccScalingShift / (Math.Sqrt(2) * estimatedUnstableRate.Value)), monoAccScalingExponent);
         }
 
-        private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
+        private double computeAccuracyValue(ScoreInfo score, bool isConvert)
         {
             if (greatHitWindow <= 0 || estimatedUnstableRate == null)
                 return 0;
@@ -127,7 +137,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double accuracyValue = 470 * Math.Pow(0.9885, estimatedUnstableRate.Value);
 
             // Scales up the bonus for lower unstable rate as star rating increases.
-            accuracyValue *= 1 + Math.Pow(50 / estimatedUnstableRate.Value, 2) * Math.Pow(attributes.StarRating, 2.8) / 600;
+            accuracyValue *= 1 + Math.Pow(50 / estimatedUnstableRate.Value, 2) * Math.Pow(starRating, 2.8) / 600;
 
             if (score.Mods.Any(m => m is ModHidden))
                 accuracyValue *= 1.1;
