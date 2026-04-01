@@ -33,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         {
             // workaround to play BGM through `TrackMixer` instead of `SampleMixer`, so it inherits players' music volume settings, etc.
             var store = audio.GetTrackStore(new NamespacedResourceStore<byte[]>(game.Resources, @"Samples"));
-            bgmTrack = store.Get(@"Multiplayer/Matchmaking/Ranked/rankedplay_bgm");
+            bgmTrack = store.Get(@"Multiplayer/Matchmaking/Ranked/rankedplay_bgm.ogg");
             bgmTrack.AddAdjustment(AdjustableProperty.Volume, bgmVolumeBindable);
         }
 
