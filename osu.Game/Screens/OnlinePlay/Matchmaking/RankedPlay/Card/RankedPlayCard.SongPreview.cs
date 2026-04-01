@@ -277,6 +277,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                             this.FadeOut(200);
                         }
                     }, true);
+                    FinishTransforms();
                 }
 
                 protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
