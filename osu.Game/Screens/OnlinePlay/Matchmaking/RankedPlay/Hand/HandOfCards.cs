@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -23,15 +24,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
     [Cached]
     public abstract partial class HandOfCards : CompositeDrawable
     {
-        private const float hover_scale = 1.2f;
+        protected const float HOVER_SCALE = 1.2f;
 
-        public IEnumerable<HandCard> Cards => cardContainer.Children;
+        private const float card_spacing = -15;
+
+        public IReadOnlyList<HandCard> Cards => cardContainer.Children;
 
         /// <summary>
         /// How far a card slides upwards when hovered.
         /// Used for making sure a card moves entirely into frame when the hand is partially off-screen.
         /// </summary>
-        public float HoverYOffset = 15;
+        public float HoverYOffset = 35;
 
         /// <summary>
         /// If true, card layout will be flipped on both axes for a card hand placed at the top edge of the screen, while keeping the cards upright.
@@ -39,13 +42,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
         /// </summary>
         protected virtual bool Flipped => false;
 
-        private readonly Container<HandCard> cardContainer;
+        /// <summary>
+        /// Position to insert cards at so they are start moving from the bottom relative to the card layout
+        /// </summary>
+        public Vector2 BottomCardInsertPosition => new Vector2(0, (DrawHeight + RankedPlayCard.SIZE.Y) / 2 * (Flipped ? -1 : 1));
+
+        private readonly CardContainer cardContainer;
 
         private readonly Dictionary<RankedPlayCardItem, HandCard> cardLookup = new Dictionary<RankedPlayCardItem, HandCard>();
 
         protected HandOfCards()
         {
-            AddInternal(cardContainer = new Container<HandCard>
+            AddInternal(cardContainer = new CardContainer
             {
                 RelativeSizeAxes = Axes.Both,
             });
@@ -54,6 +62,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
         protected override void Update()
         {
             base.Update();
+
+            if (!drawOrderBacking.IsValid)
+            {
+                cardContainer.Sort();
+                drawOrderBacking.Validate();
+            }
 
             if (!layoutBacking.IsValid)
             {
@@ -76,16 +90,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
             foreach (var card in cardContainer)
             {
-                card.Delay(delay)
-                    .MoveTo(new Vector2(0, Flipped ? -220 : 220), 400, Easing.OutExpo)
-                    .RotateTo(0, 400, Easing.OutExpo)
-                    .ScaleTo(1, 400, Easing.OutExpo);
+                Scheduler.AddDelayed(() =>
+                {
+                    card.LayoutTarget = new CardLayout
+                    {
+                        Position = new Vector2(0, (DrawHeight + RankedPlayCard.SIZE.Y + 10) / 2 * (Flipped ? -1 : 1)),
+                        Rotation = 0,
+                        Scale = 1,
+                    };
+                }, delay);
 
                 delay += 50;
             }
         }
-
-        private Anchor cardAnchor => Flipped ? Anchor.TopCentre : Anchor.BottomCentre;
 
         public void AddCard(RankedPlayCardWithPlaylistItem item, Action<HandCard>? setupAction = null) => AddCard(new RankedPlayCard(item), setupAction);
 
@@ -95,12 +112,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 return;
 
             var drawable = CreateHandCard(card);
-            drawable.Anchor = drawable.Origin = cardAnchor;
 
             cardLookup[card.Item.Card] = drawable;
 
+            drawable.Position = GetArcPosition(0);
+
+            if (card.Item.DisplayOrder != null)
+                drawable.Order = card.Item.DisplayOrder.Value;
+            else if (cardContainer.Count > 0)
+                drawable.Order = cardContainer.Max(c => c.Order) + 1;
+
             cardContainer.Add(drawable);
-            layoutBacking.Invalidate();
+            InvalidateLayout(drawOrder: true);
 
             setupAction?.Invoke(drawable);
         }
@@ -113,8 +136,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 return false;
 
             cardContainer.Remove(drawable, true);
-            layoutBacking.Invalidate();
-            return false;
+            InvalidateLayout(drawOrder: true);
+            return true;
         }
 
         /// <summary>
@@ -137,19 +160,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             card = drawable.Detach();
 
             cardContainer.Remove(drawable, true);
-            layoutBacking.Invalidate();
+            InvalidateLayout(drawOrder: true);
 
             return true;
         }
 
         protected virtual HandCard CreateHandCard(RankedPlayCard card) => new HandCard(card);
 
-        protected virtual void OnCardStateChanged(HandCard card, RankedPlayCardState state)
+        protected virtual void OnCardStateChanged(HandCard card, ValueChangedEvent<RankedPlayCardState> evt)
         {
-            InvalidateLayout();
+            InvalidateLayout(drawOrder: affectsDrawOrder(evt));
 
             // hovered state can be caused by keyboard focus, in which case we have to clean up after the other cards manually
-            if (state.Hovered)
+            if (evt.NewValue.Hovered)
             {
                 foreach (var c in cardContainer)
                 {
@@ -159,95 +182,195 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             }
         }
 
+        private static bool affectsDrawOrder(ValueChangedEvent<RankedPlayCardState> evt) =>
+            evt.OldValue.Order != evt.NewValue.Order ||
+            evt.OldValue.Dragged != evt.NewValue.Dragged;
+
         #region Layout
 
         private readonly Cached layoutBacking = new Cached();
+        private readonly Cached drawOrderBacking = new Cached();
 
-        protected void InvalidateLayout() => layoutBacking.Invalidate();
-
-        public void UpdateLayout(double stagger = 0)
+        /// <summary>
+        /// Invalidates the layout of the hand of cards, causing a relayout to occur.
+        /// </summary>
+        /// <param name="drawOrder">If set to true, also invalidates the draw order of the cards.</param>
+        protected void InvalidateLayout(bool drawOrder = false)
         {
-            updateLayout(stagger);
-            layoutBacking.Validate();
+            layoutBacking.Invalidate();
+            if (drawOrder)
+                drawOrderBacking.Invalidate();
         }
 
-        private void updateLayout(double stagger = 0)
+        private void updateLayout()
         {
             if (Contracted)
                 return;
 
-            const float spacing = -20;
+            // card container draws dragged card on top so we need to sort those separately
+            var cards = cardContainer.Children.OrderBy(static c => c.State.Order).ToArray();
 
-            float totalWidth = cardContainer.Sum(it => it.LayoutWidth + spacing) - spacing;
+            int activeCardIndex = GetActiveCardIndex(cards);
 
-            float x = -totalWidth / 2;
-
-            const int no_card_hovered = -1;
-            int hoverIndex = no_card_hovered;
-
-            for (int i = 0; i < cardContainer.Count; i++)
+            for (int i = 0; i < cards.Length; i++)
             {
-                if (cardContainer[i].CardHovered)
-                {
-                    hoverIndex = i;
-                    break;
-                }
+                var card = cards[i];
+
+                var layout = card.CardDragged
+                    ? CalculateDraggedCardLayout(card.DragPosition)
+                    : CalculateCardLayout(i, activeCardIndex);
+
+                if (Flipped)
+                    layout.Position *= -1;
+
+                card.LayoutTarget = layout;
+            }
+        }
+
+        protected int GetActiveCardIndex(IReadOnlyList<HandCard> cards)
+        {
+            // the mouse can temporarily leave the dragged card, so dragged card should take precedence
+            for (int i = 0; i < cards.Count; i++)
+            {
+                if (cards[i].CardDragged)
+                    return i;
             }
 
-            double delay = 0;
-
-            for (int i = 0; i < cardContainer.Count; i++)
+            for (int i = 0; i < cards.Count; i++)
             {
-                var child = cardContainer[i];
+                if (cards[i].CardHovered)
+                    return i;
+            }
 
-                x += child.LayoutWidth / 2;
+            return -1;
+        }
 
-                float yOffset = 0;
+        protected CardLayout CalculateCardLayout(int index, int activeIndex)
+        {
+            float x = GetCardX(index, activeIndex);
 
-                var position = new Vector2(x, MathF.Pow(MathF.Abs(x / 250), 2) * 20 - 10);
+            var position = GetArcPosition(x);
+            float rotation = GetArcRotation(x);
 
-                if (hoverIndex != no_card_hovered && cardContainer.Children.Count > 1)
-                {
-                    int distance = Math.Abs(i - hoverIndex);
-                    int direction = Math.Sign(i - hoverIndex);
+            if (index == activeIndex)
+                position += GetCardUpwardsDirection(rotation) * HoverYOffset;
 
-                    position.X += direction switch
+            return new CardLayout
+            {
+                Position = position,
+                Rotation = rotation,
+                Scale = index == activeIndex ? HOVER_SCALE : 1,
+            };
+        }
+
+        protected virtual CardLayout CalculateDraggedCardLayout(Vector2 dragPosition)
+        {
+            return new CardLayout
+            {
+                Position = dragPosition,
+                Rotation = 0,
+                Scale = HOVER_SCALE,
+            };
+        }
+
+        /// <summary>
+        /// Represents the total width of the layout for all cards in the hand.
+        /// </summary>
+        /// <remarks>
+        /// Does not account for extra space needed for spreading the cards adjacent to the active card apart.
+        /// </remarks>
+        protected float TotalLayoutWidth => cardContainer.Count * (RankedPlayCard.SIZE.X + card_spacing) - card_spacing;
+
+        protected float GetCardX(int index, int activeIndex)
+        {
+            float x = -TotalLayoutWidth / 2
+                      + index * (RankedPlayCard.SIZE.X + card_spacing)
+                      + RankedPlayCard.SIZE.X / 2;
+
+            if (activeIndex < 0 || cardContainer.Count <= 1)
+                return x;
+
+            // if a card is hovered or dragged, the adjacent cards should get spread apart
+            int distance = Math.Abs(index - activeIndex);
+            int direction = Math.Sign(index - activeIndex);
+
+            float baseOffset = RankedPlayCard.SIZE.X * 0.1f;
+
+            switch (direction)
+            {
+                case -1:
+                    if (cardContainer.Count == 2)
                     {
-                        0 => 0,
-
                         // special case for the left card when there's only 2 cards
                         // too much offset looks kinda odd here so it's reduced
-                        < 0 when cardContainer.Count == 2 => -3,
+                        x -= baseOffset + 3;
+                        break;
+                    }
 
-                        < 0 => -10 / MathF.Pow(distance, 3),
+                    x -= baseOffset + 10 / MathF.Pow(distance, 2);
+                    break;
 
-                        // cards right to the hovered card have a higher offset because they are partially
-                        // covering the cards to their left
-                        > 0 => 20 / MathF.Pow(distance, 2),
-                    };
+                case 1:
+                    // cards right to the active card have a higher offset because they are partially
+                    // covering the cards to their left
+                    x += baseOffset + 20 / MathF.Pow(distance, 2);
+                    break;
+            }
+
+            return x;
+        }
+
+        /// <summary>
+        /// Calculates the position of a card at a given <paramref name="x" /> coordinate so all cards are laid out in an arc
+        /// </summary>
+        protected Vector2 GetArcPosition(float x)
+        {
+            float offset = (DrawHeight - RankedPlayCard.SIZE.Y) / 2;
+
+            return new Vector2(x, MathF.Pow(MathF.Abs(x / 250), 2) * 20 + offset);
+        }
+
+        /// <summary>
+        /// Calculates the rotation of a card at a given <paramref name="x"/> coordinate
+        /// </summary>
+        protected static float GetArcRotation(float x) => x * 0.03f;
+
+        protected static Vector2 GetCardUpwardsDirection(float rotation)
+        {
+            float angle = MathHelper.DegreesToRadians(rotation - 90);
+
+            return new Vector2(MathF.Cos(angle), MathF.Sin(angle));
+        }
+
+        private partial class CardContainer : Container<HandCard>
+        {
+            protected override int Compare(Drawable x, Drawable y)
+            {
+                if (x is HandCard c1 && y is HandCard c2)
+                {
+                    // dragged cards should always be drawn on top
+                    if (c1.CardDragged)
+                        return 1;
+
+                    if (c2.CardDragged)
+                        return -1;
+
+                    int result = c1.Order.CompareTo(c2.Order);
+                    if (result != 0)
+                        return result;
                 }
 
-                if (child.CardHovered)
-                    yOffset = -HoverYOffset;
-
-                float rotation = x * 0.03f;
-
-                float angle = MathHelper.DegreesToRadians(rotation + 90);
-
-                position += new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * yOffset;
-
-                position *= Flipped ? -1 : 1;
-
-                child
-                    .Delay(delay)
-                    .MoveTo(position, 300, Easing.OutExpo)
-                    .RotateTo(rotation, 300, Easing.OutExpo)
-                    .ScaleTo(child.CardHovered ? hover_scale : 1f, 400, Easing.OutElasticQuarter);
-
-                x += child.LayoutWidth / 2 + spacing;
-
-                delay += stagger;
+                return base.Compare(x, y);
             }
+
+            public void Sort() => SortInternal();
+        }
+
+        public struct CardLayout
+        {
+            public required Vector2 Position { get; set; }
+            public required float Rotation { get; set; }
+            public required float Scale { get; set; }
         }
 
         #endregion

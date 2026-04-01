@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Game.Online.RankedPlay;
+using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 {
@@ -23,6 +24,23 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
                 card.State = cardState;
             }
+        }
+
+        protected override CardLayout CalculateDraggedCardLayout(Vector2 dragPosition)
+        {
+            // the opponent shouldn't be able to drag his card across the entire screen.
+            // card movement is limited to roughly the width of the hand horizontally
+            // and has a fixed vertical offset (extended slightly further than when hovered)
+            float maxExtent = TotalLayoutWidth / 2;
+
+            float x = float.Clamp(dragPosition.X, -maxExtent, maxExtent);
+
+            return new CardLayout
+            {
+                Position = GetArcPosition(x) + new Vector2(0, -60),
+                Rotation = 0,
+                Scale = HOVER_SCALE,
+            };
         }
     }
 }
