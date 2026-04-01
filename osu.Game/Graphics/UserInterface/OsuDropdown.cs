@@ -21,7 +21,6 @@ using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -163,15 +162,6 @@ namespace osu.Game.Graphics.UserInterface
             };
 
             protected override ScrollContainer<Drawable> CreateScrollContainer(Direction direction) => new OsuScrollContainer(direction);
-
-            protected override bool OnKeyDown(KeyDownEvent e)
-            {
-                // disable the framework-level handling of up and down key for conformity (we use GlobalAction.SelectPrevious and SelectNext).
-                if (e.Key == Key.Up || e.Key == Key.Down)
-                    return false;
-
-                return base.OnKeyDown(e);
-            }
 
             public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {
