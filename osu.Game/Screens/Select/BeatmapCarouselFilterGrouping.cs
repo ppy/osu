@@ -156,6 +156,10 @@ namespace osu.Game.Screens.Select
                 return false;
             if (criteria.Sort == SortMode.LastPlayed && criteria.Group == GroupMode.LastPlayed)
                 return false;
+            if (criteria.Sort == SortMode.Length && criteria.Group == GroupMode.Length)
+                return false;
+            if (criteria.Sort == SortMode.BPM && criteria.Group == GroupMode.BPM)
+                return false;
             if (criteria.Group == GroupMode.RankAchieved)
                 return false;
 
