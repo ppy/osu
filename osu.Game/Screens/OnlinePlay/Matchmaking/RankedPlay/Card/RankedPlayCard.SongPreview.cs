@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -21,6 +22,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 using osuTK;
 using osuTK.Graphics;
 
@@ -50,6 +52,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 
             [Resolved]
             private OsuColour osuColour { get; set; } = null!;
+
+            [Resolved]
+            private BackgroundMusicManager? backgroundMusic { get; set; }
 
             public SongPreviewContainer()
             {
@@ -124,11 +129,29 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 
             protected override bool OnHover(HoverEvent e)
             {
+                previewStopDelegate?.Cancel();
+
                 if (shouldBePlaying)
+                {
                     startPreviewIfAvailable();
+                    backgroundMusic?.Duck();
+                }
 
                 return base.OnHover(e);
             }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                previewStopDelegate?.Cancel();
+
+                backgroundMusic?.Unduck();
+                previewStopDelegate = Scheduler.AddDelayed(() =>
+                {
+                    previewTrack?.Stop();
+                }, 500);
+            }
+
+            private ScheduledDelegate? previewStopDelegate;
 
             private void onTrackStarted() => Schedule(() => trackRunning.Value = true);
 

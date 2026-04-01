@@ -95,8 +95,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 
             vsScreen.Play(ref delay, out double impactDelay);
 
-            duckOperation = musicController?.Duck();
-
             if (windupSample != null)
             {
                 Scheduler.AddDelayed(() => windupSample?.Play(), impactDelay - windupSample.Length);
