@@ -137,10 +137,15 @@ namespace osu.Game.Beatmaps
                 Value = new StarDifficulty(beatmapInfo.StarRating, 0)
             };
 
-            updateBindable(bindable, currentRuleset.Value, currentMods.Value, cancellationToken, computationDelay);
-
             lock (bindableUpdateLock)
+            {
+                var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(trackedUpdateCancellationSource.Token, cancellationToken);
+                linkedCancellationSources.Add(linkedSource);
+
+                updateBindable(bindable, currentRuleset.Value, currentMods.Value, linkedSource.Token, computationDelay);
+
                 trackedBindables.Add(bindable);
+            }
 
             return bindable;
         }
