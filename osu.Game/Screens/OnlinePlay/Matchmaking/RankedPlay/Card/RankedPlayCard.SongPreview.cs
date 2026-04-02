@@ -41,6 +41,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
             protected override Container<Drawable> Content { get; }
 
             private readonly Bindable<bool> trackRunning = new BindableBool();
+
             private readonly Container overlayLayer;
 
             private bool shouldBePlaying => Enabled.Value && IsHovered;
@@ -114,7 +115,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 
                     overlayLayer.Add(new RippleVisualization(cardColours.Border)
                     {
-                        TrackRunning = trackRunning.GetBoundCopy(),
+                        TrackRunning = { BindTarget = trackRunning }
                     });
 
                     if (IsHovered)
@@ -124,10 +125,23 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 
             protected override bool OnHover(HoverEvent e)
             {
+                if (previewTrack != null)
+                    previewTrack.Looping = true;
+
                 if (shouldBePlaying)
+                {
                     startPreviewIfAvailable();
+                }
 
                 return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                if (previewTrack != null)
+                    previewTrack.Looping = false;
+
+                base.OnHoverLost(e);
             }
 
             private void onTrackStarted() => Schedule(() => trackRunning.Value = true);
@@ -193,7 +207,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                 [Resolved]
                 private SongPreviewParticleContainer? particleContainer { get; set; }
 
-                public required IBindable<bool> TrackRunning { get; init; }
+                public readonly IBindable<bool> TrackRunning = new Bindable<bool>();
 
                 private readonly Color4 accentColour;
                 private readonly Container rippleContainer;
