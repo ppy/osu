@@ -17,12 +17,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 {
     public partial class BackgroundMusicManager : CompositeComponent
     {
-        public const int DELAY_BEFORE_UNDUCK = 500;
-
         private const int hover_fade_duration = 250;
-        private const int track_fade_duration = 3000;
 
-        private ScheduledDelegate? unduckDebounceDelegate;
         private ScheduledDelegate? globalTrackFadeDelegate;
 
         private ITrackStore store = null!;
@@ -53,32 +49,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             isPlayingPreview = previewTrackManager.IsPlayingPreview.GetBoundCopy();
             isPlayingPreview.BindValueChanged(playing =>
             {
-                if (playing.NewValue)
-                    Duck();
-                else
-                    Unduck();
+                bgm.VolumeTo(playing.NewValue ? 0 : 1, hover_fade_duration);
             });
-        }
-
-        public void Duck()
-        {
-            unduckDebounceDelegate?.Cancel();
-            bgm.VolumeTo(0, hover_fade_duration);
-        }
-
-        public void Unduck()
-        {
-            unduckDebounceDelegate?.Cancel();
-            unduckDebounceDelegate = Scheduler.AddDelayed(() =>
-            {
-                bgm.VolumeTo(1, hover_fade_duration);
-            }, DELAY_BEFORE_UNDUCK);
         }
 
         public void Play()
         {
             if (bgm.IsRunning)
                 return;
+
+            const int track_fade_duration = 3000;
 
             // remove music control from player, to prevent overlapping music
             musicController.AllowTrackControl.Value = false;
@@ -106,7 +86,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         public void Stop()
         {
-            unduckDebounceDelegate?.Cancel();
             globalTrackFadeDelegate?.Cancel();
 
             bgm.Stop();
