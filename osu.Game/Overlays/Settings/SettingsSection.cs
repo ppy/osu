@@ -42,6 +42,16 @@ namespace osu.Game.Overlays.Settings
 
         private bool matchingFilter = true;
 
+        private static void showIFilterableChildren(Drawable drawable)
+        {
+            if (drawable is IFilterable filterable)
+                filterable.MatchingFilter = true;
+            if (drawable is IContainerEnumerable<Drawable> container)
+            {
+                foreach (var child in container.Children)
+                    showIFilterableChildren(child);
+            }
+        }
         public bool MatchingFilter
         {
             get => matchingFilter;
@@ -50,6 +60,12 @@ namespace osu.Game.Overlays.Settings
                 bool wasPresent = IsPresent;
 
                 matchingFilter = value;
+
+                if (matchingFilter && FilteringActive)
+                {
+                    foreach (var child in Children)
+                        showIFilterableChildren(child);
+                }
 
                 if (IsPresent != wasPresent)
                     Invalidate(Invalidation.Presence);
