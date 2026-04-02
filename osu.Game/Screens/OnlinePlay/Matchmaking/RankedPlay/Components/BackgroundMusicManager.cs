@@ -4,11 +4,13 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
 using osu.Framework.Threading;
+using osu.Game.Audio;
 using osu.Game.Overlays;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
@@ -26,8 +28,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         private ITrackStore store = null!;
         private DrawableTrack bgm = null!;
 
+        private Bindable<bool> isPlayingPreview = null!;
+
         [Resolved]
         private MusicController musicController { get; set; } = null!;
+
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuGameBase game)
@@ -39,10 +46,23 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             AddInternal(bgm = new DrawableTrack(track));
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            isPlayingPreview = previewTrackManager.IsPlayingPreview.GetBoundCopy();
+            isPlayingPreview.BindValueChanged(playing =>
+            {
+                if (playing.NewValue)
+                    Duck();
+                else
+                    Unduck();
+            });
+        }
+
         public void Duck()
         {
             unduckDebounceDelegate?.Cancel();
-
             bgm.VolumeTo(0, hover_fade_duration);
         }
 

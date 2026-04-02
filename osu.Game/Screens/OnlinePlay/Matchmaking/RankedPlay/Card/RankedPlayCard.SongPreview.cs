@@ -14,7 +14,6 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.Events;
-using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -22,7 +21,6 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 using osuTK;
 using osuTK.Graphics;
 
@@ -43,6 +41,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
             protected override Container<Drawable> Content { get; }
 
             private readonly Bindable<bool> trackRunning = new BindableBool();
+
             private readonly Container overlayLayer;
 
             private bool shouldBePlaying => Enabled.Value && IsHovered;
@@ -52,9 +51,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 
             [Resolved]
             private OsuColour osuColour { get; set; } = null!;
-
-            [Resolved]
-            private BackgroundMusicManager? backgroundMusic { get; set; }
 
             public SongPreviewContainer()
             {
@@ -119,7 +115,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 
                     overlayLayer.Add(new RippleVisualization(cardColours.Border)
                     {
-                        TrackRunning = trackRunning.GetBoundCopy(),
+                        TrackRunning = { BindTarget = trackRunning }
                     });
 
                     if (IsHovered)
@@ -129,29 +125,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 
             protected override bool OnHover(HoverEvent e)
             {
-                previewStopDelegate?.Cancel();
-
                 if (shouldBePlaying)
                 {
                     startPreviewIfAvailable();
-                    backgroundMusic?.Duck();
                 }
 
                 return base.OnHover(e);
             }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                previewStopDelegate?.Cancel();
-
-                backgroundMusic?.Unduck();
-                previewStopDelegate = Scheduler.AddDelayed(() =>
-                {
-                    previewTrack?.Stop();
-                }, BackgroundMusicManager.DELAY_BEFORE_UNDUCK);
-            }
-
-            private ScheduledDelegate? previewStopDelegate;
 
             private void onTrackStarted() => Schedule(() => trackRunning.Value = true);
 
@@ -216,7 +196,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                 [Resolved]
                 private SongPreviewParticleContainer? particleContainer { get; set; }
 
-                public required IBindable<bool> TrackRunning { get; init; }
+                public readonly IBindable<bool> TrackRunning = new Bindable<bool>();
 
                 private readonly Color4 accentColour;
                 private readonly Container rippleContainer;
