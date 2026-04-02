@@ -88,6 +88,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         [Cached]
         private readonly SongPreviewParticleContainer particleContainer;
 
+        [Cached]
+        private BackgroundMusicManager backgroundMusic;
+
         public RankedPlayScreen(MultiplayerRoom room)
         {
             this.room = room;
@@ -129,6 +132,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 },
                 overlayContainer = new CardDetailsOverlayContainer(),
                 particleContainer = new SongPreviewParticleContainer(),
+                backgroundMusic = new BackgroundMusicManager()
             };
         }
 
@@ -224,6 +228,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         {
             chat.Appear();
 
+            if (stage is RankedPlayStage.GameplayWarmup or RankedPlayStage.Gameplay)
+                backgroundMusic.Stop();
+            else
+                backgroundMusic.Play();
+
             switch (stage)
             {
                 case RankedPlayStage.RoundWarmup when matchInfo.CurrentRound == 1:
@@ -278,6 +287,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         public override void OnSuspending(ScreenTransitionEvent e)
         {
             chat.Disappear();
+            backgroundMusic.Stop();
             previewTrackManager.StopAnyPlaying(this);
 
             base.OnSuspending(e);
@@ -296,6 +306,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     return true;
                 }
 
+                backgroundMusic.Stop();
                 previewTrackManager.StopAnyPlaying(this);
 
                 client.LeaveRoom().FireAndForget();
