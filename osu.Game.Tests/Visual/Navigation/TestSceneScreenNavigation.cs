@@ -472,7 +472,7 @@ namespace osu.Game.Tests.Visual.Navigation
             void checkScrollSpeed(double configValue, double gameplayValue)
             {
                 AddUntilStep($"config value is {configValue}", () => getConfigManager().Get<double>(ManiaRulesetSetting.ScrollSpeed), () => Is.EqualTo(configValue));
-                AddUntilStep($"gameplay value is {gameplayValue}", () => this.ChildrenOfType<DrawableManiaRuleset>().Single().ScrollingInfo.TimeRange.Value,
+                AddUntilStep($"gameplay value is {gameplayValue}", () => this.ChildrenOfType<DrawableManiaRuleset>().Single().TargetTimeRange,
                     () => Is.EqualTo(DrawableManiaRuleset.ComputeScrollTime(gameplayValue)));
             }
 
