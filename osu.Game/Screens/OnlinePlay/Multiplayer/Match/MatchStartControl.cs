@@ -32,7 +32,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
-        private readonly MultiplayerReadyButton readyButton;
         private readonly MultiplayerCountdownButton countdownButton;
 
         private IBindable<bool> operationInProgress = null!;
@@ -58,7 +57,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 {
                     new Drawable?[]
                     {
-                        readyButton = new MultiplayerReadyButton
+                        new MultiplayerReadyButton
                         {
                             RelativeSizeAxes = Axes.Both,
                             Size = Vector2.One,
@@ -179,7 +178,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             if (client.Room == null)
             {
-                readyButton.Enabled.Value = false;
                 countdownButton.Enabled.Value = false;
                 return;
             }
@@ -207,18 +205,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 }
             }
 
-            readyButton.Enabled.Value = countdownButton.Enabled.Value =
+            countdownButton.Enabled.Value =
                 client.Room.State != MultiplayerRoomState.Closed
                 && !client.Room.CurrentPlaylistItem.Expired
                 && !operationInProgress.Value;
-
-            // When the local user is the host and spectating the match, the ready button should be enabled only if any users are ready.
-            if (localUser?.State == MultiplayerUserState.Spectating)
-                readyButton.Enabled.Value &= client.IsHost && newCountReady > 0 && !client.Room.ActiveCountdowns.Any(c => c is MatchStartCountdown);
-
-            // When the local user is not the host, the button should only be enabled when no match is in progress.
-            if (!client.IsHost)
-                readyButton.Enabled.Value &= client.Room.State == MultiplayerRoomState.Open;
 
             // At all times, the countdown button should only be enabled when no match is in progress.
             countdownButton.Enabled.Value &= client.Room.State == MultiplayerRoomState.Open;

@@ -12,29 +12,21 @@ namespace osu.Game.Screens.OnlinePlay.Components
 {
     public abstract partial class ReadyButton : RoundedButton
     {
-        public new readonly BindableBool Enabled = new BindableBool();
-
         private readonly IBindable<BeatmapAvailability> availability = new Bindable<BeatmapAvailability>();
 
         [BackgroundDependencyLoader]
         private void load(OnlinePlayBeatmapAvailabilityTracker beatmapTracker)
         {
             availability.BindTo(beatmapTracker.Availability);
-            availability.BindValueChanged(_ => updateState());
-
-            Enabled.BindValueChanged(_ => updateState(), true);
+            availability.BindValueChanged(_ => UpdateEnabledState());
         }
 
-        private void updateState() =>
-            base.Enabled.Value = availability.Value.State == DownloadState.LocallyAvailable && Enabled.Value;
+        protected virtual void UpdateEnabledState() => Enabled.Value = availability.Value.State == DownloadState.LocallyAvailable;
 
         public override LocalisableString TooltipText
         {
             get
             {
-                if (base.Enabled.Value)
-                    return string.Empty;
-
                 if (availability.Value.State != DownloadState.LocallyAvailable)
                     return "Beatmap not downloaded";
 
