@@ -50,7 +50,7 @@ jobs:
           exit $exit_code
 
       - name: InspectCode
-        uses: JetBrains/ReSharper-InspectCode@v0.11
+        uses: JetBrains/ReSharper-InspectCode@v0.12
         with:
           # this is WTF tier but if you don't specify *both* of these the defaults assume `build: true`
           build: false
