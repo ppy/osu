@@ -148,7 +148,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                 previewStopDelegate = Scheduler.AddDelayed(() =>
                 {
                     previewTrack?.Stop();
-                }, 500);
+                }, BackgroundMusicManager.DELAY_BEFORE_UNDUCK);
             }
 
             private ScheduledDelegate? previewStopDelegate;

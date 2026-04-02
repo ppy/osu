@@ -14,7 +14,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 {
     public partial class BackgroundMusicManager : Component
     {
-        private const int unhover_debounce_duration = 500;
+        public const int DELAY_BEFORE_UNDUCK = 500;
+
         private const int hover_fade_duration = 250;
         private const int track_fade_duration = 3000;
 
@@ -49,7 +50,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             unduckDebounceDelegate = Scheduler.AddDelayed(() =>
             {
                 this.TransformBindableTo(bgmVolumeBindable, 1, hover_fade_duration);
-            }, unhover_debounce_duration);
+            }, DELAY_BEFORE_UNDUCK);
         }
 
         public void Play()
