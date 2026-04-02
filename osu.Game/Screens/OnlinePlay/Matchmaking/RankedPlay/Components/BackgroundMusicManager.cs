@@ -22,7 +22,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         private ScheduledDelegate? unduckDebounceDelegate;
         private ScheduledDelegate? globalTrackFadeDelegate;
 
-        private readonly BindableDouble bgmVolumeBindable = new BindableDouble(1);
+        private readonly BindableDouble volume = new BindableDouble(1);
 
         private Track bgmTrack = null!;
 
@@ -35,13 +35,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             // workaround to play BGM through `TrackMixer` instead of `SampleMixer`, so it inherits players' music volume settings, etc.
             var store = audio.GetTrackStore(new NamespacedResourceStore<byte[]>(game.Resources, @"Samples"));
             bgmTrack = store.Get(@"Multiplayer/Matchmaking/Ranked/rankedplay_bgm.ogg");
-            bgmTrack.AddAdjustment(AdjustableProperty.Volume, bgmVolumeBindable);
+            bgmTrack.AddAdjustment(AdjustableProperty.Volume, volume);
         }
 
         public void Duck()
         {
             unduckDebounceDelegate?.Cancel();
-            this.TransformBindableTo(bgmVolumeBindable, 0, hover_fade_duration);
+            this.TransformBindableTo(volume, 0, hover_fade_duration);
         }
 
         public void Unduck()
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             unduckDebounceDelegate?.Cancel();
             unduckDebounceDelegate = Scheduler.AddDelayed(() =>
             {
-                this.TransformBindableTo(bgmVolumeBindable, 1, hover_fade_duration);
+                this.TransformBindableTo(volume, 1, hover_fade_duration);
             }, DELAY_BEFORE_UNDUCK);
         }
 
@@ -74,8 +74,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 }, track_fade_duration);
             }
 
-            bgmVolumeBindable.Value = 0;
-            this.TransformBindableTo(bgmVolumeBindable, 1, track_fade_duration, Easing.InCubic);
+            volume.Value = 0;
+            this.TransformBindableTo(volume, 1, track_fade_duration, Easing.InCubic);
 
             bgmTrack.Looping = true;
             bgmTrack.Start();
