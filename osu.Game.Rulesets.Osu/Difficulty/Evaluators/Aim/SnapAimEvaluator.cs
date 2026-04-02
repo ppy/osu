@@ -140,17 +140,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 aimStrain += velocityChangeBonus * velocity_change_multiplier;
             }
 
-            double sliderBonus = 0;
-
-            if (osuCurrObj.BaseObject is Slider)
+            // Reward sliders based on velocity.
+            if (osuCurrObj.BaseObject is Slider && withSliderTravelDistance)
             {
-                // Reward sliders based on velocity.
-                sliderBonus = osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
-            }
-
-            // Add in additional slider velocity bonus.
-            if (withSliderTravelDistance)
+                double sliderBonus = osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
                 aimStrain += (sliderBonus < 1 ? sliderBonus : Math.Pow(sliderBonus, 0.75)) * slider_multiplier;
+            }
 
             // Apply high circle size bonus
             aimStrain *= osuCurrObj.SmallCircleBonus;
