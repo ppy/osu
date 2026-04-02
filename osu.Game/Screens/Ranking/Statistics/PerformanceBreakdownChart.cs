@@ -19,7 +19,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Scoring;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking.Statistics
@@ -38,9 +37,6 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
-
-        private const int achieved_pp_font_size = 18;
-        private const int horizontal_padding = 25;
 
         public PerformanceBreakdownChart(ScoreInfo score, IBeatmap playableBeatmap)
         {
@@ -64,68 +60,17 @@ namespace osu.Game.Screens.Ranking.Statistics
                     AutoSizeAxes = Axes.Y,
                     Origin = Anchor.TopCentre,
                     Anchor = Anchor.TopCentre,
-                    Padding = new MarginPadding
-                    {
-                        Horizontal = horizontal_padding,
-                    },
                     RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                     ColumnDimensions = new[]
                     {
-                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(),
+                        new Dimension(GridSizeMode.Absolute, 50),
                         new Dimension()
                     },
                     Content = new[]
                     {
                         new Drawable[]
                         {
-                            new FillFlowContainer
-                            {
-                                Origin = Anchor.Centre,
-                                Anchor = Anchor.Centre,
-                                AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Vertical,
-                                Margin = new MarginPadding
-                                {
-                                    Right = horizontal_padding * 2,
-                                },
-                                Children = new Drawable[]
-                                {
-                                    new OsuSpriteText
-                                    {
-                                        Origin = Anchor.Centre,
-                                        Anchor = Anchor.Centre,
-                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: achieved_pp_font_size),
-                                        Text = "Achieved PP",
-                                    },
-                                    new FillFlowContainer
-                                    {
-                                        Origin = Anchor.Centre,
-                                        Anchor = Anchor.Centre,
-                                        Direction = FillDirection.Horizontal,
-                                        Spacing = new Vector2(5),
-                                        AutoSizeAxes = Axes.Both,
-                                        Children = new[]
-                                        {
-                                            achievedPerformance = new OsuSpriteText
-                                            {
-                                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: achieved_pp_font_size),
-                                                Colour = Color4Extensions.FromHex("#66FFCC")
-                                            },
-                                            new OsuSpriteText
-                                            {
-                                                Font = OsuFont.GetFont(weight: FontWeight.Regular, size: achieved_pp_font_size),
-                                                Text = "/",
-                                                Colour = OsuColour.Gray(0.7f)
-                                            },
-                                            maximumPerformance = new OsuSpriteText
-                                            {
-                                                Font = OsuFont.GetFont(weight: FontWeight.Regular, size: achieved_pp_font_size),
-                                                Colour = OsuColour.Gray(0.7f)
-                                            },
-                                        }
-                                    }
-                                }
-                            },
                             chart = new GridContainer
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -137,6 +82,63 @@ namespace osu.Game.Screens.Ranking.Statistics
                                     new Dimension(GridSizeMode.AutoSize),
                                     new Dimension(),
                                     new Dimension(GridSizeMode.AutoSize)
+                                }
+                            },
+                            new SimpleStatisticTable.Spacer(),
+                            new GridContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                ColumnDimensions = new[]
+                                {
+                                    new Dimension(),
+                                    new Dimension(GridSizeMode.AutoSize)
+                                },
+                                RowDimensions = new[]
+                                {
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(GridSizeMode.AutoSize)
+                                },
+                                Content = new[]
+                                {
+                                    new Drawable[]
+                                    {
+                                        new OsuSpriteText
+                                        {
+                                            Origin = Anchor.CentreLeft,
+                                            Anchor = Anchor.CentreLeft,
+                                            Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
+                                            Text = "Achieved PP",
+                                            Colour = Color4Extensions.FromHex("#66FFCC")
+                                        },
+                                        achievedPerformance = new OsuSpriteText
+                                        {
+                                            Origin = Anchor.CentreRight,
+                                            Anchor = Anchor.CentreRight,
+                                            Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
+                                            Colour = Color4Extensions.FromHex("#66FFCC")
+                                        }
+                                    },
+                                    new Drawable[]
+                                    {
+                                        new OsuSpriteText
+                                        {
+                                            Origin = Anchor.CentreLeft,
+                                            Anchor = Anchor.CentreLeft,
+                                            Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
+                                            Text = "Maximum",
+                                            Colour = OsuColour.Gray(0.7f)
+                                        },
+                                        maximumPerformance = new OsuSpriteText
+                                        {
+                                            Origin = Anchor.CentreLeft,
+                                            Anchor = Anchor.CentreLeft,
+                                            Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
+                                            Colour = OsuColour.Gray(0.7f)
+                                        }
+                                    }
                                 }
                             },
                         }
