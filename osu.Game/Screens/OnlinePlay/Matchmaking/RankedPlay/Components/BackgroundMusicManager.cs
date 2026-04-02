@@ -4,15 +4,16 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
 using osu.Framework.Threading;
 using osu.Game.Overlays;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 {
-    public partial class BackgroundMusicManager : Component
+    public partial class BackgroundMusicManager : CompositeComponent
     {
         public const int DELAY_BEFORE_UNDUCK = 500;
 
@@ -22,9 +23,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         private ScheduledDelegate? unduckDebounceDelegate;
         private ScheduledDelegate? globalTrackFadeDelegate;
 
-        private readonly BindableDouble volume = new BindableDouble(1);
-
-        private Track bgmTrack = null!;
+        private ITrackStore store = null!;
+        private DrawableTrack bgm = null!;
 
         [Resolved]
         private MusicController musicController { get; set; } = null!;
@@ -33,15 +33,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         private void load(AudioManager audio, OsuGameBase game)
         {
             // workaround to play BGM through `TrackMixer` instead of `SampleMixer`, so it inherits players' music volume settings, etc.
-            var store = audio.GetTrackStore(new NamespacedResourceStore<byte[]>(game.Resources, @"Samples"));
-            bgmTrack = store.Get(@"Multiplayer/Matchmaking/Ranked/rankedplay_bgm.ogg");
-            bgmTrack.AddAdjustment(AdjustableProperty.Volume, volume);
+            store = audio.GetTrackStore(new NamespacedResourceStore<byte[]>(game.Resources, @"Samples"));
+            var track = store.Get(@"Multiplayer/Matchmaking/Ranked/rankedplay_bgm.ogg");
+
+            AddInternal(bgm = new DrawableTrack(track));
         }
 
         public void Duck()
         {
             unduckDebounceDelegate?.Cancel();
-            this.TransformBindableTo(volume, 0, hover_fade_duration);
+
+            bgm.VolumeTo(0, hover_fade_duration);
         }
 
         public void Unduck()
@@ -49,13 +51,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             unduckDebounceDelegate?.Cancel();
             unduckDebounceDelegate = Scheduler.AddDelayed(() =>
             {
-                this.TransformBindableTo(volume, 1, hover_fade_duration);
+                bgm.VolumeTo(1, hover_fade_duration);
             }, DELAY_BEFORE_UNDUCK);
         }
 
         public void Play()
         {
-            if (bgmTrack.IsRunning)
+            if (bgm.IsRunning)
                 return;
 
             // remove music control from player, to prevent overlapping music
@@ -65,20 +67,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             // cross-fade if global track is playing something
             if (musicController.IsPlaying)
             {
-                var track = musicController.CurrentTrack;
-                track.VolumeTo(0, track_fade_duration, Easing.OutCubic);
+                var globalTrack = musicController.CurrentTrack;
+
+                globalTrack.VolumeTo(0, track_fade_duration, Easing.OutCubic);
                 globalTrackFadeDelegate = Scheduler.AddDelayed(() =>
                 {
                     musicController.Stop();
-                    track.VolumeTo(1);
+                    globalTrack.VolumeTo(1);
                 }, track_fade_duration);
             }
 
-            volume.Value = 0;
-            this.TransformBindableTo(volume, 1, track_fade_duration, Easing.InCubic);
+            bgm.VolumeTo(0)
+               .VolumeTo(1, track_fade_duration, Easing.InCubic);
 
-            bgmTrack.Looping = true;
-            bgmTrack.Start();
+            bgm.Looping = true;
+            bgm.Start();
         }
 
         public void Stop()
@@ -86,8 +89,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             unduckDebounceDelegate?.Cancel();
             globalTrackFadeDelegate?.Cancel();
 
-            bgmTrack.Stop();
-            bgmTrack.Reset();
+            bgm.Stop();
+            bgm.Reset();
 
             // return control of music to player and reset volume
             musicController.AllowTrackControl.Value = true;
@@ -98,6 +101,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         protected override void Dispose(bool isDisposing)
         {
             Stop();
+
+            bgm.Dispose();
+            store.Dispose();
 
             base.Dispose(isDisposing);
         }
