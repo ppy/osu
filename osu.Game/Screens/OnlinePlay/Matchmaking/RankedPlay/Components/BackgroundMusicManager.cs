@@ -3,12 +3,10 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.IO.Stores;
 using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Overlays;
@@ -21,7 +19,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         private ScheduledDelegate? globalTrackFadeDelegate;
 
-        private ITrackStore store = null!;
         private DrawableTrack bgm = null!;
 
         private Bindable<bool> isPlayingPreview = null!;
@@ -35,11 +32,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuGameBase game)
         {
-            // workaround to play BGM through `TrackMixer` instead of `SampleMixer`, so it inherits players' music volume settings, etc.
-            store = audio.GetTrackStore(new NamespacedResourceStore<byte[]>(game.Resources, @"Samples"));
-            var track = store.Get(@"Multiplayer/Matchmaking/Ranked/rankedplay_bgm.ogg");
-
-            AddInternal(bgm = new DrawableTrack(track));
+            AddInternal(bgm = new DrawableTrack(audio.Tracks.Get("rankedplay_bgm.ogg")));
         }
 
         protected override void LoadComplete()
@@ -95,16 +88,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             musicController.AllowTrackControl.Value = true;
             musicController.CurrentTrack.Volume.Value = 1;
             musicController.EnsurePlayingSomething();
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            Stop();
-
-            bgm.Dispose();
-            store.Dispose();
-
-            base.Dispose(isDisposing);
         }
     }
 }
