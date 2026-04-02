@@ -52,6 +52,7 @@ namespace osu.Game.Overlays.Settings
                     showIFilterableChildren(child);
             }
         }
+
         public bool MatchingFilter
         {
             get => matchingFilter;
