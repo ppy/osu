@@ -125,12 +125,23 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 
             protected override bool OnHover(HoverEvent e)
             {
+                if (previewTrack != null)
+                    previewTrack.Looping = true;
+
                 if (shouldBePlaying)
                 {
                     startPreviewIfAvailable();
                 }
 
                 return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                if (previewTrack != null)
+                    previewTrack.Looping = false;
+
+                base.OnHoverLost(e);
             }
 
             private void onTrackStarted() => Schedule(() => trackRunning.Value = true);
