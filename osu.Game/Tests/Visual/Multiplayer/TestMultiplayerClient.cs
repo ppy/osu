@@ -260,7 +260,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 },
                 Playlist = ServerAPIRoom.Playlist.Select(item => new MultiplayerPlaylistItem(item)).ToList(),
                 Users = { localUser },
-                Host = localUser
+                Host = localUser,
+                ChannelID = ServerAPIRoom.ChannelId
             };
 
             await changeMatchType(ServerRoom.Settings.MatchType).ConfigureAwait(false);
@@ -859,6 +860,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public async Task PlayUserCard(int userId, Func<RankedPlayCardItem[], RankedPlayCardItem> selector)
         {
             RankedPlayCardItem card = selector(((RankedPlayRoomState)ServerRoom!.MatchState!).Users[userId].Hand.ToArray());
+            MultiplayerPlaylistItem item = GetCardWithPlaylistItem(card).PlaylistItem.Value!;
+
+            ServerRoom!.Playlist.Add(item);
+            await ((IMultiplayerClient)this).PlaylistItemAdded(clone(item)).ConfigureAwait(false);
+            await ((IMultiplayerClient)this).PlaylistItemChanged(clone(item)).ConfigureAwait(false);
+
+            var settings = clone(ServerRoom!.Settings);
+            settings.PlaylistItemId = item.ID;
+            await ((IMultiplayerClient)this).SettingsChanged(settings).ConfigureAwait(false);
+
             await ((IRankedPlayClient)this).RankedPlayCardPlayed(clone(card)).ConfigureAwait(false);
         }
 
