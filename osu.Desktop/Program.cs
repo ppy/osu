@@ -180,15 +180,10 @@ namespace osu.Desktop
             // or is running with pending imports via file association or otherwise.
             //
             // In both these scenarios, we'd hope the game does not attempt to update.
+            // However, in the second case for pending imports, we still need to initialize Velopack for manual updates.
             //
             // Special consideration for velopack startup arguments, which must be handled during update.
             // See https://docs.velopack.io/integrating/hooks#command-line-hooks.
-            if (args.Length > 0 && !args[0].StartsWith("--velo", StringComparison.Ordinal))
-            {
-                Logger.Log("Handling arguments, skipping velopack setup.");
-                return;
-            }
-
             if (OsuGameDesktop.IsPackageManaged)
             {
                 Logger.Log("Updates are being managed by an external provider. Skipping Velopack setup.");
@@ -196,6 +191,12 @@ namespace osu.Desktop
             }
 
             var app = VelopackApp.Build();
+
+            if (args.Length > 0 && !args[0].StartsWith("--velo", StringComparison.Ordinal))
+            {
+                Logger.Log("Handling arguments, skipping velopack setup.");
+                return;
+            }
 
             app.OnFirstRun(_ => isFirstRun = true);
 
