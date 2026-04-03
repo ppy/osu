@@ -596,7 +596,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     break;
 
                 default:
-                    targetScreen.Push(new MultiplayerPlayerLoader(() => new MultiplayerPlayer(room, new PlaylistItem(client.Room.CurrentPlaylistItem), users)));
+                    if (!client.IsReferee)
+                        targetScreen.Push(new MultiplayerPlayerLoader(() => new MultiplayerPlayer(room, new PlaylistItem(client.Room.CurrentPlaylistItem), users)));
                     break;
             }
         }
@@ -676,8 +677,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Ruleset.Value = ruleset;
             Mods.Value = client.LocalUser.Mods.Concat(item.RequiredMods).Select(m => m.ToMod(rulesetInstance)).ToArray();
 
-            bool freemods = item.Freestyle || item.AllowedMods.Any();
-            bool freestyle = item.Freestyle;
+            bool freemods = !client.IsReferee && (item.Freestyle || item.AllowedMods.Any());
+            bool freestyle = !client.IsReferee && item.Freestyle;
 
             if (freemods)
                 userModsSection.Show();
@@ -921,8 +922,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.Room.CanAddPlaylistItems(client.LocalUser) != true)
                 return;
 
-            // If there's only one playlist item and we are the host, assume we want to change it. Else add a new one.
-            PlaylistItem? itemToEdit = client.IsHost && room.Playlist.Count == 1 ? room.Playlist.Single() : null;
+            // If there's only one playlist item and we are the host / a referee, assume we want to change it. Else add a new one.
+            PlaylistItem? itemToEdit = (client.IsHost || client.IsReferee) && room.Playlist.Count == 1 ? room.Playlist.Single() : null;
 
             ShowSongSelect(itemToEdit);
 

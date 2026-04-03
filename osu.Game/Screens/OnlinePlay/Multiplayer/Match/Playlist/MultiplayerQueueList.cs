@@ -66,8 +66,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                 if (multiplayerClient.Room == null)
                     return;
 
-                bool isItemOwner = Item.OwnerID == api.LocalUser.Value.OnlineID || multiplayerClient.IsHost;
-                bool isValidItem = isItemOwner && !Item.Expired;
+                bool isItemOwnerOrReferee = Item.OwnerID == api.LocalUser.Value.OnlineID || multiplayerClient.IsHost || multiplayerClient.IsReferee;
+                bool isValidItem = isItemOwnerOrReferee && !Item.Expired;
 
                 AllowDeletion = isValidItem
                                 && (Item.ID != multiplayerClient.Room.Settings.PlaylistItemId // This is an optimisation for the following check.

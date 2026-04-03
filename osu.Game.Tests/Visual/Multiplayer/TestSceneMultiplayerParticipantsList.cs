@@ -32,10 +32,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneMultiplayerParticipantsList : MultiplayerTestScene
     {
-        public override void SetUpSteps()
+        private void setUpList()
         {
-            base.SetUpSteps();
-
             AddStep("join room", () => JoinRoom(CreateDefaultRoom()));
             WaitForJoined();
             createNewParticipantsList();
@@ -44,6 +42,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestAddUser()
         {
+            setUpList();
             AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.Current.Value).Distinct().Count() == 1);
 
             AddStep("add user", () => MultiplayerClient.AddUser(new APIUser
@@ -59,6 +58,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestAddReferee()
         {
+            setUpList();
             AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.Current.Value).Distinct().Count() == 1);
 
             AddStep("add user", () => MultiplayerClient.AddUser(new MultiplayerRoomUser(3)
@@ -78,6 +78,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestAddUnresolvedUser()
         {
+            setUpList();
             AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.Current.Value).Distinct().Count() == 1);
 
             AddStep("add non-resolvable user", () => MultiplayerClient.TestAddUnresolvedUser());
@@ -94,6 +95,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestRemoveUser()
         {
+            setUpList();
+
             APIUser? secondUser = null;
 
             AddStep("add a user", () =>
@@ -114,6 +117,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestGameStateHasPriorityOverDownloadState()
         {
+            setUpList();
             AddStep("set to downloading map", () => MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(0)));
             checkProgressBarVisibility(true);
 
@@ -128,6 +132,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestCorrectInitialState()
         {
+            setUpList();
             AddStep("set to downloading map", () => MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(0)));
             createNewParticipantsList();
             checkProgressBarVisibility(true);
@@ -136,6 +141,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestBeatmapDownloadingStates()
         {
+            setUpList();
             AddStep("set to unknown", () => MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.Unknown()));
             AddStep("set to no map", () => MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.NotDownloaded()));
             AddStep("set to downloading map", () => MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(0)));
@@ -159,6 +165,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestToggleReadyState()
         {
+            setUpList();
             AddAssert("ready mark invisible", () => !this.ChildrenOfType<StateDisplay>().Single().IsPresent);
 
             AddStep("make user ready", () => MultiplayerClient.ChangeState(MultiplayerUserState.Ready));
@@ -171,6 +178,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestToggleSpectateState()
         {
+            setUpList();
             AddStep("make user spectating", () => MultiplayerClient.ChangeState(MultiplayerUserState.Spectating));
             AddStep("make user idle", () => MultiplayerClient.ChangeState(MultiplayerUserState.Idle));
         }
@@ -178,6 +186,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestCrownChangesStateWhenHostTransferred()
         {
+            setUpList();
             AddStep("add user", () => MultiplayerClient.AddUser(new APIUser
             {
                 Id = 3,
@@ -201,6 +210,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestHostGetsPinnedToTop()
         {
+            setUpList();
             AddStep("add user", () => MultiplayerClient.AddUser(new APIUser
             {
                 Id = 3,
@@ -218,8 +228,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestKickButtonOnlyPresentWhenHost()
+        public void TestKickButtonPresentWhenHost()
         {
+            setUpList();
             AddStep("add user", () => MultiplayerClient.AddUser(new APIUser
             {
                 Id = 3,
@@ -239,8 +250,32 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestKickButtonPresentWhenReferee()
+        {
+            AddStep("set up referee", () => MultiplayerClient.RoomSetupAction = r => r.Host!.Role = MultiplayerRoomUserRole.Referee);
+            setUpList();
+            AddStep("add user", () => MultiplayerClient.AddUser(new APIUser
+            {
+                Id = 3,
+                Username = "Second",
+                CoverUrl = TestResources.COVER_IMAGE_3,
+            }));
+
+            AddUntilStep("kick buttons visible", () => this.ChildrenOfType<ParticipantPanel.KickButton>().Count(d => d.IsPresent) == 1);
+
+            AddStep("make second user host", () => MultiplayerClient.TransferHost(3));
+
+            AddUntilStep("kick buttons visible", () => this.ChildrenOfType<ParticipantPanel.KickButton>().Count(d => d.IsPresent) == 1);
+
+            AddStep("make local user host again", () => MultiplayerClient.TransferHost(API.LocalUser.Value.Id));
+
+            AddUntilStep("kick buttons visible", () => this.ChildrenOfType<ParticipantPanel.KickButton>().Count(d => d.IsPresent) == 1);
+        }
+
+        [Test]
         public void TestKickButtonKicks()
         {
+            setUpList();
             AddStep("add user", () => MultiplayerClient.AddUser(new APIUser
             {
                 Id = 3,
@@ -258,6 +293,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             const int users_count = 200;
 
+            setUpList();
             AddStep("add many users", () =>
             {
                 for (int i = 0; i < users_count; i++)
@@ -316,6 +352,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestUserWithMods()
         {
+            setUpList();
             AddStep("add user", () =>
             {
                 MultiplayerClient.AddUser(new APIUser
@@ -353,6 +390,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestUserWithStyle()
         {
+            setUpList();
             AddStep("add users", () =>
             {
                 MultiplayerClient.AddUser(new APIUser
@@ -380,6 +418,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestModOverlap()
         {
+            setUpList();
             AddStep("add dummy mods", () =>
             {
                 MultiplayerClient.ChangeUserMods(new Mod[]
@@ -438,6 +477,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestModsAndRuleset()
         {
+            setUpList();
             AddStep("add another user", () =>
             {
                 MultiplayerClient.AddUser(new APIUser
@@ -472,6 +512,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestTeams()
         {
+            setUpList();
             AddStep("enable teams", () => MultiplayerClient.ChangeSettings(matchType: MatchType.TeamVersus));
             AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.Current.Value).Distinct().Count() == 1);
 

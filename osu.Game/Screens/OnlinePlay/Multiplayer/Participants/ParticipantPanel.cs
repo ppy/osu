@@ -295,7 +295,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 userStyleDisplay.FadeOut(fade_time);
             }
 
-            kickButton.Alpha = client.IsHost && !user.Equals(client.LocalUser) ? 1 : 0;
+            kickButton.Alpha = (client.IsHost || client.IsReferee) && !user.Equals(client.LocalUser) ? 1 : 0;
             crown.Alpha = client.Room.Host?.Equals(user) == true ? 1 : 0;
         }
 
@@ -312,8 +312,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 if (user.UserID == api.LocalUser.Value.Id)
                     return null;
 
-                // If the local user is not the host of the room.
-                if (client.Room.Host?.UserID != api.LocalUser.Value.Id)
+                if (!client.IsHost && !client.IsReferee)
                     return null;
 
                 int targetUser = user.UserID;
@@ -322,8 +321,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 {
                     new OsuMenuItem("Give host", MenuItemType.Standard, () =>
                     {
-                        // Ensure the local user is still host.
-                        if (!client.IsHost)
+                        // Ensure the local user is still host / a referee.
+                        if (!client.IsHost && !client.IsReferee)
                             return;
 
                         client.TransferHost(targetUser).FireAndForget();
@@ -331,7 +330,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     new OsuMenuItem("Kick", MenuItemType.Destructive, () =>
                     {
                         // Ensure the local user is still host.
-                        if (!client.IsHost)
+                        if (!client.IsHost && !client.IsReferee)
                             return;
 
                         client.KickUser(targetUser).FireAndForget();
