@@ -61,10 +61,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             // Total difficult hits measures the total difficulty of a map based on its consistency factor.
             totalDifficultHits = totalHits * taikoAttributes.ConsistencyFactor;
 
-            // Converts are detected and omitted from mod-specific bonuses due to the scope of current difficulty calculation.
+            // Converts and the classic mod are detected and omitted from mod-specific bonuses due to the scope of current difficulty calculation.
             bool isConvert = score.BeatmapInfo!.Ruleset.OnlineID != 1;
+            bool isClassic = score.Mods.Any(m => m is ModClassic);
 
-            double difficultyValue = computeDifficultyValue(score, taikoAttributes, isConvert) * 1.08;
+            double difficultyValue = computeDifficultyValue(score, taikoAttributes, isConvert, isClassic) * 1.08;
             double accuracyValue = computeAccuracyValue(score, taikoAttributes, isConvert) * 1.1;
 
             return new TaikoPerformanceAttributes
@@ -76,30 +77,17 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             };
         }
 
-        private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
+        private double computeDifficultyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert, bool isClassic)
         {
             if (estimatedUnstableRate == null || totalDifficultHits == 0)
                 return 0;
 
-            // The estimated unstable rate for 100% accuracy, at which all rhythm difficulty has been played successfully.
-            double rhythmExpectedUnstableRate = computeDeviationUpperBound(1.0) * 10;
+            double penalisedStarRating = attributes.StarRating * calculateImproperlyPlayedRhythmPenalty(attributes.RhythmDifficulty, attributes.StarRating);
 
-            // The unstable rate at which it can be assumed all rhythm difficulty has been ignored.
-            // 0.8 represents 80% of total hits being greats, or 90% accuracy in-game
-            double rhythmMaximumUnstableRate = computeDeviationUpperBound(0.8) * 10;
+            if (!isClassic)
+                penalisedStarRating *= calculateLazerHiddenReadingPenalty(attributes.HiddenReadingDifficulty, attributes.StarRating);
 
-            // The fraction of star rating made up by rhythm difficulty, normalised to represent rhythm's perceived contribution to star rating.
-            double rhythmFactor = DifficultyCalculationUtils.ReverseLerp(attributes.RhythmDifficulty / attributes.StarRating, 0.15, 0.4);
-
-            // A penalty removing improperly played rhythm difficulty from star rating based on estimated unstable rate.
-            double rhythmPenalty = 1 - DifficultyCalculationUtils.Logistic(
-                estimatedUnstableRate.Value,
-                midpointOffset: (rhythmExpectedUnstableRate + rhythmMaximumUnstableRate) / 2,
-                multiplier: 10 / (rhythmMaximumUnstableRate - rhythmExpectedUnstableRate),
-                maxValue: 0.25 * Math.Pow(rhythmFactor, 3)
-            );
-
-            double baseDifficulty = 5 * Math.Max(1.0, attributes.StarRating * rhythmPenalty / 0.110) - 4.0;
+            double baseDifficulty = 5 * Math.Max(1.0, penalisedStarRating / 0.110) - 4.0;
             double difficultyValue = Math.Min(Math.Pow(baseDifficulty, 3) / 69052.51, Math.Pow(baseDifficulty, 2.25) / 1250.0);
 
             difficultyValue *= 1 + 0.10 * Math.Max(0, attributes.StarRating - 10);
@@ -117,6 +105,36 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double monoAccScalingShift = 500 - 100 * (attributes.MonoStaminaFactor * 3);
 
             return difficultyValue * Math.Pow(DifficultyCalculationUtils.Erf(monoAccScalingShift / (Math.Sqrt(2) * estimatedUnstableRate.Value)), monoAccScalingExponent);
+        }
+
+        // A penalty removing improperly played rhythm difficulty from star rating based on estimated unstable rate.
+        private double calculateImproperlyPlayedRhythmPenalty(double rhythmDifficulty, double starRating)
+        {
+            // The estimated unstable rate for 100% accuracy, at which all rhythm difficulty has been played successfully.
+            double rhythmExpectedUnstableRate = computeDeviationUpperBound(1.0) * 10;
+
+            // The unstable rate at which it can be assumed all rhythm difficulty has been ignored.
+            // 0.8 represents 80% of total hits being greats, or 90% accuracy in-game
+            double rhythmMaximumUnstableRate = computeDeviationUpperBound(0.8) * 10;
+
+            // The fraction of star rating made up by rhythm difficulty, normalised to represent rhythm's perceived contribution to star rating.
+            double rhythmFactor = DifficultyCalculationUtils.ReverseLerp(rhythmDifficulty / starRating, 0.15, 0.4);
+
+            return 1 - DifficultyCalculationUtils.Logistic(
+                estimatedUnstableRate.Value,
+                midpointOffset: (rhythmExpectedUnstableRate + rhythmMaximumUnstableRate) / 2,
+                multiplier: 10 / (rhythmMaximumUnstableRate - rhythmExpectedUnstableRate),
+                maxValue: 0.25 * Math.Pow(rhythmFactor, 3)
+            );
+        }
+
+        // A penalty removing hidden reading difficulty unfairly awarded by playing on lazer from star rating.
+        private double calculateLazerHiddenReadingPenalty(double hiddenDifficulty, double starRating)
+        {
+            // The fraction of star rating made up by hidden reading difficulty, normalised to represent hidden reading's perceived contribution to star rating.
+            double hiddenFactor = DifficultyCalculationUtils.ReverseLerp(hiddenDifficulty / starRating, 0.1, 0.35);
+
+            return 1 - 0.15 * Math.Pow(hiddenFactor, 1.5);
         }
 
         private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
