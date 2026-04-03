@@ -31,9 +31,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimRating = Math.Pow(aimDifficultyValue, 0.63) * 0.02275;
 
-            if (mods.Any(m => m is OsuModRelax))
-                aimRating *= 0.9;
-
             if (mods.Any(m => m is OsuModMagnetised))
             {
                 float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
