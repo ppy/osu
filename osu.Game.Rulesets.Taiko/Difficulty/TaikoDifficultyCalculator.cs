@@ -49,7 +49,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return new Skill[]
             {
                 new Rhythm(mods),
-                new Reading(mods),
+                new Reading(mods, false),
+                new Reading(mods, true),
                 new Colour(mods),
                 new Stamina(mods, false, isConvert),
                 new Stamina(mods, true, isConvert)
@@ -103,7 +104,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 return new TaikoDifficultyAttributes { Mods = mods };
 
             var rhythm = skills.OfType<Rhythm>().Single();
-            var reading = skills.OfType<Reading>().Single();
+            var reading = skills.OfType<Reading>().Single(s => !s.HiddenDifficultyOnly);
+            var hiddenReading = skills.OfType<Reading>().Single(s => s.HiddenDifficultyOnly);
             var colour = skills.OfType<Colour>().Single();
             var stamina = skills.OfType<Stamina>().Single(s => !s.SingleColourStamina);
             var singleColourStamina = skills.OfType<Stamina>().Single(s => s.SingleColourStamina);
@@ -113,6 +115,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             double rhythmSkill = rhythm.DifficultyValue() * rhythm_skill_multiplier;
             double readingSkill = reading.DifficultyValue() * reading_skill_multiplier;
+            double hiddenReadingSkill = hiddenReading.DifficultyValue() * reading_skill_multiplier;
             double colourSkill = colour.DifficultyValue() * colour_skill_multiplier;
             double staminaSkill = staminaDifficultyValue * stamina_skill_multiplier;
             double monoStaminaSkill = singleColourStamina.DifficultyValue() * stamina_skill_multiplier;
@@ -137,6 +140,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             double rhythmDifficulty = rhythmSkill * skillRating;
             double readingDifficulty = readingSkill * skillRating;
+            double hiddenReadingDifficulty = hiddenReadingSkill * skillRating;
             double colourDifficulty = colourSkill * skillRating;
             double staminaDifficulty = staminaSkill * skillRating;
             double mechanicalDifficulty = colourDifficulty + staminaDifficulty; // Mechanical difficulty is the sum of colour and stamina difficulties.
@@ -148,6 +152,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 MechanicalDifficulty = mechanicalDifficulty,
                 RhythmDifficulty = rhythmDifficulty,
                 ReadingDifficulty = readingDifficulty,
+                HiddenReadingDifficulty = hiddenReadingDifficulty,
                 ColourDifficulty = colourDifficulty,
                 StaminaDifficulty = staminaDifficulty,
                 MonoStaminaFactor = monoStaminaFactor,
