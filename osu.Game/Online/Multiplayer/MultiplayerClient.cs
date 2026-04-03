@@ -196,6 +196,11 @@ namespace osu.Game.Online.Multiplayer
             }
         }
 
+        /// <summary>
+        /// Whether the <see cref="LocalUser"/> is a referee in the <see cref="Room"/>.
+        /// </summary>
+        public virtual bool IsReferee => LocalUser?.Role == MultiplayerRoomUserRole.Referee;
+
         [Resolved]
         protected IAPIProvider API { get; private set; } = null!;
 

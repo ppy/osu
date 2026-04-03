@@ -122,14 +122,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             var localUser = multiplayerClient.LocalUser;
 
-            int countReady = room.Users.Count(u => u.State == MultiplayerUserState.Ready);
-            int countTotal = room.Users.Count(u => u.State != MultiplayerUserState.Spectating);
+            int countReady = room.Users.Count(u => u.Role == MultiplayerRoomUserRole.Player && u.State == MultiplayerUserState.Ready);
+            int countTotal = room.Users.Count(u => u.Role == MultiplayerRoomUserRole.Player && u.State != MultiplayerUserState.Spectating);
             string countText = $"({countReady} / {countTotal} ready)";
 
-            if (countdown != null)
-            {
-                string countdownText = $"Starting in {countdownTimeRemaining:mm\\:ss}";
+            string? countdownText = countdown != null ? $"Starting in {countdownTimeRemaining:mm\\:ss}" : null;
 
+            if (multiplayerClient.IsReferee)
+            {
+                if (room.State == MultiplayerRoomState.Open)
+                    Text = countReady == 0 ? $"Waiting for players... {countText}" : $"{countdownText ?? "Start match"} {countText}";
+                else
+                    Text = "Abort match";
+
+                return;
+            }
+
+            if (countdownText != null)
+            {
                 switch (localUser?.State)
                 {
                     default:
@@ -196,7 +206,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             {
                 default:
                     // Show the abort button for the host as long as gameplay is in progress.
-                    if (multiplayerClient.IsHost && room.State != MultiplayerRoomState.Open)
+                    if ((multiplayerClient.IsHost || multiplayerClient.IsReferee) && room.State != MultiplayerRoomState.Open)
                         setRed();
                     else
                         setGreen();
@@ -204,7 +214,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 case MultiplayerUserState.Spectating:
                 case MultiplayerUserState.Ready:
-                    if (multiplayerClient.IsHost && !room.ActiveCountdowns.Any(c => c is MatchStartCountdown))
+                    if ((multiplayerClient.IsHost || multiplayerClient.IsReferee) && !room.ActiveCountdowns.Any(c => c is MatchStartCountdown))
                         setGreen();
                     else
                         setYellow();
