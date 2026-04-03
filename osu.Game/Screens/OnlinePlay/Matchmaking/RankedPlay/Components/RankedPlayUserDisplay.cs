@@ -174,25 +174,25 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 return;
 
             availability = user.BeatmapAvailability;
-            beatmapState.FadeIn(50);
+
+            if (availability.State is DownloadState.NotDownloaded or DownloadState.Downloading or DownloadState.Importing)
+                beatmapState.FadeIn(50);
+            else
+                beatmapState.FadeOut(50);
 
             switch (availability.State)
             {
-                default:
-                    beatmapState.FadeOut(50);
-                    break;
-
                 case DownloadState.NotDownloaded:
                     beatmapState.Text = "Missing Beatmap";
                     break;
 
                 case DownloadState.Downloading:
                     double progress = Math.Clamp(availability.DownloadProgress ?? 0, 0, 1);
-                    beatmapState.Text = $"Downloading ({progress:P0})";
+                    beatmapState.Text = $"Downloading... ({progress:P0})";
                     break;
 
                 case DownloadState.Importing:
-                    beatmapState.Text = "Importing";
+                    beatmapState.Text = "Importing...";
                     break;
             }
         }
