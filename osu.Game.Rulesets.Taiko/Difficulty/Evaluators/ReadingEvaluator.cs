@@ -112,20 +112,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             bool isHidden = mods.Any(m => m is TaikoModHidden);
             bool isFlashlight = mods.Any(m => m is TaikoModFlashlight);
             bool isEasy = mods.Any(m => m is TaikoModEasy);
-            bool isClassic = mods.Any(m => m is TaikoModClassic);
 
             double multiplier = 1.0;
 
             if (isHidden)
             {	
-                // With the classic mod enabled, the playfield is limited from the expected 1560px wide (equivalent to 16:9) to only 1080px (4:3)
+                // With hidden enabled, the playfield is limited from the expected 1560px wide (equivalent to 16:9) to only 1080px (4:3)
+                // This is not the case with the classic mod enabled, but due to current limitations this is penalised in performance calculation instead
                 // Considerations for HDHRCL are currently out of scope
-                if (isClassic)
-                    multiplier *= 1560.0 / 1080.0;
+                multiplier *= 1560.0 / 1080.0;
 
-                // Notes fading out after a short time with hidden means their velocity is essentially higher. With EZCL notes fade out after longer.
+                // Notes fading out after a short time with hidden means their velocity is essentially higher. With easy enabled, notes fade out after longer.
                 // Both of these values are arbitrary and based on feedback
-                if (isClassic && isEasy)
+                if (isEasy)
                     multiplier *= 1.1;
                 else
                     multiplier *= 1.2;
@@ -142,12 +141,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         private static double calculateTimeInvisibleModMultiplier(Mod[] mods)
         {
             bool isEasy = mods.Any(m => m is TaikoModEasy);
-            bool isClassic = mods.Any(m => m is TaikoModClassic);
 
             double multiplier = 1.0;
 
-            // With EZCL, notes fade out later and are invisible for less time. This is equivalent to their effective BPM being higher
-            if (isEasy && isClassic)
+            // With easy enabled, notes fade out later and are invisible for less time. This is equivalent to their effective BPM being higher
+            if (isEasy)
                 multiplier *= 1.35;
 
             return multiplier;
