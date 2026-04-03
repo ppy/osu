@@ -26,18 +26,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);
             var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
 
-            double currDistance = withSliderTravelDistance ? osuCurrObj.LazyJumpDistance : osuCurrObj.JumpDistance;
-            double prevDistance = withSliderTravelDistance ? osuLastObj.LazyJumpDistance : osuLastObj.JumpDistance;
+            double currDistance = osuCurrObj.GetDistance(withSliderTravelDistance);
+            double prevDistance = osuLastObj.GetDistance(withSliderTravelDistance);
 
             double currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
-
-            if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
-            {
-                // If the last object is a slider, then we extend the travel velocity through the slider into the current object.
-                double sliderDistance = osuLastObj.LazyTravelDistance + osuCurrObj.LazyJumpDistance;
-                currVelocity = Math.Max(currVelocity, sliderDistance / osuCurrObj.AdjustedDeltaTime);
-            }
-
             double prevVelocity = prevDistance / osuLastObj.AdjustedDeltaTime;
 
             double flowDifficulty = currVelocity;
@@ -83,11 +75,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             if (Math.Max(prevVelocity, currVelocity) != 0)
             {
-                if (withSliderTravelDistance)
-                {
-                    currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
-                }
-
                 // Scale with ratio of difference compared to 0.5 * max dist.
                 double distRatio = DifficultyCalculationUtils.Smoothstep(Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity), 0, 1);
 
@@ -104,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             if (osuCurrObj.BaseObject is Slider && withSliderTravelDistance)
             {
                 // Include slider velocity to make velocity more consistent with snap
-                flowDifficulty += osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
+                flowDifficulty += osuCurrObj.SliderBonusDistance / osuCurrObj.SliderTravelTime;
             }
 
             // Final velocity is being raised to a power because flow difficulty scales harder with both high distance and time, and we want to account for that
