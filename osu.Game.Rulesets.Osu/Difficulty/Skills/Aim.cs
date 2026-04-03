@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// <summary>
     /// Represents the skill required to correctly aim at every object in the map with a uniform CircleSize and normalized distances.
     /// </summary>
-    public class Aim : StrainSkill
+    public class Aim : VariableLengthStrainSkill
     {
         public readonly bool IncludeSliders;
 
@@ -31,26 +31,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain;
 
-        private double skillMultiplierSnap => 71.0;
-        private double skillMultiplierAgility => 2.0;
-        private double skillMultiplierFlow => 245.0;
-        private double skillMultiplierTotal => 1.1;
+        private double skillMultiplierSnap => 70.9;
+        private double skillMultiplierAgility => 2.35;
+        private double skillMultiplierFlow => 243.0;
+        private double skillMultiplierTotal => 1.12;
         private double meanExponent => 1.2;
 
         /// <summary>
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.
         /// This is done in order to decrease their impact on the overall difficulty of the map for this skill.
         /// </summary>
-        private int reducedSectionCount => 10;
+        private int reducedSectionTime => 4000;
 
         /// <summary>
         /// The baseline multiplier applied to the section with the biggest strain.
         /// </summary>
-        private double reducedStrainBaseline => 0.75;
+        private double reducedStrainBaseline => 0.727;
 
         private readonly List<double> sliderStrains = new List<double>();
 
-        private double strainDecay(double ms) => Math.Pow(0.15, ms / 1000);
+        private double strainDecay(double ms) => Math.Pow(0.2, ms / 1000);
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) =>
             currentStrain * strainDecay(time - current.Previous(0).StartTime);
@@ -153,30 +153,80 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public override double DifficultyValue()
         {
             double difficulty = 0;
-            double weight = 1;
+            double time = 0;
 
+            var strains = getReducedStrainPeaks();
+
+            // Difficulty is a continuous weighted sum of the sorted strains
+            foreach (StrainPeak strain in strains)
+            {
+                /* Weighting function can be thought of as:
+                        b
+                        ∫ DecayWeight^x dx
+                        a
+                    where a = startTime and b = endTime
+
+                    Technically, the function below has been slightly modified from the equation above.
+                    The real function would be
+                        double weight = Math.Pow(DecayWeight, startTime) - Math.Pow(DecayWeight, endTime);
+                        ...
+                        return difficulty / Math.Log(1 / DecayWeight);
+                    E.g. for a DecayWeight of 0.9, we're multiplying by 10 instead of 9.49122...
+
+                    This change makes it so that a map composed solely of MaxSectionLength chunks will have the exact same value when summed in this class and StrainSkill.
+                    Doing this ensures the relationship between strain values and difficulty values remains the same between the two classes.
+                */
+                double startTime = time;
+                double endTime = time + strain.SectionLength / MaxSectionLength;
+
+                double weight = Math.Pow(DecayWeight, startTime) - Math.Pow(DecayWeight, endTime);
+
+                difficulty += strain.Value * weight;
+                time = endTime;
+            }
+
+            return difficulty / (1 - DecayWeight);
+        }
+
+        /// <summary>
+        /// Returns a sorted enumerable of strain peaks with the highest values reduced.
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerable<StrainPeak> getReducedStrainPeaks()
+        {
             // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
             // These sections will not contribute to the difficulty.
-            var peaks = GetCurrentStrainPeaks().Where(p => p > 0);
+            var peaks = GetCurrentStrainPeaks().Where(p => p.Value > 0);
 
-            List<double> strains = peaks.OrderDescending().ToList();
+            List<StrainPeak> strains = peaks.OrderByDescending(p => p.Value).ToList();
+
+            const int chunk_size = 20;
+            double time = 0;
+            int strainsToRemove = 0; // All strains are removed at the end for optimization purposes
 
             // We are reducing the highest strains first to account for extreme difficulty spikes
-            for (int i = 0; i < Math.Min(strains.Count, reducedSectionCount); i++)
+            // Strains are split into 20ms chunks to try to mitigate inconsistencies caused by reducing strains
+            while (strains.Count > strainsToRemove && time < reducedSectionTime)
             {
-                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((float)i / reducedSectionCount, 0, 1)));
-                strains[i] *= Interpolation.Lerp(reducedStrainBaseline, 1.0, scale);
+                StrainPeak strain = strains[strainsToRemove];
+
+                for (double addedTime = 0; addedTime < strain.SectionLength; addedTime += chunk_size)
+                {
+                    double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((time + addedTime) / reducedSectionTime, 0, 1)));
+
+                    strains.Add(new StrainPeak(
+                        strain.Value * Interpolation.Lerp(reducedStrainBaseline, 1.0, scale),
+                        Math.Min(chunk_size, strain.SectionLength - addedTime)
+                    ));
+                }
+
+                time += strain.SectionLength;
+                strainsToRemove++;
             }
 
-            // Difficulty is the weighted sum of the highest strains from every section.
-            // We're sorting from highest to lowest strain.
-            foreach (double strain in strains.OrderDescending())
-            {
-                difficulty += strain * weight;
-                weight *= DecayWeight;
-            }
+            strains.RemoveRange(0, strainsToRemove);
 
-            return difficulty;
+            return strains.OrderByDescending(p => p.Value);
         }
     }
 }
