@@ -11,12 +11,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
     public class TaikoDifficultyAttributes : DifficultyAttributes
     {
         /// <summary>
-        /// The combined star rating of all skills.
-        /// </summary>
-        [JsonProperty("star_rating_classic", Order = -2)]
-        public double StarRatingClassic { get; set; }
-
-        /// <summary>
         /// The difficulty corresponding to the mechanical skills in osu!taiko.
         /// This includes colour and stamina combined.
         /// </summary>
@@ -32,11 +26,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// The difficulty corresponding to the reading skill.
         /// </summary>
         public double ReadingDifficulty { get; set; }
-
-        /// <summary>
-        /// The difficulty corresponding to the reading skill with the classic mod enabled.
-        /// </summary>
-        public double ReadingDifficultyClassic { get; set; }
 
         /// <summary>
         /// The difficulty corresponding to the colour skill.
@@ -59,12 +48,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// </summary>
         [JsonProperty("consistency_factor")]
         public double ConsistencyFactor { get; set; }
-
-        /// <summary>
-        /// The factor corresponding to the consistency of a map with the classic mod enabled.
-        /// </summary>
-        [JsonProperty("consistency_factor_classic")]
-        public double ConsistencyFactorClassic { get; set; }
 
         public double StaminaTopStrains { get; set; }
 

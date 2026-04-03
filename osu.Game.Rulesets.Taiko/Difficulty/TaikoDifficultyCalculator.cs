@@ -49,8 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return new Skill[]
             {
                 new Rhythm(mods),
-                new Reading(mods, false),
-                new Reading(mods, true),
+                new Reading(mods),
                 new Colour(mods),
                 new Stamina(mods, false, isConvert),
                 new Stamina(mods, true, isConvert)
@@ -104,42 +103,40 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 return new TaikoDifficultyAttributes { Mods = mods };
 
             var rhythm = skills.OfType<Rhythm>().Single();
-            var reading = skills.OfType<Reading>().Single(s => !s.isClassic);
-            var readingClassic = skills.OfType<Reading>().Single(s => s.isClassic);
+            var reading = skills.OfType<Reading>().Single();
             var colour = skills.OfType<Colour>().Single();
             var stamina = skills.OfType<Stamina>().Single(s => !s.SingleColourStamina);
             var singleColourStamina = skills.OfType<Stamina>().Single(s => s.SingleColourStamina);
 
             double staminaDifficultyValue = stamina.DifficultyValue();
+            double readingDifficultyValue = reading.DifficultyValue();
 
             double rhythmSkill = rhythm.DifficultyValue() * rhythm_skill_multiplier;
             double readingSkill = reading.DifficultyValue() * reading_skill_multiplier;
-            double readingClassicSkill = readingClassic.DifficultyValue() * reading_skill_multiplier;
             double colourSkill = colour.DifficultyValue() * colour_skill_multiplier;
             double staminaSkill = staminaDifficultyValue * stamina_skill_multiplier;
             double monoStaminaSkill = singleColourStamina.DifficultyValue() * stamina_skill_multiplier;
             double monoStaminaFactor = staminaSkill == 0 ? 1 : Math.Pow(monoStaminaSkill / staminaSkill, 5);
 
             double staminaDifficultStrains = stamina.CountTopWeightedStrains(staminaDifficultyValue);
+            double readingDifficultStrains = reading.CountTopWeightedStrains(readingDifficultyValue);
 
             // As we don't have pattern integration in osu!taiko, we apply the other two skills relative to rhythm.
             patternMultiplier = Math.Pow(staminaSkill * colourSkill, 0.10);
 
             strainLengthBonus = 1 + 0.15 * DifficultyCalculationUtils.ReverseLerp(staminaDifficultStrains, 1000, 1555);
 
+            // Apply a penalty to small amounts of reading that can be memorised.
+            readingLengthPenalty = DifficultyCalculationUtils.ReverseLerp(readingDifficultStrains, 0, 150);
+
             double combinedRating = combinedDifficultyValue(rhythm, reading, colour, stamina, out double consistencyFactor);
             double starRating = rescale(combinedRating * 1.4);
-
-            // Repeat difficulty calculation for if the classic mod is enabled.
-            double combinedRatingClassic = combinedDifficultyValue(rhythm, readingClassic, colour, stamina, out double consistencyFactorClassic);
-            double starRatingClassic = rescale(combinedRatingClassic * 1.4);
 
             // Calculate proportional contribution of each skill to the combinedRating.
             double skillRating = starRating / (rhythmSkill + readingSkill + colourSkill + staminaSkill);
 
             double rhythmDifficulty = rhythmSkill * skillRating;
             double readingDifficulty = readingSkill * skillRating;
-            double readingClassicDifficulty = readingClassicSkill * skillRating;
             double colourDifficulty = colourSkill * skillRating;
             double staminaDifficulty = staminaSkill * skillRating;
             double mechanicalDifficulty = colourDifficulty + staminaDifficulty; // Mechanical difficulty is the sum of colour and stamina difficulties.
@@ -147,18 +144,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             TaikoDifficultyAttributes attributes = new TaikoDifficultyAttributes
             {
                 StarRating = starRating,
-                StarRatingClassic = starRatingClassic,
                 Mods = mods,
                 MechanicalDifficulty = mechanicalDifficulty,
                 RhythmDifficulty = rhythmDifficulty,
                 ReadingDifficulty = readingDifficulty,
-                ReadingDifficultyClassic = readingClassicDifficulty,
                 ColourDifficulty = colourDifficulty,
                 StaminaDifficulty = staminaDifficulty,
                 MonoStaminaFactor = monoStaminaFactor,
                 StaminaTopStrains = staminaDifficultStrains,
                 ConsistencyFactor = consistencyFactor,
-                ConsistencyFactorClassic = consistencyFactorClassic,
                 MaxCombo = beatmap.GetMaxCombo(),
             };
 
@@ -174,12 +168,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// </remarks>
         private double combinedDifficultyValue(Rhythm rhythm, Reading reading, Colour colour, Stamina stamina, out double consistencyFactor)
         {
-            double readingDifficultyValue = reading.DifficultyValue();
-            double readingDifficultStrains = reading.CountTopWeightedStrains(readingDifficultyValue);
-			
-            // Apply a penalty to small amounts of reading that can be memorised.
-            readingLengthPenalty = DifficultyCalculationUtils.ReverseLerp(readingDifficultStrains, 0, 150);
-
             List<double> peaks = combinePeaks(
                 rhythm.GetCurrentStrainPeaks().ToList(),
                 reading.GetCurrentStrainPeaks().ToList(),

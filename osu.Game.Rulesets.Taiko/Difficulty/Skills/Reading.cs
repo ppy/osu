@@ -20,15 +20,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         protected override double StrainDecayBase => 0.4;
 
         private double currentStrain;
-
         private Mod[] mods;
-        public readonly bool isClassic;
 
-        public Reading(Mod[] mods, bool isClassic)
+        public Reading(Mod[] mods)
             : base(mods)
         {
             this.mods = mods;
-            this.isClassic = isClassic;
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
@@ -45,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             currentStrain *= DifficultyCalculationUtils.Logistic(index, 4, -1 / 25.0, 0.5) + 0.5;
 
             currentStrain *= StrainDecayBase;
-            currentStrain += ReadingEvaluator.EvaluateDifficultyOf(taikoObject, mods, isClassic) * SkillMultiplier;
+            currentStrain += ReadingEvaluator.EvaluateDifficultyOf(taikoObject, mods) * SkillMultiplier;
 
             return currentStrain;
         }
