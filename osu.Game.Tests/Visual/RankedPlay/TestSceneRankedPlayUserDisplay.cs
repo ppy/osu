@@ -4,6 +4,8 @@
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Utils;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 using osu.Game.Tests.Visual.Multiplayer;
@@ -20,11 +22,19 @@ namespace osu.Game.Tests.Visual.RankedPlay
             Value = 1_000_000,
         };
 
+        public TestSceneRankedPlayUserDisplay()
+        {
+            AddSliderStep("health", 0, 1_000_000, 1_000_000, value => health.Value = value);
+        }
+
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
-            AddStep("add display", () => Child = new RankedPlayUserDisplay(2, Anchor.BottomLeft, RankedPlayColourScheme.Blue)
+            AddStep("join room", () => JoinRoom(CreateDefaultRoom(MatchType.RankedPlay)));
+            WaitForJoined();
+
+            AddStep("add display", () => Child = new RankedPlayUserDisplay(1001, Anchor.BottomLeft, RankedPlayColourScheme.Blue)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -36,7 +46,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void TesUserDisplay()
         {
-            AddStep("blue color scheme", () => Child = new RankedPlayUserDisplay(2, Anchor.BottomLeft, RankedPlayColourScheme.Blue)
+            AddStep("blue color scheme", () => Child = new RankedPlayUserDisplay(1001, Anchor.BottomLeft, RankedPlayColourScheme.Blue)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -44,15 +54,30 @@ namespace osu.Game.Tests.Visual.RankedPlay
                 Health = { BindTarget = health }
             });
 
-            AddStep("red color scheme", () => Child = new RankedPlayUserDisplay(2, Anchor.BottomLeft, RankedPlayColourScheme.Red)
+            AddStep("red color scheme", () => Child = new RankedPlayUserDisplay(1001, Anchor.BottomLeft, RankedPlayColourScheme.Red)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(256, 72),
                 Health = { BindTarget = health }
             });
+        }
 
-            AddSliderStep("health", 0, 1_000_000, 1_000_000, value => health.Value = value);
+        [Test]
+        public void TestBeatmapState()
+        {
+            float progress = 0;
+
+            AddStep("set unavailable", () => MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.NotDownloaded()));
+            AddStep("set downloading", () => MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(progress = 0)));
+            AddUntilStep("increment progress", () =>
+            {
+                progress += RNG.NextSingle(0.1f);
+                MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(progress));
+                return progress >= 1;
+            });
+            AddStep("set to importing", () => MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.Importing()));
+            AddStep("set to available", () => MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.LocallyAvailable()));
         }
     }
 }
