@@ -66,6 +66,7 @@ namespace osu.Game.Overlays.Settings
                 if (child is FillFlowContainer { Direction: FillDirection.Horizontal } row)
                 {
                     bool hasVisibleButtons = false;
+
                     foreach (var item in row.Children)
                     {
                         if (item is IFilterable && item.IsPresent)
@@ -74,6 +75,7 @@ namespace osu.Game.Overlays.Settings
                             break;
                         }
                     }
+
                     if (hasVisibleButtons)
                     {
                         foreach (var item in row.Children)
