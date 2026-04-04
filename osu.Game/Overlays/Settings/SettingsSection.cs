@@ -42,17 +42,6 @@ namespace osu.Game.Overlays.Settings
 
         private bool matchingFilter = true;
 
-        private static void showIFilterableChildren(Drawable drawable)
-        {
-            if (drawable is IFilterable filterable)
-                filterable.MatchingFilter = true;
-            if (drawable is IContainerEnumerable<Drawable> container)
-            {
-                foreach (var child in container.Children)
-                    showIFilterableChildren(child);
-            }
-        }
-
         public bool MatchingFilter
         {
             get => matchingFilter;
@@ -63,13 +52,37 @@ namespace osu.Game.Overlays.Settings
                 matchingFilter = value;
 
                 if (matchingFilter && FilteringActive)
-                {
-                    foreach (var child in Children)
-                        showIFilterableChildren(child);
-                }
+                    showHorizontalSiblings();
 
                 if (IsPresent != wasPresent)
                     Invalidate(Invalidation.Presence);
+            }
+        }
+
+        private void showHorizontalSiblings()
+        {
+            foreach (var child in FlowContent)
+            {
+                if (child is FillFlowContainer { Direction: FillDirection.Horizontal } row)
+                {
+                    bool hasVisibleButtons = false;
+                    foreach (var item in row.Children)
+                    {
+                        if (item is IFilterable && item.IsPresent)
+                        {
+                            hasVisibleButtons = true;
+                            break;
+                        }
+                    }
+                    if (hasVisibleButtons)
+                    {
+                        foreach (var item in row.Children)
+                        {
+                            if (item is IFilterable filterable)
+                                filterable.MatchingFilter = true;
+                        }
+                    }
+                }
             }
         }
 
