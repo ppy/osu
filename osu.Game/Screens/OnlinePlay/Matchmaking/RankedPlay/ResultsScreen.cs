@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -205,8 +207,24 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
             private RankedPlayDamageInfo losingDamageInfo = null!;
 
+            private Sample resultsAppearSample = null!;
+            private Sample dmgFlySample = null!;
+            private Sample dmgHitSample = null!;
+            private Sample hpDownSample = null!;
+            private Sample playerAppearSample = null!;
+            private Sample pseudoScoreCounterSample = null!;
+            private Sample scoreTickSample = null!;
+            private Sample gradePassSample = null!;
+            private Sample gradePassSsSample = null!;
+            private Sample gradeFailSample = null!;
+            private Sample gradeFailDSample = null!;
+            private SampleChannel? playerScoreTickChannel;
+            private SampleChannel? opponentScoreTickChannel;
+            private readonly BindableDouble playerScoreTickPitch = new BindableDouble();
+            private readonly BindableDouble opponentScoreTickPitch = new BindableDouble();
+
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(AudioManager audio)
             {
                 // this works under the assumption that only one player can receive damage each round
                 losingDamageInfo = matchInfo.RoomState.Users
@@ -417,6 +435,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                         ]
                     }
                 });
+
+                resultsAppearSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/results-appear");
+                dmgFlySample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/dmg-fly");
+                dmgHitSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/dmg-hit");
+                hpDownSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/hp-down");
+                playerAppearSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/players-appear");
+                pseudoScoreCounterSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/pseudo-score-counter");
+                scoreTickSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/score-tick");
+                gradePassSample = audio.Samples.Get(@"Results/rank-impact-pass");
+                gradePassSsSample = audio.Samples.Get(@"Results/rank-impact-pass-ss");
+                gradeFailSample = audio.Samples.Get(@"Results/rank-impact-fail");
+                gradeFailDSample = audio.Samples.Get(@"Results/rank-impact-fail-d");
             }
 
             protected override void LoadComplete()
@@ -436,6 +466,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
             private void appear(ref double delay)
             {
+                resultsAppearSample.Play();
+
                 panelScaffold.FadeIn(100)
                              .ResizeTo(0)
                              .ResizeTo(cardSize with { Y = 30 }, 600, Easing.OutExpo)
@@ -451,7 +483,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     playerScoreCounter.FadeIn(600);
                     opponentScoreCounter.FadeIn(600);
 
-                    Schedule(() => cornerPieceVisibility.Value = Visibility.Visible);
+                    Schedule(() =>
+                    {
+                        cornerPieceVisibility.Value = Visibility.Visible;
+                        playerAppearSample.Play();
+                    });
                 }
 
                 using (BeginDelayedSequence(900))
@@ -487,12 +523,57 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     playerScoreBar.FadeIn(100);
                     opponentScoreBar.FadeIn(100);
 
+                    playerScoreTickChannel ??= scoreTickSample.GetChannel();
+                    playerScoreTickChannel.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH;
+                    playerScoreTickChannel.Frequency.BindTarget = playerScoreTickPitch;
+                    playerScoreTickPitch.Value = 0.5f;
+                    playerScoreTickChannel.Looping = true;
+
+                    opponentScoreTickChannel ??= scoreTickSample.GetChannel();
+                    opponentScoreTickChannel.Balance.Value = OsuGameBase.SFX_STEREO_STRENGTH;
+                    opponentScoreTickChannel.Frequency.BindTarget = opponentScoreTickPitch;
+                    opponentScoreTickPitch.Value = 0.5f;
+                    opponentScoreTickChannel.Looping = true;
+
+                    Schedule(() =>
+                    {
+                        if (losingDamageInfo.Damage > 0)
+                            pseudoScoreCounterSample.Play();
+
+                        if (PlayerScore.TotalScore > 0)
+                            playerScoreTickChannel.Play();
+
+                        if (OpponentScore.TotalScore > 0)
+                            opponentScoreTickChannel.Play();
+                    });
+
                     this.TransformBindableTo(scoreBarProgress, maxScorePercent, score_text_duration, new CubicBezierEasingFunction(easeIn: 0.4, easeOut: 1));
+                    this.TransformBindableTo(playerScoreTickPitch, 0.5f + playerScorePercent, score_text_duration, Easing.OutCubic);
+                    this.TransformBindableTo(opponentScoreTickPitch, 0.5f + opponentScorePercent, score_text_duration, Easing.OutCubic);
+
+                    // safety timeout to ensure scoreTicks don't play forever
+                    Scheduler.AddDelayed(() =>
+                    {
+                        if (playerScoreTickChannel != null)
+                            playerScoreTickChannel.Looping = false;
+
+                        if (opponentScoreTickChannel != null)
+                            opponentScoreTickChannel.Looping = false;
+                    }, score_text_duration + 500);
 
                     scoreBarProgress.BindValueChanged(e =>
                     {
                         playerScoreBar.Height = float.Lerp(0.05f, 1f, Math.Min(e.NewValue, playerScorePercent));
                         opponentScoreBar.Height = float.Lerp(0.05f, 1f, Math.Min(e.NewValue, opponentScorePercent));
+
+                        Schedule(() =>
+                        {
+                            if (playerScoreTickChannel != null && playerScoreBar.Height >= playerScorePercent)
+                                playerScoreTickChannel.Looping = false;
+
+                            if (opponentScoreTickChannel != null && opponentScoreBar.Height >= opponentScorePercent)
+                                opponentScoreTickChannel.Looping = false;
+                        });
                     });
                 }
 
@@ -502,6 +583,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             private void updateHealthBars(ref double delay)
             {
                 const double text_movement_duration = 400;
+
+                bool playerTookDamage = OpponentScore.TotalScore > PlayerScore.TotalScore;
+                double loserPanDirection = playerTookDamage ? -OsuGameBase.SFX_STEREO_STRENGTH : OsuGameBase.SFX_STEREO_STRENGTH;
 
                 using (BeginDelayedSequence(delay))
                 {
@@ -522,6 +606,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                      .ScaleTo(0.9f)
                                      .ScaleTo(1f, 300, Easing.OutElasticHalf);
 
+                        var dmgFlyChannel = dmgFlySample.GetChannel();
+                        this.TransformBindableTo(dmgFlyChannel.Balance, loserPanDirection, text_movement_duration, Easing.InCubic);
+                        dmgFlyChannel.Play();
+
                         flyingDamageText.FadeIn()
                                         .MoveTo(position, text_movement_duration, Easing.InCubic)
                                         .ScaleTo(0.75f, text_movement_duration, new CubicBezierEasingFunction(easeIn: 0.35, easeOut: 0.5))
@@ -531,6 +619,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
                         Scheduler.AddDelayed(() =>
                         {
+                            var dmgHitChannel = dmgHitSample.GetChannel();
+                            dmgHitChannel.Balance.Value = loserPanDirection;
+                            dmgHitChannel.Play();
+
                             userDisplay.Shake(shakeDuration: 60, shakeMagnitude: 2, maximumLength: 120);
 
                             for (int i = 0; i < 10; i++)
@@ -564,6 +656,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     {
                         playerUserDisplay.Health.Value = PlayerDamageInfo.NewLife;
                         opponentUserDisplay.Health.Value = OpponentDamageInfo.NewLife;
+
+                        Scheduler.AddDelayed(() =>
+                        {
+                            var hpDecreaseChannel = hpDownSample.GetChannel();
+                            hpDecreaseChannel.Balance.Value = loserPanDirection;
+                            hpDecreaseChannel.Play();
+                        }, 900);
                     });
                 }
 
@@ -576,9 +675,43 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 {
                     playerScoreDetails.FadeIn(300);
                     opponentScoreDetails.FadeIn(300);
+
+                    Schedule(() =>
+                    {
+                        SampleChannel playerRankChannel = getRankSample(PlayerScore.Rank).GetChannel();
+                        playerRankChannel.Balance.Value = -OsuGameBase.SFX_STEREO_STRENGTH;
+                        playerRankChannel.Play();
+
+                        SampleChannel opponentRankChannel = getRankSample(OpponentScore.Rank).GetChannel();
+                        opponentRankChannel.Balance.Value = OsuGameBase.SFX_STEREO_STRENGTH;
+                        opponentRankChannel.Play();
+                    });
                 }
 
                 delay += 800;
+            }
+
+            private Sample getRankSample(ScoreRank rank)
+            {
+                switch (rank)
+                {
+                    default:
+                    case ScoreRank.D:
+                        return gradeFailDSample;
+
+                    case ScoreRank.C:
+                    case ScoreRank.B:
+                        return gradeFailSample;
+
+                    case ScoreRank.A:
+                    case ScoreRank.S:
+                    case ScoreRank.SH:
+                        return gradePassSample;
+
+                    case ScoreRank.X:
+                    case ScoreRank.XH:
+                        return gradePassSsSample;
+                }
             }
 
             private static int numDigits(long value)

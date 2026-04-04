@@ -4,6 +4,8 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -36,8 +38,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private OsuTextFlowContainer localRatingText = null!;
         private OsuTextFlowContainer opponentRatingText = null!;
 
+        private Sample winSample = null!;
+        private Sample loseSample = null!;
+        private Sample drawSample = null!;
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, AudioManager audio)
         {
             CenterColumn.Child = new FillFlowContainer
             {
@@ -172,6 +178,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 }
             };
 
+            winSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/win");
+            loseSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/lose");
+            drawSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/draw");
+
             RankedPlayUserInfo localUser = matchInfo.RoomState.Users[Client.LocalUser!.UserID];
             RankedPlayUserInfo otherUser = matchInfo.RoomState.Users.Values.Single(u => u != localUser);
 
@@ -179,16 +189,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             {
                 titleText.Text = "DRAW";
                 titleText.Colour = titleSeparator.Colour = colours.Orange1;
+                drawSample.Play();
             }
             else if (matchInfo.RoomState.WinningUserId == Client.LocalUser!.UserID)
             {
                 titleText.Text = "VICTORY";
                 titleText.Colour = titleSeparator.Colour = colours.Green1;
+                winSample.Play();
             }
             else
             {
                 titleText.Text = "DEFEAT";
                 titleText.Colour = titleSeparator.Colour = colours.Red1;
+                loseSample.Play();
             }
 
             localRatingText.AddText("Your Rating: ", s => s.Font = OsuFont.Style.Heading1.With(weight: FontWeight.Regular));
