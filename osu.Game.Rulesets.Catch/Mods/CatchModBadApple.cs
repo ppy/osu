@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override double ScoreMultiplier => 1;
         public override string Acronym => "BA";
         public override Type[] IncompatibleMods => new[] { typeof(CatchModAutoplay) };
+        public override ModType Type => ModType.Conversion;
 
         [SettingSource("Mute hit sounds", "Hit sounds become muted.")]
         public BindableBool AffectsHitSounds { get; } = new BindableBool(true);

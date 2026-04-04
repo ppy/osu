@@ -138,6 +138,7 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModDifficultyAdjust(),
                         new CatchModClassic(),
                         new CatchModMirror(),
+                        new CatchModBadApple(),
                     };
 
                 case ModType.Automation:
@@ -155,7 +156,6 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModMuted(),
                         new CatchModNoScope(),
                         new CatchModMovingFast(),
-                        new CatchModBadApple(),
                     };
 
                 case ModType.System:
