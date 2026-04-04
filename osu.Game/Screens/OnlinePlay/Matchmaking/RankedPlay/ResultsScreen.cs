@@ -39,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 {
     public partial class ResultsScreen : RankedPlaySubScreen
     {
-        protected override LocalisableString StageHeading => "Results";
+        public override LocalisableString StageHeading => "Results";
         protected override LocalisableString StageCaption => string.Empty;
 
         public override bool ShowBeatmapBackground => true;
@@ -243,7 +243,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             State = { BindTarget = cornerPieceVisibility },
-                            Child = playerUserDisplay = new RankedPlayUserDisplay(PlayerScore.UserID, Anchor.BottomLeft, RankedPlayColourScheme.Blue)
+                            Child = playerUserDisplay = new RankedPlayUserDisplay(PlayerScore.User, Anchor.BottomLeft, RankedPlayColourScheme.Blue)
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Health = { Value = PlayerDamageInfo.OldLife }
@@ -254,7 +254,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
                             State = { BindTarget = cornerPieceVisibility },
-                            Child = opponentUserDisplay = new RankedPlayUserDisplay(OpponentScore.UserID, Anchor.BottomRight, RankedPlayColourScheme.Red)
+                            Child = opponentUserDisplay = new RankedPlayUserDisplay(OpponentScore.User, Anchor.BottomRight, RankedPlayColourScheme.Red)
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Health = { Value = OpponentDamageInfo.OldLife }

@@ -79,6 +79,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private APIUser localUser = null!;
         private APIUser opponentUser = null!;
 
+        private readonly Container<RankedPlayStageOverlay> stageOverlayContainer;
         private readonly Container<RankedPlaySubScreen> screenContainer;
         private readonly RankedPlayChatDisplay chat;
 
@@ -139,6 +140,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                             }
                         }
                     }
+                },
+                stageOverlayContainer = new Container<RankedPlayStageOverlay>
+                {
+                    RelativeSizeAxes = Axes.Both,
                 },
                 overlayContainer = new CardDetailsOverlayContainer(),
                 particleContainer = new SongPreviewParticleContainer(),
@@ -212,6 +217,25 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
                 cornerPieceVisibility.BindTo(screen.CornerPieceVisibility);
                 showBeatmapBackground.Value = screen.ShowBeatmapBackground;
+
+                if (screen.ShowStageOverlay)
+                {
+                    APIUser? pickingUser = null;
+                    double? multiplier = matchInfo.Stage.Value < RankedPlayStage.CardPlay ? null : matchInfo.RoomState.DamageMultiplier;
+                    RankedPlayColourScheme colourScheme = RankedPlayColourScheme.Blue;
+
+                    if (matchInfo.Stage.Value == RankedPlayStage.CardPlay && matchInfo.RoomState.ActiveUser != null)
+                    {
+                        pickingUser = matchInfo.IsOwnTurn ? localUser : opponentUser;
+                        colourScheme = matchInfo.IsOwnTurn ? RankedPlayColourScheme.Blue : RankedPlayColourScheme.Red;
+                    }
+
+                    stageOverlayContainer.Add(new RankedPlayStageOverlay(screen.StageHeading, colourScheme)
+                    {
+                        PickingUser = pickingUser,
+                        Multiplier = multiplier,
+                    });
+                }
             };
         }
 

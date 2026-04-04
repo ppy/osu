@@ -13,7 +13,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 {
     public partial class GameplayScreen : RankedPlaySubScreen
     {
-        protected override LocalisableString StageHeading => "Gameplay";
+        public override LocalisableString StageHeading => "Gameplay";
         protected override LocalisableString StageCaption => string.Empty;
 
         [BackgroundDependencyLoader]
