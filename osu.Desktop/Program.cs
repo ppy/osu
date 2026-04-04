@@ -194,7 +194,7 @@ namespace osu.Desktop
 
             if (args.Length > 0 && !args[0].StartsWith("--velo", StringComparison.Ordinal))
             {
-                Logger.Log("Handling arguments, skipping velopack setup.");
+                Logger.Log("Handling arguments, skipping full velopack setup.");
                 return;
             }
 
