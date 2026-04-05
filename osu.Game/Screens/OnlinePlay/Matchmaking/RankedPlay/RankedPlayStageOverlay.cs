@@ -115,6 +115,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     {
                         avatarContainer = new CircularContainer
                         {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
                             Size = new Vector2(32),
                             Masking = true,
                             Children = new Drawable[]
@@ -129,6 +131,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                         },
                         new OsuSpriteText
                         {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            UseFullGlyphHeight = false,
                             Font = OsuFont.Torus.With(size: 32),
                             Text = $"{PickingUser.Username}'s pick",
                             Colour = colourScheme.Primary,
@@ -141,8 +146,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             {
                 detailsContainer.Add(new OsuSpriteText
                 {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    UseFullGlyphHeight = false,
                     Font = OsuFont.Torus.With(size: 32),
-                    Text = $"{Multiplier:N0}x Damage",
+                    Text = $"{Multiplier:N0}x damage",
                 });
             }
         }
@@ -156,6 +164,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
             const int duration = 500;
             const int time_visible = 1500;
+
             const Easing easing = Easing.OutQuint;
 
             this.FadeInFromZero(300, easing);
