@@ -27,7 +27,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         /// </summary>
         public Action<bool>? ExitRequested { get; init; }
 
-        protected override LocalisableString StageHeading => "Results";
+        public override LocalisableString StageHeading => "Results";
         protected override LocalisableString StageCaption => string.Empty;
 
         [Resolved]

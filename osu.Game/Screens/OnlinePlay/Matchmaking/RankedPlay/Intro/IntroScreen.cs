@@ -19,7 +19,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 {
     public partial class IntroScreen : RankedPlaySubScreen
     {
-        protected override LocalisableString StageHeading => string.Empty;
+        public override LocalisableString StageHeading => string.Empty;
         protected override LocalisableString StageCaption => string.Empty;
 
         public IntroScreen()
