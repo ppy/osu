@@ -23,7 +23,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         public APIUser? PickingUser { get; init; }
         public double? Multiplier { get; init; }
 
-        private Box background = null!;
         private FillFlowContainer displayContainer = null!;
         private FillFlowContainer detailsContainer = null!;
         private CircularContainer avatarContainer = null!;
@@ -46,13 +45,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 Origin = Anchor.Centre,
                 Children = new Drawable[]
                 {
-                    background = new Box
+                    new Box
                     {
+                        Alpha = 0.4f,
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Colour = Color4Extensions.FromHex("#000"),
-                        Alpha = 0.4f,
                     },
                     displayContainer = new FillFlowContainer
                     {
@@ -159,20 +158,20 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             const int time_visible = 1500;
             const Easing easing = Easing.OutQuint;
 
-            background.FadeTo(0f)
-                      .FadeTo(0.4f, 300, easing)
-                      .Delay(time_visible)
-                      .FadeOut(duration, easing);
+            this.FadeInFromZero(300, easing);
 
-            displayContainer.FadeTo(0)
-                            .ScaleTo(0.9f)
-                            .FadeIn(duration, easing)
-                            .ScaleTo(1f, duration, easing)
-                            .Delay(time_visible)
-                            .FadeOut(duration, easing)
-                            .ScaleTo(0.9f, duration, easing)
-                            .Then()
-                            .Schedule(() => Expire());
+            displayContainer
+                .ScaleTo(0.9f)
+                .ScaleTo(1f, duration, easing);
+
+            using (BeginDelayedSequence(time_visible))
+            {
+                this.FadeOut(duration, easing)
+                    .Expire();
+
+                displayContainer
+                    .ScaleTo(0.9f, duration, easing);
+            }
         }
     }
 }
