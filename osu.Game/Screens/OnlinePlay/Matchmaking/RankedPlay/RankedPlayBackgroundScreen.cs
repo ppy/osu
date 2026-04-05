@@ -28,9 +28,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             InternalChild = Background = new RankedPlayBackground
             {
                 RelativeSizeAxes = Axes.Both,
-                GradientOutside = Color4Extensions.FromHex("716BE0"),
-                GradientInside = Color4Extensions.FromHex("#71308F"),
-                DotsColour = Color4Extensions.FromHex("#CC46F6").Opacity(0.5f),
+                GradientBottom = Color4Extensions.FromHex("716BE0"),
+                GradientTop = Color4Extensions.FromHex("71308F"),
             };
         }
 

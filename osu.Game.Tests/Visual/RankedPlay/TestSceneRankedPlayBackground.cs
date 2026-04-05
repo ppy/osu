@@ -54,9 +54,8 @@ namespace osu.Game.Tests.Visual.RankedPlay
         {
             base.LoadComplete();
 
-            gradientOuter.BindValueChanged(e => background.GradientOutside = e.NewValue, true);
-            gradientInner.BindValueChanged(e => background.GradientInside = e.NewValue, true);
-            dots.BindValueChanged(e => background.DotsColour = e.NewValue, true);
+            gradientOuter.BindValueChanged(e => background.GradientBottom = e.NewValue, true);
+            gradientInner.BindValueChanged(e => background.GradientTop = e.NewValue, true);
         }
     }
 }
