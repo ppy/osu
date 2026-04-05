@@ -30,7 +30,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         private PreviewTrackManager previewTrackManager { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuGameBase game)
+        private void load(AudioManager audio)
         {
             AddInternal(bgm = new DrawableTrack(audio.Tracks.Get("rankedplay_bgm.ogg")));
         }
