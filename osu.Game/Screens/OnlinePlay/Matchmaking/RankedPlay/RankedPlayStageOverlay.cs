@@ -174,12 +174,5 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                             .Then()
                             .Schedule(() => Expire());
         }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            displayContainer.Y = DrawHeight * -0.2f;
-        }
     }
 }

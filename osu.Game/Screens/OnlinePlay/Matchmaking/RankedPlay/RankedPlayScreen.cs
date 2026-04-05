@@ -79,7 +79,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private APIUser localUser = null!;
         private APIUser opponentUser = null!;
 
-        private readonly Container<RankedPlayStageOverlay> stageOverlayContainer;
+        private readonly Container stageOverlayContainer;
         private readonly Container<RankedPlaySubScreen> screenContainer;
         private readonly RankedPlayChatDisplay chat;
 
@@ -141,7 +141,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                         }
                     }
                 },
-                stageOverlayContainer = new Container<RankedPlayStageOverlay>
+                stageOverlayContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
