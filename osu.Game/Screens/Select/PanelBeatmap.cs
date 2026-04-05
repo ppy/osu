@@ -245,7 +245,7 @@ namespace osu.Game.Screens.Select
             {
                 starRatingDisplay.Current.Value = starDifficulty.NewValue;
                 starCounter.Current = (float)starDifficulty.NewValue.Stars;
-            }, true);
+            }, false);
         }
 
         protected override void Update()
