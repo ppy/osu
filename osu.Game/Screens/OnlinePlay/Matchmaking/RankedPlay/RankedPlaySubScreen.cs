@@ -24,9 +24,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         public virtual bool ShowBeatmapBackground => false;
 
         /// <summary>
+        /// Whether a fullscreen overlay displaying the current stage (and any additional
+        /// information like the currently picking player and/or the damage multiplier)
+        /// should be displayed upon entering this screen.
+        /// </summary>
+        public virtual bool ShowStageOverlay => false;
+
+        /// <summary>
         /// Heading text to be displayed indicating the purpose of the current stage.
         /// </summary>
-        protected abstract LocalisableString StageHeading { get; }
+        public abstract LocalisableString StageHeading { get; }
 
         /// <summary>
         /// Subtitle text to be displayed indicating the action a user should take in the current stage.
