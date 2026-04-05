@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
@@ -35,9 +34,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             MinValue = 0,
             Value = 1_000_000,
         };
-
-        [Resolved]
-        private UserLookupCache users { get; set; } = null!;
 
         private readonly APIUser user;
         private readonly Anchor contentAnchor;
