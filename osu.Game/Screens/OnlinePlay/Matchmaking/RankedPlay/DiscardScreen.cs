@@ -34,7 +34,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         public CardFlow CenterRow { get; private set; } = null!;
 
-        protected override LocalisableString StageHeading => "Discard Phase";
+        public override bool ShowStageOverlay => true;
+        public override LocalisableString StageHeading => "Discard Phase";
         protected override LocalisableString StageCaption => "Replace cards from your hand";
 
         private PlayerHandOfCards playerHand = null!;

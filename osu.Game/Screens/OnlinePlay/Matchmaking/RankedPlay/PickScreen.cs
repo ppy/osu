@@ -28,7 +28,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         public CardFlow CenterRow { get; private set; } = null!;
 
-        protected override LocalisableString StageHeading => "Pick Phase";
+        public override bool ShowStageOverlay => true;
+
+        public override LocalisableString StageHeading => "Pick Phase";
         protected override LocalisableString StageCaption => "It's your turn to play a card!";
 
         private PlayerHandOfCards playerHand = null!;
