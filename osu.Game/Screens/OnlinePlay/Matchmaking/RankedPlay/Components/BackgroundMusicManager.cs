@@ -48,78 +48,64 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             });
         }
 
-        public void Play()
-        {
-            shouldBePlaying = true;
-        }
+        public void Play() => shouldBePlaying = true;
 
-        public void Stop()
-        {
-            shouldBePlaying = false;
-        }
+        public void Stop() => shouldBePlaying = false;
 
         protected override void Update()
         {
             base.Update();
 
-            if (shouldBePlaying && !bgm.IsRunning)
-                ensurePlaying();
-
-            if (!shouldBePlaying && bgm.IsRunning)
-                ensureStopped();
+            updatePlayingState();
         }
 
-        private void ensurePlaying()
+        private void updatePlayingState()
         {
             if (!bgm.IsLoaded)
                 return;
 
-            if (bgm.IsRunning)
+            if (shouldBePlaying == bgm.IsRunning)
                 return;
 
-            const int track_fade_duration = 3000;
-
-            // remove music control from player, to prevent overlapping music
-            musicController.AllowTrackControl.Value = false;
-            globalTrackFadeDelegate?.Cancel();
-
-            // cross-fade if global track is playing something
-            if (musicController.IsPlaying)
+            if (shouldBePlaying)
             {
-                var globalTrack = musicController.CurrentTrack;
+                const int track_fade_duration = 3000;
 
-                globalTrack.VolumeTo(0, track_fade_duration, Easing.OutCubic);
-                globalTrackFadeDelegate = Scheduler.AddDelayed(() =>
+                // remove music control from player, to prevent overlapping music
+                musicController.AllowTrackControl.Value = false;
+                globalTrackFadeDelegate?.Cancel();
+
+                // cross-fade if global track is playing something
+                if (musicController.IsPlaying)
                 {
-                    musicController.Stop();
-                    globalTrack.VolumeTo(1);
-                }, track_fade_duration);
+                    var globalTrack = musicController.CurrentTrack;
+
+                    globalTrack.VolumeTo(0, track_fade_duration, Easing.OutCubic);
+                    globalTrackFadeDelegate = Scheduler.AddDelayed(() =>
+                    {
+                        musicController.Stop();
+                        globalTrack.VolumeTo(1);
+                    }, track_fade_duration);
+                }
+
+                bgm.VolumeTo(0)
+                   .VolumeTo(1, track_fade_duration, Easing.InCubic);
+
+                bgm.Looping = true;
+                bgm.Start();
             }
+            else
+            {
+                globalTrackFadeDelegate?.Cancel();
 
-            bgm.VolumeTo(0)
-               .VolumeTo(1, track_fade_duration, Easing.InCubic);
+                bgm.Stop();
+                bgm.Reset();
 
-            bgm.Looping = true;
-            bgm.Start();
-        }
-
-        private void ensureStopped()
-        {
-            if (!bgm.IsLoaded)
-                return;
-
-            if (!bgm.IsRunning)
-                return;
-
-            globalTrackFadeDelegate?.Cancel();
-
-            bgm.Stop();
-            bgm.Reset();
-
-            // return control of music to player and reset volume
-            musicController.AllowTrackControl.Value = true;
-            musicController.CurrentTrack.Volume.Value = 1;
-            musicController.EnsurePlayingSomething();
+                // return control of music to player and reset volume
+                musicController.AllowTrackControl.Value = true;
+                musicController.CurrentTrack.Volume.Value = 1;
+                musicController.EnsurePlayingSomething();
+            }
         }
     }
 }
