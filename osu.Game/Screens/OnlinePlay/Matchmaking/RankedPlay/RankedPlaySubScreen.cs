@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
-using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 {
@@ -57,7 +56,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         /// </summary>
         protected readonly Container CenterColumn;
 
-        protected readonly FillFlowContainer ButtonsContainer;
         protected readonly RankedPlayStageDisplay StageDisplay;
 
         protected RankedPlaySubScreen()
@@ -77,17 +75,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 {
                     Name = "Content",
                     RelativeSizeAxes = Axes.Both,
-                },
-                ButtonsContainer = new FillFlowContainer
-                {
-                    Name = "Buttons",
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    X = 30,
-                    Y = -110,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(8)
                 },
                 StageDisplay = new RankedPlayStageDisplay(ColourScheme)
                 {
