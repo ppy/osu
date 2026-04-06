@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -64,12 +63,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Padding = new MarginPadding(30),
+                        Spacing = new Vector2(10),
                         Direction = FillDirection.Vertical,
                         Children =
                         [
                             title = new OsuSpriteText
                             {
                                 Text = "Refining star difficulty range...",
+                                Padding = new MarginPadding { Bottom = 20 },
                                 Font = OsuFont.Style.Title,
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
@@ -80,14 +81,20 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                                 Height = 90,
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
+                                Masking = true,
+                                CornerRadius = 8,
                                 Children =
                                 [
+                                    new Box
+                                    {
+                                        Alpha = 0.4f,
+                                        Colour = Color4.Black,
+                                        RelativeSizeAxes = Axes.Both,
+                                    },
                                     bars = new Container<Bar>
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding { Top = 30 },
-                                        Anchor = Anchor.BottomLeft,
-                                        Origin = Anchor.BottomLeft,
+                                        Padding = new MarginPadding { Top = 40, Horizontal = 3 },
                                     },
                                 ]
                             },
@@ -101,10 +108,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                             explainer = new OsuSpriteText
                             {
                                 Text = "Difficulty range is calculated to suit the two players.",
+                                Padding = new MarginPadding { Top = 20 },
                                 Font = OsuFont.Style.Heading2,
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Margin = new MarginPadding { Top = 20 },
                                 Alpha = 0,
                                 AlwaysPresent = true,
                             }
@@ -159,6 +166,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 
         private bool animateGaussianCurve;
 
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
         public void Play(ref double delay, float starRating)
         {
             using (BeginDelayedSequence(delay))
@@ -193,8 +203,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                         AutoSizeAxes = Axes.Both,
                         RelativePositionAxes = Axes.X,
                         X = starRating * 0.1f,
-                        Y = 24,
-                        Colour = Color4Extensions.FromHex("#FFE280"),
+                        Y = 34,
+                        Colour = colours.ForStarDifficulty(starRating),
                         Spacing = new Vector2(4, 0),
                         Children =
                         [
