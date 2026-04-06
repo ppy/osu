@@ -277,13 +277,18 @@ namespace osu.Game.Tests.Visual.Ranking
             ScorePanel expandedPanel = null;
             ScorePanel contractedPanel = null;
 
+            AddUntilStep("retrieve expanded panel",
+                () => expandedPanel = this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded),
+                () => Is.Not.Null);
+            AddUntilStep("retrieve contracted panel",
+                () => contractedPanel = this.ChildrenOfType<ScorePanel>().First(p => p.State == PanelState.Contracted && p.ScreenSpaceDrawQuad.TopLeft.X > screen.ScreenSpaceDrawQuad.TopLeft.X),
+                () => Is.Not.Null);
+
             AddStep("click expanded panel then contracted panel", () =>
             {
-                expandedPanel = this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded);
                 InputManager.MoveMouseTo(expandedPanel);
                 InputManager.Click(MouseButton.Left);
 
-                contractedPanel = this.ChildrenOfType<ScorePanel>().First(p => p.State == PanelState.Contracted && p.ScreenSpaceDrawQuad.TopLeft.X > screen.ScreenSpaceDrawQuad.TopLeft.X);
                 InputManager.MoveMouseTo(contractedPanel);
                 InputManager.Click(MouseButton.Left);
             });

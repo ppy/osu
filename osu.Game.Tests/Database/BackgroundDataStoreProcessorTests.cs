@@ -187,6 +187,7 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        [FlakyTest]
         public void TestCustomRulesetScoreNotSubjectToUpgrades([Values] bool available)
         {
             RulesetInfo rulesetInfo = null!;

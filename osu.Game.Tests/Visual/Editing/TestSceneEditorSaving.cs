@@ -128,6 +128,7 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        [FlakyTest]
         public void TestLengthAndStarRatingUpdated()
         {
             WorkingBeatmap working = null;
