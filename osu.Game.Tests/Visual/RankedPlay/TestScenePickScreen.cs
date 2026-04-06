@@ -1,12 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Extensions;
+using osu.Framework.Testing;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.RankedPlay
 {
@@ -45,6 +50,30 @@ namespace osu.Game.Tests.Visual.RankedPlay
                         BeatmapID = requestHandler.Beatmaps[i2].OnlineID
                     }).WaitSafely();
                 }
+            });
+
+            for (int i = 0; i < 3; i++)
+            {
+                int i2 = i;
+                AddStep($"click card {i2}", () =>
+                {
+                    InputManager.MoveMouseTo(this.ChildrenOfType<PlayerHandOfCards.PlayerHandCard>().ElementAt(i2));
+                    InputManager.Click(MouseButton.Left);
+                });
+            }
+
+            AddWaitStep("wait", 3);
+
+            AddStep("click play button", () =>
+            {
+                var button = screen
+                             .ChildrenOfType<PlayerHandOfCards.PlayerHandCard>()
+                             .First(it => it.Selected)
+                             .ChildrenOfType<ShearedButton>()
+                             .First();
+
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
             });
         }
     }
