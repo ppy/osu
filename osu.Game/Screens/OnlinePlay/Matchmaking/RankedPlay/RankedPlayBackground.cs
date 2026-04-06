@@ -18,20 +18,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         public Color4 GradientBottom = Color4Extensions.FromHex("#15061e");
         public Color4 GradientTop = Color4Extensions.FromHex("#240d36");
 
+        private BufferedContainer triangles1Buffered = null!;
+        private Box bgBox = null!;
+        private TrianglesV2 triangles2 = null!;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             InternalChildren =
             [
-                new Box
+                bgBox = new Box
                 {
-                    Colour = ColourInfo.GradientVertical(GradientTop, GradientBottom),
                     RelativeSizeAxes = Axes.Both,
                 },
-                new BufferedContainer
+                triangles1Buffered = new BufferedContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientVertical(GradientTop.Lighten(0.2f), GradientBottom.Lighten(0.2f)),
                     Children = new Drawable[]
                     {
                         new Triangles
@@ -49,17 +51,31 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                         },
                     }
                 },
-                new TrianglesV2
+                triangles2 = new TrianglesV2
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(0.4f, 1),
                     SpawnRatio = 2,
-                    Colour = GradientTop.Lighten(0.5f),
                     ClampAxes = Axes.Y,
                     RelativeSizeAxes = Axes.Both,
                 },
             ];
+        }
+
+        public void FadeColours(Color4 top, Color4 bottom)
+        {
+            this.TransformTo(nameof(GradientTop), top, 1500, Easing.OutQuint);
+            this.TransformTo(nameof(GradientBottom), bottom, 1500, Easing.OutQuint);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            bgBox.Colour = ColourInfo.GradientVertical(GradientTop, GradientBottom);
+            triangles1Buffered.Colour = ColourInfo.GradientVertical(GradientTop.Lighten(0.2f), GradientBottom.Lighten(0.2f));
+            triangles2.Colour = GradientTop.Lighten(0.5f);
         }
     }
 }
