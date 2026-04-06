@@ -51,7 +51,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         protected MultiplayerClient Client => client;
 
         protected override Container<Drawable> Content { get; }
+
+        /// <summary>
+        /// Column in the centre of the screen whose width is calculated so its content don't overlap with the <see cref="RankedPlayCornerPiece"/>s
+        /// </summary>
         protected readonly Container CenterColumn;
+
         protected readonly FillFlowContainer ButtonsContainer;
         protected readonly RankedPlayStageDisplay StageDisplay;
 
@@ -67,7 +72,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Padding = new MarginPadding(20),
                 },
                 Content = new Container
                 {
