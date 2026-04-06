@@ -21,6 +21,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         private DrawableTrack bgm = null!;
 
+        private bool shouldBePlaying;
+
         private Bindable<bool> isPlayingPreview = null!;
 
         [Resolved]
@@ -48,6 +50,30 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         public void Play()
         {
+            shouldBePlaying = true;
+        }
+
+        public void Stop()
+        {
+            shouldBePlaying = false;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (shouldBePlaying && !bgm.IsRunning)
+                ensurePlaying();
+
+            if (!shouldBePlaying && bgm.IsRunning)
+                ensureStopped();
+        }
+
+        private void ensurePlaying()
+        {
+            if (!bgm.IsLoaded)
+                return;
+
             if (bgm.IsRunning)
                 return;
 
@@ -77,8 +103,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             bgm.Start();
         }
 
-        public void Stop()
+        private void ensureStopped()
         {
+            if (!bgm.IsLoaded)
+                return;
+
+            if (!bgm.IsRunning)
+                return;
+
             globalTrackFadeDelegate?.Cancel();
 
             bgm.Stop();
