@@ -369,10 +369,10 @@ namespace osu.Game.Tests.Visual.UserInterface
                     CompletionText = "Uploaded to BSS!",
                 };
 
+                notification.CompleteSilently();
+
                 notificationOverlay.Post(notification);
                 progressingNotifications.Add(notification);
-
-                notification.CompleteSilently();
             });
 
             AddAssert("completed", () => notification.State == ProgressNotificationState.Completed);

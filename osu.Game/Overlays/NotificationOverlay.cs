@@ -172,39 +172,35 @@ namespace osu.Game.Overlays
 
         private double? lastSamplePlayback;
 
-        public void Post(Notification notification)
+        public void Post(Notification notification) => (notification.IsCritical ? criticalPostScheduler : postScheduler).Add(() =>
         {
-            // Completion target set early to ensure that if something else decides to redirect before the schedule below occurs, it's still respected.
+            ++runningDepth;
+
+            Logger.Log($"⚠️ {notification.Text}");
+
+            notification.Closed += () => notificationClosed(notification);
+
             if (notification is IHasCompletionTarget hasCompletionTarget)
                 hasCompletionTarget.CompletionTarget ??= Post;
 
-            (notification.IsCritical ? criticalPostScheduler : postScheduler).Add(() =>
+            playDebouncedSample(notification.PopInSampleName);
+
+            if (notification.IsImportant)
             {
-                ++runningDepth;
+                game?.Window?.Flash();
+                notification.Closed += () => game?.Window?.CancelFlash();
+            }
 
-                Logger.Log($"⚠️ {notification.Text}");
+            if (State.Value == Visibility.Hidden)
+            {
+                notification.IsInToastTray = true;
+                toastTray.Post(notification);
+            }
+            else
+                addPermanently(notification);
 
-                notification.Closed += () => notificationClosed(notification);
-
-                playDebouncedSample(notification.PopInSampleName);
-
-                if (notification.IsImportant)
-                {
-                    game?.Window?.Flash();
-                    notification.Closed += () => game?.Window?.CancelFlash();
-                }
-
-                if (State.Value == Visibility.Hidden)
-                {
-                    notification.IsInToastTray = true;
-                    toastTray.Post(notification);
-                }
-                else
-                    addPermanently(notification);
-
-                updateCounts();
-            });
-        }
+            updateCounts();
+        });
 
         private void addPermanently(Notification notification)
         {
