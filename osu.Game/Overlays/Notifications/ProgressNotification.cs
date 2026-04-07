@@ -252,6 +252,14 @@ namespace osu.Game.Overlays.Notifications
             cancelSample = audioManager.Samples.Get(@"UI/notification-cancel");
         }
 
+        public void CompleteSilently()
+        {
+            // This sequence allows the notification to be immediately dismissed without posting a continuation message.
+            CompletionTarget = null;
+            State = ProgressNotificationState.Completed;
+            Close(false);
+        }
+
         public override void Close(bool runFlingAnimation)
         {
             switch (State)
