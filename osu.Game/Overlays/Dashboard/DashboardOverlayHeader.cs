@@ -30,6 +30,9 @@ namespace osu.Game.Overlays.Dashboard
         Friends,
 
         [Description("Currently online")]
-        CurrentlyPlaying
+        CurrentlyPlaying,
+
+        [Description("User search")]
+        UserSearch
     }
 }

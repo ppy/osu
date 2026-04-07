@@ -171,7 +171,12 @@ namespace osu.Game.Graphics.UserInterface
                 rotate();
 
             MainContents.ScaleTo(1, TRANSITION_DURATION, Easing.OutQuint);
-            this.FadeIn(TRANSITION_DURATION, Easing.OutQuint);
+
+            // Very slight delay to avoid spinner flickering briefly during minimal loads.
+            // Note that we still use fade in here because it is important for input blocking cases (see `LoadingLayer`).
+            this.FadeTo(0.01f, 50)
+                .Then()
+                .FadeIn(TRANSITION_DURATION, Easing.OutQuint);
         }
 
         protected override void PopOut()
