@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                                         PlaceholderText = HomeStrings.SearchPlaceholder,
                                     },
                                     Empty(),
-                                    userListToolbar = new UserListToolbar(false)
+                                    userListToolbar = new UserListToolbar(supportsBrickMode: false)
                                     {
                                         Anchor = Anchor.CentreRight,
                                         Origin = Anchor.CentreRight,
