@@ -530,7 +530,6 @@ namespace osu.Game.Overlays
             queuedTrack.Volume.Value = 0;
             AddInternal(queuedTrack);
             queuedTrack.Delay(DELAY_BEFORE_FADE).VolumeTo(1, track_fade_in_time);
-            queuedTrack.VolumeTo(0, 200);
         }
 
         private DrawableTrack getQueuedTrack()
