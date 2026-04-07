@@ -41,12 +41,16 @@ namespace osu.Game.Overlays
             switch (tab)
             {
                 case DashboardOverlayTabs.Friends:
-                    LoadDisplay(new FriendDisplay());
+                    LoadDisplay(new FriendDisplay
+                    {
+                        Loading = { BindTarget = loading },
+                    });
                     break;
 
                 case DashboardOverlayTabs.CurrentlyPlaying:
                     LoadDisplay(new CurrentlyOnlineDisplay
                     {
+                        Loading = { BindTarget = loading },
                         OverlayState = { BindTarget = State }
                     });
                     break;
