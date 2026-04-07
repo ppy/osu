@@ -169,7 +169,7 @@ namespace osu.Game.Overlays.Dashboard.UserSearch
         private void showResults(SearchUsersResponse response)
         {
             clearPreviousResults();
-            var friendsList = new FriendsList(userListToolbar.DisplayStyle.Value, response.Users.ToArray());
+            var friendsList = new UserPanelList(userListToolbar.DisplayStyle.Value, response.Users.ToArray());
             listContainer.Add(friendsList);
 
             friendsList.FadeInFromZero(500, Easing.OutQuint);
