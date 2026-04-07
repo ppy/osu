@@ -21,6 +21,7 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
@@ -29,9 +30,11 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Matchmaking.Requests;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
 using osuTK;
@@ -48,8 +51,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         public override bool? ApplyModTrackAdjustments => false;
 
         private Container mainContent = null!;
-
         private CloudVisualisation cloud = null!;
+        private RatingDistributionGraph ratingGraph = null!;
+        private FillFlowContainer<RankedPlayMatchPanel> resultPanelContainer = null!;
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -91,6 +95,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private SampleChannel? waitingLoopChannel;
         private ScheduledDelegate? startLoopPlaybackDelegate;
 
+        private int? userRating;
+
         public ScreenQueue(MatchmakingPoolType poolType)
         {
             this.poolType = poolType;
@@ -114,47 +120,118 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 Children = new Drawable[]
                 {
                     new GlobalScrollAdjustsVolume(),
-                    cloud = new CloudVisualisation
+                    new GridContainer
                     {
-                        Y = -100,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(0.6f)
-                    },
-                    new MatchmakingAvatar(api.LocalUser.Value, true)
-                    {
-                        Y = -100,
-                        Scale = new Vector2(3),
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    },
-                    new Container
-                    {
-                        RelativePositionAxes = Axes.Y,
-                        Y = 0.25f,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        AutoSizeAxes = Axes.Both,
-                        CornerRadius = 10f,
-                        Masking = true,
-                        Children = new Drawable[]
+                        Padding = new MarginPadding
                         {
-                            new Box
+                            Horizontal = 50,
+                            Top = 50,
+                            Bottom = ScreenFooter.HEIGHT + 50
+                        },
+                        ColumnDimensions = new[]
+                        {
+                            new Dimension(),
+                            new Dimension(GridSizeMode.Absolute, 20),
+                            new Dimension()
+                        },
+                        RowDimensions = new[]
+                        {
+                            new Dimension(),
+                            new Dimension(GridSizeMode.Absolute, 20),
+                            new Dimension(GridSizeMode.Absolute, 200)
+                        },
+                        Content = new[]
+                        {
+                            new Drawable?[]
                             {
-                                Colour = colourProvider.Background3,
-                                RelativeSizeAxes = Axes.Both,
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        cloud = new CloudVisualisation
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            RelativeSizeAxes = Axes.Both,
+                                            Size = new Vector2(0.6f)
+                                        },
+                                        new MatchmakingAvatar(api.LocalUser.Value, true)
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Scale = new Vector2(3),
+                                        }
+                                    }
+                                },
+                                null,
+                                new OsuScrollContainer(Direction.Vertical)
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    ScrollbarOverlapsContent = false,
+                                    Child = resultPanelContainer = new FillFlowContainer<RankedPlayMatchPanel>
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Spacing = new Vector2(10),
+                                    }
+                                }
                             },
-                            mainContent = new Container
+                            null,
+                            new Drawable?[]
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Alpha = 0,
-                                AutoSizeAxes = Axes.Both,
-                                AutoSizeDuration = 300,
-                                AutoSizeEasing = Easing.OutQuint,
-                                Padding = new MarginPadding(20),
-                            },
+                                new Container
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    AutoSizeAxes = Axes.Both,
+                                    CornerRadius = 10f,
+                                    Masking = true,
+                                    Children = new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            Colour = colourProvider.Background3,
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        mainContent = new Container
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Alpha = 0,
+                                            AutoSizeAxes = Axes.Both,
+                                            AutoSizeDuration = 300,
+                                            AutoSizeEasing = Easing.OutQuint,
+                                            Padding = new MarginPadding(20),
+                                        },
+                                    }
+                                },
+                                null,
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    CornerRadius = 10f,
+                                    Masking = true,
+                                    Children = new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            Colour = colourProvider.Background3,
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Padding = new MarginPadding(10),
+                                            Child = ratingGraph = new RatingDistributionGraph
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     },
                 }
@@ -195,10 +272,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                if (!cancellation.IsCancellationRequested)
                                    Users = users.OfType<APIUser>().ToArray();
                            }), cancellation.Token);
+
+            if (status.UserRating != null)
+                userRating = status.UserRating;
+
+            ratingGraph.SetData(status.RatingDistribution, userRating);
+
+            foreach (var state in status.RecentMatches.OfType<RankedPlayRoomState>())
+                resultPanelContainer.Insert(-resultPanelContainer.Count, new RankedPlayMatchPanel(state));
         });
 
         private void onSelectedPoolChanged(ValueChangedEvent<MatchmakingPool?> e)
         {
+            userRating = null;
+            resultPanelContainer.Clear();
+
             if (e.NewValue == null)
             {
                 client.MatchmakingLeaveLobby();
