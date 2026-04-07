@@ -11,6 +11,7 @@ using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Layout;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.RankedPlay;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
@@ -57,6 +58,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             {
                 RelativeSizeAxes = Axes.Both,
             });
+
+            AddLayout(layoutBacking);
         }
 
         protected override void Update()
@@ -188,7 +191,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
         #region Layout
 
-        private readonly Cached layoutBacking = new Cached();
+        private readonly LayoutValue layoutBacking = new LayoutValue(Invalidation.DrawSize | Invalidation.MiscGeometry);
         private readonly Cached drawOrderBacking = new Cached();
 
         /// <summary>

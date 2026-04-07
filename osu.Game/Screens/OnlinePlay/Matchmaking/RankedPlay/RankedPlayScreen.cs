@@ -46,7 +46,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         public RankedPlaySubScreen? ActiveSubScreen { get; private set; }
 
-        protected override BackgroundScreen CreateBackground() => new RankedPlayBackgroundScreen
+        private RankedPlayBackgroundScreen rankedPlayBackground = null!;
+
+        protected override BackgroundScreen CreateBackground() => rankedPlayBackground = new RankedPlayBackgroundScreen
         {
             ShowBeatmapBackground = { BindTarget = showBeatmapBackground }
         };
@@ -235,6 +237,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                         PickingUser = pickingUser,
                         Multiplier = multiplier,
                     });
+
+                    rankedPlayBackground.ColourScheme = colourScheme;
+                }
+                else
+                {
+                    rankedPlayBackground.ColourScheme = null;
                 }
             };
         }
