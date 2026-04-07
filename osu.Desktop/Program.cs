@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Runtime.Versioning;
+using System.Threading;
 using osu.Desktop.LegacyIpc;
 using osu.Desktop.Windows;
 using osu.Framework;
@@ -180,10 +181,22 @@ namespace osu.Desktop
             // or is running with pending imports via file association or otherwise.
             //
             // In both these scenarios, we'd hope the game does not attempt to update.
-            // However, in the second case for pending imports, we still need to initialize Velopack for manual updates.
+            // However, in the case for pending imports, we still need to initialize Velopack if this is the first launch of the game.
             //
             // Special consideration for velopack startup arguments, which must be handled during update.
             // See https://docs.velopack.io/integrating/hooks#command-line-hooks.
+            if (args.Length > 0 && !args[0].StartsWith("--velo", StringComparison.Ordinal))
+            {
+                using (var _ = new Mutex(false, $"Global\\osu-framework-{OsuGame.IPC_PIPE_NAME}", out bool createdNew))
+                {
+                    if (!createdNew)
+                    {
+                        Logger.Log("Handling arguments, not running as primary instance, skipping velopack setup.");
+                        return;
+                    }
+                }
+            }
+
             if (OsuGameDesktop.IsPackageManaged)
             {
                 Logger.Log("Updates are being managed by an external provider. Skipping Velopack setup.");
@@ -191,12 +204,6 @@ namespace osu.Desktop
             }
 
             var app = VelopackApp.Build();
-
-            if (args.Length > 0 && !args[0].StartsWith("--velo", StringComparison.Ordinal))
-            {
-                Logger.Log("Handling arguments, skipping full velopack setup.");
-                return;
-            }
 
             app.OnFirstRun(_ => isFirstRun = true);
 
