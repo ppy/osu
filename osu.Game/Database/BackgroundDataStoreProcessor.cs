@@ -656,7 +656,8 @@ namespace osu.Game.Database
 
             if (metadataSourceFetchDate <= lastPopulation)
             {
-                Logger.Log($@"Skipping user tag population because the local metadata source hasn't been updated since the last time user tags were checked ({lastPopulation.Value.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)})");
+                Logger.Log(
+                    $@"Skipping user tag population because the local metadata source hasn't been updated since the last time user tags were checked ({lastPopulation.Value.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)})");
                 return;
             }
 
@@ -711,7 +712,10 @@ namespace osu.Game.Database
                             ++updatedCount;
                             realmAccess.Write(r =>
                             {
-                                beatmap = r.Find<BeatmapInfo>(id)!;
+                                beatmap = r.Find<BeatmapInfo>(id);
+
+                                if (beatmap == null)
+                                    return;
 
                                 beatmap.Metadata.UserTags.Clear();
                                 beatmap.Metadata.UserTags.AddRange(userTags);
@@ -736,7 +740,9 @@ namespace osu.Game.Database
                 }
             }
 
+            // Report the updated item count rather than the total processed. Users don't really care about noops here.
             completeNotification(notification, updatedCount, updatedCount, failedCount);
+
             config.SetValue(OsuSetting.LastOnlineTagsPopulation, metadataSourceFetchDate);
         }
 
