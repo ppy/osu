@@ -122,7 +122,8 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Automatically focus search text box in mod select"
         /// </summary>
-        public static LocalisableString ModSelectTextSearchStartsActive => new TranslatableString(getKey(@"mod_select_text_search_starts_active"), @"Automatically focus search text box in mod select");
+        public static LocalisableString ModSelectTextSearchStartsActive =>
+            new TranslatableString(getKey(@"mod_select_text_search_starts_active"), @"Automatically focus search text box in mod select");
 
         /// <summary>
         /// "no limit"
@@ -193,6 +194,16 @@ namespace osu.Game.Localisation
         /// "Show hidden"
         /// </summary>
         public static LocalisableString ShowHidden => new TranslatableString(getKey(@"show_hidden"), @"Show hidden");
+
+        /// <summary>
+        /// "Currently online"
+        /// </summary>
+        public static LocalisableString CurrentlyOnline => new TranslatableString(getKey(@"currently_online"), @"Currently online");
+
+        /// <summary>
+        /// "User search"
+        /// </summary>
+        public static LocalisableString UserSearch => new TranslatableString(getKey(@"user_search"), @"User search");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
