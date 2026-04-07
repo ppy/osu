@@ -51,6 +51,13 @@ namespace osu.Game.Overlays
                     });
                     break;
 
+                case DashboardOverlayTabs.UserSearch:
+                    LoadDisplay(new UserSearchDisplay
+                    {
+                        Loading = { BindTarget = loading },
+                    });
+                    break;
+
                 default:
                     throw new NotImplementedException($"Display for {tab} tab is not implemented");
             }
