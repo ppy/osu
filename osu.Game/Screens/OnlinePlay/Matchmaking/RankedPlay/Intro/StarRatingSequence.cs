@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -16,6 +15,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 {
@@ -25,7 +25,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
         private Container<StarRatingDisplay> starContainer = null!;
         private Container centerContainer = null!;
         private OsuSpriteText title = null!;
-        private OsuSpriteText creatingMapPool = null!;
         private OsuSpriteText explainer = null!;
 
         private Sample? tickSample;
@@ -38,73 +37,87 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
         [BackgroundDependencyLoader]
         private void load(OsuColour colour, AudioManager audio)
         {
-            RelativeSizeAxes = Axes.X;
+            Width = 600;
             AutoSizeAxes = Axes.Y;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             Alpha = 0;
 
-            Padding = new MarginPadding { Horizontal = 100 };
+            Masking = true;
+            CornerRadius = 10;
 
-            InternalChild = new FillFlowContainer
+            InternalChild = new Container
             {
-                RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Children =
-                [
-                    title = new OsuSpriteText
+                RelativeSizeAxes = Axes.X,
+                Children = new Drawable[]
+                {
+                    new Box
                     {
-                        Text = "Finding Match Rating...",
-                        Font = OsuFont.Style.Title,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
+                        Colour = Color4.Black,
+                        Alpha = 0.2f,
+                        RelativeSizeAxes = Axes.Both,
                     },
-                    creatingMapPool = new OsuSpriteText
-                    {
-                        Text = "Creating a mappool...",
-                        Font = OsuFont.Style.Heading1,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Margin = new MarginPadding { Bottom = 30 },
-                        Alpha = 0,
-                        AlwaysPresent = true,
-                    },
-                    centerContainer = new Container
+                    new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 90,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding(30),
+                        Spacing = new Vector2(10),
+                        Direction = FillDirection.Vertical,
                         Children =
                         [
-                            bars = new Container<Bar>
+                            title = new OsuSpriteText
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Top = 30 },
-                                Anchor = Anchor.BottomLeft,
-                                Origin = Anchor.BottomLeft,
+                                Text = "Refining star difficulty range...",
+                                Padding = new MarginPadding { Bottom = 20 },
+                                Font = OsuFont.Style.Title,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
                             },
-                        ]
-                    },
-                    starContainer = new Container<StarRatingDisplay>
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 20,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                    },
-                    explainer = new OsuSpriteText
-                    {
-                        Text = "There’s still a chance that you get maps outside of the selected match rating!",
-                        Font = OsuFont.Style.Heading2,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Margin = new MarginPadding { Top = 20 },
-                        Alpha = 0,
-                        AlwaysPresent = true,
+                            centerContainer = new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Height = 90,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                Masking = true,
+                                CornerRadius = 8,
+                                Children =
+                                [
+                                    new Box
+                                    {
+                                        Alpha = 0.4f,
+                                        Colour = Color4.Black,
+                                        RelativeSizeAxes = Axes.Both,
+                                    },
+                                    bars = new Container<Bar>
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Padding = new MarginPadding { Top = 40, Horizontal = 3 },
+                                    },
+                                ]
+                            },
+                            starContainer = new Container<StarRatingDisplay>
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Height = 20,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                            },
+                            explainer = new OsuSpriteText
+                            {
+                                Text = "Difficulty range is calculated to suit the two players.",
+                                Padding = new MarginPadding { Top = 20 },
+                                Font = OsuFont.Style.Heading2,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                Alpha = 0,
+                                AlwaysPresent = true,
+                            }
+                        ],
                     }
-                ],
+                }
             };
 
             for (int i = 0; i < 100; i++)
@@ -153,16 +166,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 
         private bool animateGaussianCurve;
 
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
+
         public void Play(ref double delay, float starRating)
         {
             using (BeginDelayedSequence(delay))
-            {
                 popIn();
-            }
 
-            delay += 500;
-
-            using (BeginDelayedSequence(delay))
+            using (BeginDelayedSequence(delay += 500))
             {
                 Schedule(() => animateGaussianCurve = true);
 
@@ -170,11 +182,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                 this.TransformTo(nameof(starRating), starRating, 4000, new CubicBezierEasingFunction(easeIn: 0.3, easeOut: 0.5));
                 this.TransformTo(nameof(amplitude), 1f, 4000, new CubicBezierEasingFunction(easeIn: 0.1, easeOut: 0.8));
                 this.TransformTo(nameof(stdDev), 0.3f, 4500, new CubicBezierEasingFunction(easeIn: 0.2, easeOut: 0.7));
+
+                explainer.Delay(400)
+                         .FadeIn(200);
             }
 
-            delay += 5000;
-
-            using (BeginDelayedSequence(delay))
+            using (BeginDelayedSequence(delay += 5000))
             {
                 Schedule(() =>
                 {
@@ -190,8 +203,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                         AutoSizeAxes = Axes.Both,
                         RelativePositionAxes = Axes.X,
                         X = starRating * 0.1f,
-                        Y = 24,
-                        Colour = Color4Extensions.FromHex("#FFE280"),
+                        Y = 34,
+                        Colour = colours.ForStarDifficulty(starRating),
                         Spacing = new Vector2(4, 0),
                         Children =
                         [
@@ -218,14 +231,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                              .ScaleTo(0)
                              .ScaleTo(1, 400, Easing.OutElasticQuarter);
 
-                    title.Text = "Match rating found!";
+                    title.Text = "Star rating has been decided!";
 
-                    creatingMapPool.FadeIn(100);
-                    explainer.Delay(1050).FadeIn(100);
-                    Scheduler.AddDelayed(() =>
+                    using (BeginDelayedSequence(1050))
                     {
-                        noticeSample?.Play();
-                    }, 1050);
+                        explainer.FadeInFromZero(200);
+                        Schedule(() =>
+                        {
+                            explainer.Text = "There's always a chance that you get maps outside this range";
+                            noticeSample?.Play();
+                        });
+                    }
                 });
             }
         }
@@ -279,13 +295,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
             if (!animateGaussianCurve)
                 return;
 
+            const float min_alpha = 0.4f;
+
             foreach (var bar in bars)
             {
                 float value = gaussianCurve(bar.StarRating, 1f, starRating, stdDev);
 
                 bar.Height = float.Lerp(0.1f, 1f, value * amplitude);
 
-                float targetAlpha = float.Clamp(0.35f + value * 20f, 0.35f, 1);
+                float targetAlpha = float.Clamp(min_alpha + value * 20f, min_alpha, 1);
 
                 bar.Alpha = float.Lerp(targetAlpha, bar.Alpha, (float)Math.Exp(-0.01f * Time.Elapsed));
             }
@@ -294,7 +312,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
             {
                 float value = gaussianCurve(child.X * 10f, 1f, starRating, stdDev);
 
-                float targetAlpha = float.Clamp(0.35f + value * 20f, 0.35f, 1);
+                float targetAlpha = float.Clamp(min_alpha + value * 20f, min_alpha, 1);
 
                 child.Alpha = float.Lerp(targetAlpha, child.Alpha, (float)Math.Exp(-0.01f * Time.Elapsed));
             }

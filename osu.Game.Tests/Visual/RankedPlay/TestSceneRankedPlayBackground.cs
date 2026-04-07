@@ -17,7 +17,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
 
         private readonly Bindable<Colour4> gradientOuter = new Bindable<Colour4>(Color4Extensions.FromHex("AC6D97"));
         private readonly Bindable<Colour4> gradientInner = new Bindable<Colour4>(Color4Extensions.FromHex("544483"));
-        private readonly Bindable<Colour4> dots = new Bindable<Colour4>(Color4Extensions.FromHex("D56CF6"));
 
         public TestSceneRankedPlayBackground()
         {
@@ -40,11 +39,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
                             Scale = new Vector2(0.4f),
                             Current = gradientInner,
                         },
-                        new BasicColourPicker
-                        {
-                            Scale = new Vector2(0.4f),
-                            Current = dots,
-                        }
                     ]
                 }
             ];
@@ -54,9 +48,8 @@ namespace osu.Game.Tests.Visual.RankedPlay
         {
             base.LoadComplete();
 
-            gradientOuter.BindValueChanged(e => background.GradientOutside = e.NewValue, true);
-            gradientInner.BindValueChanged(e => background.GradientInside = e.NewValue, true);
-            dots.BindValueChanged(e => background.DotsColour = e.NewValue, true);
+            gradientOuter.BindValueChanged(e => background.GradientBottom = e.NewValue, true);
+            gradientInner.BindValueChanged(e => background.GradientTop = e.NewValue, true);
         }
     }
 }
