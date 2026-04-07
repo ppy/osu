@@ -12,7 +12,6 @@ using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
@@ -219,7 +218,7 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         private void waitForLoad()
-            => AddUntilStep("wait for panels to load", () => this.ChildrenOfType<LoadingSpinner>().First().State.Value, () => Is.EqualTo(Visibility.Hidden));
+            => AddUntilStep("wait for panels to load", () => this.ChildrenOfType<UserPanel>().Any());
 
         private void assertVisiblePanelCount<T>(int expectedVisible)
             where T : UserPanel
