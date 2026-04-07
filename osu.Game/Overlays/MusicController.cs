@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
@@ -513,30 +514,22 @@ namespace osu.Game.Overlays
 
         private void changeTrack()
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             const double track_fade_in_time = 220;
             const double track_fade_out_time = 150;
 
             var queuedTrack = getQueuedTrack();
-
             var lastTrack = CurrentTrack;
+
             lastTrack.Completed -= onTrackCompleted;
+            lastTrack.VolumeTo(0, track_fade_out_time, Easing.Out).Expire();
 
             CurrentTrack = queuedTrack;
 
-            lastTrack.VolumeTo(0, track_fade_out_time, Easing.Out).Expire();
-
-            if (queuedTrack == CurrentTrack)
-            {
-                queuedTrack.Volume.Value = 0;
-                AddInternal(queuedTrack);
-                queuedTrack.Delay(DELAY_BEFORE_FADE).VolumeTo(1, track_fade_in_time);
-            }
-            else
-            {
-                // If the track has changed since the call to changeTrack, it is safe to dispose the
-                // queued track rather than consume it.
-                queuedTrack.Dispose();
-            }
+            queuedTrack.Volume.Value = 0;
+            AddInternal(queuedTrack);
+            queuedTrack.Delay(DELAY_BEFORE_FADE).VolumeTo(1, track_fade_in_time);
         }
 
         private DrawableTrack getQueuedTrack()
