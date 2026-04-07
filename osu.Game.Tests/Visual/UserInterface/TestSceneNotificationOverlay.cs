@@ -336,6 +336,50 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestProgressSilentDismissal()
+        {
+            ProgressNotification notification = null!;
+
+            AddStep("add progress notification", () =>
+            {
+                notification = new ProgressNotification
+                {
+                    Text = @"Uploading to BSS...",
+                    CompletionText = "Uploaded to BSS!",
+                };
+                notificationOverlay.Post(notification);
+                progressingNotifications.Add(notification);
+            });
+
+            AddStep("silently dismiss", () => notification.CompleteSilently());
+            AddAssert("completed", () => notification.State == ProgressNotificationState.Completed);
+            AddAssert("Completion toast not shown", () => notificationOverlay.ToastCount == 0);
+        }
+
+        [Test]
+        public void TestProgressSilentDismissalImmediate()
+        {
+            ProgressNotification notification = null!;
+
+            AddStep("add progress notification", () =>
+            {
+                notification = new ProgressNotification
+                {
+                    Text = @"Uploading to BSS...",
+                    CompletionText = "Uploaded to BSS!",
+                };
+
+                notification.CompleteSilently();
+
+                notificationOverlay.Post(notification);
+                progressingNotifications.Add(notification);
+            });
+
+            AddAssert("completed", () => notification.State == ProgressNotificationState.Completed);
+            AddAssert("Completion toast not shown", () => notificationOverlay.ToastCount == 0);
+        }
+
+        [Test]
         public void TestProgressClick()
         {
             ProgressNotification notification = null!;
