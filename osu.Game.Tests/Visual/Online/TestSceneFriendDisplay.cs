@@ -223,8 +223,8 @@ namespace osu.Game.Tests.Visual.Online
         private void assertVisiblePanelCount<T>(int expectedVisible)
             where T : UserPanel
         {
-            AddAssert($"{typeof(T).ReadableName()}s in list", () => this.ChildrenOfType<FriendsList>().Last().ChildrenOfType<UserPanel>().All(p => p is T));
-            AddAssert($"{expectedVisible} panels visible", () => this.ChildrenOfType<FriendsList>().Last().ChildrenOfType<FriendsList.FilterableUserPanel>().Count(p => p.IsPresent),
+            AddUntilStep($"{typeof(T).ReadableName()}s in list", () => this.ChildrenOfType<FriendsList>().Last().ChildrenOfType<UserPanel>().All(p => p is T));
+            AddUntilStep($"{expectedVisible} panels visible", () => this.ChildrenOfType<FriendsList>().Last().ChildrenOfType<FriendsList.FilterableUserPanel>().Count(p => p.IsPresent),
                 () => Is.EqualTo(expectedVisible));
         }
 
