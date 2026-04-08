@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -10,6 +11,8 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics.Carousel;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Utils;
@@ -40,6 +43,8 @@ namespace osu.Game.Screens.Select
         private Dictionary<object, (CarouselItem, int)> itemMap = new Dictionary<object, (CarouselItem, int)>();
         private Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>> setMap = new Dictionary<GroupedBeatmapSet, HashSet<CarouselItem>>();
         private Dictionary<GroupDefinition, HashSet<CarouselItem>> groupMap = new Dictionary<GroupDefinition, HashSet<CarouselItem>>();
+
+        private readonly ConcurrentDictionary<(Guid beatmapId, int converterModsSignature), int> maniaKeyCountCache = new ConcurrentDictionary<(Guid beatmapId, int converterModsSignature), int>();
 
         public required Func<FilterCriteria> GetCriteria { get; init; }
         public required Func<List<BeatmapCollection>> GetCollections { get; init; }
@@ -158,7 +163,6 @@ namespace osu.Game.Screens.Select
                 return false;
             if (criteria.Group == GroupMode.RankAchieved)
                 return false;
-
             // In the majority case we group sets together for display.
             return true;
         }
@@ -204,6 +208,17 @@ namespace osu.Game.Screens.Select
 
                 case GroupMode.Difficulty:
                     return getGroupsBy(b => defineGroupByStars(b.StarRating), items);
+
+                case GroupMode.ManiaKeyCount:
+                {
+                    // Key count is only meaningful in mania.
+                    if (criteria.Ruleset?.OnlineID != 3)
+                        return new List<GroupMapping> { new GroupMapping(null, items) };
+
+                    int converterModsSignature = getConverterModsSignature(criteria.Mods);
+                    ILegacyRuleset legacyRuleset = (ILegacyRuleset)criteria.Ruleset.CreateInstance();
+                    return getGroupsBy(b => defineGroupByKeyCount(getManiaKeyCount(legacyRuleset, b, criteria.Mods, converterModsSignature)), items);
+                }
 
                 case GroupMode.Length:
                     return getGroupsBy(b => defineGroupByLength(b.Length), items);
@@ -391,6 +406,34 @@ namespace osu.Game.Screens.Select
                 return new GroupDefinition(10, "10 minutes or less").Yield();
 
             return new GroupDefinition(11, "Over 10 minutes").Yield();
+        }
+
+        private IEnumerable<GroupDefinition> defineGroupByKeyCount(int keyCount)
+        {
+            if (keyCount <= 0)
+                return new GroupDefinition(int.MaxValue, "Unknown key count").Yield();
+
+            return new GroupDefinition(keyCount, $"{keyCount}K").Yield();
+        }
+
+        private int getManiaKeyCount(ILegacyRuleset legacyRuleset, BeatmapInfo beatmap, IReadOnlyList<Mod>? mods, int converterModsSignature)
+            => maniaKeyCountCache.GetOrAdd((beatmap.ID, converterModsSignature), _ => legacyRuleset.GetKeyCount(beatmap, mods));
+
+        private static int getConverterModsSignature(IReadOnlyList<Mod>? mods)
+        {
+            if (mods == null || mods.Count == 0)
+                return 0;
+
+            HashCode hash = default;
+
+            foreach (string typeName in mods.OfType<IApplicableToBeatmapConverter>()
+                                             .Select(m => m.GetType().FullName ?? m.GetType().Name)
+                                             .OrderBy(name => name, StringComparer.Ordinal))
+            {
+                hash.Add(typeName, StringComparer.Ordinal);
+            }
+
+            return hash.ToHashCode();
         }
 
         private IEnumerable<GroupDefinition> defineGroupBySource(string source)

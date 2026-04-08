@@ -36,6 +36,9 @@ namespace osu.Game.Screens.Select
         // taken from draw visualiser. used for carousel alignment purposes.
         public const float HEIGHT_FROM_SCREEN_TOP = 141 - corner_radius;
 
+        private static readonly GroupMode[] all_group_modes = Enum.GetValues<GroupMode>();
+        private static readonly GroupMode[] non_mania_group_modes = all_group_modes.Where(m => m != GroupMode.ManiaKeyCount).ToArray();
+
         private const float corner_radius = 10;
 
         public IBindable<BeatmapSetInfo?> ScopedBeatmapSet { get; } = new Bindable<BeatmapSetInfo?>();
@@ -193,7 +196,7 @@ namespace osu.Game.Screens.Select
                                             groupDropdown = new ShearedDropdown<GroupMode>(SongSelectStrings.Group)
                                             {
                                                 RelativeSizeAxes = Axes.X,
-                                                Items = Enum.GetValues<GroupMode>(),
+                                                Items = non_mania_group_modes,
                                             },
                                             Empty(),
                                             collectionDropdown = new CollectionDropdown
@@ -227,7 +230,13 @@ namespace osu.Game.Screens.Select
             config.BindWith(OsuSetting.SongSelectSortingMode, sortDropdown.Current);
             config.BindWith(OsuSetting.SongSelectGroupMode, groupDropdown.Current);
 
-            ruleset.BindValueChanged(_ => updateCriteria());
+            updateAvailableGroupModes();
+
+            ruleset.BindValueChanged(_ =>
+            {
+                updateAvailableGroupModes();
+                updateCriteria();
+            });
             mods.BindValueChanged(m =>
             {
                 // The following is a note carried from old song select and may not be a valid reason anymore:
@@ -270,6 +279,16 @@ namespace osu.Game.Screens.Select
             ScopedBeatmapSet.BindValueChanged(_ => updateCriteria(clearScopedSet: false));
 
             updateCriteria();
+        }
+
+        private void updateAvailableGroupModes()
+        {
+            bool isManiaRuleset = ruleset.Value.OnlineID == 3;
+
+            if (!isManiaRuleset && groupDropdown.Current.Value == GroupMode.ManiaKeyCount)
+                groupDropdown.Current.Value = GroupMode.None;
+
+            groupDropdown.Items = isManiaRuleset ? all_group_modes : non_mania_group_modes;
         }
 
         protected override void Dispose(bool isDisposing)

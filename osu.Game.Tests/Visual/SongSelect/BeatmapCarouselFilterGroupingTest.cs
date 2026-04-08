@@ -11,6 +11,9 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics.Carousel;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
@@ -326,6 +329,62 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         #endregion
 
+        #region Key count grouping
+
+        [Test]
+        public void TestManiaKeyCountGroupingKeepsBeatmapSetsTogether()
+        {
+            var criteria = new FilterCriteria
+            {
+                Group = GroupMode.ManiaKeyCount,
+                Ruleset = new ManiaRuleset().RulesetInfo
+            };
+
+            Assert.That(BeatmapCarouselFilterGrouping.ShouldGroupBeatmapsTogether(criteria), Is.True);
+        }
+
+        [Test]
+        public async Task TestGroupingByKeyCountInMania()
+        {
+            int total = 0;
+
+            RulesetInfo maniaRuleset = new ManiaRuleset().RulesetInfo;
+            var beatmapSets = new List<BeatmapSetInfo>();
+
+            addBeatmapSet(applyKeyCount(4), beatmapSets, out var first4k, [maniaRuleset]);
+            addBeatmapSet(applyKeyCount(4), beatmapSets, out var second4k, [maniaRuleset]);
+            addBeatmapSet(applyKeyCount(7), beatmapSets, out var map7k, [maniaRuleset]);
+            addBeatmapSet(applyKeyCount(18), beatmapSets, out var map18k, [maniaRuleset]);
+
+            var results = await runGrouping(GroupMode.ManiaKeyCount, beatmapSets, maniaRuleset);
+            assertGroup(results, 0, "4K", first4k.Beatmaps.Concat(second4k.Beatmaps), ref total);
+            assertGroup(results, 1, "7K", map7k.Beatmaps, ref total);
+            assertGroup(results, 2, "18K", map18k.Beatmaps, ref total);
+            assertTotal(results, total);
+        }
+
+        [Test]
+        public async Task TestGroupingByKeyCountOutsideManiaFallsBackToNoGrouping()
+        {
+            RulesetInfo osuRuleset = new OsuRuleset().RulesetInfo;
+
+            var beatmapSets = new List<BeatmapSetInfo>();
+            addBeatmapSet(applyKeyCount(4), beatmapSets, out _, [osuRuleset]);
+            addBeatmapSet(applyKeyCount(7), beatmapSets, out _, [osuRuleset]);
+
+            var results = await runGrouping(GroupMode.ManiaKeyCount, beatmapSets, osuRuleset);
+
+            Assert.That(results.All(i => i.Model is not GroupDefinition), Is.True);
+            Assert.That(results.Select(r => r.Model).OfType<GroupedBeatmapSet>().Select(groupedSet => groupedSet.BeatmapSet), Is.EquivalentTo(beatmapSets));
+        }
+
+        private Action<BeatmapSetInfo> applyKeyCount(float keyCount)
+        {
+            return s => s.Beatmaps.ForEach(b => b.Difficulty.CircleSize = keyCount);
+        }
+
+        #endregion
+
         #region Ranked date grouping
 
         [Test]
@@ -397,11 +456,11 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private HashSet<int> favouriteBeatmapSets = [];
 
-        private async Task<List<CarouselItem>> runGrouping(GroupMode group, List<BeatmapSetInfo> beatmapSets)
+        private async Task<List<CarouselItem>> runGrouping(GroupMode group, List<BeatmapSetInfo> beatmapSets, RulesetInfo? ruleset = null)
         {
             var groupingFilter = new BeatmapCarouselFilterGrouping
             {
-                GetCriteria = () => new FilterCriteria { Group = group },
+                GetCriteria = () => new FilterCriteria { Group = group, Ruleset = ruleset },
                 GetCollections = () => new List<BeatmapCollection>(),
                 GetLocalUserTopRanks = _ => new Dictionary<Guid, ScoreRank>(),
                 GetFavouriteBeatmapSets = () => favouriteBeatmapSets,
@@ -435,9 +494,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             Assert.That(items.Count, Is.EqualTo(total));
         }
 
-        private static void addBeatmapSet(Action<BeatmapSetInfo> change, List<BeatmapSetInfo> list, out BeatmapSetInfo added)
+        private static void addBeatmapSet(Action<BeatmapSetInfo> change, List<BeatmapSetInfo> list, out BeatmapSetInfo added, RulesetInfo[]? rulesets = null)
         {
-            var set = TestResources.CreateTestBeatmapSetInfo();
+            var set = TestResources.CreateTestBeatmapSetInfo(rulesets: rulesets);
             change(set);
             list.Add(set);
             added = set;
