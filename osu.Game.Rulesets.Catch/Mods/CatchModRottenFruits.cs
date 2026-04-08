@@ -16,12 +16,12 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModBadApple : Mod, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<CatchHitObject>, IUpdatableByPlayfield
+    public class CatchModRottenFruits : Mod, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<CatchHitObject>, IUpdatableByPlayfield
     {
-        public override string Name => "Bad Apple";
+        public override string Name => "Rotten Fruits";
         public override LocalisableString Description => "The fruit has gone bad... dodge it!";
         public override double ScoreMultiplier => 1;
-        public override string Acronym => "BA";
+        public override string Acronym => "RF";
         public override Type[] IncompatibleMods => new[] { typeof(CatchModAutoplay) };
         public override ModType Type => ModType.Conversion;
 

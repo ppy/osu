@@ -7,14 +7,14 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Catch.Tests.Mods
 {
-    public partial class TestSceneCatchModBadApple : ModTestScene
+    public partial class TestSceneCatchModRottenFruits : ModTestScene
     {
         protected override Ruleset CreatePlayerRuleset() => new CatchRuleset();
 
         [Test]
-        public void TestBadApple() => CreateModTest(new ModTestData
+        public void TestRottenFruits() => CreateModTest(new ModTestData
         {
-            Mod = new CatchModBadApple(),
+            Mod = new CatchModRottenFruits(),
             PassCondition = () => true
         });
     }
