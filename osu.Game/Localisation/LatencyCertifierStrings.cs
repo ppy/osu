@@ -15,6 +15,11 @@ namespace osu.Game.Localisation
         public static LocalisableString VisualSpacing => new TranslatableString(getKey(@"visual_spacing"), @"Visual Spacing");
 
         /// <summary>
+        /// "Approach Rate"
+        /// </summary>
+        public static LocalisableString ApproachRate => new TranslatableString(getKey(@"approach_rate"), @"Approach Rate");
+
+        /// <summary>
         /// "Welcome to the latency certifier!"
         /// </summary>
         public static LocalisableString ExplanatoryTextWelcome => new TranslatableString(getKey(@"explanatory_text_welcome"), @"Welcome to the latency certifier!");
@@ -74,37 +79,42 @@ Round {1} of {2}", difficultyLevel, currentRound, totalRounds);
         /// <summary>
         /// "You&#39;ve reached the maximum level."
         /// </summary>
-        public static LocalisableString CannotIncreaseMaximumLevel => new TranslatableString(getKey(@"cannot_increase_maximum_level"), @"You've reached the maximum level.");
+        public static LocalisableString MaximumLevel => new TranslatableString(getKey(@"maximum_level"), @"You've reached the maximum level.");
 
         /// <summary>
         /// "Game is not running fast enough to test this level!"
         /// </summary>
-        public static LocalisableString CannotIncreaseLowPerformance => new TranslatableString(getKey(@"cannot_increase_low_performance"), @"Game is not running fast enough to test this level!");
+        public static LocalisableString LowPerformance => new TranslatableString(getKey(@"low_performance"), @"Game is not running fast enough to test this level!");
 
         /// <summary>
         /// "Continue to the next level"
         /// </summary>
-        public static LocalisableString NextLevel => new TranslatableString(getKey(@"next_level"), @"Continue to the next level");
+        public static LocalisableString ButtonNextLevelText => new TranslatableString(getKey(@"button_next_level_text"), @"Continue to the next level");
+
+        /// <summary>
+        /// "Retry"
+        /// </summary>
+        public static LocalisableString ButtonRetryText => new TranslatableString(getKey(@"button_retry_text"), @"Retry");
 
         /// <summary>
         /// "Are you even trying..?"
         /// </summary>
-        public static LocalisableString RetryTooltip => new TranslatableString(getKey(@"retry_tooltip"), @"Are you even trying..?");
+        public static LocalisableString ButtonRetryTooltip => new TranslatableString(getKey(@"button_retry_tooltip"), @"Are you even trying..?");
 
         /// <summary>
         /// "Begin certification at last level"
         /// </summary>
-        public static LocalisableString BeginCertificationText => new TranslatableString(getKey(@"begin_certification_text"), @"Begin certification at last level");
+        public static LocalisableString ButtonCertifyText => new TranslatableString(getKey(@"button_certify_text"), @"Begin certification at last level");
 
         /// <summary>
         /// "Chain {0} rounds to confirm your perception!"
         /// </summary>
-        public static LocalisableString BeginCertificationTooltipConfirm(int roundsCount) => new TranslatableString(getKey(@"begin_certification_tooltip_confirm"), @"Chain {0} rounds to confirm your perception!", roundsCount);
+        public static LocalisableString ButtonCertifyTooltipConfirm(int roundsCount) => new TranslatableString(getKey(@"button_certify_tooltip_confirm"), @"Chain {0} rounds to confirm your perception!", roundsCount);
 
         /// <summary>
-        /// "You've reached your limits. Go to the previous level to complete certification!"
+        /// "You&#39;ve reached your limits. Go to the previous level to complete certification!"
         /// </summary>
-        public static LocalisableString BeginCertificationTooltipComplete => new TranslatableString(getKey(@"begin_certification_tooltip_complete"), @"You've reached your limits. Go to the previous level to complete certification!");
+        public static LocalisableString ButtonCertifyTooltipComplete => new TranslatableString(getKey(@"button_certify_tooltip_complete"), @"You've reached your limits. Go to the previous level to complete certification!");
 
         /// <summary>
         /// "Certified!"
@@ -119,7 +129,7 @@ Round {1} of {2}", difficultyLevel, currentRound, totalRounds);
         /// <summary>
         /// "Feels better"
         /// </summary>
-        public static LocalisableString FeelsBetter => new TranslatableString(getKey(@"feels_better"), @"Feels better");
+        public static LocalisableString ButtonFeelsBetter => new TranslatableString(getKey(@"button_feels_better"), @"Feels better");
 
         /// <summary>
         /// "{0} (Press {1})"
