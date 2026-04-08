@@ -178,7 +178,7 @@ namespace osu.Game.Screens.Utility
                             Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.None,
                             Width = 400,
-                            LabelText = SongSelectStrings.ApproachRate,
+                            LabelText = LatencyCertifierStrings.ApproachRate,
                             Current = SampleApproachRate
                         },
                     },
@@ -338,9 +338,9 @@ namespace osu.Game.Screens.Utility
             LocalisableString? cannotIncreaseReason = null;
 
             if (mapDifficultyToTargetFrameRate(DifficultyLevel + 1) > target_host_update_frames)
-                cannotIncreaseReason = LatencyCertifierStrings.CannotIncreaseMaximumLevel;
+                cannotIncreaseReason = LatencyCertifierStrings.MaximumLevel;
             else if (mapDifficultyToTargetFrameRate(DifficultyLevel + 1) > Clock.FramesPerSecond)
-                cannotIncreaseReason = LatencyCertifierStrings.CannotIncreaseLowPerformance;
+                cannotIncreaseReason = LatencyCertifierStrings.LowPerformance;
 
             FillFlowContainer buttonFlow;
 
@@ -357,7 +357,7 @@ namespace osu.Game.Screens.Utility
             if (isPass)
             {
                 var bind = new ButtonWithKeyBind(Key.Enter);
-                bind.Text = LatencyCertifierStrings.NextLevel;
+                bind.Text = LatencyCertifierStrings.ButtonNextLevelText;
                 bind.BackgroundColour = colours.Green;
                 bind.Anchor = Anchor.Centre;
                 bind.Origin = Anchor.Centre;
@@ -374,8 +374,8 @@ namespace osu.Game.Screens.Utility
                 {
                     buttonFlow.Add(new ButtonWithKeyBind(Key.Enter)
                     {
-                        Text = GameplayMenuOverlayStrings.Retry,
-                        TooltipText = LatencyCertifierStrings.RetryTooltip,
+                        Text = LatencyCertifierStrings.ButtonRetryText,
+                        TooltipText = LatencyCertifierStrings.ButtonRetryTooltip,
                         BackgroundColour = colours.Pink2,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -390,7 +390,7 @@ namespace osu.Game.Screens.Utility
                 {
                     buttonFlow.Add(new ButtonWithKeyBind(Key.Enter)
                     {
-                        Text = LatencyCertifierStrings.BeginCertificationText,
+                        Text = LatencyCertifierStrings.ButtonCertifyText,
                         BackgroundColour = colours.Yellow,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -400,8 +400,8 @@ namespace osu.Game.Screens.Utility
                             changeDifficulty(DifficultyLevel - 1);
                         },
                         TooltipText = isPass
-                            ? LatencyCertifierStrings.BeginCertificationTooltipConfirm(rounds_to_complete_certified)
-                            : LatencyCertifierStrings.BeginCertificationTooltipComplete,
+                            ? LatencyCertifierStrings.ButtonCertifyTooltipConfirm(rounds_to_complete_certified)
+                            : LatencyCertifierStrings.ButtonCertifyTooltipComplete,
                     });
                 }
             }
