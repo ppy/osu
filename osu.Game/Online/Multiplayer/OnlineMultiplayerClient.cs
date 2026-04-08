@@ -15,6 +15,8 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Localisation;
 using osu.Game.Online.Matchmaking;
+using osu.Game.Online.Matchmaking.Requests;
+using osu.Game.Online.Matchmaking.Responses;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.RankedPlay;
 
@@ -369,13 +371,13 @@ namespace osu.Game.Online.Multiplayer
             return connection.InvokeAsync<MatchmakingPool[]>(nameof(IMatchmakingServer.GetMatchmakingPoolsOfType), type);
         }
 
-        public override Task MatchmakingJoinLobby()
+        public override Task<MatchmakingJoinLobbyResponse> MatchmakingJoinLobbyWithParams(MatchmakingJoinLobbyRequest request)
         {
             if (!IsConnected.Value)
-                return Task.CompletedTask;
+                return Task.FromResult(new MatchmakingJoinLobbyResponse());
 
             Debug.Assert(connection != null);
-            return connection.InvokeAsync(nameof(IMatchmakingServer.MatchmakingJoinLobby));
+            return connection.InvokeAsync<MatchmakingJoinLobbyResponse>(nameof(IMatchmakingServer.MatchmakingJoinLobbyWithParams), request);
         }
 
         public override Task MatchmakingLeaveLobby()
