@@ -32,8 +32,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
 
             AddStep("set pick state", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.CardPlay, state => state.ActiveUserId = 2).WaitSafely());
 
-            AddWaitStep("wait some", 5);
-
             AddStep("reveal cards", () =>
             {
                 for (int i = 0; i < 5; i++)
@@ -46,6 +44,15 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     }).WaitSafely();
                 }
             });
+
+            AddWaitStep("wait", 15);
+
+            AddStep("play beatmap", () => MultiplayerClient.PlayUserCard(2, hand => hand[0]).WaitSafely());
+            AddStep("reveal card", () => MultiplayerClient.RankedPlayRevealUserCard(2, hand => hand[0], new MultiplayerPlaylistItem
+            {
+                ID = 0,
+                BeatmapID = requestHandler.Beatmaps[0].OnlineID
+            }).WaitSafely());
         }
     }
 }

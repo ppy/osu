@@ -54,7 +54,7 @@ namespace osu.Game.Graphics.UserInterface
 
         #region OsuDropdownMenu
 
-        public partial class OsuDropdownMenu : DropdownMenu
+        public partial class OsuDropdownMenu : DropdownMenu, IKeyBindingHandler<GlobalAction>
         {
             public override bool HandleNonPositionalInput => State == MenuState.Open;
 
@@ -162,6 +162,35 @@ namespace osu.Game.Graphics.UserInterface
             };
 
             protected override ScrollContainer<Drawable> CreateScrollContainer(Direction direction) => new OsuScrollContainer(direction);
+
+            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+            {
+                // logic copied from https://github.com/ppy/osu-framework/blob/baf865f1fd9e677310e7e432a7c6af99db7db914/osu.Framework/Graphics/UserInterface/Dropdown.cs#L702-L717
+                var visibleMenuItemsList = VisibleMenuItems.ToList();
+
+                if (visibleMenuItemsList.Count > 0)
+                {
+                    var currentPreselected = PreselectedItem;
+                    int targetPreselectionIndex = visibleMenuItemsList.IndexOf(currentPreselected);
+
+                    switch (e.Action)
+                    {
+                        case GlobalAction.SelectPrevious:
+                            PreselectItem(targetPreselectionIndex - 1);
+                            return true;
+
+                        case GlobalAction.SelectNext:
+                            PreselectItem(targetPreselectionIndex + 1);
+                            return true;
+                    }
+                }
+
+                return false;
+            }
+
+            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+            {
+            }
 
             #region DrawableOsuDropdownMenuItem
 

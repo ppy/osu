@@ -17,6 +17,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
@@ -46,6 +47,8 @@ namespace osu.Game.Screens.Play
 
         private ReplayFailIndicator? failIndicator;
         private PlaybackSettings? playbackSettings;
+
+        public ReplayOverlay ReplayOverlay { get; private set; } = null!;
 
         protected override bool CheckModsAllowFailure()
         {
@@ -80,7 +83,7 @@ namespace osu.Game.Screens.Play
         /// Add a settings group to the HUD overlay. Intended to be used by rulesets to add replay-specific settings.
         /// </summary>
         /// <param name="settings">The settings group to be shown.</param>
-        public void AddSettings(PlayerSettingsGroup settings) => Schedule(() => HUDOverlay.PlayerSettingsOverlay.Add(settings));
+        public void AddSettings(PlayerSettingsGroup settings) => Schedule(() => ReplayOverlay.Settings.Add(settings));
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -89,6 +92,8 @@ namespace osu.Game.Screens.Play
                 return;
 
             AddInternal(leaderboardProvider);
+
+            GameplayClockContainer.Add(ReplayOverlay = new ReplayOverlay());
 
             playbackSettings = new PlaybackSettings
             {
@@ -99,7 +104,25 @@ namespace osu.Game.Screens.Play
             if (GameplayClockContainer is MasterGameplayClockContainer master)
                 playbackSettings.UserPlaybackRate.BindTo(master.UserPlaybackRate);
 
-            HUDOverlay.PlayerSettingsOverlay.AddAtStart(playbackSettings);
+            ReplayOverlay.Settings.AddAtStart(playbackSettings);
+
+            OsuTextFlowContainer message = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Body) { AutoSizeAxes = Axes.Both };
+            message.AddText("Watching ");
+            message.AddText(Score.ScoreInfo.User.Username, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+            message.AddText(" play ");
+            message.AddText(Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(), s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+            message.AddText(" on ");
+            message.AddArbitraryDrawable(new PlayedOnText(Score.ScoreInfo.Date, false)
+            {
+                Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
+            });
+
+            ReplayOverlay.SetMessage(new ScrollingMessage(message)
+            {
+                Y = 96,
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+            });
 
             AddInternal(new RulesetSkinProvidingContainer(GameplayState.Ruleset, GameplayState.Beatmap, Beatmap.Value.Skin)
             {
@@ -115,27 +138,6 @@ namespace osu.Game.Screens.Play
                     }
                 }
             });
-        }
-
-        protected override Drawable CreateOverlayComponents()
-        {
-            OsuTextFlowContainer message = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Body) { AutoSizeAxes = Axes.Both };
-            message.AddText("Watching ");
-            message.AddText(Score.ScoreInfo.User.Username, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
-            message.AddText(" play ");
-            message.AddText(Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(), s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
-            message.AddText(" on ");
-            message.AddArbitraryDrawable(new PlayedOnText(Score.ScoreInfo.Date, false)
-            {
-                Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
-            });
-
-            return new ScrollingMessage(message)
-            {
-                Y = 100,
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-            };
         }
 
         protected override void PrepareReplay()

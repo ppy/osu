@@ -34,7 +34,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         public CardFlow CenterRow { get; private set; } = null!;
 
-        protected override LocalisableString StageHeading => "Discard Phase";
+        public override bool ShowStageOverlay => true;
+        public override LocalisableString StageHeading => "Discard Phase";
         protected override LocalisableString StageCaption => "Replace cards from your hand";
 
         private PlayerHandOfCards playerHand = null!;
@@ -81,6 +82,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
+            ];
+
+            CenterColumn.Children =
+            [
                 discardButton = new ShearedButton
                 {
                     Name = "Discard Button",
@@ -89,11 +94,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     Width = 150,
                     Action = onDiscardButtonClicked,
                     Enabled = { Value = true },
-                }
-            ];
-
-            CenterColumn.Children =
-            [
+                },
                 playerHand = new PlayerHandOfCards
                 {
                     Anchor = Anchor.BottomCentre,
@@ -179,23 +180,23 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         {
             base.OnEntering(previous);
 
-            var screenBottomCenter = new Vector2(DrawWidth / 2, DrawHeight);
-            int cardCount = 0;
+            double delay = 0;
+            const double stagger = 50;
 
             foreach (var card in matchInfo.PlayerCards)
             {
+                double currentDelay = delay;
+
                 playerHand.AddCard(card, c =>
                 {
-                    c.Position = ToSpaceOfOtherDrawable(screenBottomCenter, playerHand);
+                    c.Position = playerHand.BottomCardInsertPosition;
+                    c.DelayMovementOnEntering(currentDelay);
                 });
-                Scheduler.AddDelayed(() =>
-                {
-                    SamplePlaybackHelper.PlayWithRandomPitch(cardAddSample);
-                }, 50 * cardCount);
-                cardCount++;
-            }
 
-            playerHand.UpdateLayout(stagger: 50);
+                Scheduler.AddDelayed(() => SamplePlaybackHelper.PlayWithRandomPitch(cardAddSample), delay);
+
+                delay += stagger;
+            }
         }
 
         private void onCountdownStarted(MultiplayerCountdown countdown) => Scheduler.Add(() =>
@@ -297,8 +298,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             {
                 playerHand.AddCard(card, d =>
                 {
-                    d.Position = ToSpaceOfOtherDrawable(new Vector2(DrawWidth, DrawHeight * 0.5f), playerHand);
-                    d.Rotation = -30;
+                    // card should enter from centre-right of screen
+                    var cardEnterPosition = ToSpaceOfOtherDrawable(new Vector2(DrawWidth, DrawHeight * 0.5f), playerHand);
+                    d.SetupMovementForDrawnCard(cardEnterPosition);
                 });
 
                 SamplePlaybackHelper.PlayWithRandomPitch(cardAddSample);
