@@ -82,6 +82,8 @@ namespace osu.Game.Tests.Visual.Online
                     }
                 ]
             }, new OsuRuleset().RulesetInfo));
+
+            AddStep("clear stats", () => userProfileData.Value = null);
         }
     }
 }
