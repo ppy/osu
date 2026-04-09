@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 new StatisticText(colourProvider) { Text = stat.FirstPlacements.ToString("N0") },
                 new StatisticText(colourProvider) { Text = stat.Plays.ToString("N0") },
                 new StatisticText(colourProvider) { Text = stat.TotalPoints.ToString("N0") },
-                new StatisticText(colourProvider) { Text = stat.Rating.ToString("N0") }
+                new StatisticText(colourProvider) { Text = stat.Rating.ToString("N0") + (stat.IsRatingProvisional ? "*" : string.Empty) }
             ];
         }
 

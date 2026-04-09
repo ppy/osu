@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Online
                         TotalPoints = 500,
                         Pool =
                         {
-                            Name = "1v1, Active"
+                            Name = "Active Pool"
                         }
                     },
                     new APIUserMatchmakingStatistics
@@ -70,7 +70,16 @@ namespace osu.Game.Tests.Visual.Online
                         TotalPoints = 250,
                         Pool =
                         {
-                            Name = "1v1, Inactive"
+                            Name = "Inactive Pool"
+                        }
+                    },
+                    new APIUserMatchmakingStatistics
+                    {
+                        Rating = 1500,
+                        IsRatingProvisional = true,
+                        Pool =
+                        {
+                            Name = "Provisional"
                         }
                     }
                 ]
