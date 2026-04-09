@@ -21,6 +21,8 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapCarouselFilterGrouping : ICarouselFilter
     {
+        private const int mania_key_count_cache_limit = 100_000;
+
         public bool BeatmapSetsGroupedTogether { get; private set; }
 
         /// <summary>
@@ -417,7 +419,12 @@ namespace osu.Game.Screens.Select
         }
 
         private int getManiaKeyCount(ILegacyRuleset legacyRuleset, BeatmapInfo beatmap, IReadOnlyList<Mod>? mods, int converterModsSignature)
-            => maniaKeyCountCache.GetOrAdd((beatmap.ID, converterModsSignature), _ => legacyRuleset.GetKeyCount(beatmap, mods));
+        {
+            if (maniaKeyCountCache.Count >= mania_key_count_cache_limit)
+                maniaKeyCountCache.Clear();
+
+            return maniaKeyCountCache.GetOrAdd((beatmap.ID, converterModsSignature), _ => legacyRuleset.GetKeyCount(beatmap, mods));
+        }
 
         private static int getConverterModsSignature(IReadOnlyList<Mod>? mods)
         {
