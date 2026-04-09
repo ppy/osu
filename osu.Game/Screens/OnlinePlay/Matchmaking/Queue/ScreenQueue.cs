@@ -273,6 +273,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                    Users = users.OfType<APIUser>().ToArray();
                            }), cancellation.Token);
 
+            // Global (incremental) updates will not contain the user rating, so keep the one we already received from initial status data.
             if (status.UserRating != null)
                 userRating = status.UserRating;
 
