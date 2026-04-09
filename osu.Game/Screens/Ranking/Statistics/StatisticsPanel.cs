@@ -247,6 +247,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                      .Filter($@"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0", newScore.BeatmapInfo.ID)
                      .AsEnumerable()
                      .OrderBy(score => score.TotalScore)
+                     .ThenBy(score => score.Rank)
                      .ToArray());
 
                 if (localUserScores.Length == 0)
