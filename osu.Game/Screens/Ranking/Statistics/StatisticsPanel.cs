@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -247,8 +246,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                     r.GetAllLocalScoresForUser(api.LocalUser.Value.Id)
                      .Filter($@"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0", newScore.BeatmapInfo.ID)
                      .AsEnumerable()
-                     .OrderByDescending(score => score.Ruleset.MatchesOnlineID(newScore.BeatmapInfo.Ruleset))
-                     .ThenBy(score => score.Rank)
+                     .OrderBy(score => score.TotalScore)
                      .ToArray());
 
                 if (localUserScores.Length == 0)
