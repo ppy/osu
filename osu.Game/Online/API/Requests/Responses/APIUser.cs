@@ -297,6 +297,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("daily_challenge_user_stats")]
         public APIUserDailyChallengeStatistics DailyChallengeStatistics = new APIUserDailyChallengeStatistics();
 
+        [JsonProperty("matchmaking_stats")]
+        public APIUserMatchmakingStatistics[] MatchmakingStatistics = [];
+
         public override string ToString() => Username;
 
         /// <summary>

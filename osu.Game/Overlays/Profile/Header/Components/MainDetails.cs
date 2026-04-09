@@ -70,11 +70,24 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                 {
                                     Title = UsersStrings.ShowRankCountrySimple,
                                 },
-                                new DailyChallengeStatsDisplay
+                                new FillFlowContainer
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
-                                    User = { BindTarget = User },
+                                    Spacing = new Vector2(20),
+                                    Direction = FillDirection.Horizontal,
+                                    AutoSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        new MatchmakingStatsDisplay
+                                        {
+                                            User = { BindTarget = User }
+                                        },
+                                        new DailyChallengeStatsDisplay
+                                        {
+                                            User = { BindTarget = User },
+                                        }
+                                    }
                                 }
                             }
                         }
