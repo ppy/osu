@@ -23,8 +23,6 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
-        private MatchmakingStatsDisplay display = null!;
-
         [SetUpSteps]
         public void SetUpSteps()
         {
@@ -36,7 +34,7 @@ namespace osu.Game.Tests.Visual.Online
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background2,
                 });
-                Add(display = new MatchmakingStatsDisplay
+                Add(new MatchmakingStatsDisplay
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
