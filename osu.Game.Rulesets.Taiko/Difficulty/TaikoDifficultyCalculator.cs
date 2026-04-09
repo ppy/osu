@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double strainLengthBonus;
         private double patternMultiplier;
-        private double readingLengthPenalty;
+        private double readingMemoryPenalty;
 
         private bool isRelax;
         private bool isConvert;
@@ -129,8 +129,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             strainLengthBonus = 1 + 0.15 * DifficultyCalculationUtils.ReverseLerp(staminaDifficultStrains, 1000, 1555);
 
-            // Apply a penalty to small amounts of reading that can be memorised.
-            readingLengthPenalty = DifficultyCalculationUtils.ReverseLerp(readingDifficultStrains, 0, 150);
+            // The amount of reading strains that can reasonably be memorised. Converts are typically much simpler and easier to memorise.
+            double memorisableReadingStrains = isConvert ? 1000 : 150;
+
+            // Apply a penalty to reading that can be memorised.
+            readingMemoryPenalty = DifficultyCalculationUtils.ReverseLerp(readingDifficultStrains, 0, memorisableReadingStrains);
 
             double combinedRating = combinedDifficultyValue(rhythm, reading, colour, stamina, out double consistencyFactor);
             double starRating = rescale(combinedRating * 1.4);
@@ -228,7 +231,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             for (int i = 0; i < colourPeaks.Count; i++)
             {
                 double rhythmPeak = rhythmPeaks[i] * rhythm_skill_multiplier * patternMultiplier;
-                double readingPeak = readingPeaks[i] * reading_skill_multiplier * readingLengthPenalty;
+                double readingPeak = readingPeaks[i] * reading_skill_multiplier * readingMemoryPenalty;
                 double colourPeak = isRelax ? 0 : colourPeaks[i] * colour_skill_multiplier; // There is no colour difficulty in relax.
                 double staminaPeak = staminaPeaks[i] * stamina_skill_multiplier * strainLengthBonus;
                 staminaPeak /= isConvert || isRelax ? 1.5 : 1.0; // Available finger count is increased by 150%, thus we adjust accordingly.
