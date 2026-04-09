@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             }
 
             float localXDivisor = 512f / TotalColumns;
-            return Math.Clamp((int)MathF.Floor(position / localXDivisor), 0, TotalColumns - 1);
+            return Math.Clamp((int)MathF.Round(position / localXDivisor), 0, TotalColumns - 1);
         }
 
         /// <summary>
