@@ -96,7 +96,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                     Alpha = 0,
                     AlwaysPresent = true,
                 },
-                opponentCoverReveal = new CoverReveal(RankedPlayColourScheme.Red)
+                opponentCoverReveal = new CoverReveal(RankedPlayColourScheme.RED)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                     Scale = new Vector2(-1, 1),
                     Alpha = 0,
                 },
-                playerCoverReveal = new CoverReveal(RankedPlayColourScheme.Blue)
+                playerCoverReveal = new CoverReveal(RankedPlayColourScheme.BLUE)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,

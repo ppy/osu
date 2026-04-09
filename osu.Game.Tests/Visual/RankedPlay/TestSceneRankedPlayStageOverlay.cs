@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void TestBasic()
         {
-            AddStep("create", () => Child = new RankedPlayStageOverlay("Pick Phase", RankedPlayColourScheme.Blue)
+            AddStep("create", () => Child = new RankedPlayStageOverlay("Pick Phase", RankedPlayColourScheme.BLUE)
             {
                 PickingUser = new APIUser
                 {
@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void TestLongUsername()
         {
-            AddStep("create", () => Child = new RankedPlayStageOverlay("Pick Phase", RankedPlayColourScheme.Blue)
+            AddStep("create", () => Child = new RankedPlayStageOverlay("Pick Phase", RankedPlayColourScheme.BLUE)
             {
                 PickingUser = new APIUser
                 {
@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void TestColourScheme()
         {
-            AddStep("create blue", () => Child = new RankedPlayStageOverlay("Pick Phase", RankedPlayColourScheme.Blue)
+            AddStep("create blue", () => Child = new RankedPlayStageOverlay("Pick Phase", RankedPlayColourScheme.BLUE)
             {
                 PickingUser = new APIUser
                 {
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                 },
                 Multiplier = 2,
             });
-            AddStep("create red", () => Child = new RankedPlayStageOverlay("Pick Phase", RankedPlayColourScheme.Red)
+            AddStep("create red", () => Child = new RankedPlayStageOverlay("Pick Phase", RankedPlayColourScheme.RED)
             {
                 PickingUser = new APIUser
                 {

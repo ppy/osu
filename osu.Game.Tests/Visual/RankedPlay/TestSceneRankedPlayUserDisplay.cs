@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddStep("join room", () => JoinRoom(CreateDefaultRoom(MatchType.RankedPlay)));
             WaitForJoined();
 
-            AddStep("add display", () => Child = new RankedPlayUserDisplay(new APIUser { Id = 1001, Username = "User 1001" }, Anchor.BottomLeft, RankedPlayColourScheme.Blue)
+            AddStep("add display", () => Child = new RankedPlayUserDisplay(new APIUser { Id = 1001, Username = "User 1001" }, Anchor.BottomLeft, RankedPlayColourScheme.BLUE)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void TesUserDisplay()
         {
-            AddStep("blue color scheme", () => Child = new RankedPlayUserDisplay(new APIUser { Id = 1001, Username = "User 1001" }, Anchor.BottomLeft, RankedPlayColourScheme.Blue)
+            AddStep("blue color scheme", () => Child = new RankedPlayUserDisplay(new APIUser { Id = 1001, Username = "User 1001" }, Anchor.BottomLeft, RankedPlayColourScheme.BLUE)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                 Health = { BindTarget = health }
             });
 
-            AddStep("red color scheme", () => Child = new RankedPlayUserDisplay(new APIUser { Id = 1001, Username = "User 1001" }, Anchor.BottomLeft, RankedPlayColourScheme.Red)
+            AddStep("red color scheme", () => Child = new RankedPlayUserDisplay(new APIUser { Id = 1001, Username = "User 1001" }, Anchor.BottomLeft, RankedPlayColourScheme.RED)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
