@@ -27,7 +27,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         public override LocalisableString StageHeading => "Pick Phase";
         protected override LocalisableString StageCaption => "Waiting for your opponent...";
 
-        protected override RankedPlayColourScheme ColourScheme => RankedPlayColourScheme.Red;
+        protected override RankedPlayColourScheme ColourScheme => RankedPlayColourScheme.RED;
 
         private PlayerHandOfCards playerHand = null!;
         private OpponentHandOfCards opponentHand = null!;

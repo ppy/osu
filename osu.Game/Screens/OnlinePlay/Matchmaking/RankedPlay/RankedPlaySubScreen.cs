@@ -42,7 +42,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         /// <summary>
         /// The colour scheme commonly used for components of this screen.
         /// </summary>
-        protected virtual RankedPlayColourScheme ColourScheme => RankedPlayColourScheme.Blue;
+        protected virtual RankedPlayColourScheme ColourScheme => RankedPlayColourScheme.BLUE;
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;

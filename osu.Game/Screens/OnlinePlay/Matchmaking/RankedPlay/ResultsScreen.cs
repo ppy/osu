@@ -238,23 +238,23 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     Origin = Anchor.Centre,
                     Children =
                     [
-                        new RankedPlayCornerPiece(RankedPlayColourScheme.Blue, Anchor.BottomLeft)
+                        new RankedPlayCornerPiece(RankedPlayColourScheme.BLUE, Anchor.BottomLeft)
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             State = { BindTarget = cornerPieceVisibility },
-                            Child = playerUserDisplay = new RankedPlayUserDisplay(PlayerScore.User, Anchor.BottomLeft, RankedPlayColourScheme.Blue)
+                            Child = playerUserDisplay = new RankedPlayUserDisplay(PlayerScore.User, Anchor.BottomLeft, RankedPlayColourScheme.BLUE)
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Health = { Value = PlayerDamageInfo.OldLife }
                             }
                         },
-                        new RankedPlayCornerPiece(RankedPlayColourScheme.Red, Anchor.BottomRight)
+                        new RankedPlayCornerPiece(RankedPlayColourScheme.RED, Anchor.BottomRight)
                         {
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
                             State = { BindTarget = cornerPieceVisibility },
-                            Child = opponentUserDisplay = new RankedPlayUserDisplay(OpponentScore.User, Anchor.BottomRight, RankedPlayColourScheme.Red)
+                            Child = opponentUserDisplay = new RankedPlayUserDisplay(OpponentScore.User, Anchor.BottomRight, RankedPlayColourScheme.RED)
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Health = { Value = OpponentDamageInfo.OldLife }
@@ -306,7 +306,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                         Content = new Drawable[][]
                                         {
                                             [
-                                                playerScoreDetails = new ScoreDetails(PlayerScore, RankedPlayColourScheme.Blue)
+                                                playerScoreDetails = new ScoreDetails(PlayerScore, RankedPlayColourScheme.BLUE)
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
                                                     Alpha = 0,
@@ -326,7 +326,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                         }
                                     },
                                     null,
-                                    playerScoreBar = new ScoreBar(RankedPlayColourScheme.Blue)
+                                    playerScoreBar = new ScoreBar(RankedPlayColourScheme.BLUE)
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Height = 0.05f,
@@ -335,7 +335,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                         Alpha = 0,
                                     },
                                     null,
-                                    opponentScoreBar = new ScoreBar(RankedPlayColourScheme.Red)
+                                    opponentScoreBar = new ScoreBar(RankedPlayColourScheme.RED)
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Height = 0.05f,
@@ -355,7 +355,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                         Content = new Drawable[][]
                                         {
                                             [
-                                                opponentScoreDetails = new ScoreDetails(OpponentScore, RankedPlayColourScheme.Red)
+                                                opponentScoreDetails = new ScoreDetails(OpponentScore, RankedPlayColourScheme.RED)
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
                                                     Alpha = 0,
