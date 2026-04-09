@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -12,9 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Models;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
@@ -36,9 +35,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
-
-        [Resolved]
-        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
         [Resolved]
         private ScoreManager scoreManager { get; set; } = null!;
@@ -75,6 +71,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             fetchFinalScores().FireAndForget();
         }
 
+        [Resolved]
+        private IBindable<WorkingBeatmap> working { get; set; } = null!;
+
         private async Task fetchFinalScores()
         {
             try
@@ -82,7 +81,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 if (client.Room == null)
                     return;
 
-                Task<APIBeatmap?> beatmapLookup = beatmapLookupCache.GetBeatmapAsync(client.Room.CurrentPlaylistItem.BeatmapID);
                 TaskCompletionSource<List<MultiplayerScore>> scoreLookup = new TaskCompletionSource<List<MultiplayerScore>>();
 
                 var request = new IndexPlaylistScoresRequest(client.Room.RoomID, client.Room.Settings.PlaylistItemId);
@@ -92,31 +90,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
                 api.Queue(request);
 
-                APIBeatmap? beatmap = await beatmapLookup.ConfigureAwait(false);
                 List<MultiplayerScore> apiScores = await scoreLookup.Task.ConfigureAwait(false);
 
-                if (beatmap == null)
-                    return;
+                ScoreInfo[] scores = apiScores.Select(s => s.CreateScoreInfo(scoreManager, rulesets, working.Value.BeatmapInfo)).ToArray();
 
-                // Reference: PlaylistItemResultsScreen
-                var scores = apiScores.Select(s => s.CreateScoreInfo(scoreManager, rulesets, new BeatmapInfo
-                {
-                    Difficulty = new BeatmapDifficulty(beatmap.Difficulty),
-                    Metadata =
-                    {
-                        Artist = beatmap.Metadata.Artist,
-                        Title = beatmap.Metadata.Title,
-                        Author = new RealmUser
-                        {
-                            Username = beatmap.Metadata.Author.Username,
-                            OnlineID = beatmap.Metadata.Author.OnlineID,
-                        }
-                    },
-                    DifficultyName = beatmap.DifficultyName,
-                    StarRating = beatmap.StarRating,
-                    Length = beatmap.Length,
-                    BPM = beatmap.BPM
-                })).ToArray();
+                Debug.Assert(scores.Length <= 2);
 
                 int localUserId = api.LocalUser.Value.OnlineID;
                 int opponentId = matchInfo.RoomState.Users.Keys.Single(it => it != localUserId);
