@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         public readonly Bindable<double> UserPlaybackRate = new BindableDouble(1)
         {
-            MinValue = 0.05,
+            MinValue = 0.1,
             MaxValue = 2,
             Precision = 0.01,
         };
