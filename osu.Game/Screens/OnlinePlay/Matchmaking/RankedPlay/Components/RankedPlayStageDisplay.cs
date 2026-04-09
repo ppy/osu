@@ -40,6 +40,38 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         private RankedPlayStage? activeStage;
 
+        private LocalisableString heading;
+
+        /// <summary>
+        /// Heading text to be displayed indicating the purpose of the current stage.
+        /// </summary>
+        public LocalisableString Heading
+        {
+            get => heading;
+            set
+            {
+                heading = value;
+                if (headingText != null)
+                    headingText.Text = value;
+            }
+        }
+
+        private LocalisableString caption;
+
+        /// <summary>
+        /// Subtitle text to be displayed indicating the action a user should take in the current stage.
+        /// </summary>
+        public LocalisableString Caption
+        {
+            get => caption;
+            set
+            {
+                caption = value;
+                if (captionText != null)
+                    captionText.Text = value;
+            }
+        }
+
         public RankedPlayStageDisplay(RankedPlayColourScheme colourScheme)
         {
             this.colourScheme = colourScheme;
@@ -166,59 +198,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                         Top = 80,
                         Left = 20
                     },
-                    Colour = CaptionColour ?? colourScheme.Primary,
                     Text = Caption,
                     Font = OsuFont.TorusAlternate.With(size: 24, weight: FontWeight.SemiBold)
                 }
             };
-        }
-
-        private LocalisableString heading;
-
-        /// <summary>
-        /// Heading text to be displayed indicating the purpose of the current stage.
-        /// </summary>
-        public LocalisableString Heading
-        {
-            get => heading;
-            set
-            {
-                heading = value;
-                if (headingText != null)
-                    headingText.Text = value;
-            }
-        }
-
-        private LocalisableString caption;
-
-        /// <summary>
-        /// Subtitle text to be displayed indicating the action a user should take in the current stage.
-        /// </summary>
-        public LocalisableString Caption
-        {
-            get => caption;
-            set
-            {
-                caption = value;
-                if (captionText != null)
-                    captionText.Text = value;
-            }
-        }
-
-        private Color4? captionColour;
-
-        /// <summary>
-        /// Overrides the default caption colour from the colour scheme with a custom one.
-        /// </summary>
-        public Color4? CaptionColour
-        {
-            get => captionColour;
-            set
-            {
-                captionColour = value;
-                if (captionText != null)
-                    captionText.Colour = value ?? colourScheme.Primary;
-            }
         }
 
         protected override void LoadComplete()

@@ -40,7 +40,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
     public partial class ResultsScreen : RankedPlaySubScreen
     {
         public override LocalisableString StageHeading => "Results";
-        protected override LocalisableString StageCaption => string.Empty;
 
         public override bool ShowBeatmapBackground => true;
 

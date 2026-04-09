@@ -31,7 +31,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         public override bool ShowStageOverlay => true;
 
         public override LocalisableString StageHeading => "Pick Phase";
-        protected override LocalisableString StageCaption => "It's your turn to play a card!";
 
         private PlayerHandOfCards playerHand = null!;
         private OpponentHandOfCards opponentHand = null!;
@@ -55,6 +54,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         /// Whether the local user has played a card themselves.
         /// </summary>
         private bool hasPlayedCard;
+
+        public PickScreen()
+        {
+            StageCaption = "It's your turn to play a card!";
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)

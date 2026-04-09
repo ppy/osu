@@ -23,7 +23,6 @@ using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 {
@@ -36,7 +35,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         public override bool ShowStageOverlay => true;
         public override LocalisableString StageHeading => "Discard Phase";
-        protected override LocalisableString StageCaption => "Replace cards from your hand";
 
         private PlayerHandOfCards playerHand = null!;
         private ShearedButton discardButton = null!;
@@ -64,7 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         public DiscardScreen()
         {
-            StageDisplay.CaptionColour = Color4.White;
+            StageCaption = "Replace cards from your hand";
         }
 
         [BackgroundDependencyLoader]
