@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.RankedPlay;
 using osuTK;
 using osuTK.Graphics;
@@ -36,6 +37,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         private DateTimeOffset countdownStartTime;
         private DateTimeOffset countdownEndTime;
+
+        private RankedPlayStage? activeStage;
 
         public RankedPlayStageDisplay(RankedPlayColourScheme colourScheme)
         {
@@ -152,7 +155,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                 Left = 10
                             },
                             UseFullGlyphHeight = false,
-                            Text = "00:27:123",
                             Font = OsuFont.TorusAlternate.With(size: 16, fixedWidth: true, weight: FontWeight.SemiBold)
                         }
                     ]
@@ -254,17 +256,36 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         private void onCountdownStarted(MultiplayerCountdown countdown) => Scheduler.Add(() =>
         {
-            if (countdown is not RankedPlayStageCountdown)
+            if (countdown is not RankedPlayStageCountdown stageCountdown)
                 return;
 
+            switch (stageCountdown.Stage)
+            {
+                case RankedPlayStage.CardDiscard:
+                    // Discard stage ends when both players have discarded, but adds a 3 second delay before completing.
+                    // Showing this in the countdown just creates visual noise, so let's handle internally.
+                    if (activeStage == stageCountdown.Stage)
+                        return;
+
+                    break;
+            }
+
+            activeStage = stageCountdown.Stage;
             countdownStartTime = DateTimeOffset.Now;
             countdownEndTime = DateTimeOffset.Now + countdown.TimeRemaining;
         });
 
         private void onCountdownStopped(MultiplayerCountdown countdown) => Scheduler.Add(() =>
         {
-            if (countdown is not RankedPlayStageCountdown)
+            if (countdown is not RankedPlayStageCountdown stageCountdown)
                 return;
+
+            switch (stageCountdown.Stage)
+            {
+                // See above special case handling.
+                case RankedPlayStage.CardDiscard:
+                    return;
+            }
 
             countdownEndTime = DateTimeOffset.Now;
         });
