@@ -348,8 +348,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = api.LocalUser.Value.Id == user.Id
-                                        ? RankedPlayColourScheme.Blue.PrimaryDarkest
-                                        : RankedPlayColourScheme.Red.PrimaryDarkest,
+                                        ? RankedPlayColourScheme.BLUE.PrimaryDarkest
+                                        : RankedPlayColourScheme.RED.PrimaryDarkest,
                                 },
                                 new Container
                                 {
