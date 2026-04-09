@@ -433,9 +433,9 @@ namespace osu.Game.Screens.Select
 
             HashCode hash = default;
 
-            foreach (string typeName in mods.OfType<IApplicableToBeatmapConverter>()
-                                             .Select(m => m.GetType().FullName ?? m.GetType().Name)
-                                             .OrderBy(name => name, StringComparer.Ordinal))
+            IEnumerable<string> converterModTypeNames = mods.OfType<IApplicableToBeatmapConverter>().Select(m => m.GetType().FullName ?? m.GetType().Name).OrderBy(name => name, StringComparer.Ordinal);
+
+            foreach (string typeName in converterModTypeNames)
             {
                 hash.Add(typeName, StringComparer.Ordinal);
             }

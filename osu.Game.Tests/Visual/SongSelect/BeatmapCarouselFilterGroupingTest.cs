@@ -351,15 +351,15 @@ namespace osu.Game.Tests.Visual.SongSelect
             RulesetInfo maniaRuleset = new ManiaRuleset().RulesetInfo;
             var beatmapSets = new List<BeatmapSetInfo>();
 
-            addBeatmapSet(applyKeyCount(4), beatmapSets, out var first4k, [maniaRuleset]);
-            addBeatmapSet(applyKeyCount(4), beatmapSets, out var second4k, [maniaRuleset]);
-            addBeatmapSet(applyKeyCount(7), beatmapSets, out var map7k, [maniaRuleset]);
-            addBeatmapSet(applyKeyCount(18), beatmapSets, out var map18k, [maniaRuleset]);
+            addBeatmapSet(applyKeyCount(4), beatmapSets, out var first4K, [maniaRuleset]);
+            addBeatmapSet(applyKeyCount(4), beatmapSets, out var second4K, [maniaRuleset]);
+            addBeatmapSet(applyKeyCount(7), beatmapSets, out var map7K, [maniaRuleset]);
+            addBeatmapSet(applyKeyCount(18), beatmapSets, out var map18K, [maniaRuleset]);
 
             var results = await runGrouping(GroupMode.ManiaKeyCount, beatmapSets, maniaRuleset);
-            assertGroup(results, 0, "4K", first4k.Beatmaps.Concat(second4k.Beatmaps), ref total);
-            assertGroup(results, 1, "7K", map7k.Beatmaps, ref total);
-            assertGroup(results, 2, "18K", map18k.Beatmaps, ref total);
+            assertGroup(results, 0, "4K", first4K.Beatmaps.Concat(second4K.Beatmaps), ref total);
+            assertGroup(results, 1, "7K", map7K.Beatmaps, ref total);
+            assertGroup(results, 2, "18K", map18K.Beatmaps, ref total);
             assertTotal(results, total);
         }
 
