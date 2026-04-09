@@ -25,18 +25,18 @@ namespace osu.Game.Tests.Visual.RankedPlay
             {
                 Children =
                 [
-                    new RankedPlayCornerPiece(RankedPlayColourScheme.Blue, Anchor.BottomLeft)
+                    new RankedPlayCornerPiece(RankedPlayColourScheme.BLUE, Anchor.BottomLeft)
                     {
                         State = { BindTarget = visibility },
-                        Child = new RankedPlayUserDisplay(new APIUser { Id = 2, Username = "peppy" }, Anchor.BottomLeft, RankedPlayColourScheme.Blue)
+                        Child = new RankedPlayUserDisplay(new APIUser { Id = 2, Username = "peppy" }, Anchor.BottomLeft, RankedPlayColourScheme.BLUE)
                         {
                             RelativeSizeAxes = Axes.Both,
                         }
                     },
-                    new RankedPlayCornerPiece(RankedPlayColourScheme.Red, Anchor.TopRight)
+                    new RankedPlayCornerPiece(RankedPlayColourScheme.RED, Anchor.TopRight)
                     {
                         State = { BindTarget = visibility },
-                        Child = new RankedPlayUserDisplay(new APIUser { Id = 2, Username = "peppy" }, Anchor.TopRight, RankedPlayColourScheme.Red)
+                        Child = new RankedPlayUserDisplay(new APIUser { Id = 2, Username = "peppy" }, Anchor.TopRight, RankedPlayColourScheme.RED)
                         {
                             RelativeSizeAxes = Axes.Both,
                         }

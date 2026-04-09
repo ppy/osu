@@ -175,19 +175,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             opponentUser = users.GetUserAsync(opponentUserId).GetResultSafely()!;
 
             AddRangeInternal([
-                new RankedPlayCornerPiece(RankedPlayColourScheme.Blue, Anchor.BottomLeft)
+                new RankedPlayCornerPiece(RankedPlayColourScheme.BLUE, Anchor.BottomLeft)
                 {
                     State = { BindTarget = cornerPieceVisibility },
-                    Child = new RankedPlayUserDisplay(localUser, Anchor.BottomLeft, RankedPlayColourScheme.Blue)
+                    Child = new RankedPlayUserDisplay(localUser, Anchor.BottomLeft, RankedPlayColourScheme.BLUE)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Health = { BindTarget = matchInfo.PlayerHealth }
                     }
                 },
-                new RankedPlayCornerPiece(RankedPlayColourScheme.Red, Anchor.TopRight)
+                new RankedPlayCornerPiece(RankedPlayColourScheme.RED, Anchor.TopRight)
                 {
                     State = { BindTarget = cornerPieceVisibility },
-                    Child = new RankedPlayUserDisplay(opponentUser, Anchor.TopRight, RankedPlayColourScheme.Red)
+                    Child = new RankedPlayUserDisplay(opponentUser, Anchor.TopRight, RankedPlayColourScheme.RED)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Health = { BindTarget = matchInfo.OpponentHealth }
@@ -224,12 +224,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 {
                     APIUser? pickingUser = null;
                     double? multiplier = matchInfo.Stage.Value < RankedPlayStage.CardPlay ? null : matchInfo.RoomState.DamageMultiplier;
-                    RankedPlayColourScheme colourScheme = RankedPlayColourScheme.Blue;
+                    RankedPlayColourScheme colourScheme = RankedPlayColourScheme.BLUE;
 
                     if (matchInfo.Stage.Value == RankedPlayStage.CardPlay && matchInfo.RoomState.ActiveUser != null)
                     {
                         pickingUser = matchInfo.IsOwnTurn ? localUser : opponentUser;
-                        colourScheme = matchInfo.IsOwnTurn ? RankedPlayColourScheme.Blue : RankedPlayColourScheme.Red;
+                        colourScheme = matchInfo.IsOwnTurn ? RankedPlayColourScheme.BLUE : RankedPlayColourScheme.RED;
                     }
 
                     stageOverlayContainer.Add(new RankedPlayStageOverlay(screen.StageHeading, colourScheme)
