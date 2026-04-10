@@ -22,13 +22,13 @@ namespace osu.Game.Rulesets.Mania.Tests
         [TestCase("8K")]
         [TestCase("9K")]
         [TestCase("10K")]
-        [TestCase("11K")]
+        // [TestCase("11K")] <- See comment in `ManiaBeatmapConverter` ctor for disable reason.
         [TestCase("12K")]
-        [TestCase("13K")]
+        // [TestCase("13K")] <- See comment in `ManiaBeatmapConverter` ctor for disable reason.
         [TestCase("14K")]
-        [TestCase("15K")]
+        // [TestCase("15K")] <- See comment in `ManiaBeatmapConverter` ctor for disable reason.
         [TestCase("16K")]
-        [TestCase("17K")]
+        // [TestCase("17K")] <- See comment in `ManiaBeatmapConverter` ctor for disable reason.
         [TestCase("18K")]
         [TestCase("7K+1")]
         public void TestEncodeDecodeStability(string name)
