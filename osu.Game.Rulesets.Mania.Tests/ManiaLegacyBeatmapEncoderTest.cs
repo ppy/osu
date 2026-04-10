@@ -30,6 +30,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         [TestCase("16K")]
         [TestCase("17K")]
         [TestCase("18K")]
+        [TestCase("7K+1")]
         public void TestEncodeDecodeStability(string name)
         {
             var decoded = DecodeFromLegacy(beatmaps_resource_store.GetStream($"Resources/Testing/Beatmaps/{name}.osu"), beatmaps_resource_store, name);
