@@ -28,7 +28,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         public Action<bool>? ExitRequested { get; init; }
 
         public override LocalisableString StageHeading => "Results";
-        protected override LocalisableString StageCaption => string.Empty;
 
         [Resolved]
         private RankedPlayMatchInfo matchInfo { get; set; } = null!;
