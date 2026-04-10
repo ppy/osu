@@ -551,7 +551,7 @@ namespace osu.Game.Screens.OnlinePlay
                 Size = new Vector2(30, 30),
                 Action = () => RequestResults?.Invoke(Item),
                 Alpha = AllowShowingResults ? 1 : 0,
-                TooltipText = "View results"
+                TooltipText = OnlinePlayStrings.ViewResults
             },
             editButton = new PlaylistEditButton
             {
@@ -569,7 +569,7 @@ namespace osu.Game.Screens.OnlinePlay
                 Size = new Vector2(30, 30),
                 Alpha = AllowDeletion ? 1 : 0,
                 Action = () => RequestDeletion?.Invoke(Item),
-                TooltipText = "Remove from playlist"
+                TooltipText = OnlinePlayStrings.RemoveFromPlaylist
             },
         };
 
@@ -766,7 +766,7 @@ namespace osu.Game.Screens.OnlinePlay
                 });
             }
 
-            public LocalisableString TooltipText => User == null ? string.Empty : $"queued by {User.Username}";
+            public LocalisableString TooltipText => User == null ? string.Empty : OnlinePlayStrings.QueuedBy(User.Username);
 
             private partial class TooltipArea : Component, IHasTooltip
             {

@@ -134,6 +134,41 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString JoinRoom => new TranslatableString(getKey(@"join_room"), @"Join Room");
 
+        /// <summary>
+        /// "Beatmap not downloaded"
+        /// </summary>
+        public static LocalisableString BeatmapNotDownloaded => new TranslatableString(getKey(@"beatmap_not_downloaded"), @"Beatmap not downloaded");
+
+        /// <summary>
+        /// "Maximum attempts: {0:N0}"
+        /// </summary>
+        public static LocalisableString MaximumAttempts(int maxAttempts) => new TranslatableString(getKey(@"maximum_attempts"), @"Maximum attempts: {0:N0}", maxAttempts);
+
+        /// <summary>
+        /// "Maximum attempts: {0:N0} ({1} remaining)"
+        /// </summary>
+        public static LocalisableString MaximumAttemptsWithRemaining(int maxAttempts, int remainingAttempts) => new TranslatableString(getKey(@"maximum_attempts_with_remaining"), @"Maximum attempts: {0:N0} ({1} remaining)", maxAttempts, remainingAttempts);
+
+        /// <summary>
+        /// "View results"
+        /// </summary>
+        public static LocalisableString ViewResults => new TranslatableString(getKey(@"view_results"), @"View results");
+
+        /// <summary>
+        /// "Remove from playlist"
+        /// </summary>
+        public static LocalisableString RemoveFromPlaylist => new TranslatableString(getKey(@"remove_from_playlist"), @"Remove from playlist");
+
+        /// <summary>
+        /// "queued by {0}"
+        /// </summary>
+        public static LocalisableString QueuedBy(string username) => new TranslatableString(getKey(@"queued_by"), @"queued by {0}", username);
+
+        /// <summary>
+        /// "Completed Beatmaps"
+        /// </summary>
+        public static LocalisableString CompletedBeatmaps => new TranslatableString(getKey(@"completed_beatmaps"), @"Completed Beatmaps");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
