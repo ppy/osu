@@ -35,6 +35,7 @@ namespace osu.Game.Screens.Select
     {
         // taken from draw visualiser. used for carousel alignment purposes.
         public const float HEIGHT_FROM_SCREEN_TOP = 141 - corner_radius;
+        private const string mania_ruleset_short_name = "mania";
 
         private static readonly GroupMode[] all_group_modes = Enum.GetValues<GroupMode>();
         private static readonly GroupMode[] non_mania_group_modes = all_group_modes.Where(m => m != GroupMode.ManiaKeyCount).ToArray();
@@ -283,7 +284,7 @@ namespace osu.Game.Screens.Select
 
         private void updateAvailableGroupModes()
         {
-            bool isManiaRuleset = ruleset.Value.OnlineID == 3;
+            bool isManiaRuleset = ruleset.Value.ShortName == mania_ruleset_short_name;
 
             if (!isManiaRuleset && groupDropdown.Current.Value == GroupMode.ManiaKeyCount)
                 groupDropdown.Current.Value = GroupMode.None;

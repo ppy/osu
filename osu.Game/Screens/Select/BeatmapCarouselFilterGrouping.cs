@@ -19,6 +19,8 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapCarouselFilterGrouping : ICarouselFilter
     {
+        private const string mania_ruleset_short_name = "mania";
+
         public bool BeatmapSetsGroupedTogether { get; private set; }
 
         /// <summary>
@@ -208,7 +210,7 @@ namespace osu.Game.Screens.Select
                 case GroupMode.ManiaKeyCount:
                 {
                     // Key count is only meaningful in mania.
-                    if (criteria.Ruleset?.OnlineID != 3)
+                    if (criteria.Ruleset?.ShortName != mania_ruleset_short_name)
                         return new List<GroupMapping> { new GroupMapping(null, items) };
 
                     ILegacyRuleset legacyRuleset = (ILegacyRuleset)criteria.Ruleset.CreateInstance();
