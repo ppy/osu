@@ -90,13 +90,16 @@ namespace osu.Game.Graphics
         public static IconUsage Twitter => get(OsuIconMapping.Twitter);
         public static IconUsage UserInterface => get(OsuIconMapping.UserInterface);
         public static IconUsage Wiki => get(OsuIconMapping.Wiki);
+        public static IconUsage EditorHitCircle => get(OsuIconMapping.EditorHitCircle);
+        public static IconUsage EditorSlider => get(OsuIconMapping.EditorSlider);
+        public static IconUsage EditorSpinner => get(OsuIconMapping.EditorSpinner);
+        public static IconUsage EditorGrid => get(OsuIconMapping.EditorGrid);
         public static IconUsage EditorAddControlPoint => get(OsuIconMapping.EditorAddControlPoint);
         public static IconUsage EditorConvertToStream => get(OsuIconMapping.EditorConvertToStream);
         public static IconUsage EditorDistanceSnap => get(OsuIconMapping.EditorDistanceSnap);
         public static IconUsage EditorFinish => get(OsuIconMapping.EditorFinish);
         public static IconUsage EditorGridSnap => get(OsuIconMapping.EditorGridSnap);
-        public static IconUsage EditorNewComboA => get(OsuIconMapping.EditorNewComboA);
-        public static IconUsage EditorNewComboB => get(OsuIconMapping.EditorNewComboB);
+        public static IconUsage EditorNewCombo => get(OsuIconMapping.EditorNewCombo);
         public static IconUsage EditorSelect => get(OsuIconMapping.EditorSelect);
         public static IconUsage EditorSound => get(OsuIconMapping.EditorSound);
         public static IconUsage EditorWhistle => get(OsuIconMapping.EditorWhistle);
@@ -397,6 +400,18 @@ namespace osu.Game.Graphics
             [Description(@"wiki")]
             Wiki,
 
+            [Description(@"Editor/hitcircle")]
+            EditorHitCircle,
+
+            [Description(@"Editor/slider")]
+            EditorSlider,
+
+            [Description(@"Editor/spinner")]
+            EditorSpinner,
+
+            [Description(@"Editor/grid")]
+            EditorGrid,
+
             [Description(@"Editor/add-control-point")]
             EditorAddControlPoint = 1000,
 
@@ -412,11 +427,8 @@ namespace osu.Game.Graphics
             [Description(@"Editor/grid-snap")]
             EditorGridSnap,
 
-            [Description(@"Editor/new-combo-a")]
-            EditorNewComboA,
-
-            [Description(@"Editor/new-combo-b")]
-            EditorNewComboB,
+            [Description(@"Editor/new-combo")]
+            EditorNewCombo,
 
             [Description(@"Editor/select")]
             EditorSelect,
