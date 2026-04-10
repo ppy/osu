@@ -9,6 +9,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -24,9 +25,11 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
@@ -165,11 +168,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 items.AddRange(base.ContextMenuItems);
 
                 items.Add(new OsuMenuItemSpacer());
-                items.Add(new OsuMenuItem("Create copy", MenuItemType.Standard, () => lounge?.OpenCopy(Room)));
+                items.Add(new OsuMenuItem(OnlinePlayStrings.CreateCopy, MenuItemType.Standard, () => lounge?.OpenCopy(Room)));
 
                 if (Room.Type == MatchType.Playlists && Room.Host?.Id == api.LocalUser.Value.Id && Room.StartDate?.AddMinutes(5) >= DateTimeOffset.Now && !Room.HasEnded)
                 {
-                    items.Add(new OsuMenuItem("Close playlist", MenuItemType.Destructive, () =>
+                    items.Add(new OsuMenuItem(OnlinePlayStrings.ClosePlaylist, MenuItemType.Destructive, () =>
                     {
                         dialogOverlay?.Push(new ClosePlaylistDialog(Room, () => lounge?.Close(Room)));
                     }));
@@ -273,12 +276,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                 passwordTextBox = new OsuPasswordTextBox
                                 {
                                     Width = 200,
-                                    PlaceholderText = "password",
+                                    PlaceholderText = UsersStrings.LoginPassword.ToLower(),
                                 },
                                 joinButton = new RoundedButton
                                 {
                                     Width = 80,
-                                    Text = "Join Room",
+                                    Text = OnlinePlayStrings.JoinRoom,
                                 }
                             }
                         },
