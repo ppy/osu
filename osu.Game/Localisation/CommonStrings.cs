@@ -204,6 +204,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString DeleteWithConfirmation => new TranslatableString(getKey(@"delete_with_confrmation"), @"Delete...");
 
+        /// <summary>
+        /// "View in browser"
+        /// </summary>
+        public static LocalisableString ViewInBrowser => new TranslatableString(getKey(@"view_in_browser"), @"View in browser");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
