@@ -74,6 +74,66 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Chat => new TranslatableString(getKey(@"chat"), @"Chat");
 
+        /// <summary>
+        /// "Closed {0}"
+        /// </summary>
+        public static LocalisableString RoomClosed(LocalisableString time) => new TranslatableString(getKey(@"room_closed"), @"Closed {0}", time);
+
+        /// <summary>
+        /// "Closed"
+        /// </summary>
+        public static LocalisableString RoomClosedRecently => new TranslatableString(getKey(@"room_closed_recently"), @"Closed");
+
+        /// <summary>
+        /// "Closing soon"
+        /// </summary>
+        public static LocalisableString RoomClosingSoon => new TranslatableString(getKey(@"room_closing_soon"), @"Closing soon");
+
+        /// <summary>
+        /// "Closing {0}"
+        /// </summary>
+        public static LocalisableString RoomClosing(LocalisableString time) => new TranslatableString(getKey(@"room_closing"), @"Closing {0}", time);
+
+        /// <summary>
+        /// "Open"
+        /// </summary>
+        public static LocalisableString RoomModeFilterOpen => new TranslatableString(getKey(@"room_mode_filter_open"), @"Open");
+
+        /// <summary>
+        /// "Recently Ended"
+        /// </summary>
+        public static LocalisableString RoomModeFilterEnded => new TranslatableString(getKey(@"room_mode_filter_ended"), @"Recently Ended");
+
+        /// <summary>
+        /// "Participated"
+        /// </summary>
+        public static LocalisableString RoomModeFilterParticipated => new TranslatableString(getKey(@"room_mode_filter_participated"), @"Participated");
+
+        /// <summary>
+        /// "Owned"
+        /// </summary>
+        public static LocalisableString RoomModeFilterOwned => new TranslatableString(getKey(@"room_mode_filter_owned"), @"Owned");
+
+        /// <summary>
+        /// "Ready to play"
+        /// </summary>
+        public static LocalisableString RoomStatusReadyToPlay => new TranslatableString(getKey(@"room_status_ready_to_play"), @"Ready to play");
+
+        /// <summary>
+        /// "Create copy"
+        /// </summary>
+        public static LocalisableString CreateCopy => new TranslatableString(getKey(@"create_copy"), @"Create copy");
+
+        /// <summary>
+        /// "Close playlist"
+        /// </summary>
+        public static LocalisableString ClosePlaylist => new TranslatableString(getKey(@"close_playlist"), @"Close playlist");
+
+        /// <summary>
+        /// "Join Room"
+        /// </summary>
+        public static LocalisableString JoinRoom => new TranslatableString(getKey(@"join_room"), @"Join Room");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

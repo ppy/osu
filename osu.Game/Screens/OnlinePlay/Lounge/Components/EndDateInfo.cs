@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
@@ -71,15 +72,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 var diffToNow = Date.Subtract(DateTimeOffset.Now);
 
                 if (diffToNow.TotalSeconds < -5)
-                    return LocalisableString.Interpolate($"Closed {base.Format()}");
+                    return OnlinePlayStrings.RoomClosed(base.Format());
 
                 if (diffToNow.TotalSeconds < 0)
-                    return "Closed";
+                    return OnlinePlayStrings.RoomClosedRecently;
 
                 if (diffToNow.TotalSeconds < 5)
-                    return "Closing soon";
+                    return OnlinePlayStrings.RoomClosingSoon;
 
-                return LocalisableString.Interpolate($"Closing {base.Format()}");
+                return OnlinePlayStrings.RoomClosing(base.Format());
             }
 
             protected override void Dispose(bool isDisposing)
