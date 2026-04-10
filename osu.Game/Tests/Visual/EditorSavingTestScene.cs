@@ -35,6 +35,8 @@ namespace osu.Game.Tests.Visual
         {
             base.SetUpSteps();
 
+            AddStep("set ruleset", () => Game.Ruleset.Value = CreateRuleset()!.RulesetInfo);
+
             if (CreateInitialBeatmap == null)
                 AddStep("set default beatmap", () => Game.Beatmap.SetDefault());
             else
