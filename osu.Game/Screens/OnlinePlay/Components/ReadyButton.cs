@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.Rooms;
 
@@ -36,7 +37,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                     return string.Empty;
 
                 if (availability.Value.State != DownloadState.LocallyAvailable)
-                    return "Beatmap not downloaded";
+                    return OnlinePlayStrings.BeatmapNotDownloaded;
 
                 return string.Empty;
             }

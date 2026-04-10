@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
@@ -66,15 +67,17 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             if (room.MaxAttempts != null)
             {
-                attemptDisplay.Text = $"Maximum attempts: {room.MaxAttempts:N0}";
-
                 if (room.UserScore != null)
                 {
                     int remaining = room.MaxAttempts.Value - room.UserScore.PlaylistItemAttempts.Sum(a => a.Attempts);
-                    attemptDisplay.Text += $" ({remaining} remaining)";
+                    attemptDisplay.Text = OnlinePlayStrings.MaximumAttemptsWithRemaining(room.MaxAttempts.Value, remaining);
 
                     if (remaining == 0)
                         attemptDisplay.Colour = colours.RedLight;
+                }
+                else
+                {
+                    attemptDisplay.Text = OnlinePlayStrings.MaximumAttempts(room.MaxAttempts.Value);
                 }
             }
             else
