@@ -213,7 +213,10 @@ namespace osu.Game.Screens.Select
                     if (criteria.Ruleset?.ShortName != mania_ruleset_short_name)
                         return new List<GroupMapping> { new GroupMapping(null, items) };
 
-                    ILegacyRuleset legacyRuleset = (ILegacyRuleset)criteria.Ruleset.CreateInstance();
+                    ILegacyRuleset? legacyRuleset = criteria.Ruleset.CreateInstance() as ILegacyRuleset;
+                    if (legacyRuleset == null)
+                        return new List<GroupMapping> { new GroupMapping(null, items) };
+
                     return getGroupsBy(b => defineGroupByKeyCount(legacyRuleset.GetKeyCount(b, criteria.Mods)), items);
                 }
 
