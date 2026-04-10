@@ -36,9 +36,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private Container xAxisContainer = null!;
         private Container chartContainer = null!;
 
-        private Container grid = null!;
+        private Container gridContainer = null!;
+        private Container barsContainer = null!;
+        private Container userRatingContainer = null!;
         private PointPath cumulativePath = null!;
-        private PointPath distributionPath = null!;
+
         private Drawable hoverMarker = null!;
         private Drawable hoverMarkerFill = null!;
         private OsuTextFlowContainer descriptionText = null!;
@@ -110,7 +112,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                         RelativeSizeAxes = Axes.Both,
                                         Children = new[]
                                         {
-                                            grid = new Container
+                                            gridContainer = new Container
+                                            {
+                                                RelativeSizeAxes = Axes.Both
+                                            },
+                                            barsContainer = new Container
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Masking = true
+                                            },
+                                            userRatingContainer = new Container
                                             {
                                                 RelativeSizeAxes = Axes.Both
                                             },
@@ -122,7 +133,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                                 Padding = new MarginPadding { Right = -2 },
                                                 Children = new Drawable[]
                                                 {
-                                                    distributionPath = new PointPath
+                                                    new PointPath
                                                     {
                                                         AutoSizeAxes = Axes.None,
                                                         RelativeSizeAxes = Axes.Both,
@@ -238,11 +249,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             xAxisContainer.Clear();
             yAxisLeftContainer.Clear();
             yAxisRightContainer.Clear();
-            grid.Clear();
+            gridContainer.Clear();
+            barsContainer.Clear();
+            userRatingContainer.Clear();
 
             for (int step = 0; step <= x_divisions; step++)
             {
-                grid.Add(new VerticalLine
+                gridContainer.Add(new VerticalLine
                 {
                     RelativeSizeAxes = Axes.Y,
                     RelativePositionAxes = Axes.X,
@@ -266,7 +279,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             for (int step = 0; step <= y_divisions; step++)
             {
-                grid.Add(new HorizontalLine
+                gridContainer.Add(new HorizontalLine
                 {
                     RelativeSizeAxes = Axes.X,
                     RelativePositionAxes = Axes.Y,
@@ -297,26 +310,35 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 });
             }
 
+            foreach (var point in data)
+            {
+                barsContainer.Add(new Container
+                {
+                    Origin = Anchor.BottomCentre,
+                    Anchor = Anchor.BottomLeft,
+                    RelativePositionAxes = Axes.X,
+                    RelativeSizeAxes = Axes.Both,
+                    X = pointOnGraph(point.x, point.y).X,
+                    Height = 1 - pointOnGraph(point.x, point.y).Y,
+                    Width = 0.5f / x_divisions,
+                    Colour = colourProvider.Colour0,
+                    Masking = true,
+                    CornerRadius = 2,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    }
+                });
+            }
+
             if (userRating != null)
             {
-                grid.Add(new UserRatingLine(userRating.Value)
+                userRatingContainer.Add(new UserRatingLine(userRating.Value)
                 {
                     RelativeSizeAxes = Axes.Y,
                     RelativePositionAxes = Axes.X,
                     X = pointOnGraph(userRating.Value, 0).X,
                     Colour = colours.Green
-                });
-            }
-
-            foreach (var point in data)
-            {
-                grid.Add(new Circle
-                {
-                    Origin = Anchor.Centre,
-                    RelativePositionAxes = Axes.Both,
-                    Position = pointOnGraph(point.x, point.y),
-                    Size = new Vector2(8),
-                    Colour = colourProvider.Colour0
                 });
             }
 
@@ -339,8 +361,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 });
                 descriptionText.AddText(" of players.");
             }
-
-            distributionPath.Points = data.Select(d => pointOnGraph(d.x, d.y)).ToArray();
 
             int currentCount = 0;
             int totalCount = data.Sum(d => d.y);
@@ -389,7 +409,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             var content = TooltipContent;
 
-            hoverMarker.Position = grid.ToLocalSpace(content.Position);
+            hoverMarker.Position = gridContainer.ToLocalSpace(content.Position);
             hoverMarkerFill.Colour = content.Colour;
 
             return true;
@@ -411,8 +431,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
                 if (userRating != null)
                 {
-                    Vector2 userRatingPos1 = grid.ToScreenSpace(pointOnGraph(userRating.Value, 0) * grid.DrawSize);
-                    Vector2 userRatingPos2 = grid.ToScreenSpace(pointOnGraph(userRating.Value, yRange.max) * grid.DrawSize);
+                    Vector2 userRatingPos1 = userRatingContainer.ToScreenSpace(pointOnGraph(userRating.Value, 0) * userRatingContainer.DrawSize);
+                    Vector2 userRatingPos2 = userRatingContainer.ToScreenSpace(pointOnGraph(userRating.Value, yRange.max) * userRatingContainer.DrawSize);
 
                     minDistToCursor = Vector2.Distance(mousePos, userRatingPos1);
                     closestPointToCursor = userRatingPos1;
@@ -429,9 +449,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     }
                 }
 
-                for (int i = 0; i < distributionPath.Vertices.Count; i++)
+                for (int i = 0; i < data.Length; i++)
                 {
-                    Vector2 pos = distributionPath.ToScreenSpace(distributionPath.Vertices[i] + new Vector2(2, 0));
+                    Vector2 pos = barsContainer.ToScreenSpace(pointOnGraph(data[i].x, data[i].y) * barsContainer.DrawSize);
                     float d = Vector2.Distance(mousePos, pos);
 
                     if (d < minDistToCursor)
@@ -451,7 +471,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 {
                     currentCount += data[i].y;
 
-                    Vector2 pos = distributionPath.ToScreenSpace(cumulativePath.Vertices[i] + new Vector2(2));
+                    Vector2 pos = cumulativePath.ToScreenSpace(cumulativePath.Vertices[i] + new Vector2(2));
                     float d = Vector2.Distance(mousePos, pos);
 
                     if (d < minDistToCursor)
