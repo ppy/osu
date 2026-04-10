@@ -20,6 +20,8 @@ namespace osu.Game.Rulesets.Mania.Tests
 {
     public partial class TestSceneReplayRewinding : RateAdjustedBeatmapTestScene
     {
+        protected override Ruleset CreateRuleset() => new ManiaRuleset();
+
         private ReplayPlayer currentPlayer = null!;
 
         [Test]

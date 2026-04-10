@@ -33,6 +33,8 @@ namespace osu.Game.Rulesets.Mania.Tests
     /// </summary>
     public partial class TestSceneHoldNoteInput : RateAdjustedBeatmapTestScene
     {
+        protected override Ruleset CreateRuleset() => new ManiaRuleset();
+
         private const double time_before_head = 250;
         private const double time_head = 1500;
         private const double time_during_hold_1 = 2500;
