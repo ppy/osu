@@ -4,9 +4,12 @@
 using System;
 using System.Linq;
 using System.Threading;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
@@ -32,10 +35,29 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModClassic), typeof(OsuModTargetPractice) };
 
+        [SettingSource("Follow circle size", "Adjust the size of the follow circle")]
+        public BindableFloat FollowCircleScale { get; } = new BindableFloat(2.4f)
+        {
+            MinValue = 0.5f,
+            MaxValue = 3.0f,
+            Precision = 0.1f
+        };
+
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
             if (drawable is DrawableSlider slider)
             {
+                // Apply the follow circle scale directly to the ball
+                // This needs to happen after the ball is loaded, so we schedule it
+                void applyFollowCircleScale(Drawable _)
+                {
+                    slider.Ball.FollowCircleScale.Value = FollowCircleScale.Value;
+                    slider.Ball.FollowCircleScale.BindTo(FollowCircleScale);
+                    slider.OnLoadComplete -= applyFollowCircleScale;
+                }
+
+                slider.OnLoadComplete += applyFollowCircleScale;
+
                 slider.Tracking.ValueChanged += e =>
                 {
                     if (e.NewValue || slider.Judged) return;

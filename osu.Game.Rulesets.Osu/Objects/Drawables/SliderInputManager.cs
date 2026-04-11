@@ -204,7 +204,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             float radius = (float)slider.HitObject.Radius;
 
             if (expanded)
-                radius *= DrawableSliderBall.FOLLOW_AREA;
+                radius *= slider.Ball.FollowCircleScale.Value;
 
             return radius;
         }
