@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Tests.Beatmaps;
-using osu.Game.Tests.Visual.Multiplayer;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -24,7 +23,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     /// Integration tests for <see cref="MultiplayerModMultiplierOverlay"/>.
     /// Verifies that:
     /// - The overlay is only visible to the host.
-    /// - Multiplier changes are propagated via <see cref="MultiplayerClient.ChangeSettings"/>.
+    /// - Multiplier changes are propagated via <see cref="MultiplayerClient.ChangeSettings(MultiplayerRoomSettings)"/>.
     /// - Changes during gameplay take effect only on the next map.
     /// </summary>
     public partial class TestSceneMultiplayerModMultiplierOverlay : MultiplayerTestScene
