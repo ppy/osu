@@ -108,5 +108,26 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 new OsuReplayFrame(3000, new Vector2(256, 192)),
             }
         });
+
+        [Test]
+        public void TestSpinnerWithoutMaxBonusNotFailing() => CreateModTest(new ModTestData
+        {
+            // RequireSpinnerMax is false by default — should not fail without MAX bonus
+            Mod = new OsuModPerfect { RequireSpinnerMax = { Value = false } },
+            PassCondition = () => ((ModFailConditionTestPlayer)Player).CheckFailed(false),
+            Autoplay = true,
+            CreateBeatmap = () => new Beatmap
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new Spinner
+                    {
+                        StartTime = 1000,
+                        EndTime = 3000,
+                        Position = new Vector2(256, 192)
+                    },
+                },
+            },
+        });
     }
 }
