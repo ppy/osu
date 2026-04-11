@@ -75,7 +75,7 @@ namespace osu.Game.Scoring
 
         public Score GetScore(ScoreInfo score) => new LegacyDatabasedScore(score, rulesets, beatmaps(), Files.Store);
 
-        protected override void Populate(ScoreInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
+        protected override void Populate(ScoreInfo model, ArchiveReader? archive, Realm realm, ImportParameters parameters, CancellationToken cancellationToken = default)
         {
             Debug.Assert(model.BeatmapInfo != null);
 

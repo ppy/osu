@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -57,6 +58,50 @@ namespace osu.Game.Database
             }
 
             return paths;
+        }
+
+        /// <summary>
+        /// Reads the <c>osu!.db</c> from the stable installation root and returns a mapping of
+        /// folder name (relative to Songs, case-insensitive) to the date the beatmap set was added.
+        /// Returns <see langword="null"/> when the database is unavailable or cannot be parsed.
+        /// </summary>
+        protected virtual Dictionary<string, DateTimeOffset>? ReadDateAddedFromStableDb(StableStorage stableStorage)
+            => OsuDbReader.ReadDateAddedByFolder(stableStorage);
+
+        protected override IEnumerable<ImportTask> CreateImportTasks(Storage songsStorage, StableStorage stableStorage)
+        {
+            var dateAddedByFolder = ReadDateAddedFromStableDb(stableStorage);
+
+            foreach (string path in GetStableImportPaths(songsStorage))
+            {
+                var task = new ImportTask(path);
+
+                if (dateAddedByFolder != null)
+                {
+                    // The folder name stored in osu!.db is relative to the Songs directory.
+                    // For nested folders (e.g., "subdirectory\beatmap"), we need to compute the relative path.
+                    string songsRoot = songsStorage.GetFullPath(string.Empty);
+                    string? relativePath = Path.GetRelativePath(songsRoot, path);
+
+                    if (!string.IsNullOrEmpty(relativePath) && relativePath != ".")
+                    {
+                        // Normalize path separators for cross-platform compatibility.
+                        // osu!.db on Windows uses backslash, but we may be importing on Linux/macOS.
+                        // Try both forward and backward slash variants.
+                        string normalizedPath = relativePath.Replace('/', '\\');
+                        string alternativePath = relativePath.Replace('\\', '/');
+
+                        if (dateAddedByFolder.TryGetValue(normalizedPath, out var dateAdded))
+                            task.DateAdded = dateAdded;
+                        else if (dateAddedByFolder.TryGetValue(alternativePath, out dateAdded))
+                            task.DateAdded = dateAdded;
+                        else if (dateAddedByFolder.TryGetValue(relativePath, out dateAdded))
+                            task.DateAdded = dateAdded;
+                    }
+                }
+
+                yield return task;
+            }
         }
 
         public LegacyBeatmapImporter(IModelImporter<BeatmapSetInfo> importer)

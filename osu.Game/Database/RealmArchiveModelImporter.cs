@@ -253,6 +253,10 @@ namespace osu.Game.Database
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            // Allow per-task date override to take precedence over the shared parameters value.
+            if (task.DateAdded.HasValue)
+                parameters.DateAdded = task.DateAdded;
+
             Live<TModel>? import;
             using (ArchiveReader reader = task.GetReader())
                 import = await importFromArchive(reader, parameters, cancellationToken).ConfigureAwait(false);
@@ -398,7 +402,7 @@ namespace osu.Game.Database
                 using (var transaction = realm.BeginWrite())
                 {
                     // TODO: we may want to run this outside of the transaction.
-                    Populate(item, archive, realm, cancellationToken);
+                    Populate(item, archive, realm, parameters, cancellationToken);
 
                     // Populate() may have adjusted file content (see SkinImporter.updateSkinIniMetadata), so regardless of whether a fast check was done earlier, let's
                     // check for existing items a second time.
@@ -540,8 +544,9 @@ namespace osu.Game.Database
         /// <param name="model">The model to populate.</param>
         /// <param name="archive">The archive to use as a reference for population. May be null.</param>
         /// <param name="realm">The current realm context.</param>
+        /// <param name="parameters">Parameters that further configure the import process.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        protected abstract void Populate(TModel model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default);
+        protected abstract void Populate(TModel model, ArchiveReader? archive, Realm realm, ImportParameters parameters, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Perform any final actions before the import to database executes.

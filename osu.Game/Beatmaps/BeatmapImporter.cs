@@ -164,12 +164,12 @@ namespace osu.Game.Beatmaps
 
         protected override bool ShouldDeleteArchive(string path) => HandledExtensions.Contains(Path.GetExtension(path).ToLowerInvariant());
 
-        protected override void Populate(BeatmapSetInfo beatmapSet, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
+        protected override void Populate(BeatmapSetInfo beatmapSet, ArchiveReader? archive, Realm realm, ImportParameters parameters, CancellationToken cancellationToken = default)
         {
             if (archive != null)
                 beatmapSet.Beatmaps.AddRange(createBeatmapDifficulties(beatmapSet, realm));
 
-            beatmapSet.DateAdded = getDateAdded(archive);
+            beatmapSet.DateAdded = getDateAdded(archive, parameters);
 
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
             {
@@ -335,25 +335,43 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// Determine the date a given beatmapset has been added to the game.
-        /// For legacy imports, we can use the oldest file write time for any `.osu` file in the directory.
-        /// For any other import types, use "now".
+        /// If <paramref name="parameters"/> contains a <see cref="ImportParameters.DateAdded"/> override (e.g. from <c>osu!.db</c>),
+        /// that value is used directly.
+        /// For legacy directory imports, the oldest <c>.osu</c> file write time is used as a fallback.
+        /// For any other import types, "now" is used.
         /// </summary>
-        private DateTimeOffset getDateAdded(ArchiveReader? reader)
+        private DateTimeOffset getDateAdded(ArchiveReader? reader, ImportParameters parameters)
         {
+            if (parameters.DateAdded.HasValue)
+                return parameters.DateAdded.Value;
+
             DateTimeOffset dateAdded = DateTimeOffset.UtcNow;
 
             if (reader is DirectoryArchiveReader legacyReader)
             {
-                var beatmaps = reader.Filenames.Where(f => f.EndsWith(".osu", StringComparison.OrdinalIgnoreCase));
+                var beatmaps = reader.Filenames.Where(f => f.EndsWith(".osu", StringComparison.OrdinalIgnoreCase)).ToList();
 
-                dateAdded = File.GetLastWriteTimeUtc(legacyReader.GetFullPath(beatmaps.First()));
-
-                foreach (string beatmapName in beatmaps)
+                if (beatmaps.Count > 0)
                 {
-                    var currentDateAdded = File.GetLastWriteTimeUtc(legacyReader.GetFullPath(beatmapName));
+                    try
+                    {
+                        dateAdded = File.GetLastWriteTimeUtc(legacyReader.GetFullPath(beatmaps[0]));
 
-                    if (currentDateAdded < dateAdded)
-                        dateAdded = currentDateAdded;
+                        foreach (string beatmapName in beatmaps)
+                        {
+                            var currentDateAdded = File.GetLastWriteTimeUtc(legacyReader.GetFullPath(beatmapName));
+
+                            if (currentDateAdded < dateAdded)
+                                dateAdded = currentDateAdded;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // If we can't read file timestamps, fall back to current time.
+                        // This can happen if files are deleted during import or due to permission issues.
+                        Logger.Log($"Failed to read file timestamps for date added: {e.Message}", LoggingTarget.Database, LogLevel.Debug);
+                        dateAdded = DateTimeOffset.UtcNow;
+                    }
                 }
             }
 

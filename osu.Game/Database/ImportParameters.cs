@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+
 namespace osu.Game.Database
 {
     public struct ImportParameters
@@ -27,5 +29,11 @@ namespace osu.Game.Database
         /// This is useful for cases where an import <em>must</em> complete even if gameplay is in progress.
         /// </summary>
         public bool ImportImmediately { get; set; }
+
+        /// <summary>
+        /// When set, overrides the automatically-determined "date added" for the imported model.
+        /// Used during stable imports to preserve the original date from <c>osu!.db</c>.
+        /// </summary>
+        public DateTimeOffset? DateAdded { get; set; }
     }
 }

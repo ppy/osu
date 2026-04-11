@@ -90,7 +90,7 @@ namespace osu.Game.Skinning
             }).ConfigureAwait(false);
         }
 
-        protected override void Populate(SkinInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
+        protected override void Populate(SkinInfo model, ArchiveReader? archive, Realm realm, ImportParameters parameters, CancellationToken cancellationToken = default)
         {
             var skinInfoFile = model.GetFile(skin_info_file);
 

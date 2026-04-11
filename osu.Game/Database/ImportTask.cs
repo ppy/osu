@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
 using osu.Framework.Extensions;
 using osu.Game.IO.Archives;
@@ -23,6 +24,12 @@ namespace osu.Game.Database
         /// An optional stream which provides the file content.
         /// </summary>
         public Stream? Stream { get; }
+
+        /// <summary>
+        /// When set, overrides the automatically-determined "date added" for the imported model.
+        /// Used during stable imports to preserve the original date from <c>osu!.db</c>.
+        /// </summary>
+        public DateTimeOffset? DateAdded { get; set; }
 
         /// <summary>
         /// Construct a new import task from a path (on a local filesystem).

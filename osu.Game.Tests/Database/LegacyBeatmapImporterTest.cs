@@ -100,6 +100,91 @@ namespace osu.Game.Tests.Database
             });
         }
 
+        /// <summary>
+        /// When <c>osu!.db</c> provides a date for a folder, that date should take precedence over
+        /// the file system write time.
+        /// </summary>
+        [Test]
+        public void TestOsuDbDateTakesPrecedenceOverFileSystemDate()
+        {
+            RunTestWithRealmAsync(async (realm, storage) =>
+            {
+                using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+                using (var tmpStorage = new TemporaryNativeStorage("stable-songs-osudb"))
+                using (new RealmRulesetStore(realm, storage))
+                {
+                    var stableStorage = new StableStorage(tmpStorage.GetFullPath(""), host);
+                    var songsStorage = stableStorage.GetStorageForDirectory(StableStorage.STABLE_DEFAULT_SONGS_PATH);
+
+                    ZipFile.ExtractToDirectory(TestResources.GetQuickTestBeatmapForImport(), songsStorage.GetFullPath("renatus"));
+
+                    // Set file system date to something recent so we can confirm it is overridden.
+                    string[] beatmaps = Directory.GetFiles(songsStorage.GetFullPath("renatus"), "*.osu", SearchOption.TopDirectoryOnly);
+                    foreach (string b in beatmaps)
+                        File.SetLastWriteTimeUtc(b, new DateTime(2024, 1, 1, 0, 0, 0));
+
+                    var osuDbDate = new DateTimeOffset(new DateTime(2010, 5, 20, 8, 30, 0, DateTimeKind.Utc));
+
+                    // Use a subclass that injects a known date from a fake osu!.db.
+                    var importer = new TestLegacyBeatmapImporterWithOsuDb(
+                        new BeatmapImporter(storage, realm),
+                        new Dictionary<string, DateTimeOffset>(StringComparer.OrdinalIgnoreCase)
+                        {
+                            { "renatus", osuDbDate }
+                        });
+
+                    await importer.ImportFromStableAsync(stableStorage);
+
+                    var importedSet = realm.Realm.All<BeatmapSetInfo>().Single();
+
+                    ClassicAssert.NotNull(importedSet);
+                    ClassicAssert.AreEqual(osuDbDate, importedSet.DateAdded);
+                }
+            });
+        }
+
+        /// <summary>
+        /// Verifies that nested folders (e.g., "subdirectory\beatmap") are matched correctly
+        /// against osu!.db entries using relative paths.
+        /// </summary>
+        [Test]
+        public void TestNestedFolderDateFromOsuDb()
+        {
+            RunTestWithRealmAsync(async (realm, storage) =>
+            {
+                using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+                using (var tmpStorage = new TemporaryNativeStorage("stable-songs-nested"))
+                using (new RealmRulesetStore(realm, storage))
+                {
+                    var stableStorage = new StableStorage(tmpStorage.GetFullPath(""), host);
+                    var songsStorage = stableStorage.GetStorageForDirectory(StableStorage.STABLE_DEFAULT_SONGS_PATH);
+
+                    // Create a nested folder structure: Songs/subfolder/beatmap
+                    var subfolderStorage = songsStorage.GetStorageForDirectory("subfolder");
+                    ZipFile.ExtractToDirectory(TestResources.GetQuickTestBeatmapForImport(), subfolderStorage.GetFullPath("renatus"));
+
+                    var osuDbDate = new DateTimeOffset(new DateTime(2012, 8, 15, 10, 0, 0, DateTimeKind.Utc));
+
+                    // osu!.db stores nested folders with backslash separator on Windows.
+                    string nestedPath = Path.Combine("subfolder", "renatus");
+
+                    var importer = new TestLegacyBeatmapImporterWithOsuDb(
+                        new BeatmapImporter(storage, realm),
+                        new Dictionary<string, DateTimeOffset>(StringComparer.OrdinalIgnoreCase)
+                        {
+                            { nestedPath, osuDbDate }
+                        });
+
+                    await importer.ImportFromStableAsync(stableStorage);
+
+                    var importedSet = realm.Realm.All<BeatmapSetInfo>().Single();
+
+                    ClassicAssert.NotNull(importedSet);
+                    ClassicAssert.AreEqual(osuDbDate, importedSet.DateAdded);
+                }
+            });
+        }
+
         private class TestLegacyBeatmapImporter : LegacyBeatmapImporter
         {
             public TestLegacyBeatmapImporter()
@@ -108,6 +193,20 @@ namespace osu.Game.Tests.Database
             }
 
             public new IEnumerable<string> GetStableImportPaths(Storage storage) => base.GetStableImportPaths(storage);
+        }
+
+        private class TestLegacyBeatmapImporterWithOsuDb : LegacyBeatmapImporter
+        {
+            private readonly Dictionary<string, DateTimeOffset> dateAddedByFolder;
+
+            public TestLegacyBeatmapImporterWithOsuDb(IModelImporter<BeatmapSetInfo> importer, Dictionary<string, DateTimeOffset> dateAddedByFolder)
+                : base(importer)
+            {
+                this.dateAddedByFolder = dateAddedByFolder;
+            }
+
+            protected override Dictionary<string, DateTimeOffset>? ReadDateAddedFromStableDb(StableStorage stableStorage)
+                => dateAddedByFolder;
         }
     }
 }

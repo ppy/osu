@@ -59,11 +59,18 @@ namespace osu.Game.Database
 
             return Task.Run(async () =>
             {
-                var tasks = GetStableImportPaths(storage).Select(p => new ImportTask(p)).ToArray();
+                var tasks = CreateImportTasks(storage, stableStorage).ToArray();
 
                 await Importer.Import(tasks, new ImportParameters { Batch = true, PreferHardLinks = true }).ConfigureAwait(false);
             });
         }
+
+        /// <summary>
+        /// Creates the <see cref="ImportTask"/>s for all items found in the stable storage.
+        /// Override to attach additional metadata (e.g. <see cref="ImportTask.DateAdded"/>) to each task.
+        /// </summary>
+        protected virtual IEnumerable<ImportTask> CreateImportTasks(Storage storage, StableStorage stableStorage)
+            => GetStableImportPaths(storage).Select(p => new ImportTask(p));
 
         /// <summary>
         /// Run any required traversal operations on the stable storage location before performing operations.
