@@ -188,7 +188,7 @@ namespace osu.Game.Database
                     Logger.Log($"Suspicious timing point count ({timingPointCount}) in {database_name}, aborting parse.", LoggingTarget.Database, LogLevel.Error);
                     return result;
                 }
-                
+
                 for (int t = 0; t < timingPointCount; t++)
                 {
                     sr.ReadDouble(); // BPM
