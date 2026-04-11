@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using MessagePack;
 using osu.Game.Online.Rooms;
 
@@ -32,6 +34,13 @@ namespace osu.Game.Online.Multiplayer
         [Key(6)]
         public bool AutoSkip { get; set; }
 
+        /// <summary>
+        /// Custom score multipliers for mods in this room.
+        /// Key is the mod acronym, value is the custom multiplier.
+        /// </summary>
+        [Key(7)]
+        public Dictionary<string, double> ModMultipliers { get; set; } = new Dictionary<string, double>();
+
         [IgnoreMember]
         public bool AutoStartEnabled => AutoStartDuration != TimeSpan.Zero;
 
@@ -47,6 +56,7 @@ namespace osu.Game.Online.Multiplayer
             QueueMode = room.QueueMode;
             AutoStartDuration = room.AutoStartDuration;
             AutoSkip = room.AutoSkip;
+            ModMultipliers = new Dictionary<string, double>();
         }
 
         public bool Equals(MultiplayerRoomSettings? other)
@@ -60,7 +70,40 @@ namespace osu.Game.Online.Multiplayer
                    && MatchType == other.MatchType
                    && QueueMode == other.QueueMode
                    && AutoStartDuration == other.AutoStartDuration
-                   && AutoSkip == other.AutoSkip;
+                   && AutoSkip == other.AutoSkip
+                   && modMultipliersEqual(other.ModMultipliers);
+        }
+
+        private bool modMultipliersEqual(Dictionary<string, double> other)
+        {
+            if (ModMultipliers.Count != other.Count)
+                return false;
+
+            foreach (var kvp in ModMultipliers)
+            {
+                if (!other.TryGetValue(kvp.Key, out double otherValue))
+                    return false;
+
+                // Use epsilon comparison for floating point
+                if (Math.Abs(kvp.Value - otherValue) > 0.001)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(Name);
+            hash.Add(PlaylistItemId);
+            hash.Add(Password);
+            hash.Add(MatchType);
+            hash.Add(QueueMode);
+            hash.Add(AutoStartDuration);
+            hash.Add(AutoSkip);
+            hash.Add(ModMultipliers.Count);
+            return hash.ToHashCode();
         }
 
         public override string ToString() => $"Name:{Name}"
@@ -69,6 +112,7 @@ namespace osu.Game.Online.Multiplayer
                                              + $" Item:{PlaylistItemId}"
                                              + $" Queue:{QueueMode}"
                                              + $" Start:{AutoStartDuration}"
-                                             + $" AutoSkip:{AutoSkip}";
+                                             + $" AutoSkip:{AutoSkip}"
+                                             + $" ModMultipliers:{ModMultipliers.Count}";
     }
 }

@@ -17,6 +17,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -89,6 +90,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             private Drawable playlistContainer = null!;
             private DrawableRoomPlaylist drawablePlaylist = null!;
             private RoundedButton selectBeatmapButton = null!;
+            private RoundedButton modMultipliersButton = null!;
+            private MultiplayerModMultiplierOverlay? modMultiplierOverlay;
 
             public MatchSettings(Room room)
             {
@@ -273,6 +276,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                             Height = 40,
                                                             Text = "Select beatmap",
                                                             Action = () => matchSubScreen.ShowSongSelect()
+                                                        },
+                                                        modMultipliersButton = new RoundedButton
+                                                        {
+                                                            RelativeSizeAxes = Axes.X,
+                                                            Height = 40,
+                                                            Text = ModMultiplierStrings.AdjustModMultipliers,
+                                                            Action = showModMultiplierOverlay,
+                                                            Alpha = 0,
                                                         }
                                                     }
                                                 }
@@ -359,6 +370,31 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 updateRoomMaxParticipants();
                 updateRoomAutoStartDuration();
                 updateRoomPlaylist();
+
+                client.RoomUpdated += onRoomUpdated;
+                updateModMultipliersButtonVisibility();
+            }
+
+            private void onRoomUpdated() => Schedule(updateModMultipliersButtonVisibility);
+
+            private void updateModMultipliersButtonVisibility()
+            {
+                // Only show the button when:
+                // 1. Local user is the host
+                // 2. Room is created on the server (has RoomID)
+                bool isHost = client.IsHost;
+                bool roomCreated = client.Room != null && room.RoomID != null;
+                modMultipliersButton.Alpha = (isHost && roomCreated) ? 1 : 0;
+            }
+
+            private void showModMultiplierOverlay()
+            {
+                // Always recreate to ensure fresh mod list from current playlist item
+                modMultiplierOverlay?.Expire();
+                modMultiplierOverlay = null;
+
+                AddInternal(modMultiplierOverlay = new MultiplayerModMultiplierOverlay(room));
+                modMultiplierOverlay.Show();
             }
 
             private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -520,6 +556,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             {
                 base.Dispose(isDisposing);
                 room.PropertyChanged -= onRoomPropertyChanged;
+                client.RoomUpdated -= onRoomUpdated;
             }
         }
 
