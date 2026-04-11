@@ -229,6 +229,14 @@ namespace osu.Game
 
         private ScreenStackFooter screenStackFooter;
 
+        private DialogOverlay dialogOverlay;
+
+        private NotificationOverlay notificationOverlay;
+
+        private LoginOverlay loginOverlay;
+
+        private NowPlayingOverlay nowPlayingOverlay;
+
         private readonly string[] args;
 
         private readonly List<OsuFocusedOverlayContainer> focusedOverlays = new List<OsuFocusedOverlayContainer>();
@@ -270,6 +278,16 @@ namespace osu.Game
         private void updateBlockingOverlayFade() =>
             ScreenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
 
+        private void updateRightFloatingOverlayDim()
+        {
+            bool notificationDim = notificationOverlay?.State.Value == Visibility.Visible;
+            bool loginDim = loginOverlay?.State.Value == Visibility.Visible;
+            bool nowPlayingDim = nowPlayingOverlay?.State.Value == Visibility.Visible;
+
+            loginOverlay?.FadeColour(nowPlayingDim ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+            notificationOverlay?.FadeColour(nowPlayingDim || loginDim ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+            overlayContent?.FadeColour(nowPlayingDim || loginDim || notificationDim ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+        }
         IDisposable IOverlayManager.RegisterBlockingOverlay(OverlayContainer overlayContainer)
         {
             if (overlayContainer.Parent != null)
@@ -1191,11 +1209,15 @@ namespace osu.Game
 
             loadComponentSingleFile(onScreenDisplay, Add, true);
 
-            loadComponentSingleFile<INotificationOverlay>(Notifications.With(d =>
+            loadComponentSingleFile<INotificationOverlay>(notificationOverlay = Notifications.With(d =>
             {
                 d.Anchor = Anchor.TopRight;
                 d.Origin = Anchor.TopRight;
-            }), rightFloatingOverlayContent.Add, true);
+            }), d =>
+            {
+                rightFloatingOverlayContent.Add(d);
+                notificationOverlay.State.BindValueChanged(_ => updateRightFloatingOverlayDim());
+            }, true);
 
             loadComponentSingleFile(legacyImportManager, Add);
 
@@ -1221,20 +1243,39 @@ namespace osu.Game
             loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(skinEditor = new SkinEditorOverlay(ScreenContainer), overlayContent.Add, true);
 
-            loadComponentSingleFile(new LoginOverlay
+            loadComponentSingleFile(loginOverlay = new LoginOverlay
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }, rightFloatingOverlayContent.Add, true);
+            }, d =>
+            {
+                rightFloatingOverlayContent.Add(d);
+                loginOverlay.State.BindValueChanged(_ => updateRightFloatingOverlayDim());
+            }, true);
 
-            loadComponentSingleFile(new NowPlayingOverlay
+            loadComponentSingleFile(nowPlayingOverlay = new NowPlayingOverlay
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }, rightFloatingOverlayContent.Add, true);
+            }, d =>
+            {
+                rightFloatingOverlayContent.Add(d);
+                nowPlayingOverlay.State.BindValueChanged(_ => updateRightFloatingOverlayDim());
+            }, true);
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
-            loadComponentSingleFile<IDialogOverlay>(new DialogOverlay(), topMostOverlayContent.Add, true);
+            loadComponentSingleFile<IDialogOverlay>(dialogOverlay = new DialogOverlay(), d =>
+            {
+                topMostOverlayContent.Add(d);
+                dialogOverlay.State.BindValueChanged(state =>
+                {
+                    bool dim = state.NewValue == Visibility.Visible;
+                    overlayContent.FadeColour(dim ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+                    leftFloatingOverlayContent.FadeColour(dim ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+                    Toolbar.FadeColour(dim ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+                });
+            }, true);
+
             loadComponentSingleFile(new MedalOverlay(), topMostOverlayContent.Add);
 
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
