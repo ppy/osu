@@ -5,7 +5,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
