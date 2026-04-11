@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -47,16 +46,16 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             if (drawable is DrawableSlider slider)
             {
-                // Apply the follow circle scale directly to the ball
-                // This needs to happen after the ball is loaded, so we schedule it
-                void applyFollowCircleScale(Drawable _)
+                void bindScale()
                 {
-                    slider.Ball.FollowCircleScale.Value = FollowCircleScale.Value;
+                    slider.Ball.FollowCircleScale.UnbindFrom(FollowCircleScale);
                     slider.Ball.FollowCircleScale.BindTo(FollowCircleScale);
-                    slider.OnLoadComplete -= applyFollowCircleScale;
                 }
 
-                slider.OnLoadComplete += applyFollowCircleScale;
+                if (slider.IsLoaded)
+                    bindScale();
+                else
+                    slider.OnLoadComplete += _ => bindScale();
 
                 slider.Tracking.ValueChanged += e =>
                 {

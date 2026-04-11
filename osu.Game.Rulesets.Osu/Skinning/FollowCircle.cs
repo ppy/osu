@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
     {
         protected DrawableSlider? DrawableObject { get; private set; }
 
-        protected IBindable<float> FollowCircleScale { get; private set; } = null!;
+        protected IBindable<float> FollowCircleScale { get; private set; } = new BindableFloat(DrawableSliderBall.FOLLOW_AREA);
 
         private readonly IBindable<bool> tracking = new Bindable<bool>();
 
@@ -32,8 +32,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             if (DrawableObject != null)
             {
-                FollowCircleScale = DrawableObject.Ball.FollowCircleScale.GetBoundCopy();
-
                 tracking.BindTo(DrawableObject.Tracking);
                 tracking.BindValueChanged(tracking =>
                 {
@@ -57,21 +55,19 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             if (DrawableObject != null)
             {
+                FollowCircleScale = DrawableObject.Ball.FollowCircleScale.GetBoundCopy();
+
                 DrawableObject.HitObjectApplied += onHitObjectApplied;
                 onHitObjectApplied(DrawableObject);
 
                 DrawableObject.ApplyCustomUpdateState += updateStateTransforms;
                 updateStateTransforms(DrawableObject, DrawableObject.State.Value);
 
-                // Update scale when FollowCircleScale changes
                 FollowCircleScale.BindValueChanged(scale =>
                 {
-                    // If currently tracking (visible and scaled), update to new scale
                     if (Alpha > 0 && Scale.X > 1)
-                    {
                         this.ScaleTo(scale.NewValue, 100, Easing.OutQuint);
-                    }
-                }, true);
+                });
             }
         }
 
