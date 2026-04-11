@@ -5,6 +5,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -17,6 +18,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public partial class DrawableSliderBall : CircularContainer, ISliderProgress
     {
         public const float FOLLOW_AREA = 2.4f;
+
+        /// <summary>
+        /// The scale multiplier for the follow circle size.
+        /// </summary>
+        public readonly BindableFloat FollowCircleScale = new BindableFloat(FOLLOW_AREA);
 
         private DrawableSlider drawableSlider;
         private Drawable ball;
