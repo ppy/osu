@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -221,6 +223,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
             private bool expanded;
 
+            private Sample messageReceivedSample = null!;
+            private double? lastSamplePlayback;
+
             public BubbleChatHistory()
             {
                 AutoSizeAxes = Axes.Y;
@@ -230,6 +235,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(AudioManager audio)
+            {
+                messageReceivedSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/message");
             }
 
             /// <summary>
@@ -301,12 +312,23 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
                 newMessage.Show();
 
+                playSample();
+
                 // If not in the expanded state, hide the new message after a short while.
                 if (!expanded)
                 {
                     using (BeginDelayedSequence(time_before_disappear))
                         newMessage.Hide();
                 }
+            }
+
+            private void playSample()
+            {
+                if (lastSamplePlayback != null && Time.Current - lastSamplePlayback < 100)
+                    return;
+
+                messageReceivedSample.Play();
+                lastSamplePlayback = Time.Current;
             }
 
             private partial class MessageBubble : CompositeDrawable
