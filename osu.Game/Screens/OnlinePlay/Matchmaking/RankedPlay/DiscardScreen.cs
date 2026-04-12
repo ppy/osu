@@ -259,6 +259,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 card.Anchor = Anchor.Centre;
                 card.Origin = Anchor.Centre;
 
+                card.SongPreviewEnabled.Value = false;
+
                 card.MatchScreenSpaceDrawQuad(drawQuad, CenterRow);
 
                 CenterRow.Add(card);
