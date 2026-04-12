@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -194,7 +195,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         {
             base.Dispose(isDisposing);
 
-            client.RoomUpdated -= onRoomUpdated;
+            if (client.IsNotNull())
+                client.RoomUpdated -= onRoomUpdated;
         }
 
         public partial class HealthBar : CompositeDrawable
