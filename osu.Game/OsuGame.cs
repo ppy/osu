@@ -229,14 +229,6 @@ namespace osu.Game
 
         private ScreenStackFooter screenStackFooter;
 
-        private DialogOverlay dialogOverlay;
-
-        private NotificationOverlay notificationOverlay;
-
-        private LoginOverlay loginOverlay;
-
-        private NowPlayingOverlay nowPlayingOverlay;
-
         private readonly string[] args;
 
         private readonly List<OsuFocusedOverlayContainer> focusedOverlays = new List<OsuFocusedOverlayContainer>();
@@ -280,13 +272,25 @@ namespace osu.Game
 
         private void updateRightFloatingOverlayDim()
         {
-            bool notificationDim = notificationOverlay?.State.Value == Visibility.Visible;
-            bool loginDim = loginOverlay?.State.Value == Visibility.Visible;
-            bool nowPlayingDim = nowPlayingOverlay?.State.Value == Visibility.Visible;
+            var overlays = rightFloatingOverlayContent?.Children.OfType<OverlayContainer>().ToList();
 
-            loginOverlay?.FadeColour(nowPlayingDim ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
-            notificationOverlay?.FadeColour(nowPlayingDim || loginDim ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
-            overlayContent?.FadeColour(nowPlayingDim || loginDim || notificationDim ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+            for (int i = 0; i < overlays.Count; i++)
+            {
+                bool shouldDim = overlays.Skip(i + 1).Any(o => o.State.Value == Visibility.Visible);
+                overlays[i].FadeColour(shouldDim ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+            }
+            bool anyVisible = overlays.Any(o => o.State.Value == Visibility.Visible);
+            overlayContent.FadeColour(anyVisible ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+        }
+
+        private void updateDialogDim()
+        {
+            var overlays = topMostOverlayContent.Children.OfType<DialogOverlay>().ToList();
+
+            bool anyVisible = overlays.Any(o => o.State.Value == Visibility.Visible);
+
+            overlayOffsetContainer.FadeColour(anyVisible ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+            Toolbar.FadeColour(anyVisible ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
         }
         IDisposable IOverlayManager.RegisterBlockingOverlay(OverlayContainer overlayContainer)
         {
@@ -1209,14 +1213,14 @@ namespace osu.Game
 
             loadComponentSingleFile(onScreenDisplay, Add, true);
 
-            loadComponentSingleFile<INotificationOverlay>(notificationOverlay = Notifications.With(d =>
+            loadComponentSingleFile<INotificationOverlay>(Notifications.With(d =>
             {
                 d.Anchor = Anchor.TopRight;
                 d.Origin = Anchor.TopRight;
             }), d =>
             {
                 rightFloatingOverlayContent.Add(d);
-                notificationOverlay.State.BindValueChanged(_ => updateRightFloatingOverlayDim());
+                ((OverlayContainer)d).State.BindValueChanged(_ => updateRightFloatingOverlayDim());
             }, true);
 
             loadComponentSingleFile(legacyImportManager, Add);
@@ -1243,37 +1247,31 @@ namespace osu.Game
             loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(skinEditor = new SkinEditorOverlay(ScreenContainer), overlayContent.Add, true);
 
-            loadComponentSingleFile(loginOverlay = new LoginOverlay
+            loadComponentSingleFile(new LoginOverlay
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, d =>
             {
                 rightFloatingOverlayContent.Add(d);
-                loginOverlay.State.BindValueChanged(_ => updateRightFloatingOverlayDim());
+                ((OverlayContainer)d).State.BindValueChanged(_ => updateRightFloatingOverlayDim());
             }, true);
 
-            loadComponentSingleFile(nowPlayingOverlay = new NowPlayingOverlay
+            loadComponentSingleFile(new NowPlayingOverlay
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, d =>
             {
                 rightFloatingOverlayContent.Add(d);
-                nowPlayingOverlay.State.BindValueChanged(_ => updateRightFloatingOverlayDim());
+                ((OverlayContainer)d).State.BindValueChanged(_ => updateRightFloatingOverlayDim());
             }, true);
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
-            loadComponentSingleFile<IDialogOverlay>(dialogOverlay = new DialogOverlay(), d =>
+            loadComponentSingleFile<IDialogOverlay>(new DialogOverlay(), d =>
             {
                 topMostOverlayContent.Add(d);
-                dialogOverlay.State.BindValueChanged(state =>
-                {
-                    bool dim = state.NewValue == Visibility.Visible;
-                    overlayContent.FadeColour(dim ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
-                    leftFloatingOverlayContent.FadeColour(dim ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
-                    Toolbar.FadeColour(dim ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
-                });
+                ((OverlayContainer)d).State.BindValueChanged(_ => updateDialogDim());
             }, true);
 
             loadComponentSingleFile(new MedalOverlay(), topMostOverlayContent.Add);
