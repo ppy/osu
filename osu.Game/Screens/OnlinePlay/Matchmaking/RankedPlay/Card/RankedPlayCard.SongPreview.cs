@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Transforms;
-using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
