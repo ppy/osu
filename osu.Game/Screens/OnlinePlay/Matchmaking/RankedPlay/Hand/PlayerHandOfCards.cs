@@ -168,7 +168,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                     if (Cards.FirstOrDefault(it => it.HasFocus) is not PlayerHandCard card)
                         return false;
 
-                    if (card.Selected)
+                    if (card.Selected && card.PlayAction != null)
                         card.PlayButton.TriggerClick();
                     else
                         card.TriggerClick();
