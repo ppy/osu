@@ -272,13 +272,14 @@ namespace osu.Game
 
         private void updateRightFloatingOverlayDim()
         {
-            var overlays = rightFloatingOverlayContent?.Children.OfType<OverlayContainer>().ToList();
+            var overlays = rightFloatingOverlayContent.Children.OfType<OverlayContainer>().ToList();
 
             for (int i = 0; i < overlays.Count; i++)
             {
                 bool shouldDim = overlays.Skip(i + 1).Any(o => o.State.Value == Visibility.Visible);
                 overlays[i].FadeColour(shouldDim ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
             }
+
             bool anyVisible = overlays.Any(o => o.State.Value == Visibility.Visible);
             overlayContent.FadeColour(anyVisible ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
         }
@@ -292,6 +293,7 @@ namespace osu.Game
             overlayOffsetContainer.FadeColour(anyVisible ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
             Toolbar.FadeColour(anyVisible ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
         }
+
         IDisposable IOverlayManager.RegisterBlockingOverlay(OverlayContainer overlayContainer)
         {
             if (overlayContainer.Parent != null)
