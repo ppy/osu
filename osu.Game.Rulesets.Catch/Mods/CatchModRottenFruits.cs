@@ -5,7 +5,9 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Framework.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.UI;
@@ -16,7 +18,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModRottenFruits : Mod, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<CatchHitObject>, IUpdatableByPlayfield
+    public class CatchModRottenFruits : Mod, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<CatchHitObject>, IApplicableToBeatmap
     {
         public override string Name => "Rotten Fruits";
         public override LocalisableString Description => "The fruit has gone bad... dodge it!";
@@ -61,10 +63,27 @@ namespace osu.Game.Rulesets.Catch.Mods
                 dho.FadeIn();
             };
         }
-        public void Update(Playfield playfield)
+
+        public void ApplyToBeatmap(IBeatmap beatmap)
         {
-            // Block hyperdashing to avoid hyperdashes when two objects appear at the same time.
-            catcher.SetHyperDashState(1, -1);
+            var catchBeatmap = (CatchBeatmap)beatmap;
+
+            foreach (var obj in catchBeatmap.HitObjects)
+            {
+                if (obj is Fruit fruit)
+                {
+                    fruit.HyperDashTarget = null;
+                    fruit.HyperDash = false;
+
+                    fruit.DistanceToHyperDash = 0;
+                }
+
+                if (obj is Droplet drop)
+                {
+                    drop.HyperDashTarget = null;
+                    drop.HyperDashBindable = false;
+                }
+            }
         }
     }
 }
