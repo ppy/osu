@@ -315,7 +315,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                                         Origin = Anchor.Centre,
                                                         Size = new Vector2(10),
                                                         Colour = colourProvider.Foreground1,
-                                                        Icon = FontAwesome.Solid.Skull,
+                                                        Icon = FontAwesome.Solid.Trophy,
                                                         TooltipText = "Rounds Won",
                                                     },
                                                     new OsuSpriteText
