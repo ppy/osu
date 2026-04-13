@@ -19,7 +19,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Overlays;
-using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -49,16 +48,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             this.state = state;
 
-            Width = 300;
+            Width = 280;
             AutoSizeAxes = Axes.Y;
-
-            Masking = true;
-            CornerRadius = 10;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            Masking = true;
+            CornerRadius = 10;
+            BorderThickness = 3;
+            BorderColour = colours.YellowDarker;
+
             (int UserId, RankedPlayUserInfo Info)[] users = state.Users.Select(kvp => (kvp.Key, kvp.Value)).ToArray();
             Task<APIUser?> leftUser = userLookupCache.GetUserAsync(users[0].UserId);
             Task<APIUser?> rightUser = userLookupCache.GetUserAsync(users[1].UserId);
@@ -77,40 +78,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        new Container
-                        {
-                            Name = "Top part",
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = colourProvider.Background4
-                                },
-                                new PillContainer
-                                {
-                                    Margin = new MarginPadding(5),
-                                    Background =
-                                    {
-                                        Colour = colours.YellowDarker,
-                                        Alpha = 1
-                                    },
-                                    Child = new OsuSpriteText
-                                    {
-                                        Text = "Completed",
-                                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                                        Colour = Color4.Black
-                                    }
-                                }
-                            }
-                        },
-                        new Container
+                        new BufferedContainer
                         {
                             Name = "Middle part",
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
+                            BackgroundColour = colourProvider.Background3.Opacity(0),
                             Children = new[]
                             {
                                 new Container
@@ -118,7 +91,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                     RelativeSizeAxes = Axes.Both,
                                     Height = 0.5f,
                                     Masking = true,
-                                    Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0.3f), colourProvider.Background3.Opacity(0)),
+                                    Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0.7f), colourProvider.Background3.Opacity(0)),
                                     Child = new UserCoverBackground
                                     {
                                         RelativeSizeAxes = Axes.Both,
@@ -132,7 +105,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                     RelativeSizeAxes = Axes.Both,
                                     Height = 0.5f,
                                     Masking = true,
-                                    Colour = ColourInfo.GradientHorizontal(colourProvider.Background3.Opacity(0), Color4.White.Opacity(0.3f)),
+                                    Colour = ColourInfo.GradientHorizontal(colourProvider.Background3.Opacity(0), Color4.White.Opacity(0.7f)),
                                     Child = new UserCoverBackground
                                     {
                                         RelativeSizeAxes = Axes.Both,
@@ -338,6 +311,35 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                                     }
                                                 },
                                             }
+                                        }
+                                    }
+                                },
+                                new BufferedContainer(cachedFrameBuffer: true)
+                                {
+                                    Name = "Status pill",
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    AutoSizeAxes = Axes.Both,
+                                    Masking = true,
+                                    CornerRadius = 10,
+                                    Padding = new MarginPadding { Left = 10, Bottom = 10 },
+                                    Margin = new MarginPadding { Left = -10, Bottom = -10 },
+                                    Children = new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = colours.YellowDarker
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Margin = new MarginPadding { Horizontal = 8, Vertical = 5 },
+                                            Colour = colourProvider.Background4,
+                                            Text = "Completed",
+                                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
+                                            UseFullGlyphHeight = false,
                                         }
                                     }
                                 }
