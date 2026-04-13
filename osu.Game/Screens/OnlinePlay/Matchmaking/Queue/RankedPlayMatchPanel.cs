@@ -70,7 +70,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background3
+                    Colour = colourProvider.Background4
                 },
                 new FillFlowContainer
                 {
@@ -83,7 +83,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                             Name = "Middle part",
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            BackgroundColour = colourProvider.Background3.Opacity(0),
+                            BackgroundColour = colourProvider.Background4.Opacity(0),
                             Children = new[]
                             {
                                 new Container
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                     RelativeSizeAxes = Axes.Both,
                                     Height = 0.5f,
                                     Masking = true,
-                                    Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0.7f), colourProvider.Background3.Opacity(0)),
+                                    Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0.7f), colourProvider.Background4.Opacity(0)),
                                     Child = new UserCoverBackground
                                     {
                                         RelativeSizeAxes = Axes.Both,
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                     RelativeSizeAxes = Axes.Both,
                                     Height = 0.5f,
                                     Masking = true,
-                                    Colour = ColourInfo.GradientHorizontal(colourProvider.Background3.Opacity(0), Color4.White.Opacity(0.7f)),
+                                    Colour = ColourInfo.GradientHorizontal(colourProvider.Background4.Opacity(0), Color4.White.Opacity(0.7f)),
                                     Child = new UserCoverBackground
                                     {
                                         RelativeSizeAxes = Axes.Both,
@@ -226,7 +226,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = colourProvider.Background4
+                                    Colour = colourProvider.Background5
                                 },
                                 new Container
                                 {
@@ -336,7 +336,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             Margin = new MarginPadding { Horizontal = 8, Vertical = 5 },
-                                            Colour = colourProvider.Background4,
+                                            Colour = colourProvider.Background5,
                                             Text = "Completed",
                                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                                             UseFullGlyphHeight = false,

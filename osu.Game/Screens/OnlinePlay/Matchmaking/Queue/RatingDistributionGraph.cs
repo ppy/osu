@@ -22,7 +22,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 {
     public partial class RatingDistributionGraph : CompositeDrawable, IHasCustomTooltip<RatingDistributionGraph.RatingDistributionGraphTooltipData>
     {
-        private const int y_divisions = 8;
+        private const int y_divisions = 4;
         private const int x_divisions = 16;
 
         [Resolved]
@@ -212,7 +212,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                             Origin = Anchor.Centre,
                             AutoSizeAxes = Axes.X,
                             Height = 16,
-                            Padding = new MarginPadding { Top = 5 }
+                            Margin = new MarginPadding { Top = 4 }
                         },
                     }
                 }

@@ -129,105 +129,195 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                             Top = 50,
                             Bottom = ScreenFooter.HEIGHT + 50
                         },
-                        ColumnDimensions = new[]
-                        {
+                        RowDimensions =
+                        [
                             new Dimension(),
-                            new Dimension(GridSizeMode.Absolute, 20),
-                            new Dimension()
-                        },
-                        RowDimensions = new[]
-                        {
-                            new Dimension(),
-                            new Dimension(GridSizeMode.Absolute, 20),
-                            new Dimension(GridSizeMode.Absolute, 200)
-                        },
+                            new Dimension(GridSizeMode.Relative, 0.35f)
+                        ],
                         Content = new[]
                         {
-                            new Drawable?[]
+                            new Drawable[]
                             {
                                 new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
+                                    Padding = new MarginPadding(5),
+                                    Child = new Container
                                     {
-                                        cloud = new CloudVisualisation
+                                        RelativeSizeAxes = Axes.Both,
+                                        CornerRadius = 10f,
+                                        Masking = true,
+                                        Children = new Drawable[]
                                         {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            RelativeSizeAxes = Axes.Both,
-                                            Size = new Vector2(0.6f)
-                                        },
-                                        new MatchmakingAvatar(api.LocalUser.Value, true)
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Scale = new Vector2(3),
+                                            new Box
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Colour = colourProvider.Background3,
+                                                Alpha = 0.5f,
+                                            },
+                                            new GridContainer
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding(10),
+                                                RowDimensions =
+                                                [
+                                                    new Dimension(GridSizeMode.AutoSize)
+                                                ],
+                                                Content = new[]
+                                                {
+                                                    new Drawable[] { new SectionHeader("Players") },
+                                                    new Drawable[]
+                                                    {
+                                                        new Container
+                                                        {
+                                                            RelativeSizeAxes = Axes.Both,
+                                                            Children = new Drawable[]
+                                                            {
+                                                                cloud = new CloudVisualisation
+                                                                {
+                                                                    Anchor = Anchor.Centre,
+                                                                    Origin = Anchor.Centre,
+                                                                    RelativeSizeAxes = Axes.Both,
+                                                                    Size = new Vector2(0.6f)
+                                                                },
+                                                                new MatchmakingAvatar(api.LocalUser.Value, true)
+                                                                {
+                                                                    Anchor = Anchor.Centre,
+                                                                    Origin = Anchor.Centre,
+                                                                    Scale = new Vector2(3),
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 },
-                                null,
-                                new OsuScrollContainer(Direction.Vertical)
+                                new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    ScrollbarOverlapsContent = false,
-                                    Child = resultPanelContainer = new FillFlowContainer<RankedPlayMatchPanel>
+                                    Padding = new MarginPadding(5),
+                                    Child = new Container
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Spacing = new Vector2(10),
+                                        RelativeSizeAxes = Axes.Both,
+                                        CornerRadius = 10f,
+                                        Masking = true,
+                                        Children = new Drawable[]
+                                        {
+                                            new Box
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Colour = colourProvider.Background3,
+                                                Alpha = 0.5f,
+                                            },
+                                            new GridContainer
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding(10),
+                                                RowDimensions =
+                                                [
+                                                    new Dimension(GridSizeMode.AutoSize)
+                                                ],
+                                                Content = new[]
+                                                {
+                                                    new Drawable[] { new SectionHeader("Completed Matches") },
+                                                    new Drawable[]
+                                                    {
+                                                        new OsuScrollContainer(Direction.Vertical)
+                                                        {
+                                                            RelativeSizeAxes = Axes.Both,
+                                                            ScrollbarOverlapsContent = false,
+                                                            Child = resultPanelContainer = new FillFlowContainer<RankedPlayMatchPanel>
+                                                            {
+                                                                RelativeSizeAxes = Axes.X,
+                                                                AutoSizeAxes = Axes.Y,
+                                                                Spacing = new Vector2(10),
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             },
-                            null,
-                            new Drawable?[]
+                            new Drawable[]
                             {
                                 new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    CornerRadius = 10f,
-                                    Masking = true,
-                                    Children = new Drawable[]
+                                    Padding = new MarginPadding(5),
+                                    Child = new Container
                                     {
-                                        new Box
+                                        RelativeSizeAxes = Axes.Both,
+                                        CornerRadius = 10f,
+                                        Masking = true,
+                                        Children = new Drawable[]
                                         {
-                                            Colour = colourProvider.Background3,
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
-                                        mainContent = new Container
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Padding = new MarginPadding(20),
-                                            Alpha = 0,
-                                        },
+                                            new Box
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Colour = colourProvider.Background3,
+                                                Alpha = 0.5f,
+                                            },
+                                            mainContent = new Container
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding(20),
+                                                Alpha = 0,
+                                            },
+                                        }
                                     }
                                 },
-                                null,
                                 new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    CornerRadius = 10f,
-                                    Masking = true,
-                                    Children = new Drawable[]
+                                    Padding = new MarginPadding(5),
+                                    Child = new Container
                                     {
-                                        new Box
+                                        RelativeSizeAxes = Axes.Both,
+                                        CornerRadius = 10f,
+                                        Masking = true,
+                                        Children = new Drawable[]
                                         {
-                                            Colour = colourProvider.Background3,
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
-                                        new Container
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Padding = new MarginPadding(10),
-                                            Child = ratingGraph = new RatingDistributionGraph
+                                            new Box
                                             {
                                                 RelativeSizeAxes = Axes.Both,
+                                                Colour = colourProvider.Background3,
+                                                Alpha = 0.5f,
+                                            },
+                                            new GridContainer
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding(10),
+                                                RowDimensions =
+                                                [
+                                                    new Dimension(GridSizeMode.AutoSize)
+                                                ],
+                                                Content = new[]
+                                                {
+                                                    new Drawable[] { new SectionHeader("Ratings") },
+                                                    new Drawable[]
+                                                    {
+                                                        new Container
+                                                        {
+                                                            RelativeSizeAxes = Axes.Both,
+                                                            Padding = new MarginPadding { Top = -10 },
+                                                            Child = ratingGraph = new RatingDistributionGraph
+                                                            {
+                                                                RelativeSizeAxes = Axes.Both,
+                                                            }
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-                    },
+                    }
                 }
             };
 
@@ -274,7 +364,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             ratingGraph.SetData(status.RatingDistribution, userRating);
 
             foreach (var state in status.RecentMatches.OfType<RankedPlayRoomState>())
-                resultPanelContainer.Insert(-resultPanelContainer.Count, new RankedPlayMatchPanel(state));
+            {
+                resultPanelContainer.Insert(-resultPanelContainer.Count, new RankedPlayMatchPanel(state)
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Width = 0.48f
+                });
+            }
         });
 
         private void onSelectedPoolChanged(ValueChangedEvent<MatchmakingPool?> e)
