@@ -286,6 +286,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private void onSelectedPoolChanged(ValueChangedEvent<MatchmakingPool?> e)
         {
             userRating = null;
+            ratingGraph.SetData([], null);
             resultPanelContainer.Clear();
 
             if (e.NewValue == null)
