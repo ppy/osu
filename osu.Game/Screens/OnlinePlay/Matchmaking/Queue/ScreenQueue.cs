@@ -183,9 +183,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                             {
                                 new Container
                                 {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    AutoSizeAxes = Axes.Both,
+                                    RelativeSizeAxes = Axes.Both,
                                     CornerRadius = 10f,
                                     Masking = true,
                                     Children = new Drawable[]
@@ -197,13 +195,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                         },
                                         mainContent = new Container
                                         {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Alpha = 0,
-                                            AutoSizeAxes = Axes.Both,
-                                            AutoSizeDuration = 300,
-                                            AutoSizeEasing = Easing.OutQuint,
+                                            RelativeSizeAxes = Axes.Both,
                                             Padding = new MarginPadding(20),
+                                            Alpha = 0,
                                         },
                                     }
                                 },
@@ -411,7 +405,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         Origin = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(20),
+                        Spacing = new Vector2(15),
                         Children = new Drawable[]
                         {
                             new OsuSpriteText
