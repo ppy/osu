@@ -47,7 +47,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private (int x, int y)[] data = [];
         private int? userRating;
-        private (int min, int max) xRange;
+        private (int min, int max, int step) xRange;
         private (int min, int max) yRange;
 
         [BackgroundDependencyLoader]
@@ -232,8 +232,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             this.data = data;
             this.userRating = userRating;
 
-            xRange = (data.Select(d => d.x).DefaultIfEmpty().Min(), data.Select(d => d.x).DefaultIfEmpty().Max());
-            yRange = (0, (int)roundToSignificant(data.Select(d => d.y).DefaultIfEmpty().Max()));
+            xRange = (
+                data.Select(d => d.x).DefaultIfEmpty().Min(),
+                data.Select(d => d.x).DefaultIfEmpty().Max(),
+                data.Zip(data.Skip(1), (a, b) => Math.Abs(b.x - a.x)).DefaultIfEmpty().Min()
+            );
+
+            yRange = (
+                0,
+                (int)roundToSignificant(data.Select(d => d.y).DefaultIfEmpty().Max())
+            );
 
             updateGraph();
         }
@@ -320,7 +328,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     RelativeSizeAxes = Axes.Both,
                     X = pointOnGraph(point.x, point.y).X,
                     Height = 1 - pointOnGraph(point.x, point.y).Y,
-                    Width = 0.5f / x_divisions,
+                    Width = pointOnGraph(xRange.min + xRange.step, 0).X,
                     Colour = colourProvider.Colour0,
                     Masking = true,
                     CornerRadius = 2,
