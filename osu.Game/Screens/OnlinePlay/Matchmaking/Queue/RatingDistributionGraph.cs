@@ -150,7 +150,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                                     },
                                                 }
                                             },
-
                                             hoverMarker = new CircularContainer
                                             {
                                                 Origin = Anchor.Centre,
@@ -189,10 +188,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     {
                         xAxisContainer = new Container
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
                             AutoSizeAxes = Axes.Y,
-                            Margin = new MarginPadding { Top = 5 }
+                            Margin = new MarginPadding { Top = 8 }
                         }
                     },
                     new Drawable[]
@@ -201,6 +198,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         {
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
+                            Margin = new MarginPadding { Top = 2 },
                             Text = "Rating",
                             Font = OsuFont.Default.With(size: 12),
                             Colour = colourProvider.Foreground1
@@ -249,6 +247,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         protected override void Update()
         {
             base.Update();
+
+            xAxisContainer.X = xAxisContainer.Parent!.ToLocalSpace(chartContainer.ScreenSpaceDrawQuad.TopLeft).X;
             xAxisContainer.Width = chartContainer.DrawWidth;
         }
 
@@ -277,6 +277,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     Origin = Anchor.CentreRight,
                     RelativePositionAxes = Axes.X,
                     X = (float)step / x_divisions,
+                    Margin = new MarginPadding { Right = -2 },
                     Rotation = -40,
                     Text = (xRange.min + (xRange.max - xRange.min) / x_divisions * step).ToString(),
                     UseFullGlyphHeight = false,
@@ -297,10 +298,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
                 yAxisLeftContainer.Add(new OsuSpriteText
                 {
-                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.CentreRight,
                     RelativePositionAxes = Axes.Y,
-                    Y = (float)step / y_divisions,
-                    Text = (yRange.max - (yRange.max - yRange.min) / y_divisions * step).ToString(),
+                    Y = 1f - (float)step / y_divisions,
+                    Text = (yRange.min + (yRange.max - yRange.min) / y_divisions * step).ToString(),
                     UseFullGlyphHeight = false,
                     Font = OsuFont.Default.With(size: 12),
                     Colour = colourProvider.Foreground1
@@ -310,8 +312,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 {
                     Origin = Anchor.CentreLeft,
                     RelativePositionAxes = Axes.Y,
-                    Y = (float)step / y_divisions,
-                    Text = $"{1.0 - (float)step / y_divisions:P1}",
+                    Y = 1f - (float)step / y_divisions,
+                    Text = $"{(float)step / y_divisions:P1}",
                     UseFullGlyphHeight = false,
                     Font = OsuFont.Default.With(size: 12),
                     Colour = colourProvider.Foreground1
