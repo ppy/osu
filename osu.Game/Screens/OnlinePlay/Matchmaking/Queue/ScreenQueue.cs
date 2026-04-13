@@ -125,9 +125,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding
                         {
-                            Horizontal = 50,
-                            Top = 50,
-                            Bottom = ScreenFooter.HEIGHT + 50
+                            Horizontal = 20,
+                            Top = 20,
+                            Bottom = ScreenFooter.HEIGHT + 20
                         },
                         RowDimensions =
                         [
@@ -149,12 +149,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                         Masking = true,
                                         Children = new Drawable[]
                                         {
-                                            new Box
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Colour = colourProvider.Background3,
-                                                Alpha = 0.5f,
-                                            },
+                                            new PanelBackground(),
                                             new GridContainer
                                             {
                                                 RelativeSizeAxes = Axes.Both,
@@ -165,7 +160,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                                 ],
                                                 Content = new[]
                                                 {
-                                                    new Drawable[] { new SectionHeader("Players") },
+                                                    new Drawable[] { new QueueSectionHeader("Queued players") },
                                                     new Drawable[]
                                                     {
                                                         new Container
@@ -205,23 +200,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                         Masking = true,
                                         Children = new Drawable[]
                                         {
-                                            new Box
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Colour = colourProvider.Background3,
-                                                Alpha = 0.5f,
-                                            },
+                                            new PanelBackground(),
                                             new GridContainer
                                             {
                                                 RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding(10),
+                                                Padding = new MarginPadding(10) { Bottom = 0 },
                                                 RowDimensions =
                                                 [
                                                     new Dimension(GridSizeMode.AutoSize)
                                                 ],
                                                 Content = new[]
                                                 {
-                                                    new Drawable[] { new SectionHeader("Completed Matches") },
+                                                    new Drawable[] { new QueueSectionHeader("Recent Matches") },
                                                     new Drawable[]
                                                     {
                                                         new OsuScrollContainer(Direction.Vertical)
@@ -255,18 +245,29 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                         Masking = true,
                                         Children = new Drawable[]
                                         {
-                                            new Box
+                                            new PanelBackground(),
+                                            new GridContainer
                                             {
                                                 RelativeSizeAxes = Axes.Both,
-                                                Colour = colourProvider.Background3,
-                                                Alpha = 0.5f,
-                                            },
-                                            mainContent = new Container
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding(20),
-                                                Alpha = 0,
-                                            },
+                                                Padding = new MarginPadding(10),
+                                                RowDimensions =
+                                                [
+                                                    new Dimension(GridSizeMode.AutoSize)
+                                                ],
+                                                Content = new[]
+                                                {
+                                                    new Drawable[] { new QueueSectionHeader("Queues") },
+                                                    new Drawable[]
+                                                    {
+                                                        mainContent = new Container
+                                                        {
+                                                            RelativeSizeAxes = Axes.Both,
+                                                            Padding = new MarginPadding(20),
+                                                            Alpha = 0,
+                                                        },
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 },
@@ -281,12 +282,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                         Masking = true,
                                         Children = new Drawable[]
                                         {
-                                            new Box
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Colour = colourProvider.Background3,
-                                                Alpha = 0.5f,
-                                            },
+                                            new PanelBackground(),
                                             new GridContainer
                                             {
                                                 RelativeSizeAxes = Axes.Both,
@@ -297,7 +293,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                                 ],
                                                 Content = new[]
                                                 {
-                                                    new Drawable[] { new SectionHeader("Ratings") },
+                                                    new Drawable[] { new QueueSectionHeader("Ratings") },
                                                     new Drawable[]
                                                     {
                                                         new Container
@@ -320,15 +316,41 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     }
                 }
             };
-
             currentState.BindTo(controller.CurrentState);
             currentState.BindValueChanged(s => SetState(s.NewValue));
-
             client.MatchmakingLobbyStatusChanged += onMatchmakingLobbyStatusChanged;
-
             selectedPool.BindValueChanged(onSelectedPoolChanged, true);
-
             populateAvailablePools().FireAndForget();
+        }
+
+        public class PanelBackground : CompositeDrawable
+        {
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                RelativeSizeAxes = Axes.Both;
+
+                InternalChild = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background3,
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0.3f,
+                };
+            }
+        }
+
+        public class QueueSectionHeader : SectionHeader
+        {
+            public QueueSectionHeader(string header)
+                : base(header)
+            {
+                // Reduce base class padding.
+                Margin = new MarginPadding { Top = 5, Bottom = 10, Horizontal = 5 };
+            }
         }
 
         private async Task populateAvailablePools()
