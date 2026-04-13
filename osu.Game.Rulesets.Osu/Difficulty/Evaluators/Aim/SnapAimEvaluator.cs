@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 {
                     acuteAngleBonus = CalcAngleAcuteness(currAngle);
 
-                    // Penalize angle repetition. It is important to do it before multiplying by velocity because we compare raw acuteness here
+                    // Penalize angle repetition. It is important to do it _before_ multiplying by anything because we compare raw acuteness here
                     acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(CalcAngleAcuteness(lastAngle), 3)));
 
                     // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
                 double wideAngleBonus = calcAngleWideness(currAngle);
 
-                // Penalize angle repetition. It is important to do it before multiplying by velocity because we compare raw acuteness here
+                // Penalize angle repetition. It is important to do it _before_ multiplying by velocity because we compare raw wideness here
                 wideAngleBonus *= 0.25 + 0.75 * (1 - Math.Min(wideAngleBonus, Math.Pow(calcAngleWideness(lastAngle), 3)));
 
                 wideAngleBonus *= velocityInfluence;
