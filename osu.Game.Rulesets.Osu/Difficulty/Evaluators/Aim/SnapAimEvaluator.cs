@@ -72,20 +72,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
                 if (Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) < 1.25 * Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) // If rhythms are the same.
                 {
-                    acuteAngleBonus = velocityInfluence * CalcAngleAcuteness(currAngle);
+                    acuteAngleBonus = CalcAngleAcuteness(currAngle);
+
+                    // Penalize angle repetition. It is important to do it _before_ multiplying by anything because we compare raw acuteness here
+                    acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(CalcAngleAcuteness(lastAngle), 3)));
 
                     // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
-                    acuteAngleBonus *= DifficultyCalculationUtils.Smootherstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime, 2), 300, 400) *
+                    acuteAngleBonus *= velocityInfluence * DifficultyCalculationUtils.Smootherstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime, 2), 300, 400) *
                                        DifficultyCalculationUtils.Smootherstep(currDistance, 0, diameter * 2);
-
-                    // Penalize angle repetition.
-                    acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(CalcAngleAcuteness(lastAngle), 3)));
                 }
 
-                double wideAngleBonus = velocityInfluence * calcAngleWideness(currAngle);
+                double wideAngleBonus = calcAngleWideness(currAngle);
 
-                // Penalize angle repetition.
+                // Penalize angle repetition. It is important to do it _before_ multiplying by velocity because we compare raw wideness here
                 wideAngleBonus *= 0.25 + 0.75 * (1 - Math.Min(wideAngleBonus, Math.Pow(calcAngleWideness(lastAngle), 3)));
+
+                wideAngleBonus *= velocityInfluence;
 
                 if (osuLast2Obj != null)
                 {
