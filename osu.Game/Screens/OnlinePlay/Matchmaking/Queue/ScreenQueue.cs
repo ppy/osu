@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Lists;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Database;
@@ -97,6 +98,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private int? userRating;
 
+        private GridContainer mainGrid = null!;
+
         public ScreenQueue(MatchmakingPoolType poolType)
         {
             this.poolType = poolType;
@@ -108,11 +111,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             enqueueSample = audio.Samples.Get(@"Multiplayer/Matchmaking/enqueue");
             waitingLoopSample = audio.Samples.Get(@"Multiplayer/Matchmaking/waiting-loop");
             matchFoundSample = audio.Samples.Get(@"Multiplayer/Matchmaking/match-found");
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
 
             InternalChild = new InverseScalingDrawSizePreservingFillContainer
             {
@@ -120,7 +118,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 Children = new Drawable[]
                 {
                     new GlobalScrollAdjustsVolume(),
-                    new GridContainer
+                    mainGrid = new GridContainer
                     {
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding
@@ -316,6 +314,26 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     }
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            int delay = 0;
+
+            foreach (var a in mainGrid.Content)
+            {
+                foreach (var d in a)
+                {
+                    d.FadeOut()
+                     .Delay(delay)
+                     .FadeInFromZero(500, Easing.OutQuint);
+
+                    delay += 100;
+                }
+            }
+
             currentState.BindTo(controller.CurrentState);
             currentState.BindValueChanged(s => SetState(s.NewValue));
             client.MatchmakingLobbyStatusChanged += onMatchmakingLobbyStatusChanged;
