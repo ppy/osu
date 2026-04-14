@@ -373,6 +373,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
                 client.LeaveRoom().FireAndForget();
 
+                ornamentOverlayRegistration?.Dispose();
+                ornamentOverlayRegistration = null;
+
                 if (retryRequested)
                     controller?.RejoinQueue();
 
@@ -424,6 +427,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             client.LoadRequested -= onLoadRequested;
 
             ornamentOverlayRegistration?.Dispose();
+            ornamentOverlayRegistration = null;
 
             base.Dispose(isDisposing);
         }
