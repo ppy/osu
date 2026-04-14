@@ -91,6 +91,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                 },
                 new OsuSpriteText
                 {
+                    Y = 4,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Font = OsuFont.Torus.With(size: 10, weight: FontWeight.Bold),

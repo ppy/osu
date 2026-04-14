@@ -89,7 +89,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private readonly Container<RankedPlaySubScreen> screenContainer;
         private readonly RankedPlayChatDisplay chat;
 
-        private RankedPlayBottomOrnament ornamentOverlay = null!;
+        private RankedPlayBottomOrnament ornament = null!;
         private IDisposable? ornamentOverlayRegistration;
 
         private IBindable<RankedPlayStage> stage = null!;
@@ -166,7 +166,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             stage = matchInfo.Stage.GetBoundCopy();
             sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
 
-            LoadComponent(ornamentOverlay = new RankedPlayBottomOrnament
+            LoadComponent(ornament = new RankedPlayBottomOrnament
             {
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre,
@@ -208,8 +208,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 },
             ]);
 
-            ornamentOverlayRegistration = overlayManager.RegisterBlockingOverlay(ornamentOverlay);
-            ornamentOverlay.Show();
+            ornamentOverlayRegistration = overlayManager.RegisterBlockingOverlay(ornament);
+            ornament.Show();
 
             stage.BindValueChanged(e => onStageChanged(e.NewValue));
         }
