@@ -41,7 +41,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         protected override bool StartHidden => true;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             Width = width;
             Height = height;
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 
             EdgeEffect = new EdgeEffectParameters
             {
-                Colour = colours.Yellow.Opacity(0.15f),
+                Colour = Color4Extensions.FromHex("#15061e").Opacity(0.8f),
                 Type = EdgeEffectType.Glow,
                 Radius = height * 2,
                 Roundness = height * 2,
