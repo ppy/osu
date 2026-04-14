@@ -181,6 +181,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             client.UserStateChanged += onUserStateChanged;
             client.LoadRequested += onLoadRequested;
 
+            Scheduler.AddDelayed(() => ornament.Show(), VsSequence.INTRO_LENGTH);
+
             int localUserId = api.LocalUser.Value.OnlineID;
             int opponentUserId = ((RankedPlayRoomState)client.Room!.MatchState!).Users.Keys.Single(it => it != localUserId);
 
@@ -209,7 +211,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             ]);
 
             ornamentOverlayRegistration = overlayManager.RegisterBlockingOverlay(ornament);
-            ornament.Show();
 
             stage.BindValueChanged(e => onStageChanged(e.NewValue));
         }

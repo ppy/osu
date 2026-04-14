@@ -137,7 +137,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                 vsText.ScaleTo(0.4f, 1300, Easing.OutExpo);
             }
 
-            delay += 850;
+            delay += delay_first;
 
             impactDelay = delay;
 
@@ -187,8 +187,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                 this.Delay(3200).FadeOut(300).Expire();
             }
 
-            delay += 3350;
+            delay += delay_final;
         }
+
+        private const double delay_first = 850;
+        private const double delay_final = 3350;
+
+        public const double INTRO_LENGTH = delay_first + delay_final;
 
         private partial class UserDisplay : CompositeDrawable
         {

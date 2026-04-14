@@ -38,12 +38,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 
         private readonly LayoutValue layout = new LayoutValue(Invalidation.DrawSize);
 
+        protected override bool StartHidden => true;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             Width = width;
             Height = height;
+            Alpha = 0;
+
             Masking = true;
+
             EdgeEffect = new EdgeEffectParameters
             {
                 Colour = colours.Yellow.Opacity(0.15f),
@@ -161,12 +166,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 
         protected override void PopIn()
         {
-            this.FadeIn(300, Easing.OutQuint);
+            this.FadeIn(500, Easing.OutQuint);
+            // TODO: animate this better.
         }
 
         protected override void PopOut()
         {
-            this.FadeOut(300, Easing.OutQuint);
+            this.FadeOut(500, Easing.OutQuint);
         }
     }
 }
