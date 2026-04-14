@@ -11,7 +11,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -29,7 +28,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 {
-    public partial class RankedPlayChatDisplay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+    public partial class RankedPlayChatDisplay : VisibilityContainer, IKeyBindingHandler<GlobalAction>
     {
         [Resolved]
         private ChannelManager? channelManager { get; set; }
@@ -164,7 +163,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         {
         }
 
-        public void Appear()
+        protected override void PopIn()
         {
             FinishTransforms();
 
@@ -174,12 +173,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 .FadeIn(240, Easing.OutCubic);
         }
 
-        public TransformSequence<RankedPlayChatDisplay> Disappear()
+        protected override void PopOut()
         {
             FinishTransforms();
 
-            return this.FadeOut(240, Easing.InOutCubic)
-                       .MoveToY(150f, 240, Easing.InOutCubic);
+            this.FadeOut(240, Easing.InOutCubic)
+                .MoveToY(150f, 240, Easing.InOutCubic);
         }
 
         protected override void Dispose(bool isDisposing)
