@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -68,6 +69,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private IDialogOverlay dialogOverlay { get; set; } = null!;
 
         [Resolved]
+        private IOverlayManager overlayManager { get; set; } = null!;
+
+        [Resolved]
         private AudioManager audio { get; set; } = null!;
 
         [Resolved]
@@ -84,6 +88,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private readonly Container stageOverlayContainer;
         private readonly Container<RankedPlaySubScreen> screenContainer;
         private readonly RankedPlayChatDisplay chat;
+
+        private RankedPlayBottomOrnament ornament = null!;
+        private IDisposable? ornamentOverlayRegistration;
 
         private IBindable<RankedPlayStage> stage = null!;
 
@@ -158,6 +165,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         {
             stage = matchInfo.Stage.GetBoundCopy();
             sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
+
+            LoadComponent(ornament = new RankedPlayBottomOrnament
+            {
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre,
+            });
         }
 
         protected override void LoadComplete()
@@ -167,6 +180,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             client.RoomUpdated += onRoomUpdated;
             client.UserStateChanged += onUserStateChanged;
             client.LoadRequested += onLoadRequested;
+
+            Scheduler.AddDelayed(() => ornament.Show(), VsSequence.INTRO_LENGTH);
 
             int localUserId = api.LocalUser.Value.OnlineID;
             int opponentUserId = ((RankedPlayRoomState)client.Room!.MatchState!).Users.Keys.Single(it => it != localUserId);
@@ -194,6 +209,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     }
                 },
             ]);
+
+            ornamentOverlayRegistration = overlayManager.RegisterBlockingOverlay(ornament);
 
             stage.BindValueChanged(e => onStageChanged(e.NewValue));
         }
@@ -356,6 +373,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
                 client.LeaveRoom().FireAndForget();
 
+                ornamentOverlayRegistration?.Dispose();
+                ornamentOverlayRegistration = null;
+
                 if (retryRequested)
                     controller?.RejoinQueue();
 
@@ -405,6 +425,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             client.RoomUpdated -= onRoomUpdated;
             client.UserStateChanged -= onUserStateChanged;
             client.LoadRequested -= onLoadRequested;
+
+            ornamentOverlayRegistration?.Dispose();
+            ornamentOverlayRegistration = null;
 
             base.Dispose(isDisposing);
         }
