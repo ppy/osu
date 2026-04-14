@@ -134,7 +134,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                     Bottom = 10,
                                     Right = 10
                                 },
-                                Alpha = 0,
+                                State = { Value = Visibility.Hidden }
                             },
                             new HamburgerMenu
                             {
@@ -277,9 +277,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 backgroundMusic.Play();
 
             if (stage is RankedPlayStage.RoundWarmup && matchInfo.CurrentRound == 1)
-                chat.Disappear();
+                chat.State.Value = Visibility.Hidden;
             else
-                chat.Appear();
+                chat.State.Value = Visibility.Visible;
 
             switch (stage)
             {
@@ -333,7 +333,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
-            chat.Disappear();
             backgroundMusic.Stop();
             previewTrackManager.StopAnyPlaying(this);
 
@@ -383,7 +382,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         {
             base.OnResuming(e);
 
-            chat.Appear();
             if (e.Last is not MultiplayerPlayerLoader playerLoader)
                 return;
 
