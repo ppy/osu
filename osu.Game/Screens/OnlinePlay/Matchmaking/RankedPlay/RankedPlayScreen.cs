@@ -271,17 +271,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         private void onStageChanged(RankedPlayStage stage)
         {
-            chat.Appear();
-
             if (stage is RankedPlayStage.GameplayWarmup or RankedPlayStage.Gameplay)
                 backgroundMusic.Stop();
             else
                 backgroundMusic.Play();
 
+            if (stage is RankedPlayStage.RoundWarmup && matchInfo.CurrentRound == 1)
+                chat.Disappear();
+            else
+                chat.Appear();
+
             switch (stage)
             {
                 case RankedPlayStage.RoundWarmup when matchInfo.CurrentRound == 1:
-                    chat.Disappear();
                     ShowScreen(new IntroScreen());
                     break;
 
