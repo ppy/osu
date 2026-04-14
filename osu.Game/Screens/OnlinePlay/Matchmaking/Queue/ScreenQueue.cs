@@ -17,7 +17,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Lists;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Database;
@@ -57,19 +56,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private FillFlowContainer<RankedPlayMatchPanel> resultPanelContainer = null!;
 
         [Resolved]
-        private IAPIProvider api { get; set; } = null!;
-
-        [Resolved]
-        private OverlayColourProvider colourProvider { get; set; } = null!;
-
-        [Resolved]
         private OsuColour colours { get; set; } = null!;
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
         [Resolved]
-        private QueueController controller { get; set; } = null!;
+        private QueueController queue { get; set; } = null!;
 
         [Resolved]
         private UserLookupCache userLookupCache { get; set; } = null!;
@@ -78,7 +71,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
-        private MusicController musicController { get; set; } = null!;
+        private MusicController music { get; set; } = null!;
 
         private readonly IBindable<MatchmakingScreenState> currentState = new Bindable<MatchmakingScreenState>();
 
@@ -106,7 +99,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, IAPIProvider api)
         {
             enqueueSample = audio.Samples.Get(@"Multiplayer/Matchmaking/enqueue");
             waitingLoopSample = audio.Samples.Get(@"Multiplayer/Matchmaking/waiting-loop");
@@ -334,7 +327,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 }
             }
 
-            currentState.BindTo(controller.CurrentState);
+            currentState.BindTo(queue.CurrentState);
             currentState.BindValueChanged(s => SetState(s.NewValue));
             client.MatchmakingLobbyStatusChanged += onMatchmakingLobbyStatusChanged;
             selectedPool.BindValueChanged(onSelectedPoolChanged, true);
@@ -435,7 +428,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             base.OnEntering(e);
 
-            controller.SearchInForeground();
+            queue.SearchInForeground();
 
             using (BeginDelayedSequence(800))
                 Schedule(() => SetState(currentState.Value));
@@ -469,12 +462,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     return false;
 
                 case MatchmakingScreenState.Queueing:
-                    controller.SearchInBackground();
+                    queue.SearchInBackground();
                     return false;
 
                 case MatchmakingScreenState.PendingAccept:
                 case MatchmakingScreenState.AcceptedWaitingForRoom:
-                    controller.LeaveQueue();
+                    queue.LeaveQueue();
                     return true;
 
                 case MatchmakingScreenState.InRoom:
@@ -526,7 +519,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                 Action = () =>
                                 {
                                     Debug.Assert(selectedPool.Value != null);
-                                    controller.JoinQueue(selectedPool.Value);
+                                    queue.JoinQueue(selectedPool.Value);
                                 },
                                 Text = "Begin queueing",
                             }
@@ -563,7 +556,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                 Origin = Anchor.Centre,
                                 Width = 200,
                                 Text = "Stop queueing",
-                                Action = () => controller.LeaveQueue()
+                                Action = () => queue.LeaveQueue()
                             }
                         }
                     };
@@ -577,7 +570,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     SetState(MatchmakingScreenState.AcceptedWaitingForRoom);
 
                     matchFoundSample?.Play();
-                    musicController.DuckMomentarily(1250);
+                    music.DuckMomentarily(1250);
                     break;
 
                 case MatchmakingScreenState.AcceptedWaitingForRoom:
