@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
@@ -19,51 +20,54 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void TestLeftWin()
         {
-            AddStep("add panel", () => Child = new RankedPlayMatchPanel(new RankedPlayRoomState
+            AddStep("add panel", () => Child = new DelayedLoadWrapper(new RankedPlayMatchPanel(new RankedPlayRoomState
             {
                 Users =
                 {
                     { 1, new RankedPlayUserInfo { Rating = 0, Life = 800_000, RoundsWon = 3 } },
                     { 2, new RankedPlayUserInfo { Rating = 0, Life = 200_000, RoundsWon = 1 } }
                 }
-            })
+            }), 0)
             {
                 Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
+                Origin = Anchor.Centre,
+                Width = 280
             });
         }
 
         [Test]
         public void TestRightWin()
         {
-            AddStep("add panel", () => Child = new RankedPlayMatchPanel(new RankedPlayRoomState
+            AddStep("add panel", () => Child = new DelayedLoadWrapper(new RankedPlayMatchPanel(new RankedPlayRoomState
             {
                 Users =
                 {
                     { 1, new RankedPlayUserInfo { Rating = 0, Life = 200_000, RoundsWon = 3 } },
                     { 2, new RankedPlayUserInfo { Rating = 0, Life = 800_000, RoundsWon = 1 } }
                 }
-            })
+            }), 0)
             {
                 Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
+                Origin = Anchor.Centre,
+                Width = 280
             });
         }
 
         [Test]
         public void TestDraw()
         {
-            AddStep("add panel", () => Child = new RankedPlayMatchPanel(new RankedPlayRoomState
+            AddStep("add panel", () => Child = new DelayedLoadWrapper(new RankedPlayMatchPanel(new RankedPlayRoomState
             {
                 Users =
                 {
                     { 1, new RankedPlayUserInfo { Rating = 0, Life = 200_000, RoundsWon = 3 } },
                     { 2, new RankedPlayUserInfo { Rating = 0, Life = 200_000, RoundsWon = 1 } }
                 }
-            })
+            }), 0)
             {
                 Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
+                Origin = Anchor.Centre,
+                Width = 280
             });
         }
     }
