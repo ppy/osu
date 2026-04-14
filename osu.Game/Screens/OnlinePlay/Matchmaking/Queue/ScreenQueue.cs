@@ -334,36 +334,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             populateAvailablePools().FireAndForget();
         }
 
-        public class PanelBackground : CompositeDrawable
-        {
-            [Resolved]
-            private OverlayColourProvider colourProvider { get; set; } = null!;
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                RelativeSizeAxes = Axes.Both;
-
-                InternalChild = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background3,
-                    Blending = BlendingParameters.Additive,
-                    Alpha = 0.3f,
-                };
-            }
-        }
-
-        public class QueueSectionHeader : SectionHeader
-        {
-            public QueueSectionHeader(string header)
-                : base(header)
-            {
-                // Reduce base class padding.
-                Margin = new MarginPadding { Top = 5, Bottom = 10, Horizontal = 5 };
-            }
-        }
-
         private async Task populateAvailablePools()
         {
             MatchmakingPool[] pools = await client.GetMatchmakingPoolsOfType(poolType).ConfigureAwait(false);
@@ -680,6 +650,36 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             waitingLoopChannel?.Stop();
             waitingLoopChannel?.Dispose();
+        }
+
+        public partial class PanelBackground : CompositeDrawable
+        {
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                RelativeSizeAxes = Axes.Both;
+
+                InternalChild = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background3,
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0.3f,
+                };
+            }
+        }
+
+        public partial class QueueSectionHeader : SectionHeader
+        {
+            public QueueSectionHeader(string header)
+                : base(header)
+            {
+                // Reduce base class padding.
+                Margin = new MarginPadding { Top = 5, Bottom = 10, Horizontal = 5 };
+            }
         }
 
         private partial class BeginQueueingButton : SelectionButton
