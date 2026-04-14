@@ -53,7 +53,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private Container mainContent = null!;
         private CloudVisualisation cloud = null!;
         private RatingDistributionGraph ratingGraph = null!;
-        private FillFlowContainer<RankedPlayMatchPanel> resultPanelContainer = null!;
+        private FillFlowContainer resultPanelContainer = null!;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -209,7 +209,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                                         {
                                                             RelativeSizeAxes = Axes.Both,
                                                             ScrollbarOverlapsContent = false,
-                                                            Child = resultPanelContainer = new FillFlowContainer<RankedPlayMatchPanel>
+                                                            Child = resultPanelContainer = new FillFlowContainer
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
                                                                 AutoSizeAxes = Axes.Y,
@@ -368,7 +368,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             foreach (var state in status.RecentMatches.OfType<RankedPlayRoomState>())
             {
-                resultPanelContainer.Insert(-resultPanelContainer.Count, new RankedPlayMatchPanel(state)
+                resultPanelContainer.Insert(-resultPanelContainer.Count, new DelayedLoadWrapper(new RankedPlayMatchPanel(state)
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Width = 1
+                }, 0)
                 {
                     RelativeSizeAxes = Axes.X,
                     Width = 0.48f
