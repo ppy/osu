@@ -313,11 +313,22 @@ namespace osu.Game.Rulesets
         public virtual IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => Array.Empty<KeyBinding>();
 
         /// <summary>
+        /// Text that describes what variants in a ruleset are.
+        /// Override this to provide better copy than the generic "Variant" text which may not tell users much.
+        /// </summary>
+        public virtual LocalisableString VariantDescription => "Variant";
+
+        /// <summary>
         /// Gets the name for a key binding variant. This is used for display in the settings overlay.
         /// </summary>
         /// <param name="variant">The variant.</param>
         /// <returns>A descriptive name of the variant.</returns>
         public virtual LocalisableString GetVariantName(int variant) => string.Empty;
+
+        /// <summary>
+        /// Returns the ID of the variant that is applicable for the given <paramref name="beatmapInfo"/>, given the current active <paramref name="mods"/>.
+        /// </summary>
+        public virtual int GetVariantForBeatmap(IBeatmapInfo beatmapInfo, IReadOnlyList<Mod>? mods = null) => 0;
 
         /// <summary>
         /// For rulesets which support legacy (osu-stable) replay conversion, this method will create an empty replay frame
