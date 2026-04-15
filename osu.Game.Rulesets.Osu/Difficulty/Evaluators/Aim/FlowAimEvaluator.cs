@@ -108,8 +108,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             }
 
             // Final velocity is being raised to a power because flow difficulty scales harder with both high distance and time, and we want to account for that
-            return Math.Pow(flowDifficulty, 1.45) *
-                   DifficultyCalculationUtils.Smootherstep(currDistance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
+            flowDifficulty = Math.Pow(flowDifficulty, 1.45);
+
+            // Reduce difficulty for low spacing since spacing below radius are always to be flowed
+            return flowDifficulty * DifficultyCalculationUtils.Smootherstep(currDistance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
         }
 
         private static double calculateOverlapFactor(OsuDifficultyHitObject first, OsuDifficultyHitObject second)
