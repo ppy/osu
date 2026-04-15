@@ -114,12 +114,20 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 return;
             }
 
-            APIUserMatchmakingStatistics[] mostRelevantStats = stats.OrderByDescending(s => s.Pool.Active).ThenByDescending(s => s.Pool.Id).ToArray();
-            APIUserMatchmakingStatistics mostRelevantStat = mostRelevantStats.First();
+            int? highestRank = null;
 
-            rankText.Text = $"#{mostRelevantStat.Rank:N0}";
+            foreach (var stat in stats)
+            {
+                if (stat.Pool.Active && stat.Rank != null)
+                {
+                    if (highestRank == null || stat.Rank < highestRank)
+                        highestRank = stat.Rank;
+                }
+            }
 
-            TooltipContent = new MatchmakingStatsTooltipData(colourProvider, mostRelevantStats);
+            rankText.Text = highestRank == null ? "-" : $"#{highestRank:N0}";
+
+            TooltipContent = new MatchmakingStatsTooltipData(colourProvider, stats.OrderByDescending(s => s.PoolId).ToArray());
 
             Show();
         }
