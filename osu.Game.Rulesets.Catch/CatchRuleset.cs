@@ -155,7 +155,8 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModMuted(),
                         new CatchModNoScope(),
                         new CatchModMovingFast(),
-                        new ModPitchAdjust()
+                        new ModPitchAdjust(),
+                        new CatchModSynesthesia(),
                     };
 
                 case ModType.System:

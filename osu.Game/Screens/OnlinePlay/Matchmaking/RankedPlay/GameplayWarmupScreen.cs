@@ -1,21 +1,29 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
 using osu.Game.Screens.Select;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
@@ -23,6 +31,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
     public partial class GameplayWarmupScreen : RankedPlaySubScreen
     {
         public override bool ShowBeatmapBackground => true;
+
+        public override LocalisableString StageHeading => "Gameplay";
 
         [Cached(typeof(IBindable<SongSelect.BeatmapSetLookupResult?>))]
         private readonly Bindable<SongSelect.BeatmapSetLookupResult?> lastLookupResult = new Bindable<SongSelect.BeatmapSetLookupResult?>();
@@ -35,6 +45,24 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         [Resolved]
         private OverlayColourProvider overlayColours { get; set; } = null!;
+
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; } = null!;
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
+
+        [Resolved]
+        private MusicController musicController { get; set; } = null!;
+
+        [Resolved]
+        private Bindable<WorkingBeatmap> globalBeatmap { get; set; } = null!;
+
+        [Resolved]
+        private Bindable<RulesetInfo> globalRuleset { get; set; } = null!;
+
+        [Resolved]
+        private Bindable<IReadOnlyList<Mod>> globalMods { get; set; } = null!;
 
         private Container<RankedPlayCard> cardColumn = null!;
         private Drawable separator = null!;
@@ -122,6 +150,27 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     }
                 }
             ];
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            MultiplayerPlaylistItem item = Client.Room!.CurrentPlaylistItem;
+
+            RulesetInfo ruleset = rulesets.GetRuleset(item.RulesetID)!;
+            Ruleset rulesetInstance = ruleset.CreateInstance();
+            BeatmapInfo? localBeatmap = beatmapManager.QueryOnlineBeatmapId(item.BeatmapID);
+
+            globalBeatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
+            globalRuleset.Value = ruleset;
+            globalMods.Value = item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+
+            // Play the new track from its preview point.
+            globalBeatmap.Value.PrepareTrackForPreview(false);
+            musicController.Play(true);
+
+            Client.ChangeState(MultiplayerUserState.Ready).FireAndForget();
         }
 
         public override void OnEntering(RankedPlaySubScreen? previous)

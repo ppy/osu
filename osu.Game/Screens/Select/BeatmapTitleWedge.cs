@@ -46,6 +46,8 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private IBindable<SongSelect.BeatmapSetLookupResult?> onlineLookupResult { get; set; } = null!;
 
+        public float TopPadding { get; init; }
+
         protected override bool StartHidden => true;
 
         private ModSettingChangeTracker? settingChangeTracker;
@@ -97,7 +99,7 @@ namespace osu.Game.Screens.Select
                     Direction = FillDirection.Vertical,
                     Padding = new MarginPadding
                     {
-                        Top = SongSelect.WEDGE_CONTENT_MARGIN,
+                        Top = SongSelect.WEDGE_CONTENT_MARGIN + TopPadding,
                         Left = SongSelect.WEDGE_CONTENT_MARGIN
                     },
                     Spacing = new Vector2(0f, 4f),

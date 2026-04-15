@@ -429,6 +429,7 @@ namespace osu.Game.Screens.Menu
                     }, () =>
                     {
                         holdToExitGameOverlay.Abort();
+                        Game.CancelRestartOnExit();
                     }));
                 }
 
@@ -501,7 +502,7 @@ namespace osu.Game.Screens.Menu
                 {
                     new PopupDialogOkButton
                     {
-                        Text = "Understood",
+                        Text = ButtonSystemStrings.MobileDisclaimerOkButton,
                         Action = confirmed,
                     },
                 };

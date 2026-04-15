@@ -4,6 +4,7 @@
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -38,8 +39,8 @@ namespace osu.Game.Tournament.Tests.NonVisual
 
                     WaitForOrAssert(() => (ipc = osu.Dependencies.Get<MatchIPCInfo>() as FileBasedIPC)?.IsLoaded == true, @"ipc could not be populated in a reasonable amount of time");
 
-                    Assert.True(ipc!.SetIPCLocation(testStableInstallDirectory));
-                    Assert.True(storage.AllTournaments.Exists("stable.json"));
+                    ClassicAssert.True(ipc!.SetIPCLocation(testStableInstallDirectory));
+                    ClassicAssert.True(storage.AllTournaments.Exists("stable.json"));
                 }
                 finally
                 {

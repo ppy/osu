@@ -19,18 +19,13 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public partial class PlayerSettingsOverlay : ExpandingContainer
+    public partial class ReplaySettingsOverlay : ExpandingContainer
     {
         private const float padding = 10;
 
         public const float EXPANDED_WIDTH = player_settings_width + padding * 2;
 
         private const float player_settings_width = 270;
-
-        private const int fade_duration = 200;
-
-        public override void Show() => this.FadeIn(fade_duration);
-        public override void Hide() => this.FadeOut(fade_duration);
 
         // we'll handle this ourselves because we have slightly custom logic.
         protected override bool ExpandOnHover => false;
@@ -52,7 +47,7 @@ namespace osu.Game.Screens.Play.HUD
         // while collapsed down, so let's avoid that.
         protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
 
-        public PlayerSettingsOverlay()
+        public ReplaySettingsOverlay()
             : base(0, EXPANDED_WIDTH)
         {
             Origin = Anchor.TopRight;
@@ -81,11 +76,14 @@ namespace osu.Game.Screens.Play.HUD
                 Action = () => Expanded.Toggle()
             });
 
-            AddInternal(new Box
+            AddRangeInternal(new Drawable[]
             {
-                Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0), Color4.Black.Opacity(0.8f)),
-                Depth = float.MaxValue,
-                RelativeSizeAxes = Axes.Both,
+                new Box
+                {
+                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0), Color4.Black.Opacity(0.8f)),
+                    Depth = float.MaxValue,
+                    RelativeSizeAxes = Axes.Both,
+                },
             });
         }
 

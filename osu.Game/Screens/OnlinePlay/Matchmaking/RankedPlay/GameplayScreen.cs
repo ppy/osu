@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -12,6 +13,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 {
     public partial class GameplayScreen : RankedPlaySubScreen
     {
+        public override LocalisableString StageHeading => "Gameplay";
+
         [BackgroundDependencyLoader]
         private void load()
         {

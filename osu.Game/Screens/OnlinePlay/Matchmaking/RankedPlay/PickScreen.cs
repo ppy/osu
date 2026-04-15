@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Online.Multiplayer;
@@ -27,6 +28,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         public CardFlow CenterRow { get; private set; } = null!;
 
+        public override bool ShowStageOverlay => true;
+
+        public override LocalisableString StageHeading => "Pick Phase";
+
         private PlayerHandOfCards playerHand = null!;
         private OpponentHandOfCards opponentHand = null!;
 
@@ -38,17 +43,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private const int card_play_samples = 2;
         private Sample?[]? cardPlaySamples;
 
-        private bool timeRunningOutWarningActive;
         private Sample? timeRunningOutSample;
         private SampleChannel? timeRunningOutSampleChannel;
-        private Sample? timeUpBuzzerSample;
 
         private DateTimeOffset stageEndTime;
+        private TimeSpan stageDuration;
 
         /// <summary>
         /// Whether the local user has played a card themselves.
         /// </summary>
         private bool hasPlayedCard;
+
+        public PickScreen()
+        {
+            StageCaption = "It's your turn to play a card!";
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -65,16 +74,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
-                new RankedPlayStageDisplay(RankedPlayColourScheme.Blue)
-                {
-                    Heading = "Pick Phase",
-                    Caption = "It's your turn to play a card!",
-                    Margin = new MarginPadding { Top = 60 },
-                },
             ];
 
             CenterColumn.Children =
             [
+                opponentHand = new OpponentHandOfCards
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.Both,
+                    Height = 0.5f,
+                    Y = -100,
+                },
                 playerHand = new PlayerHandOfCards
                 {
                     Anchor = Anchor.BottomCentre,
@@ -83,14 +94,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     Height = 0.5f,
                     SelectionMode = HandSelectionMode.Single,
                     PlayCardAction = onPlayButtonClicked
-                },
-                opponentHand = new OpponentHandOfCards
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.5f,
-                    Y = -100,
                 },
                 new HandReplayRecorder(playerHand),
                 new HandReplayPlayer(matchInfo.OpponentId, opponentHand),
@@ -103,7 +106,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 cardPlaySamples[i] = audio.Samples.Get($@"Multiplayer/Matchmaking/Ranked/card-play-{1 + i}");
 
             timeRunningOutSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/time-running-out");
-            timeUpBuzzerSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/time-up");
         }
 
         protected override void LoadComplete()
@@ -122,13 +124,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             }
         }
 
+        private bool shouldPlayWarningSample
+            => matchInfo.Stage.Value == RankedPlayStage.CardPlay
+               && stageDuration > TimeSpan.FromSeconds(warning_time_threshold)
+               && stageEndTime - DateTimeOffset.Now < TimeSpan.FromSeconds(warning_time_threshold)
+               && !hasPlayedCard;
+
         protected override void Update()
         {
             base.Update();
 
-            TimeSpan remainingTime = stageEndTime - DateTimeOffset.Now;
-
-            if (timeRunningOutWarningActive && remainingTime.TotalSeconds < warning_time_threshold)
+            if (shouldPlayWarningSample)
             {
                 timeRunningOutSampleChannel ??= timeRunningOutSample?.GetChannel();
 
@@ -139,70 +145,77 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 timeRunningOutSampleChannel.Looping = true;
                 timeRunningOutSampleChannel.Play();
             }
+            else
+                timeRunningOutSampleChannel?.Stop();
         }
 
         public override void OnEntering(RankedPlaySubScreen? previous)
         {
             base.OnEntering(previous);
 
-            int delay = 0;
+            const double stagger = 50;
+            double delay = 0;
 
             foreach (var item in matchInfo.PlayerCards)
             {
+                double currentDelay = delay;
+
                 if ((previous as DiscardScreen)?.CenterRow.RemoveCard(item, out var card, out var drawQuad) == true)
                 {
                     playerHand.AddCard(card, c =>
                     {
                         c.MatchScreenSpaceDrawQuad(drawQuad, playerHand);
+                        c.DelayMovementOnEntering(currentDelay);
                     });
                 }
                 else
                 {
                     playerHand.AddCard(item, c =>
                     {
-                        c.Position = ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, DrawHeight), playerHand);
+                        c.Position = playerHand.BottomCardInsertPosition;
+                        c.DelayMovementOnEntering(currentDelay);
                     });
                     Scheduler.AddDelayed(() =>
                     {
                         SamplePlaybackHelper.PlayWithRandomPitch(cardAddSample);
-                    }, 50 * delay);
-                    delay++;
+                    }, delay);
                 }
+
+                delay += stagger;
             }
+
+            delay = 0;
 
             foreach (var item in matchInfo.OpponentCards)
             {
+                double currentDelay = delay;
+
                 opponentHand.AddCard(item, c =>
                 {
                     c.Position = ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), playerHand);
+                    c.DelayMovementOnEntering(currentDelay);
                 });
-            }
 
-            playerHand.UpdateLayout(stagger: 50);
-            opponentHand.UpdateLayout(stagger: 50);
+                delay += 50;
+            }
         }
 
         private void onCountdownStarted(MultiplayerCountdown countdown) => Scheduler.Add(() =>
         {
-            if (countdown is not RankedPlayStageCountdown stageCountdown)
+            if (countdown is not RankedPlayStageCountdown)
                 return;
 
             stageEndTime = DateTimeOffset.Now + countdown.TimeRemaining;
-            timeRunningOutWarningActive = stageCountdown.Stage == RankedPlayStage.CardPlay;
+            stageDuration = countdown.TimeRemaining;
         });
 
         private void onCountdownStopped(MultiplayerCountdown countdown) => Scheduler.Add(() =>
         {
-            if (countdown is not RankedPlayStageCountdown stageCountdown)
+            if (countdown is not RankedPlayStageCountdown)
                 return;
 
-            timeRunningOutSampleChannel?.Stop();
-
             stageEndTime = DateTimeOffset.Now;
-            timeRunningOutWarningActive = false;
-
-            if (stageCountdown.Stage == RankedPlayStage.CardPlay && !hasPlayedCard)
-                timeUpBuzzerSample?.Play();
+            stageDuration = TimeSpan.Zero;
         });
 
         private void onPlayButtonClicked()

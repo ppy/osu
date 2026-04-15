@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -15,32 +14,63 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.RankedPlay;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 {
-    public partial class RankedPlayStageDisplay : CompositeDrawable
+    public partial class RankedPlayStageDisplay : VisibilityContainer
     {
-        public required LocalisableString Heading { get; init; }
-
-        public required LocalisableString Caption { get; init; }
-
-        public Color4? CaptionColour { get; init; }
-
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
         private readonly RankedPlayColourScheme colourScheme;
 
         private Drawable headingTextBackground = null!;
-        private OsuSpriteText headingText = null!;
         private Drawable progressBar = null!;
         private OsuSpriteText progressText = null!;
 
+        private OsuSpriteText? headingText;
+        private OsuSpriteText? captionText;
+
         private DateTimeOffset countdownStartTime;
         private DateTimeOffset countdownEndTime;
+
+        private RankedPlayStage? activeStage;
+
+        private LocalisableString heading;
+
+        /// <summary>
+        /// Heading text to be displayed indicating the purpose of the current stage.
+        /// </summary>
+        public LocalisableString Heading
+        {
+            get => heading;
+            set
+            {
+                heading = value;
+                if (headingText != null)
+                    headingText.Text = value;
+            }
+        }
+
+        private LocalisableString caption;
+
+        /// <summary>
+        /// Subtitle text to be displayed indicating the action a user should take in the current stage.
+        /// </summary>
+        public LocalisableString Caption
+        {
+            get => caption;
+            set
+            {
+                caption = value;
+                if (captionText != null)
+                    captionText.Text = value;
+            }
+        }
 
         public RankedPlayStageDisplay(RankedPlayColourScheme colourScheme)
         {
@@ -50,7 +80,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
             const float phase_text_background_height = 55;
             Vector2 progressBarSize = new Vector2(300, 25);
@@ -157,19 +187,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                 Left = 10
                             },
                             UseFullGlyphHeight = false,
-                            Text = "00:27:123",
                             Font = OsuFont.TorusAlternate.With(size: 16, fixedWidth: true, weight: FontWeight.SemiBold)
                         }
                     ]
                 },
-                new OsuSpriteText
+                captionText = new OsuSpriteText
                 {
                     Margin = new MarginPadding
                     {
                         Top = 80,
                         Left = 20
                     },
-                    Colour = CaptionColour ?? colourScheme.Primary,
                     Text = Caption,
                     Font = OsuFont.TorusAlternate.With(size: 24, weight: FontWeight.SemiBold)
                 }
@@ -194,7 +222,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         {
             base.Update();
 
-            headingTextBackground.Width = headingText.DrawWidth + 80;
+            headingTextBackground.Width = headingText!.DrawWidth + 80;
 
             TimeSpan duration = countdownEndTime - countdownStartTime;
             TimeSpan remaining = countdownEndTime - DateTimeOffset.Now;
@@ -211,20 +239,49 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         private void onCountdownStarted(MultiplayerCountdown countdown) => Scheduler.Add(() =>
         {
-            if (countdown is not RankedPlayStageCountdown)
+            if (countdown is not RankedPlayStageCountdown stageCountdown)
                 return;
 
+            switch (stageCountdown.Stage)
+            {
+                case RankedPlayStage.CardDiscard:
+                    // Discard stage ends when both players have discarded, but adds a 3 second delay before completing.
+                    // Showing this in the countdown just creates visual noise, so let's handle internally.
+                    if (activeStage == stageCountdown.Stage)
+                        return;
+
+                    break;
+            }
+
+            activeStage = stageCountdown.Stage;
             countdownStartTime = DateTimeOffset.Now;
             countdownEndTime = DateTimeOffset.Now + countdown.TimeRemaining;
         });
 
         private void onCountdownStopped(MultiplayerCountdown countdown) => Scheduler.Add(() =>
         {
-            if (countdown is not RankedPlayStageCountdown)
+            if (countdown is not RankedPlayStageCountdown stageCountdown)
                 return;
+
+            switch (stageCountdown.Stage)
+            {
+                // See above special case handling.
+                case RankedPlayStage.CardDiscard:
+                    return;
+            }
 
             countdownEndTime = DateTimeOffset.Now;
         });
+
+        protected override void PopIn()
+        {
+            this.FadeIn();
+        }
+
+        protected override void PopOut()
+        {
+            this.FadeOut();
+        }
 
         protected override void Dispose(bool isDisposing)
         {

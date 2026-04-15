@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -64,6 +65,7 @@ namespace osu.Game.Tests.Beatmaps
         }
 
         [Test]
+        [FlakyTest] // one fix attempted in https://github.com/ppy/osu/pull/37178, didn't work
         public void TestInvalidationFlow()
         {
             BeatmapInfo postEditBeatmapInfo = null;
@@ -225,7 +227,7 @@ namespace osu.Game.Tests.Beatmaps
         {
             var actualBracket = StarDifficulty.GetDifficultyRating(starRating);
 
-            Assert.AreEqual(expectedBracket, actualBracket);
+            ClassicAssert.AreEqual(expectedBracket, actualBracket);
         }
 
         private partial class TestBeatmapDifficultyCache : BeatmapDifficultyCache

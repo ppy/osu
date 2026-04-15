@@ -328,6 +328,8 @@ namespace osu.Game.Rulesets.Mania
 
         public override RulesetSettingsSubsection CreateSettings() => new ManiaSettingsSubsection(this);
 
+        public override LocalisableString VariantDescription => "Keys";
+
         public override IEnumerable<int> AvailableVariants
         {
             get
@@ -499,6 +501,9 @@ namespace osu.Game.Rulesets.Mania
 
         public int GetKeyCount(IBeatmapInfo beatmapInfo, IReadOnlyList<Mod>? mods = null)
             => ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), mods);
+
+        public override int GetVariantForBeatmap(IBeatmapInfo beatmapInfo, IReadOnlyList<Mod>? mods = null)
+            => GetKeyCount(beatmapInfo, mods);
     }
 
     public enum PlayfieldType

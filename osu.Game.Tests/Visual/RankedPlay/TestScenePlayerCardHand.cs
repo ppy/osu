@@ -6,6 +6,7 @@ using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
@@ -33,12 +34,23 @@ namespace osu.Game.Tests.Visual.RankedPlay
             };
         }
 
+        [SetUpSteps]
+        public void SetupSteps()
+        {
+            AddStep("reset card hand", () => Child = handOfCards = new PlayerHandOfCards
+            {
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre,
+                RelativeSizeAxes = Axes.Both,
+                Height = 0.5f,
+            });
+        }
+
         [Test]
         public void TestSingleSelectionMode()
         {
             AddStep("add cards", () =>
             {
-                handOfCards.Clear();
                 for (int i = 0; i < 5; i++)
                     handOfCards.AddCard(new RankedPlayCardWithPlaylistItem(new RankedPlayCardItem()));
             });
@@ -59,7 +71,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
         {
             AddStep("add cards", () =>
             {
-                handOfCards.Clear();
                 for (int i = 0; i < 5; i++)
                     handOfCards.AddCard(new RankedPlayCardWithPlaylistItem(new RankedPlayCardItem()));
             });
@@ -84,7 +95,13 @@ namespace osu.Game.Tests.Visual.RankedPlay
 
                 AddStep($"{i} {"cards".Pluralize(i == 1)}", () =>
                 {
-                    handOfCards.Clear();
+                    Child = handOfCards = new PlayerHandOfCards
+                    {
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        RelativeSizeAxes = Axes.Both,
+                        Height = 0.5f,
+                    };
 
                     for (int j = 0; j < numCards; j++)
                         handOfCards.AddCard(new RankedPlayCardWithPlaylistItem(new RankedPlayCardItem()));
@@ -138,7 +155,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
         {
             AddStep("add cards", () =>
             {
-                handOfCards.Clear();
                 for (int i = 0; i < 5; i++)
                     handOfCards.AddCard(new RankedPlayCardWithPlaylistItem(new RankedPlayCardItem()));
             });
@@ -156,6 +172,25 @@ namespace osu.Game.Tests.Visual.RankedPlay
                 AddStep("space", () => InputManager.Key(Key.Space));
                 AddAssert("card selected", () => handOfCards.Selection.Contains(handOfCards.Cards.ElementAt(i1).Card.Item));
             }
+        }
+
+        [Test]
+        public void TestContract()
+        {
+            AddStep("add cards", () =>
+            {
+                for (int i = 0; i < 5; i++)
+                    handOfCards.AddCard(new RankedPlayCardWithPlaylistItem(new RankedPlayCardItem()));
+            });
+            AddWaitStep("wait", 5);
+            AddStep("contract", () => handOfCards.Contract());
+            AddWaitStep("wait", 5);
+            AddAssert(
+                "all cards outside bounds", () =>
+                    handOfCards
+                        .ChildrenOfType<HandOfCards.HandCard>()
+                        .All(card => !card.ScreenSpaceDrawQuad.AABBFloat.IntersectsWith(handOfCards.ScreenSpaceDrawQuad.AABBFloat))
+            );
         }
     }
 }
