@@ -417,87 +417,72 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            var content = TooltipContent;
+            float minDistToCursor = float.MaxValue;
+            Vector2 closestPointToCursor = Vector2.Zero;
+            Color4 closestColourToCursor = Color4.White;
+            int closestRatingToCursor = 0;
+            string closestValueToCursor = string.Empty;
 
-            hoverMarker.Position = gridContainer.ToLocalSpace(content.Position);
-            hoverMarkerFill.Colour = content.Colour;
-
-            return true;
-        }
-
-        public ITooltip<RatingDistributionGraphTooltipData> GetCustomTooltip() => new RatingDistributionGraphTooltip();
-
-        public RatingDistributionGraphTooltipData TooltipContent
-        {
-            get
+            if (userRating != null)
             {
-                Vector2 mousePos = GetContainingInputManager()!.CurrentState.Mouse.Position;
+                Vector2 userRatingPos1 = userRatingContainer.ToScreenSpace(pointOnGraph(userRating.Value, 0) * userRatingContainer.DrawSize);
+                Vector2 userRatingPos2 = userRatingContainer.ToScreenSpace(pointOnGraph(userRating.Value, yRange.max) * userRatingContainer.DrawSize);
 
-                float minDistToCursor = float.MaxValue;
-                Vector2 closestPointToCursor = Vector2.Zero;
-                Color4 closestColourToCursor = Color4.White;
-                int closestRatingToCursor = 0;
-                string closestValueToCursor = string.Empty;
+                minDistToCursor = Vector2.Distance(e.ScreenSpaceMousePosition, userRatingPos1);
+                closestPointToCursor = userRatingPos1;
+                closestColourToCursor = colours.Green;
+                closestRatingToCursor = userRating.Value;
+                closestValueToCursor = $"Your rating ({userRating})";
 
-                if (userRating != null)
+                float d = Vector2.Distance(e.ScreenSpaceMousePosition, userRatingPos2);
+
+                if (d < minDistToCursor)
                 {
-                    Vector2 userRatingPos1 = userRatingContainer.ToScreenSpace(pointOnGraph(userRating.Value, 0) * userRatingContainer.DrawSize);
-                    Vector2 userRatingPos2 = userRatingContainer.ToScreenSpace(pointOnGraph(userRating.Value, yRange.max) * userRatingContainer.DrawSize);
-
-                    minDistToCursor = Vector2.Distance(mousePos, userRatingPos1);
-                    closestPointToCursor = userRatingPos1;
-                    closestColourToCursor = colours.Green;
-                    closestRatingToCursor = userRating.Value;
-                    closestValueToCursor = $"Your rating ({userRating})";
-
-                    float d = Vector2.Distance(mousePos, userRatingPos2);
-
-                    if (d < minDistToCursor)
-                    {
-                        minDistToCursor = d;
-                        closestPointToCursor = userRatingPos2;
-                    }
+                    minDistToCursor = d;
+                    closestPointToCursor = userRatingPos2;
                 }
+            }
 
-                for (int i = 0; i < data.Length; i++)
+            for (int i = 0; i < data.Length; i++)
+            {
+                Vector2 pos = barsContainer.ToScreenSpace(pointOnGraph(data[i].x, data[i].y) * barsContainer.DrawSize);
+                float d = Vector2.Distance(e.ScreenSpaceMousePosition, pos);
+
+                if (d < minDistToCursor)
                 {
-                    Vector2 pos = barsContainer.ToScreenSpace(pointOnGraph(data[i].x, data[i].y) * barsContainer.DrawSize);
-                    float d = Vector2.Distance(mousePos, pos);
-
-                    if (d < minDistToCursor)
-                    {
-                        minDistToCursor = d;
-                        closestPointToCursor = pos;
-                        closestColourToCursor = colourProvider.Colour0;
-                        closestRatingToCursor = data[i].x;
-                        closestValueToCursor = $"Players: {data[i].y}";
-                    }
+                    minDistToCursor = d;
+                    closestPointToCursor = pos;
+                    closestColourToCursor = colourProvider.Colour0;
+                    closestRatingToCursor = data[i].x;
+                    closestValueToCursor = $"Players: {data[i].y}";
                 }
+            }
 
-                int currentCount = 0;
-                int totalCount = data.Sum(p => p.y);
+            int currentCount = 0;
+            int totalCount = data.Sum(p => p.y);
 
-                for (int i = 0; i < cumulativePath.Vertices.Count; i++)
+            for (int i = 0; i < cumulativePath.Vertices.Count; i++)
+            {
+                currentCount += data[i].y;
+
+                Vector2 pos = cumulativePath.ToScreenSpace(cumulativePath.Vertices[i] + new Vector2(2));
+                float d = Vector2.Distance(e.ScreenSpaceMousePosition, pos);
+
+                if (d < minDistToCursor)
                 {
-                    currentCount += data[i].y;
-
-                    Vector2 pos = cumulativePath.ToScreenSpace(cumulativePath.Vertices[i] + new Vector2(2));
-                    float d = Vector2.Distance(mousePos, pos);
-
-                    if (d < minDistToCursor)
-                    {
-                        minDistToCursor = d;
-                        closestPointToCursor = pos;
-                        closestColourToCursor = colours.Yellow;
-                        closestRatingToCursor = data[i].x;
-                        closestValueToCursor = $"Cumulative: {(float)currentCount / totalCount:P1}";
-                    }
+                    minDistToCursor = d;
+                    closestPointToCursor = pos;
+                    closestColourToCursor = colours.Yellow;
+                    closestRatingToCursor = data[i].x;
+                    closestValueToCursor = $"Cumulative: {(float)currentCount / totalCount:P1}";
                 }
+            }
 
-                if (float.IsNaN(minDistToCursor) || minDistToCursor == float.MaxValue)
-                    return new RatingDistributionGraphTooltipData();
-
-                return new RatingDistributionGraphTooltipData
+            if (minDistToCursor == float.MaxValue)
+                TooltipContent = new RatingDistributionGraphTooltipData();
+            else
+            {
+                TooltipContent = new RatingDistributionGraphTooltipData
                 {
                     Colour = closestColourToCursor,
                     Position = closestPointToCursor,
@@ -505,7 +490,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     Value = closestValueToCursor,
                 };
             }
+
+            hoverMarker.Position = gridContainer.ToLocalSpace(TooltipContent.Position);
+            hoverMarkerFill.Colour = TooltipContent.Colour;
+
+            return true;
         }
+
+        public ITooltip<RatingDistributionGraphTooltipData> GetCustomTooltip() => new RatingDistributionGraphTooltip();
+
+        public RatingDistributionGraphTooltipData TooltipContent { get; private set; } = new RatingDistributionGraphTooltipData();
 
         /// <summary>
         /// A simple vertical line that always remains 1px in size.
