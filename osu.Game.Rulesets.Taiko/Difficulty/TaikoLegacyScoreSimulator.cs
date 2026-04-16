@@ -66,7 +66,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 drainLength = ((int)Math.Round(baseBeatmap.HitObjects[^1].StartTime) - (int)Math.Round(baseBeatmap.HitObjects[0].StartTime) - breakLength) / 1000;
             }
 
-            difficultyPeppyStars = LegacyRulesetExtensions.CalculateDifficultyPeppyStars(baseBeatmap.Difficulty, objectCount, drainLength);
+            var alteredDifficulty = baseBeatmap.Difficulty.Clone();
+            // https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameplayElements/HitObjectManagerTaiko.cs#L78
+            alteredDifficulty.CircleSize = 2;
+
+            difficultyPeppyStars = LegacyRulesetExtensions.CalculateDifficultyPeppyStars(alteredDifficulty, objectCount, drainLength);
 
             LegacyScoreAttributes attributes = new LegacyScoreAttributes();
 
