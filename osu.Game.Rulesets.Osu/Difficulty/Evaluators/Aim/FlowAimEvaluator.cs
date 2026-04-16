@@ -21,7 +21,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             if (currObj.BaseObject is Spinner || currObj.Index <= 1 || currObj.Previous(0).BaseObject is Spinner)
                 return 0;
 
-            var nextObj = (OsuDifficultyHitObject?)currObj.Next(0);
             var prevObj = (OsuDifficultyHitObject)currObj.Previous(0);
             var prev2Obj = (OsuDifficultyHitObject)currObj.Previous(1);
 
