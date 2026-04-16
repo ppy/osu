@@ -236,11 +236,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 data.Zip(data.Skip(1), (a, b) => Math.Abs(b.x - a.x)).DefaultIfEmpty().Min()
             );
 
-            yRange = (
-                0,
-                (int)roundToSignificant(data.Select(d => d.y).DefaultIfEmpty().Max())
-            );
-
             if (userRating < xRange.min)
             {
                 this.data = this.data.Prepend((userRating.Value, 1)).ToArray();
@@ -252,6 +247,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 this.data = this.data.Append((userRating.Value, 1)).ToArray();
                 xRange.max = userRating.Value;
             }
+
+            yRange = (
+                0,
+                (int)roundToSignificant(this.data.Select(d => d.y).DefaultIfEmpty().Max())
+            );
 
             updateGraph();
         }
