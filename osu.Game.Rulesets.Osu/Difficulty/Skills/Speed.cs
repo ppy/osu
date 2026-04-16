@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentDifficulty *= decay;
             currentDifficulty += SpeedEvaluator.EvaluateDifficultyOf(osuCurrObj) * (1 - decay) * skillMultiplier;
 
-            double currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
+            double currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(osuCurrObj);
 
             double totalDifficulty = currentDifficulty * currentRhythm;
 
