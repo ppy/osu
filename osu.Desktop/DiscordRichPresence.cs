@@ -210,8 +210,10 @@ namespace osu.Desktop
                     Password = room.Settings.Password,
                 };
 
-                if (client.HasRegisteredUriScheme)
-                    presence.Secrets.JoinSecret = JsonConvert.SerializeObject(roomSecret);
+                // Prevent join secret from being too long for Discord to handle. Prevents crashes but disables join button on Discord.
+                string roomSecretJson = JsonConvert.SerializeObject(roomSecret);
+                if (client.HasRegisteredUriScheme && Encoding.UTF8.GetByteCount(roomSecretJson) <= 128)
+                    presence.Secrets.JoinSecret = roomSecretJson;
 
                 // discord cannot handle both secrets and buttons at the same time, so we need to choose something.
                 // the multiplayer room seems more important.
