@@ -43,10 +43,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (Mods.Any(m => m is OsuModAutopilot))
                 return 0;
 
-            double decay = strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+            double decay = strainDecay(osuCurrObj.AdjustedDeltaTime);
 
             currentStrain *= decay;
-            currentStrain += calculateAdjustedDifficulty(current) * (1 - decay);
+            currentStrain += calculateAdjustedDifficulty(osuCurrObj) * (1 - decay);
 
             if (current.BaseObject is Slider)
                 sliderStrains.Add(currentStrain);
@@ -54,15 +55,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return currentStrain;
         }
 
-        private double calculateAdjustedDifficulty(DifficultyHitObject current)
+        private double calculateAdjustedDifficulty(OsuDifficultyHitObject osuCurrObj)
         {
             const double skill_multiplier_snap = 70.9;
             const double skill_multiplier_agility = 2.35;
             const double skill_multiplier_flow = 242.0;
 
-            double snapDifficulty = SnapAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skill_multiplier_snap;
-            double agilityDifficulty = AgilityEvaluator.EvaluateDifficultyOf(current) * skill_multiplier_agility;
-            double flowDifficulty = FlowAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skill_multiplier_flow;
+            double snapDifficulty = SnapAimEvaluator.EvaluateDifficultyOf(osuCurrObj, IncludeSliders) * skill_multiplier_snap;
+            double agilityDifficulty = AgilityEvaluator.EvaluateDifficultyOf(osuCurrObj) * skill_multiplier_agility;
+            double flowDifficulty = FlowAimEvaluator.EvaluateDifficultyOf(osuCurrObj, IncludeSliders) * skill_multiplier_flow;
 
             double totalDifficulty = calculateTotalValue(snapDifficulty, agilityDifficulty, flowDifficulty);
 
@@ -72,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 totalDifficulty *= 1.0 - magnetisedStrength;
             }
 
-            totalDifficulty *= 0.985 + DiffUtils.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2) / 4000;
+            totalDifficulty *= 0.985 + DiffUtils.Pow(Math.Max(0, osuCurrObj.OverallDifficulty), 2) / 4000;
 
             return totalDifficulty;
         }
