@@ -40,6 +40,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private DrumSegment rightRim = null!;
 
         private readonly Bindable<TaikoTouchControlScheme> configTouchControlScheme = new Bindable<TaikoTouchControlScheme>();
+        private readonly Bindable<float> configDrumTouchSize = new Bindable<float>();
 
         [BackgroundDependencyLoader]
         private void load(TaikoInputManager taikoInputManager, TaikoRulesetConfigManager config)
@@ -67,6 +68,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                     {
                         mainContent = new Container
                         {
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
@@ -105,6 +108,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             };
 
             config.BindWith(TaikoRulesetSetting.TouchControlScheme, configTouchControlScheme);
+            config.BindWith(TaikoRulesetSetting.DrumTouchSize, configDrumTouchSize);
+
             configTouchControlScheme.BindValueChanged(scheme =>
             {
                 var actions = getOrderedActionsForScheme(scheme.NewValue);
@@ -113,6 +118,11 @@ namespace osu.Game.Rulesets.Taiko.UI
                 leftCentre.Action = actions[1];
                 rightCentre.Action = actions[2];
                 rightRim.Action = actions[3];
+            }, true);
+
+            configDrumTouchSize.BindValueChanged(size =>
+            {
+                mainContent.Scale = new Vector2(size.NewValue);
             }, true);
         }
 
