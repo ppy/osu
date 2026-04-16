@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 {
     public static class SnapAimEvaluator
     {
-        private const double wide_angle_multiplier = 1.05;
+        private const double wide_angle_multiplier = 0.95;
         private const double acute_angle_multiplier = 2.41;
         private const double slider_multiplier = 1.5;
         private const double velocity_change_multiplier = 0.9;
@@ -82,12 +82,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                                        DifficultyCalculationUtils.Smootherstep(currDistance, 0, diameter * 2);
                 }
 
-                double wideAngleBonus = calcAngleWideness(currAngle);
-
-                // Penalize angle repetition. It is important to do it _before_ multiplying by velocity because we compare raw wideness here
-                wideAngleBonus *= 0.25 + 0.75 * (1 - Math.Min(wideAngleBonus, Math.Pow(calcAngleWideness(lastAngle), 3)));
-
-                wideAngleBonus *= velocityInfluence;
+                double wideAngleBonus = velocityInfluence * calcAngleWideness(currAngle);
 
                 if (osuLast2Obj != null)
                 {
