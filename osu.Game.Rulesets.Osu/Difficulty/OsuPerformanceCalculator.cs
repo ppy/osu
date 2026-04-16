@@ -243,15 +243,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedValue *= calculateMissPenalty(relevantMissCount, attributes.SpeedDifficultStrainCount);
             }
 
-            // TC bonuses are excluded when blinds is present as the increased visual difficulty is unimportant when notes cannot be seen.
             if (score.Mods.Any(m => m is OsuModBlinds))
             {
                 // Increasing the speed value by object count for Blinds isn't ideal, so the minimum buff is given.
                 speedValue *= 1.12;
-            }
-            else if (score.Mods.Any(m => m is OsuModTraceable))
-            {
-                speedValue *= 1.0 + calculateTraceableBonus();
             }
 
             double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
@@ -514,19 +509,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         private double calculateTraceableBonus(double sliderFactor = 1)
         {
-            // Start from normal curve, rewarding lower AR up to AR7
-            double traceableBonus = 0.025 * (12.0 - Math.Max(approachRate, 7));
+            // We want to reward slider aim less, more so at lower AR
+            double highApproachRateSliderVisibilityFactor = 0.5 + (Math.Pow(sliderFactor, 6) / 2);
+            double lowApproachRateSliderVisibilityFactor = Math.Pow(sliderFactor, 6);
 
-            // We want to reward slider aim on low AR less
-            double sliderVisibilityFactor = Math.Pow(sliderFactor, 3);
+            // Start from normal curve, rewarding lower AR up to AR7
+            double traceableBonus = 0.0275;
+            traceableBonus += 0.025 * (12.0 - Math.Max(approachRate, 7)) * highApproachRateSliderVisibilityFactor;
 
             // For AR up to 0 - reduce reward for very low ARs when object is visible
             if (approachRate < 7)
-                traceableBonus += 0.02 * (7.0 - Math.Max(approachRate, 0)) * sliderVisibilityFactor;
+                traceableBonus += 0.025 * (7.0 - Math.Max(approachRate, 0)) * lowApproachRateSliderVisibilityFactor;
 
             // Starting from AR0 - cap values so they won't grow to infinity
             if (approachRate < 0)
-                traceableBonus += 0.01 * (1 - Math.Pow(1.5, approachRate)) * sliderVisibilityFactor;
+                traceableBonus += 0.025 * (1 - Math.Pow(1.5, approachRate)) * lowApproachRateSliderVisibilityFactor;
 
             return traceableBonus;
         }
