@@ -76,8 +76,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 double lastAngle = osuLastObj.Angle.Value;
 
                 // Rewarding angles, take the smaller velocity as base.
-                double velocityInfluence = Math.Min(anglercurrVelocity, anglerprevVelocity);
-                double velocityInfluence2 = Math.Min(currVelocity, prevVelocity);
+                double velocityInfluence = Math.Min(currVelocity, prevVelocity);
 
                 double acuteAngleBonus = 0;
 
@@ -89,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                     acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(CalcAngleAcuteness(lastAngle), 3)));
 
                     // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
-                    acuteAngleBonus *= velocityInfluence2 * DifficultyCalculationUtils.Smootherstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime, 2), 300, 400) *
+                    acuteAngleBonus *= velocityInfluence * DifficultyCalculationUtils.Smootherstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime, 2), 300, 400) *
                                        DifficultyCalculationUtils.Smootherstep(currDistance, 0, diameter * 2);
                 }
 
@@ -98,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 // Penalize angle repetition. It is important to do it _before_ multiplying by velocity because we compare raw wideness here
                 wideAngleBonus *= 0.25 + 0.75 * (1 - Math.Min(wideAngleBonus, Math.Pow(calcAngleWideness(lastAngle), 3)));
 
-                wideAngleBonus *= velocityInfluence;
+                wideAngleBonus *= Math.Min(anglercurrVelocity, anglerprevVelocity);
 
                 if (osuLast2Obj != null)
                 {
@@ -120,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
                 // Apply wiggle bonus for jumps that are [radius, 3*diameter] in distance, with < 110 angle
                 // https://www.desmos.com/calculator/dp0v0nvowc
-                double wiggleBonus = velocityInfluence2
+                double wiggleBonus = velocityInfluence
                                      * DifficultyCalculationUtils.Smootherstep(currDistance, radius, diameter)
                                      * Math.Pow(DifficultyCalculationUtils.ReverseLerp(currDistance, diameter * 3, diameter), 1.8)
                                      * DifficultyCalculationUtils.Smootherstep(currAngle, double.DegreesToRadians(110), double.DegreesToRadians(60))
