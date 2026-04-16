@@ -241,6 +241,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 (int)roundToSignificant(data.Select(d => d.y).DefaultIfEmpty().Max())
             );
 
+            if (userRating < xRange.min)
+            {
+                this.data = this.data.Prepend((userRating.Value, 1)).ToArray();
+                xRange.min = userRating.Value;
+            }
+
+            if (userRating > xRange.max)
+            {
+                this.data = this.data.Append((userRating.Value, 1)).ToArray();
+                xRange.max = userRating.Value;
+            }
+
             updateGraph();
         }
 
