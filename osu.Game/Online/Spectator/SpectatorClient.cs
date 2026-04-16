@@ -232,9 +232,11 @@ namespace osu.Game.Online.Spectator
 
                     if (!success)
                     {
-                        Logger.Log($"Clearing {nameof(SpectatorClient)} state due to failed {nameof(BeginPlayingInternal)} call.");
                         Schedule(() =>
                         {
+                            if (IsConnected.Value)
+                                Logger.Log($"Clearing {nameof(SpectatorClient)} state due to failed {nameof(BeginPlayingInternal)} call.");
+
                             clearScoreState();
 
                             currentState.BeatmapID = null;
@@ -252,7 +254,8 @@ namespace osu.Game.Online.Spectator
         {
             if (!isPlaying)
             {
-                Logger.Log($"Frames arrived at {nameof(SpectatorClient)} outside of gameplay scope and will be ignored.");
+                if (IsConnected.Value)
+                    Logger.Log($"Frames arrived at {nameof(SpectatorClient)} outside of gameplay scope and will be ignored.");
                 return;
             }
 
