@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
+using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -31,8 +32,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += FlashlightEvaluator.EvaluateDifficultyOf(current, Mods) * skillMultiplier;
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+            currentStrain *= strainDecay(osuCurrObj.AdjustedDeltaTime);
+            currentStrain += FlashlightEvaluator.EvaluateDifficultyOf(osuCurrObj, Mods) * skillMultiplier;
 
             return currentStrain;
         }
