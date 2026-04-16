@@ -438,8 +438,7 @@ namespace osu.Game.Screens.Select
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.TopRight,
-                    RelativePositionAxes = Axes.Y,
-                    Y = 1,
+                    Y = -10,
                     Size = Vector2.Zero,
                     CreatePopover = createPopover
                 };

@@ -37,6 +37,9 @@ namespace osu.Game.Screens.Select
             this.onSelect = onSelect;
             this.onSave = onSave;
             this.ruleset = ruleset;
+
+            // Only allow placement below the trigger, with horizontal side chosen by available space.
+            AllowableAnchors = new[] { Anchor.BottomLeft, Anchor.BottomRight };
         }
 
         [BackgroundDependencyLoader]
