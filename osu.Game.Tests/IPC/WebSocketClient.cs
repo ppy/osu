@@ -27,7 +27,7 @@ namespace osu.Game.Tests.IPC
             var webSocket = new ClientWebSocket();
             await webSocket.ConnectAsync(new Uri($@"ws://localhost:{port}/"), cancellationToken);
             channel = new WebSocketChannel(webSocket);
-            channel.MessageReceived += (msg) => MessageReceived?.Invoke(msg);
+            channel.MessageReceived += msg => MessageReceived?.Invoke(msg);
             channel.ClosedPrematurely += () => Closed?.Invoke();
             channel.Start(cancellationToken);
         }
