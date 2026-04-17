@@ -25,6 +25,11 @@ namespace osu.Game.Graphics
         /// </summary>
         public const float STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF = 6.5f;
 
+        /// <summary>
+        /// Star rating at which display text switches from static colours to a gradient.
+        /// </summary>
+        public const float STAR_DIFFICULTY_TEXT_GRADIENT_CUTOFF = 9.0f;
+
         public static readonly (float, Color4)[] STAR_DIFFICULTY_SPECTRUM =
         {
             (0.1f, Color4Extensions.FromHex("aaaaaa")),
@@ -42,10 +47,33 @@ namespace osu.Game.Graphics
             (10.0f, Color4.Black),
         };
 
+        public static readonly (float, Color4)[] STAR_DIFFICULTY_TEXT_SPECTRUM =
+        {
+            (9.0f, Color4Extensions.FromHex("f6f05c")),
+            (9.9f, Color4Extensions.FromHex("ff8068")),
+            (10.6f, Color4Extensions.FromHex("ff4e6f")),
+            (11.5f, Color4Extensions.FromHex("c645b8")),
+            (12.4f, Color4Extensions.FromHex("6563de")),
+        };
+
         /// <summary>
         /// Retrieves the colour for a given point in the star range.
         /// </summary>
         public Color4 ForStarDifficulty(double starDifficulty) => ColourUtils.SampleFromLinearGradient(STAR_DIFFICULTY_SPECTRUM, (float)Math.Round(starDifficulty, 2, MidpointRounding.AwayFromZero));
+
+        /// <summary>
+        /// Retrieves the colour for the text inside the star rating display.
+        /// </summary>
+        public Color4 ForStarDifficultyText(double starDifficulty)
+        {
+            if (starDifficulty < STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF)
+                return Color4.Black.Opacity(0.75f);
+
+            if (starDifficulty < STAR_DIFFICULTY_TEXT_GRADIENT_CUTOFF)
+                return Orange1;
+
+            return ColourUtils.SampleFromLinearGradient(STAR_DIFFICULTY_TEXT_SPECTRUM, (float)Math.Round(starDifficulty, 2, MidpointRounding.AwayFromZero));
+        }
 
         /// <summary>
         /// Retrieves the colour for a <see cref="ScoreRank"/>.

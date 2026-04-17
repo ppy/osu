@@ -17,7 +17,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Online.Spectator;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Spectate;
 using osu.Game.Users;
 using osuTK;
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private readonly Room room;
 
-        private PlayerSettingsOverlay playerSettingsOverlay = null!;
+        private ReplaySettingsOverlay replaySettingsOverlay = null!;
         private Bindable<bool> configSettingsOverlay = null!;
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 {
                     ReadyToStart = performInitialSeek,
                 },
-                playerSettingsOverlay = new PlayerSettingsOverlay
+                replaySettingsOverlay = new ReplaySettingsOverlay
                 {
                     Alpha = 0,
                 }
@@ -189,9 +189,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private void updateVisibility()
         {
             if (configSettingsOverlay.Value)
-                playerSettingsOverlay.Show();
+                replaySettingsOverlay.Show();
             else
-                playerSettingsOverlay.Hide();
+                replaySettingsOverlay.Hide();
         }
 
         protected override void Update()

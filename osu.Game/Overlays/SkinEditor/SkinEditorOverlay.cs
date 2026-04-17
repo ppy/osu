@@ -28,7 +28,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 using osu.Game.Users;
 using osu.Game.Utils;
 
@@ -208,7 +208,7 @@ namespace osu.Game.Overlays.SkinEditor
                     mods.Value = mods.Value.Except(invalid).ToArray();
 
                 if (replayGeneratingMod != null)
-                    screen.Push(new EndlessPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods)));
+                    screen.Push(new EndlessPlayer(replayGeneratingMod.CreateScoreFromReplayData));
             }, new[] { typeof(Player), typeof(SoloSongSelect) });
         }
 

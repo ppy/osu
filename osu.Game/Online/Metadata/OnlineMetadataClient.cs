@@ -175,7 +175,7 @@ namespace osu.Game.Online.Metadata
         public override Task<BeatmapUpdates> GetChangesSince(int queueId)
         {
             if (connector?.IsConnected.Value != true)
-                return Task.FromCanceled<BeatmapUpdates>(default);
+                return Task.FromCanceled<BeatmapUpdates>(CancellationToken.None);
 
             Logger.Log($"Requesting any changes since last known queue id {queueId}");
 
@@ -286,6 +286,15 @@ namespace osu.Game.Online.Metadata
             Debug.Assert(connection != null);
             await connection.InvokeAsync(nameof(IMetadataServer.EndWatchingMultiplayerRoom), id).ConfigureAwait(false);
             Logger.Log($@"{nameof(OnlineMetadataClient)} stopped watching multiplayer room with ID {id}", LoggingTarget.Network);
+        }
+
+        public override async Task RefreshFriends()
+        {
+            if (connector?.IsConnected.Value != true)
+                throw new OperationCanceledException();
+
+            Debug.Assert(connection != null);
+            await connection.InvokeAsync(nameof(IMetadataServer.RefreshFriends)).ConfigureAwait(false);
         }
 
         public override async Task DisconnectRequested()

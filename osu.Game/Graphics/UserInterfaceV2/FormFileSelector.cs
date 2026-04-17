@@ -11,7 +11,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
@@ -70,7 +69,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public Container PreviewContainer { get; private set; } = null!;
 
-        private Box background = null!;
+        private FormControlBackground background = null!;
 
         private FormFieldCaption caption = null!;
         private OsuSpriteText placeholderText = null!;
@@ -93,16 +92,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Masking = true;
-            CornerRadius = 5;
-
             InternalChildren = new Drawable[]
             {
-                background = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
-                },
+                background = new FormControlBackground(),
                 PreviewContainer = new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -194,7 +186,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             initialChooserPath = Current.Value?.DirectoryName;
             placeholderText.Alpha = Current.Value == null ? 1 : 0;
             filenameText.Text = Current.Value?.Name ?? string.Empty;
-            background.FlashColour(ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark2), 800, Easing.OutQuint);
+            background.Flash();
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -220,22 +212,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
             caption.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
             filenameText.Colour = Current.Disabled || Current.Value == null ? colourProvider.Foreground1 : colourProvider.Content1;
 
-            if (!Current.Disabled)
-            {
-                BorderThickness = IsHovered || popoverState.Value == Visibility.Visible ? 2 : 0;
-                BorderColour = popoverState.Value == Visibility.Visible ? colourProvider.Highlight1 : colourProvider.Light4;
-
-                if (popoverState.Value == Visibility.Visible)
-                    background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
-                else if (IsHovered)
-                    background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
-                else
-                    background.Colour = colourProvider.Background5;
-            }
+            if (Current.Disabled)
+                background.VisualStyle = VisualStyle.Disabled;
+            else if (popoverState.Value == Visibility.Visible)
+                background.VisualStyle = VisualStyle.Focused;
+            else if (IsHovered)
+                background.VisualStyle = VisualStyle.Hovered;
             else
-            {
-                background.Colour = colourProvider.Background4;
-            }
+                background.VisualStyle = VisualStyle.Normal;
         }
 
         protected override void Dispose(bool isDisposing)

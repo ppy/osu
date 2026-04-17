@@ -95,7 +95,7 @@ namespace osu.Game.Beatmaps
         protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap? defaultBeatmap,
                                                                         GameHost? host)
         {
-            return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host);
+            return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host, Realm);
         }
 
         protected virtual BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm) => new BeatmapImporter(storage, realm);
@@ -154,7 +154,11 @@ namespace osu.Game.Beatmaps
             {
                 DifficultyName = NamingUtils.GetNextBestName(targetBeatmapSet.Beatmaps.Select(b => b.DifficultyName), "New Difficulty")
             };
-            var newBeatmap = new Beatmap { BeatmapInfo = newBeatmapInfo };
+            var newBeatmap = new Beatmap
+            {
+                BeatmapInfo = newBeatmapInfo,
+                Bookmarks = referenceWorkingBeatmap.Beatmap.Bookmarks.ToArray()
+            };
 
             foreach (var timingPoint in referenceWorkingBeatmap.Beatmap.ControlPointInfo.TimingPoints)
                 newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
@@ -292,7 +296,7 @@ namespace osu.Game.Beatmaps
             return Realm.Run(r =>
             {
                 r.Refresh();
-                return r.All<BeatmapSetInfo>().Where(b => !b.DeletePending).Detach();
+                return r.All<BeatmapSetInfo>().Where(b => !b.DeletePending).AsEnumerable().Detach();
             });
         }
 

@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Testing;
@@ -106,7 +107,7 @@ namespace osu.Game.Rulesets.Edit
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, [CanBeNull] Editor editor)
+        private void load(OsuConfigManager config, [CanBeNull] Editor editor, ReadableKeyCombinationProvider keyCombinationProvider)
         {
             autoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
 
@@ -134,6 +135,9 @@ namespace osu.Game.Rulesets.Edit
                 dependencies.CacheAs(scrollingRuleset.ScrollingInfo);
 
             dependencies.CacheAs(Playfield);
+
+            string shiftDisplay = keyCombinationProvider.GetReadableString(new KeyCombination(InputKey.Shift));
+            string altDisplay = keyCombinationProvider.GetReadableString(new KeyCombination(InputKey.Alt));
 
             InternalChildren = new[]
             {
@@ -180,7 +184,7 @@ namespace osu.Game.Rulesets.Edit
                                         Spacing = new Vector2(0, 5),
                                     },
                                 },
-                                new EditorToolboxGroup("bank (Shift/Alt-Q~R)")
+                                new EditorToolboxGroup($"bank ({shiftDisplay}/{altDisplay}-Q~R)")
                                 {
                                     Child = new FillFlowContainer
                                     {

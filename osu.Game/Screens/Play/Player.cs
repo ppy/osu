@@ -311,7 +311,7 @@ namespace osu.Game.Screens.Play
                     {
                         // underlay and gameplay should have access to the skinning sources.
                         createUnderlayComponents(Beatmap.Value),
-                        createGameplayComponents(Beatmap.Value)
+                        createGameplayComponents()
                     }
                 },
                 FailOverlay = new FailOverlay
@@ -320,32 +320,32 @@ namespace osu.Game.Screens.Play
                     OnRetry = Configuration.AllowUserInteraction ? () => Restart() : null,
                     OnQuit = () => PerformExitWithConfirmation(),
                 },
-                exitOverlay = new HotkeyExitOverlay
-                {
-                    Action = () =>
-                    {
-                        if (!this.IsCurrentScreen()) return;
-
-                        PerformExit(skipTransition: true);
-                    },
-                },
             });
 
             if (cancellationToken.IsCancellationRequested)
                 return;
 
+            GameplayClockContainer.Add(exitOverlay = new HotkeyExitOverlay
+            {
+                Depth = float.MinValue,
+                Action = () =>
+                {
+                    if (!this.IsCurrentScreen()) return;
+
+                    PerformExit(skipTransition: true);
+                },
+            });
+
             if (Configuration.AllowRestart)
             {
-                rulesetSkinProvider.AddRange(new Drawable[]
+                GameplayClockContainer.Add(retryOverlay = new HotkeyRetryOverlay
                 {
-                    retryOverlay = new HotkeyRetryOverlay
+                    Depth = float.MinValue,
+                    Action = () =>
                     {
-                        Action = () =>
-                        {
-                            if (!this.IsCurrentScreen()) return;
+                        if (!this.IsCurrentScreen()) return;
 
-                            Restart(true);
-                        },
+                        Restart(true);
                     },
                 });
             }
@@ -360,6 +360,9 @@ namespace osu.Game.Screens.Play
             // also give the overlays the ruleset skin provider to allow rulesets to potentially override HUD elements (used to disable combo counters etc.)
             // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
             failAnimationContainer.Add(createOverlayComponents());
+
+            // Used by ReplaySettingsOverlay for button positioning.
+            dependencies.CacheAs(HUDOverlay);
 
             if (!DrawableRuleset.AllowGameplayOverlays)
             {
@@ -451,7 +454,7 @@ namespace osu.Game.Screens.Play
             return container;
         }
 
-        private Drawable createGameplayComponents(IWorkingBeatmap working) => new ScalingContainer(ScalingMode.Gameplay)
+        private Drawable createGameplayComponents() => new ScalingContainer(ScalingMode.Gameplay)
         {
             Children = new Drawable[]
             {

@@ -170,6 +170,7 @@ namespace osu.Game.Screens.Footer
             /// <summary>
             /// The screen which should be bound to the screen footer - the most nested subscreen.
             /// </summary>
+            // ReSharper disable once FunctionRecursiveOnAllPaths (TODO: remove after fixed https://youtrack.jetbrains.com/issue/RIDER-135036/Incorrect-recursive-on-all-execution-paths-inspection)
             private IScreen leadingScreen => subScreenTracker?.leadingScreen ?? stack.CurrentScreen;
 
             public ScreenStackTracker(ScreenStack stack)
