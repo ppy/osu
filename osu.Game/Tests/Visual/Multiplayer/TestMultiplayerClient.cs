@@ -10,12 +10,15 @@ using MessagePack;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Matchmaking.Events;
+using osu.Game.Online.Matchmaking.Requests;
+using osu.Game.Online.Matchmaking.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
@@ -259,7 +262,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 },
                 Playlist = ServerAPIRoom.Playlist.Select(item => new MultiplayerPlaylistItem(item)).ToList(),
                 Users = { localUser },
-                Host = localUser
+                Host = localUser,
+                ChannelID = ServerAPIRoom.ChannelId
             };
 
             await changeMatchType(ServerRoom.Settings.MatchType).ConfigureAwait(false);
@@ -431,6 +435,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 case StopCountdownRequest stopCountdown:
                     await StopCountdown(ServerRoom.ActiveCountdowns.First(c => c.ID == stopCountdown.ID)).ConfigureAwait(false);
+                    break;
+
+                case RollRequest rollRequest:
+                    int max = (int)(rollRequest.Max ?? 100);
+                    await ((IMultiplayerClient)this).MatchEvent(new RollEvent
+                    {
+                        UserID = userId,
+                        Max = (uint)max,
+                        Result = (uint)RNG.Next(1, max + 1)
+                    }).ConfigureAwait(false);
                     break;
 
                 case MatchmakingAvatarActionRequest avatarAction:
@@ -848,6 +862,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public async Task PlayUserCard(int userId, Func<RankedPlayCardItem[], RankedPlayCardItem> selector)
         {
             RankedPlayCardItem card = selector(((RankedPlayRoomState)ServerRoom!.MatchState!).Users[userId].Hand.ToArray());
+            MultiplayerPlaylistItem? item = GetCardWithPlaylistItem(card).PlaylistItem.Value;
+
+            if (item != null)
+            {
+                ServerRoom!.Playlist.Add(item);
+                await ((IMultiplayerClient)this).PlaylistItemAdded(clone(item)).ConfigureAwait(false);
+                await ((IMultiplayerClient)this).PlaylistItemChanged(clone(item)).ConfigureAwait(false);
+
+                var settings = clone(ServerRoom!.Settings);
+                settings.PlaylistItemId = item.ID;
+                await ((IMultiplayerClient)this).SettingsChanged(settings).ConfigureAwait(false);
+            }
+
             await ((IRankedPlayClient)this).RankedPlayCardPlayed(clone(card)).ConfigureAwait(false);
         }
 
@@ -863,9 +890,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ]);
         }
 
-        public override Task MatchmakingJoinLobby()
+        public override Task<MatchmakingJoinLobbyResponse> MatchmakingJoinLobbyWithParams(MatchmakingJoinLobbyRequest request)
         {
-            return Task.CompletedTask;
+            return Task.FromResult(new MatchmakingJoinLobbyResponse());
         }
 
         public override Task MatchmakingLeaveLobby()
@@ -892,6 +919,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public override Task MatchmakingDeclineInvitation()
         {
             return Task.CompletedTask;
+        }
+
+        public new async Task MatchmakingLobbyStatusChanged(MatchmakingLobbyStatus status)
+        {
+            await ((IMatchmakingClient)this).MatchmakingLobbyStatusChanged(clone(status)).ConfigureAwait(false);
         }
 
         public override Task MatchmakingToggleSelection(long playlistItemId)

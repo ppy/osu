@@ -7,6 +7,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -44,7 +45,7 @@ namespace osu.Game.Screens.Select
         private ShearedToggleButton showConvertedBeatmapsButton = null!;
         private DifficultyRangeSlider difficultyRangeSlider = null!;
         private ShearedDropdown<SortMode> sortDropdown = null!;
-        private ShearedDropdown<GroupMode> groupDropdown = null!;
+        private ShearedDropdown<GroupModeDropdownItem> groupDropdown = null!;
         private CollectionDropdown collectionDropdown = null!;
 
         /// <summary>
@@ -109,99 +110,107 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0f, 5f),
                     Padding = new MarginPadding { Top = corner_radius + 5, Bottom = 2, Right = 40f, Left = 2f },
                     Children = new Drawable[]
                     {
-                        new Container
+                        new ReverseChildIDFillFlowContainer<Drawable>
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Shear = -OsuGame.SHEAR,
-                            Child = searchTextBox = new SongSelectSearchTextBox
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0f, 5f),
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.X,
-                                HoldFocus = true,
-                                ScopedBeatmapSet = { BindTarget = ScopedBeatmapSet },
-                            },
-                        },
-                        new GridContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Shear = -OsuGame.SHEAR,
-                            RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                            ColumnDimensions = new[]
-                            {
-                                new Dimension(),
-                                new Dimension(GridSizeMode.Absolute), // can probably be removed?
-                                new Dimension(GridSizeMode.AutoSize),
-                            },
-                            Content = new[]
-                            {
-                                new[]
+                                new Container
                                 {
-                                    difficultyRangeSlider = new DifficultyRangeSlider
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Shear = -OsuGame.SHEAR,
+                                    Child = searchTextBox = new SongSelectSearchTextBox
                                     {
                                         RelativeSizeAxes = Axes.X,
-                                        MinRange = 0.1f,
-                                    },
-                                    Empty(),
-                                    showConvertedBeatmapsButton = new ShearedToggleButton
-                                    {
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        AutoSizeAxes = Axes.X,
-                                        Text = UserInterfaceStrings.ShowConverts,
-                                        Height = 30f,
+                                        HoldFocus = true,
+                                        ScopedBeatmapSet = { BindTarget = ScopedBeatmapSet },
                                     },
                                 },
-                            }
-                        },
-                        new GridContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 30,
-                            Shear = -OsuGame.SHEAR,
-                            RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                            ColumnDimensions = new[]
-                            {
-                                new Dimension(maxSize: 180),
-                                new Dimension(GridSizeMode.Absolute, 5),
-                                new Dimension(maxSize: 180),
-                                new Dimension(GridSizeMode.Absolute, 5),
-                                new Dimension(),
-                                new Dimension(GridSizeMode.AutoSize),
-                            },
-                            Content = new[]
-                            {
-                                new[]
+                                new GridContainer
                                 {
-                                    sortDropdown = new ShearedDropdown<SortMode>(SongSelectStrings.Sort)
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Shear = -OsuGame.SHEAR,
+                                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                                    ColumnDimensions = new[]
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        Items = Enum.GetValues<SortMode>(),
+                                        new Dimension(),
+                                        new Dimension(GridSizeMode.Absolute), // can probably be removed?
+                                        new Dimension(GridSizeMode.AutoSize),
                                     },
-                                    Empty(),
-                                    groupDropdown = new ShearedDropdown<GroupMode>(SongSelectStrings.Group)
+                                    Content = new[]
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        Items = Enum.GetValues<GroupMode>(),
-                                    },
-                                    Empty(),
-                                    collectionDropdown = new CollectionDropdown
+                                        new[]
+                                        {
+                                            difficultyRangeSlider = new DifficultyRangeSlider
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                MinRange = 0.1f,
+                                            },
+                                            Empty(),
+                                            showConvertedBeatmapsButton = new ShearedToggleButton
+                                            {
+                                                Anchor = Anchor.Centre,
+                                                Origin = Anchor.Centre,
+                                                AutoSizeAxes = Axes.X,
+                                                Text = UserInterfaceStrings.ShowConverts,
+                                                Height = 30f,
+                                            },
+                                        },
+                                    }
+                                },
+                                new GridContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 30,
+                                    Shear = -OsuGame.SHEAR,
+                                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                                    ColumnDimensions = new[]
                                     {
-                                        RelativeSizeAxes = Axes.X,
+                                        new Dimension(maxSize: 180),
+                                        new Dimension(GridSizeMode.Absolute, 5),
+                                        new Dimension(maxSize: 180),
+                                        new Dimension(GridSizeMode.Absolute, 5),
+                                        new Dimension(),
+                                        new Dimension(GridSizeMode.AutoSize),
                                     },
-                                }
-                            }
+                                    Content = new[]
+                                    {
+                                        new[]
+                                        {
+                                            sortDropdown = new ShearedDropdown<SortMode>(SongSelectStrings.Sort)
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Items = Enum.GetValues<SortMode>(),
+                                            },
+                                            Empty(),
+                                            groupDropdown = new GroupModeDropdown(SongSelectStrings.Group)
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                            },
+                                            Empty(),
+                                            collectionDropdown = new CollectionDropdown
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                            },
+                                        }
+                                    }
+                                },
+                            },
                         },
                         new ScopedBeatmapSetDisplay
                         {
                             ScopedBeatmapSet = { BindTarget = ScopedBeatmapSet },
                         }
                     },
-                }
+                },
             };
 
             localUser = api.LocalUser.GetBoundCopy();
@@ -216,7 +225,6 @@ namespace osu.Game.Screens.Select
             difficultyRangeSlider.UpperBound = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum);
             config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConvertedBeatmapsButton.Active);
             config.BindWith(OsuSetting.SongSelectSortingMode, sortDropdown.Current);
-            config.BindWith(OsuSetting.SongSelectGroupMode, groupDropdown.Current);
 
             ruleset.BindValueChanged(_ => updateCriteria());
             mods.BindValueChanged(m =>
@@ -231,7 +239,7 @@ namespace osu.Game.Screens.Select
                     return;
 
                 var rulesetCriteria = currentCriteria.RulesetCriteria;
-                if (rulesetCriteria?.FilterMayChangeFromMods(m) == true)
+                if (rulesetCriteria?.FilterMayChangeFromMods(currentCriteria, m) == true)
                     updateCriteria();
             });
 
@@ -252,7 +260,7 @@ namespace osu.Game.Screens.Select
             });
             collectionsSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), (collections, changeSet) =>
             {
-                if (changeSet != null && groupDropdown.Current.Value == GroupMode.Collections)
+                if (changeSet != null && groupDropdown.Current.Value.Value == GroupMode.Collections)
                     updateCriteria();
             });
 
@@ -281,7 +289,7 @@ namespace osu.Game.Screens.Select
             {
                 SelectedBeatmapSet = ScopedBeatmapSet.Value,
                 Sort = sortDropdown.Current.Value,
-                Group = groupDropdown.Current.Value,
+                Group = groupDropdown.Current.Value?.Value ?? GroupMode.None,
                 AllowConvertedBeatmaps = showConvertedBeatmapsButton.Active.Value,
                 Ruleset = ruleset.Value,
                 Mods = mods.Value,
@@ -377,5 +385,102 @@ namespace osu.Game.Screens.Select
                 }
             }
         }
+
+        private partial class GroupModeDropdown : ShearedDropdown<GroupModeDropdownItem>
+        {
+            [Resolved]
+            private IBindable<RulesetInfo> ruleset { get; set; } = null!;
+
+            private Bindable<GroupMode> configGroupMode { get; } = new Bindable<GroupMode>();
+
+            public GroupModeDropdown(LocalisableString label)
+                : base(label)
+            {
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager config)
+            {
+                config.BindWith(OsuSetting.SongSelectGroupMode, configGroupMode);
+            }
+
+            protected override void LoadAsyncComplete()
+            {
+                // Bindings set up intentionally in `LoadAsyncComplete()` rather than `LoadComplete()` as normal
+                // to avoid double-filter on entering song select with the "variant" group mode engaged.
+                ruleset.BindValueChanged(_ =>
+                {
+                    updateAvailableItems();
+                    updateCurrentFromConfig();
+                }, true);
+                configGroupMode.BindValueChanged(_ => updateCurrentFromConfig());
+                Current.BindValueChanged(currentChanged);
+
+                // Ordering important - base call must run *after* the above bindings
+                // because the bindings set up `Items`, and the base call is responsible for calling `GenerateItemText()`.
+                base.LoadAsyncComplete();
+            }
+
+            private void updateAvailableItems()
+            {
+                var rulesetInstance = ruleset.Value.CreateInstance();
+                var items = new List<GroupModeDropdownItem>();
+
+                foreach (var item in Enum.GetValues<GroupMode>())
+                {
+                    switch (item)
+                    {
+                        default:
+                            items.Add(new GroupModeDropdownItem(item, item.GetLocalisableDescription()));
+                            break;
+
+                        case GroupMode.Variant:
+                            if (rulesetInstance.AvailableVariants.Count() <= 1)
+                                break;
+
+                            items.Add(new GroupModeDropdownItem(GroupMode.Variant, rulesetInstance.VariantDescription));
+                            break;
+                    }
+                }
+
+                Items = items.ToArray();
+            }
+
+            private bool synchronisingBindables;
+
+            private void updateCurrentFromConfig()
+            {
+                if (synchronisingBindables)
+                    return;
+
+                synchronisingBindables = true;
+                // Only rulesets that actually have variants expose and support the "variant" grouping mode.
+                // If it's missing, default to no grouping.
+                Current.Value = Items.SingleOrDefault(i => i.Value == configGroupMode.Value) ?? Items.Single(i => i.Value == GroupMode.None);
+                synchronisingBindables = false;
+            }
+
+            private void currentChanged(ValueChangedEvent<GroupModeDropdownItem> current)
+            {
+                if (synchronisingBindables)
+                    return;
+
+                // Only rulesets that actually have variants expose and support the "variant" grouping mode.
+                // If it's missing, code above will revert to no grouping, which also incurs a `Current` change.
+                // However, for better user experience, don't write the new value out to config in this scenario
+                // so that the variant grouping is re-engaged on switching to a ruleset that has variant support
+                // (this also persists across game restarts).
+                if (current.OldValue.Value == GroupMode.Variant && Items.All(i => i.Value != GroupMode.Variant))
+                    return;
+
+                synchronisingBindables = true;
+                configGroupMode.Value = current.NewValue.Value;
+                synchronisingBindables = false;
+            }
+
+            protected override LocalisableString GenerateItemText(GroupModeDropdownItem item) => item.Text;
+        }
+
+        private record GroupModeDropdownItem(GroupMode Value, LocalisableString Text);
     }
 }

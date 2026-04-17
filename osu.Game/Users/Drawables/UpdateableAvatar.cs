@@ -43,7 +43,9 @@ namespace osu.Game.Users.Drawables
             set => base.EdgeEffect = value;
         }
 
-        protected override double LoadDelay => 200;
+        public bool DelayedLoad = true;
+
+        protected override double LoadDelay => DelayedLoad ? 200 : 0;
 
         private readonly bool isInteractive;
         private readonly bool showGuestOnNull;

@@ -5,11 +5,16 @@ using System;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Ranking;
+using FontWeight = osu.Game.Graphics.FontWeight;
+using OsuFont = osu.Game.Graphics.OsuFont;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
@@ -39,6 +44,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             : base(score, new PlayerConfiguration { AllowUserInteraction = false })
         {
             this.spectatorPlayerClock = spectatorPlayerClock;
+
+            ShowSettingsOverlay = false;
         }
 
         [BackgroundDependencyLoader]
@@ -54,8 +61,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             // also applied in `MultiplayerPlayer.load()`
             ScoreProcessor.ApplyNewJudgementsWhenFailed = true;
 
-            HUDOverlay.PlayerSettingsOverlay.Expire();
             HUDOverlay.HoldToQuit.Expire();
+
+            // Player username display
+            GameplayClockContainer.Add(new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Title.With(size: 60, weight: FontWeight.SemiBold))
+            {
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                AutoSizeAxes = Axes.Both,
+                Text = Score.ScoreInfo.User.Username,
+                Y = 50,
+            });
         }
 
         protected override void Update()

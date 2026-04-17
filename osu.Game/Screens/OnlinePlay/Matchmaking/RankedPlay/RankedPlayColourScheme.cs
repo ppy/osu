@@ -14,7 +14,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         public required Color4 Surface;
         public required Color4 SurfaceBorder;
 
-        public static RankedPlayColourScheme Blue => new RankedPlayColourScheme
+        public static readonly RankedPlayColourScheme BLUE = new RankedPlayColourScheme
         {
             Primary = Color4Extensions.FromHex("5EBFFF"),
             PrimaryDarker = Color4Extensions.FromHex("4382FF"),
@@ -23,7 +23,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             SurfaceBorder = Color4Extensions.FromHex("514c5e"),
         };
 
-        public static RankedPlayColourScheme Red => new RankedPlayColourScheme
+        public static readonly RankedPlayColourScheme RED = new RankedPlayColourScheme
         {
             Primary = Color4Extensions.FromHex("FF8198"),
             PrimaryDarker = Color4Extensions.FromHex("F94D92"),

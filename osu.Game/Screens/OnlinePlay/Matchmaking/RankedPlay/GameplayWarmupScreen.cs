@@ -32,8 +32,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
     {
         public override bool ShowBeatmapBackground => true;
 
-        protected override LocalisableString StageHeading => "Gameplay";
-        protected override LocalisableString StageCaption => string.Empty;
+        public override LocalisableString StageHeading => "Gameplay";
 
         [Cached(typeof(IBindable<SongSelect.BeatmapSetLookupResult?>))]
         private readonly Bindable<SongSelect.BeatmapSetLookupResult?> lastLookupResult = new Bindable<SongSelect.BeatmapSetLookupResult?>();
@@ -52,6 +51,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
+
+        [Resolved]
+        private MusicController musicController { get; set; } = null!;
 
         [Resolved]
         private Bindable<WorkingBeatmap> globalBeatmap { get; set; } = null!;
@@ -163,6 +165,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             globalBeatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
             globalRuleset.Value = ruleset;
             globalMods.Value = item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+
+            // Play the new track from its preview point.
+            globalBeatmap.Value.PrepareTrackForPreview(false);
+            musicController.Play(true);
 
             Client.ChangeState(MultiplayerUserState.Ready).FireAndForget();
         }

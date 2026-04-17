@@ -559,7 +559,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 return false;
             }
 
-            public bool FilterMayChangeFromMods(ValueChangedEvent<IReadOnlyList<Mod>> mods) => false;
+            public bool FilterMayChangeFromMods(FilterCriteria criteria, ValueChangedEvent<IReadOnlyList<Mod>> mods) => false;
         }
 
         private static readonly object[] correct_date_query_examples =

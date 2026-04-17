@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -37,7 +38,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             WaitForFiltering();
 
             AddAssert("select screen position unchanged", () => Carousel.ChildrenOfType<PanelBeatmap>().Single(p => p.Selected.Value).ScreenSpaceDrawQuad,
-                () => Is.EqualTo(positionBefore));
+                () => Is.EqualTo(positionBefore).Using<Quad, Quad>((expected, actual)
+                    => Precision.AlmostEquals(expected.TopLeft, actual.TopLeft)
+                       && Precision.AlmostEquals(expected.TopRight, actual.TopRight)
+                       && Precision.AlmostEquals(expected.BottomLeft, actual.BottomLeft)
+                       && Precision.AlmostEquals(expected.BottomRight, actual.BottomRight)));
         }
 
         [Test]
