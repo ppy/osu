@@ -15,6 +15,8 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Framework.Graphics;
+using osu.Framework.Utils;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
@@ -28,39 +30,71 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override ModType Type => ModType.Conversion;
 
         [SettingSource("Mute hit sounds", "Hit sounds become muted.")]
-        public BindableBool AffectsHitSounds { get; } = new BindableBool(true);
+        public BindableBool AffectsHitSounds { get; } = new BindableBool();
 
-        private Catcher catcher = null!;
+        private CatcherArea catcherArea = null!;
         private readonly BindableNumber<double> hitSoundVolume = new BindableDouble(0);
 
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
-            catcher = ((CatchPlayfield)drawableRuleset.Playfield).Catcher;
+            catcherArea = ((CatchPlayfield)drawableRuleset.Playfield).CatcherArea;
 
             // Don't show caught fruits as they aren't technically being caught.
-            catcher.CatchFruitOnPlate = false;
+            catcherArea.Catcher.CatchFruitOnPlate = false;
+
+            // Don't show explosions either.
+            // To a point this could be maybe made to work everywhere except legacy skins.
+            // However, `LegacyHitExplosion` is sort of designed to only show explosions on the catcher and that behaviour can never make any sense here.
+            catcherArea.Catcher.HitExplosionContainer.Expire();
 
             if (AffectsHitSounds.Value)
-            {
                 drawableRuleset.Audio.AddAdjustment(AdjustableProperty.Volume, hitSoundVolume);
-            }
         }
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
             if (drawable is DrawableCatchHitObject catchHitObject)
             {
-                catchHitObject.CheckPosition = hitObject => !catcher.CanCatch(hitObject);
+                catchHitObject.CheckPosition = hitObject =>
+                {
+                    bool caught = catcherArea.Catcher.CanCatch(hitObject);
+
+                    if (caught)
+                    {
+                        // Since hyperdashes don't exist in this mode, creatively reuse hyperdash trail afterimages as miss indicators.
+                        catcherArea.CatcherTrails.Add(new CatcherTrailEntry(catcherArea.Time.Current, CatcherAnimationState.Fail, catcherArea.Catcher.X, new Vector2(1.5f),
+                            CatcherTrailAnimation.HyperDashAfterImage));
+                    }
+
+                    return !caught;
+                };
             }
 
             drawable.ApplyCustomUpdateState += (dho, state) =>
             {
-                // Keep the existing transforms when hit.
-                if (state is not ArmedState.Hit)
+                // Off-brown tint to all objects. To fit with the "rotten fruit" vernacular.
+                dho.FadeColour(new Colour4(237, 215, 163, 255));
+
+                if (state == ArmedState.Idle)
                     return;
 
-                // When "hit", the DHO is faded out, so to let fruits fall after being caught we fade them back in.
+                const double transition_duration = 500;
+
                 dho.FadeIn();
+
+                if (dho is DrawableJuiceStream || dho is DrawableBananaShower)
+                {
+                    dho.FadeOut(transition_duration).Expire();
+                    return;
+                }
+
+                dho.ScaleTo(new Vector2(1.5f), transition_duration, Easing.OutElastic)
+                   .RotateTo(RNG.NextSingle(-50, 50), transition_duration, Easing.OutElastic);
+
+                if (state == ArmedState.Miss)
+                    dho.FadeColour(Colour4.Red);
+
+                dho.Expire();
             };
         }
 
