@@ -2,12 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Framework.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.UI;
@@ -66,24 +66,17 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
-            var catchBeatmap = (CatchBeatmap)beatmap;
+            foreach (var obj in beatmap.HitObjects.OfType<PalpableCatchHitObject>())
+                disableHyperDashes(obj);
+        }
 
-            foreach (var obj in catchBeatmap.HitObjects)
-            {
-                if (obj is Fruit fruit)
-                {
-                    fruit.HyperDashTarget = null;
-                    fruit.HyperDash = false;
+        private void disableHyperDashes(PalpableCatchHitObject palpableObject)
+        {
+            palpableObject.HyperDashTarget = null;
+            palpableObject.DistanceToHyperDash = 0;
 
-                    fruit.DistanceToHyperDash = 0;
-                }
-
-                if (obj is Droplet drop)
-                {
-                    drop.HyperDashTarget = null;
-                    drop.HyperDashBindable = false;
-                }
-            }
+            foreach (var nested in palpableObject.NestedHitObjects.OfType<PalpableCatchHitObject>())
+                disableHyperDashes(nested);
         }
     }
 }
