@@ -237,9 +237,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
-                                                                        // Matches discord rich presence library limits for simplicity.
+                                                                        // Set quite small to avoid hitting rich presence limits.
+                                                                        // Note that we use JSON encoding so this needs to be well below the 128 byte limit discord end.
                                                                         // See https://github.com/Lachee/discord-rpc-csharp/blob/master/DiscordRPC/Entities/Secrets.cs#L26-L42
-                                                                        LengthLimit = 128,
+                                                                        LengthLimit = 40,
                                                                     },
                                                                 },
                                                                 new Section("Other")
