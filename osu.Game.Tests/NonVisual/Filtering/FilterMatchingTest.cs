@@ -456,23 +456,21 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
-        [TestCase("toprank=None", new int[] { 1 })]
-        [TestCase("toprank=X", new int[] { 0 })]
-        [TestCase("toprank=A", new int[] { })]
-        public void TestTopRank(string query, int[] expectedBeatmapIndexes)
+        [TestCase("toprank=None", 0)]
+        [TestCase("toprank=X", 1)]
+        [TestCase("toprank=A")]
+        public void TestTopRank(string query, params int[] expectedBeatmapIndexes)
         {
-            var carouselBeatmaps = new CarouselBeatmap[]
+            var carouselBeatmaps = new[]
             {
-                new CarouselBeatmap(new BeatmapInfo()
-                {
-                    ID = Guid.Empty
-                }),
-                new CarouselBeatmap(new BeatmapInfo()
-                {
-                    ID = Guid.NewGuid()
-                }),
-            }.ToList();
-            Dictionary<Guid, ScoreRank> localUserTopRanks = new Dictionary<Guid, ScoreRank>() {
+                Guid.NewGuid(),
+                Guid.Empty
+            }.Select(info => new CarouselBeatmap(new BeatmapInfo
+            {
+                ID = info
+            })).ToList();
+
+            Dictionary<Guid, ScoreRank> localUserTopRanks = new Dictionary<Guid, ScoreRank> {
                 { Guid.Empty, ScoreRank.X }
             };
             //localUserTopRanks.Add();

@@ -93,7 +93,11 @@ namespace osu.Game.Screens.Select
 
             match &= !criteria.BeatDivisor.HasFilter || criteria.BeatDivisor.IsInRange(beatmap.BeatDivisor);
             match &= !criteria.OnlineStatus.HasFilter || criteria.OnlineStatus.IsInRange(beatmap.Status);
-            match &= !criteria.TopRank.HasFilter || criteria.TopRank.IsInRange(localUserTopRanks.ContainsKey(beatmap.ID) ? localUserTopRanks[beatmap.ID] : ScoreRank.None);
+
+            if (localUserTopRanks.TryGetValue(beatmap.ID, out ScoreRank scoreRank))
+                match &= !criteria.TopRank.HasFilter || criteria.TopRank.IsInRange(scoreRank);
+            else
+                match &= !criteria.TopRank.HasFilter || criteria.TopRank.IsInRange(ScoreRank.None);
 
             if (!match) return false;
 
