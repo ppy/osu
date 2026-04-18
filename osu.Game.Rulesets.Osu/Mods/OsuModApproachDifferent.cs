@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -19,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Name => "Approach Different";
         public override string Acronym => "AD";
         public override LocalisableString Description => "Never trust the approach circles...";
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1;
         public override IconUsage? Icon => OsuIcon.ModApproachDifferent;
 
         public override Type[] IncompatibleMods => new[] { typeof(IHidesApproachCircles), typeof(OsuModFreezeFrame) };

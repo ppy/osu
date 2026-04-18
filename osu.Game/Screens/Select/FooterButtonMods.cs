@@ -234,7 +234,7 @@ namespace osu.Game.Screens.Select
                 modDisplay.FadeIn(duration, easing);
             }
 
-            double multiplier = Current.Value?.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier) ?? 1;
+            double multiplier = Current.Value?.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier(Current.Value)) ?? 1;
             multiplierText.Text = ModUtils.FormatScoreMultiplier(multiplier);
 
             if (multiplier > 1)

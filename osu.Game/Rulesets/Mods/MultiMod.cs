@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Localisation;
 
@@ -12,7 +13,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => string.Empty;
         public override string Acronym => string.Empty;
         public override LocalisableString Description => string.Empty;
-        public override double ScoreMultiplier => 0;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 0;
 
         public Mod[] Mods { get; }
 

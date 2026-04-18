@@ -83,8 +83,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// The score multiplier of this mod.
         /// </summary>
-        [JsonIgnore]
-        public abstract double ScoreMultiplier { get; }
+        public abstract double ScoreMultiplier(IReadOnlyCollection<Mod> mods);
 
         /// <summary>
         /// Returns true if this mod is implemented (and playable).

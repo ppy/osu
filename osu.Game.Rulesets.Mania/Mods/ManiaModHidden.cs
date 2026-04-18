@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
@@ -30,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         private const float coverage_increase_per_combo = 0.5f;
 
         public override LocalisableString Description => @"Keys fade out before you hit them!";
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]
         {

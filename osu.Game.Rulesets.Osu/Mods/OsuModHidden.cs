@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public Bindable<bool> OnlyFadeApproachCircles { get; } = new BindableBool();
 
         public override LocalisableString Description => @"Play with no approach circles and fading circles/sliders.";
-        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => UsesDefaultConfiguration ? 1.06 : 1;
 
         public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModSpinIn), typeof(OsuModDepth), typeof(OsuModFreezeFrame) };
 

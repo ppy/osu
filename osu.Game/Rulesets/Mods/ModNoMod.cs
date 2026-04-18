@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
@@ -15,7 +16,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "No Mod";
         public override string Acronym => "NM";
         public override LocalisableString Description => "No mods applied.";
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1;
         public override IconUsage? Icon => OsuIcon.ModNoMod;
         public override ModType Type => ModType.System;
     }

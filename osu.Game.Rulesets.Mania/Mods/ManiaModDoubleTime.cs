@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Mods
@@ -10,6 +11,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         // For now, all rate-increasing mods should be given a 1x multiplier in mania because it doesn't always
         // make the map harder and is more of a personal preference.
         // In the future, we can consider adjusting this by experimenting with not applying the hitwindow leniency.
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1;
     }
 }
