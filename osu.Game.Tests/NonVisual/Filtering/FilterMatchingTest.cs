@@ -470,7 +470,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 ID = info
             })).ToList();
 
-            Dictionary<Guid, ScoreRank> localUserTopRanks = new Dictionary<Guid, ScoreRank> {
+            Dictionary<Guid, ScoreRank> localUserTopRanks = new Dictionary<Guid, ScoreRank>
+            {
                 { Guid.Empty, ScoreRank.X }
             };
             //localUserTopRanks.Add();
