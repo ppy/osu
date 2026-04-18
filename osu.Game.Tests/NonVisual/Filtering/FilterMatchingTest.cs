@@ -472,8 +472,10 @@ namespace osu.Game.Tests.NonVisual.Filtering
                     ID = Guid.NewGuid()
                 }),
             }.ToList();
-            Dictionary<Guid, ScoreRank> localUserTopRanks = new Dictionary<Guid, ScoreRank>();
-            localUserTopRanks.Add(Guid.Empty, ScoreRank.X);
+            Dictionary<Guid, ScoreRank> localUserTopRanks = new Dictionary<Guid, ScoreRank>() {
+                { Guid.Empty, ScoreRank.X }
+            };
+            //localUserTopRanks.Add();
 
             var criteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(criteria, query);
