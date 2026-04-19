@@ -57,16 +57,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             double aimStrain = currVelocity; // Start strain with regular velocity.
 
-            double anglercurrVelocity = currDistance / Math.Pow(osuCurrObj.AdjustedDeltaTime, 1.5);
-            double anglerprevVelocity = prevDistance / Math.Pow(osuLastObj.AdjustedDeltaTime, 1.5);
-
-            // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
-            if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
-            {
-                double sliderDistance = osuLastObj.LazyTravelDistance + osuCurrObj.LazyJumpDistance;
-                anglercurrVelocity = Math.Max(anglercurrVelocity, sliderDistance / Math.Pow(osuCurrObj.AdjustedDeltaTime, 1.5));
-            }
-
             // Penalize angle repetition.
             aimStrain *= vectorAngleRepetition(osuCurrObj, osuLastObj);
 
@@ -97,7 +87,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 // Penalize angle repetition. It is important to do it _before_ multiplying by velocity because we compare raw wideness here
                 wideAngleBonus *= 0.25 + 0.75 * (1 - Math.Min(wideAngleBonus, Math.Pow(calcAngleWideness(lastAngle), 3)));
 
-                wideAngleBonus *= Math.Min(anglercurrVelocity, anglerprevVelocity);
+                // Rescaling velocity for the wide angle bonus
+                const double wide_angle_time_scale = 1.45;
+                double wideAngleCurrVelocity = currDistance / Math.Pow(osuCurrObj.AdjustedDeltaTime, wide_angle_time_scale);
+                double wideAnglePrevVelocity = prevDistance / Math.Pow(osuLastObj.AdjustedDeltaTime, wide_angle_time_scale);
+
+                if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
+                {
+                    double sliderDistance = osuLastObj.LazyTravelDistance + osuCurrObj.LazyJumpDistance;
+                    wideAngleCurrVelocity = Math.Max(wideAngleCurrVelocity, sliderDistance / Math.Pow(osuCurrObj.AdjustedDeltaTime, wide_angle_time_scale));
+                }
+
+                wideAngleBonus *= Math.Min(wideAngleCurrVelocity, wideAnglePrevVelocity);
 
                 if (osuLast2Obj != null)
                 {
