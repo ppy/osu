@@ -17,6 +17,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK;
@@ -125,7 +126,7 @@ namespace osu.Game.Collections
             }
         }
 
-        private partial class ItemTextBox : OsuTextBox
+        private partial class ItemTextBox : FocusedTextBox
         {
             protected override float LeftRightPadding => item_height / 2;
 
@@ -181,6 +182,15 @@ namespace osu.Game.Collections
                 {
                     PlaceholderText = CollectionsStrings.CreateNew;
                 }
+            }
+
+            public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+            {
+                // Only respond to GlobalAction.Back
+                if (!base.OnPressed(e)) return false;
+
+                KillFocus();
+                return true;
             }
         }
 
