@@ -28,7 +28,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
         private const float card_spacing = -15;
 
-        public IReadOnlyCollection<HandCard> Cards => cardLookup.Values;
+        /// <summary>
+        /// Cards currently present in this <see cref="HandOfCards"/>
+        /// </summary>
+        /// <remarks>
+        /// Entries are not sorted by display order
+        /// </remarks>
+        public IEnumerable<HandCard> Cards => cardLookup.Values;
+
+        /// <summary>
+        /// Returns a list of the cards present in this <see cref="HandOfCards"/> ordered by the cards' <see cref="HandCard.Order"/>
+        /// </summary>
+        public List<HandCard> GetCardsInDisplayOrder() => Cards.OrderBy(static c => c.Order).ToList();
 
         /// <summary>
         /// How far a card slides upwards when hovered.
@@ -136,9 +147,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             if (!cardLookup.Remove(item.Card, out var drawable))
                 return false;
 
-            // child order is only updated once per frame so ordering can change between that and the card getting removed
-            // which can mess when doing a binary-search for the child during removal
-            cardContainer.Sort();
             cardContainer.Remove(drawable, true);
             InvalidateLayout();
             return true;
@@ -163,9 +171,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             screenSpaceDrawQuad = drawable.ScreenSpaceDrawQuad;
             card = drawable.Detach();
 
-            // child order is only updated once per frame so ordering can change between that and the card getting removed
-            // which can mess when doing a binary-search for the child during removal
-            cardContainer.Sort();
             cardContainer.Remove(drawable, true);
             InvalidateLayout();
 
@@ -210,11 +215,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 return;
 
             // card container draws dragged card on top so we need to sort those separately
-            var cards = cardContainer.Children.OrderBy(static c => c.State.Order).ToArray();
+            var cards = GetCardsInDisplayOrder();
 
             int activeCardIndex = GetActiveCardIndex(cards);
 
-            for (int i = 0; i < cards.Length; i++)
+            for (int i = 0; i < cards.Count; i++)
             {
                 var card = cards[i];
 
