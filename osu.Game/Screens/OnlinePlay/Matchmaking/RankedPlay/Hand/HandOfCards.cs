@@ -138,6 +138,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             if (!cardLookup.Remove(item.Card, out var drawable))
                 return false;
 
+            // child order is only updated once per frame so ordering can change between that and the card getting removed
+            // which can mess when doing a binary-search for the child during removal
+            cardContainer.Sort();
             cardContainer.Remove(drawable, true);
             InvalidateLayout(drawOrder: true);
             return true;
@@ -162,6 +165,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             screenSpaceDrawQuad = drawable.ScreenSpaceDrawQuad;
             card = drawable.Detach();
 
+            // child order is only updated once per frame so ordering can change between that and the card getting removed
+            // which can mess when doing a binary-search for the child during removal
+            cardContainer.Sort();
             cardContainer.Remove(drawable, true);
             InvalidateLayout(drawOrder: true);
 
@@ -352,13 +358,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 if (x is HandCard c1 && y is HandCard c2)
                 {
                     // dragged cards should always be drawn on top
-                    if (c1.CardDragged)
-                        return 1;
+                    int result = c1.CardDragged.CompareTo(c2.CardDragged);
+                    if (result != 0)
+                        return result;
 
-                    if (c2.CardDragged)
-                        return -1;
-
-                    int result = c1.Order.CompareTo(c2.Order);
+                    result = c1.Order.CompareTo(c2.Order);
                     if (result != 0)
                         return result;
                 }

@@ -192,5 +192,24 @@ namespace osu.Game.Tests.Visual.RankedPlay
                         .All(card => !card.ScreenSpaceDrawQuad.AABBFloat.IntersectsWith(handOfCards.ScreenSpaceDrawQuad.AABBFloat))
             );
         }
+
+        [Test]
+        public void TestRemoveCardsWhileDragging()
+        {
+            AddStep("add cards", () =>
+            {
+                for (int i = 0; i < 5; i++)
+                    handOfCards.AddCard(new RankedPlayCardWithPlaylistItem(new RankedPlayCardItem()));
+            });
+            AddStep("hover card", () => InputManager.MoveMouseTo(handOfCards.Cards.First()));
+            AddStep("start drag", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("move card", () => InputManager.MoveMouseTo(handOfCards.Cards[3]));
+            AddStep("remove cards", () =>
+            {
+                foreach (var card in handOfCards.Cards.ToArray())
+                    handOfCards.RemoveCard(card.Item);
+            });
+            AddStep("release mouse", () => InputManager.ReleaseButton(MouseButton.Left));
+        }
     }
 }
