@@ -18,10 +18,12 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -58,8 +60,8 @@ namespace osu.Game.Screens.Menu
 
         protected virtual double BeatSampleVariance => 0.1;
 
-        protected Sample SampleBeat;
-        protected Sample SampleDownbeat;
+        protected ISample SampleBeat;
+        protected ISample SampleDownbeat;
 
         private readonly Container colourAndTriangles;
         private readonly TrianglesV2 triangles;
@@ -274,16 +276,39 @@ namespace osu.Game.Screens.Menu
                 Schedule(runnableAction);
         }
 
+        [Resolved]
+        private ISkinSource skinSource { get; set; }
+
+        protected AudioManager Audio { get; private set; }
+
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, AudioManager audio)
         {
+            Audio = audio;
+
             sampleClick = audio.Samples.Get(@"Menu/osu-logo-select");
 
-            SampleBeat = audio.Samples.Get(@"Menu/osu-logo-heartbeat");
-            SampleDownbeat = audio.Samples.Get(@"Menu/osu-logo-downbeat");
+            LoadBeatSamples();
+            skinSource.SourceChanged += LoadBeatSamples;
 
             logo.Texture = textures.Get(@"Menu/logo");
             ripple.Texture = textures.Get(@"Menu/logo");
+        }
+
+        // loaded via the current skin (with a fallback to the default resources) so users can override
+        // these sounds via the skinning system, as described in the skinning wiki.
+        protected virtual void LoadBeatSamples()
+        {
+            SampleBeat = skinSource.GetSample(new SampleInfo(@"Menu/osu-logo-heartbeat")) ?? Audio.Samples.Get(@"Menu/osu-logo-heartbeat");
+            SampleDownbeat = skinSource.GetSample(new SampleInfo(@"Menu/osu-logo-downbeat")) ?? Audio.Samples.Get(@"Menu/osu-logo-downbeat");
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (skinSource != null)
+                skinSource.SourceChanged -= LoadBeatSamples;
         }
 
         private int lastBeatIndex;

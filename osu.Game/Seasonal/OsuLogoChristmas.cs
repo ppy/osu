@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -22,7 +21,7 @@ namespace osu.Game.Seasonal
         protected override MenuLogoVisualisation CreateMenuLogoVisualisation() => new SeasonalMenuLogoVisualisation();
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, AudioManager audio)
+        private void load(TextureStore textures)
         {
             LogoElements.Add(hat = new Sprite
             {
@@ -32,9 +31,12 @@ namespace osu.Game.Seasonal
                 Scale = new Vector2(-1, 1),
                 Texture = textures.Get(@"Menu/hat"),
             });
+        }
 
-            // override base samples with our preferred ones.
-            SampleDownbeat = SampleBeat = audio.Samples.Get(@"Menu/osu-logo-heartbeat-bell");
+        // override base samples with our preferred seasonal bell variant.
+        protected override void LoadBeatSamples()
+        {
+            SampleDownbeat = SampleBeat = Audio.Samples.Get(@"Menu/osu-logo-heartbeat-bell");
         }
 
         protected override void Update()
