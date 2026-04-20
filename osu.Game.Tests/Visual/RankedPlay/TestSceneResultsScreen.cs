@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Extensions;
+using osu.Framework.Screens;
 using osu.Framework.Utils;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -36,6 +37,44 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddUntilStep("screen loaded", () => screen.IsLoaded);
 
             setupRequestHandler();
+        }
+
+        [Test]
+        [Explicit("Test exercises correct stopping of audio playback. Has no assertions, only useful when checked manually by a human.")]
+        public void TestAllSamplesStopOnExit()
+        {
+            AddStep("set results state", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.Results, state =>
+            {
+                int losingPlayer = state.Users.Keys.First();
+
+                foreach (var (id, userInfo) in state.Users)
+                {
+                    if (id == losingPlayer)
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 123_456,
+                            Damage = 123_456,
+                            OldLife = 500_000,
+                            NewLife = 500_000 - 123_456,
+                        };
+
+                        userInfo.Life = 500_000 - 123_456;
+                    }
+                    else
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 0,
+                            Damage = 0,
+                            OldLife = 1_000_000,
+                            NewLife = 1_000_000,
+                        };
+                    }
+                }
+            }).WaitSafely());
+            AddWaitStep("wait for samples to start playing", 5);
+            AddRepeatStep("exit", () => screen.Exit(), 2);
         }
 
         [Test]

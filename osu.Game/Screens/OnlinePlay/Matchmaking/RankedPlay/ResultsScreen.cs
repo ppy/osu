@@ -48,6 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private IBindable<RulesetInfo> globalRuleset { get; set; } = null!;
 
         private LoadingSpinner loadingSpinner = null!;
+        private MainPanel? mainPanel;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -123,7 +124,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                         OpponentScore = opponentScore,
                         PlayerDamageInfo = matchInfo.RoomState.Users[localUserId].DamageInfo!,
                         OpponentDamageInfo = matchInfo.RoomState.Users[opponentId].DamageInfo!,
-                    }, AddInternal);
+                    }, loaded =>
+                    {
+                        AddInternal(loaded);
+                        mainPanel = loaded;
+                    });
                 });
             }
             catch (Exception e)
@@ -135,6 +140,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             {
                 Scheduler.Add(() => loadingSpinner.Hide());
             }
+        }
+
+        public override void OnExiting(RankedPlaySubScreen? next)
+        {
+            mainPanel?.StopAllSamples();
+            base.OnExiting(next);
         }
     }
 }

@@ -376,6 +376,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     return true;
                 }
 
+                ActiveSubScreen?.OnExiting(null);
                 backgroundMusic.Stop();
                 previewTrackManager.StopAnyPlaying(this);
 
