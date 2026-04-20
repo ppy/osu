@@ -43,6 +43,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
     {
         protected override bool InitialBackButtonVisibility => false;
 
+        public override bool? ApplyModTrackAdjustments => true;
+
+        public override bool DisallowExternalBeatmapRulesetChanges => true;
+
         public override bool HideOverlaysOnEnter => true;
 
         public RankedPlaySubScreen? ActiveSubScreen { get; private set; }
