@@ -29,7 +29,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
         private const float card_spacing = -15;
 
-        public IReadOnlyList<HandCard> Cards => cardContainer.Children;
+        public IReadOnlyCollection<HandCard> Cards => cardLookup.Values;
 
         /// <summary>
         /// How far a card slides upwards when hovered.
@@ -131,7 +131,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             setupAction?.Invoke(drawable);
         }
 
-        public void Clear() => cardContainer.Clear();
+        public void Clear()
+        {
+            foreach (var card in Cards.ToArray())
+                RemoveCard(card.Item);
+        }
 
         public bool RemoveCard(RankedPlayCardWithPlaylistItem item)
         {
