@@ -43,13 +43,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
             Origin = Anchor.Centre;
             Alpha = 0;
 
-            Masking = true;
-            CornerRadius = 10;
-
             InternalChild = new Container
             {
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
+                Masking = true,
+                CornerRadius = 10,
                 Children = new Drawable[]
                 {
                     new Box
@@ -226,6 +225,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                     };
 
                     centerContainer.Add(container);
+                    // Avoid text getting masked out by inner containers
+                    AddInternal(container.CreateProxy());
 
                     container.FadeInFromZero(200)
                              .ScaleTo(0)
