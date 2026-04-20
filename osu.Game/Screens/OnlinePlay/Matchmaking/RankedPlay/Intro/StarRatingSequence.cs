@@ -204,7 +204,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                         RelativePositionAxes = Axes.X,
                         X = starRating * 0.1f,
                         Y = 34,
-                        Colour = colours.ForStarDifficulty(starRating),
+                        Colour = starRating < OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.ForStarDifficulty(starRating) : colours.ForStarDifficultyText(starRating),
                         Spacing = new Vector2(4, 0),
                         Children =
                         [
