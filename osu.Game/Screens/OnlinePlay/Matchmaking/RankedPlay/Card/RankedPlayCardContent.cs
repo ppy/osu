@@ -141,7 +141,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 
         public MenuItem[] ContextMenuItems =>
         [
-            new OsuMenuItem(ContextMenuStrings.ViewBeatmap, MenuItemType.Highlighted, () => beatmapSetOverlay?.ShowBeatmapSet(Beatmap.BeatmapSet))
+            new OsuMenuItem(ContextMenuStrings.ViewBeatmap, MenuItemType.Highlighted, () => beatmapSetOverlay?.FetchAndShowBeatmap(Beatmap.OnlineID))
         ];
     }
 }
