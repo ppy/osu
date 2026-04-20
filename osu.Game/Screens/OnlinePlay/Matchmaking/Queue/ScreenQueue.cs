@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -124,7 +125,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         RowDimensions =
                         [
                             new Dimension(),
-                            new Dimension(GridSizeMode.Relative, 0.35f)
+                            new Dimension(GridSizeMode.Relative, RuntimeInfo.IsMobile ? 0.55f : 0.35f)
                         ],
                         Content = new[]
                         {
