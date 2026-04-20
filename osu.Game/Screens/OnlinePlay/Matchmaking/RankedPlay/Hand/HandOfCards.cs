@@ -7,7 +7,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -66,12 +65,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
         {
             base.Update();
 
-            if (!drawOrderBacking.IsValid)
-            {
-                cardContainer.Sort();
-                drawOrderBacking.Validate();
-            }
-
             if (!layoutBacking.IsValid)
             {
                 updateLayout();
@@ -126,7 +119,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 drawable.Order = cardContainer.Max(c => c.Order) + 1;
 
             cardContainer.Add(drawable);
-            InvalidateLayout(drawOrder: true);
+            cardContainer.Sort();
+            InvalidateLayout();
 
             setupAction?.Invoke(drawable);
         }
@@ -146,7 +140,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             // which can mess when doing a binary-search for the child during removal
             cardContainer.Sort();
             cardContainer.Remove(drawable, true);
-            InvalidateLayout(drawOrder: true);
+            InvalidateLayout();
             return true;
         }
 
@@ -173,7 +167,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             // which can mess when doing a binary-search for the child during removal
             cardContainer.Sort();
             cardContainer.Remove(drawable, true);
-            InvalidateLayout(drawOrder: true);
+            InvalidateLayout();
 
             return true;
         }
@@ -182,7 +176,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
         protected virtual void OnCardStateChanged(HandCard card, ValueChangedEvent<RankedPlayCardState> evt)
         {
-            InvalidateLayout(drawOrder: affectsDrawOrder(evt));
+            InvalidateLayout();
+            if (affectsDrawOrder(evt))
+                cardContainer.Sort();
 
             // hovered state can be caused by keyboard focus, in which case we have to clean up after the other cards manually
             if (evt.NewValue.Hovered)
@@ -202,18 +198,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
         #region Layout
 
         private readonly LayoutValue layoutBacking = new LayoutValue(Invalidation.DrawSize | Invalidation.MiscGeometry);
-        private readonly Cached drawOrderBacking = new Cached();
 
         /// <summary>
         /// Invalidates the layout of the hand of cards, causing a relayout to occur.
         /// </summary>
-        /// <param name="drawOrder">If set to true, also invalidates the draw order of the cards.</param>
-        protected void InvalidateLayout(bool drawOrder = false)
-        {
-            layoutBacking.Invalidate();
-            if (drawOrder)
-                drawOrderBacking.Invalidate();
-        }
+        protected void InvalidateLayout() => layoutBacking.Invalidate();
 
         private void updateLayout()
         {
