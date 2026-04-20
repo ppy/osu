@@ -13,6 +13,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
@@ -83,11 +84,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private CancellationTokenSource userLookupCancellation = new CancellationTokenSource();
 
         private Sample? enqueueSample;
-        private Sample? waitingLoopSample;
         private Sample? matchFoundSample;
 
         private SampleChannel? waitingLoopChannel;
         private ScheduledDelegate? startLoopPlaybackDelegate;
+        private DrawableSample waitingLoop = null!;
 
         private int? userRating;
 
@@ -102,7 +103,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private void load(AudioManager audio, IAPIProvider api)
         {
             enqueueSample = audio.Samples.Get(@"Multiplayer/Matchmaking/enqueue");
-            waitingLoopSample = audio.Samples.Get(@"Multiplayer/Matchmaking/waiting-loop");
             matchFoundSample = audio.Samples.Get(@"Multiplayer/Matchmaking/match-found");
 
             InternalChild = new InverseScalingDrawSizePreservingFillContainer
@@ -110,6 +110,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
+                    waitingLoop = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/waiting-loop")),
                     new GlobalScrollAdjustsVolume(),
                     mainGrid = new GridContainer
                     {
@@ -642,12 +643,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             stopWaitingLoopPlayback();
 
-            waitingLoopChannel = waitingLoopSample?.GetChannel();
+            waitingLoopChannel = waitingLoop.GetChannel();
             if (waitingLoopChannel == null)
                 return;
 
             waitingLoopChannel.Looping = true;
             waitingLoopChannel?.Play();
+
+            waitingLoop.VolumeTo(1)
+                       .Delay(2000)
+                       .VolumeTo(0, 12000);
         }
 
         private void stopWaitingLoopPlayback()
