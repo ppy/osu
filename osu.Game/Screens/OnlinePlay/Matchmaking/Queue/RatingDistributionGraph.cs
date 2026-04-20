@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Layout;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -521,7 +522,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             protected override void Update()
             {
                 base.Update();
-                Width = Parent!.DrawWidth / Parent.ScreenSpaceDrawQuad.Width;
+                if (Precision.DefinitelyBigger(Parent!.ScreenSpaceDrawQuad.Width, 0))
+                    Width = Parent.DrawWidth / Parent.ScreenSpaceDrawQuad.Width;
             }
         }
 
@@ -533,7 +535,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             protected override void Update()
             {
                 base.Update();
-                Height = Parent!.DrawHeight / Parent.ScreenSpaceDrawQuad.Height;
+                if (Precision.DefinitelyBigger(Parent!.ScreenSpaceDrawQuad.Height, 0))
+                    Height = Parent!.DrawHeight / Parent.ScreenSpaceDrawQuad.Height;
             }
         }
 
