@@ -8,7 +8,7 @@ using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro;
 namespace osu.Game.Tests.Visual.RankedPlay
 {
     [TestFixture]
-    public partial class TestSceneStarRatingSequence : OsuTestScene
+    public partial class TestSceneStarRatingSequence : RankedPlayTestScene
     {
         [Test]
         public void TestBasicAppearance()

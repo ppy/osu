@@ -14,8 +14,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 {
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
         private float lastTickStdDev;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour, AudioManager audio)
+        private void load(OsuColour colour, OverlayColourProvider overlayColourProvider, AudioManager audio)
         {
             Width = 600;
             AutoSizeAxes = Axes.Y;
@@ -54,8 +54,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                 {
                     new Box
                     {
-                        Colour = Color4.Black,
-                        Alpha = 0.2f,
+                        Colour = overlayColourProvider.Background5,
+                        Alpha = 0.8f,
                         RelativeSizeAxes = Axes.Both,
                     },
                     new FillFlowContainer
@@ -88,7 +88,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                                     new Box
                                     {
                                         Alpha = 0.4f,
-                                        Colour = Color4.Black,
+                                        Colour = overlayColourProvider.Background4,
                                         RelativeSizeAxes = Axes.Both,
                                     },
                                     bars = new Container<Bar>
