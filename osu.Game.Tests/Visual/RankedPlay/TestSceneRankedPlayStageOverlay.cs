@@ -40,6 +40,9 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void TestBasic()
         {
+            double multiplier = 1.0;
+
+            AddSliderStep<double>("set multiplier", 1, 5, 2, value => multiplier = value);
             AddStep("create", () => Child = new RankedPlayStageOverlay("Pick Phase", RankedPlayColourScheme.BLUE)
             {
                 PickingUser = new APIUser
@@ -47,7 +50,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     Id = 2,
                     Username = "peppy",
                 },
-                Multiplier = 2,
+                Multiplier = multiplier,
             });
         }
 
