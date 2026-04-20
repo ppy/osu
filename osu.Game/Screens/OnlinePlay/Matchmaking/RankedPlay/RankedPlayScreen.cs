@@ -34,6 +34,7 @@ using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
+using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
@@ -118,6 +119,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         public RankedPlayScreen(MultiplayerRoom room)
         {
             this.room = room;
+
+            Activity.Value = new UserActivity.InLobby(room);
 
             InternalChildren = new Drawable[]
             {
