@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Select
         public OptionalTextFilter DifficultyName;
         public OptionalTextFilter Source;
         public List<OptionalTextFilter> UserTags = [];
-        public OptionalSet<ScoreRank> TopRank = new OptionalSet<ScoreRank>();
+        public OptionalSet<ScoreRank> Rank = new OptionalSet<ScoreRank>();
 
         public OptionalRange<double> UserStarDifficulty = new OptionalRange<double>
         {

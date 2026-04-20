@@ -456,10 +456,10 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
-        [TestCase("toprank=None", 0)]
-        [TestCase("toprank=X", 1)]
-        [TestCase("toprank=A")]
-        public void TestTopRank(string query, params int[] expectedBeatmapIndexes)
+        [TestCase("rank=None", 0)]
+        [TestCase("rank=X", 1)]
+        [TestCase("rank=A")]
+        public void TestRankFilter(string query, params int[] expectedBeatmapIndexes)
         {
             var carouselBeatmaps = new[]
             {
@@ -474,7 +474,6 @@ namespace osu.Game.Tests.NonVisual.Filtering
             {
                 { Guid.Empty, ScoreRank.X }
             };
-            //localUserTopRanks.Add();
 
             var criteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(criteria, query);

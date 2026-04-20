@@ -95,9 +95,9 @@ namespace osu.Game.Screens.Select
             match &= !criteria.OnlineStatus.HasFilter || criteria.OnlineStatus.IsInRange(beatmap.Status);
 
             if (localUserTopRanks.TryGetValue(beatmap.ID, out ScoreRank scoreRank))
-                match &= !criteria.TopRank.HasFilter || criteria.TopRank.IsInRange(scoreRank);
+                match &= !criteria.Rank.HasFilter || criteria.Rank.IsInRange(scoreRank);
             else
-                match &= !criteria.TopRank.HasFilter || criteria.TopRank.IsInRange(ScoreRank.None);
+                match &= !criteria.Rank.HasFilter || criteria.Rank.IsInRange(ScoreRank.None);
 
             if (!match) return false;
 
