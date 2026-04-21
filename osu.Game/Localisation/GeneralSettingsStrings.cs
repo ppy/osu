@@ -109,7 +109,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ChangeReleaseStreamConfirmation => new TranslatableString(getKey(@"change_release_stream_confirmation"), @"Are you sure you want to run a potentially unstable version of the game?");
 
-
         /// <summary>
         /// "Speed alterations affect main menu and song select music"
         /// </summary>
