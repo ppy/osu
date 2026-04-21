@@ -161,10 +161,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             switch (e.Key)
             {
                 case >= Key.Number1 and <= Key.Number9:
-                    focusCard(e.Key - Key.Number1);
+                {
+                    int index = e.Key - Key.Number1;
+                    if (GetCardsInDisplayOrder().ElementAtOrDefault(index) is HandCard card)
+                        focusCard(card);
                     return true;
+                }
 
                 case Key.Space:
+                {
                     if (selectionMode == HandSelectionMode.Disabled)
                         return false;
 
@@ -177,6 +182,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                         card.TriggerClick();
 
                     return true;
+                }
 
                 case Key.Left:
                     moveCardFocus(-1);
@@ -192,30 +198,27 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
         private void moveCardFocus(int direction)
         {
-            int currentIndex = Cards.ToList().FindIndex(c => c.HasFocus);
+            var cards = GetCardsInDisplayOrder();
+
+            int currentIndex = cards.FindIndex(c => c.HasFocus);
 
             // default behaviour is to start from either end of the cards if no card is focused currently
             // in single-selection mode we can however use the current selection as a fallback index if there's no focus
             if (selectionMode == HandSelectionMode.Single && currentIndex == -1)
-                currentIndex = Cards.ToList().FindIndex(c => c.Selected);
+                currentIndex = cards.FindIndex(c => c.Selected);
 
             int newIndex = currentIndex + direction;
 
             if (newIndex < 0)
-                newIndex = Cards.Count - 1;
-            else if (newIndex >= Cards.Count)
+                newIndex = cards.Count - 1;
+            else if (newIndex >= cards.Count)
                 newIndex = 0;
 
-            focusCard(newIndex);
+            focusCard(cards[newIndex]);
         }
 
-        private void focusCard(int index)
+        private void focusCard(HandCard card)
         {
-            var card = Cards.ElementAtOrDefault(index);
-
-            if (card == null)
-                return;
-
             GetContainingFocusManager()?.ChangeFocus(card);
 
             if (SelectionMode == HandSelectionMode.Single && !card.Selected)
@@ -224,7 +227,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
         private void cardDragged(PlayerHandCard card, Vector2 screenSpacePosition)
         {
-            var cards = Cards.OrderBy(static c => c.Order).ToArray();
+            var cards = GetCardsInDisplayOrder();
 
             int newIndex = cardIndexInLayout(cards, card.ScreenSpaceDrawQuad.Centre);
 
@@ -247,9 +250,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 c.Item.DisplayOrder = c.Order;
         }
 
-        private int cardIndexInLayout(HandCard[] cards, Vector2 screenSpacePosition)
+        private int cardIndexInLayout(IReadOnlyList<HandCard> cards, Vector2 screenSpacePosition)
         {
-            Debug.Assert(cards.Length > 0);
+            Debug.Assert(cards.Count > 0);
 
             var position = ToLocalSpace(screenSpacePosition) - DrawSize / 2;
 
@@ -258,7 +261,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             int minIndex = 0;
             float minDistance = float.MaxValue;
 
-            for (int i = 0; i < cards.Length; i++)
+            for (int i = 0; i < cards.Count; i++)
             {
                 float distance = MathF.Abs(GetCardX(i, activeIndex) - position.X);
 
