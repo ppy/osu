@@ -12,6 +12,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 {
     public static class FlowAimEvaluator
     {
+        private static double multiplier => 0.60 * Skills.Aim.SkillMultiplierTotal;
+
         private const double velocity_change_multiplier = 0.52;
 
         /// <summary>
@@ -111,7 +113,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             flowDifficulty = Math.Pow(flowDifficulty, 1.45);
 
             // Reduce difficulty for low spacing since spacing below radius is always to be flowed
-            return flowDifficulty * DifficultyCalculationUtils.Smootherstep(currDistance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
+            flowDifficulty *= DifficultyCalculationUtils.Smootherstep(currDistance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
+
+            return flowDifficulty * multiplier;
         }
 
         private static double calculateOverlapFactor(OsuDifficultyHitObject first, OsuDifficultyHitObject second)

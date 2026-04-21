@@ -13,6 +13,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class ReadingEvaluator
     {
+        private static double multiplier => 0.0114;
+
         private const double reading_window_size = 3000; // 3 seconds
         private const double distance_influence_threshold = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.5; // 1.5 circles distance between centers
         private const double hidden_multiplier = 0.28;
@@ -51,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Having less time to process information is harder
             difficulty *= highBpmBonus(currObj.AdjustedDeltaTime);
 
-            return difficulty;
+            return difficulty * multiplier;
         }
 
         /// <summary>
