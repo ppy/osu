@@ -312,6 +312,12 @@ namespace osu.Game.Online.API.Requests.Responses
             Colour = @"9c0101",
         };
 
+        public static APIUser UnknownUser(int userId) => new APIUser
+        {
+            Id = userId,
+            Username = "Unknown user",
+        };
+
         public int OnlineID => Id;
 
         public bool Equals(APIUser other) => this.MatchesOnlineID(other);

@@ -607,7 +607,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             switch (ev)
             {
                 case RollEvent rollEvent:
-                    var user = client.Room?.Users.SingleOrDefault(u => u.UserID == rollEvent.UserID)?.User ?? new APIUser { Username = "Unknown user" };
+                    var user = client.Room?.Users.SingleOrDefault(u => u.UserID == rollEvent.UserID)?.User ?? APIUser.UnknownUser(rollEvent.UserID);
                     string text = $"{user.Username} rolled {"point".ToQuantity(rollEvent.Result)} out of {rollEvent.Max}.";
                     chat.Channel.Value?.AddNewMessages(new InfoMessage(text));
                     break;
