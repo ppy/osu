@@ -391,14 +391,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             if (e.NewValue == null)
             {
-                client.MatchmakingLeaveLobby();
+                client.MatchmakingLeaveLobby().FireAndForget();
                 return;
             }
 
             client.MatchmakingJoinLobbyWithParams(new MatchmakingJoinLobbyRequest
             {
                 PoolId = e.NewValue.Id
-            });
+            }).FireAndForget();
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
