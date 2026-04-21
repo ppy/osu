@@ -101,6 +101,11 @@ namespace osu.Game.Screens
 
         public virtual bool? ApplyModTrackAdjustments => null;
 
+        /// <summary>
+        /// Whether to allow speed/time mods to affect the track in menu screens.
+        /// </summary>
+        protected virtual bool ApplySpeedModsToMenuMusic => true;
+
         public virtual bool? AllowGlobalTrackControl => null;
 
         public Bindable<WorkingBeatmap> Beatmap { get; private set; } = null!;

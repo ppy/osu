@@ -61,6 +61,8 @@ namespace osu.Game.Screens.Menu
 
         public override bool? AllowGlobalTrackControl => true;
 
+        protected override bool ApplySpeedModsToMenuMusic => speedAffectsMenuMusic.Value;
+
         private MenuSideFlashes sideFlashes;
 
         protected ButtonSystem Buttons;
@@ -97,6 +99,7 @@ namespace osu.Game.Screens.Menu
         private Bindable<double> holdDelay;
         private Bindable<bool> loginDisplayed;
         private Bindable<bool> showMobileDisclaimer;
+        private Bindable<bool> speedAffectsMenuMusic;
 
         private HoldToExitGameOverlay holdToExitGameOverlay;
 
@@ -125,6 +128,7 @@ namespace osu.Game.Screens.Menu
             holdDelay = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
             showMobileDisclaimer = config.GetBindable<bool>(OsuSetting.ShowMobileDisclaimer);
+            speedAffectsMenuMusic = config.GetBindable<bool>(OsuSetting.SpeedAffectsMenuMusic);
 
             if (host.CanExit)
             {
@@ -247,6 +251,8 @@ namespace osu.Game.Screens.Menu
         {
             base.LoadComplete();
             GetContainingInputManager();
+
+            speedAffectsMenuMusic.BindValueChanged(_ => musicController.ApplyModTrackAdjustments = speedAffectsMenuMusic.Value, true);
         }
 
         public void ReturnToOsuLogo() => Buttons.State = ButtonSystemState.Initial;

@@ -55,6 +55,14 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     Caption = GameplaySettingsStrings.BackgroundBlur,
                     Current = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur),
                 }),
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = GeneralSettingsStrings.SpeedAffectsMenuMusic,
+                    Current = config.GetBindable<bool>(OsuSetting.SpeedAffectsMenuMusic),
+                })
+                {
+                    Keywords = new[] { @"speed", @"dt", @"nc", @"ht", @"double", @"half", @"time" },
+                },
             };
         }
     }

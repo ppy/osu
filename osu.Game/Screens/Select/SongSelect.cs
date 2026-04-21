@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Select
 
         private NoResultsPlaceholder noResultsPlaceholder = null!;
 
-        public override bool? ApplyModTrackAdjustments => true;
+        protected override bool ApplySpeedModsToMenuMusic => speedAffectsMenuMusic.Value;
 
         public override bool ShowFooter => true;
 
@@ -168,12 +168,15 @@ namespace osu.Game.Screens.Select
 
         private Bindable<bool> configBackgroundBlur = null!;
         private Bindable<bool> showConvertedBeatmaps = null!;
+        private Bindable<bool> speedAffectsMenuMusic = null!;
 
         private IDisposable? modSelectOverlayRegistration;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)
         {
+            speedAffectsMenuMusic = config.GetBindable<bool>(OsuSetting.SpeedAffectsMenuMusic);
+
             errorSample = audio.Samples.Get(@"UI/generic-error");
 
             AddRangeInternal(new Drawable[]
@@ -382,6 +385,8 @@ namespace osu.Game.Screens.Select
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            speedAffectsMenuMusic.BindValueChanged(_ => music.ApplyModTrackAdjustments = speedAffectsMenuMusic.Value, true);
 
             modSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(modSelectOverlay);
 
