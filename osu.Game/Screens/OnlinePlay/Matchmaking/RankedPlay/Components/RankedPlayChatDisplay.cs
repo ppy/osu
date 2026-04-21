@@ -122,13 +122,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         private void onPendingMessageResolved(Message existing, Message updated)
         {
-            var found = chatHistory.Messages.LastOrDefault(mb => mb.Message == existing);
-
-            if (found != null)
-            {
-                Trace.Assert(updated.Id.HasValue, "An updated message was returned with no ID.");
-                found.Message = updated;
-            }
+            chatHistory.ResolvePendingMessage(existing, updated);
         }
 
         private void onFocusGained()
@@ -336,6 +330,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 {
                     using (BeginDelayedSequence(time_before_disappear))
                         newMessage.Hide();
+                }
+            }
+
+            public void ResolvePendingMessage(Message existing, Message updated)
+            {
+                var found = messageContainer.LastOrDefault(mb => mb.Message == existing);
+
+                if (found != null)
+                {
+                    Trace.Assert(updated.Id.HasValue, "An updated message was returned with no ID.");
+                    found.Message = updated;
                 }
             }
 

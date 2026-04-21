@@ -74,5 +74,25 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddStep("set collapsed", () => history.Collapse());
             AddAssert("message bubble hidden", () => history.Messages.FirstOrDefault()?.Alpha == 0);
         }
+
+        [Test]
+        public void TestResolvePendingMessage()
+        {
+            var message = new Message(1)
+            {
+                Sender = new APIUser { Id = 2 },
+                Content = "message",
+            };
+            var newMessage = new Message(1)
+            {
+                Sender = new APIUser { Id = 2 },
+                Content = "new message",
+            };
+            AddStep("post a message", () => history.PostMessage(message));
+
+            AddWaitStep("wait a bit", 10);
+            AddStep("resolve pending message", () => history.ResolvePendingMessage(message, newMessage));
+            AddAssert("resolved message text changed", () => history.Messages.FirstOrDefault()?.Message.Content == newMessage.Content);
+        }
     }
 }
