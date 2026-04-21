@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
@@ -80,6 +81,24 @@ namespace osu.Game.Tests.Editing.Checks
             }
 
             assertOk(hitObjects);
+        }
+
+        [Test]
+        public void TestRarelyHitsoundedLongWallTimeMostlyBreak()
+        {
+            var hitObjects = new List<HitObject>
+            {
+                new HitCircle { StartTime = 0, Samples = hitsounded },
+                new HitCircle { StartTime = 1000, Samples = notHitsounded },
+                new HitCircle { StartTime = 2000, Samples = notHitsounded },
+                new HitCircle { StartTime = 3000, Samples = notHitsounded },
+                new HitCircle { StartTime = 4000, Samples = notHitsounded },
+                new HitCircle { StartTime = 5000, Samples = notHitsounded },
+                new HitCircle { StartTime = 10000, Samples = hitsounded },
+            };
+
+            // 10s since last hitsound, but 6s overlap a break → 4s without hitsounds (below warning threshold).
+            assertOk(hitObjects, new BreakPeriod(4000, 10000));
         }
 
         [Test]
@@ -194,9 +213,9 @@ namespace osu.Game.Tests.Editing.Checks
             assertOk(hitObjects);
         }
 
-        private void assertOk(List<HitObject> hitObjects)
+        private void assertOk(List<HitObject> hitObjects, params BreakPeriod[] breaks)
         {
-            Assert.That(check.Run(getContext(hitObjects)), Is.Empty);
+            Assert.That(check.Run(getContext(hitObjects, breaks)), Is.Empty);
         }
 
         private void assertLongPeriodProblem(List<HitObject> hitObjects, int count = 1)
@@ -231,9 +250,12 @@ namespace osu.Game.Tests.Editing.Checks
             Assert.That(issues.Any(issue => issue.Template is CheckFewHitsounds.IssueTemplateNoHitsounds));
         }
 
-        private BeatmapVerifierContext getContext(List<HitObject> hitObjects)
+        private BeatmapVerifierContext getContext(List<HitObject> hitObjects, params BreakPeriod[] breaks)
         {
             var beatmap = new Beatmap<HitObject> { HitObjects = hitObjects };
+
+            foreach (var b in breaks)
+                beatmap.Breaks.Add(b);
 
             return new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
         }

@@ -1,9 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Audio;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Rulesets.Objects;
 
@@ -45,11 +47,14 @@ namespace osu.Game.Rulesets.Edit.Checks
         private bool mapHasHitsounds;
         private int objectsWithoutHitsounds;
         private double lastHitsoundTime;
+        private IReadOnlyList<BreakPeriod> breaks = Array.Empty<BreakPeriod>();
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
             if (!context.CurrentDifficulty.Playable.HitObjects.Any())
                 yield break;
+
+            breaks = context.CurrentDifficulty.Playable.Breaks;
 
             mapHasHitsounds = false;
             objectsWithoutHitsounds = 0;
@@ -94,7 +99,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             // If there are no hitsounds we let the "No hitsounds" template take precedence.
             if (hasHitsound || (isLastObject && mapHasHitsounds))
             {
-                double timeWithoutHitsounds = time - lastHitsoundTime;
+                double timeWithoutHitsounds = getTimeWithoutHitsoundsExcludingBreaks(lastHitsoundTime, time);
 
                 if (timeWithoutHitsounds > problem_threshold_time && objectsWithoutHitsounds > problem_threshold_objects)
                     yield return new IssueTemplateLongPeriodProblem(this).Create(lastHitsoundTime, timeWithoutHitsounds);
@@ -112,6 +117,28 @@ namespace osu.Game.Rulesets.Edit.Checks
             }
             else if (couldHaveHitsound)
                 ++objectsWithoutHitsounds;
+        }
+
+        /// <summary>
+        /// Milliseconds between <paramref name="start"/> and <paramref name="end"/> that are not covered by a <see cref="BreakPeriod"/>.
+        /// </summary>
+        private double getTimeWithoutHitsoundsExcludingBreaks(double start, double end)
+        {
+            if (end <= start)
+                return 0;
+
+            double duration = end - start;
+
+            foreach (var b in breaks)
+            {
+                double overlapStart = Math.Max(start, b.StartTime);
+                double overlapEnd = Math.Min(end, b.EndTime);
+
+                if (overlapEnd > overlapStart)
+                    duration -= overlapEnd - overlapStart;
+            }
+
+            return Math.Max(0, duration);
         }
 
         private bool isHitsound(HitSampleInfo sample) => HitSampleInfo.ALL_ADDITIONS.Any(sample.Name.Contains);
