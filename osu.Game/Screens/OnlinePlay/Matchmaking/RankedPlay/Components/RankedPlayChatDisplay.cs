@@ -272,7 +272,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 {
                     // Normally we wait an amount of time to preview messages before they disappear.
                     // When quickly toggling expanded and collapsed states, we want to still consider this preview window.
-                    double previewTimeRemaining = Math.Max(0, time_before_disappear - (Time.Current - child.Message.Timestamp.ToUnixTimeMilliseconds()));
+                    double previewTimeRemaining = Math.Max(0, time_before_disappear - (Time.Current - child.PostTime));
 
                     using (BeginDelayedSequence(previewTimeRemaining))
                         child.Hide();
@@ -300,6 +300,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
+                    PostTime = Time.Current,
                 };
 
                 messageContainer.Add(newMessage);
@@ -366,6 +367,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                         updateMessageContent();
                     }
                 }
+
+                /// <summary>
+                /// The time at which this message was posted.
+                /// </summary>
+                public required double PostTime { get; init; }
 
                 public MessageBubble(Message message)
                 {
