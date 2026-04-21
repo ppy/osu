@@ -71,6 +71,22 @@ namespace osu.Game.Tests.Visual.Matchmaking
             AddStep("change state to in room", () => queueScreen!.SetState(ScreenQueue.MatchmakingScreenState.InRoom));
         }
 
+        [Test]
+        public void TestDelayedRoomScreenPushDoesNotRunIfRoomIsLeftPrematurely()
+        {
+            AddStep("change state to in room then immediately leave room", () =>
+            {
+                queueScreen!.SetState(ScreenQueue.MatchmakingScreenState.InRoom);
+                MultiplayerClient.LeaveRoom();
+            });
+
+            // the queue screen waits 2 seconds between transitioning to `InRoom` state and actually pushing the relevant screen.
+            // if the room goes to `null` in that time, things die very hard.
+            // therefore the wait here is to check that things don't die very hard.
+            // if they do the test will throw an exception and fail.
+            AddWaitStep("wait a little bit", 10);
+        }
+
         private static double generateCount(double x, double mean, double stdDev, double amplitude)
         {
             return amplitude * Math.Exp(-Math.Pow(x - mean, 2) / (2 * Math.Pow(stdDev, 2))) + Random.Shared.Next(300);
