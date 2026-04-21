@@ -1252,6 +1252,19 @@ namespace osu.Game.Screens.Select
 
         public void Delete(BeatmapSetInfo beatmapSet) => dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet));
 
+        public void DeleteGroup(GroupDefinition group)
+        {
+            if (dialogOverlay == null)
+                return;
+
+            var beatmapSets = carousel.GetBeatmapSetsForGroup(group).ToArray();
+
+            if (beatmapSets.Length == 0)
+                return;
+
+            dialogOverlay.Push(new BeatmapGroupDeleteDialog(group, beatmapSets));
+        }
+
         public void RestoreAllHidden(BeatmapSetInfo beatmapSet)
         {
             foreach (var b in beatmapSet.Beatmaps)
