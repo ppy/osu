@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
@@ -58,6 +59,20 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddStep("set expanded", () => history.Expand());
             AddWaitStep("wait a bit", 10);
             AddStep("set collapsed", () => history.Collapse());
+        }
+
+        [Test]
+        public void TestMessageDisappear()
+        {
+            AddStep("post a message", () => history.PostMessage(new Message
+            {
+                Sender = new APIUser { Id = 2 },
+                Content = "message"
+            }));
+
+            AddWaitStep("wait a bit", 30);
+            AddStep("set collapsed", () => history.Collapse());
+            AddAssert("message bubble hidden", () => history.Messages.FirstOrDefault()?.Alpha == 0);
         }
     }
 }
