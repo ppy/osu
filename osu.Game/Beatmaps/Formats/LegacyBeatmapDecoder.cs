@@ -465,9 +465,16 @@ namespace osu.Game.Beatmaps.Formats
                         break;
 
                     case LegacyEventType.Background:
-                        beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[2]);
+                    {
+                        var metadata = beatmap.BeatmapInfo.Metadata;
+                        metadata.BackgroundFile = CleanFilename(split[2]);
+                        if (split.Length > 3)
+                            metadata.BackgroundOffsetX = Parsing.ParseFloat(split[3], Parsing.MAX_COORDINATE_VALUE);
+                        if (split.Length > 4)
+                            metadata.BackgroundOffsetY = Parsing.ParseFloat(split[4], Parsing.MAX_COORDINATE_VALUE);
                         lineSupportedByEncoder = true;
                         break;
+                    }
 
                     case LegacyEventType.Break:
                         double start = getOffsetTime(Parsing.ParseDouble(split[1]));
