@@ -201,7 +201,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             base.Dispose(isDisposing);
 
             if (channel != null)
+            {
                 channel.NewMessagesArrived -= onNewMessagesArrived;
+                channel.PendingMessageResolved -= onPendingMessageResolved;
+            }
         }
 
         private partial class ChatTextBox : StandAloneChatDisplay.ChatTextBox
