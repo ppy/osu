@@ -155,6 +155,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             if (e.Repeat || Contracted || Cards.Any(static c => c.CardDragged))
                 return false;
 
+            if (e.ShiftPressed || e.ControlPressed || e.AltPressed || e.SuperPressed)
+                return false;
+
             switch (e.Key)
             {
                 case >= Key.Number1 and <= Key.Number9:
