@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = "Quick Play",
+                                    Text = "Ranked Play",
                                     Margin = new MarginPadding { Horizontal = 5f, Vertical = 7f },
                                     Font = OsuFont.GetFont(size: 12)
                                 },
