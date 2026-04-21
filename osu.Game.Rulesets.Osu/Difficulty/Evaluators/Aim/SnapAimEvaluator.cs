@@ -12,6 +12,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 {
     public static class SnapAimEvaluator
     {
+        private static double multiplier => 0.175 * Skills.Aim.SkillMultiplierTotal;
+
         private const double wide_angle_multiplier = 9.67;
         private const double acute_angle_multiplier = 2.41;
         private const double slider_multiplier = 1.5;
@@ -165,7 +167,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             aimStrain *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
 
-            return aimStrain;
+            return aimStrain * multiplier;
         }
 
         private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.03, Math.Pow(ms / 1000, 0.65)));
