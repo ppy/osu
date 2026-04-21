@@ -26,21 +26,35 @@ namespace osu.Game.Tests.Visual.RankedPlay
 
             AddStep("join room", () => JoinRoom(CreateDefaultRoom(MatchType.RankedPlay)));
             WaitForJoined();
-
-            AddStep("join other user", () => MultiplayerClient.AddUser(new APIUser { Id = 2 }));
-
-            AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
         }
 
         [Test]
         public void TestIntroStage()
         {
+            AddStep("join other user", () => MultiplayerClient.AddUser(new APIUser { Id = 2 }));
+
+            AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
+
+            AddStep("set round warmup phase", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.RoundWarmup, s => s.StarRating = 6.3f).WaitSafely());
+        }
+
+        [Test]
+        public void TestUnresolvedUser()
+        {
+            AddStep("join other user", () => MultiplayerClient.AddUser(new APIUser { Id = TestUserLookupCache.UNRESOLVED_USER_ID }));
+
+            AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
+
             AddStep("set round warmup phase", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.RoundWarmup, s => s.StarRating = 6.3f).WaitSafely());
         }
 
         [Test]
         public void TestDiscardCardsStage()
         {
+            AddStep("join other user", () => MultiplayerClient.AddUser(new APIUser { Id = 2 }));
+
+            AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
+
             AddStep("set discard phase", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.CardDiscard).WaitSafely());
 
             AddWaitStep("wait", 3);
@@ -72,6 +86,10 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void TestAddRemoveCards()
         {
+            AddStep("join other user", () => MultiplayerClient.AddUser(new APIUser { Id = 2 }));
+
+            AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
+
             AddStep("set discard phase", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.CardDiscard).WaitSafely());
 
             for (int i = 0; i < 3; i++)
@@ -84,6 +102,10 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void TestRevealCards()
         {
+            AddStep("join other user", () => MultiplayerClient.AddUser(new APIUser { Id = 2 }));
+
+            AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
+
             var requestHandler = new BeatmapRequestHandler();
 
             AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
@@ -104,6 +126,10 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void TestPlayCardDirect()
         {
+            AddStep("join other user", () => MultiplayerClient.AddUser(new APIUser { Id = 2 }));
+
+            AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
+
             AddStep("set play phase", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.CardPlay, state => state.ActiveUserId = API.LocalUser.Value.OnlineID).WaitSafely());
             AddWaitStep("wait", 3);
             AddStep("play card", () => MultiplayerClient.PlayCard(hand => hand[0]).WaitSafely());
@@ -112,6 +138,10 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void TestDiscardCardsDirect()
         {
+            AddStep("join other user", () => MultiplayerClient.AddUser(new APIUser { Id = 2 }));
+
+            AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
+
             AddStep("set discard phase", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.CardDiscard).WaitSafely());
             AddWaitStep("wait", 3);
             AddStep("discard cards", () => MultiplayerClient.DiscardCards(hand => hand.Take(3)).WaitSafely());
@@ -122,6 +152,10 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void TestPlayStage()
         {
+            AddStep("join other user", () => MultiplayerClient.AddUser(new APIUser { Id = 2 }));
+
+            AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
+
             AddStep("set play phase", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.CardPlay, state => state.ActiveUserId = API.LocalUser.Value.OnlineID).WaitSafely());
             AddUntilStep("wait until cards are present", () => this.ChildrenOfType<PlayerHandOfCards.PlayerHandCard>().Count() == 5);
 
@@ -153,6 +187,10 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void TestOtherPlaysCard()
         {
+            AddStep("join other user", () => MultiplayerClient.AddUser(new APIUser { Id = 2 }));
+
+            AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
+
             AddStep("set play phase", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.CardPlay, state => state.ActiveUserId = 2).WaitSafely());
             AddWaitStep("wait", 5);
             AddStep("play beatmap", () => MultiplayerClient.PlayUserCard(2, hand => hand[0]).WaitSafely());
@@ -166,6 +204,10 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void TestHealthChange()
         {
+            AddStep("join other user", () => MultiplayerClient.AddUser(new APIUser { Id = 2 }));
+
+            AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
+
             AddStep("set play phase", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.CardPlay, state => state.ActiveUserId = 2).WaitSafely());
             AddWaitStep("wait", 5);
             AddStep("change player 1 health", () => MultiplayerClient.RankedPlayChangeUserState(MultiplayerClient.LocalUser!.UserID, state => state.Life = 250_000).WaitSafely());
