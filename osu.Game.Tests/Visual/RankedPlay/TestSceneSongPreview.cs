@@ -58,21 +58,36 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddAssert("only one track running", () => this.ChildrenOfType<RankedPlayCard>().Count(c => c.PreviewTrackRunning) == 1);
 
             AddStep("move mouse to second card", () => InputManager.MoveMouseTo(getCard(1)));
-
             AddAssert("second track running", () => getCard(1).PreviewTrackRunning);
             AddAssert("only one track running", () => this.ChildrenOfType<RankedPlayCard>().Count(c => c.PreviewTrackRunning) == 1);
 
             AddStep("disable preview", () => previewEnabled.Value = false);
-
             AddAssert("no tracks running", () => !this.ChildrenOfType<RankedPlayCard>().Any(c => c.PreviewTrackRunning));
 
             AddStep("move mouse to third card", () => InputManager.MoveMouseTo(getCard(2)));
-
             AddAssert("no tracks running", () => !this.ChildrenOfType<RankedPlayCard>().Any(c => c.PreviewTrackRunning));
 
             AddStep("enable preview", () => previewEnabled.Value = true);
-
             AddAssert("third track running", () => getCard(2).PreviewTrackRunning);
+
+            AddStep("move mouse away", () => InputManager.MoveMouseTo(Vector2.Zero));
+            AddAssert("third track running", () => getCard(2).PreviewTrackRunning);
+
+            AddStep("disable preview", () => previewEnabled.Value = false);
+            AddAssert("no tracks running", () => !this.ChildrenOfType<RankedPlayCard>().Any(c => c.PreviewTrackRunning));
+
+            AddStep("enable preview", () => previewEnabled.Value = true);
+            AddAssert("no tracks running", () => !this.ChildrenOfType<RankedPlayCard>().Any(c => c.PreviewTrackRunning));
+
+            AddStep("move mouse to third card", () => InputManager.MoveMouseTo(getCard(2)));
+            AddAssert("third track running", () => getCard(2).PreviewTrackRunning);
+
+            AddStep("move mouse away", () => InputManager.MoveMouseTo(Vector2.Zero));
+            AddAssert("third track running", () => getCard(2).PreviewTrackRunning);
+
+            AddStep("move mouse to second card", () => InputManager.MoveMouseTo(getCard(1)));
+            AddAssert("second track running", () => getCard(1).PreviewTrackRunning);
+            AddAssert("only one track running", () => this.ChildrenOfType<RankedPlayCard>().Count(c => c.PreviewTrackRunning) == 1);
         }
 
         private RankedPlayCard getCard(int index) => this.ChildrenOfType<RankedPlayCard>().ElementAt(index);
