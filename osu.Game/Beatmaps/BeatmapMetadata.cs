@@ -61,6 +61,16 @@ namespace osu.Game.Beatmaps
         public string AudioFile { get; set; } = string.Empty;
         public string BackgroundFile { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Horizontal offset in pixels of the legacy Background event (fourth column in <c>[Events]</c>).
+        /// </summary>
+        public float BackgroundOffsetX { get; set; }
+
+        /// <summary>
+        /// Vertical offset in pixels of the legacy Background event (fifth column in <c>[Events]</c>).
+        /// </summary>
+        public float BackgroundOffsetY { get; set; }
+
         public BeatmapMetadata(RealmUser? user = null)
         {
             Author = user ?? new RealmUser();
@@ -85,7 +95,9 @@ namespace osu.Game.Beatmaps
             Tags = Tags,
             PreviewTime = PreviewTime,
             AudioFile = AudioFile,
-            BackgroundFile = BackgroundFile
+            BackgroundFile = BackgroundFile,
+            BackgroundOffsetX = BackgroundOffsetX,
+            BackgroundOffsetY = BackgroundOffsetY
         };
     }
 }
