@@ -31,28 +31,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 
         private readonly IBindable<MultiplayerPlaylistItem?> playlistItem;
 
-        public readonly Bindable<bool> SongPreviewEnabled = new BindableBool(true);
-
         private readonly Container content;
         private readonly Container cardContent;
         private readonly Container shadow;
         private readonly SelectionOutline selectionOutline;
-        private readonly SongPreviewContainer songPreviewContainer;
+        public readonly SongPreviewContainer SongPreview;
 
         public bool ShowSelectionOutline
         {
             set => selectionOutline.FadeTo(value ? 1 : 0, 50);
         }
 
-        public bool PlayAudioPreview
-        {
-            set => songPreviewContainer.CardHovered.Value = value;
-        }
-
         public float Elevation;
-
-        public bool PreviewTrackLoaded => songPreviewContainer.TrackLoaded;
-        public bool PreviewTrackRunning => songPreviewContainer.IsRunning;
 
         private Sample? cardFlipSample;
 
@@ -67,9 +57,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 
             playlistItem = item.PlaylistItem.GetBoundCopy();
 
-            InternalChild = songPreviewContainer = new SongPreviewContainer
+            InternalChild = SongPreview = new SongPreviewContainer
             {
-                Enabled = { BindTarget = SongPreviewEnabled },
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -173,7 +162,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
             Schedule(() =>
             {
                 SetContent(new RankedPlayCardContent(beatmap));
-                songPreviewContainer.LoadPreview(beatmap);
+                SongPreview.LoadPreview(beatmap);
             });
         });
 
