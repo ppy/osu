@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckFewHitsounds : ICheck
+    public abstract class CheckFewHitsounds : ICheck
     {
         /// <summary>
         /// 2 measures (4/4) of 120 BPM, typically makes up a few patterns in the map.

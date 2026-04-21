@@ -11,6 +11,7 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Edit.Checks;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Beatmaps;
 
@@ -19,7 +20,7 @@ namespace osu.Game.Tests.Editing.Checks
     [TestFixture]
     public class CheckFewHitsoundsTest
     {
-        private CheckFewHitsounds check = null!;
+        private CheckOsuFewHitsounds check = null!;
 
         private List<HitSampleInfo> notHitsounded = null!;
         private List<HitSampleInfo> hitsounded = null!;
@@ -27,7 +28,7 @@ namespace osu.Game.Tests.Editing.Checks
         [SetUp]
         public void Setup()
         {
-            check = new CheckFewHitsounds();
+            check = new CheckOsuFewHitsounds();
             notHitsounded = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) };
             hitsounded = new List<HitSampleInfo>
             {
