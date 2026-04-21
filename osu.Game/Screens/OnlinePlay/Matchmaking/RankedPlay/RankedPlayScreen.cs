@@ -193,8 +193,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             int localUserId = api.LocalUser.Value.OnlineID;
             int opponentUserId = ((RankedPlayRoomState)client.Room!.MatchState!).Users.Keys.Single(it => it != localUserId);
 
-            localUser = users.GetUserAsync(localUserId).GetResultSafely()!;
-            opponentUser = users.GetUserAsync(opponentUserId).GetResultSafely()!;
+            localUser = users.GetUserAsync(localUserId).GetResultSafely() ?? api.LocalUser.Value;
+            opponentUser = users.GetUserAsync(opponentUserId).GetResultSafely() ?? APIUser.UnknownUser(opponentUserId);
 
             AddRangeInternal([
                 new RankedPlayCornerPiece(RankedPlayColourScheme.BLUE, Anchor.BottomLeft)

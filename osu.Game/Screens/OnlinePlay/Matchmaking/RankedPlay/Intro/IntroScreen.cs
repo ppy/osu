@@ -60,8 +60,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 
             var users = await userLookupCache.GetUsersAsync(userIds).ConfigureAwait(false);
 
-            var player = users.OfType<APIUser>().First(it => it.Id == api.LocalUser.Value.Id);
-            var opponent = users.OfType<APIUser>().First(it => it.Id != api.LocalUser.Value.Id);
+            var player = users.OfType<APIUser>().FirstOrDefault(it => it.Id == api.LocalUser.Value.Id)
+                         ?? api.LocalUser.Value;
+            var opponent = users.OfType<APIUser>().FirstOrDefault(it => it.Id != api.LocalUser.Value.Id)
+                           ?? APIUser.UnknownUser(userIds.First(id => id != api.LocalUser.Value.Id));
 
             int playerRating = roomState.Users[player.Id].Rating;
             int opponentRating = roomState.Users[opponent.Id].Rating;
