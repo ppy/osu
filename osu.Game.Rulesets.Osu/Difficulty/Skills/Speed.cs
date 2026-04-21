@@ -39,12 +39,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double ObjectDifficultyOf(DifficultyHitObject current)
         {
-            double decay = strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+            double decay = strainDecay(osuCurrObj.AdjustedDeltaTime);
 
             currentDifficulty *= decay;
-            currentDifficulty += SpeedEvaluator.EvaluateDifficultyOf(current) * (1 - decay) * skillMultiplier;
+            currentDifficulty += SpeedEvaluator.EvaluateDifficultyOf(osuCurrObj) * (1 - decay) * skillMultiplier;
 
-            double currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
+            double currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(osuCurrObj);
 
             double totalDifficulty = currentDifficulty * currentRhythm;
 

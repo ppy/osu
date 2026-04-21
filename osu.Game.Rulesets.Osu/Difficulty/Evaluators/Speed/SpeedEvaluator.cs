@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -22,19 +21,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
         /// <item><description>and how easily they can be cheesed.</description></item>
         /// </list>
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current)
+        public static double EvaluateDifficultyOf(OsuDifficultyHitObject currObj)
         {
-            if (current.BaseObject is Spinner)
+            if (currObj.BaseObject is Spinner)
                 return 0;
 
-            var osuCurrObj = (OsuDifficultyHitObject)current;
-
-            double strainTime = osuCurrObj.AdjustedDeltaTime;
-            double doubletapness = 1.0 - osuCurrObj.GetDoubletapness((OsuDifficultyHitObject?)osuCurrObj.Next(0));
+            double strainTime = currObj.AdjustedDeltaTime;
+            double doubletapness = 1.0 - currObj.GetDoubletapness((OsuDifficultyHitObject?)currObj.Next(0));
 
             // Cap deltatime to the OD 300 hitwindow.
             // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
-            strainTime /= Math.Clamp((strainTime / osuCurrObj.HitWindow(HitResult.Great)) / 0.93, 0.92, 1);
+            strainTime /= Math.Clamp((strainTime / currObj.HitWindow(HitResult.Great)) / 0.93, 0.92, 1);
 
             // speedBonus will be 0.0 for BPM < 200
             double speedBonus = 0.0;
@@ -46,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
             // Base difficulty with all bonuses
             double difficulty = (1 + speedBonus) * 1000 / strainTime;
 
-            difficulty *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
+            difficulty *= highBpmBonus(currObj.AdjustedDeltaTime);
 
             // Apply penalty if there's doubletappable doubles
             return difficulty * doubletapness;

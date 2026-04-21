@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
+using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
@@ -37,11 +38,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             objectList.Add(current);
 
-            double decay = strainDecay(current.DeltaTime);
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+            double decay = strainDecay(osuCurrObj.AdjustedDeltaTime);
 
             currentDifficulty *= decay;
 
-            currentDifficulty += ReadingEvaluator.EvaluateDifficultyOf(current, hasHiddenMod) * (1 - decay) * skillMultiplier;
+            currentDifficulty += ReadingEvaluator.EvaluateDifficultyOf(osuCurrObj, hasHiddenMod) * (1 - decay) * skillMultiplier;
 
             return currentDifficulty;
         }

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 
@@ -15,24 +14,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         /// <summary>
         /// Evaluates the difficulty of fast aiming
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current)
+        public static double EvaluateDifficultyOf(OsuDifficultyHitObject currObj)
         {
-            if (current.BaseObject is Spinner)
+            if (currObj.BaseObject is Spinner)
                 return 0;
 
-            var osuCurrObj = (OsuDifficultyHitObject)current;
-            var osuPrevObj = current.Index > 0 ? (OsuDifficultyHitObject)current.Previous(0) : null;
+            var prevObj = currObj.Index > 0 ? (OsuDifficultyHitObject)currObj.Previous(0) : null;
 
-            double travelDistance = osuPrevObj?.LazyTravelDistance ?? 0;
-            double distance = travelDistance + osuCurrObj.LazyJumpDistance;
+            double travelDistance = prevObj?.LazyTravelDistance ?? 0;
+            double distance = travelDistance + currObj.LazyJumpDistance;
 
             double distanceScaled = Math.Min(distance, distance_cap) / distance_cap;
 
-            double strain = distanceScaled * 1000 / osuCurrObj.AdjustedDeltaTime;
+            double strain = distanceScaled * 1000 / currObj.AdjustedDeltaTime;
 
-            strain *= Math.Pow(osuCurrObj.SmallCircleBonus, 1.5);
+            strain *= Math.Pow(currObj.SmallCircleBonus, 1.5);
 
-            strain *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
+            strain *= highBpmBonus(currObj.AdjustedDeltaTime);
 
             return strain;
         }
