@@ -90,6 +90,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private SampleChannel? waitingLoopChannel;
         private ScheduledDelegate? startLoopPlaybackDelegate;
         private DrawableSample waitingLoop = null!;
+        private ScheduledDelegate? pushScreenDelegate;
 
         private int? userRating;
 
@@ -465,6 +466,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             startLoopPlaybackDelegate?.Cancel();
             stopWaitingLoopPlayback();
 
+            pushScreenDelegate?.Cancel();
+            pushScreenDelegate = null;
+
             switch (newState)
             {
                 case MatchmakingScreenState.Idle:
@@ -599,7 +603,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
                     using (BeginDelayedSequence(2000))
                     {
-                        Schedule(() =>
+                        pushScreenDelegate = Schedule(() =>
                         {
                             switch (poolType)
                             {
