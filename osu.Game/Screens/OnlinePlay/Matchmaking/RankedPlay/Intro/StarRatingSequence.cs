@@ -14,8 +14,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 {
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
         private float lastTickStdDev;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour, AudioManager audio)
+        private void load(OsuColour colour, OverlayColourProvider overlayColourProvider, AudioManager audio)
         {
             Width = 600;
             AutoSizeAxes = Axes.Y;
@@ -43,19 +43,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
             Origin = Anchor.Centre;
             Alpha = 0;
 
-            Masking = true;
-            CornerRadius = 10;
-
             InternalChild = new Container
             {
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
+                Masking = true,
+                CornerRadius = 10,
                 Children = new Drawable[]
                 {
                     new Box
                     {
-                        Colour = Color4.Black,
-                        Alpha = 0.2f,
+                        Colour = overlayColourProvider.Background5,
+                        Alpha = 0.8f,
                         RelativeSizeAxes = Axes.Both,
                     },
                     new FillFlowContainer
@@ -88,7 +87,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                                     new Box
                                     {
                                         Alpha = 0.4f,
-                                        Colour = Color4.Black,
+                                        Colour = overlayColourProvider.Background4,
                                         RelativeSizeAxes = Axes.Both,
                                     },
                                     bars = new Container<Bar>
@@ -204,7 +203,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                         RelativePositionAxes = Axes.X,
                         X = starRating * 0.1f,
                         Y = 34,
-                        Colour = colours.ForStarDifficulty(starRating),
+                        Colour = starRating < OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.ForStarDifficulty(starRating) : colours.ForStarDifficultyText(starRating),
                         Spacing = new Vector2(4, 0),
                         Children =
                         [
@@ -226,6 +225,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                     };
 
                     centerContainer.Add(container);
+                    // Avoid text getting masked out by inner containers
+                    AddInternal(container.CreateProxy());
 
                     container.FadeInFromZero(200)
                              .ScaleTo(0)
