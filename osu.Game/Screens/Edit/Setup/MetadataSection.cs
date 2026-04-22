@@ -100,7 +100,12 @@ namespace osu.Game.Screens.Edit.Setup
                 if (b.Equals(current))
                     continue;
 
-                copySyncedMetadataTo(source, b.Metadata);
+                b.Metadata.ArtistUnicode = source.ArtistUnicode;
+                b.Metadata.Artist = source.Artist;
+                b.Metadata.TitleUnicode = source.TitleUnicode;
+                b.Metadata.Title = source.Title;
+                b.Metadata.Source = source.Source;
+                b.Metadata.Tags = source.Tags;
 
                 try
                 {
@@ -115,16 +120,6 @@ namespace osu.Game.Screens.Edit.Setup
 
             // Persist the current difficulty and align with how resource changes re-save the current beatmap.
             editor?.Save();
-        }
-
-        private static void copySyncedMetadataTo(BeatmapMetadata source, BeatmapMetadata target)
-        {
-            target.ArtistUnicode = source.ArtistUnicode;
-            target.Artist = source.Artist;
-            target.TitleUnicode = source.TitleUnicode;
-            target.Title = source.Title;
-            target.Source = source.Source;
-            target.Tags = source.Tags;
         }
 
         private TTextBox createTextBox<TTextBox>(LocalisableString label)
