@@ -92,9 +92,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                     // If objects just go back and forth through a middle point - don't give as much wide bonus
                     // Use Previous(2) and Previous(0) because angles calculation is done prevprev-prev-curr, so any object's angle's center point is always the previous object
                     var prevBaseObject = (OsuHitObject)prevObj.BaseObject;
-                    var prev3BaseObject = (OsuHitObject)prev2Obj.BaseObject;
+                    var prev2BaseObject = (OsuHitObject)prev2Obj.BaseObject;
 
-                    float distance = (prev3BaseObject.StackedPosition - prevBaseObject.StackedPosition).Length;
+                    float distance = (prev2BaseObject.StackedPosition - prevBaseObject.StackedPosition).Length;
 
                     if (distance < 1)
                     {
