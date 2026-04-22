@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Lines;
-using osu.Framework.Layout;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
@@ -28,7 +27,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         private const int width = 400;
         private const int height = 24;
 
+        protected override bool StartHidden => true;
         protected override bool BlockPositionalInput => false;
+
+        private readonly SliderPath sliderPath;
 
         private Path pathLeft = null!;
         private Path pathRight = null!;
@@ -36,9 +38,58 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         private Path pathCenter = null!;
         private Path pathCenterWide = null!;
 
-        private readonly LayoutValue layout = new LayoutValue(Invalidation.DrawSize);
+        // TODO: remove this jank after we've migrated to .NET 10
+        private float progressStartInternal = 0.5f;
+        private float progressEndInternal = 0.5f;
 
-        protected override bool StartHidden => true;
+        private float progressStart
+        {
+            get => progressStartInternal;
+            set
+            {
+                progressStartInternal = value;
+                Scheduler.AddOnce(recomputePaths);
+            }
+        }
+
+        private float progressEnd
+        {
+            get => progressEndInternal;
+            set
+            {
+                progressEndInternal = value;
+                Scheduler.AddOnce(recomputePaths);
+            }
+        }
+
+        public RankedPlayBottomOrnament()
+        {
+            const int top = 2; // to account for the middle segment being twice as wide
+            const int bottom = 10;
+            const int curve_smoothness = 5;
+
+            const int left_start = 0;
+            const int left_corner = 10;
+            const int left_end = 20;
+            var diagonalDirLeft = (new Vector2(left_start, bottom) - new Vector2(left_corner, top)).Normalized();
+
+            const float right_start = width;
+            const float right_corner = right_start - 10;
+            const float right_end = right_start - 20;
+            var diagonalDirRight = (new Vector2(right_start, bottom) - new Vector2(right_corner, top)).Normalized();
+
+            sliderPath = new SliderPath(new[]
+            {
+                new PathControlPoint(new Vector2(left_start, bottom), PathType.BEZIER),
+                new PathControlPoint(new Vector2(left_corner, top) + diagonalDirLeft * curve_smoothness),
+                new PathControlPoint(new Vector2(left_corner, top)),
+                new PathControlPoint(new Vector2(left_end, top), PathType.LINEAR),
+                new PathControlPoint(new Vector2(right_end, top), PathType.BEZIER),
+                new PathControlPoint(new Vector2(right_corner, top)),
+                new PathControlPoint(new Vector2(right_corner, top) + diagonalDirRight * curve_smoothness),
+                new PathControlPoint(new Vector2(right_start, bottom)),
+            });
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -108,71 +159,45 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 
         private void recomputePaths()
         {
-            const int top = 2; // to account for the middle segment being twice as wide
-            const int bottom = 10;
-            const int curve_smoothness = 5;
-
-            pathCenter.AddVertex(new Vector2(30, top));
-            pathCenter.AddVertex(new Vector2(DrawWidth - 30, top));
-
-            pathCenterWide.AddVertex(new Vector2(60, top));
-            pathCenterWide.AddVertex(new Vector2(DrawWidth - 60, top));
-
-            const int left_start = 0;
-            const int left_corner = 10;
-            const int left_end = 20;
-
             List<Vector2> vertices = new List<Vector2>();
-            var diagonalDirLeft = (new Vector2(left_start, bottom) - new Vector2(left_corner, top)).Normalized();
+            sliderPath.GetPathToProgress(vertices, progressStart, progressEnd);
 
-            var sliderPathLeft = new SliderPath(new[]
+            if (progressStart >= 0.15 && progressEnd <= 0.85)
+                pathCenterWide.Vertices = vertices;
+
+            if (progressStart >= 0.075 && progressEnd <= 0.925)
+                pathCenter.Vertices = vertices;
+
+            if (progressStart <= 0.05)
             {
-                new PathControlPoint(new Vector2(left_start, bottom), PathType.LINEAR),
-                new PathControlPoint(new Vector2(left_corner, top) + diagonalDirLeft * curve_smoothness, PathType.BEZIER),
-                new PathControlPoint(new Vector2(left_corner, top)),
-                new PathControlPoint(new Vector2(left_end, top), PathType.LINEAR),
-            });
+                List<Vector2> verticesLeft = new List<Vector2>();
+                sliderPath.GetPathToProgress(verticesLeft, progressStart, 0.05);
+                pathLeft.Vertices = verticesLeft;
+            }
 
-            sliderPathLeft.GetPathToProgress(vertices, 0.0, 1.0);
-            pathLeft.Vertices = vertices;
-
-            float rightStart = DrawWidth;
-            float rightCorner = rightStart - 10;
-            float rightEnd = rightStart - 20;
-
-            var diagonalDirRight = (new Vector2(rightStart, bottom) - new Vector2(rightCorner, top)).Normalized();
-            var sliderPathRight = new SliderPath(new[]
+            if (progressEnd >= 0.95)
             {
-                new PathControlPoint(new Vector2(rightStart, bottom), PathType.LINEAR),
-                new PathControlPoint(new Vector2(rightCorner, top) + diagonalDirRight * curve_smoothness, PathType.BEZIER),
-                new PathControlPoint(new Vector2(rightCorner, top)),
-                new PathControlPoint(new Vector2(rightEnd, top), PathType.LINEAR),
-            });
-
-            sliderPathRight.GetPathToProgress(vertices, 0.0, 1.0);
-            pathRight.Vertices = vertices;
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (!layout.IsValid)
-            {
-                recomputePaths();
-                layout.Validate();
+                List<Vector2> verticesRight = new List<Vector2>();
+                sliderPath.GetPathToProgress(verticesRight, 0.95, progressEnd);
+                pathRight.Vertices = verticesRight;
             }
         }
 
+        private const int duration = 1200;
+        private const Easing easing = Easing.OutExpo;
+
         protected override void PopIn()
         {
-            this.FadeIn(500, Easing.OutQuint);
-            // TODO: animate this better.
+            this.FadeIn(duration, easing)
+                .TransformTo(nameof(progressStart), 0f, duration, easing)
+                .TransformTo(nameof(progressEnd), 1f, duration, easing);
         }
 
         protected override void PopOut()
         {
-            this.FadeOut(500, Easing.OutQuint);
+            this.FadeOut(duration, easing)
+                .TransformTo(nameof(progressStart), 0.5f, duration, easing)
+                .TransformTo(nameof(progressEnd), 0.5f, duration, easing);
         }
     }
 }
