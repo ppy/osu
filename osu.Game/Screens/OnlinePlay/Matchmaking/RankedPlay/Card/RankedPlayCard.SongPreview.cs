@@ -49,7 +49,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
             private OsuColour colours { get; set; } = null!;
 
             [Resolved]
-            private RankedPlayScreen rankedPlayScreen { get; set; } = null!;
+            private RankedPlayScreen? rankedPlayScreen { get; set; }
 
             public readonly IBindable<SongPreviewContainer?> CurrentPlayingPreview = new Bindable<SongPreviewContainer?>();
 
@@ -122,7 +122,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                 // - https://github.com/ppy/osu-framework/pull/6728
                 // - https://github.com/ppy/osu/pull/37218
                 // - https://github.com/ppy/osu/pull/37453
-                if (!rankedPlayScreen.IsCurrentScreen())
+                if (rankedPlayScreen?.IsCurrentScreen() == false)
                     return;
 
                 bool shouldBePlaying = CurrentPlayingPreview.Value == this;
