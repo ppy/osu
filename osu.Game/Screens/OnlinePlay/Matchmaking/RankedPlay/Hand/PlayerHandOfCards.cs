@@ -4,13 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Online.RankedPlay;
@@ -84,17 +82,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
         /// </summary>
         public IEnumerable<RankedPlayCardWithPlaylistItem> Selection => selection.Select(it => it.Card.Item);
 
-        /// <summary>
-        /// The currently-playing preview.
-        /// </summary>
-        /// <remarks>
-        /// Note that due to how cards get detached and handed off between multiple <see cref="HandOfCards"/> instances and non-hand containers,
-        /// DI cannot be reliably used to pass this bindable down to children
-        /// because it'll only work for the first <see cref="PlayerHandOfCards"/> that <see cref="RankedPlayCard"/>s bind to.
-        /// Instead, <see cref="AddCard"/> and <see cref="DetachCard"/> overrides in this class set up this bindable manually as cards are handed off between stages.
-        /// </remarks>
-        public readonly Bindable<RankedPlayCard.SongPreviewContainer?> CurrentPlayingPreview = new Bindable<RankedPlayCard.SongPreviewContainer?>();
-
         private readonly BindableBool allowSelection = new BindableBool();
 
         private const int select_samples = 1;
@@ -122,19 +109,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             AllowSelection = allowSelection.GetBoundCopy(),
             PlayAction = PlayCardAction,
         };
-
-        public override void AddCard(RankedPlayCard card, Action<HandCard>? setupAction = null)
-        {
-            base.AddCard(card, setupAction);
-            card.SongPreview.CurrentPlayingPreview.BindTo(CurrentPlayingPreview);
-        }
-
-        public override bool DetachCard(RankedPlayCardWithPlaylistItem item, [MaybeNullWhen(false)] out RankedPlayCard card, out Quad screenSpaceDrawQuad)
-        {
-            bool result = base.DetachCard(item, out card, out screenSpaceDrawQuad);
-            card?.SongPreview.CurrentPlayingPreview.UnbindFrom(CurrentPlayingPreview);
-            return result;
-        }
 
         private void cardClicked(PlayerHandCard card)
         {
@@ -170,9 +144,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
         protected override void OnCardStateChanged(HandCard card, ValueChangedEvent<RankedPlayCardState> evt)
         {
             StateChanged?.Invoke();
-
-            if (evt.NewValue.Hovered)
-                CurrentPlayingPreview.Value = card.Card.SongPreview;
 
             base.OnCardStateChanged(card, evt);
         }
