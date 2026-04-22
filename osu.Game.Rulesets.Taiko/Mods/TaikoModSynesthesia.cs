@@ -23,7 +23,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
         private const float triangle_width = 13f;
         private const float triangle_height = 7.5f;
 
-        /// <summary>Gap from hit content top/bottom edge to the outside of the triangle (before half-height).</summary>
+        /// <summary>
+        /// Gap from hit content top/bottom edge to the outside of the triangle (before half-height).
+        /// </summary>
         private const float content_edge_to_triangle_margin = 4f;
 
         private static readonly OsuColour colours = new OsuColour();
@@ -52,12 +54,12 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 {
                     var overlay = new SynesthesiaLayerOverlay(
                         Position,
-                        new SnapIndicatorBlock[]
+                        new[]
                         {
                             new SnapIndicatorBlock(),
                             new SnapIndicatorBlock(),
                         },
-                        new Func<double>[]
+                        new[]
                         {
                             () => drumRoll.HitObject.StartTime,
                             () => drumRoll.HitObject.EndTime,
@@ -71,7 +73,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     var overlay = new SynesthesiaLayerOverlay(
                         Position,
                         new[] { new SnapIndicatorBlock() },
-                        new Func<double>[]
+                        new[]
                         {
                             () => hit.HitObject.StartTime,
                         });
@@ -146,7 +148,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 }
             }
 
-            /// <summary>Place triangle centres at <c>±(contentHalfHeight + margin + triHalf)</c> from the note centre (local Y=0).</summary>
+            /// <summary>
+            /// Place triangle centres at <c>±(contentHalfHeight + margin + triHalf)</c> from the note centre (local Y=0).
+            /// </summary>
             public void LayoutForContentHalfHeight(float contentHalfHeight)
             {
                 float offsetFromNoteCentreY = contentHalfHeight + content_edge_to_triangle_margin + triangle_height / 2f;
@@ -211,13 +215,19 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public enum IndicatorPosition
         {
-            /// <summary>Indicators above and below the note.</summary>
+            /// <summary>
+            /// Indicators above and below the note.
+            /// </summary>
             Both = 0,
 
-            /// <summary>Only the indicator above the note.</summary>
+            /// <summary>
+            /// Only the indicator above the note.
+            /// </summary>
             Top = 1,
 
-            /// <summary>Only the indicator below the note.</summary>
+            /// <summary>
+            /// Only the indicator below the note.
+            /// </summary>
             Bottom = 2,
         }
     }
