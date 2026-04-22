@@ -2,11 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Audio;
 using osu.Game.Screens.Menu;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Seasonal
@@ -22,7 +23,7 @@ namespace osu.Game.Seasonal
         protected override MenuLogoVisualisation CreateMenuLogoVisualisation() => new SeasonalMenuLogoVisualisation();
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, AudioManager audio)
+        private void load(TextureStore textures)
         {
             LogoElements.Add(hat = new Sprite
             {
@@ -34,7 +35,7 @@ namespace osu.Game.Seasonal
             });
 
             // override base samples with our preferred ones.
-            SampleDownbeat = SampleBeat = audio.Samples.Get(@"Menu/osu-logo-heartbeat-bell");
+            AddInternal(SampleDownbeat = SampleBeat = new SkinnableSound(new SampleInfo(@"Menu/osu-logo-heartbeat-bell")));
         }
 
         protected override void Update()
