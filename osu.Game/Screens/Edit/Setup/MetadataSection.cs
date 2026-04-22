@@ -12,6 +12,7 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
+using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.Edit.Setup
@@ -43,6 +44,9 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         private IBindable<WorkingBeatmap> working { get; set; } = null!;
 
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(SetupScreen? setupScreen)
         {
@@ -60,8 +64,14 @@ namespace osu.Game.Screens.Edit.Setup
                 RelativeSizeAxes = Axes.X,
                 Text = EditorSetupStrings.SyncMetadataWithAllDifficulties,
                 TooltipText = EditorSetupStrings.SyncMetadataWithAllDifficultiesTooltip,
-                Action = syncMetadataToAllOtherDifficulties,
                 Margin = new MarginPadding { Top = 10 },
+                Action = () =>
+                {
+                    if (working.Value.BeatmapSetInfo.Beatmaps.Count <= 1)
+                        return;
+
+                    dialogOverlay?.Push(new SyncMetadataConfirmationDialog(syncMetadataToAllOtherDifficulties));
+                },
             };
             syncMetadataButton.Enabled.Value = working.Value.BeatmapSetInfo.Beatmaps.Count > 1;
 
