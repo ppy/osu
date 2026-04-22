@@ -113,7 +113,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
         public void AddCard(RankedPlayCardWithPlaylistItem item, Action<HandCard>? setupAction = null) => AddCard(new RankedPlayCard(item), setupAction);
 
-        public virtual void AddCard(RankedPlayCard card, Action<HandCard>? setupAction = null)
+        public void AddCard(RankedPlayCard card, Action<HandCard>? setupAction = null)
         {
             if (cardLookup.ContainsKey(card.Item.Card))
                 return;
@@ -159,7 +159,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
         /// <param name="card">Contained <see cref="RankedPlayCard"/></param>
         /// <param name="screenSpaceDrawQuad"><see cref="Drawable.ScreenSpaceDrawQuad"/> of the removed card</param>
         /// <returns>Whether a card was found for the provided item</returns>
-        public virtual bool DetachCard(RankedPlayCardWithPlaylistItem item, [MaybeNullWhen(false)] out RankedPlayCard card, out Quad screenSpaceDrawQuad)
+        public bool RemoveCard(RankedPlayCardWithPlaylistItem item, [MaybeNullWhen(false)] out RankedPlayCard card, out Quad screenSpaceDrawQuad)
         {
             if (!cardLookup.Remove(item.Card, out var drawable))
             {
