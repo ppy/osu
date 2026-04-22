@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Screens;
 using osu.Framework.Timing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -46,6 +47,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 
             [Resolved]
             private OsuColour colours { get; set; } = null!;
+
+            [Resolved]
+            private RankedPlayScreen rankedPlayScreen { get; set; } = null!;
 
             public readonly IBindable<SongPreviewContainer?> CurrentPlayingPreview = new Bindable<SongPreviewContainer?>();
 
@@ -108,6 +112,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
             private void updatePlayingState()
             {
                 if (previewTrack?.IsLoaded != true)
+                    return;
+
+                // TODO: the ranked play screen current check should not be required. `IPreviewTrackOwner` should be handling all of this.
+                // the reason why all of this logic is so wonky and `Update()`-based is because of framework breakage that causes hard crashes
+                // in inopportune threading arrangements.
+                // read:
+                // - https://github.com/ppy/osu-framework/pull/6727
+                // - https://github.com/ppy/osu-framework/pull/6728
+                // - https://github.com/ppy/osu/pull/37218
+                // - https://github.com/ppy/osu/pull/37453
+                if (!rankedPlayScreen.IsCurrentScreen())
                     return;
 
                 bool shouldBePlaying = CurrentPlayingPreview.Value == this;
