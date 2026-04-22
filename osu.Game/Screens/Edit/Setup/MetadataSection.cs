@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Edit.Setup
                 try
                 {
                     var beatmapWorking = beatmaps.GetWorkingBeatmap(b);
-                    beatmaps.Save(b, beatmapWorking.GetPlayableBeatmap(b.Ruleset));
+                    beatmaps.Save(b, beatmapWorking.GetPlayableBeatmap(b.Ruleset), beatmapWorking.GetSkin());
                 }
                 catch (Exception e)
                 {
