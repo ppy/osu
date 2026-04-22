@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -121,10 +122,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Consider that full combo is maximum combo minus dropped slider tails since they don't contribute to combo but also don't break it
             // In classic scores we can't know the amount of dropped sliders so we estimate it
-            double fullComboThreshold = attributes.MaxCombo - Math.Min(4 + likelyMissedSliderendPortion * attributes.SliderCount, attributes.SliderCount);
+            double likelyMissedSliderends = Math.Min(4 + likelyMissedSliderendPortion * attributes.SliderCount, attributes.SliderCount);
+            double fullComboThreshold = attributes.MaxCombo - likelyMissedSliderends;
 
-            if (score.MaxCombo < fullComboThreshold)
+            double leniencyBounds = likelyMissedSliderends / 4;
+
+            if (score.MaxCombo < fullComboThreshold + leniencyBounds)
+            {
                 missCount = Math.Pow(fullComboThreshold / Math.Max(1.0, score.MaxCombo), 2.5);
+
+                // Apply a gradient to ensure combo threshold isn't all or nothing
+                missCount *= DifficultyCalculationUtils.Smoothstep(score.MaxCombo, fullComboThreshold + leniencyBounds, fullComboThreshold - leniencyBounds);
+            }
 
             // In classic scores there can't be more misses than a sum of all non-perfect judgements
             missCount = Math.Min(missCount, totalImperfectHits);
