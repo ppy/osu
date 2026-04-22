@@ -31,10 +31,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
         {
             private const double minimum_beat_length = 800;
 
-            public readonly Bindable<bool> Enabled = new BindableBool(true);
-
-            public readonly Bindable<bool> CardHovered = new BindableBool(true);
-
             public bool TrackLoaded => previewTrack?.TrackLoaded ?? false;
 
             public bool IsRunning => previewTrack?.IsRunning ?? false;
@@ -50,6 +46,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 
             [Resolved]
             private OsuColour colours { get; set; } = null!;
+
+            public readonly IBindable<SongPreviewContainer?> CurrentPlayingPreview = new Bindable<SongPreviewContainer?>();
 
             public SongPreviewContainer()
             {
@@ -112,7 +110,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                 if (previewTrack?.IsLoaded != true)
                     return;
 
-                bool shouldBePlaying = Enabled.Value && CardHovered.Value;
+                bool shouldBePlaying = CurrentPlayingPreview.Value == this;
 
                 if (shouldBePlaying == previewTrack.IsRunning)
                     return;

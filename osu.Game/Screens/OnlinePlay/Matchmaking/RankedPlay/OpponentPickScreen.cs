@@ -155,7 +155,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             {
                 RankedPlayCard? card;
 
-                if (opponentHand.RemoveCard(item, out card, out var drawQuad))
+                if (opponentHand.DetachCard(item, out card, out var drawQuad))
                 {
                     card.MatchScreenSpaceDrawQuad(drawQuad, CenterRow);
                 }
