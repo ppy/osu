@@ -104,6 +104,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 handOfCards.OnCardStateChanged(this, state);
 
                 Card.ShowSelectionOutline = state.NewValue.Selected;
+                Card.PlayAudioPreview = state.NewValue.Hovered;
 
                 switch (state.NewValue.Pressed, state.OldValue.Pressed)
                 {
