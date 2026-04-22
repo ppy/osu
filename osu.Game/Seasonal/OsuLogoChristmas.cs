@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -14,6 +15,8 @@ namespace osu.Game.Seasonal
     public partial class OsuLogoChristmas : OsuLogo
     {
         protected override double BeatSampleVariance => 0.02;
+
+        private Sample? sampleBeatBell;
 
         private Sprite? hat;
 
@@ -33,8 +36,21 @@ namespace osu.Game.Seasonal
                 Texture = textures.Get(@"Menu/hat"),
             });
 
-            // override base samples with our preferred ones.
-            SampleDownbeat = SampleBeat = audio.Samples.Get(@"Menu/osu-logo-heartbeat-bell");
+            sampleBeatBell = audio.Samples.Get(@"Menu/osu-logo-heartbeat-bell");
+        }
+
+        // override base samples with our preferred ones.
+        protected override void PlaySampleDownbeat() => sampleBeatBell?.Play();
+
+        protected override void PlaySampleBeat(double frequency)
+        {
+            if (sampleBeatBell == null)
+                return;
+
+            var channel = sampleBeatBell.GetChannel();
+
+            channel.Frequency.Value = frequency;
+            channel.Play();
         }
 
         protected override void Update()
