@@ -8,9 +8,11 @@ using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand;
 using osuTK.Input;
 
@@ -213,6 +215,42 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddStep("change player 1 health", () => MultiplayerClient.RankedPlayChangeUserState(MultiplayerClient.LocalUser!.UserID, state => state.Life = 250_000).WaitSafely());
             AddWaitStep("wait", 5);
             AddStep("change player 2 health", () => MultiplayerClient.RankedPlayChangeUserState(2, state => state.Life = 250_000).WaitSafely());
+        }
+
+        [Test]
+        public void TestPreviewStopsOnEnteringGameplay()
+        {
+            AddStep("join other user", () => MultiplayerClient.AddUser(new APIUser { Id = 2 }));
+
+            AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
+
+            var requestHandler = new BeatmapRequestHandler();
+
+            AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
+
+            AddStep("set play phase", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.CardPlay, state => state.ActiveUserId = 1001).WaitSafely());
+
+            for (int i = 0; i < 3; i++)
+            {
+                int i2 = i;
+                AddStep("reveal card", () => MultiplayerClient.RankedPlayRevealCard(hand => hand[i2], new MultiplayerPlaylistItem
+                {
+                    ID = i2,
+                    BeatmapID = requestHandler.Beatmaps[i2].OnlineID
+                }).WaitSafely());
+            }
+
+            AddStep("hover first card", () => InputManager.MoveMouseTo(this.ChildrenOfType<PlayerHandOfCards>().Single().Cards.First()));
+            AddUntilStep("preview playing", () => this.ChildrenOfType<RankedPlayCard.SongPreviewContainer>().Any(p => p.IsRunning), () => Is.True);
+
+            AddWaitStep("wait", 1);
+            AddStep("play beatmap", () => MultiplayerClient.PlayUserCard(1001, hand => hand[0]).WaitSafely());
+
+            AddStep("set warmup", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.GameplayWarmup).WaitSafely());
+            AddUntilStep("preview running", () => this.ChildrenOfType<RankedPlayCard.SongPreviewContainer>().Any(p => p.IsRunning), () => Is.True);
+
+            AddStep("load requested", () => ((IMultiplayerClient)MultiplayerClient).LoadRequested());
+            AddUntilStep("preview stopped", () => this.ChildrenOfType<RankedPlayCard.SongPreviewContainer>().Any(p => p.IsRunning), () => Is.False);
         }
     }
 }

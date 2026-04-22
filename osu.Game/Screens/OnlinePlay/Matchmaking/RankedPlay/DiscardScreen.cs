@@ -253,14 +253,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
             foreach (var item in discardedCards)
             {
-                if (!playerHand.DetachCard(item, out var card, out Quad drawQuad))
+                if (!playerHand.RemoveCard(item, out var card, out Quad drawQuad))
                     return;
 
                 card.Anchor = Anchor.Centre;
                 card.Origin = Anchor.Centre;
 
-                if (playerHand.CurrentPlayingPreview.Value == card.SongPreview)
-                    playerHand.CurrentPlayingPreview.Value = null;
+                card.SongPreviewEnabled.Value = false;
 
                 card.MatchScreenSpaceDrawQuad(drawQuad, CenterRow);
 
@@ -334,7 +333,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
             foreach (var item in matchInfo.PlayerCards)
             {
-                if (playerHand.DetachCard(item, out var card, out Quad drawQuad))
+                if (playerHand.RemoveCard(item, out var card, out Quad drawQuad))
                 {
                     card.MatchScreenSpaceDrawQuad(drawQuad, CenterRow);
 
