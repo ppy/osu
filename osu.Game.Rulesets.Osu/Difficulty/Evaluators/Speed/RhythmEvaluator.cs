@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                 rhythmStart++;
 
             var loopPrevObj = (OsuDifficultyHitObject)currObj.Previous(rhythmStart);
-            var loopPrev2Obj = (OsuDifficultyHitObject)currObj.Previous(rhythmStart + 1);
+            var loopPrev1Obj = (OsuDifficultyHitObject)currObj.Previous(rhythmStart + 1);
 
             // we go from the furthest object back to the current one
             for (int i = rhythmStart; i > 0; i--)
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                 // Use custom cap value to ensure that at this point delta time is actually zero
                 double currDelta = Math.Max(loopObj.DeltaTime, 1e-7);
                 double prevDelta = Math.Max(loopPrevObj.DeltaTime, 1e-7);
-                double prev2Delta = Math.Max(loopPrev2Obj.DeltaTime, 1e-7);
+                double prev1Delta = Math.Max(loopPrev1Obj.DeltaTime, 1e-7);
 
                 // calculate how much current delta difference deserves a rhythm bonus
                 // this function is meant to reduce rhythm bonus for deltas that are multiples of each other (i.e 100 and 200)
@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                             effectiveRatio *= 0.5;
 
                         // previous increase happened a note ago, 1/1->1/2-1/4, dont want to buff this.
-                        if (prev2Delta > prevDelta + deltaDifferenceEpsilon && prevDelta > currDelta + deltaDifferenceEpsilon)
+                        if (prev1Delta > prevDelta + deltaDifferenceEpsilon && prevDelta > currDelta + deltaDifferenceEpsilon)
                             effectiveRatio *= 0.125;
 
                         // repeated island size (ex: triplet -> triplet)
@@ -177,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                     island = new Island((int)currDelta, deltaDifferenceEpsilon);
                 }
 
-                loopPrev2Obj = loopPrevObj;
+                loopPrev1Obj = loopPrevObj;
                 loopPrevObj = loopObj;
             }
 
