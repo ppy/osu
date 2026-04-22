@@ -122,7 +122,7 @@ namespace osu.Game.Overlays.BeatmapSet
             });
             Beatmap.BindValueChanged(b =>
             {
-                userTags.Metadata = b.NewValue?.GetTopUserTags().Select(t => t.Tag.Name).ToArray();
+                userTags.Metadata = b.NewValue?.GetTopUserTags().Select(t => t.Tag.Name).ToArray() ?? Array.Empty<string>();
                 successRate.Beatmap = b.NewValue;
             });
         }
