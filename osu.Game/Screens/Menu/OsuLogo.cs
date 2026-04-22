@@ -18,10 +18,12 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -58,8 +60,8 @@ namespace osu.Game.Screens.Menu
 
         protected virtual double BeatSampleVariance => 0.1;
 
-        protected Sample SampleBeat;
-        protected Sample SampleDownbeat;
+        private SkinnableSound sampleBeat;
+        private SkinnableSound sampleDownbeat;
 
         private readonly Container colourAndTriangles;
         private readonly TrianglesV2 triangles;
@@ -279,14 +281,25 @@ namespace osu.Game.Screens.Menu
         {
             sampleClick = audio.Samples.Get(@"Menu/osu-logo-select");
 
-            SampleBeat = audio.Samples.Get(@"Menu/osu-logo-heartbeat");
-            SampleDownbeat = audio.Samples.Get(@"Menu/osu-logo-downbeat");
+            AddRangeInternal(new Drawable[]
+            {
+                sampleBeat = new SkinnableSound(new SampleInfo(@"Menu/osu-logo-heartbeat", @"heartbeat")),
+                sampleDownbeat = new SkinnableSound(new SampleInfo(@"Menu/osu-logo-downbeat", @"heartbeat")),
+            });
 
             logo.Texture = textures.Get(@"Menu/logo");
             ripple.Texture = textures.Get(@"Menu/logo");
         }
 
         private int lastBeatIndex;
+
+        protected virtual void PlaySampleDownbeat() => sampleDownbeat.Play();
+
+        protected virtual void PlaySampleBeat(double frequency)
+        {
+            sampleBeat.Frequency.Value = frequency;
+            sampleBeat.Play();
+        }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
@@ -306,14 +319,11 @@ namespace osu.Game.Screens.Menu
                 {
                     if (beatIndex % timingPoint.TimeSignature.Numerator == 0)
                     {
-                        SampleDownbeat?.Play();
+                        PlaySampleDownbeat();
                     }
                     else
                     {
-                        var channel = SampleBeat.GetChannel();
-
-                        channel.Frequency.Value = 1 - BeatSampleVariance / 2 + RNG.NextDouble(BeatSampleVariance);
-                        channel.Play();
+                        PlaySampleBeat(1 - BeatSampleVariance / 2 + RNG.NextDouble(BeatSampleVariance));
                     }
                 });
             }
