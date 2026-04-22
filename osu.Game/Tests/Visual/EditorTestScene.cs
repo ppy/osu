@@ -104,6 +104,8 @@ namespace osu.Game.Tests.Visual
 
             public new void SetPreviewPointToCurrentTime() => base.SetPreviewPointToCurrentTime();
 
+            public new void SnapAllHitObjectsToCurrentGrid() => base.SnapAllHitObjectsToCurrentGrid();
+
             public new bool Save() => base.Save();
 
             public new void Cut() => base.Cut();
