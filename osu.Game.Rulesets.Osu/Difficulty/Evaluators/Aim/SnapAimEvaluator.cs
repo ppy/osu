@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 return 0;
 
             var prevObj = (OsuDifficultyHitObject)currObj.Previous(0);
-            var prev3Obj = (OsuDifficultyHitObject)currObj.Previous(2);
+            var prev2Obj = (OsuDifficultyHitObject)currObj.Previous(2);
 
             const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
@@ -87,12 +87,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
                 wideAngleBonus *= velocityInfluence;
 
-                if (prev3Obj != null)
+                if (prev2Obj != null)
                 {
                     // If objects just go back and forth through a middle point - don't give as much wide bonus
                     // Use Previous(2) and Previous(0) because angles calculation is done prevprev-prev-curr, so any object's angle's center point is always the previous object
                     var prevBaseObject = (OsuHitObject)prevObj.BaseObject;
-                    var prev3BaseObject = (OsuHitObject)prev3Obj.BaseObject;
+                    var prev3BaseObject = (OsuHitObject)prev2Obj.BaseObject;
 
                     float distance = (prev3BaseObject.StackedPosition - prevBaseObject.StackedPosition).Length;
 

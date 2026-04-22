@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 return 0;
 
             var prevObj = (OsuDifficultyHitObject)currObj.Previous(0);
-            var prev2Obj = (OsuDifficultyHitObject)currObj.Previous(1);
+            var prev1Obj = (OsuDifficultyHitObject)currObj.Previous(1);
 
             double currDistance = withSliderTravelDistance ? currObj.LazyJumpDistance : currObj.JumpDistance;
             double prevDistance = withSliderTravelDistance ? prevObj.LazyJumpDistance : prevObj.JumpDistance;
@@ -64,8 +64,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             if (currObj.Index > 2)
             {
                 double o1 = calculateOverlapFactor(currObj, prevObj);
-                double o2 = calculateOverlapFactor(currObj, prev2Obj);
-                double o3 = calculateOverlapFactor(prevObj, prev2Obj);
+                double o2 = calculateOverlapFactor(currObj, prev1Obj);
+                double o3 = calculateOverlapFactor(prevObj, prev1Obj);
 
                 overlappedNotesWeight = 1 - o1 * o2 * o3;
             }
