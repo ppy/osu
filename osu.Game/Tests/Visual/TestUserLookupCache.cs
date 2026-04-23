@@ -24,7 +24,8 @@ namespace osu.Game.Tests.Visual
             return Task.FromResult<APIUser?>(new APIUser
             {
                 Id = lookup,
-                Username = $"User {lookup}"
+                Username = $"User {lookup}",
+                CoverUrl = "https://assets.ppy.sh/user-cover-presets/1/df28696b58541a9e67f6755918951d542d93bdf1da41720fcca2fd2c1ea8cf51.jpeg"
             });
         }
     }

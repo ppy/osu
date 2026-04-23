@@ -25,9 +25,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         public override bool ShowStageOverlay => true;
         public override LocalisableString StageHeading => "Pick Phase";
-        protected override LocalisableString StageCaption => "Waiting for your opponent...";
 
-        protected override RankedPlayColourScheme ColourScheme => RankedPlayColourScheme.Red;
+        protected override RankedPlayColourScheme ColourScheme => RankedPlayColourScheme.RED;
 
         private PlayerHandOfCards playerHand = null!;
         private OpponentHandOfCards opponentHand = null!;
@@ -39,6 +38,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         private const int card_play_samples = 2;
         private Sample?[]? cardPlaySamples;
+
+        public OpponentPickScreen()
+        {
+            StageCaption = "Waiting for your opponent...";
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)

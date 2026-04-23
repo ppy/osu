@@ -13,7 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Transforms;
-using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -34,6 +34,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 
             public readonly Bindable<bool> Enabled = new BindableBool(true);
 
+            public readonly Bindable<bool> CardHovered = new BindableBool(true);
+
             public bool TrackLoaded => previewTrack?.TrackLoaded ?? false;
 
             public bool IsRunning => previewTrack?.IsRunning ?? false;
@@ -44,13 +46,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
 
             private readonly Container overlayLayer;
 
-            private bool shouldBePlaying => Enabled.Value && IsHovered;
+            private bool shouldBePlaying => Enabled.Value && CardHovered.Value;
 
             [Resolved]
             private PreviewTrackManager previewTrackManager { get; set; } = null!;
 
             [Resolved]
-            private OsuColour osuColour { get; set; } = null!;
+            private OsuColour colours { get; set; } = null!;
 
             public SongPreviewContainer()
             {
@@ -84,11 +86,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                 {
                     if (!enabled.NewValue)
                     {
-                        previewTrack?.Stop();
+                        stopPreviewIfAvailable();
                         return;
                     }
 
                     if (shouldBePlaying)
+                    {
+                        startPreviewIfAvailable();
+                    }
+                });
+
+                CardHovered.BindValueChanged(selected =>
+                {
+                    if (selected.NewValue && shouldBePlaying)
                     {
                         startPreviewIfAvailable();
                     }
@@ -106,49 +116,61 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                     AddInternal(track);
 
                     track.Looping = true;
-                    track.Started += onTrackStarted;
-                    track.Stopped += onTrackStopped;
+                    track.Started += () => Schedule(() => trackRunning.Value = true);
+                    track.Stopped += () => Schedule(() => trackRunning.Value = false);
 
                     setupBeatSyncProvider(track, beatmap);
 
-                    var cardColours = new RankedPlayCardContent.CardColours(beatmap, osuColour);
+                    var cardColours = new RankedPlayCardContent.CardColours(beatmap, colours);
 
                     overlayLayer.Add(new RippleVisualization(cardColours.Border)
                     {
                         TrackRunning = { BindTarget = trackRunning }
                     });
 
-                    if (IsHovered)
+                    if (shouldBePlaying)
                         startPreviewIfAvailable();
                 });
             }
 
-            protected override bool OnHover(HoverEvent e)
-            {
-                if (previewTrack != null)
-                    previewTrack.Looping = true;
+            // The following weirdness is a workaround for single-threaded crashes when
+            // attempting to start a track before it's fully loaded.
+            //
+            // See https://github.com/ppy/osu-framework/pull/6727
+            //     https://github.com/ppy/osu/pull/37473
+            private ScheduledDelegate? trackStartStopAction;
 
-                if (shouldBePlaying)
+            private void startPreviewIfAvailable()
+            {
+                if (previewTrack == null)
+                    return;
+
+                trackStartStopAction?.Cancel();
+
+                if (!previewTrack.TrackLoaded)
                 {
-                    startPreviewIfAvailable();
+                    trackStartStopAction = Schedule(startPreviewIfAvailable);
+                    return;
                 }
 
-                return base.OnHover(e);
+                previewTrack?.Start();
             }
 
-            protected override void OnHoverLost(HoverLostEvent e)
+            private void stopPreviewIfAvailable()
             {
-                if (previewTrack != null)
-                    previewTrack.Looping = false;
+                if (previewTrack == null)
+                    return;
 
-                base.OnHoverLost(e);
+                trackStartStopAction?.Cancel();
+
+                if (!previewTrack.TrackLoaded)
+                {
+                    trackStartStopAction = Schedule(stopPreviewIfAvailable);
+                    return;
+                }
+
+                previewTrack?.Stop();
             }
-
-            private void onTrackStarted() => Schedule(() => trackRunning.Value = true);
-
-            private void onTrackStopped() => Schedule(() => trackRunning.Value = false);
-
-            private void startPreviewIfAvailable() => previewTrack?.Start();
 
             #region IBeatSyncProvider implementation
 

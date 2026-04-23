@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Threading.Tasks;
+using osu.Game.Online.Matchmaking.Requests;
+using osu.Game.Online.Matchmaking.Responses;
 
 namespace osu.Game.Online.Matchmaking
 {
@@ -16,7 +18,7 @@ namespace osu.Game.Online.Matchmaking
         /// <summary>
         /// Joins the matchmaking lobby, allowing the local user to receive status updates.
         /// </summary>
-        Task MatchmakingJoinLobby();
+        Task<MatchmakingJoinLobbyResponse> MatchmakingJoinLobbyWithParams(MatchmakingJoinLobbyRequest request);
 
         /// <summary>
         /// Leaves the matchmaking lobby.

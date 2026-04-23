@@ -17,6 +17,8 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Matchmaking.Events;
+using osu.Game.Online.Matchmaking.Requests;
+using osu.Game.Online.Matchmaking.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
@@ -888,9 +890,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ]);
         }
 
-        public override Task MatchmakingJoinLobby()
+        public override Task<MatchmakingJoinLobbyResponse> MatchmakingJoinLobbyWithParams(MatchmakingJoinLobbyRequest request)
         {
-            return Task.CompletedTask;
+            return Task.FromResult(new MatchmakingJoinLobbyResponse());
         }
 
         public override Task MatchmakingLeaveLobby()
@@ -917,6 +919,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public override Task MatchmakingDeclineInvitation()
         {
             return Task.CompletedTask;
+        }
+
+        public new async Task MatchmakingLobbyStatusChanged(MatchmakingLobbyStatus status)
+        {
+            await ((IMatchmakingClient)this).MatchmakingLobbyStatusChanged(clone(status)).ConfigureAwait(false);
         }
 
         public override Task MatchmakingToggleSelection(long playlistItemId)
