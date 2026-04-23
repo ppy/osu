@@ -26,6 +26,7 @@ using osu.Framework.Input.Handlers;
 using osu.Framework.Input.Handlers.Joystick;
 using osu.Framework.Input.Handlers.Midi;
 using osu.Framework.Input.Handlers.Mouse;
+using osu.Framework.Input.Handlers.Pen;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Input.Handlers.Touch;
 using osu.Framework.IO.Stores;
@@ -670,6 +671,9 @@ namespace osu.Game
 
                 case TouchHandler th:
                     return new TouchSettings(th);
+
+                case PenHandler ph:
+                    return new PenSettings(ph);
 
                 case MidiHandler:
                     return new InputSubsection(handler);
