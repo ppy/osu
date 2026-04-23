@@ -25,7 +25,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// <summary>
         /// The difficulty corresponding to the reading skill.
         /// </summary>
+        [JsonProperty("reading_difficulty")]
         public double ReadingDifficulty { get; set; }
+
+        /// <summary>
+        /// Contribution to reading difficulty from the hidden mod.
+        /// </summary>
+        [JsonProperty("hidden_reading_difficulty")]
+        public double HiddenReadingDifficulty { get; set; }
 
         /// <summary>
         /// The difficulty corresponding to the colour skill.
