@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shaders.Types;
@@ -116,8 +117,8 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
             private Vector2 progressRange;
             private float pathRadius;
             private float glowPortion;
-            private Color4 barColour;
-            private Color4 glowColour;
+            private SRGBColour barColour;
+            private SRGBColour glowColour;
 
             public override void ApplyState()
             {
@@ -146,8 +147,8 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
                 parametersBuffer ??= renderer.CreateUniformBuffer<ArgonBarPathParameters>();
                 parametersBuffer.Data = new ArgonBarPathParameters
                 {
-                    BarColour = new Vector4(barColour.R, barColour.G, barColour.B, barColour.A),
-                    GlowColour = new Vector4(glowColour.R, glowColour.G, glowColour.B, glowColour.A),
+                    BarColour = barColour.SRGB.ToPremultiplied(),
+                    GlowColour = glowColour.SRGB.ToPremultiplied(),
                     GlowPortion = glowPortion,
                     Size = size,
                     ProgressRange = progressRange,
@@ -168,8 +169,8 @@ namespace osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts
             [StructLayout(LayoutKind.Sequential, Pack = 1)]
             private record struct ArgonBarPathParameters
             {
-                public UniformVector4 BarColour;
-                public UniformVector4 GlowColour;
+                public UniformColour BarColour;
+                public UniformColour GlowColour;
                 public UniformVector2 Size;
                 public UniformVector2 ProgressRange;
                 public UniformFloat PathRadius;
