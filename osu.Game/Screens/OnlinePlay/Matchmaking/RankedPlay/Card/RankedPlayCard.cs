@@ -44,6 +44,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
             set => selectionOutline.FadeTo(value ? 1 : 0, 50);
         }
 
+        public bool PlayAudioPreview
+        {
+            set => songPreviewContainer.CardHovered.Value = value;
+        }
+
         public float Elevation;
 
         public bool PreviewTrackLoaded => songPreviewContainer.TrackLoaded;

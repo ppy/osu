@@ -37,12 +37,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         /// <summary>
         /// Subtitle text to be displayed indicating the action a user should take in the current stage.
         /// </summary>
-        protected abstract LocalisableString StageCaption { get; }
+        protected LocalisableString StageCaption
+        {
+            get => StageDisplay.Caption;
+            set => StageDisplay.Caption = value;
+        }
 
         /// <summary>
         /// The colour scheme commonly used for components of this screen.
         /// </summary>
-        protected virtual RankedPlayColourScheme ColourScheme => RankedPlayColourScheme.Blue;
+        protected virtual RankedPlayColourScheme ColourScheme => RankedPlayColourScheme.BLUE;
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
@@ -79,7 +83,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 StageDisplay = new RankedPlayStageDisplay(ColourScheme)
                 {
                     Heading = StageHeading,
-                    Caption = StageCaption,
                     Margin = new MarginPadding { Top = 60 },
                     State = { BindTarget = CountdownVisibility }
                 },
