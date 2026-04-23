@@ -98,6 +98,16 @@ Please bear with us as we continue to improve the game for you!");
         /// </summary>
         public static LocalisableString MobileDisclaimerOkButton => new TranslatableString(getKey(@"mobile_disclaimer_ok_button"), @"Understood");
 
+        /// <summary>
+        /// "Eternal thanks to you for supporting osu!"
+        /// </summary>
+        public static LocalisableString SupporterDisplayThanks => new TranslatableString(getKey(@"supporter_display_thanks"), @"Eternal thanks to you for supporting osu!");
+
+        /// <summary>
+        /// "Consider becoming an [osu!supporter]({0}) to help support osu!'s development"
+        /// </summary>
+        public static LocalisableString SupporterDisplayConsider(string url) => new TranslatableString(getKey(@"supporter_display_consider"), @"Consider becoming an [osu!supporter]({0}) to help support osu!'s development", url);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
