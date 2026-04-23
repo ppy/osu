@@ -29,6 +29,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             double sameRhythm = 0;
             double samePattern = 0;
             double intervalPenalty = 0;
+            double gapPenalty = 0;
 
             double hitWindow = hitObject.HitWindow(HitResult.Great);
 
@@ -36,12 +37,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             {
                 sameRhythm += 10.0 * evaluateDifficultyOf(rhythmData.SameRhythmGroupedHitObjects, hitWindow);
                 intervalPenalty = repeatedIntervalPenalty(rhythmData.SameRhythmGroupedHitObjects, hitWindow);
+                gapPenalty = longGapPenalty(rhythmData.SameRhythmGroupedHitObjects.Previous);
             }
 
             if (rhythmData.SamePatternsGroupedHitObjects?.FirstHitObject == hitObject) // Difficulty for SamePatternsGroupedHitObjects
                 samePattern += 1.15 * ratioDifficulty(rhythmData.SamePatternsGroupedHitObjects.IntervalRatio);
 
-            difficulty += Math.Max(sameRhythm, samePattern) * intervalPenalty;
+            difficulty += Math.Max(sameRhythm, samePattern) * intervalPenalty * gapPenalty;
 
             return difficulty;
         }
@@ -159,5 +161,34 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// </summary>
         private static double termPenalty(double ratio, int denominator, double power, double multiplier) =>
             -multiplier * Math.Pow(Math.Cos(denominator * Math.PI * ratio), power);
+
+        /// <summary>
+        /// Frequent rhythm changes containing long gaps (i.e. 1/4 + 1/6 with 1/2 gaps) award more difficulty than expected.
+        /// Due to limitations of the current rhythm evaluation, these cases are targeted and penalised.
+        /// The previous hit object grouping is used as often the rhythm change *two* rhythms after a long gap awards the unexpected difficulty.
+        /// </summary>
+        private static double longGapPenalty(SameRhythmHitObjectGrouping? previousOrNull)
+        {
+            if (previousOrNull == null)
+                return 1.0;
+
+            SameRhythmHitObjectGrouping previous = (SameRhythmHitObjectGrouping) previousOrNull;
+
+            double gapInterval = previous.FirstHitObject.DeltaTime;
+            double rhythmInterval = previous.HitObjectInterval ?? gapInterval;
+
+            // The ratio of the gap before this rhythm to the rhythm itself.
+            double gapRatio = gapInterval / Math.Max(rhythmInterval, 1);
+
+            // The gap ratio normalised to represent if the gap is long.
+            double gapFactor = DifficultyCalculationUtils.Logistic(gapRatio, 1.75, 20);
+
+            double rhythmLength = previous.HitObjects.Count;
+
+            // The length in objects of this rhythm normalised to represent if the rhythm change is frequent enough to be penalised.
+            double lengthFactor = DifficultyCalculationUtils.Logistic(rhythmLength, 4, -2.5);
+
+            return 1.0 - 0.75 * gapFactor * lengthFactor;
+        }
     }
 }
