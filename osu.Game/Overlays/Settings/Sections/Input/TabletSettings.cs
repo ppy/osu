@@ -42,13 +42,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private readonly Bindable<Vector2> outputAreaOffset = new Bindable<Vector2>();
         private readonly IBindable<TabletInfo> tablet = new Bindable<TabletInfo>();
 
-        private readonly BindableNumber<float> offsetX = new BindableNumber<float> { MinValue = 0, Precision = 1 };
-        private readonly BindableNumber<float> offsetY = new BindableNumber<float> { MinValue = 0, Precision = 1 };
+        private readonly BindableNumber<float> offsetX = new BindableNumber<float> { MinValue = 0, Precision = 0.0001f };
+        private readonly BindableNumber<float> offsetY = new BindableNumber<float> { MinValue = 0, Precision = 0.0001f };
 
-        private readonly BindableNumber<float> sizeX = new BindableNumber<float> { MinValue = 10, Precision = 1 };
-        private readonly BindableNumber<float> sizeY = new BindableNumber<float> { MinValue = 10, Precision = 1 };
+        private readonly BindableNumber<float> sizeX = new BindableNumber<float> { MinValue = 10, Precision = 0.0001f };
+        private readonly BindableNumber<float> sizeY = new BindableNumber<float> { MinValue = 10, Precision = 0.0001f };
 
-        private readonly BindableNumber<float> rotation = new BindableNumber<float> { MinValue = 0, MaxValue = 360, Precision = 1 };
+        private readonly BindableNumber<float> rotation = new BindableNumber<float> { MinValue = 0, MaxValue = 360, Precision = 0.0001f };
 
         private readonly BindableNumber<float> pressureThreshold = new BindableNumber<float> { MinValue = 0.0f, MaxValue = 1.0f, Precision = 0.005f };
 
@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             MinValue = 1 / largest_feasible_aspect_ratio,
             MaxValue = largest_feasible_aspect_ratio,
-            Precision = 0.01f,
+            Precision = 0.0001f,
         };
 
         private readonly BindableBool aspectLock = new BindableBool();
@@ -143,18 +143,21 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         {
                             TransferValueOnCommit = true,
                             Caption = TabletSettingsStrings.XOffset,
+                            KeyboardStep = 0.0001f,
                             Current = offsetX,
                         }),
                         new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
                             Caption = TabletSettingsStrings.YOffset,
+                            KeyboardStep = 0.0001f,
                             Current = offsetY,
                         }),
                         new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
                             Caption = TabletSettingsStrings.Rotation,
+                            KeyboardStep = 0.0001f,
                             Current = rotation,
                         }),
                         new RotationPresetButtons(tabletHandler)
@@ -165,6 +168,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         {
                             TransferValueOnCommit = true,
                             Caption = TabletSettingsStrings.AspectRatio,
+                            KeyboardStep = 0.0001f,
                             Current = aspectRatio,
                         }),
                         new SettingsItemV2(new FormCheckBox
@@ -176,12 +180,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         {
                             TransferValueOnCommit = true,
                             Caption = CommonStrings.Width,
+                            KeyboardStep = 0.0001f,
                             Current = sizeX,
                         }),
                         new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
                             Caption = CommonStrings.Height,
+                            KeyboardStep = 0.0001f,
                             Current = sizeY,
                         }),
                         new SettingsItemV2(new FormSliderBar<float>
