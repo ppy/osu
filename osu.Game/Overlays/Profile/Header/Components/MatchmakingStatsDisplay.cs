@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -58,7 +59,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = "Quick Play",
+                                    Text = UsersStrings.ShowMatchmakingTitle,
                                     Margin = new MarginPadding { Horizontal = 5f, Vertical = 7f },
                                     Font = OsuFont.GetFont(size: 12)
                                 },
