@@ -209,6 +209,12 @@ namespace osu.Game.Online.Spectator
             return Task.CompletedTask;
         }
 
+        Task IStatefulUserHubClient.ServerShuttingDown()
+        {
+            // TODO: check when we can disconnect and do so.
+            return Task.CompletedTask;
+        }
+
         public void BeginPlaying(long? scoreToken, GameplayState state, Score score)
         {
             // This schedule is only here to match the one below in `EndPlaying`.

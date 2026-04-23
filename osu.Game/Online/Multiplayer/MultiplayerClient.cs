@@ -1091,6 +1091,12 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
+        Task IStatefulUserHubClient.ServerShuttingDown()
+        {
+            // TODO: check when we can disconnect and do so.
+            return Task.CompletedTask;
+        }
+
         Task IMatchmakingClient.MatchmakingQueueJoined()
         {
             Scheduler.Add(() => MatchmakingQueueJoined?.Invoke());

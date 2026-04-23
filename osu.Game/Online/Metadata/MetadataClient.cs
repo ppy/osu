@@ -187,6 +187,12 @@ namespace osu.Game.Online.Metadata
             return Task.CompletedTask;
         }
 
+        Task IStatefulUserHubClient.ServerShuttingDown()
+        {
+            // TODO: check when we can disconnect and do so.
+            return Task.CompletedTask;
+        }
+
         #endregion
     }
 }
