@@ -211,5 +211,13 @@ namespace osu.Game.Tests.Visual.RankedPlay
             });
             AddStep("release mouse", () => InputManager.ReleaseButton(MouseButton.Left));
         }
+
+        [Test]
+        public void TestKeyboardSelectionWithoutCards()
+        {
+            AddAssert("no cards", () => !handOfCards.Cards.Any());
+            AddStep("right arrow", () => InputManager.Key(Key.Right));
+            AddStep("left arrow", () => InputManager.Key(Key.Left));
+        }
     }
 }
