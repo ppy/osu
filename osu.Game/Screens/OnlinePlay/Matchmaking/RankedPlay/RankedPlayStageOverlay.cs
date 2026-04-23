@@ -2,14 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 using osu.Game.Users.Drawables;
 using osuTK;
 
@@ -27,6 +31,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private FillFlowContainer detailsContainer = null!;
         private CircularContainer avatarContainer = null!;
 
+        private Sample stageChangeSample = null!;
+
+        [Resolved]
+        private MusicController musicController { get; set; } = null!;
+
         public RankedPlayStageOverlay(LocalisableString stageName, RankedPlayColourScheme colourScheme)
         {
             this.stageName = stageName;
@@ -34,7 +43,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -150,9 +159,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     Origin = Anchor.CentreLeft,
                     UseFullGlyphHeight = false,
                     Font = OsuFont.Torus.With(size: 32),
-                    Text = $"{Multiplier:N0}x damage",
+                    Text = $"{Multiplier.Value.ToStandardFormattedString(maxDecimalDigits: 1)}x damage",
                 });
             }
+
+            stageChangeSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/stage-change");
         }
 
         protected override void LoadComplete()
@@ -172,6 +183,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             displayContainer
                 .ScaleTo(0.9f)
                 .ScaleTo(1f, duration, easing);
+
+            musicController.DuckMomentarily(time_visible, new DuckParameters
+            {
+                DuckDuration = 0,
+                DuckVolumeTo = 0.5,
+                DuckCutoffTo = 600,
+            });
+            stageChangeSample.Play();
 
             using (BeginDelayedSequence(time_visible))
             {

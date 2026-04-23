@@ -27,8 +27,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
     ///
     /// Includes support for deferring to background.
     /// </summary>
-    /// <remarks>
-    /// This is initialised and cached in the <see cref="ScreenQueue"/> but can be used throughout the system via DI.</remarks>
     public partial class QueueController : Component
     {
         public readonly Bindable<ScreenQueue.MatchmakingScreenState> CurrentState = new Bindable<ScreenQueue.MatchmakingScreenState>();
