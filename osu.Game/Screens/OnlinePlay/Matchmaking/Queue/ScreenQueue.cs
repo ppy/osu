@@ -345,8 +345,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             {
                 availablePools.Value = pools;
 
-                // Default to the user's ruleset for the initial pool selection.
-                selectedPool.Value = pools.FirstOrDefault(p => p.RulesetId == ruleset.Value.OnlineID) ?? pools.FirstOrDefault();
+                // Default to the currently queueing pool, or fallback to the user's ruleset for the initial pool selection.
+                MatchmakingPool? queueingPool = queue.CurrentState.Value == MatchmakingScreenState.Queueing ? pools.FirstOrDefault(p => p.Id == queue.LastJoinedPool?.Id) : null;
+                selectedPool.Value = queueingPool ?? pools.FirstOrDefault(p => p.RulesetId == ruleset.Value.OnlineID) ?? pools.FirstOrDefault();
             });
         }
 

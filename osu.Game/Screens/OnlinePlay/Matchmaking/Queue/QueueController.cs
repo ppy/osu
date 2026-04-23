@@ -39,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private BackgroundQueueNotification? backgroundNotification;
         private bool isBackgrounded;
-        private MatchmakingPool? lastJoinedPool;
+        public MatchmakingPool? LastJoinedPool;
 
         protected override void LoadComplete()
         {
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         public void JoinQueue(MatchmakingPool pool)
         {
             client.MatchmakingJoinQueue(pool.Id).FireAndForget();
-            lastJoinedPool = pool;
+            LastJoinedPool = pool;
         }
 
         /// <summary>
@@ -75,8 +75,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         /// </summary>
         public void RejoinQueue()
         {
-            if (lastJoinedPool != null)
-                JoinQueue(lastJoinedPool);
+            if (LastJoinedPool != null)
+                JoinQueue(LastJoinedPool);
         }
 
         /// <summary>
@@ -150,8 +150,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             if (backgroundNotification != null)
                 return;
 
-            Debug.Assert(lastJoinedPool != null);
-            notifications?.Post(backgroundNotification = new BackgroundQueueNotification(this, lastJoinedPool.Type));
+            Debug.Assert(LastJoinedPool != null);
+            notifications?.Post(backgroundNotification = new BackgroundQueueNotification(this, LastJoinedPool.Type));
         }
 
         private void closeNotifications()
