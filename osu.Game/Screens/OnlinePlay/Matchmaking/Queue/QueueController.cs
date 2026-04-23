@@ -39,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private BackgroundQueueNotification? backgroundNotification;
         private bool isBackgrounded;
-        public MatchmakingPool? LastJoinedPool;
+        public MatchmakingPool? LastJoinedPool { get; private set; }
 
         protected override void LoadComplete()
         {
