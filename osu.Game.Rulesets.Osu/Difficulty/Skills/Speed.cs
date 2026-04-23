@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class Speed : HarmonicSkill
     {
         private double totalMultiplier => 0.8;
-        private double burstMultiplier => 2.45;
-        private double streamMultiplier => 0.05;
+        private double burstMultiplier => 2.43;
+        private double streamMultiplier => 0.06;
         private double staminaMultiplier => 0.042;
         private double meanExponent => 1.25;
 
