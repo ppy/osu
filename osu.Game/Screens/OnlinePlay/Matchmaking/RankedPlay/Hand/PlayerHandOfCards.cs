@@ -200,6 +200,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
         {
             var cards = GetCardsInDisplayOrder();
 
+            if (cards.Count == 0)
+                return;
+
             int currentIndex = cards.FindIndex(c => c.HasFocus);
 
             // default behaviour is to start from either end of the cards if no card is focused currently
