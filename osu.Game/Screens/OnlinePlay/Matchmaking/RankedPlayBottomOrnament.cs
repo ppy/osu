@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -9,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Lines;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
@@ -35,30 +37,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         private Path pathLeft = null!;
         private Path pathRight = null!;
 
-        private Path pathCenter = null!;
-        private Path pathCenterWide = null!;
+        private Circle centerLine = null!;
+        private Circle centerLineThick = null!;
 
-        // TODO: remove this jank after we've migrated to .NET 10
-        private float progressStartInternal = 0.5f;
-        private float progressEndInternal = 0.5f;
+        private float progress = 0f;
 
-        private float progressStart
+        protected float Progress
         {
-            get => progressStartInternal;
+            get => progress;
             set
             {
-                progressStartInternal = value;
-                Scheduler.AddOnce(recomputePaths);
-            }
-        }
+                if (progress == value)
+                    return;
 
-        private float progressEnd
-        {
-            get => progressEndInternal;
-            set
-            {
-                progressEndInternal = value;
-                Scheduler.AddOnce(recomputePaths);
+                progress = value;
+                recomputePaths(value);
             }
         }
 
@@ -96,7 +89,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         {
             Width = width;
             Height = height;
-            Alpha = 0;
 
             Masking = true;
 
@@ -121,26 +113,26 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                     {
                         pathLeft = new SmoothPath
                         {
-                            AutoSizeAxes = Axes.None,
-                            RelativeSizeAxes = Axes.Both,
+                            Origin = Anchor.BottomRight,
                             PathRadius = 1,
                         },
-                        pathCenter = new SmoothPath
+                        centerLine = new Circle
                         {
-                            AutoSizeAxes = Axes.None,
-                            RelativeSizeAxes = Axes.Both,
-                            PathRadius = 1,
+                            RelativeSizeAxes = Axes.X,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Y = 1,
+                            Height = 2,
                         },
-                        pathCenterWide = new SmoothPath
+                        centerLineThick = new Circle
                         {
-                            AutoSizeAxes = Axes.None,
-                            RelativeSizeAxes = Axes.Both,
-                            PathRadius = 2,
+                            RelativeSizeAxes = Axes.X,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Height = 4,
                         },
                         pathRight = new SmoothPath
                         {
-                            AutoSizeAxes = Axes.None,
-                            RelativeSizeAxes = Axes.Both,
                             PathRadius = 1,
                         },
                     },
@@ -157,29 +149,43 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
             };
         }
 
-        private void recomputePaths()
+        private readonly List<Vector2> vertices = new List<Vector2>();
+
+        private void recomputePaths(float newProgress)
         {
-            List<Vector2> vertices = new List<Vector2>();
-            sliderPath.GetPathToProgress(vertices, progressStart, progressEnd);
+            centerLineThick.Width = Math.Clamp(newProgress, 0f, 0.7f);
+            centerLine.Width = Math.Clamp(newProgress, 0f, 0.85f);
 
-            if (progressStart >= 0.15 && progressEnd <= 0.85)
-                pathCenterWide.Vertices = vertices;
-
-            if (progressStart >= 0.075 && progressEnd <= 0.925)
-                pathCenter.Vertices = vertices;
-
-            if (progressStart <= 0.05)
+            if (newProgress > 0.9f)
             {
-                List<Vector2> verticesLeft = new List<Vector2>();
-                sliderPath.GetPathToProgress(verticesLeft, progressStart, 0.05);
-                pathLeft.Vertices = verticesLeft;
+                pathLeft.Alpha = 1;
+                pathRight.Alpha = 1;
+
+                vertices.Clear();
+                sliderPath.GetPathToProgress(vertices, 0.5f - newProgress * 0.5f, 0.05f);
+
+                Vector2 lastVertex = vertices[^1];
+                Vector2 firstVertex = vertices[0];
+                for (int i = 0; i < vertices.Count; i++)
+                    vertices[i] -= firstVertex;
+
+                pathLeft.Vertices = vertices;
+                pathLeft.Position = pathLeft.PositionInBoundingBox(lastVertex);
+
+                vertices.Clear();
+                sliderPath.GetPathToProgress(vertices, 0.95f, 0.5f + newProgress * 0.5f);
+
+                firstVertex = vertices[0];
+                for (int i = 0; i < vertices.Count; i++)
+                    vertices[i] -= firstVertex;
+
+                pathRight.Vertices = vertices;
+                pathRight.Position = pathRight.PositionInBoundingBox(firstVertex) - new Vector2(pathRight.PathRadius * 2);
             }
-
-            if (progressEnd >= 0.95)
+            else
             {
-                List<Vector2> verticesRight = new List<Vector2>();
-                sliderPath.GetPathToProgress(verticesRight, 0.95, progressEnd);
-                pathRight.Vertices = verticesRight;
+                pathLeft.Alpha = 0;
+                pathRight.Alpha = 0;
             }
         }
 
@@ -189,15 +195,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         protected override void PopIn()
         {
             this.FadeIn(duration, easing)
-                .TransformTo(nameof(progressStart), 0f, duration, easing)
-                .TransformTo(nameof(progressEnd), 1f, duration, easing);
+                .TransformTo(nameof(Progress), 1f, duration, easing);
         }
 
         protected override void PopOut()
         {
             this.FadeOut(duration, easing)
-                .TransformTo(nameof(progressStart), 0.5f, duration, easing)
-                .TransformTo(nameof(progressEnd), 0.5f, duration, easing);
+                .TransformTo(nameof(Progress), 0f, duration, easing);
         }
     }
 }

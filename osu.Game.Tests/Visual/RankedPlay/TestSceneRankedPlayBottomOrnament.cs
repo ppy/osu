@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
 {
     public partial class TestSceneRankedPlayBottomOrnament : OsuTestScene
     {
-        private RankedPlayBottomOrnament ornament = null!;
+        private TestOrnament ornament = null!;
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Gray,
                     },
-                    ornament = new RankedPlayBottomOrnament(),
+                    ornament = new TestOrnament(),
                 }
             });
         }
@@ -41,6 +41,16 @@ namespace osu.Game.Tests.Visual.RankedPlay
         {
             AddStep("hide", () => ornament.Hide());
             AddStep("show", () => ornament.Show());
+            AddSliderStep("Progress", 0f, 1f, 0f, p => ornament.Progress = p);
+        }
+
+        private partial class TestOrnament : RankedPlayBottomOrnament
+        {
+            public new float Progress
+            {
+                get => base.Progress;
+                set => base.Progress = value;
+            }
         }
     }
 }
