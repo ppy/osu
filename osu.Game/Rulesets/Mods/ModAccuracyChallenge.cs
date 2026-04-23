@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public MinimumAccuracySlider()
         {
-            KeyboardStep = 0.01f;
+            KeyboardStep = 0.001f;
         }
     }
 }

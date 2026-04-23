@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -58,7 +59,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = "Quick Play",
+                                    Text = UsersStrings.ShowMatchmakingTitle,
                                     Margin = new MarginPadding { Horizontal = 5f, Vertical = 7f },
                                     Font = OsuFont.GetFont(size: 12)
                                 },
@@ -114,12 +115,20 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 return;
             }
 
-            APIUserMatchmakingStatistics[] mostRelevantStats = stats.OrderByDescending(s => s.Pool.Active).ThenByDescending(s => s.Pool.Id).ToArray();
-            APIUserMatchmakingStatistics mostRelevantStat = mostRelevantStats.First();
+            int? highestRank = null;
 
-            rankText.Text = $"#{mostRelevantStat.Rank:N0}";
+            foreach (var stat in stats)
+            {
+                if (stat.Pool.Active && stat.Rank != null)
+                {
+                    if (highestRank == null || stat.Rank < highestRank)
+                        highestRank = stat.Rank;
+                }
+            }
 
-            TooltipContent = new MatchmakingStatsTooltipData(colourProvider, mostRelevantStats);
+            rankText.Text = highestRank == null ? "-" : $"#{highestRank:N0}";
+
+            TooltipContent = new MatchmakingStatsTooltipData(colourProvider, stats.OrderByDescending(s => s.PoolId).ToArray());
 
             Show();
         }
