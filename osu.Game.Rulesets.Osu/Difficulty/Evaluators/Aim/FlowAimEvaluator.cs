@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             }
 
             // Final velocity is being raised to a power because flow difficulty scales harder with both high distance and time, and we want to account for that
-            flowDifficulty = Math.Pow(flowDifficulty, 1.35);
+            flowDifficulty = Math.Pow(flowDifficulty, 1.4);
 
             // Reduce difficulty for low spacing since spacing below radius is always to be flowed
             return flowDifficulty * DifficultyCalculationUtils.Smootherstep(currDistance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
