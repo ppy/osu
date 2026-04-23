@@ -3,7 +3,6 @@
 
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 
@@ -11,7 +10,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 {
     public static class AgilityEvaluator
     {
-        private const double distance_cap = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25; // 1.25 circles distance between centers
+        private const double distance_cap = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.2; // 1.2 circles distance between centers
 
         /// <summary>
         /// Evaluates the difficulty of fast aiming
@@ -35,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             strain *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
 
-            return strain * DifficultyCalculationUtils.Smootherstep(distance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
+            return strain;
         }
 
         private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.2, ms / 1000));

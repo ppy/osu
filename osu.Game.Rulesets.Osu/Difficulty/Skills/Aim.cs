@@ -33,9 +33,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double skillMultiplierSnap => 70.9;
         private double skillMultiplierAgility => 2.35;
-        private double skillMultiplierFlow => 243.0;
+        private double skillMultiplierFlow => 242.0;
         private double skillMultiplierTotal => 1.12;
-        private double meanExponent => 1.2;
+        private double combinedSnapNormExponent => 1.2;
 
         /// <summary>
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.
@@ -63,18 +63,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double agilityDifficulty = AgilityEvaluator.EvaluateDifficultyOf(current) * skillMultiplierAgility;
             double flowDifficulty = FlowAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierFlow;
 
-            if (Mods.Any(m => m is OsuModTouchDevice))
-            {
-                snapDifficulty = Math.Pow(snapDifficulty, 0.89);
-                // we don't adjust agility here since agility represents TD difficulty in a decent enough way
-                flowDifficulty = Math.Pow(flowDifficulty, 1.1);
-            }
-
-            if (Mods.Any(m => m is OsuModRelax))
-            {
-                agilityDifficulty *= 0.3;
-            }
-
             double totalDifficulty = calculateTotalValue(snapDifficulty, agilityDifficulty, flowDifficulty);
 
             currentStrain *= decay;
@@ -91,10 +79,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // We compare flow to combined snap and agility because snap by itself doesn't have enough difficulty to be above flow on streams
             // Agility on the other hand is supposed to measure the rate of cursor velocity changes while snapping
             // So snapping every circle on a stream requires an enormous amount of agility at which point it's easier to flow
-            double combinedSnapDifficulty = DifficultyCalculationUtils.Norm(meanExponent, snapDifficulty, agilityDifficulty);
+            double combinedSnapDifficulty = DifficultyCalculationUtils.Norm(combinedSnapNormExponent, snapDifficulty, agilityDifficulty);
 
             double pSnap = calculateSnapFlowProbability(flowDifficulty / combinedSnapDifficulty);
             double pFlow = 1 - pSnap;
+
+            if (Mods.Any(m => m is OsuModTouchDevice))
+            {
+                // we don't adjust agility here since agility represents TD difficulty in a decent enough way
+                snapDifficulty = Math.Pow(snapDifficulty, 0.89);
+                combinedSnapDifficulty = DifficultyCalculationUtils.Norm(combinedSnapNormExponent, snapDifficulty, agilityDifficulty);
+            }
+
+            if (Mods.Any(m => m is OsuModRelax))
+            {
+                combinedSnapDifficulty *= 0.75;
+                flowDifficulty *= 0.6;
+            }
 
             double totalDifficulty = combinedSnapDifficulty * pSnap + flowDifficulty * pFlow;
 
