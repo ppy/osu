@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
@@ -68,10 +69,10 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 [
                     new TableColumn(dimension: new Dimension(GridSizeMode.AutoSize)),
                     new TableColumn(dimension: new Dimension(GridSizeMode.AutoSize)),
-                    new TableColumn("Wins", dimension: new Dimension(GridSizeMode.AutoSize)),
-                    new TableColumn("Plays", dimension: new Dimension(GridSizeMode.AutoSize)),
-                    new TableColumn("Points", dimension: new Dimension(GridSizeMode.AutoSize)),
-                    new TableColumn("Rating", dimension: new Dimension(GridSizeMode.AutoSize)),
+                    new TableColumn(RankingsStrings.MatchmakingWins, dimension: new Dimension(GridSizeMode.AutoSize)),
+                    new TableColumn(RankingsStrings.MatchmakingPlays, dimension: new Dimension(GridSizeMode.AutoSize)),
+                    new TableColumn(RankingsStrings.MatchmakingPoints, dimension: new Dimension(GridSizeMode.AutoSize)),
+                    new TableColumn(RankingsStrings.MatchmakingRating, dimension: new Dimension(GridSizeMode.AutoSize)),
                 ],
                 RowSize = new Dimension(GridSizeMode.AutoSize),
                 Content = statistics.Select(s => createRow(colourProvider, s)).ToArray().ToRectangular()
