@@ -21,8 +21,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         private double totalMultiplier => 0.8;
         private double burstMultiplier => 2.45;
-        private double streamMultiplier => 0.2;
-        private double staminaMultiplier => 0.045;
+        private double streamMultiplier => 0.05;
+        private double staminaMultiplier => 0.042;
         private double meanExponent => 1.25;
 
         private double currentBurstStrain;
@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double totalValue = DifficultyCalculationUtils.Norm(meanExponent,
                 totalBurstStrain,
-                //currentStreamStrain,
+                currentStreamStrain,
                 currentStaminaStrain) * totalMultiplier;
 
             if (current.BaseObject is Slider)
