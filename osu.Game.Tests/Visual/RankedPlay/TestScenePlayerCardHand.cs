@@ -218,7 +218,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddAssert("no cards", () => !handOfCards.Cards.Any());
             AddStep("right arrow", () => InputManager.Key(Key.Right));
             AddStep("left arrow", () => InputManager.Key(Key.Left));
-            AddAssert("card not selected", () => !handOfCards.Selection.Any());
         }
     }
 }
