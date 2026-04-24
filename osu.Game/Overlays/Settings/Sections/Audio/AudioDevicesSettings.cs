@@ -26,8 +26,6 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
         private FormCheckBox? wasapiExperimental;
 
-        private readonly Bindable<SettingsNote.Data?> wasapiExperimentalNote = new Bindable<SettingsNote.Data?>();
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -52,7 +50,6 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 })
                 {
                     Keywords = new[] { "wasapi", "latency", "exclusive" },
-                    Note = { BindTarget = wasapiExperimentalNote },
                 });
 
                 wasapiExperimental.Current.ValueChanged += _ => onDeviceChanged(string.Empty);
@@ -68,14 +65,6 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         private void onDeviceChanged(string _)
         {
             updateItems();
-
-            if (wasapiExperimental != null)
-            {
-                if (wasapiExperimental.Current.Value)
-                    wasapiExperimentalNote.Value = new SettingsNote.Data(AudioSettingsStrings.WasapiNotice, SettingsNote.Type.Warning);
-                else
-                    wasapiExperimentalNote.Value = null;
-            }
         }
 
         private void updateItems()

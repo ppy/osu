@@ -109,11 +109,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString WasapiTooltip => new TranslatableString(getKey(@"wasapi_tooltip"), @"This will attempt to initialise the audio engine in a lower latency mode.");
 
-        /// <summary>
-        /// "Due to reduced latency, your audio offset will need to be adjusted when enabling this setting. Generally expect to subtract 20 - 60 ms from your known value."
-        /// </summary>
-        public static LocalisableString WasapiNotice => new TranslatableString(getKey(@"wasapi_notice"), @"Due to reduced latency, your audio offset will need to be adjusted when enabling this setting. Generally expect to subtract 20 - 60 ms from your known value.");
-
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

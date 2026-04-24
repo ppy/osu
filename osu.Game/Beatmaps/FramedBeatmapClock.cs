@@ -72,7 +72,7 @@ namespace osu.Game.Beatmaps
             {
                 // Audio timings in general with newer BASS versions don't match stable.
                 // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-                platformOffsetClock = new OffsetCorrectionClock(interpolatedTrack) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
+                platformOffsetClock = new OffsetCorrectionClock(interpolatedTrack) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? WINDOWS_DEFAULT_OFFSET : 0 };
 
                 // User global offset (set in settings) should also be applied.
                 userGlobalOffsetClock = new OffsetCorrectionClock(platformOffsetClock);
@@ -225,6 +225,11 @@ namespace osu.Game.Beatmaps
                     return $"current: {clock.CurrentTime:N2} running: {clock.IsRunning} rate: {clock.Rate} elapsed: {framed.ElapsedFrameTime:N2}";
 
                 return $"current: {clock.CurrentTime:N2} running: {clock.IsRunning} rate: {clock.Rate}";
+            }
+        }
+    }
+}
+: {clock.IsRunning} rate: {clock.Rate}";
             }
         }
     }
