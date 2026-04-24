@@ -110,6 +110,7 @@ namespace osu.Game.Online.Metadata
                 {
                     userPresences.Clear();
                     friendPresences.Clear();
+                    WatchedRooms.Clear();
                     dailyChallengeInfo.Value = null;
                     localUserPresence = default;
                 });
@@ -273,6 +274,8 @@ namespace osu.Game.Online.Metadata
             if (connector?.IsConnected.Value != true)
                 throw new OperationCanceledException();
 
+            WatchedRooms.Add(id);
+
             Debug.Assert(connection != null);
             var result = await connection.InvokeAsync<MultiplayerPlaylistItemStats[]>(nameof(IMetadataServer.BeginWatchingMultiplayerRoom), id).ConfigureAwait(false);
             Logger.Log($@"{nameof(OnlineMetadataClient)} began watching multiplayer room with ID {id}", LoggingTarget.Network);
@@ -283,6 +286,8 @@ namespace osu.Game.Online.Metadata
         {
             if (connector?.IsConnected.Value != true)
                 throw new OperationCanceledException();
+
+            WatchedRooms.Remove(id);
 
             Debug.Assert(connection != null);
             await connection.InvokeAsync(nameof(IMetadataServer.EndWatchingMultiplayerRoom), id).ConfigureAwait(false);

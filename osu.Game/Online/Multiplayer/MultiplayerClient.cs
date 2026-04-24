@@ -1237,7 +1237,7 @@ namespace osu.Game.Online.Multiplayer
 
         Task IStatefulUserHubClient.ServerShuttingDown()
         {
-            // TODO: check when we can disconnect and do so.
+            this.ReconnectWhenReady(IsConnected, () => room == null, Reconnect);
             return Task.CompletedTask;
         }
 

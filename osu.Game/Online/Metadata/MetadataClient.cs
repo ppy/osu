@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,6 +19,11 @@ namespace osu.Game.Online.Metadata
     public abstract partial class MetadataClient : Component, IMetadataClient, IMetadataServer
     {
         public abstract IBindable<bool> IsConnected { get; }
+
+        /// <summary>
+        /// A list of all watched multiplayer rooms (see <see cref="BeginWatchingMultiplayerRoom"/>).
+        /// </summary>
+        protected readonly HashSet<long> WatchedRooms = new HashSet<long>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -200,7 +206,7 @@ namespace osu.Game.Online.Metadata
 
         Task IStatefulUserHubClient.ServerShuttingDown()
         {
-            // TODO: check when we can disconnect and do so.
+            this.ReconnectWhenReady(IsConnected, () => WatchedRooms.Count == 0, Reconnect);
             return Task.CompletedTask;
         }
 

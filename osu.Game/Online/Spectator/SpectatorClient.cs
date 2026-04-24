@@ -453,7 +453,7 @@ namespace osu.Game.Online.Spectator
 
         Task IStatefulUserHubClient.ServerShuttingDown()
         {
-            // TODO: check when we can disconnect and do so.
+            this.ReconnectWhenReady(IsConnected, () => watchedUsersRefCounts.Count == 0, Reconnect);
             return Task.CompletedTask;
         }
 
