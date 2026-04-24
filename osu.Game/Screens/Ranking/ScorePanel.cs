@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Height of the top layer when the panel is expanded.
         /// </summary>
-        private const float expanded_top_layer_height = 53;
+        public const float EXPANDED_TOP_LAYER_HEIGHT = 53;
 
         /// <summary>
         /// Height of the top layer when the panel is contracted.
@@ -286,8 +286,8 @@ namespace osu.Game.Screens.Ranking
                 switch (state)
                 {
                     case PanelState.Expanded:
-                        topLayerContainer.MoveToY(-expanded_top_layer_height / 2, top_layer_expand_duration, Easing.OutQuint);
-                        middleLayerContainer.MoveToY(expanded_top_layer_height / 2, top_layer_expand_duration, Easing.OutQuint);
+                        topLayerContainer.MoveToY(-EXPANDED_TOP_LAYER_HEIGHT / 2, top_layer_expand_duration, Easing.OutQuint);
+                        middleLayerContainer.MoveToY(EXPANDED_TOP_LAYER_HEIGHT / 2, top_layer_expand_duration, Easing.OutQuint);
                         break;
 
                     case PanelState.Contracted:
