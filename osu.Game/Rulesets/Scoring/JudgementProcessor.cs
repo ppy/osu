@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The maximum number of hits that can be judged.
         /// </summary>
-        protected int MaxHits { get; private set; }
+        public int MaxHits { get; private set; }
 
         /// <summary>
         /// Whether <see cref="SimulateAutoplay"/> is currently running.
