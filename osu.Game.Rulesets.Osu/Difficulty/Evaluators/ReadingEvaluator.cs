@@ -46,12 +46,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double preemptDifficulty = calculatePreemptDifficulty(velocity, constantAngleNerfFactor, currObj.Preempt);
 
-            double difficulty = DifficultyCalculationUtils.Norm(1.5, preemptDifficulty, hiddenDifficulty, noteDensityDifficulty);
+            double readingDifficulty = DifficultyCalculationUtils.Norm(1.5, preemptDifficulty, hiddenDifficulty, noteDensityDifficulty);
 
             // Having less time to process information is harder
-            difficulty *= highBpmBonus(currObj.AdjustedDeltaTime);
+            readingDifficulty *= highBpmBonus(currObj.AdjustedDeltaTime);
 
-            return difficulty;
+            return readingDifficulty;
         }
 
         /// <summary>

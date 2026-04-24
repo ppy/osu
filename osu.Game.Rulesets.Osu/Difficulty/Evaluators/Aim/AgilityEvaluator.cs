@@ -28,13 +28,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             double distanceScaled = Math.Min(distance, distance_cap) / distance_cap;
 
-            double strain = distanceScaled * 1000 / osuCurrObj.AdjustedDeltaTime;
+            double agilityDifficulty = distanceScaled * 1000 / osuCurrObj.AdjustedDeltaTime;
 
-            strain *= Math.Pow(osuCurrObj.SmallCircleBonus, 1.5);
+            agilityDifficulty *= Math.Pow(osuCurrObj.SmallCircleBonus, 1.5);
 
-            strain *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
+            agilityDifficulty *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
 
-            return strain;
+            return agilityDifficulty;
         }
 
         private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.2, ms / 1000));
