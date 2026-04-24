@@ -105,9 +105,9 @@ namespace osu.Game.Localisation
         public static LocalisableString AdjustGlobalAudioOffsetAutomatically => new TranslatableString(getKey(@"adjust_global_audio_offset_automatically"), @"Adjust global audio offset automatically");
 
         /// <summary>
-        /// "If enabled, the global offset will slowly adjust itself over time based on your average hit error."
+        /// "If enabled, the global offset will slowly adjust itself over time based on your recent hit error."
         /// </summary>
-        public static LocalisableString AdjustGlobalAudioOffsetAutomaticallyTooltip => new TranslatableString(getKey(@"adjust_global_audio_offset_automatically_tooltip"), @"If enabled, the global offset will slowly adjust itself over time based on your average hit error.");
+        public static LocalisableString AdjustGlobalAudioOffsetAutomaticallyTooltip => new TranslatableString(getKey(@"adjust_global_audio_offset_automatically_tooltip"), @"If enabled, the global offset will slowly adjust itself over time based on your recent hit error.");
 
         /// <summary>
         /// "Use experimental audio mode"

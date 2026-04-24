@@ -23,12 +23,16 @@ namespace osu.Game.Configuration
 
         private readonly Bindable<ScoreInfo?> latestScore = new Bindable<ScoreInfo?>();
 
+        private readonly Bindable<bool> autoAdjustGlobalOffset = new Bindable<bool>();
+
         [Resolved]
         private OsuConfigManager configManager { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(SessionStatics statics)
         {
+            configManager.BindWith(OsuSetting.AutomaticallyAdjustGlobalAudioOffset, autoAdjustGlobalOffset);
+
             statics.BindWith(Static.LastLocalUserScore, latestScore);
             latestScore.BindValueChanged(score => calculateAverageHitError(score.NewValue), true);
         }
@@ -53,6 +57,17 @@ namespace osu.Game.Configuration
 
             double globalOffset = configManager.Get<double>(OsuSetting.AudioOffset);
             averageHitErrorHistory.Add(new DataPoint(medianError, globalOffset));
+
+            if (autoAdjustGlobalOffset.Value && averageHitErrorHistory.Count >= 3)
+            {
+                double suggested = Math.Round(averageHitErrorHistory.Average(dataPoint => dataPoint.SuggestedGlobalAudioOffset));
+
+                if (Math.Abs(suggested - globalOffset) >= 1)
+                {
+                    configManager.SetValue(OsuSetting.AudioOffset, suggested);
+                    ClearHistory();
+                }
+            }
         }
 
         public void ClearHistory() => averageHitErrorHistory.Clear();
