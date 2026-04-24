@@ -117,7 +117,12 @@ namespace osu.Game.Screens.Play
 
             Children = new[]
             {
-                CreateFailingLayer(),
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = configuration.ShowFailingOverlay ? 1 : 0,
+                    Child = CreateFailingLayer()
+                },
                 //Needs to be initialized before skinnable drawables.
                 judgementCountController = new JudgementCountController(),
                 clicksPerSecondController = new ClicksPerSecondController(),
