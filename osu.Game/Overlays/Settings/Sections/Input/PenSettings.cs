@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     {
         private readonly PenHandler penHandler;
 
-        protected override LocalisableString Header => PenSettingsStrings.Pen;
+        protected override LocalisableString Header => PenSettingsStrings.TabletExternal;
 
         private Bindable<double> handlerSensitivity = null!;
 
