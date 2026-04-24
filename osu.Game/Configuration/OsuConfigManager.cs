@@ -109,6 +109,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.AudioOffset, 0, -500.0, 500.0, 1);
 
+            SetDefault(OsuSetting.AutomaticallyAdjustGlobalAudioOffset, false);
             SetDefault(OsuSetting.AutomaticallyAdjustBeatmapOffset, false);
 
             // Input
@@ -490,6 +491,7 @@ namespace osu.Game.Configuration
         LastOnlineTagsPopulation,
 
         AutomaticallyAdjustBeatmapOffset,
+        AutomaticallyAdjustGlobalAudioOffset,
 
         DashboardSortMode,
         DashboardDisplayStyle,

@@ -30,6 +30,12 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 },
                 new SettingsItemV2(new FormCheckBox
                 {
+                    Caption = AudioSettingsStrings.AdjustGlobalAudioOffsetAutomatically,
+                    HintText = AudioSettingsStrings.AdjustGlobalAudioOffsetAutomaticallyTooltip,
+                    Current = config.GetBindable<bool>(OsuSetting.AutomaticallyAdjustGlobalAudioOffset),
+                }),
+                new SettingsItemV2(new FormCheckBox
+                {
                     Caption = AudioSettingsStrings.AdjustBeatmapOffsetAutomatically,
                     HintText = AudioSettingsStrings.AdjustBeatmapOffsetAutomaticallyTooltip,
                     Current = config.GetBindable<bool>(OsuSetting.AutomaticallyAdjustBeatmapOffset),

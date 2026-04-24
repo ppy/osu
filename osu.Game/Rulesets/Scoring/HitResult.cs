@@ -225,22 +225,16 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Whether a <see cref="HitResult"/> is a non-tick and non-bonus result.
         /// </summary>
-        public static bool IsBasic(this HitResult result)
+        public static bool IsBasic(this HitResult result) => result switch
         {
-            switch (result)
-            {
-                // LegacyComboIncrease is a special non-gameplay type which is neither a basic, tick, bonus, or accuracy-affecting result.
-                case HitResult.LegacyComboIncrease:
-                    return false;
+            // LegacyComboIncrease is a special non-gameplay type which is neither a basic, tick, bonus, or accuracy-affecting result.
+            HitResult.LegacyComboIncrease => false,
 
-                // ComboBreak is a special type that only affects combo. It cannot be considered as basic, tick, bonus, or accuracy-affecting.
-                case HitResult.ComboBreak:
-                    return false;
+            // ComboBreak is a special type that only affects combo. It cannot be considered as basic, tick, bonus, or accuracy-affecting.
+            HitResult.ComboBreak => false,
 
-                default:
-                    return IsScorable(result) && !IsTick(result) && !IsBonus(result);
-            }
-        }
+            _ => IsScorable(result) && !IsTick(result) && !IsBonus(result)
+        };
 
         /// <summary>
         /// Whether a <see cref="HitResult"/> should be counted as a tick.
@@ -325,26 +319,19 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Whether a <see cref="HitResult"/> is scorable.
         /// </summary>
-        public static bool IsScorable(this HitResult result)
+        public static bool IsScorable(this HitResult result) => result switch
         {
-            switch (result)
-            {
-                // LegacyComboIncrease is not actually scorable (in terms of usable by rulesets for that purpose), but needs to be defined as such to be correctly included in statistics output.
-                case HitResult.LegacyComboIncrease:
-                    return true;
+            // LegacyComboIncrease is not actually scorable (in terms of usable by rulesets for that purpose), but needs to be defined as such to be correctly included in statistics output.
+            HitResult.LegacyComboIncrease => true,
 
-                // ComboBreak is its own type that affects score via combo.
-                case HitResult.ComboBreak:
-                    return true;
+            // ComboBreak is its own type that affects score via combo.
+            HitResult.ComboBreak => true,
 
-                case HitResult.SliderTailHit:
-                    return true;
+            HitResult.SliderTailHit => true,
 
-                default:
-                    // Note that IgnoreHit and IgnoreMiss are excluded as they do not affect score.
-                    return result >= HitResult.Miss && result < HitResult.IgnoreMiss;
-            }
-        }
+            // Note that IgnoreHit and IgnoreMiss are excluded as they do not affect score.
+            _ => result >= HitResult.Miss && result < HitResult.IgnoreMiss
+        };
 
         /// <summary>
         /// An array of all scorable <see cref="HitResult"/>s.
