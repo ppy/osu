@@ -386,6 +386,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         Width = 0.48f
                     });
                 }
+
+                if (resultPanelContainer.Any(c => c.Position != Vector2.Zero))
+                {
+                    resultPanelContainer.LayoutDuration = 400;
+                    resultPanelContainer.LayoutEasing = Easing.OutQuint;
+                }
             });
         }
 
@@ -393,7 +399,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             userRating = null;
             ratingGraph.SetData([], null);
+
             resultPanelContainer.Clear();
+            resultPanelContainer.LayoutDuration = 0;
 
             if (e.NewValue == null)
             {
