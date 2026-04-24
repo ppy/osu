@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -34,34 +35,29 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            if (scoreProcessor != null)
-            {
-                scoreProcessor.NewJudgement += onJudgementChanged;
-                scoreProcessor.JudgementReverted += onJudgementChanged;
-                updateCount();
-            }
+            scoreProcessor.NewJudgement += onJudgementChanged;
+            scoreProcessor.JudgementReverted += onJudgementChanged;
+            updateCount();
         }
 
         private void onJudgementChanged(JudgementResult _) => updateCount();
 
         private void updateCount()
         {
-            Current.Value = scoreProcessor.MaxHits - scoreProcessor.JudgedHits;
+            int remaining = scoreProcessor.MaxHits - scoreProcessor.JudgedHits;
+            Current.Value = remaining < 0 ? 0 : remaining;
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            base.Dispose(isDisposing);
-
-            if (scoreProcessor != null)
+            if (IsNotNull())
             {
                 scoreProcessor.NewJudgement -= onJudgementChanged;
                 scoreProcessor.JudgementReverted -= onJudgementChanged;
             }
-        }
 
-        protected override OsuSpriteText CreateSpriteText()
-            => base.CreateSpriteText().With(s => s.Font = s.Font.With(size: 20f, fixedWidth: true));
+            base.Dispose(isDisposing);
+        }
 
         protected override LocalisableString FormatCount(int count)
         {
@@ -101,7 +97,7 @@ namespace osu.Game.Screens.Play.HUD
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             Font = OsuFont.Numeric.With(size: 8),
-                            Text = @"REMAINING",
+                            Text = new TranslatableString(@"objects_remaining_counter.remaining", @"REMAINING"),
                             Padding = new MarginPadding { Bottom = 2f },
                         }
                     }
