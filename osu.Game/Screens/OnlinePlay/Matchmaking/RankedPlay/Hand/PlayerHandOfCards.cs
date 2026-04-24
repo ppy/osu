@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -12,6 +13,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Online.RankedPlay;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
@@ -103,6 +105,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
         protected override HandCard CreateHandCard(RankedPlayCard card) => new PlayerHandCard(card)
         {
             Clicked = cardClicked,
+            Dragged = cardDragged,
             AllowSelection = allowSelection.GetBoundCopy(),
             PlayAction = PlayCardAction,
         };
@@ -138,39 +141,48 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             }
         }
 
-        protected override void OnCardStateChanged(HandCard card, RankedPlayCardState state)
+        protected override void OnCardStateChanged(HandCard card, ValueChangedEvent<RankedPlayCardState> evt)
         {
             StateChanged?.Invoke();
 
-            base.OnCardStateChanged(card, state);
+            base.OnCardStateChanged(card, evt);
         }
 
         public Dictionary<Guid, RankedPlayCardState> State => Cards.Select(static card => new KeyValuePair<Guid, RankedPlayCardState>(card.Item.Card.ID, card.State)).ToDictionary();
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.Repeat || Contracted)
+            if (e.Repeat || Contracted || Cards.Any(static c => c.CardDragged))
+                return false;
+
+            if (e.ShiftPressed || e.ControlPressed || e.AltPressed || e.SuperPressed)
                 return false;
 
             switch (e.Key)
             {
                 case >= Key.Number1 and <= Key.Number9:
-                    focusCard(e.Key - Key.Number1);
+                {
+                    int index = e.Key - Key.Number1;
+                    if (GetCardsInDisplayOrder().ElementAtOrDefault(index) is HandCard card)
+                        focusCard(card);
                     return true;
+                }
 
                 case Key.Space:
+                {
                     if (selectionMode == HandSelectionMode.Disabled)
                         return false;
 
                     if (Cards.FirstOrDefault(it => it.HasFocus) is not PlayerHandCard card)
                         return false;
 
-                    if (card.Selected)
+                    if (card.Selected && card.PlayAction != null)
                         card.PlayButton.TriggerClick();
                     else
                         card.TriggerClick();
 
                     return true;
+                }
 
                 case Key.Left:
                     moveCardFocus(-1);
@@ -186,34 +198,84 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
         private void moveCardFocus(int direction)
         {
-            int currentIndex = Cards.ToList().FindIndex(c => c.HasFocus);
+            var cards = GetCardsInDisplayOrder();
+
+            if (cards.Count == 0)
+                return;
+
+            int currentIndex = cards.FindIndex(c => c.HasFocus);
 
             // default behaviour is to start from either end of the cards if no card is focused currently
             // in single-selection mode we can however use the current selection as a fallback index if there's no focus
             if (selectionMode == HandSelectionMode.Single && currentIndex == -1)
-                currentIndex = Cards.ToList().FindIndex(c => c.Selected);
+                currentIndex = cards.FindIndex(c => c.Selected);
 
             int newIndex = currentIndex + direction;
 
             if (newIndex < 0)
-                newIndex = Cards.Count() - 1;
-            else if (newIndex >= Cards.Count())
+                newIndex = cards.Count - 1;
+            else if (newIndex >= cards.Count)
                 newIndex = 0;
 
-            focusCard(newIndex);
+            focusCard(cards[newIndex]);
         }
 
-        private void focusCard(int index)
+        private void focusCard(HandCard card)
         {
-            var card = Cards.ElementAtOrDefault(index);
-
-            if (card == null)
-                return;
-
             GetContainingFocusManager()?.ChangeFocus(card);
 
             if (SelectionMode == HandSelectionMode.Single && !card.Selected)
                 card.TriggerClick();
+        }
+
+        private void cardDragged(PlayerHandCard card, Vector2 screenSpacePosition)
+        {
+            var cards = GetCardsInDisplayOrder();
+
+            int newIndex = cardIndexInLayout(cards, card.ScreenSpaceDrawQuad.Centre);
+
+            card.Order = newIndex;
+
+            int order = 0;
+
+            foreach (var c in cards)
+            {
+                if (order == newIndex)
+                    order++;
+
+                if (c == card)
+                    continue;
+
+                c.Order = order++;
+            }
+
+            foreach (var c in Cards)
+                c.Item.DisplayOrder = c.Order;
+        }
+
+        private int cardIndexInLayout(IReadOnlyList<HandCard> cards, Vector2 screenSpacePosition)
+        {
+            Debug.Assert(cards.Count > 0);
+
+            var position = ToLocalSpace(screenSpacePosition) - DrawSize / 2;
+
+            int activeIndex = GetActiveCardIndex(cards);
+
+            int minIndex = 0;
+            float minDistance = float.MaxValue;
+
+            for (int i = 0; i < cards.Count; i++)
+            {
+                float distance = MathF.Abs(GetCardX(i, activeIndex) - position.X);
+
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    minIndex = i;
+                }
+            }
+
+            return minIndex;
         }
     }
 }

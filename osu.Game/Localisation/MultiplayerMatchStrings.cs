@@ -39,6 +39,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString FreestyleButtonTooltip => new TranslatableString(getKey(@"freestyle_button_tooltip"), @"Each player can choose their preferred difficulty, ruleset and mods.");
 
+        /// <summary>
+        /// "Searching for opponents..."
+        /// </summary>
+        public static LocalisableString SearchingForOpponents => new TranslatableString(getKey(@"searching_for_opponents"), @"Searching for opponents...");
+
+        /// <summary>
+        /// "Your match is ready! Click to join."
+        /// </summary>
+        public static LocalisableString MatchIsReady => new TranslatableString(getKey(@"match_is_ready"), @"Your match is ready! Click to join.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

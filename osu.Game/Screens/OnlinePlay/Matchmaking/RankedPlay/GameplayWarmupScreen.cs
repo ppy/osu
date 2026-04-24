@@ -32,8 +32,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
     {
         public override bool ShowBeatmapBackground => true;
 
-        protected override LocalisableString StageHeading => "Gameplay";
-        protected override LocalisableString StageCaption => string.Empty;
+        public override LocalisableString StageHeading => "Gameplay";
 
         [Cached(typeof(IBindable<SongSelect.BeatmapSetLookupResult?>))]
         private readonly Bindable<SongSelect.BeatmapSetLookupResult?> lastLookupResult = new Bindable<SongSelect.BeatmapSetLookupResult?>();
