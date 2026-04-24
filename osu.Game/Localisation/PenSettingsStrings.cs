@@ -10,9 +10,9 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.PenSettings";
 
         /// <summary>
-        /// "Pen"
+        /// "Tablet (External)"
         /// </summary>
-        public static LocalisableString Pen => new TranslatableString(getKey(@"pen"), @"Pen");
+        public static LocalisableString TabletExternal => new TranslatableString(getKey(@"tablet_external"), @"Tablet (External)");
 
         /// <summary>
         /// "Cursor sensitivity"
