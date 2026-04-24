@@ -40,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         private Circle centerLine = null!;
         private Circle centerLineThick = null!;
 
-        private float progress = 0f;
+        private float progress;
 
         protected float Progress
         {
