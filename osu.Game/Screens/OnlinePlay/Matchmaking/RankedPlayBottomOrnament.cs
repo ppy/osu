@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
@@ -40,19 +41,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
         private Circle centerLine = null!;
         private Circle centerLineThick = null!;
 
-        private float progress;
+        private readonly Bindable<float> progressBindable = new Bindable<float>();
 
         protected float Progress
         {
-            get => progress;
-            set
-            {
-                if (progress == value)
-                    return;
-
-                progress = value;
-                recomputePaths(value);
-            }
+            get => progressBindable.Value;
+            set => progressBindable.Value = value;
         }
 
         public RankedPlayBottomOrnament()
@@ -147,6 +141,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
                     Text = ButtonSystemStrings.RankedPlay.ToUpper(),
                 },
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            progressBindable.BindValueChanged(progress => recomputePaths(progress.NewValue), true);
         }
 
         private readonly List<Vector2> vertices = new List<Vector2>();

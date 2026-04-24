@@ -5,7 +5,6 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Testing;
 using osu.Game.Screens.OnlinePlay.Matchmaking;
 using osuTK.Graphics;
 
@@ -13,12 +12,11 @@ namespace osu.Game.Tests.Visual.RankedPlay
 {
     public partial class TestSceneRankedPlayBottomOrnament : OsuTestScene
     {
-        private TestOrnament ornament = null!;
+        private readonly TestOrnament ornament;
 
-        [SetUpSteps]
-        public void SetUpSteps()
+        public TestSceneRankedPlayBottomOrnament()
         {
-            AddStep("create", () => Child = new Container
+            Child = new Container
             {
                 Width = 400,
                 Height = 24,
@@ -33,7 +31,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     },
                     ornament = new TestOrnament(),
                 }
-            });
+            };
         }
 
         [Test]
@@ -48,7 +46,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
         {
             public new float Progress
             {
-                get => base.Progress;
                 set => base.Progress = value;
             }
         }
