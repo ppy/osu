@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Layout;
@@ -14,7 +15,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public partial class TaikoModFlashlight : ModFlashlight<TaikoHitObject>
     {
-        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => UsesDefaultConfiguration ? 1.12 : 1;
 
         public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)
         {

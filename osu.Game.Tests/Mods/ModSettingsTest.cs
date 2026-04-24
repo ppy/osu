@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
@@ -91,7 +92,7 @@ namespace osu.Game.Tests.Mods
         {
             public override string Name => "Non-matching setting type mod";
             public override LocalisableString Description => "Description";
-            public override double ScoreMultiplier => 1;
+            public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1;
             public override ModType Type => ModType.Conversion;
 
             [SettingSource("Test setting")]

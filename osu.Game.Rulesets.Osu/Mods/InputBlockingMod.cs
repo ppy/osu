@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public abstract partial class InputBlockingMod : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IUpdatableByPlayfield
     {
-        public override double ScoreMultiplier => 1.0;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(OsuModCinema) };
         public override ModType Type => ModType.Conversion;
 

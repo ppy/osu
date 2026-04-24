@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Graphics.Sprites;
@@ -29,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override IconUsage? Icon => OsuIcon.ModStrictTracking;
         public override ModType Type => ModType.DifficultyIncrease;
         public override LocalisableString Description => @"Once you start a slider, follow precisely or get a miss.";
-        public override double ScoreMultiplier => 1.0;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModClassic), typeof(OsuModTargetPractice) };
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)

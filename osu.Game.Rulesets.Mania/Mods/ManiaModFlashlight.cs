@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Layout;
@@ -13,7 +14,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public partial class ManiaModFlashlight : ModFlashlight<ManiaHitObject>
     {
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1;
         public override Type[] IncompatibleMods => new[] { typeof(ModHidden) };
 
         public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)

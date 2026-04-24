@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
@@ -20,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override LocalisableString Description => @"Dons become kats, kats become dons";
         public override IconUsage? Icon => OsuIcon.ModSwap;
         public override ModType Type => ModType.Conversion;
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1;
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModRandom)).ToArray();
         public override bool Ranked => true;
 

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
@@ -19,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override ModType Type => ModType.Fun;
 
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1;
 
         [SettingSource("Starting Size", "The initial size multiplier applied to all objects.")]
         public abstract BindableNumber<float> StartScale { get; }

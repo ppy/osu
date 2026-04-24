@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override string Acronym => "MF";
         public override LocalisableString Description => "Dashing by default, slow down!";
         public override ModType Type => ModType.Fun;
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1;
         public override IconUsage? Icon => OsuIcon.ModMovingFast;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax) };
 

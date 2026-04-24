@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 
@@ -9,7 +10,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModHardRock : ModHardRock
     {
-        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => UsesDefaultConfiguration ? 1.06 : 1;
 
         /// <summary>
         /// Multiplier factor added to the scrolling speed.

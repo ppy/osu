@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Localisation;
 
 namespace osu.Game.Rulesets.Mods
@@ -15,7 +16,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => $"Unknown mod ({OriginalAcronym})";
         public override string Acronym => $"{OriginalAcronym}??";
         public override LocalisableString Description => "This mod could not be resolved by the game.";
-        public override double ScoreMultiplier => 0;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 0;
 
         public override bool UserPlayable => false;
         public override bool ValidForMultiplayer => false;

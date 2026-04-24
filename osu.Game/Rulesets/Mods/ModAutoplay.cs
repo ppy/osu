@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModAutoplay;
         public override ModType Type => ModType.Automation;
         public override LocalisableString Description => "Watch a perfect automated play through the song.";
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1;
 
         public sealed override bool UserPlayable => false;
         public sealed override bool ValidForMultiplayer => false;

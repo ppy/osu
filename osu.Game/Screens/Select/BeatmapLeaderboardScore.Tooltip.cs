@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Select
                         double multiplier = 1.0;
 
                         foreach (var mod in value.Mods)
-                            multiplier *= mod.ScoreMultiplier;
+                            multiplier *= mod.ScoreMultiplier(value.Mods);
 
                         var generalStatistics = new[]
                         {

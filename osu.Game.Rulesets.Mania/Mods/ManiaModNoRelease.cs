@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Graphics.Sprites;
@@ -26,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override LocalisableString Description => "No more timing the end of hold notes.";
 
-        public override double ScoreMultiplier => 0.9;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 0.9;
 
         public override IconUsage? Icon => OsuIcon.ModNoRelease;
 

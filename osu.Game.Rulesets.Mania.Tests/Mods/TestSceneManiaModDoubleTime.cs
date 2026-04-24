@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
                 Mod = doubleTime,
                 PassCondition = () => Player.ScoreProcessor.JudgedHits > 0
                                       && Player.ScoreProcessor.Accuracy.Value == 1
-                                      && Player.ScoreProcessor.TotalScore.Value == (long)(1_000_000 * doubleTime.ScoreMultiplier),
+                                      && Player.ScoreProcessor.TotalScore.Value == (long)(1_000_000 * doubleTime.ScoreMultiplier(new[] { doubleTime })),
                 Autoplay = false,
                 CreateBeatmap = () => new Beatmap
                 {

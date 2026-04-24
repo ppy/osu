@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -34,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override LocalisableString Description => "Don't let their popping distract you!";
 
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1;
 
         public override IconUsage? Icon => OsuIcon.ModBubbles;
 
