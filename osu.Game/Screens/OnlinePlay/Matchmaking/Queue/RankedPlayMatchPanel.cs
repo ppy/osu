@@ -26,7 +26,6 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 {
-    [LongRunningLoad]
     public partial class RankedPlayMatchPanel : CompositeDrawable
     {
         [Resolved]

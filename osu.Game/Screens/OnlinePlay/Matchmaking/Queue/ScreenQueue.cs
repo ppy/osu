@@ -369,19 +369,25 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             ratingGraph.SetData(status.RatingDistribution, userRating);
 
-            foreach (var state in status.RecentMatches.OfType<RankedPlayRoomState>())
-            {
-                resultPanelContainer.Insert(-resultPanelContainer.Count, new DelayedLoadWrapper(new RankedPlayMatchPanel(state)
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Width = 1
-                }, 0)
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Width = 0.48f
-                });
-            }
+            loadRecentMatches(status.RecentMatches.OfType<RankedPlayRoomState>().ToArray()).FireAndForget();
         });
+
+        private async Task loadRecentMatches(RankedPlayRoomState[] matches)
+        {
+            await userLookupCache.GetUsersAsync(matches.SelectMany(m => m.Users.Keys).ToArray()).ConfigureAwait(false);
+
+            Scheduler.Add(() =>
+            {
+                foreach (var match in matches)
+                {
+                    resultPanelContainer.Insert(-resultPanelContainer.Count, new RankedPlayMatchPanel(match)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Width = 0.48f
+                    });
+                }
+            });
+        }
 
         private void onSelectedPoolChanged(ValueChangedEvent<MatchmakingPool?> e)
         {
