@@ -830,6 +830,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
+        public override Task Reconnect()
+        {
+            return Task.CompletedTask;
+        }
+
         public async Task ChangeMatchRoomState(MatchRoomState state)
         {
             Debug.Assert(ServerRoom != null);

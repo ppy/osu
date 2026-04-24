@@ -1223,6 +1223,8 @@ namespace osu.Game.Online.Multiplayer
 
         protected abstract Task DisconnectInternal();
 
+        public abstract Task Reconnect();
+
         Task IStatefulUserHubClient.DisconnectRequested()
         {
             Schedule(() =>

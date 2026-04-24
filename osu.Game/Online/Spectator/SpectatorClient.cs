@@ -439,6 +439,8 @@ namespace osu.Game.Online.Spectator
 
         protected abstract Task DisconnectInternal();
 
+        public abstract Task Reconnect();
+
         Task IStatefulUserHubClient.DisconnectRequested()
         {
             Schedule(() =>

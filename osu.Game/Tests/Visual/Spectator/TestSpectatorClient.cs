@@ -209,5 +209,11 @@ namespace osu.Game.Tests.Visual.Spectator
             isConnected.Value = false;
             return Task.CompletedTask;
         }
+
+        public override Task Reconnect()
+        {
+            isConnected.Value = true;
+            return Task.CompletedTask;
+        }
     }
 }

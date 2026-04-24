@@ -184,6 +184,8 @@ namespace osu.Game.Online.Metadata
         /// </summary>
         public event Action? Disconnecting;
 
+        public abstract Task Reconnect();
+
         protected abstract Task DisconnectInternal();
 
         Task IStatefulUserHubClient.DisconnectRequested()

@@ -304,6 +304,12 @@ namespace osu.Game.Online.Metadata
             connector?.Dispose();
         }
 
+        public override async Task Reconnect()
+        {
+            if (connector != null)
+                await connector.Reconnect().ConfigureAwait(false);
+        }
+
         protected override async Task DisconnectInternal()
         {
             if (connector != null)

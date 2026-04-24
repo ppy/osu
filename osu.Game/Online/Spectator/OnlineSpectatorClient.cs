@@ -123,6 +123,12 @@ namespace osu.Game.Online.Spectator
             return connection.InvokeAsync(nameof(ISpectatorServer.EndWatchingUser), userId);
         }
 
+        public override async Task Reconnect()
+        {
+            if (connector != null)
+                await connector.Reconnect().ConfigureAwait(false);
+        }
+
         protected override async Task DisconnectInternal()
         {
             if (connector != null)
