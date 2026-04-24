@@ -125,12 +125,8 @@ namespace osu.Game.Online.Spectator
 
         protected override async Task DisconnectInternal()
         {
-            await base.DisconnectInternal().ConfigureAwait(false);
-
-            if (connector == null)
-                return;
-
-            await connector.Disconnect().ConfigureAwait(false);
+            if (connector != null)
+                await connector.Disconnect().ConfigureAwait(false);
         }
     }
 }

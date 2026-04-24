@@ -298,17 +298,16 @@ namespace osu.Game.Online.Metadata
             await connection.InvokeAsync(nameof(IMetadataServer.RefreshFriends)).ConfigureAwait(false);
         }
 
-        public override async Task DisconnectRequested()
-        {
-            await base.DisconnectRequested().ConfigureAwait(false);
-            if (connector != null)
-                await connector.Disconnect().ConfigureAwait(false);
-        }
-
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
             connector?.Dispose();
+        }
+
+        protected override async Task DisconnectInternal()
+        {
+            if (connector != null)
+                await connector.Disconnect().ConfigureAwait(false);
         }
     }
 }

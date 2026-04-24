@@ -179,11 +179,20 @@ namespace osu.Game.Online.Metadata
 
         #region Disconnection handling
 
+        /// <summary>
+        /// Invoked just prior to disconnection.
+        /// </summary>
         public event Action? Disconnecting;
 
-        public virtual Task DisconnectRequested()
+        protected abstract Task DisconnectInternal();
+
+        Task IStatefulUserHubClient.DisconnectRequested()
         {
-            Schedule(() => Disconnecting?.Invoke());
+            Schedule(() =>
+            {
+                Disconnecting?.Invoke();
+                DisconnectInternal().FireAndForget();
+            });
             return Task.CompletedTask;
         }
 

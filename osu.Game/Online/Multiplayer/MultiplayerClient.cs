@@ -11,9 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Database;
-using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -116,11 +114,6 @@ namespace osu.Game.Online.Multiplayer
         /// Invoked when the multiplayer server has finished collating results.
         /// </summary>
         public event Action? ResultsReady;
-
-        /// <summary>
-        /// Invoked just prior to disconnection requested by the server via <see cref="IStatefulUserHubClient.DisconnectRequested"/>.
-        /// </summary>
-        public event Action? Disconnecting;
 
         public event Action<MultiplayerCountdown>? CountdownStarted;
 
@@ -488,8 +481,6 @@ namespace osu.Game.Online.Multiplayer
         public abstract Task ChangeState(MultiplayerUserState newState);
 
         public abstract Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability);
-
-        public abstract Task DisconnectInternal();
 
         public abstract Task ChangeUserStyle(int? beatmapId, int? rulesetId);
 
@@ -1081,21 +1072,7 @@ namespace osu.Game.Online.Multiplayer
             });
         }
 
-        Task IStatefulUserHubClient.DisconnectRequested()
-        {
-            Schedule(() =>
-            {
-                Disconnecting?.Invoke();
-                DisconnectInternal();
-            });
-            return Task.CompletedTask;
-        }
-
-        Task IStatefulUserHubClient.ServerShuttingDown()
-        {
-            // TODO: check when we can disconnect and do so.
-            return Task.CompletedTask;
-        }
+        #region Matchmaking / Ranked Play
 
         Task IMatchmakingClient.MatchmakingQueueJoined()
         {
@@ -1235,14 +1212,33 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task MatchmakingSkipToNextStage();
 
-        private partial class MultiplayerInvitationNotification : UserAvatarNotification
-        {
-            protected override IconUsage CloseButtonIcon => FontAwesome.Solid.Times;
+        #endregion
 
-            public MultiplayerInvitationNotification(APIUser user, Room room)
-                : base(user, NotificationsStrings.InvitedYouToTheMultiplayer(user.Username, room.Name))
+        #region Disconnection handling
+
+        /// <summary>
+        /// Invoked just prior to disconnection.
+        /// </summary>
+        public event Action? Disconnecting;
+
+        protected abstract Task DisconnectInternal();
+
+        Task IStatefulUserHubClient.DisconnectRequested()
+        {
+            Schedule(() =>
             {
-            }
+                Disconnecting?.Invoke();
+                DisconnectInternal().FireAndForget();
+            });
+            return Task.CompletedTask;
         }
+
+        Task IStatefulUserHubClient.ServerShuttingDown()
+        {
+            // TODO: check when we can disconnect and do so.
+            return Task.CompletedTask;
+        }
+
+        #endregion
     }
 }

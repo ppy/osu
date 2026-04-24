@@ -140,5 +140,11 @@ namespace osu.Game.Tests.Visual.Metadata
         {
             isConnected.Value = true;
         }
+
+        protected override Task DisconnectInternal()
+        {
+            Disconnect();
+            return Task.CompletedTask;
+        }
     }
 }

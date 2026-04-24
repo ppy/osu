@@ -335,14 +335,6 @@ namespace osu.Game.Online.Multiplayer
             return connection.InvokeAsync(nameof(IMultiplayerServer.VoteToSkipIntro));
         }
 
-        public override Task DisconnectInternal()
-        {
-            if (connector == null)
-                return Task.CompletedTask;
-
-            return connector.Disconnect();
-        }
-
         public override Task DiscardCards(RankedPlayCardItem[] cards)
         {
             if (!IsConnected.Value)
@@ -448,6 +440,12 @@ namespace osu.Game.Online.Multiplayer
         {
             base.Dispose(isDisposing);
             connector?.Dispose();
+        }
+
+        protected override async Task DisconnectInternal()
+        {
+            if (connector != null)
+                await connector.Disconnect().ConfigureAwait(false);
         }
     }
 }
