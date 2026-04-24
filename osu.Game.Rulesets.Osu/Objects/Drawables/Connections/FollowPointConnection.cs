@@ -17,8 +17,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     public partial class FollowPointConnection : PoolableDrawableWithLifetime<FollowPointLifetimeEntry>
     {
         // Todo: These shouldn't be constants
-        public const int SPACING = 32;
-        public const double PREEMPT = 800;
+        public static readonly int SPACING = 32;
+        public static readonly double PREEMPT = 800;
 
         public DrawablePool<FollowPoint>? Pool { private get; set; }
 
