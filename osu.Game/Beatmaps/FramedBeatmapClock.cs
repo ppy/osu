@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using osu.Framework;
+using osu.Framework.Audio;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -42,6 +43,9 @@ namespace osu.Game.Beatmaps
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
+
+        [Resolved]
+        private AudioManager audioManager { get; set; } = null!;
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
@@ -90,9 +94,15 @@ namespace osu.Game.Beatmaps
             {
                 Debug.Assert(userBeatmapOffsetClock != null);
                 Debug.Assert(userGlobalOffsetClock != null);
+                Debug.Assert(platformOffsetClock != null);
 
                 userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
                 userAudioOffset.BindValueChanged(offset => userGlobalOffsetClock.Offset = offset.NewValue, true);
+
+                audioManager.UseExperimentalWasapi.BindValueChanged(wasapi =>
+                {
+                    platformOffsetClock.Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? (wasapi.NewValue ? -35 : 15) : 0;
+                }, true);
 
                 // TODO: this doesn't update when using ChangeSource() to change beatmap.
                 beatmapOffsetSubscription = realm.SubscribeToPropertyChanged(
