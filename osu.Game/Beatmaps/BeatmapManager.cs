@@ -20,6 +20,7 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO.Archives;
+using osu.Game.Localisation;
 using osu.Game.Models;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -372,7 +373,6 @@ namespace osu.Game.Beatmaps
 
         public void ResetAllOffsets()
         {
-            const string reset_complete_message = "All offsets have been reset!";
             Realm.Write(r =>
             {
                 var items = r.All<BeatmapInfo>();
@@ -383,7 +383,7 @@ namespace osu.Game.Beatmaps
                         beatmap.UserSettings.Offset = 0;
                 }
 
-                PostNotification?.Invoke(new ProgressCompletionNotification { Text = reset_complete_message });
+                PostNotification?.Invoke(new ProgressCompletionNotification { Text = MaintenanceSettingsStrings.AllOffsetsReset });
             });
         }
 
@@ -435,12 +435,10 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public void DeleteVideos(List<BeatmapSetInfo> items, bool silent = false)
         {
-            const string no_videos_message = "No videos found to delete!";
-
             if (items.Count == 0)
             {
                 if (!silent)
-                    PostNotification?.Invoke(new ProgressCompletionNotification { Text = no_videos_message });
+                    PostNotification?.Invoke(new ProgressCompletionNotification { Text = MaintenanceSettingsStrings.NoVideosFoundToDelete });
                 return;
             }
 
@@ -448,7 +446,7 @@ namespace osu.Game.Beatmaps
             {
                 Progress = 0,
                 Text = $"Preparing to delete all {HumanisedModelName} videos...",
-                CompletionText = no_videos_message,
+                CompletionText = MaintenanceSettingsStrings.NoVideosFoundToDelete,
                 State = ProgressNotificationState.Active,
             };
 
