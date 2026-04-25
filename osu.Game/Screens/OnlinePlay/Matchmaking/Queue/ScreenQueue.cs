@@ -370,25 +370,39 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             ratingGraph.SetData(status.RatingDistribution, userRating);
 
-            foreach (var state in status.RecentMatches.OfType<RankedPlayRoomState>())
-            {
-                resultPanelContainer.Insert(-resultPanelContainer.Count, new DelayedLoadWrapper(new RankedPlayMatchPanel(state)
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Width = 1
-                }, 0)
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Width = 0.48f
-                });
-            }
+            loadRecentMatches(status.RecentMatches.OfType<RankedPlayRoomState>().ToArray()).FireAndForget();
         });
+
+        private async Task loadRecentMatches(RankedPlayRoomState[] matches)
+        {
+            await userLookupCache.GetUsersAsync(matches.SelectMany(m => m.Users.Keys).ToArray()).ConfigureAwait(false);
+
+            Scheduler.Add(() =>
+            {
+                foreach (var match in matches)
+                {
+                    resultPanelContainer.Insert(-resultPanelContainer.Count, new RankedPlayMatchPanel(match)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Width = 0.48f
+                    });
+                }
+
+                if (resultPanelContainer.Any(c => c.Position != Vector2.Zero))
+                {
+                    resultPanelContainer.LayoutDuration = 400;
+                    resultPanelContainer.LayoutEasing = Easing.OutQuint;
+                }
+            });
+        }
 
         private void onSelectedPoolChanged(ValueChangedEvent<MatchmakingPool?> e)
         {
             userRating = null;
             ratingGraph.SetData([], null);
+
             resultPanelContainer.Clear();
+            resultPanelContainer.LayoutDuration = 0;
 
             if (e.NewValue == null)
             {
