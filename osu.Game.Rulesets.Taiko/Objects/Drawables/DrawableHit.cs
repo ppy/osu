@@ -10,9 +10,11 @@ using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -20,6 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public partial class DrawableHit : DrawableTaikoStrongableHitObject<Hit, Hit.StrongNestedHit>
     {
+
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
@@ -162,17 +165,16 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     // If we're far enough away from the left stage, we should bring ourselves in front of it
                     ProxyContent();
 
-                    const float gravity_time = 300;
                     const float gravity_travel_height = 200;
 
                     if (SnapJudgementLocation)
                         MainPiece.MoveToX(-X);
 
-                    this.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);
+                    this.ScaleTo(0.8f, FlyingTimeAfterHit * 2, Easing.OutQuad);
 
-                    this.MoveToY(-gravity_travel_height, gravity_time, Easing.Out)
+                    this.MoveToY(-gravity_travel_height, FlyingTimeAfterHit, Easing.Out)
                         .Then()
-                        .MoveToY(gravity_travel_height * 2, gravity_time * 2, Easing.In);
+                        .MoveToY(gravity_travel_height * 2, FlyingTimeAfterHit * 2, Easing.In);
 
                     this.FadeOut(800);
                     break;
