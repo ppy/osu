@@ -53,12 +53,35 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private IPlacementHandler placementHandler { get; set; } = null!;
 
+        /// <summary>
+        /// Acceptable leniency to account for rounding errors and minor unsnaps that we generally
+        /// don't consider a problem, but still need to account for in certain operations.
+        /// </summary>
+        private const double placement_replace_start_time_leniency_ms = 2;
+
         protected HitObjectPlacementBlueprint(HitObject hitObject)
         {
             HitObject = hitObject;
 
             // adding the default hit sample should be the case regardless of the ruleset.
             HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL));
+        }
+
+        /// <summary>
+        /// Whether <paramref name="existing"/> should be removed because <paramref name="placement"/> is being placed on top of it.
+        /// </summary>
+        /// <remarks>
+        /// Matches when start times are within ±<see cref="placement_replace_start_time_leniency_ms"/> ms of each other.
+        /// </remarks>
+        public static bool PlacementReplacesExisting(HitObject existing, HitObject placement)
+        {
+            if (System.Math.Abs(existing.StartTime - placement.StartTime) > placement_replace_start_time_leniency_ms)
+                return false;
+
+            if (placement is IHasColumn placementColumn && existing is IHasColumn existingColumn)
+                return existingColumn.Column == placementColumn.Column;
+
+            return true;
         }
 
         [BackgroundDependencyLoader]
