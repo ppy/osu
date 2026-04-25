@@ -1,14 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Localisation;
+using osu.Game.Overlays;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -33,25 +38,98 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         private Editor? editor { get; set; }
 
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> working { get; set; } = null!;
+
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(SetupScreen? setupScreen)
         {
-            Children = new[]
+            ArtistTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Artist);
+            RomanisedArtistTextBox = createTextBox<FormRomanisedTextBox>(EditorSetupStrings.RomanisedArtist);
+            TitleTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Title);
+            RomanisedTitleTextBox = createTextBox<FormRomanisedTextBox>(EditorSetupStrings.RomanisedTitle);
+            creatorTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Creator);
+            difficultyTextBox = createTextBox<FormTextBox>(EditorSetupStrings.DifficultyName);
+            sourceTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoSource);
+            tagsTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoMapperTags);
+
+            var syncMetadataButton = new RoundedButton
             {
-                ArtistTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Artist),
-                RomanisedArtistTextBox = createTextBox<FormRomanisedTextBox>(EditorSetupStrings.RomanisedArtist),
-                TitleTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Title),
-                RomanisedTitleTextBox = createTextBox<FormRomanisedTextBox>(EditorSetupStrings.RomanisedTitle),
-                creatorTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Creator),
-                difficultyTextBox = createTextBox<FormTextBox>(EditorSetupStrings.DifficultyName),
-                sourceTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoSource),
-                tagsTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoMapperTags)
+                RelativeSizeAxes = Axes.X,
+                Text = EditorSetupStrings.SyncMetadataWithAllDifficulties,
+                TooltipText = EditorSetupStrings.SyncMetadataWithAllDifficultiesTooltip,
+                Margin = new MarginPadding { Top = 10 },
+                Action = () =>
+                {
+                    if (working.Value.BeatmapSetInfo.Beatmaps.Count <= 1)
+                        return;
+
+                    dialogOverlay?.Push(new SyncMetadataConfirmationDialog(syncMetadataToAllOtherDifficulties));
+                },
+            };
+            syncMetadataButton.Enabled.Value = working.Value.BeatmapSetInfo.Beatmaps.Count > 1;
+
+            Children = new Drawable[]
+            {
+                ArtistTextBox,
+                RomanisedArtistTextBox,
+                TitleTextBox,
+                RomanisedTitleTextBox,
+                creatorTextBox,
+                difficultyTextBox,
+                sourceTextBox,
+                tagsTextBox,
+                syncMetadataButton,
             };
 
             if (setupScreen != null)
                 setupScreen.MetadataChanged += reloadMetadata;
 
             reloadMetadata();
+        }
+
+        private void syncMetadataToAllOtherDifficulties()
+        {
+            if (working.Value.BeatmapSetInfo.Beatmaps.Count <= 1)
+                return;
+
+            applyMetadata();
+
+            var set = working.Value.BeatmapSetInfo;
+            var current = Beatmap.BeatmapInfo;
+            var source = Beatmap.Metadata;
+
+            foreach (var b in set.Beatmaps)
+            {
+                if (b.Equals(current))
+                    continue;
+
+                b.Metadata.ArtistUnicode = source.ArtistUnicode;
+                b.Metadata.Artist = source.Artist;
+                b.Metadata.TitleUnicode = source.TitleUnicode;
+                b.Metadata.Title = source.Title;
+                b.Metadata.Source = source.Source;
+                b.Metadata.Tags = source.Tags;
+
+                try
+                {
+                    var beatmapWorking = beatmaps.GetWorkingBeatmap(b);
+                    beatmaps.Save(b, beatmapWorking.GetPlayableBeatmap(b.Ruleset), beatmapWorking.GetSkin());
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $"Failed to sync metadata to {b.GetDisplayTitle()}");
+                }
+            }
+
+            // Persist the current difficulty and align with how resource changes re-save the current beatmap.
+            editor?.Save();
         }
 
         private TTextBox createTextBox<TTextBox>(LocalisableString label)
