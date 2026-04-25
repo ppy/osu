@@ -2,10 +2,20 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModDoubleTime : ModDoubleTime
+    public class TaikoModDoubleTime : ModDoubleTime, IApplicableToDrawableHitObject
     {
+        public void ApplyToDrawableHitObject(DrawableHitObject drawable)
+        {
+            //Increase flying time to match stable. Because osu!stable does not make flying hits go faster with DoubleTime
+            if (drawable is DrawableTaikoHitObject taiko)
+            {
+                taiko.FlyingTimeAfterHit = 300.0 * SpeedChange.Value;
+            }
+        }
     }
 }
