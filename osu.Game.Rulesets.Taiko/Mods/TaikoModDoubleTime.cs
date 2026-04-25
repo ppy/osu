@@ -11,12 +11,10 @@ namespace osu.Game.Rulesets.Taiko.Mods
     {
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
-            switch (drawable)
+            //Increase flying time to match stable. Because osu!stable does not make flying hits go faster with DoubleTime
+            if (drawable is DrawableTaikoHitObject taiko)
             {
-                case DrawableTaikoHitObject taiko:
-                    //Increase flying time to match stable. Because osu!stable does not make flying hits go faster with DoubleTime
-                    taiko.FlyingTimeAfterHit = 300 * 1.5f;
-                    break;
+                taiko.FlyingTimeAfterHit = 300.0 * SpeedChange.Value;
             }
         }
     }

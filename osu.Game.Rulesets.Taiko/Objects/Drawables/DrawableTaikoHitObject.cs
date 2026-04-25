@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// <summary>
         /// Length of the animation of the taiko note flying away after hit
         /// </summary>
-        public float FlyingTimeAfterHit = 300;
+        public double FlyingTimeAfterHit = 300;
 
         /// <summary>
         /// Whether the location of the hit should be snapped to the hit target before animating.

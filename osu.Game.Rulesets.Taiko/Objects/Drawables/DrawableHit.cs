@@ -10,11 +10,9 @@ using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
-using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
-using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -22,7 +20,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public partial class DrawableHit : DrawableTaikoStrongableHitObject<Hit, Hit.StrongNestedHit>
     {
-
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
