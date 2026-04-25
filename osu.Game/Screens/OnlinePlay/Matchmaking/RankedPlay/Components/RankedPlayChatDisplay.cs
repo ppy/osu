@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -18,7 +19,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Resources.Localisation.Web;
@@ -91,8 +91,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             textbox.OnCommit += onCommit;
 
             channel = channelManager?.JoinChannel(new Channel { Id = room.ChannelID, Type = ChannelType.Multiplayer, Name = $"#lazermp_{room.RoomID}" });
+
             if (channel != null)
+            {
                 channel.NewMessagesArrived += onNewMessagesArrived;
+                channel.PendingMessageResolved += onPendingMessageResolved;
+            }
         }
 
         private void onCommit(TextBox sender, bool newText)
@@ -113,7 +117,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         private void onNewMessagesArrived(IEnumerable<Message> bundle)
         {
             foreach (var message in bundle)
-                chatHistory.PostMessage(message.Sender, message.Content);
+                chatHistory.PostMessage(message);
+        }
+
+        private void onPendingMessageResolved(Message existing, Message updated)
+        {
+            chatHistory.ResolvePendingMessage(existing, updated);
         }
 
         private void onFocusGained()
@@ -186,7 +195,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             base.Dispose(isDisposing);
 
             if (channel != null)
+            {
                 channel.NewMessagesArrived -= onNewMessagesArrived;
+                channel.PendingMessageResolved -= onPendingMessageResolved;
+            }
         }
 
         private partial class ChatTextBox : StandAloneChatDisplay.ChatTextBox
@@ -219,6 +231,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             private const float time_before_disappear = 5000;
 
             private readonly Container<MessageBubble> messageContainer;
+            internal IReadOnlyList<MessageBubble> Messages => messageContainer.Children;
 
             private bool expanded;
 
@@ -274,15 +287,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             /// <summary>
             /// Posts a message.
             /// </summary>
-            /// <param name="user">The user that posted the message.</param>
-            /// <param name="content">The message content.</param>
-            public void PostMessage(APIUser user, string content)
+            /// <param name="message">The message to be posted.</param>
+            public void PostMessage(Message message)
             {
-                var newMessage = new MessageBubble(user, content)
+                var newMessage = new MessageBubble(message)
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    PostTime = Time.Current
+                    PostTime = Time.Current,
                 };
 
                 messageContainer.Add(newMessage);
@@ -321,6 +333,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 }
             }
 
+            public void ResolvePendingMessage(Message existing, Message updated)
+            {
+                var found = messageContainer.LastOrDefault(mb => mb.Message == existing);
+
+                if (found != null)
+                {
+                    Trace.Assert(updated.Id.HasValue, "An updated message was returned with no ID.");
+                    found.Message = updated;
+                }
+            }
+
             private void playSample()
             {
                 if (lastSamplePlayback != null && Time.Current - lastSamplePlayback < 100)
@@ -330,20 +353,34 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 lastSamplePlayback = Time.Current;
             }
 
-            private partial class MessageBubble : CompositeDrawable
+            internal partial class MessageBubble : CompositeDrawable
             {
-                private readonly APIUser user;
-                private readonly string message;
+                private Message message = null!;
+
+                public Message Message
+                {
+                    get => message;
+                    set
+                    {
+                        if (message == value) return;
+
+                        message = MessageFormatter.FormatMessage(value);
+
+                        if (!IsLoaded)
+                            return;
+
+                        updateMessageContent();
+                    }
+                }
 
                 /// <summary>
                 /// The time at which this message was posted.
                 /// </summary>
                 public required double PostTime { get; init; }
 
-                public MessageBubble(APIUser user, string message)
+                public MessageBubble(Message message)
                 {
-                    this.user = user;
-                    this.message = message;
+                    Message = message;
                     AutoSizeAxes = Axes.Both;
 
                     Scale = Vector2.Zero;
@@ -352,6 +389,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
                 [Resolved]
                 private IAPIProvider api { get; set; } = null!;
+
+                private OsuTextFlowContainer textFlowContainer = null!;
 
                 [BackgroundDependencyLoader]
                 private void load()
@@ -368,7 +407,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = api.LocalUser.Value.Id == user.Id
+                                    Colour = api.LocalUser.Value.Id == Message.SenderId
                                         ? RankedPlayColourScheme.BLUE.PrimaryDarkest
                                         : RankedPlayColourScheme.RED.PrimaryDarkest,
                                 },
@@ -384,26 +423,32 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                             Origin = Anchor.CentreLeft,
                                             Size = new Vector2(16),
                                             Masking = true,
-                                            Child = new UpdateableAvatar(user)
+                                            Child = new UpdateableAvatar(Message.Sender)
                                             {
                                                 DelayedLoad = false,
                                                 RelativeSizeAxes = Axes.Both
                                             }
                                         },
-                                        new OsuTextFlowContainer
+                                        textFlowContainer = new OsuTextFlowContainer
                                         {
                                             X = 20,
                                             MaximumSize = new Vector2(width * 1.5f, 0),
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             AutoSizeAxes = Axes.Both,
-                                            Text = message,
+                                            Text = Message.DisplayContent,
                                         }
                                     }
                                 }
                             }
                         }
                     };
+                }
+
+                private void updateMessageContent()
+                {
+                    textFlowContainer.Clear();
+                    textFlowContainer.AddText(message.DisplayContent);
                 }
 
                 public override void Show()
