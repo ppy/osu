@@ -79,6 +79,17 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString AllBookmarks => new TranslatableString(getKey(@"all_bookmarks"), @"All Bookmarks");
 
+        /// <summary>
+        /// "Snap all notes to the current snap grid?"
+        /// </summary>
+        public static LocalisableString SnapAllNotesConfirmationHeader => new TranslatableString(getKey(@"snap_all_notes_confirmation_header"), @"Snap all notes to the current snap grid?");
+
+        /// <summary>
+        /// "Every hit object in this difficulty will move to the nearest tick for your current beat divisor. Slider and hold durations may change. You can undo this from the editor history."
+        /// </summary>
+        public static LocalisableString SnapAllNotesConfirmationBody => new TranslatableString(getKey(@"snap_all_notes_confirmation_body"), @"Every hit object in this difficulty will move to the nearest tick for your current beat divisor. Slider and hold durations may change. You can undo this from the editor history.");
+
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
