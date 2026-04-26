@@ -112,7 +112,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Health = { Value = OpponentDamageInfo.OldLife }
-                            }
+                            },
                         },
                         new Container
                         {
