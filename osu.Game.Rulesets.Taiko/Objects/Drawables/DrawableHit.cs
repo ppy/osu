@@ -170,9 +170,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                     this.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);
 
-                    this.MoveToY(-gravity_travel_height, gravity_time, Easing.Out)
+                    // Rate independent to match stable.
+                    this.MoveToY(-gravity_travel_height, gravity_time * Clock.Rate, Easing.Out)
                         .Then()
-                        .MoveToY(gravity_travel_height * 2, gravity_time * 2, Easing.In);
+                        .MoveToY(gravity_travel_height * 2, gravity_time * Clock.Rate * 2, Easing.In);
 
                     this.FadeOut(800);
                     break;
