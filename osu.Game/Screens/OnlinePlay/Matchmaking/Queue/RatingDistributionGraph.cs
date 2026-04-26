@@ -249,9 +249,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 xRange.max = userRating.Value;
             }
 
+            int yMax = this.data.Select(d => d.y).DefaultIfEmpty().Max();
+
             yRange = (
                 0,
-                (int)roundToSignificant(this.data.Select(d => d.y).DefaultIfEmpty().Max())
+                (int)ceilingWithFactor(yMax, significantOfNumber(yMax))
             );
 
             updateGraph();
@@ -403,13 +405,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             return new Vector2(xPos, yPos);
         }
 
-        private static double roundToSignificant(double value)
+        private static double significantOfNumber(double value)
         {
-            if (value == 0)
+            return Math.Pow(10, Math.Floor(Math.Log10(value)));
+        }
+
+        private static double ceilingWithFactor(double value, double factor)
+        {
+            if (value == 0 || factor == 0)
                 return 0;
 
-            double scale = Math.Pow(10, Math.Floor(Math.Log10(value)));
-            return Math.Ceiling(value / scale) * scale;
+            return Math.Ceiling(value / factor) * factor;
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
