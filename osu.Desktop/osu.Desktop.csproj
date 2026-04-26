@@ -13,6 +13,10 @@
     <FileVersion>0.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup>
+    <IsTachyonRelease Condition="$([System.String]::Copy('$(Version)').EndsWith('-tachyon'))">true</IsTachyonRelease>
+    <DefineConstants Condition="'$(IsTachyonRelease)' == 'true'">$(DefineConstants);TACHYON</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup>
     <StartupObject>osu.Desktop.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup Label="Project References">
