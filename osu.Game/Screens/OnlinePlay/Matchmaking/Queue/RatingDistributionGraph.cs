@@ -50,7 +50,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private int? userRating;
         private (int min, int max, int step) xRange;
         private (int min, int max) yRange;
-        private int xDivisionStep;
+        private int xDivisionStep = 1;
 
         [BackgroundDependencyLoader]
         private void load()
