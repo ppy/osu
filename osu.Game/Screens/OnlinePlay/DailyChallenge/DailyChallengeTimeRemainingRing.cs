@@ -84,7 +84,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = DailyChallengeStrings.Remaining,
+                                    Text = "remaining",
                                     Font = OsuFont.Default.With(size: 20),
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
