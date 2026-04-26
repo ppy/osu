@@ -73,10 +73,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             FillFlowContainer userLeft;
             FillFlowContainer userRight;
 
-
-
-
-
             InternalChildren = new Drawable[]
             {
                 new Box
@@ -456,8 +452,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
                 leftRatingChangeText.Colour = colours.RedDark;
                 rightRatingChangeText.Colour = colours.GreenDark;
-
-
             }
         }
 
