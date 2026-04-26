@@ -44,6 +44,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private OsuSpriteText leftLifeText = null!;
         private OsuSpriteText rightLifeText = null!;
 
+        private OsuSpriteText leftRatingText = null!;
+        private OsuSpriteText rightRatingText = null!;
+        private OsuSpriteText leftRatingChangeText = null!;
+        private OsuSpriteText rightRatingChangeText = null!;
+
         public RankedPlayMatchPanel(RankedPlayRoomState state)
         {
             this.state = state;
@@ -67,6 +72,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             FillFlowContainer userLeft;
             FillFlowContainer userRight;
+
+
+
+
 
             InternalChildren = new Drawable[]
             {
@@ -315,6 +324,68 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                                         UseFullGlyphHeight = false,
                                                     }
                                                 },
+                                            },
+                                            new Container
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Children = new Drawable[]
+                                                {
+                                                    new IconWithTooltip
+                                                    {
+                                                        Anchor = Anchor.Centre,
+                                                        Origin = Anchor.Centre,
+                                                        Size = new Vector2(10),
+                                                        Colour = colourProvider.Foreground1,
+                                                        Icon = FontAwesome.Solid.Columns,
+                                                        TooltipText = "Elo Score",
+                                                    },
+                                                    leftRatingText = new OsuSpriteText
+                                                    {
+                                                        Anchor = Anchor.Centre,
+                                                        Origin = Anchor.CentreRight,
+                                                        X = -15,
+                                                        Colour = colourProvider.Foreground1,
+                                                        Text = users[0].Info.RatingAfter.ToString(),
+                                                        UseFullGlyphHeight = false,
+                                                    },
+                                                    rightRatingText = new OsuSpriteText
+                                                    {
+                                                        Anchor = Anchor.Centre,
+                                                        Origin = Anchor.CentreLeft,
+                                                        X = 15,
+                                                        Colour = colourProvider.Foreground1,
+                                                        Text = users[1].Info.RatingAfter.ToString(),
+                                                        UseFullGlyphHeight = false,
+                                                    }
+                                                },
+                                            },
+                                            new Container
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Children = new Drawable[]
+                                                {
+                                                    leftRatingChangeText = new OsuSpriteText
+                                                    {
+                                                        Anchor = Anchor.Centre,
+                                                        Origin = Anchor.CentreRight,
+                                                        X = -15,
+                                                        Colour = colourProvider.Foreground1,
+                                                        Text = $"({users[0].Info.RatingAfter - users[0].Info.Rating:+0;-0;+0})",
+                                                        UseFullGlyphHeight = false,
+                                                    },
+                                                    rightRatingChangeText = new OsuSpriteText
+                                                    {
+                                                        Anchor = Anchor.Centre,
+                                                        Origin = Anchor.CentreLeft,
+                                                        X = 15,
+                                                        Colour = colourProvider.Foreground1,
+                                                        Text = $"({users[1].Info.RatingAfter - users[1].Info.Rating:+0;-0;+0})",
+                                                        UseFullGlyphHeight = false,
+                                                    },
+                                                }
+
                                             }
                                         }
                                     }
@@ -371,6 +442,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
                 leftLifeText.Colour = userLeft.Colour = Color4.White;
                 leftLifeText.Font = OsuFont.GetFont(weight: FontWeight.SemiBold);
+
+                leftRatingChangeText.Colour = colours.GreenDark;
+                rightRatingChangeText.Colour = colours.RedDark;
             }
             else if (rightWin)
             {
@@ -379,6 +453,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
                 rightLifeText.Colour = userRight.Colour = Color4.White;
                 rightLifeText.Font = OsuFont.GetFont(weight: FontWeight.SemiBold);
+
+                leftRatingChangeText.Colour = colours.RedDark;
+                rightRatingChangeText.Colour = colours.GreenDark;
+
+
             }
         }
 
