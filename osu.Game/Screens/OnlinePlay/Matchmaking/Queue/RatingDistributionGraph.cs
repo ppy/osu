@@ -409,7 +409,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 currentCount += d.y;
                 float p = (float)currentCount / totalCount;
                 return new Vector2(pointOnGraph(d.x, 0).X, 1 - p);
-            }).ToArray();
+            }).Append(new Vector2(1, 0)).ToArray();
         });
 
         private Vector2 pointOnGraph(int x, int y)
@@ -502,7 +502,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             int currentCount = 0;
             int totalCount = data.Sum(p => p.y);
 
-            for (int i = 0; i < cumulativePath.Vertices.Count; i++)
+            for (int i = 0; i < data.Length; i++)
             {
                 currentCount += data[i].y;
 
