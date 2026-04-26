@@ -129,11 +129,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             strainLengthBonus = 1 + 0.15 * DifficultyCalculationUtils.ReverseLerp(staminaDifficultStrains, 1000, 1555);
 
-            // The amount of reading strains that can reasonably be memorised. Converts are typically much simpler and easier to memorise.
-            double memorisableReadingStrains = isConvert ? 1000 : 150;
-
-            // Apply a penalty to reading that can be memorised.
-            readingMemoryPenalty = DifficultyCalculationUtils.ReverseLerp(readingDifficultStrains, 0, memorisableReadingStrains);
+            // Apply a penalty to small amounts of reading that can be memorised.
+            readingMemoryPenalty = DifficultyCalculationUtils.ReverseLerp(reading.weightedTotalDifficultySum, 0, 150);
 
             double combinedRating = combinedDifficultyValue(rhythm, reading, colour, stamina, out double consistencyFactor);
             double starRating = rescale(combinedRating * 1.4);
