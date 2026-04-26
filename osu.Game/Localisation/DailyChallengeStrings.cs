@@ -60,11 +60,6 @@ Tomorrow's challenge is now being prepared and will appear soon.");
         public static LocalisableString SectionEvents => new TranslatableString(getKey(@"section_events"), @"Events");
 
         /// <summary>
-        /// "remaining"
-        /// </summary>
-        public static LocalisableString Remaining => new TranslatableString(getKey(@"remaining"), @"remaining");
-
-        /// <summary>
         /// "You"
         /// </summary>
         public static LocalisableString You => new TranslatableString(getKey(@"you"), @"You");
