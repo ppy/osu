@@ -353,7 +353,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             {
                 barsContainer.Add(new Container
                 {
-                    Origin = Anchor.BottomCentre,
+                    Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     RelativePositionAxes = Axes.X,
                     RelativeSizeAxes = Axes.Both,
