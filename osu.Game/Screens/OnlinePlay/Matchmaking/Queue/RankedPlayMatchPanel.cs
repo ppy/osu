@@ -43,9 +43,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private Drawable rightResultLight = null!;
         private OsuSpriteText leftLifeText = null!;
         private OsuSpriteText rightLifeText = null!;
-
-        private OsuSpriteText leftRatingText = null!;
-        private OsuSpriteText rightRatingText = null!;
         private OsuSpriteText leftRatingChangeText = null!;
         private OsuSpriteText rightRatingChangeText = null!;
 
@@ -336,7 +333,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                                         Icon = FontAwesome.Solid.Columns,
                                                         TooltipText = "Elo Score",
                                                     },
-                                                    leftRatingText = new OsuSpriteText
+                                                    new OsuSpriteText
                                                     {
                                                         Anchor = Anchor.Centre,
                                                         Origin = Anchor.CentreRight,
@@ -345,7 +342,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                                         Text = users[0].Info.RatingAfter.ToString(),
                                                         UseFullGlyphHeight = false,
                                                     },
-                                                    rightRatingText = new OsuSpriteText
+                                                    new OsuSpriteText
                                                     {
                                                         Anchor = Anchor.Centre,
                                                         Origin = Anchor.CentreLeft,
