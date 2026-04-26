@@ -27,8 +27,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override LocalisableString Description => "Burn the notes into your memory.";
 
-        //Alters the transforms of the approach circles, breaking the effects of these mods.
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModApproachDifferent), typeof(OsuModTransform), typeof(OsuModDepth) }).ToArray();
+        /// <remarks>
+        /// Incompatible with all mods that directly modify or indirectly depend on <see cref="OsuHitObject.TimePreempt"/>, or alter the behaviour of approach circles.
+        /// </remarks>
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModApproachDifferent), typeof(OsuModTransform), typeof(OsuModDepth), typeof(OsuModHidden) }).ToArray();
 
         public override ModType Type => ModType.Fun;
 
@@ -60,14 +62,22 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (osuObject is not Spinner)
                     osuObject.TimePreempt += osuObject.StartTime - lastNewComboTime;
 
+                int repeatCount = 0;
+
                 foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
                 {
                     switch (nested)
                     {
-                        //Freezing the SliderTicks doesnt play well with snaking sliders
+                        // Freezing the SliderTicks doesnt play well with snaking sliders
                         case SliderTick:
-                        //SliderRepeat wont layer correctly if preempt is changed.
+                            break;
+
                         case SliderRepeat:
+                            if (repeatCount > 2)
+                                break;
+
+                            applyFadeInAdjustment(nested);
+                            repeatCount++;
                             break;
 
                         default:

@@ -7,19 +7,17 @@ using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public partial class AddToPlaylistFooterButton : ShearedButton
     {
-        public AddToPlaylistFooterButton()
-            : base(width: 220)
-        {
-        }
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            Width = 220;
+
             DarkerColour = colours.Blue3;
             LighterColour = colours.Blue1;
 
@@ -31,7 +29,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     Origin = Anchor.Centre,
                     X = -10,
                     Font = OsuFont.TorusAlternate.With(size: 17),
-                    Text = "Add to playlist",
+                    Text = OnlinePlayStrings.FooterButtonPlaylistAdd,
                     UseFullGlyphHeight = false,
                 },
                 new OsuSpriteText

@@ -13,6 +13,7 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Extensions;
 using osu.Game.IO;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -70,8 +71,15 @@ namespace osu.Game.Database
 
             // Encode to legacy format
             var stream = new MemoryStream();
+
             using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+            {
+                // Maintain line endings in windows style.
+                // If we don't do that, uploads to BSS may show changes where there are none.
+                sw.NewLine = "\r\n";
+
                 new LegacyBeatmapEncoder(playableBeatmap, beatmapSkin).Encode(sw);
+            }
 
             stream.Seek(0, SeekOrigin.Begin);
 
@@ -80,6 +88,16 @@ namespace osu.Game.Database
 
         protected virtual void MutateBeatmap(BeatmapSetInfo beatmapSet, IBeatmap playableBeatmap)
         {
+            // Limit grid sizes to those which stable knows about.
+            if (playableBeatmap.GridSize >= 24)
+                playableBeatmap.GridSize = 32;
+            else if (playableBeatmap.GridSize >= 12)
+                playableBeatmap.GridSize = 16;
+            else if (playableBeatmap.GridSize >= 6)
+                playableBeatmap.GridSize = 8;
+            else
+                playableBeatmap.GridSize = 4;
+
             // Convert beatmap elements to be compatible with legacy format
             // So we truncate time and position values to integers, and convert paths with multiple segments to Bézier curves
 
@@ -198,7 +216,7 @@ namespace osu.Game.Database
             ProgressNotification notification = new ProgressNotification
             {
                 State = ProgressNotificationState.Active,
-                Text = $"Exporting {itemFilename}...",
+                Text = NotificationsStrings.FileExportOngoing(itemFilename),
             };
 
             PostNotification?.Invoke(notification);
@@ -225,7 +243,7 @@ namespace osu.Game.Database
                 throw;
             }
 
-            notification.CompletionText = $"Exported {itemFilename}! Click to view.";
+            notification.CompletionText = NotificationsStrings.FileExportFinished(itemFilename);
             notification.CompletionClickAction = () => ExportStorage.PresentFileExternally(filename);
             notification.State = ProgressNotificationState.Completed;
         });
