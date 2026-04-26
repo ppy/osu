@@ -24,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
     public partial class RatingDistributionGraph : CompositeDrawable, IHasCustomTooltip<RatingDistributionGraph.RatingDistributionGraphTooltipData>
     {
         private const int y_divisions = 4;
-        private const int x_divisions = 16;
+        private const int x_max_divisions = 16;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -50,6 +50,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private int? userRating;
         private (int min, int max, int step) xRange;
         private (int min, int max) yRange;
+        private int xDivisionStep;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -237,6 +238,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 data.Zip(data.Skip(1), (a, b) => Math.Abs(b.x - a.x)).DefaultIfEmpty().Min()
             );
 
+            xDivisionStep = Math.Max(xRange.step, 50); // avoid division by zero
+
+            // Keep increasing the division until number of lines is appropriately low
+            while ((xRange.max - xRange.min) / xDivisionStep > x_max_divisions)
+            {
+                xDivisionStep *= 2;
+            }
+
+            xRange.min = (int)floorWithFactor(xRange.min, xDivisionStep);
+            xRange.max = (int)ceilingWithFactor(xRange.max, xDivisionStep);
+
             if (userRating < xRange.min)
             {
                 this.data = this.data.Prepend((userRating.Value, 1)).ToArray();
@@ -276,13 +288,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             barsContainer.Clear();
             userRatingContainer.Clear();
 
-            for (int step = 0; step <= x_divisions; step++)
+            int xDivisions = Math.Max(1, (xRange.max - xRange.min) / xDivisionStep);
+
+            for (int step = 0; step <= xDivisions; step++)
             {
                 gridContainer.Add(new VerticalLine
                 {
                     RelativeSizeAxes = Axes.Y,
                     RelativePositionAxes = Axes.X,
-                    X = (float)step / x_divisions,
+                    X = (float)step / xDivisions,
                     Colour = colourProvider.Background1
                 });
 
@@ -291,10 +305,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.CentreRight,
                     RelativePositionAxes = Axes.X,
-                    X = (float)step / x_divisions,
+                    X = (float)step / xDivisions,
                     Margin = new MarginPadding { Right = -2 },
                     Rotation = -40,
-                    Text = (xRange.min + (xRange.max - xRange.min) / x_divisions * step).ToString(),
+                    Text = (xRange.min + xDivisionStep * step).ToString(),
                     UseFullGlyphHeight = false,
                     Font = OsuFont.Default.With(size: 12),
                     Colour = colourProvider.Foreground1
@@ -408,6 +422,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private static double significantOfNumber(double value)
         {
             return Math.Pow(10, Math.Floor(Math.Log10(value)));
+        }
+
+        private static double floorWithFactor(double value, double factor)
+        {
+            if (value == 0 || factor == 0)
+                return 0;
+
+            return Math.Floor(value / factor) * factor;
         }
 
         private static double ceilingWithFactor(double value, double factor)
