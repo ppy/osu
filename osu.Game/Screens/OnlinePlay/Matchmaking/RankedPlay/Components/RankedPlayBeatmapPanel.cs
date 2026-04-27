@@ -166,6 +166,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                                                     {
                                                                         Text = beatmap.DifficultyName,
                                                                         Font = OsuFont.Style.Caption1.With(weight: FontWeight.Bold),
+                                                                        Colour = colours.ForStarDifficultyText(beatmap.StarRating),
                                                                         Anchor = Anchor.CentreLeft,
                                                                         Origin = Anchor.CentreLeft,
                                                                     },
