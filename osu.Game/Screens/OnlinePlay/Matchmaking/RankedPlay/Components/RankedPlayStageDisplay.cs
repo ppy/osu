@@ -35,7 +35,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         private readonly RankedPlayColourScheme colourScheme;
         private readonly bool containBeatmapInfo;
         private Drawable headingTextBackground = null!;
-        public Drawable ProgressBar = null!;
+        private Drawable progressBar = null!;
         private OsuSpriteText progressText = null!;
 
         private OsuSpriteText? headingText;
@@ -164,7 +164,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                         Margin = progressBarMargin,
                         Children =
                         [
-                            ProgressBar = new Container
+                            progressBar = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Width = 0.5f,
@@ -316,7 +316,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                         Margin = progressBarMargin,
                                         Children =
                                         [
-                                            ProgressBar = new Container
+                                            progressBar = new Container
                                             {
                                                 RelativeSizeAxes = Axes.Both,
                                                 Width = 0.5f,
@@ -408,7 +408,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             TimeSpan remaining = countdownEndTime - DateTimeOffset.Now;
 
             if (duration > TimeSpan.Zero)
-                ProgressBar.Width = (float)Math.Clamp(remaining / duration, 0, 1);
+                progressBar.Width = (float)Math.Clamp(remaining / duration, 0, 1);
 
             int minutes = (int)Math.Max(0, remaining.TotalMinutes);
             int seconds = Math.Max(0, remaining.Seconds);
