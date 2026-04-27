@@ -102,7 +102,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                             AutoSizeAxes = Axes.Y,
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
-                            Margin = new MarginPadding(3),
+                            Padding = new MarginPadding
+                            {
+                                Top = 5
+                            },
                             Children = new Drawable[]
                             {
                                 idleBottomContent = new FillFlowContainer
