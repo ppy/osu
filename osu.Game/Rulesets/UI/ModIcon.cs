@@ -246,17 +246,17 @@ namespace osu.Game.Rulesets.UI
                 modSettingsChangeTracker.SettingChanged = _ => updateExtendedInformation();
             }
 
-            Texture? texture = null;
+            Texture? skinIconTexture = null;
 
             if (useSkinIcon)
             {
                 string textureName = getModIconSpriteName(mod);
-                texture = source.GetTexture(textureName);
+                skinIconTexture = source.GetTexture(textureName);
             }
 
-            if (texture != null)
+            if (skinIconTexture != null)
             {
-                skinIcon.Texture = texture;
+                skinIcon.Texture = skinIconTexture;
                 skinIcon.FadeIn();
 
                 modAcronym.FadeOut();
