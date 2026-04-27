@@ -266,29 +266,26 @@ namespace osu.Game.Rulesets.UI
             else
             {
                 skinIcon.FadeOut();
-
-                modAcronym.FadeIn();
-                modIcon.FadeIn();
                 background.FadeIn();
 
                 modAcronym.Text = value.Acronym;
                 modIcon.Icon = value.Icon ?? FontAwesome.Solid.Question;
 
+                if (value.Icon == null)
+                {
+                    modIcon.FadeOut();
+                    modAcronym.FadeIn();
+                }
+                else
+                {
+                    modIcon.FadeIn();
+                    modAcronym.FadeOut();
+                }
+
                 canShowExtendedInformation = true;
             }
 
             TooltipContent = showTooltip ? value as Mod : null;
-
-            if (value.Icon == null)
-            {
-                modIcon.FadeOut();
-                modAcronym.FadeIn();
-            }
-            else
-            {
-                modIcon.FadeIn();
-                modAcronym.FadeOut();
-            }
 
             backgroundColour = colours.ForModType(value.Type);
             updateColour();
