@@ -84,7 +84,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                             Origin = Anchor.TopLeft;
                                             Anchor = Anchor.TopLeft;
                                         }
-                                        ).With(d =>
+                                    ).With(d =>
                                         {
                                             d.AddText("    mapped by ", t => t.Colour = colours.Blue);
                                             d.AddUserLink(beatmapSet.Author);
@@ -196,6 +196,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 },
             };
         }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();

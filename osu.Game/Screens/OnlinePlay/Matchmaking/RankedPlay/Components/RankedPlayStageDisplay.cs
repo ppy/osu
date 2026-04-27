@@ -241,8 +241,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
                     ColumnDimensions = new[]
                     {
-                        new Dimension(GridSizeMode.AutoSize),   // left content shrinks to fit
-                        new Dimension(GridSizeMode.AutoSize)                         // right content takes remaining space
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.AutoSize)
                     },
 
                     RowDimensions = new[]

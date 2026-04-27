@@ -51,11 +51,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         public ResultsScreen() : base(true)
         {
-
         }
-
-
-
 
         [BackgroundDependencyLoader]
         private void load()
