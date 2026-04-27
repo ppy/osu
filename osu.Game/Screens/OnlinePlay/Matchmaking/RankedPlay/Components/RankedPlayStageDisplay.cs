@@ -373,7 +373,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                     }
                                 }
                             },
-                            new BeatmapPanel(beatmap, mods)
+                            new RankedPlayBeatmapPanel(beatmap, mods)
                             {
                                 Anchor = Anchor.TopLeft,
                                 Origin = Anchor.TopLeft

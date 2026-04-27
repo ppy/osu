@@ -22,10 +22,10 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 {
-    public partial class BeatmapPanel : CompositeDrawable
+    public partial class RankedPlayBeatmapPanel : CompositeDrawable
     {
 
-        public BeatmapPanel(APIBeatmap apibeatmap, Mod[] mods)
+        public RankedPlayBeatmapPanel(APIBeatmap apibeatmap, Mod[] mods)
         {
             beatmapSet = apibeatmap.BeatmapSet!;
             beatmap = apibeatmap;
