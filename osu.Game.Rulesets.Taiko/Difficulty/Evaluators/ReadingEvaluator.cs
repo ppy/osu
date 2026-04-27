@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
             // With hidden, all notes award a base difficulty
             if (isHidden)
-                difficulty = 0.25 + 0.75 * difficulty;
+                difficulty = 0.4 + 0.6 * Math.Pow(difficulty, 1.25);
 
             return difficulty;
         }
@@ -64,8 +64,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             double densityBonus = calculateHighVelocityDensityBonus(noteObject);
 
             var highVelocity = new VelocityRange(
-                420 - 140 * densityBonus,
-                1000 - 320 * densityBonus
+                500 - 200 * densityBonus,
+                1000 - 275 * densityBonus
             );
 
             highVelocityDifficulty = DifficultyCalculationUtils.Logistic(
@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
             // With hidden, notes that stay invisible for longer before being hit are harder to read
             if (isHidden) {
-                var lowVelocity = new VelocityRange(280, 125);
+                var lowVelocity = new VelocityRange(280, 140);
 
                 timeInvisibleDifficulty = DifficultyCalculationUtils.Logistic(
                     noteObject.EffectiveBPM * calculateTimeInvisibleModMultiplier(mods),
@@ -130,10 +130,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                     multiplier *= 1.2;
             }
 
-            // With flashlight, the visible playfield is limited from the expected 1560px wide to around 468px
-            // Considerations for combo and smaller flashlights are currently out of scope
+            // With flashlight enabled, the visible playfield becomes more obscured as combo increases
+            // As this is unrealistic to consider, an arbitrary value is used based on feedback
             if (isFlashlight)
-                multiplier *= 1560.0 / 468.0;
+                multiplier *= 4.5;
 
             return multiplier;
         }
@@ -154,10 +154,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         private static double calculateDensityDifficulty(TaikoDifficultyHitObject noteObject)
         {
             // Notes at very high density are harder to read
-            return Math.Pow(
-                DifficultyCalculationUtils.Logistic(calculateObjectDensity(noteObject), 3.5, 1.5),
-                3.0
-            );
+            return DifficultyCalculationUtils.Logistic(calculateObjectDensity(noteObject), 3.5, 1.5);
         }
 
         private static double calculateObjectDensity(TaikoDifficultyHitObject noteObject)
