@@ -76,12 +76,6 @@ namespace osu.Game.Rulesets.UI
         [Resolved]
         private OverlayColourProvider? colourProvider { get; set; }
 
-        [Resolved]
-        private ISkinSource source { get; set; } = null!;
-
-        [Resolved]
-        private SkinManager skinManager { get; set; } = null!;
-
         private Color4 backgroundColour;
 
         private Sprite extendedBackground = null!;
@@ -95,6 +89,7 @@ namespace osu.Game.Rulesets.UI
         private SpriteIcon cogBackground = null!;
         private SpriteIcon cog = null!;
 
+        private Bindable<Skin> skin = new Bindable<Skin>();
         private Sprite skinIcon = null!;
 
         private ModSettingChangeTracker? modSettingsChangeTracker;
@@ -119,7 +114,7 @@ namespace osu.Game.Rulesets.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load(TextureStore textures, SkinManager skinManager)
         {
             Children = new Drawable[]
             {
@@ -222,6 +217,8 @@ namespace osu.Game.Rulesets.UI
                     }
                 },
             };
+
+            skin.BindTarget = skinManager.CurrentSkin;
         }
 
         protected override void LoadComplete()
@@ -231,7 +228,7 @@ namespace osu.Game.Rulesets.UI
             Selected.BindValueChanged(_ => updateColour());
 
             if (useSkinIcon)
-                skinManager.CurrentSkin.BindValueChanged(_ => updateMod(mod));
+                skin.BindValueChanged(_ => updateMod(mod));
 
             updateMod(mod);
         }
@@ -251,7 +248,7 @@ namespace osu.Game.Rulesets.UI
             if (useSkinIcon)
             {
                 string textureName = getModIconSpriteName(mod);
-                skinIconTexture = source.GetTexture(textureName);
+                skinIconTexture = skin.Value.GetTexture(textureName);
             }
 
             if (skinIconTexture != null)
