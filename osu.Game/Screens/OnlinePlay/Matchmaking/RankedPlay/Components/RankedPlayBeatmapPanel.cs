@@ -16,7 +16,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
-
 using osu.Game.Screens.Play.HUD;
 using osuTK;
 
@@ -24,7 +23,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 {
     public partial class RankedPlayBeatmapPanel : CompositeDrawable
     {
-
         public RankedPlayBeatmapPanel(APIBeatmap apibeatmap, Mod[] mods)
         {
             beatmapSet = apibeatmap.BeatmapSet!;
@@ -36,14 +34,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         private readonly APIBeatmapSet beatmapSet;
         private readonly APIBeatmap beatmap;
         private readonly Mod[] mods;
-        private FillFlowContainer idleBottomContent = null!;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             InternalChildren = new Drawable[]
             {
                 new FillFlowContainer
-                    {
+                {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
@@ -108,7 +106,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                             },
                             Children = new Drawable[]
                             {
-                                idleBottomContent = new FillFlowContainer
+                                new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
