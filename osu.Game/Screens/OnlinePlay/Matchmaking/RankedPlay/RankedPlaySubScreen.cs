@@ -62,7 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         protected readonly RankedPlayStageDisplay StageDisplay;
 
-        protected RankedPlaySubScreen()
+        protected RankedPlaySubScreen(bool containBeatmapInfo = false)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -80,7 +80,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     Name = "Content",
                     RelativeSizeAxes = Axes.Both,
                 },
-                StageDisplay = new RankedPlayStageDisplay(ColourScheme)
+                StageDisplay = new RankedPlayStageDisplay(ColourScheme,containBeatmapInfo)
                 {
                     Heading = StageHeading,
                     Margin = new MarginPadding { Top = 60 },

@@ -8,13 +8,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -22,7 +20,6 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
-
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 {
     public partial class ResultsScreen : RankedPlaySubScreen
@@ -52,10 +49,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private LoadingSpinner loadingSpinner = null!;
         private MainPanel? mainPanel;
 
-        private APIBeatmap beatmap = null!;
+        public ResultsScreen() : base(true)
+        {
 
-        [Resolved]
-        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
+        }
+
 
 
 
@@ -75,20 +73,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             base.LoadComplete();
 
             loadingSpinner.Show();
-
-            try
-            {
-                if (client.Room == null)
-                    return;
-
-                beatmap = beatmapLookupCache.GetBeatmapAsync(Client.Room!.CurrentPlaylistItem.BeatmapID).GetResultSafely()!;
-                Schedule(() => LoadComponentAsync(new TitlePanel(beatmap), loaded => { AddInternal(loaded); }));
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, "Failed to load beatmap info for result screen.");
-                throw;
-            }
 
             fetchFinalScores().FireAndForget();
 

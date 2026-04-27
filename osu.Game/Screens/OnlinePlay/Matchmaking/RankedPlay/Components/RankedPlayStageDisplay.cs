@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -10,12 +12,16 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.RankedPlay;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osuTK;
 using osuTK.Graphics;
 
@@ -27,9 +33,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         private MultiplayerClient client { get; set; } = null!;
 
         private readonly RankedPlayColourScheme colourScheme;
-
+        private readonly bool containBeatmapInfo;
         private Drawable headingTextBackground = null!;
-        private Drawable progressBar = null!;
+        public Drawable ProgressBar = null!;
         private OsuSpriteText progressText = null!;
 
         private OsuSpriteText? headingText;
@@ -41,7 +47,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         private RankedPlayStage? activeStage;
 
         private LocalisableString heading;
+        private APIBeatmap beatmap = null!;
 
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null!;
+
+        [Resolved]
+        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
         /// <summary>
         /// Heading text to be displayed indicating the purpose of the current stage.
         /// </summary>
@@ -72,11 +84,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             }
         }
 
-        public RankedPlayStageDisplay(RankedPlayColourScheme colourScheme)
+        public RankedPlayStageDisplay(RankedPlayColourScheme colourScheme, bool containBeatmapInfo = false)
         {
             this.colourScheme = colourScheme;
-
-            AutoSizeAxes = Axes.Both;
+            this.containBeatmapInfo = containBeatmapInfo;
+            AutoSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]
@@ -90,118 +103,285 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 Top = phase_text_background_height - progressBarSize.Y / 2
             };
 
-            InternalChildren = new Drawable[]
+            if (containBeatmapInfo == false)
             {
-                new BufferedContainer
+                InternalChildren = new Drawable[]
                 {
-                    AutoSizeAxes = Axes.Both,
-                    BackgroundColour = colourScheme.Surface.Opacity(0),
-                    Alpha = 0.7f,
-                    Children = new[]
+                    new BufferedContainer
                     {
-                        headingTextBackground = new Container
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
+                        BackgroundColour = colourScheme.Surface.Opacity(0),
+                        Alpha = 0.7f,
+                        Children = new[]
                         {
-                            Height = phase_text_background_height,
-                            Shear = OsuGame.SHEAR,
-                            Masking = true,
-                            CornerRadius = 3,
-                            Child = new Box
+                            headingTextBackground = new Container
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = colourScheme.Surface.Darken(0.1f),
-                                Alpha = 0.8f
-                            }
-                        },
-                        new Container
-                        {
-                            Size = progressBarSize,
-                            Margin = progressBarMargin,
-                            Shear = OsuGame.SHEAR,
-                            Masking = true,
-                            CornerRadius = 3,
-                            BorderThickness = 1f,
-                            BorderColour = ColourInfo.GradientVertical(colourScheme.Surface, colourScheme.SurfaceBorder),
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = colourScheme.Surface,
-                            }
-                        },
-                    }
-                },
-                headingText = new OsuSpriteText
-                {
-                    Margin = new MarginPadding
-                    {
-                        Top = 5,
-                        Left = 20,
-                    },
-                    Text = Heading,
-                    Font = OsuFont.TorusAlternate.With(size: 34),
-                    Shadow = false,
-                },
-                new Container
-                {
-                    Size = progressBarSize,
-                    Shear = OsuGame.SHEAR,
-                    Padding = new MarginPadding { Horizontal = 2.2f, Vertical = 2 },
-                    Margin = progressBarMargin,
-                    Children =
-                    [
-                        progressBar = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            CornerRadius = 2,
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Children =
-                            [
-                                new Box
+                                Height = phase_text_background_height,
+                                Shear = OsuGame.SHEAR,
+                                Masking = true,
+                                CornerRadius = 3,
+                                Child = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Alpha = 0.8f,
-                                    Colour = ColourInfo.GradientHorizontal(colourScheme.PrimaryDarker, colourScheme.Primary)
-                                },
-                                new TrianglesV2
-                                {
-                                    Width = progressBarSize.X,
-                                    RelativeSizeAxes = Axes.Y,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    SpawnRatio = 0.5f,
-                                    ScaleAdjust = 0.75f,
-                                    Alpha = 0.1f,
-                                    Blending = BlendingParameters.Additive,
-                                    Colour = ColourInfo.GradientHorizontal(Color4.Transparent, Color4.White)
-                                },
-                            ],
-                        },
-                        progressText = new OsuSpriteText
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Shear = -OsuGame.SHEAR,
-                            Margin = new MarginPadding
-                            {
-                                Left = 10
+                                    Colour = colourScheme.Surface.Darken(0.1f),
+                                    Alpha = 0.8f
+                                }
                             },
-                            UseFullGlyphHeight = false,
-                            Font = OsuFont.TorusAlternate.With(size: 16, fixedWidth: true, weight: FontWeight.SemiBold)
+                            new Container
+                            {
+                                Size = progressBarSize,
+                                Margin = progressBarMargin,
+                                Shear = OsuGame.SHEAR,
+                                Masking = true,
+                                CornerRadius = 3,
+                                BorderThickness = 1f,
+                                BorderColour = ColourInfo.GradientVertical(colourScheme.Surface, colourScheme.SurfaceBorder),
+                                Child = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = colourScheme.Surface,
+                                }
+                            },
                         }
-                    ]
-                },
-                captionText = new OsuSpriteText
-                {
-                    Margin = new MarginPadding
-                    {
-                        Top = 80,
-                        Left = 20
                     },
-                    Text = Caption,
-                    Font = OsuFont.TorusAlternate.With(size: 24, weight: FontWeight.SemiBold)
-                }
-            };
+                    headingText = new OsuSpriteText
+                    {
+                        Margin = new MarginPadding
+                        {
+                            Top = 5,
+                            Left = 20,
+                        },
+                        Text = Heading,
+                        Font = OsuFont.TorusAlternate.With(size: 34),
+                        Shadow = false,
+                    },
+                    new Container
+                    {
+                        Size = progressBarSize,
+                        Shear = OsuGame.SHEAR,
+                        Padding = new MarginPadding { Horizontal = 2.2f, Vertical = 2 },
+                        Margin = progressBarMargin,
+                        Children =
+                        [
+                            ProgressBar = new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Width = 0.5f,
+                                Masking = true,
+                                CornerRadius = 2,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Children =
+                                [
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Alpha = 0.8f,
+                                        Colour = ColourInfo.GradientHorizontal(colourScheme.PrimaryDarker, colourScheme.Primary)
+                                    },
+                                    new TrianglesV2
+                                    {
+                                        Width = progressBarSize.X,
+                                        RelativeSizeAxes = Axes.Y,
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        SpawnRatio = 0.5f,
+                                        ScaleAdjust = 0.75f,
+                                        Alpha = 0.1f,
+                                        Blending = BlendingParameters.Additive,
+                                        Colour = ColourInfo.GradientHorizontal(Color4.Transparent, Color4.White)
+                                    },
+                                ],
+                            },
+                            progressText = new OsuSpriteText
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Shear = -OsuGame.SHEAR,
+                                Margin = new MarginPadding
+                                {
+                                    Left = 10
+                                },
+                                UseFullGlyphHeight = false,
+                                Font = OsuFont.TorusAlternate.With(size: 16, fixedWidth: true, weight: FontWeight.SemiBold)
+                            }
+                        ]
+                    },
+                    captionText = new OsuSpriteText
+                    {
+                        Margin = new MarginPadding
+                        {
+                            Top = 80,
+                            Left = 20
+                        },
+                        Text = Caption,
+                        Font = OsuFont.TorusAlternate.With(size: 24, weight: FontWeight.SemiBold)
+                    }
+                };
+            }
+            else
+            {
+                beatmap = beatmapLookupCache
+                    .GetBeatmapAsync(client.Room!.CurrentPlaylistItem.BeatmapID)
+                    .GetResultSafely()!;
+
+                Ruleset? rulesetInstance = rulesets
+                    .GetRuleset(beatmap.Ruleset.ShortName)?
+                    .CreateInstance();
+
+                Mod[] mods = client.Room!.CurrentPlaylistItem.RequiredMods
+                    .Select(mod => mod.ToMod(rulesetInstance!))
+                    .ToArray();
+
+                InternalChild = new GridContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize),   // left content shrinks to fit
+                        new Dimension(GridSizeMode.AutoSize)                         // right content takes remaining space
+                    },
+
+                    RowDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize)
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            new Container
+                            {
+                                Origin = Anchor.TopLeft,
+                                Anchor = Anchor.TopLeft,
+                                AutoSizeAxes = Axes.Both,
+                                Children = new Drawable[]
+                                {
+                                    new BufferedContainer
+                                    {
+                                        AutoSizeAxes = Axes.Both,
+                                        BackgroundColour = colourScheme.Surface.Opacity(0),
+                                        Alpha = 0.7f,
+                                        Children = new[]
+                                        {
+                                            headingTextBackground = new Container
+                                            {
+                                                Height = phase_text_background_height,
+                                                Shear = OsuGame.SHEAR,
+                                                Masking = true,
+                                                CornerRadius = 3,
+                                                Child = new Box
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Colour = colourScheme.Surface.Darken(0.1f),
+                                                    Alpha = 0.8f
+                                                }
+                                            },
+                                            new Container
+                                            {
+                                                Size = progressBarSize,
+                                                Margin = progressBarMargin,
+                                                Shear = OsuGame.SHEAR,
+                                                Masking = true,
+                                                CornerRadius = 3,
+                                                BorderThickness = 1f,
+                                                BorderColour = ColourInfo.GradientVertical(
+                                                    colourScheme.Surface,
+                                                    colourScheme.SurfaceBorder),
+                                                Child = new Box
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Colour = colourScheme.Surface,
+                                                }
+                                            },
+                                        }
+                                    },
+
+                                    headingText = new OsuSpriteText
+                                    {
+                                        Margin = new MarginPadding { Top = 5, Left = 20 },
+                                        Text = Heading,
+                                        Font = OsuFont.TorusAlternate.With(size: 34),
+                                        Shadow = false,
+                                    },
+
+                                    new Container
+                                    {
+                                        Size = progressBarSize,
+                                        Shear = OsuGame.SHEAR,
+                                        Padding = new MarginPadding { Horizontal = 2.2f, Vertical = 2 },
+                                        Margin = progressBarMargin,
+                                        Children =
+                                        [
+                                            ProgressBar = new Container
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Width = 0.5f,
+                                                Masking = true,
+                                                CornerRadius = 2,
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                Children =
+                                                [
+                                                    new Box
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Alpha = 0.8f,
+                                                        Colour = ColourInfo.GradientHorizontal(
+                                                            colourScheme.PrimaryDarker,
+                                                            colourScheme.Primary)
+                                                    },
+                                                    new TrianglesV2
+                                                    {
+                                                        Width = progressBarSize.X,
+                                                        RelativeSizeAxes = Axes.Y,
+                                                        Anchor = Anchor.CentreLeft,
+                                                        Origin = Anchor.CentreLeft,
+                                                        SpawnRatio = 0.5f,
+                                                        ScaleAdjust = 0.75f,
+                                                        Alpha = 0.1f,
+                                                        Blending = BlendingParameters.Additive,
+                                                        Colour = ColourInfo.GradientHorizontal(
+                                                            Color4.Transparent,
+                                                            Color4.White)
+                                                    },
+                                                ],
+                                            },
+                                            progressText = new OsuSpriteText
+                                            {
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                Shear = -OsuGame.SHEAR,
+                                                Margin = new MarginPadding { Left = 10 },
+                                                UseFullGlyphHeight = false,
+                                                Font = OsuFont.TorusAlternate.With(
+                                                    size: 16,
+                                                    fixedWidth: true,
+                                                    weight: FontWeight.SemiBold)
+                                            }
+                                        ]
+                                    },
+
+                                    captionText = new OsuSpriteText
+                                    {
+                                        Margin = new MarginPadding { Top = 80, Left = 20 },
+                                        Text = Caption,
+                                        Font = OsuFont.TorusAlternate.With(size: 24, weight: FontWeight.SemiBold)
+                                    }
+                                }
+                            },
+                            new BeatmapPanel(beatmap, mods)
+                            {
+                                Anchor = Anchor.TopLeft,
+                                Origin = Anchor.TopLeft
+                            }
+                        }
+                    }
+                };
+            }
         }
 
         protected override void LoadComplete()
@@ -228,7 +408,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             TimeSpan remaining = countdownEndTime - DateTimeOffset.Now;
 
             if (duration > TimeSpan.Zero)
-                progressBar.Width = (float)Math.Clamp(remaining / duration, 0, 1);
+                ProgressBar.Width = (float)Math.Clamp(remaining / duration, 0, 1);
 
             int minutes = (int)Math.Max(0, remaining.TotalMinutes);
             int seconds = Math.Max(0, remaining.Seconds);
