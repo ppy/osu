@@ -71,7 +71,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     new TableColumn(dimension: new Dimension(GridSizeMode.AutoSize)),
                     new TableColumn(RankingsStrings.MatchmakingWins, dimension: new Dimension(GridSizeMode.AutoSize)),
                     new TableColumn(RankingsStrings.MatchmakingPlays, dimension: new Dimension(GridSizeMode.AutoSize)),
-                    new TableColumn(RankingsStrings.MatchmakingPoints, dimension: new Dimension(GridSizeMode.AutoSize)),
                     new TableColumn(RankingsStrings.MatchmakingRating, dimension: new Dimension(GridSizeMode.AutoSize)),
                 ],
                 RowSize = new Dimension(GridSizeMode.AutoSize),
@@ -91,7 +90,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 new StatisticText(colourProvider) { Text = $"#{stat.Rank:N0}" },
                 new StatisticText(colourProvider) { Text = stat.FirstPlacements.ToString("N0") },
                 new StatisticText(colourProvider) { Text = stat.Plays.ToString("N0") },
-                new StatisticText(colourProvider) { Text = stat.TotalPoints.ToString("N0") },
                 new StatisticText(colourProvider) { Text = stat.Rating.ToString("N0") + (stat.IsRatingProvisional ? "*" : string.Empty) }
             ];
         }
