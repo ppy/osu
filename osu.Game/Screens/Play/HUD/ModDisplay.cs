@@ -55,6 +55,7 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         private bool showExtendedInformation;
+        private readonly bool useSkinIcons;
 
         public bool ShowExtendedInformation
         {
@@ -75,9 +76,10 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly FillFlowContainer<ModIcon> iconsContainer;
 
-        public ModDisplay(bool showExtendedInformation = true)
+        public ModDisplay(bool showExtendedInformation = true, bool useSkinIcons = false)
         {
             this.showExtendedInformation = showExtendedInformation;
+            this.useSkinIcons = useSkinIcons;
 
             AutoSizeAxes = Axes.Both;
 
@@ -101,7 +103,7 @@ namespace osu.Game.Screens.Play.HUD
             iconsContainer.Clear();
 
             foreach (Mod mod in mods.NewValue.AsOrdered())
-                iconsContainer.Add(new ModIcon(mod, showExtendedInformation: showExtendedInformation) { Scale = new Vector2(MOD_ICON_SCALE) });
+                iconsContainer.Add(new ModIcon(mod, showExtendedInformation: showExtendedInformation, useSkinIcon: useSkinIcons) { Scale = new Vector2(MOD_ICON_SCALE) });
         }
 
         private void updateExpansionMode(double duration = 500)

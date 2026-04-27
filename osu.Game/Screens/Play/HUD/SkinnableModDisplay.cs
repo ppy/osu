@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 // Provide a minimum autosize.
                 new Container { Size = ModIcon.MOD_ICON_SIZE * ModDisplay.MOD_ICON_SCALE },
-                modDisplay = new ModDisplay(),
+                modDisplay = new ModDisplay(useSkinIcons: true),
             };
 
             modDisplay.Current = mods;
