@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -115,35 +114,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private bool hasRotation;
 
-        public void UpdateSnakingPosition(Vector2 start, Vector2 end)
+        public void UpdateSnakingPosition(double progressStart, double progressEnd)
         {
             // When the repeat is hit, the arrow should fade out on spot rather than following the slider
             if (IsHit) return;
 
             bool isRepeatAtEnd = HitObject.RepeatIndex % 2 == 0;
-            List<Vector2> curve = ((PlaySliderBody)DrawableSlider.Body.Drawable).CurrentCurve;
+            double progress = isRepeatAtEnd ? progressEnd : progressStart;
 
-            Position = isRepeatAtEnd ? end : start;
+            Position = Slider?.Path.PositionAt(progress) ?? Vector2.Zero;
+            Vector2 direction = Slider?.Path.DirectionAtProgress(progress, !isRepeatAtEnd) ?? (isRepeatAtEnd ? -Vector2.UnitX : Vector2.UnitX);
 
-            if (curve.Count < 2)
-                return;
-
-            int searchStart = isRepeatAtEnd ? curve.Count - 1 : 0;
-            int direction = isRepeatAtEnd ? -1 : 1;
-
-            Vector2 aimRotationVector = Vector2.Zero;
-
-            // find the next vector2 in the curve which is not equal to our current position to infer a rotation.
-            for (int i = searchStart; i >= 0 && i < curve.Count; i += direction)
-            {
-                if (Precision.AlmostEquals(curve[i], Position))
-                    continue;
-
-                aimRotationVector = curve[i];
-                break;
-            }
-
-            float aimRotation = float.RadiansToDegrees(MathF.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
+            float aimRotation = float.RadiansToDegrees(MathF.Atan2(direction.Y, direction.X));
             while (Math.Abs(aimRotation - Arrow.Rotation) > 180)
                 aimRotation += aimRotation < Arrow.Rotation ? 360 : -360;
 
