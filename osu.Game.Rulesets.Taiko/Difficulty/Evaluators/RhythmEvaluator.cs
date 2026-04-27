@@ -128,6 +128,34 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         }
 
         /// <summary>
+        /// Frequent rhythm changes containing long gaps (i.e. 1/4 + 1/6 with 1/2 gaps) award more difficulty than expected.
+        /// Due to limitations of the current rhythm evaluation, these cases are targeted and penalised.
+        /// The previous hit object grouping is used as often the rhythm change *two* rhythms after a long gap awards the unexpected difficulty.
+        /// </summary>
+        private static double longGapPenalty(SameRhythmHitObjectGrouping? previousOrNull)
+        {
+            if (previousOrNull == null)
+                return 1.0;
+
+            SameRhythmHitObjectGrouping previous = (SameRhythmHitObjectGrouping) previousOrNull;
+
+            double gapInterval = previous.FirstHitObject.DeltaTime;
+            double rhythmInterval = previous.HitObjectInterval ?? gapInterval;
+            double rhythmLength = previous.HitObjects.Count;
+
+            // The ratio of the gap before this rhythm to the rhythm itself.
+            double gapRatio = gapInterval / Math.Max(rhythmInterval, 1);
+
+            // The gap ratio normalised to represent if the gap is long.
+            double gapFactor = DifficultyCalculationUtils.Logistic(gapRatio, 1.75, 20);
+
+            // The length in objects of this rhythm normalised to represent if the rhythm change is frequent enough to be penalised.
+            double lengthFactor = DifficultyCalculationUtils.ReverseLerp(rhythmLength, 8, 2);
+
+            return 1.0 - 0.75 * gapFactor * lengthFactor;
+        }
+
+        /// <summary>
         /// Calculates the difficulty of a given ratio using a combination of periodic penalties and bonuses.
         /// </summary>
         private static double ratioDifficulty(double ratio, int terms = 8)
@@ -161,34 +189,5 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// </summary>
         private static double termPenalty(double ratio, int denominator, double power, double multiplier) =>
             -multiplier * Math.Pow(Math.Cos(denominator * Math.PI * ratio), power);
-
-        /// <summary>
-        /// Frequent rhythm changes containing long gaps (i.e. 1/4 + 1/6 with 1/2 gaps) award more difficulty than expected.
-        /// Due to limitations of the current rhythm evaluation, these cases are targeted and penalised.
-        /// The previous hit object grouping is used as often the rhythm change *two* rhythms after a long gap awards the unexpected difficulty.
-        /// </summary>
-        private static double longGapPenalty(SameRhythmHitObjectGrouping? previousOrNull)
-        {
-            if (previousOrNull == null)
-                return 1.0;
-
-            SameRhythmHitObjectGrouping previous = (SameRhythmHitObjectGrouping) previousOrNull;
-
-            double gapInterval = previous.FirstHitObject.DeltaTime;
-            double rhythmInterval = previous.HitObjectInterval ?? gapInterval;
-
-            // The ratio of the gap before this rhythm to the rhythm itself.
-            double gapRatio = gapInterval / Math.Max(rhythmInterval, 1);
-
-            // The gap ratio normalised to represent if the gap is long.
-            double gapFactor = DifficultyCalculationUtils.Logistic(gapRatio, 1.75, 20);
-
-            double rhythmLength = previous.HitObjects.Count;
-
-            // The length in objects of this rhythm normalised to represent if the rhythm change is frequent enough to be penalised.
-            double lengthFactor = DifficultyCalculationUtils.ReverseLerp(rhythmLength, 8, 2);
-
-            return 1.0 - 0.75 * gapFactor * lengthFactor;
-        }
     }
 }
