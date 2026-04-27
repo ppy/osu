@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
@@ -38,6 +39,9 @@ namespace osu.Game.Rulesets.Taiko
                     HintText = RulesetSettingsStrings.RateAdjustedHitAnimationTooltip,
                     Current = config.GetBindable<bool>(TaikoRulesetSetting.RateAdjustedHitAnimation)
                 })
+                {
+                    ApplyClassicDefault = c => ((IHasCurrentValue<bool>)c).Current.Value = false,
+                }
             };
         }
     }
