@@ -7,11 +7,13 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Configuration;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
@@ -142,6 +144,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             base.OnReleased(e);
         }
 
+        [Resolved]
+        private TaikoRulesetConfigManager taikoConfig { get; set; }
+
         protected override void UpdateHitStateTransforms(ArmedState state)
         {
             Debug.Assert(HitObject.HitWindows != null);
@@ -168,12 +173,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     if (SnapJudgementLocation)
                         MainPiece.MoveToX(-X);
 
-                    this.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);
-
                     // Rate independent to match stable.
-                    this.MoveToY(-gravity_travel_height, gravity_time * Clock.Rate, Easing.Out)
+                    double length = gravity_time * (taikoConfig.Get<bool>(TaikoRulesetSetting.RateAdjustedHitAnimation) ? 1 : Clock.Rate);
+
+                    this.ScaleTo(0.8f, length * 2, Easing.OutQuad);
+
+                    this.MoveToY(-gravity_travel_height, length, Easing.Out)
                         .Then()
-                        .MoveToY(gravity_travel_height * 2, gravity_time * Clock.Rate * 2, Easing.In);
+                        .MoveToY(gravity_travel_height * 2, length * 2, Easing.In);
 
                     this.FadeOut(800);
                     break;
