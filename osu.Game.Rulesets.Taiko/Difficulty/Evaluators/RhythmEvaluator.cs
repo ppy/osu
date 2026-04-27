@@ -186,7 +186,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             double rhythmLength = previous.HitObjects.Count;
 
             // The length in objects of this rhythm normalised to represent if the rhythm change is frequent enough to be penalised.
-            double lengthFactor = DifficultyCalculationUtils.Logistic(rhythmLength, 4, -2.5);
+            double lengthFactor = DifficultyCalculationUtils.ReverseLerp(rhythmLength, 8, 2);
 
             return 1.0 - 0.75 * gapFactor * lengthFactor;
         }
