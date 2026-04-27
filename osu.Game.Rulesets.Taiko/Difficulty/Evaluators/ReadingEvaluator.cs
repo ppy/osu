@@ -33,15 +33,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// <param name="noteObject">The hit object to evaluate.</param>
         /// <param name="mods">The mods which were applied to the beatmap.</param>
         /// <returns>The reading difficulty value for the given hit object.</returns>
-        public static double EvaluateDifficultyOf(TaikoDifficultyHitObject noteObject, Mod[] mods, bool isHidden)
+        public static double EvaluateDifficultyOf(TaikoDifficultyHitObject noteObject, Mod[] mods)
         {
+            bool isHidden = mods.Any(m => m is TaikoModHidden);
             bool isFlashlight = mods.Any(m => m is TaikoModFlashlight);
 
             // With HDFL, all note objects are invisible and give the maximum reading difficulty
             if (isHidden && isFlashlight)
                 return 1.0;
 
-            double velocityDifficulty = calculateVelocityDifficulty(noteObject, mods, isHidden);
+            double velocityDifficulty = calculateVelocityDifficulty(noteObject, mods);
             double densityDifficulty = calculateDensityDifficulty(noteObject);
 
             double difficulty = Math.Max(velocityDifficulty, densityDifficulty);
@@ -53,7 +54,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             return difficulty;
         }
 
-        private static double calculateVelocityDifficulty(TaikoDifficultyHitObject noteObject, Mod[] mods, bool isHidden)
+        private static double calculateVelocityDifficulty(TaikoDifficultyHitObject noteObject, Mod[] mods)
         {
             double highVelocityDifficulty = 0.0;
             double timeInvisibleDifficulty = 0.0;
@@ -68,10 +69,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             );
 
             highVelocityDifficulty = DifficultyCalculationUtils.Logistic(
-                noteObject.EffectiveBPM * calculateHighVelocityModMultiplier(mods, isHidden),
+                noteObject.EffectiveBPM * calculateHighVelocityModMultiplier(mods),
                 highVelocity.Center,
                 10.0 / highVelocity.Range
             );
+
+            bool isHidden = mods.Any(m => m is TaikoModHidden);
 
             // With hidden, notes that stay invisible for longer before being hit are harder to read
             if (isHidden) {
@@ -104,8 +107,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             return DifficultyCalculationUtils.Smoothstep(density, 0.9, 0.35);
         }
 
-        private static double calculateHighVelocityModMultiplier(Mod[] mods, bool isHidden)
+        private static double calculateHighVelocityModMultiplier(Mod[] mods)
         {
+            bool isHidden = mods.Any(m => m is TaikoModHidden);
             bool isFlashlight = mods.Any(m => m is TaikoModFlashlight);
             bool isEasy = mods.Any(m => m is TaikoModEasy);
 

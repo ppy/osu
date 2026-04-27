@@ -1,14 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 using System;
 using System.Linq;
@@ -28,15 +26,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         public double weightedTotalDifficultySum;
 
         private double currentStrain;
-
         private Mod[] mods;
-        public readonly bool HiddenDifficultyOnly;
 
-        public Reading(Mod[] mods, bool HiddenDifficultyOnly)
+        public Reading(Mod[] mods)
             : base(mods)
         {
             this.mods = mods;
-            this.HiddenDifficultyOnly = HiddenDifficultyOnly;
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
@@ -47,8 +42,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
                 return 0.0;
             }
 
-            bool isHidden = mods.Any(m => m is TaikoModHidden);
-
             var taikoObject = (TaikoDifficultyHitObject)current;
             var colourData = taikoObject.ColourData;
 
@@ -56,7 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             currentStrain *= DifficultyCalculationUtils.Logistic(index, 4, -1 / 25.0, 0.5) + 0.5;
 
-            double difficulty = ReadingEvaluator.EvaluateDifficultyOf(taikoObject, mods, isHidden);
+            double difficulty = ReadingEvaluator.EvaluateDifficultyOf(taikoObject, mods);
 
             currentStrain *= StrainDecayBase;
             currentStrain += difficulty * SkillMultiplier;

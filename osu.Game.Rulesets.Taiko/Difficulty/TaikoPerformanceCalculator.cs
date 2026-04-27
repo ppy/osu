@@ -84,8 +84,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             double penalisedStarRating = attributes.StarRating * calculateImproperlyPlayedRhythmPenalty(attributes.RhythmDifficulty, attributes.StarRating);
 
-            if (!isClassic)
-                penalisedStarRating *= calculateLazerHiddenReadingPenalty(attributes.HiddenReadingDifficulty, attributes.StarRating);
+            if (score.Mods.Any(m => m is ModHidden) && !isClassic)
+            {
+                // HDFL is exempt from reading penalties.
+                if (!score.Mods.Any(m => m is ModFlashlight))
+                    penalisedStarRating *= calculateLazerReadingPenalty(attributes.ReadingDifficulty, attributes.StarRating);
+            }
 
             double baseDifficulty = 5 * Math.Max(1.0, penalisedStarRating / 0.110) - 4.0;
             double difficultyValue = Math.Min(Math.Pow(baseDifficulty, 3) / 69052.51, Math.Pow(baseDifficulty, 2.25) / 1250.0);
@@ -128,13 +132,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             );
         }
 
-        // A penalty removing hidden reading difficulty unfairly awarded by playing on lazer from star rating.
-        private double calculateLazerHiddenReadingPenalty(double hiddenDifficulty, double starRating)
+        // A penalty removing reading difficulty unfairly awarded by playing on lazer from star rating.
+        private double calculateLazerReadingPenalty(double readingDifficulty, double starRating)
         {
-            // The fraction of star rating made up by hidden reading difficulty, normalised to represent hidden reading's perceived contribution to star rating.
-            double hiddenFactor = DifficultyCalculationUtils.ReverseLerp(hiddenDifficulty / starRating, 0.1, 0.35);
+            // The fraction of star rating made up by reading difficulty, normalised to represent reading's perceived contribution to star rating.
+            double readingFactor = DifficultyCalculationUtils.ReverseLerp(readingDifficulty / starRating, 0.15, 0.35);
 
-            return 1 - 0.15 * Math.Pow(hiddenFactor, 1.5);
+            return 1 - 0.15 * Math.Pow(readingFactor, 1.25);
         }
 
         private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
