@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.UI
         private SpriteIcon cogBackground = null!;
         private SpriteIcon cog = null!;
 
-        private Bindable<Skin> skin = new Bindable<Skin>();
+        private readonly Bindable<Skin> skin = new Bindable<Skin>();
         private Sprite skinIcon = null!;
 
         private ModSettingChangeTracker? modSettingsChangeTracker;
