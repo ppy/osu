@@ -102,6 +102,9 @@ namespace osu.Game.Rulesets.Catch.Mods
         {
             foreach (var obj in beatmap.HitObjects.OfType<PalpableCatchHitObject>())
                 disableHyperDashes(obj);
+
+            foreach (var obj in beatmap.HitObjects.OfType<JuiceStream>().SelectMany(js => js.NestedHitObjects.OfType<PalpableCatchHitObject>()))
+                disableHyperDashes(obj);
         }
 
         private void disableHyperDashes(PalpableCatchHitObject palpableObject)
