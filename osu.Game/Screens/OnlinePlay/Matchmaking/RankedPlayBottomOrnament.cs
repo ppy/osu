@@ -194,12 +194,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking
 
         protected override void PopIn()
         {
+            this.MoveToY(5)
+                .Delay(550)
+                .MoveToY(0, duration - 550, easing);
+
             this.FadeIn(duration, easing)
                 .TransformTo(nameof(Progress), 1f, duration, easing);
         }
 
         protected override void PopOut()
         {
+            this.MoveToY(5, duration / 2f, Easing.In);
+
             this.FadeOut(duration, easing)
                 .TransformTo(nameof(Progress), 0f, duration, easing);
         }
