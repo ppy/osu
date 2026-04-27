@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private readonly List<double> sliderStrains = new List<double>();
 
-        private double currentDifficulty;
+        private double currentStrain;
 
         private double strainDecayBase => 0.3;
 
@@ -41,17 +41,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             double decay = strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
 
-            currentDifficulty *= decay;
-            currentDifficulty += SpeedEvaluator.EvaluateDifficultyOf(current) * (1 - decay) * skillMultiplier;
+            currentStrain *= decay;
+            currentStrain += SpeedEvaluator.EvaluateDifficultyOf(current) * (1 - decay) * skillMultiplier;
 
             double currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
 
-            double totalDifficulty = currentDifficulty * currentRhythm;
+            double totalStrain = currentStrain * currentRhythm;
 
             if (current.BaseObject is Slider)
-                sliderStrains.Add(totalDifficulty);
+                sliderStrains.Add(totalStrain);
 
-            return totalDifficulty;
+            return totalStrain;
         }
 
         public double RelevantNoteCount()
