@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         public override string Acronym => "CC";
         public override ModType Type => ModType.Fun;
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModFlashlight), typeof(OsuModAutopilot), typeof(OsuModRelax), typeof(OsuModBubbles) }).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModFlashlight), typeof(OsuModAutopilot), typeof(OsuModRelax), typeof(OsuModBubbles), typeof(ModTouchDevice) }).ToArray();
 
         private OsuInputManager osuInputManager = null!;
         private bool hasReplay;
