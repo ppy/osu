@@ -19,20 +19,29 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public partial class TestSceneOverlayContainer : OsuManualInputManagerTestScene
     {
-        [SetUp]
-        public void SetUp() => Schedule(() => Child = new TestOverlay
+        private TestOverlay createOverlay() => new TestOverlay
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
             RelativeSizeAxes = Axes.Both,
             Size = new Vector2(0.5f)
-        });
+        };
+
+        private void loadOverlay() => Schedule(() => Child = createOverlay());
+        private void loadBlockingOverlay() => Schedule(() => Child = createOverlay().With(d =>
+        {
+            d.Child = new BlockingContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
+        }));
 
         [Test]
         public void TestScrollBlocked()
         {
             OsuScrollContainer scroll = null!;
 
+            AddStep("load overlay", () => loadOverlay());
             AddStep("add scroll container", () =>
             {
                 Add(scroll = new OsuScrollContainer
@@ -60,9 +69,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestAltScrollNotBlocked()
         {
-            TestGlobalScrollAdjustsVolume volumeAdjust = null!;
+            TestGlobalAltScrollAdjustsVolume volumeAdjust = null!;
 
-            AddStep("add volume control receptor", () => Add(volumeAdjust = new TestGlobalScrollAdjustsVolume
+            AddStep("load overlay", () => loadOverlay());
+            AddStep("add volume control receptor", () => Add(volumeAdjust = new TestGlobalAltScrollAdjustsVolume
             {
                 RelativeSizeAxes = Axes.Both,
                 Depth = float.MaxValue,
@@ -79,7 +89,33 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("release alt", () => InputManager.ReleaseKey(Key.AltLeft));
         }
 
-        public partial class TestGlobalScrollAdjustsVolume : GlobalScrollAdjustsVolume
+        [Test]
+        public void TestAltScrollBlockedByOptOut()
+        {
+            TestGlobalAltScrollAdjustsVolume volumeAdjust = null!;
+
+            AddStep("add blocker and receptor", () =>
+            {
+                Add(volumeAdjust = new TestGlobalAltScrollAdjustsVolume
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = float.MaxValue,
+                });
+            });
+            AddStep("load blocking overlay", () => loadBlockingOverlay());
+
+            AddStep("hold alt", () => InputManager.PressKey(Key.AltLeft));
+            AddStep("perform scroll", () =>
+            {
+                InputManager.MoveMouseTo(Content);
+                InputManager.ScrollVerticalBy(10);
+            });
+
+            AddAssert("receptor did not receive scroll input", () => !volumeAdjust.ScrollReceived);
+            AddStep("release alt", () => InputManager.ReleaseKey(Key.AltLeft));
+        }
+
+        public partial class TestGlobalAltScrollAdjustsVolume : GlobalAltScrollAdjustsVolume
         {
             public bool ScrollReceived { get; private set; }
 
@@ -87,6 +123,13 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 ScrollReceived = true;
                 return base.OnScroll(e);
+            }
+        }
+
+        private partial class BlockingContainer : Container, IBlockGlobalAltScrollVolume
+        {
+            public BlockingContainer()
+            {
             }
         }
 
