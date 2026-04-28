@@ -15,9 +15,9 @@ namespace osu.Game.Localisation
         public static LocalisableString TabletExternal => new TranslatableString(getKey(@"tablet_external"), @"Tablet (External)");
 
         /// <summary>
-        /// "Cursor sensitivity"
+        /// "Pen sensitivity"
         /// </summary>
-        public static LocalisableString CursorSensitivity => new TranslatableString(getKey(@"cursor_sensitivity"), @"Cursor sensitivity");
+        public static LocalisableString PenSensitivity => new TranslatableString(getKey(@"pen_sensitivity"), @"Pen sensitivity");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

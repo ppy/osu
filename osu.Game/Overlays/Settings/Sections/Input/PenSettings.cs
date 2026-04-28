@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 new SettingsItemV2(new FormSliderBar<double>
                 {
-                    Caption = PenSettingsStrings.CursorSensitivity,
+                    Caption = PenSettingsStrings.PenSensitivity,
                     Current = handlerSensitivity,
                     KeyboardStep = 0.01f,
                     TransferValueOnCommit = true,
