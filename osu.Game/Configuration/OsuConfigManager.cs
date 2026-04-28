@@ -2,12 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Input.Handlers.Mouse;
+using osu.Framework.Input.Handlers.Pen;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.Drawables.Cards;
@@ -30,9 +33,13 @@ namespace osu.Game.Configuration
 {
     public class OsuConfigManager : IniConfigManager<OsuSetting>, IGameplaySettings
     {
-        public OsuConfigManager(Storage storage)
+        private readonly GameHost? host;
+
+        public OsuConfigManager(Storage storage, GameHost? host = null)
             : base(storage)
         {
+            this.host = host;
+
             Migrate();
         }
 
@@ -273,6 +280,17 @@ namespace osu.Game.Configuration
                 // UI scaling on mobile platforms has been internally adjusted such that 1x UI scale looks correctly zoomed in than before.
                 if (RuntimeInfo.IsMobile)
                     GetBindable<float>(OsuSetting.UIScale).SetDefault();
+            }
+
+            if (combined < 20250428)
+            {
+                // Pen tablet sensitivity is now separated from cursor sensitivity.
+                // Most users will want the default to be what they already had set on cursor sensitivity so let's transfer it.
+                var mouseHandler = host?.AvailableInputHandlers.OfType<MouseHandler>().SingleOrDefault();
+                var penHandler = host?.AvailableInputHandlers.OfType<PenHandler>().SingleOrDefault();
+
+                if (penHandler != null && mouseHandler != null && penHandler.Sensitivity.IsDefault)
+                    penHandler.Sensitivity.Value = mouseHandler.Sensitivity.Value;
             }
         }
 
