@@ -13,12 +13,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
@@ -45,7 +47,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private RankedPlayMatchInfo matchInfo { get; set; } = null!;
 
         [Resolved]
+        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> globalBeatmap { get; set; } = null!;
+
+        [Resolved]
         private IBindable<RulesetInfo> globalRuleset { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> globalMods { get; set; } = null!;
 
         private LoadingSpinner loadingSpinner = null!;
         private MainPanel? mainPanel;
@@ -55,10 +66,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         {
             CornerPieceVisibility.Value = Visibility.Hidden;
 
-            AddInternal(loadingSpinner = new LoadingSpinner
+            AddRangeInternal(new Drawable[]
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
+                loadingSpinner = new LoadingSpinner
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
+                },
             });
         }
 
@@ -70,9 +84,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
             fetchFinalScores().FireAndForget();
         }
-
-        [Resolved]
-        private IBindable<WorkingBeatmap> working { get; set; } = null!;
 
         private async Task fetchFinalScores()
         {
@@ -92,7 +103,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
                 List<MultiplayerScore> apiScores = await scoreLookup.Task.ConfigureAwait(false);
 
-                ScoreInfo[] scores = apiScores.Select(s => s.CreateScoreInfo(scoreManager, rulesets, working.Value.BeatmapInfo)).ToArray();
+                ScoreInfo[] scores = apiScores.Select(s => s.CreateScoreInfo(scoreManager, rulesets, globalBeatmap.Value.BeatmapInfo)).ToArray();
 
                 Debug.Assert(scores.Length <= 2);
 
@@ -113,6 +124,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     User = new APIUser { Id = opponentId }
                 };
 
+                // Should complete instantaneously due to prior lookups.
+                APIBeatmap beatmap = (await beatmapLookupCache.GetBeatmapAsync(globalBeatmap.Value.BeatmapInfo.OnlineID).ConfigureAwait(false))!;
+
                 Schedule(() =>
                 {
                     LoadComponentAsync(new MainPanel
@@ -124,6 +138,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                         OpponentScore = opponentScore,
                         PlayerDamageInfo = matchInfo.RoomState.Users[localUserId].DamageInfo!,
                         OpponentDamageInfo = matchInfo.RoomState.Users[opponentId].DamageInfo!,
+                        Beatmap = beatmap,
+                        Mods = globalMods.Value.ToArray(),
                     }, loaded =>
                     {
                         AddInternal(loaded);
