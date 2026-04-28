@@ -24,8 +24,11 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
+        [SettingSource(typeof(SkinnableModDisplayStrings), nameof(SkinnableModDisplayStrings.UseSkinIcons), nameof(SkinnableModDisplayStrings.UseSkinIconsDescription))]
+        public Bindable<bool> UseSkinIcons { get; } = new Bindable<bool>(true);
+
         [SettingSource(typeof(SkinnableModDisplayStrings), nameof(SkinnableModDisplayStrings.ShowExtendedInformation), nameof(SkinnableModDisplayStrings.ShowExtendedInformationDescription))]
-        public Bindable<bool> ShowExtendedInformation { get; } = new Bindable<bool>(true);
+        public Bindable<bool> ShowExtendedInformation { get; } = new Bindable<bool>(false);
 
         [SettingSource(typeof(SkinnableModDisplayStrings), nameof(SkinnableModDisplayStrings.ExpansionMode), nameof(SkinnableModDisplayStrings.ExpansionModeDescription))]
         public Bindable<ExpansionMode> ExpansionModeSetting { get; } = new Bindable<ExpansionMode>();
@@ -40,7 +43,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 // Provide a minimum autosize.
                 new Container { Size = ModIcon.MOD_ICON_SIZE * ModDisplay.MOD_ICON_SCALE },
-                modDisplay = new ModDisplay(useSkinIcons: true),
+                modDisplay = new ModDisplay(useSkinIcons: UseSkinIcons.Value),
             };
 
             modDisplay.Current = mods;
@@ -54,6 +57,16 @@ namespace osu.Game.Screens.Play.HUD
             ShowExtendedInformation.BindValueChanged(_ => modDisplay.ShowExtendedInformation = ShowExtendedInformation.Value, true);
             ExpansionModeSetting.BindValueChanged(_ => modDisplay.ExpansionMode = ExpansionModeSetting.Value, true);
             Direction.BindValueChanged(_ => modDisplay.FillDirection = Direction.Value == Framework.Graphics.Direction.Horizontal ? FillDirection.Horizontal : FillDirection.Vertical, true);
+            UseSkinIcons.BindValueChanged(_ =>
+            {
+                modDisplay.UseSkinIcons = UseSkinIcons.Value;
+
+                // we can't display extended information on legacy icons
+                if (UseSkinIcons.Value)
+                    ShowExtendedInformation.Value = false;
+
+                ShowExtendedInformation.Disabled = UseSkinIcons.Value;
+            }, true);
 
             FinishTransforms(true);
         }

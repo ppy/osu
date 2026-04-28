@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         private bool showExtendedInformation;
-        private readonly bool useSkinIcons;
+        private bool useSkinIcons;
 
         public bool ShowExtendedInformation
         {
@@ -72,6 +72,17 @@ namespace osu.Game.Screens.Play.HUD
         {
             get => iconsContainer.Direction;
             set => iconsContainer.Direction = value;
+        }
+
+        public bool UseSkinIcons
+        {
+            get => useSkinIcons;
+            set
+            {
+                useSkinIcons = value;
+                foreach (var icon in iconsContainer)
+                    icon.UseSkinIcon = value;
+            }
         }
 
         private readonly FillFlowContainer<ModIcon> iconsContainer;

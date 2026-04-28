@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.UI
         private readonly bool showTooltip;
 
         private bool showExtendedInformation;
-        private readonly bool useSkinIcon;
+        private bool useSkinIcon;
         private bool canShowExtendedInformation = true;
 
         public bool ShowExtendedInformation
@@ -52,6 +52,16 @@ namespace osu.Game.Rulesets.UI
             {
                 showExtendedInformation = value;
                 updateExtendedInformation();
+            }
+        }
+
+        public bool UseSkinIcon
+        {
+            get => useSkinIcon;
+            set
+            {
+                useSkinIcon = value;
+                updateMod(mod);
             }
         }
 
