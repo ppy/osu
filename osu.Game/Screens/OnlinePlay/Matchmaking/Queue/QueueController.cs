@@ -36,7 +36,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
     {
         public readonly Bindable<ScreenQueue.MatchmakingScreenState> CurrentState = new Bindable<ScreenQueue.MatchmakingScreenState>();
         public readonly Bindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
-        public MatchmakingPool? LastJoinedPool { get; private set; }
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
@@ -70,7 +69,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         public void JoinQueue(MatchmakingPool pool)
         {
             client.MatchmakingJoinQueue(pool.Id).FireAndForget();
-            LastJoinedPool = pool;
         }
 
         /// <summary>
@@ -86,8 +84,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         /// </summary>
         public void RejoinQueue()
         {
-            if (LastJoinedPool != null)
-                JoinQueue(LastJoinedPool);
+            if (SelectedPool.Value != null)
+                JoinQueue(SelectedPool.Value);
         }
 
         /// <summary>

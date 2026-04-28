@@ -353,8 +353,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 availablePools.Value = pools;
 
                 // Default to the currently queueing pool, or fallback to the user's ruleset for the initial pool selection.
-                MatchmakingPool? lastQueuedPool = pools.FirstOrDefault(p => p.Id == queue.LastJoinedPool?.Id);
-                selectedPool.Value = lastQueuedPool ?? pools.FirstOrDefault(p => p.RulesetId == ruleset.Value.OnlineID) ?? pools.FirstOrDefault();
+                selectedPool.Value ??= pools.FirstOrDefault(p => p.RulesetId == ruleset.Value.OnlineID) ?? pools.FirstOrDefault();
             });
         }
 
@@ -456,7 +455,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             switch (currentState.Value)
             {
                 default:
-                    selectedPool.Value = null!;
                     client.MatchmakingLeaveLobby().FireAndForget();
                     queue.SearchInBackground();
                     return false;
