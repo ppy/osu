@@ -129,6 +129,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString StableDirectorySelectHeader => new TranslatableString(getKey(@"stable_directory_select_header"), @"Please select your osu!stable install location");
 
+        /// <summary>
+        /// "All offsets have been reset!"
+        /// </summary>
+        public static LocalisableString AllOffsetsReset => new TranslatableString(getKey(@"all_offsets_reset"), @"All offsets have been reset!");
+
+        /// <summary>
+        /// "No videos found to delete!"
+        /// </summary>
+        public static LocalisableString NoVideosFoundToDelete => new TranslatableString(getKey(@"no_videos_found_to_delete"), @"No videos found to delete!");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }
