@@ -31,9 +31,17 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         [SettingSource("Mute hit sounds", "Hit sounds become muted.")]
         public BindableBool AffectsHitSounds { get; } = new BindableBool();
+        private readonly BindableNumber<double> hitSoundVolume = new BindableDouble(0);
+
+        [SettingSource("Miss indicator size", "Size of the Hyperdash afterimage when catching objects.", 0)]
+        public BindableFloat AfterImageSetting { get; } = new BindableFloat(1.5f)
+        {
+            Precision = 0.1f,
+            MinValue = 0.5f,
+            MaxValue = 2f
+        };
 
         private CatcherArea catcherArea = null!;
-        private readonly BindableNumber<double> hitSoundVolume = new BindableDouble(0);
 
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
@@ -61,8 +69,10 @@ namespace osu.Game.Rulesets.Catch.Mods
 
                     if (caught)
                     {
+                        var AfterImageSize = new Vector2(AfterImageSetting.Value);
+
                         // Since hyperdashes don't exist in this mode, creatively reuse hyperdash trail afterimages as miss indicators.
-                        catcherArea.CatcherTrails.Add(new CatcherTrailEntry(catcherArea.Time.Current, CatcherAnimationState.Fail, catcherArea.Catcher.X, new Vector2(1.5f),
+                        catcherArea.CatcherTrails.Add(new CatcherTrailEntry(catcherArea.Time.Current, CatcherAnimationState.Fail, catcherArea.Catcher.X, AfterImageSize,
                             CatcherTrailAnimation.HyperDashAfterImage));
                     }
 
