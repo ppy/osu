@@ -74,7 +74,11 @@ namespace osu.Game.Rulesets.Mods
             get
             {
                 if (!IsExactlyOneSettingChanged(OverallDifficulty, DrainRate))
+                {
+                    if (OverallDifficulty.ExtendedMaxValue == OverallDifficulty.Value && DrainRate.ExtendedMaxValue == DrainRate.Value) return "MAX!";
+
                     return string.Empty;
+                }
 
                 if (!OverallDifficulty.IsDefault) return format("OD", OverallDifficulty);
                 if (!DrainRate.IsDefault) return format("HP", DrainRate);
