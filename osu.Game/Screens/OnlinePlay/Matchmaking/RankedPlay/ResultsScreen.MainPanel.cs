@@ -16,8 +16,11 @@ using osu.Framework.Utils;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 using osuTK;
 using osuTK.Graphics;
@@ -33,6 +36,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             public required RankedPlayDamageInfo PlayerDamageInfo { get; init; }
             public required RankedPlayDamageInfo OpponentDamageInfo { get; init; }
 
+            public required APIBeatmap Beatmap { get; init; }
+            public required Mod[] Mods { get; init; }
+
             [Resolved]
             private RankedPlayMatchInfo matchInfo { get; set; } = null!;
 
@@ -44,6 +50,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             private readonly Bindable<Visibility> cornerPieceVisibility = new Bindable<Visibility>();
             private readonly Bindable<float> scoreBarProgress = new Bindable<float>();
 
+            private Drawable beatmapPanel = null!;
             private PanelScaffold panelScaffold = null!;
             private Box flash = null!;
             private ScoreDetails playerScoreDetails = null!;
@@ -85,6 +92,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                             .Select(it => it.Value.DamageInfo)
                                             .OfType<RankedPlayDamageInfo>()
                                             .MaxBy(it => it.Damage)!;
+
+                AddInternal(new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = cardSize,
+                    Child = beatmapPanel = new Container
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.BottomRight,
+                        Margin = new MarginPadding { Bottom = 10 },
+                        Scale = new Vector2(1.1f),
+                        Size = new Vector2(MatchmakingSelectPanel.WIDTH, MatchmakingSelectPanel.HEIGHT),
+                        Child = new MatchmakingSelectPanel.CardContentBeatmap(Beatmap, Mods)
+                    }
+                });
 
                 AddInternal(panelScaffold = new PanelScaffold
                 {
@@ -323,6 +346,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 double delay = 0;
 
                 resultsAppearSample.Play();
+
+                beatmapPanel.FadeOut()
+                            .Delay(800)
+                            .FadeIn(300);
 
                 panelScaffold.FadeIn(100)
                              .ResizeTo(0)
