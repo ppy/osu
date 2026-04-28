@@ -22,7 +22,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Localisation;
-using osu.Game.Online.Matchmaking.Requests;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens;
@@ -191,13 +190,7 @@ namespace osu.Game.Users
                         items.Add(new OsuMenuItem("Duel", MenuItemType.Standard, () =>
                         {
                             if (canDuelUser())
-                            {
-                                multiplayerClient!.MatchmakingIssueDuel(new MatchmakingIssueDuelRequest
-                                {
-                                    UserId = User.Id,
-                                    PoolId = queueController!.SelectedPool.Value!.Id
-                                });
-                            }
+                                queueController?.IssueDuel(queueController.SelectedPool.Value!, User.Id);
                         }));
                     }
                 }
