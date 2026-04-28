@@ -298,9 +298,9 @@ namespace osu.Game.Screens.Menu
 
         private int lastBeatIndex;
 
-        protected virtual void PlaySampleDownbeat() => sampleDownbeat.Play();
+        protected virtual void PlayDownbeatSample() => sampleDownbeat.Play();
 
-        protected virtual void PlaySampleBeat(double frequency)
+        protected virtual void PlayBeatSample(double frequency)
         {
             sampleBeat.Frequency.Value = frequency;
             sampleBeat.Play();
@@ -324,11 +324,11 @@ namespace osu.Game.Screens.Menu
                 {
                     if (beatIndex % timingPoint.TimeSignature.Numerator == 0)
                     {
-                        PlaySampleDownbeat();
+                        PlayDownbeatSample();
                     }
                     else
                     {
-                        PlaySampleBeat(1 - BeatSampleVariance / 2 + RNG.NextDouble(BeatSampleVariance));
+                        PlayBeatSample(1 - BeatSampleVariance / 2 + RNG.NextDouble(BeatSampleVariance));
                     }
                 });
             }
