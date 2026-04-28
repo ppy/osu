@@ -75,9 +75,12 @@ namespace osu.Game.Rulesets.Mods
             {
                 if (!IsExactlyOneSettingChanged(OverallDifficulty, DrainRate))
                 {
-                    if (OverallDifficulty.ExtendedMaxValue == OverallDifficulty.Value && DrainRate.ExtendedMaxValue == DrainRate.Value) return "MAX+";
-                    if (OverallDifficulty.MaxValue == OverallDifficulty.Value && DrainRate.MaxValue == DrainRate.Value) return "MAX";
-                    if (OverallDifficulty.MinValue == OverallDifficulty.Value && DrainRate.MinValue == DrainRate.Value) return "MIN";
+                    if (OverallDifficulty.ExtendedMaxValue == OverallDifficulty.Value
+                        && DrainRate.ExtendedMaxValue == DrainRate.Value) return "MAX+";
+                    if (OverallDifficulty.MaxValue == OverallDifficulty.Value
+                        && DrainRate.MaxValue == DrainRate.Value) return "MAX";
+                    if (OverallDifficulty.MinValue == OverallDifficulty.Value
+                        && DrainRate.MinValue == DrainRate.Value) return "MIN";
 
                     return string.Empty;
                 }

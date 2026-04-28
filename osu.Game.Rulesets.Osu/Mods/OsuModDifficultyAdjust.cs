@@ -44,7 +44,29 @@ namespace osu.Game.Rulesets.Osu.Mods
             get
             {
                 if (!IsExactlyOneSettingChanged(CircleSize, ApproachRate, OverallDifficulty, DrainRate))
+                {
+                    if (OverallDifficulty.ExtendedMaxValue == OverallDifficulty.Value
+                        && DrainRate.ExtendedMaxValue == DrainRate.Value
+                        && CircleSize.ExtendedMaxValue == CircleSize.Value
+                        && ApproachRate.ExtendedMaxValue == ApproachRate.Value) return "MAX+";
+
+                    if (OverallDifficulty.MaxValue == OverallDifficulty.Value
+                        && DrainRate.MaxValue == DrainRate.Value
+                        && CircleSize.MaxValue == CircleSize.Value
+                        && ApproachRate.MaxValue == ApproachRate.Value) return "MAX";
+
+                    if (OverallDifficulty.MinValue == OverallDifficulty.Value
+                        && DrainRate.MinValue == DrainRate.Value
+                        && CircleSize.MinValue == CircleSize.Value
+                        && ApproachRate.ExtendedMinValue == ApproachRate.Value) return "MIN+";
+
+                    if (OverallDifficulty.MinValue == OverallDifficulty.Value
+                        && DrainRate.MinValue == DrainRate.Value
+                        && CircleSize.MinValue == CircleSize.Value
+                        && ApproachRate.MinValue == ApproachRate.Value) return "MIN";
+
                     return string.Empty;
+                }
 
                 if (!CircleSize.IsDefault) return format("CS", CircleSize);
                 if (!ApproachRate.IsDefault) return format("AR", ApproachRate);

@@ -26,7 +26,21 @@ namespace osu.Game.Rulesets.Taiko.Mods
             get
             {
                 if (!IsExactlyOneSettingChanged(ScrollSpeed, OverallDifficulty, DrainRate))
+                {
+                    if (OverallDifficulty.ExtendedMaxValue == OverallDifficulty.Value
+                        && DrainRate.ExtendedMaxValue == DrainRate.Value
+                        && ScrollSpeed.MaxValue == ScrollSpeed.Value) return "MAX+";
+
+                    if (OverallDifficulty.MaxValue == OverallDifficulty.Value
+                        && DrainRate.MaxValue == DrainRate.Value
+                        && ScrollSpeed.MaxValue == ScrollSpeed.Value) return "MAX";
+
+                    if (OverallDifficulty.MinValue == OverallDifficulty.Value
+                        && DrainRate.MinValue == DrainRate.Value
+                        && ScrollSpeed.MinValue == ScrollSpeed.Value) return "MIN";
+
                     return string.Empty;
+                }
 
                 if (!ScrollSpeed.IsDefault) return format("SC", ScrollSpeed, 2);
                 if (!OverallDifficulty.IsDefault) return format("OD", OverallDifficulty, 1);
