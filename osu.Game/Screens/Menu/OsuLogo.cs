@@ -276,16 +276,21 @@ namespace osu.Game.Screens.Menu
                 Schedule(runnableAction);
         }
 
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures, AudioManager audio)
+        protected virtual void GetBeatSamples(AudioManager audio)
         {
-            sampleClick = audio.Samples.Get(@"Menu/osu-logo-select");
-
             AddRangeInternal(new Drawable[]
             {
                 sampleBeat = new SkinnableSound(new SampleInfo(@"Menu/osu-logo-heartbeat", @"heartbeat")),
                 sampleDownbeat = new SkinnableSound(new SampleInfo(@"Menu/osu-logo-downbeat", @"heartbeat")),
             });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures, AudioManager audio)
+        {
+            sampleClick = audio.Samples.Get(@"Menu/osu-logo-select");
+
+            GetBeatSamples(audio);
 
             logo.Texture = textures.Get(@"Menu/logo");
             ripple.Texture = textures.Get(@"Menu/logo");

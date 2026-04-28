@@ -24,6 +24,11 @@ namespace osu.Game.Seasonal
 
         protected override MenuLogoVisualisation CreateMenuLogoVisualisation() => new SeasonalMenuLogoVisualisation();
 
+        protected override void GetBeatSamples(AudioManager audio)
+        {
+            sampleBeatBell = audio.Samples.Get(@"Menu/osu-logo-heartbeat-bell");
+        }
+
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, AudioManager audio)
         {
@@ -35,8 +40,6 @@ namespace osu.Game.Seasonal
                 Scale = new Vector2(-1, 1),
                 Texture = textures.Get(@"Menu/hat"),
             });
-
-            sampleBeatBell = audio.Samples.Get(@"Menu/osu-logo-heartbeat-bell");
         }
 
         // override base samples with our preferred ones.
