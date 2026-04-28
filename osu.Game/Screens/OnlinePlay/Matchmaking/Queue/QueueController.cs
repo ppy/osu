@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -39,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private BackgroundQueueNotification? backgroundNotification;
         private bool isBackgrounded;
-        private MatchmakingPool? lastJoinedPool;
+        public MatchmakingPool? LastJoinedPool { get; private set; }
 
         protected override void LoadComplete()
         {
@@ -59,7 +60,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         public void JoinQueue(MatchmakingPool pool)
         {
             client.MatchmakingJoinQueue(pool.Id).FireAndForget();
-            lastJoinedPool = pool;
+            LastJoinedPool = pool;
         }
 
         /// <summary>
@@ -75,8 +76,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         /// </summary>
         public void RejoinQueue()
         {
-            if (lastJoinedPool != null)
-                JoinQueue(lastJoinedPool);
+            if (LastJoinedPool != null)
+                JoinQueue(LastJoinedPool);
         }
 
         /// <summary>
@@ -150,8 +151,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             if (backgroundNotification != null)
                 return;
 
-            Debug.Assert(lastJoinedPool != null);
-            notifications?.Post(backgroundNotification = new BackgroundQueueNotification(this, lastJoinedPool.Type));
+            Debug.Assert(LastJoinedPool != null);
+            notifications?.Post(backgroundNotification = new BackgroundQueueNotification(this, LastJoinedPool.Type));
         }
 
         private void closeNotifications()
@@ -201,7 +202,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             [BackgroundDependencyLoader]
             private void load(AudioManager audio)
             {
-                Text = "Searching for opponents...";
+                Text = MultiplayerMatchStrings.SearchingForOpponents;
 
                 Activated = () =>
                 {
@@ -253,7 +254,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 return foundNotification = new MatchFoundNotification
                 {
                     Activated = CompletionClickAction,
-                    Text = "Your match is ready! Click to join.",
+                    Text = MultiplayerMatchStrings.MatchIsReady,
                 };
             }
 
