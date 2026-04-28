@@ -301,6 +301,13 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
+        public void Refresh()
+        {
+            if (!IsLoaded) return;
+
+            updateState();
+        }
+
         public override Vector2 Size
         {
             get => base.Size;
