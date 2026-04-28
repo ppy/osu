@@ -43,9 +43,9 @@ namespace osu.Game.Seasonal
         }
 
         // override base samples with our preferred ones.
-        protected override void PlaySampleDownbeat() => sampleBeatBell?.Play();
+        protected override void PlayDownbeatSample() => sampleBeatBell?.Play();
 
-        protected override void PlaySampleBeat(double frequency)
+        protected override void PlayBeatSample(double frequency)
         {
             if (sampleBeatBell == null)
                 return;
