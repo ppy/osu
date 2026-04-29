@@ -91,14 +91,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
         {
             Ruleset.Value = rulesetStore.GetRuleset(3);
 
-            AddStep("join room", () => JoinRoom(CreateDefaultRoom(MatchType.RankedPlay)));
-            WaitForJoined();
-
-            AddStep("add other user", () => MultiplayerClient.AddUser(new MultiplayerRoomUser(2)));
-
-            AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
-            AddUntilStep("screen loaded", () => screen.IsLoaded);
-
             var requestHandler = new BeatmapRequestHandler(this);
 
             AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
