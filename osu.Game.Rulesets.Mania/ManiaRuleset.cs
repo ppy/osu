@@ -495,11 +495,7 @@ namespace osu.Game.Rulesets.Mania
             var adjustedDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
             var colours = new OsuColour();
 
-            yield return new RulesetBeatmapAttribute("LN Ratio", "LN Ratio", (float)SliderCount / beatmapInfo.TotalObjectCount, (float)SliderCount / beatmapInfo.TotalObjectCount, 1);
-            yield return new RulesetBeatmapAttribute(SongSelectStrings.KeyCount, @"KC", originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 18)
-            {
-                Description = "Affects the number of key columns on the playfield."
-            };
+            yield return new RulesetBeatmapAttribute("LN Ratio", @"LN Ratio", (float)SliderCount / beatmapInfo.TotalObjectCount, (float)SliderCount / beatmapInfo.TotalObjectCount, 1);
 
             var hitWindows = new ManiaHitWindows();
             hitWindows.SetDifficulty(adjustedDifficulty.OverallDifficulty);
