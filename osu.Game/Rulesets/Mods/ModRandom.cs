@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
@@ -15,7 +16,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "RD";
         public override ModType Type => ModType.Conversion;
         public override IconUsage? Icon => OsuIcon.ModRandom;
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1;
 
         [SettingSource("Seed", "Use a custom seed instead of a random one", SettingControlType = typeof(SettingsNumberBox))]
         public Bindable<int?> Seed { get; } = new Bindable<int?>();

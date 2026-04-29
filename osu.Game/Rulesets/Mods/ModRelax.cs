@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 
@@ -13,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "RX";
         public override IconUsage? Icon => OsuIcon.ModRelax;
         public override ModType Type => ModType.Automation;
-        public override double ScoreMultiplier => 0.1;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 0.1;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay) };
     }
 }

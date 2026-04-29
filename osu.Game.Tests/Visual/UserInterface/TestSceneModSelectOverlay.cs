@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("two panels active", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
             AddAssert("mod multiplier correct", () =>
             {
-                double multiplier = SelectedMods.Value.Aggregate(1d, (m, mod) => m * mod.ScoreMultiplier);
+                double multiplier = SelectedMods.Value.Aggregate(1d, (m, mod) => m * mod.ScoreMultiplier(SelectedMods.Value));
                 return Precision.AlmostEquals(multiplier, this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value);
             });
             assertCustomisationToggleState(disabled: false, active: false);
@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("two panels active", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
             AddAssert("mod multiplier correct", () =>
             {
-                double multiplier = SelectedMods.Value.Aggregate(1d, (m, mod) => m * mod.ScoreMultiplier);
+                double multiplier = SelectedMods.Value.Aggregate(1d, (m, mod) => m * mod.ScoreMultiplier(SelectedMods.Value));
                 return Precision.AlmostEquals(multiplier, this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value);
             });
             assertCustomisationToggleState(disabled: false, active: false);
@@ -1143,7 +1143,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             public override string Name => "Unimplemented mod";
             public override string Acronym => "UM";
             public override LocalisableString Description => "A mod that is not implemented.";
-            public override double ScoreMultiplier => 1;
+            public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1;
             public override ModType Type => ModType.Conversion;
         }
 

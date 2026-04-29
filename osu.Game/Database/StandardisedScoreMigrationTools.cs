@@ -190,7 +190,7 @@ namespace osu.Game.Database
             double modMultiplier = 1;
 
             foreach (var mod in score.Mods)
-                modMultiplier *= mod.ScoreMultiplier;
+                modMultiplier *= mod.ScoreMultiplier(score.Mods);
 
             return (long)Math.Round((1000000 * (accuracyPortion * accuracyScore + (1 - accuracyPortion) * comboScore) + bonusScore) * modMultiplier);
 
@@ -352,7 +352,7 @@ namespace osu.Game.Database
             long maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
             double bonusProportion = Math.Max(0, ((long)score.LegacyTotalScore - maximumLegacyBaseScore) * maximumLegacyBonusRatio);
 
-            double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
+            double modMultiplier = score.Mods.Aggregate(1.0, (c, m) => c * m.ScoreMultiplier(score.Mods));
 
             long convertedTotalScoreWithoutMods;
 

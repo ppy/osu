@@ -123,7 +123,7 @@ namespace osu.Game.Overlays.Mods
                 double multiplier = 1.0;
 
                 foreach (var mod in ActiveMods.Value)
-                    multiplier *= mod.ScoreMultiplier;
+                    multiplier *= mod.ScoreMultiplier(ActiveMods.Value);
 
                 rankingInformationDisplay.ModMultiplier.Value = multiplier;
                 rankingInformationDisplay.Ranked.Value = ActiveMods.Value.All(m => m.Ranked);

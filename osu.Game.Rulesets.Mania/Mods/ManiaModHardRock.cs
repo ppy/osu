@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Mods;
@@ -10,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModHardRock : ModHardRock, IApplicableToHitObject
     {
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1;
         public override bool Ranked => false;
 
         public const double HIT_WINDOW_DIFFICULTY_MULTIPLIER = 1.4;

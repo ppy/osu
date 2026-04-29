@@ -261,7 +261,7 @@ namespace osu.Game.Scoring.Legacy
             double modMultiplier = 1;
 
             foreach (var mod in score.Mods)
-                modMultiplier *= mod.ScoreMultiplier;
+                modMultiplier *= mod.ScoreMultiplier(score.Mods);
 
             score.TotalScoreWithoutMods = (long)Math.Round(score.TotalScore / modMultiplier);
         }

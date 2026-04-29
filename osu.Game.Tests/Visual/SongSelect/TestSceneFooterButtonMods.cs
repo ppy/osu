@@ -109,7 +109,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void assertModsMultiplier(IEnumerable<Mod> mods)
         {
-            double multiplier = mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
+            var modsList = mods.ToArray();
+            double multiplier = modsList.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier(modsList));
             string expectedValue = ModUtils.FormatScoreMultiplier(multiplier).ToString();
 
             AddAssert($"Displayed multiplier is {expectedValue}", () => footerButtonMods.ChildrenOfType<OsuSpriteText>().First(t => t.Text.ToString().Contains('x')).Text.ToString(), () => Is.EqualTo(expectedValue));

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
@@ -17,7 +18,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "PF";
         public override IconUsage? Icon => OsuIcon.ModPerfect;
         public override ModType Type => ModType.DifficultyIncrease;
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1;
         public override LocalisableString Description => "SS or quit.";
         public override bool Ranked => true;
         public override bool ValidForFreestyleAsRequiredMod => true;
