@@ -97,15 +97,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                                 },
                             ]
                         },
-                        ..ruleset.GetBeatmapAttributesForDisplay(beatmap, [])
+                        ..(beatmap.RulesetID==3 ? ruleset.GetBeatmapAttributesForDisplay(beatmap, [],beatmap.SliderCount) : ruleset.GetBeatmapAttributesForDisplay(beatmap, []))
                                 .Select(attribute =>
                                     {
-                                        if(attribute.Acronym == "KC" && beatmap.RulesetID==3){
-                                            return new AttributeRow(new RulesetBeatmapAttribute("LN Ratio", "LN Ratio", (float)beatmap.SliderCount/beatmap.TotalObjectCount, (float)beatmap.SliderCount/beatmap.TotalObjectCount, 1));
-                                        }
                                         return new AttributeRow(attribute);
                                     }
-                                )
+                        )
                     ]
                 };
             }
@@ -114,6 +111,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
         private partial class AttributeRow(RulesetBeatmapAttribute attribute) : CompositeDrawable
         {
             private float normalizedValue => float.Clamp(attribute.AdjustedValue / attribute.MaxValue, 0, 1);
+            private string getAdjustedValuestring()
+            {
+                switch (attribute.Acronym)
+                {
+                    case "LN Ratio":
+                        return attribute.AdjustedValue.ToString("P1");
+                    default:
+                        return attribute.AdjustedValue.ToStandardFormattedString(maxDecimalDigits: 1);
+                }
+            }
             [BackgroundDependencyLoader]
             private void load(CardColours colours)
             {
@@ -132,7 +139,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                     new OsuSpriteText
                     {
                         RelativePositionAxes = Axes.X,
-                        Text = attribute.AdjustedValue.ToStandardFormattedString(maxDecimalDigits: attribute.Acronym == "LN Ratio" ? 3 : 1),
+                        Text = getAdjustedValuestring(),
                         Font = OsuFont.GetFont(size: 9, weight: FontWeight.SemiBold),
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreRight,
