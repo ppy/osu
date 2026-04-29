@@ -94,7 +94,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 double overlapVelocityBuff = Math.Min(OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25 / Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime),
                     Math.Abs(prevVelocity - currVelocity));
 
-                flowDifficulty += overlapVelocityBuff *
+                // Reward for % distance slowed down compared to previous, paying attention to not award overlap
+                double nonOverlapVelocityBuff = Math.Abs(prevVelocity - currVelocity)
+                                                // do not award overlap
+                                                * DifficultyCalculationUtils.Smoothstep(Math.Min(osuCurrObj.LazyJumpDistance, osuLastObj.LazyJumpDistance), 0, OsuDifficultyHitObject.NORMALISED_DIAMETER);
+
+                flowDifficulty += Math.Max(overlapVelocityBuff, nonOverlapVelocityBuff) *
                                   distRatio *
                                   overlappedNotesWeight *
                                   velocity_change_multiplier;
