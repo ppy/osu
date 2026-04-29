@@ -551,7 +551,7 @@ namespace osu.Game.Screens.OnlinePlay
                 Size = new Vector2(30, 30),
                 Action = () => RequestResults?.Invoke(Item),
                 Alpha = AllowShowingResults ? 1 : 0,
-                TooltipText = "View results"
+                TooltipText = OnlinePlayStrings.ViewResults
             },
             editButton = new PlaylistEditButton
             {
@@ -569,7 +569,7 @@ namespace osu.Game.Screens.OnlinePlay
                 Size = new Vector2(30, 30),
                 Alpha = AllowDeletion ? 1 : 0,
                 Action = () => RequestDeletion?.Invoke(Item),
-                TooltipText = "Remove from playlist"
+                TooltipText = OnlinePlayStrings.RemoveFromPlaylist
             },
         };
 
@@ -605,7 +605,7 @@ namespace osu.Game.Screens.OnlinePlay
                 List<MenuItem> items = new List<MenuItem>();
 
                 if (beatmapOverlay != null)
-                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(Item.Beatmap.OnlineID)));
+                    items.Add(new OsuMenuItem(CommonStrings.Details, MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(Item.Beatmap.OnlineID)));
 
                 if (beatmap != null)
                 {
@@ -617,9 +617,9 @@ namespace osu.Game.Screens.OnlinePlay
                                                    .Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmap)).Cast<OsuMenuItem>().ToList();
 
                         if (manageCollectionsDialog != null)
-                            collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
+                            collectionItems.Add(new OsuMenuItem(CommonStrings.Manage, MenuItemType.Standard, manageCollectionsDialog.Show));
 
-                        items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+                        items.Add(new OsuMenuItem(CommonStrings.Collections) { Items = collectionItems });
                     }
                 }
 
@@ -766,7 +766,7 @@ namespace osu.Game.Screens.OnlinePlay
                 });
             }
 
-            public LocalisableString TooltipText => User == null ? string.Empty : $"queued by {User.Username}";
+            public LocalisableString TooltipText => User == null ? string.Empty : OnlinePlayStrings.QueuedBy(User.Username);
 
             private partial class TooltipArea : Component, IHasTooltip
             {
