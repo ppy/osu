@@ -16,6 +16,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -99,7 +100,7 @@ namespace osu.Game.Screens.Import
                             },
                             importButton = new RoundedButton
                             {
-                                Text = "Import selected file",
+                                Text = UserInterfaceStrings.ImportSelectedFile,
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
                                 RelativeSizeAxes = Axes.X,
@@ -111,13 +112,13 @@ namespace osu.Game.Screens.Import
 
                             importAllButton = new RoundedButton
                             {
-                                Text = "Import all files from directory",
+                                Text = UserInterfaceStrings.ImportFilesFromDirectory,
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
                                 RelativeSizeAxes = Axes.X,
                                 Height = button_height,
                                 Width = 0.9f,
-                                TooltipText = "Imports all osu files from selected directory",
+                                TooltipText = UserInterfaceStrings.ImportFilesFromDirectoryTooltip,
                                 Margin = new MarginPadding { Vertical = button_vertical_margin },
                                 Action = () => startDirectoryImport(fileSelector.CurrentPath.Value?.FullName)
                             }
@@ -165,7 +166,7 @@ namespace osu.Game.Screens.Import
         private void fileChanged(ValueChangedEvent<FileInfo> selectedFile)
         {
             importButton.Enabled.Value = selectedFile.NewValue != null;
-            currentFileText.Text = selectedFile.NewValue?.Name ?? "Select a file";
+            currentFileText.Text = selectedFile.NewValue?.Name ?? UserInterfaceStrings.SelectFile;
         }
 
         private void startImport(params string[] paths)
