@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
@@ -9,6 +11,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand;
 using osuTK.Input;
@@ -17,8 +20,10 @@ namespace osu.Game.Tests.Visual.RankedPlay
 {
     public partial class TestScenePickScreen : RankedPlayTestScene
     {
-        private RankedPlayScreen screen = null!;
 
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; } = null!;
+        private RankedPlayScreen screen = null!;
         public override void SetUpSteps()
         {
             base.SetUpSteps();
@@ -30,8 +35,13 @@ namespace osu.Game.Tests.Visual.RankedPlay
 
             AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
             AddUntilStep("screen loaded", () => screen.IsLoaded);
+        }
+        [Test]
+        public void Standard()
+        {
+            Ruleset.Value = rulesetStore.GetRuleset(0);
 
-            var requestHandler = new BeatmapRequestHandler();
+            var requestHandler = new BeatmapRequestHandler(this);
 
             AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
 
@@ -47,7 +57,65 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     MultiplayerClient.RankedPlayRevealCard(hand => hand[i2], new MultiplayerPlaylistItem
                     {
                         ID = i2,
-                        BeatmapID = requestHandler.Beatmaps[i2].OnlineID
+                        BeatmapID = requestHandler.APIBeatmaps[i2].OnlineID
+                    }).WaitSafely();
+                }
+            });
+
+            for (int i = 0; i < 3; i++)
+            {
+                int i2 = i;
+                AddStep($"click card {i2}", () =>
+                {
+                    InputManager.MoveMouseTo(this.ChildrenOfType<PlayerHandOfCards.PlayerHandCard>().ElementAt(i2));
+                    InputManager.Click(MouseButton.Left);
+                });
+            }
+
+            AddWaitStep("wait", 3);
+
+            AddStep("click play button", () =>
+            {
+                var button = screen
+                             .ChildrenOfType<PlayerHandOfCards.PlayerHandCard>()
+                             .First(it => it.Selected)
+                             .ChildrenOfType<ShearedButton>()
+                             .First();
+
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
+            });
+        }
+        [Test]
+        public void Mania()
+        {
+            Ruleset.Value = rulesetStore.GetRuleset(3);
+
+            AddStep("join room", () => JoinRoom(CreateDefaultRoom(MatchType.RankedPlay)));
+            WaitForJoined();
+
+            AddStep("add other user", () => MultiplayerClient.AddUser(new MultiplayerRoomUser(2)));
+
+            AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
+            AddUntilStep("screen loaded", () => screen.IsLoaded);
+
+            var requestHandler = new BeatmapRequestHandler(this);
+
+            AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
+
+            AddStep("set pick state", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.CardPlay, state => state.ActiveUserId = API.LocalUser.Value.OnlineID).WaitSafely());
+
+            AddWaitStep("wait some", 5);
+
+            AddStep("reveal cards", () =>
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    int i2 = i;
+                    MultiplayerClient.RankedPlayRevealCard(hand => hand[i2], new MultiplayerPlaylistItem
+                    {
+                        ID = i2,
+                        BeatmapID = requestHandler.APIBeatmaps[i2].OnlineID
                     }).WaitSafely();
                 }
             });

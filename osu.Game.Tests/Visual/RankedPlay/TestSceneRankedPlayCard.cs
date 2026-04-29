@@ -31,10 +31,11 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Cached]
         private readonly SongPreviewParticleContainer particleContainer;
 
-        private readonly BeatmapRequestHandler requestHandler = new BeatmapRequestHandler();
+        private readonly BeatmapRequestHandler requestHandler;
 
         public TestSceneRankedPlayCard()
         {
+            requestHandler = new BeatmapRequestHandler(this);
             base.Content.AddRange(new Drawable[]
             {
                 new OsuContextMenuContainer
@@ -136,7 +137,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     SelectionMode = HandSelectionMode.Single
                 };
 
-                foreach (var beatmap in requestHandler.Beatmaps)
+                foreach (var beatmap in requestHandler.APIBeatmaps)
                 {
                     handOfCards.AddCard(new RevealedRankedPlayCardWithPlaylistItem(beatmap));
                 }

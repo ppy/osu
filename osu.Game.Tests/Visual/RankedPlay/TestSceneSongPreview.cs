@@ -17,12 +17,12 @@ namespace osu.Game.Tests.Visual.RankedPlay
     {
         private readonly Bindable<bool> previewEnabled = new BindableBool(true);
 
-        private readonly BeatmapRequestHandler requestHandler = new BeatmapRequestHandler();
+        private BeatmapRequestHandler? requestHandler;
 
         public override void SetUpSteps()
         {
             base.SetUpSteps();
-
+            requestHandler = new BeatmapRequestHandler(this);
             AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
 
             AddStep("add cards", () =>
@@ -36,8 +36,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     Origin = Anchor.BottomCentre,
                     Size = new Vector2(0.5f),
                 };
-
-                foreach (var beatmap in requestHandler.Beatmaps.Take(3))
+                foreach (var beatmap in requestHandler.APIBeatmaps.Take(3))
                 {
                     handOfCards.AddCard(new RevealedRankedPlayCardWithPlaylistItem(beatmap), handCard =>
                     {

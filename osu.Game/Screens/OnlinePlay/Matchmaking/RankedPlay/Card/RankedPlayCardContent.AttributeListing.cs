@@ -98,7 +98,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                             ]
                         },
                         ..ruleset.GetBeatmapAttributesForDisplay(beatmap, [])
-                                 .Select(attribute => new AttributeRow(attribute))
+                                .Select(attribute =>
+                                    {
+                                        if(attribute.Acronym == "KC" && beatmap.RulesetID==3){
+                                            return new AttributeRow(new RulesetBeatmapAttribute("LN Ratio", "LN Ratio", (float)beatmap.SliderCount/beatmap.TotalObjectCount, (float)beatmap.SliderCount/beatmap.TotalObjectCount, 1));
+                                        }
+                                        return new AttributeRow(attribute);
+                                    }
+                                )
                     ]
                 };
             }
@@ -107,7 +114,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
         private partial class AttributeRow(RulesetBeatmapAttribute attribute) : CompositeDrawable
         {
             private float normalizedValue => float.Clamp(attribute.AdjustedValue / attribute.MaxValue, 0, 1);
-
             [BackgroundDependencyLoader]
             private void load(CardColours colours)
             {
@@ -126,7 +132,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                     new OsuSpriteText
                     {
                         RelativePositionAxes = Axes.X,
-                        Text = attribute.AdjustedValue.ToStandardFormattedString(maxDecimalDigits: 1),
+                        Text = attribute.AdjustedValue.ToStandardFormattedString(maxDecimalDigits: attribute.Acronym == "LN Ratio" ? 3 : 1),
                         Font = OsuFont.GetFont(size: 9, weight: FontWeight.SemiBold),
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreRight,

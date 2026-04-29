@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
             AddUntilStep("screen loaded", () => screen.IsLoaded);
 
-            var requestHandler = new BeatmapRequestHandler();
+            var requestHandler = new BeatmapRequestHandler(this);
 
             AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
 
@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     MultiplayerClient.RankedPlayRevealCard(hand => hand[i2], new MultiplayerPlaylistItem
                     {
                         ID = i2,
-                        BeatmapID = requestHandler.Beatmaps[i2].OnlineID
+                        BeatmapID = requestHandler.APIBeatmaps[i2].OnlineID
                     }).WaitSafely();
                 }
             });
@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddStep("reveal card", () => MultiplayerClient.RankedPlayRevealUserCard(2, hand => hand[0], new MultiplayerPlaylistItem
             {
                 ID = 0,
-                BeatmapID = requestHandler.Beatmaps[0].OnlineID
+                BeatmapID = requestHandler.APIBeatmaps[0].OnlineID
             }).WaitSafely());
         }
     }
