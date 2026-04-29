@@ -105,6 +105,30 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestCancelCollectionCreationViaEscape()
+        {
+            DrawableCollectionListItem placeholderItem = null!;
+
+            AddStep("focus placeholder", () =>
+            {
+                InputManager.MoveMouseTo(placeholderItem = dialog.ChildrenOfType<DrawableCollectionListItem>().Last());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            assertCollectionCount(0);
+
+            AddStep("change collection name", () =>
+            {
+                placeholderItem.ChildrenOfType<TextBox>().First().Text = "test text";
+                InputManager.Key(Key.Escape);
+            });
+
+            assertCollectionCount(0);
+
+            AddAssert("last item is placeholder", () => !dialog.ChildrenOfType<DrawableCollectionListItem>().Last().Model.IsManaged);
+        }
+
+        [Test]
         public void TestAddCollectionViaPlaceholder()
         {
             DrawableCollectionListItem placeholderItem = null!;
