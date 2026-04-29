@@ -129,6 +129,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
             SelectedItems.AddRange(Beatmap.HitObjects.Except(SelectedItems).ToArray());
         }
 
+        protected override void InvertSelection()
+        {
+            Composer.Playfield.KeepAllAlive();
+
+            var toSelect = Beatmap.HitObjects.Except(SelectedItems).ToArray();
+
+            SelectedItems.Clear();
+            SelectedItems.AddRange(toSelect);
+        }
+
         /// <summary>
         /// Ensures that newly-selected hitobjects are kept alive
         /// and drops that keep-alive from newly-deselected objects.
