@@ -80,6 +80,7 @@ namespace osu.Game.Online.Multiplayer
                     connection.On(nameof(IMatchmakingClient.MatchmakingQueueJoined), ((IMatchmakingClient)this).MatchmakingQueueJoined);
                     connection.On(nameof(IMatchmakingClient.MatchmakingQueueLeft), ((IMatchmakingClient)this).MatchmakingQueueLeft);
                     connection.On<MatchmakingRoomInvitationParams>(nameof(IMatchmakingClient.MatchmakingRoomInvitedWithParams), ((IMatchmakingClient)this).MatchmakingRoomInvitedWithParams);
+                    connection.On<MatchmakingDuelIssuedParams>(nameof(IMatchmakingClient.MatchmakingDuelIssued), ((IMatchmakingClient)this).MatchmakingDuelIssued);
                     connection.On<long, string>(nameof(IMatchmakingClient.MatchmakingRoomReady), ((IMatchmakingClient)this).MatchmakingRoomReady);
                     connection.On<MatchmakingLobbyStatus>(nameof(IMatchmakingClient.MatchmakingLobbyStatusChanged), ((IMatchmakingClient)this).MatchmakingLobbyStatusChanged);
                     connection.On<MatchmakingQueueStatus>(nameof(IMatchmakingClient.MatchmakingQueueStatusChanged), ((IMatchmakingClient)this).MatchmakingQueueStatusChanged);
@@ -414,6 +415,24 @@ namespace osu.Game.Online.Multiplayer
 
             Debug.Assert(connection != null);
             return connection.InvokeAsync(nameof(IMatchmakingServer.MatchmakingAcceptInvitation));
+        }
+
+        public override Task<MatchmakingIssueDuelResponse> MatchmakingIssueDuel(MatchmakingIssueDuelRequest request)
+        {
+            if (!IsConnected.Value)
+                return Task.FromResult(new MatchmakingIssueDuelResponse());
+
+            Debug.Assert(connection != null);
+            return connection.InvokeAsync<MatchmakingIssueDuelResponse>(nameof(IMatchmakingServer.MatchmakingIssueDuel), request);
+        }
+
+        public override Task<MatchmakingAcceptDuelResponse> MatchmakingAcceptDuel(MatchmakingAcceptDuelRequest request)
+        {
+            if (!IsConnected.Value)
+                return Task.FromResult(new MatchmakingAcceptDuelResponse());
+
+            Debug.Assert(connection != null);
+            return connection.InvokeAsync<MatchmakingAcceptDuelResponse>(nameof(IMatchmakingServer.MatchmakingAcceptDuel), request);
         }
 
         public override Task MatchmakingDeclineInvitation()
