@@ -25,6 +25,7 @@ using osu.Game.Localisation;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
 using osu.Game.Screens.Play;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -82,6 +83,9 @@ namespace osu.Game.Users
 
         [Resolved]
         private MetadataClient? metadataClient { get; set; }
+
+        [Resolved]
+        private QueueController? queueController { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -180,6 +184,15 @@ namespace osu.Game.Users
                                 multiplayerClient!.InvitePlayer(User.Id);
                         }));
                     }
+
+                    if (canDuelUser())
+                    {
+                        items.Add(new OsuMenuItem("Duel", MenuItemType.Standard, () =>
+                        {
+                            if (canDuelUser())
+                                queueController?.IssueDuel(queueController.SelectedPool.Value!, User.Id);
+                        }));
+                    }
                 }
 
                 return items.ToArray();
@@ -187,6 +200,7 @@ namespace osu.Game.Users
                 bool isUserOnline() => metadataClient?.GetPresence(User.OnlineID) != null;
                 bool canInviteUser() => isUserOnline() && multiplayerClient?.Room?.Users.All(u => u.UserID != User.Id) == true;
                 bool isUserBlocked() => api.LocalUserState.Blocks.Any(b => b.TargetID == User.OnlineID);
+                bool canDuelUser() => isUserOnline() && queueController?.SelectedPool.Value != null;
             }
         }
 
