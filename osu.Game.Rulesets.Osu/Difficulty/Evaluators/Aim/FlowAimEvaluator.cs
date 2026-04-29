@@ -90,16 +90,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 // Scale with ratio of difference compared to 0.5 * max dist.
                 double distRatio = DifficultyCalculationUtils.Smoothstep(Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity), 0, 1);
 
-                // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
-                double overlapVelocityBuff = Math.Min(OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25 / Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime),
-                    Math.Abs(prevVelocity - currVelocity));
-
-                // Reward for % distance slowed down compared to previous, paying attention to not award overlap
-                double nonOverlapVelocityBuff = Math.Abs(prevVelocity - currVelocity)
-                                                // do not award overlap
-                                                * DifficultyCalculationUtils.Smoothstep(Math.Min(osuCurrObj.LazyJumpDistance, osuLastObj.LazyJumpDistance), 0, OsuDifficultyHitObject.NORMALISED_DIAMETER);
-
-                flowDifficulty += Math.Max(overlapVelocityBuff, nonOverlapVelocityBuff) *
+                flowDifficulty += Math.Abs(prevVelocity - currVelocity) *
                                   distRatio *
                                   overlappedNotesWeight *
                                   velocity_change_multiplier;
