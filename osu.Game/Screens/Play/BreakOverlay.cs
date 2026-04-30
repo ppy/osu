@@ -49,7 +49,6 @@ namespace osu.Game.Screens.Play
 
         private readonly IBindable<Period?> currentPeriod = new Bindable<Period?>();
         private Bindable<HUDVisibilityMode> configVisibilityMode;
-        // private readonly List<Drawable> hideTargets;
 
         public BreakOverlay(ScoreProcessor scoreProcessor)
         {
@@ -146,7 +145,7 @@ namespace osu.Game.Screens.Play
             // Logger.Log($"configVisibilityMode = {configVisibilityMode.Value:G}");
             if (configVisibilityMode.Value == HUDVisibilityMode.Never)
             {
-                Logger.Log($"configVisibilityMode = Never, hiding break info");
+                Logger.Log("configVisibilityMode = Never, hiding break info");
                 info.Hide();
             }
             else
