@@ -3,6 +3,7 @@
 
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Objects;
 
@@ -21,29 +22,43 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 return 0.0;
             }
 
-            // Find the previous hit object hit by the current finger, which is n notes prior, n being the number of
-            // available fingers.
             TaikoDifficultyHitObject taikoCurrent = (TaikoDifficultyHitObject)current;
-            TaikoDifficultyHitObject? taikoPrevious = current.Previous(1) as TaikoDifficultyHitObject;
-            TaikoDifficultyHitObject? previousMono = taikoCurrent.PreviousMono(availableFingersFor(taikoCurrent) - 1);
 
-            double objectStrain = 0.5; // Add a base strain to all objects
-            if (taikoPrevious == null) return objectStrain;
-
-            if (previousMono != null)
-                objectStrain += speedBonus(taikoCurrent.StartTime - previousMono.StartTime) + 0.5 * speedBonus(taikoCurrent.StartTime - taikoPrevious.StartTime);
+            // Add a base strain of 0.5 to all objects
+            double objectStrain = 0.5 + speedBonus(taikoCurrent) + monoSpeedBonus(taikoCurrent);
 
             return objectStrain;
         }
 
         /// <summary>
+        /// Applies a speed bonus dependent on the time since the object before last.
+        /// </summary>
+        private static double speedBonus(TaikoDifficultyHitObject current)
+        {
+            TaikoDifficultyHitObject? previous = current.Previous(1) as TaikoDifficultyHitObject;
+
+            if (previous == null)
+                return 0.0;
+
+            // Interval is capped at a very small value to prevent infinite values.
+            double interval = Math.Max(current.StartTime - previous.StartTime, 1);
+
+            return (10 / interval) + 0.2 * DifficultyCalculationUtils.ReverseLerp(interval, 100, 0);
+        }
+
+        /// <summary>
         /// Applies a speed bonus dependent on the time since the last hit performed using this finger.
         /// </summary>
-        /// <param name="interval">The interval between the current and previous note hit using the same finger.</param>
-        private static double speedBonus(double interval)
+        private static double monoSpeedBonus(TaikoDifficultyHitObject current)
         {
+            // Find the previous hit object hit by the current finger, which is n notes prior, n being the number of available fingers.
+            TaikoDifficultyHitObject? previousMono = current.PreviousMono(availableFingersFor(current) - 1);
+
+            if (previousMono == null)
+                return 0.0;
+
             // Interval is capped at a very small value to prevent infinite values.
-            interval = Math.Max(interval, 1);
+            double interval = Math.Max(current.StartTime - previousMono.StartTime, 1);
 
             return 20 / interval;
         }
