@@ -24,6 +24,7 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Ranking.Expanded;
 using osu.Game.Skinning;
 using osu.Game.Users;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -212,6 +213,19 @@ namespace osu.Game.Screens.Play
             double target = Math.Clamp(GameplayClockContainer.CurrentTime + amount * BASE_SEEK_AMOUNT, 0, GameplayState.Beatmap.GetLastObjectTime());
 
             Seek(target);
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Key >= Key.Number0 && e.Key <= Key.Number9)
+            {
+                int digit = e.Key - Key.Number0;
+                double target = (digit / 10.0) * GameplayState.Beatmap.GetLastObjectTime();
+
+                Seek(target);
+            }
+
+            return true;
         }
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
