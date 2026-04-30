@@ -54,7 +54,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             currentStrain *= StrainDecayBase;
             currentStrain += difficulty * SkillMultiplier;
 
-            if (colourData.RepeatingHitPattern.FirstHitObject == taikoObject)
+            bool isNewPattern = colourData.RepeatingHitPattern?.FirstHitObject == taikoObject;
+
+            // Add the average reading difficulty of the previous pattern to the sum when a new pattern is started.
+            if (isNewPattern)
             {
                 weightedTotalDifficultySum += currentPatternDifficultySum / Math.Max(currentPatternLength, 1);
 

@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             bool isHidden = mods.Any(m => m is TaikoModHidden);
             bool isFlashlight = mods.Any(m => m is TaikoModFlashlight);
 
-            // With HDFL, all note objects are invisible and give the maximum reading difficulty
+            // With HDFL, all notes are invisible and give the maximum reading difficulty
             if (isHidden && isFlashlight)
                 return 1.0;
 
@@ -54,6 +54,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             return difficulty;
         }
 
+        /// <summary>
+        /// Calculate the difficulty from a note being at high or low velocity.
+        /// </summary>
         private static double calculateVelocityDifficulty(TaikoDifficultyHitObject noteObject, Mod[] mods)
         {
             double highVelocityDifficulty = 0.0;
@@ -77,7 +80,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             bool isHidden = mods.Any(m => m is TaikoModHidden);
 
             // With hidden, notes that stay invisible for longer before being hit are harder to read
-            if (isHidden) {
+            if (isHidden) 
+            {
                 var lowVelocity = new VelocityRange(280, 140);
 
                 timeInvisibleDifficulty = DifficultyCalculationUtils.Logistic(
@@ -90,6 +94,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             return Math.Max(highVelocityDifficulty, timeInvisibleDifficulty);
         }
 
+        /// <summary>
+        /// Calculate the bonus to EffectiveBPM in high velocity calculation for a note being at low density.
+        /// </summary>
         private static double calculateHighVelocityDensityBonus(TaikoDifficultyHitObject noteObject)
         {
             double density = calculateObjectDensity(noteObject);
@@ -107,6 +114,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             return DifficultyCalculationUtils.Smoothstep(density, 0.9, 0.35);
         }
 
+        /// <summary>
+        /// Calculate the effect on EffectiveBPM in high velocity calculation from reading mods.
+        /// </summary>
         private static double calculateHighVelocityModMultiplier(Mod[] mods)
         {
             bool isHidden = mods.Any(m => m is TaikoModHidden);
@@ -122,7 +132,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 // Considerations for HDHRCL are currently out of scope
                 multiplier *= 1560.0 / 1080.0;
 
-                // Notes fading out after a short time with hidden means their velocity is essentially higher. With easy enabled, notes fade out after longer.
+                // Notes fading out after a short time with hidden means their velocity is essentially higher. With easy enabled, notes take longer to fade out.
                 // Both of these values are arbitrary and based on feedback
                 if (isEasy)
                     multiplier *= 1.1;
@@ -138,6 +148,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             return multiplier;
         }
 
+        /// <summary>
+        /// Calculate the effect on EffectiveBPM in time invisible calculation from reading mods.
+        /// </summary>
         private static double calculateTimeInvisibleModMultiplier(Mod[] mods)
         {
             bool isEasy = mods.Any(m => m is TaikoModEasy);
@@ -145,18 +158,22 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             double multiplier = 1.0;
 
             // With easy enabled, notes fade out later and are invisible for less time. This is equivalent to their effective BPM being higher
+            // This is not the case on lazer, but due to current limitations this cannot be rewarded
             if (isEasy)
                 multiplier *= 1.35;
 
             return multiplier;
         }
 
-        private static double calculateDensityDifficulty(TaikoDifficultyHitObject noteObject)
-        {
-            // Notes at very high density are harder to read
-            return DifficultyCalculationUtils.Logistic(calculateObjectDensity(noteObject), 3.5, 1.5);
-        }
+        /// <summary>
+        /// Calculate the difficulty from a note being at high density.
+        /// </summary>
+        private static double calculateDensityDifficulty(TaikoDifficultyHitObject noteObject) =>
+            DifficultyCalculationUtils.Logistic(calculateObjectDensity(noteObject), 3.5, 1.5);
 
+        /// <summary>
+        /// Calculate the object density of a note.
+        /// </summary>
         private static double calculateObjectDensity(TaikoDifficultyHitObject noteObject)
         {
             if (noteObject.EffectiveBPM == 0 || noteObject.DeltaTime == 0)
