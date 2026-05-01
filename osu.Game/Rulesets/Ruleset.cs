@@ -430,6 +430,7 @@ namespace osu.Game.Rulesets
             yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10);
             yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10);
         }
+
         /// <summary>
         /// Overload of <see cref="GetAdjustedDisplayDifficulty"/> for display on Ranked Cards
         /// </summary>

@@ -31,12 +31,14 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     using var reader = new StreamReader(resourceStream);
                     return JsonConvert.DeserializeObject<APIBeatmap[]>(reader.ReadToEnd())!;
                 }
+
                 case "mania":
                 {
                     using var resourceStream = TestResources.OpenResource("Requests/api-beatmaps-rankedplay-mania4k.json");
                     using var reader = new StreamReader(resourceStream);
                     return JsonConvert.DeserializeObject<APIBeatmap[]>(reader.ReadToEnd())!;
                 }
+
                 default:
                 {
                     using var resourceStream = TestResources.OpenResource("Requests/api-beatmaps-rankedplay.json");
