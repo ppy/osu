@@ -97,7 +97,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                                 },
                             ]
                         },
-                        ..(beatmap.RulesetID==3 ? ruleset.GetBeatmapAttributesForDisplayRankedPlayCard(beatmap, [],beatmap.SliderCount) : ruleset.GetBeatmapAttributesForDisplay(beatmap, []))
+                        ..ruleset.GetBeatmapAttributesForDisplayRankedPlayCard(beatmap, [])
                                 .Select(attribute =>
                                     {
                                         return new AttributeRow(attribute);
@@ -107,6 +107,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                 };
             }
         }
+
 
         private partial class AttributeRow(RulesetBeatmapAttribute attribute) : CompositeDrawable
         {

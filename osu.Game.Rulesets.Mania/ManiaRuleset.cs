@@ -14,6 +14,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
@@ -485,7 +486,7 @@ namespace osu.Game.Rulesets.Mania
             };
         }
 
-        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplayRankedPlayCard(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods, int SliderCount)
+        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplayRankedPlayCard(APIBeatmap beatmapInfo, IReadOnlyCollection<Mod> mods)
         {
             // a special touch-up of key count is required to the original difficulty, since key conversion mods are not `IApplicableToDifficulty`
             var originalDifficulty = new BeatmapDifficulty(beatmapInfo.Difficulty)
@@ -495,7 +496,7 @@ namespace osu.Game.Rulesets.Mania
             var adjustedDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
             var colours = new OsuColour();
 
-            yield return new RulesetBeatmapAttribute("LN Ratio", @"LN Ratio", (float)SliderCount / beatmapInfo.TotalObjectCount, (float)SliderCount / beatmapInfo.TotalObjectCount, 1);
+            yield return new RulesetBeatmapAttribute("LN Ratio", @"LN Ratio", (float)beatmapInfo.SliderCount / beatmapInfo.TotalObjectCount, (float)beatmapInfo.SliderCount / beatmapInfo.TotalObjectCount, 1);
 
             var hitWindows = new ManiaHitWindows();
             hitWindows.SetDifficulty(adjustedDifficulty.OverallDifficulty);
