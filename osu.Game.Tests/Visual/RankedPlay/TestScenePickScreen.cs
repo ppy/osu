@@ -20,7 +20,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
 {
     public partial class TestScenePickScreen : RankedPlayTestScene
     {
-
         [Resolved]
         private RulesetStore rulesetStore { get; set; } = null!;
         private RankedPlayScreen screen = null!;
@@ -39,9 +38,8 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void Standard()
         {
-            Ruleset.Value = rulesetStore.GetRuleset(0);
-
-            var requestHandler = new BeatmapRequestHandler(this);
+            BeatmapRequestHandler requestHandler = null!;
+            AddStep("setup ruleset", () => requestHandler = new BeatmapRequestHandler(rulesetStore.GetRuleset(0)!));
 
             AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
 
@@ -89,9 +87,8 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void Mania()
         {
-            Ruleset.Value = rulesetStore.GetRuleset(3);
-
-            var requestHandler = new BeatmapRequestHandler(this);
+            BeatmapRequestHandler requestHandler = null!;
+            AddStep("setup ruleset", () => requestHandler = new BeatmapRequestHandler(rulesetStore.GetRuleset(0)!));
 
             AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
 

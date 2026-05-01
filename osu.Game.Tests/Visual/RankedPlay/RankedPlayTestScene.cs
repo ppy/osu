@@ -4,12 +4,13 @@
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Allocation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Rooms;
-
+using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual.Multiplayer;
@@ -18,12 +19,14 @@ namespace osu.Game.Tests.Visual.RankedPlay
 {
     public abstract partial class RankedPlayTestScene : MultiplayerTestScene
     {
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; } = null!;
         /// <summary>
         /// Returns 5 sample of the chosen ruleset <see cref="APIBeatmap"/>s.
         /// </summary>
-        protected APIBeatmap[] GetSampleBeatmaps()
+        protected static APIBeatmap[] GetSampleBeatmaps(RulesetInfo ri)
         {
-            switch (Ruleset.Value.ShortName)
+            switch (ri.ShortName)
             {
                 case "osu!":
                 {
@@ -49,9 +52,14 @@ namespace osu.Game.Tests.Visual.RankedPlay
         /// <summary>
         /// A request handler that will resolve api requests to any beatmaps provided by <see cref="GetSampleBeatmaps"/>.
         /// </summary>
-        public class BeatmapRequestHandler(RankedPlayTestScene rt)
+        public class BeatmapRequestHandler
         {
-            public APIBeatmap[] APIBeatmaps = rt.GetSampleBeatmaps();
+            public APIBeatmap[] APIBeatmaps = null!;
+
+            public BeatmapRequestHandler(RulesetInfo ri)
+            {
+                APIBeatmaps = GetSampleBeatmaps(ri);
+            }
             public bool HandleRequest(APIRequest request)
             {
                 switch (request)

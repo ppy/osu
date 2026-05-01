@@ -20,6 +20,8 @@ namespace osu.Game.Tests.Visual.RankedPlay
 {
     public partial class TestSceneRankedPlayCard : RankedPlayTestScene
     {
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; } = null!;
         protected override Container<Drawable> Content { get; }
 
         [Cached]
@@ -31,11 +33,8 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Cached]
         private readonly SongPreviewParticleContainer particleContainer;
 
-        private readonly BeatmapRequestHandler requestHandler;
-
         public TestSceneRankedPlayCard()
         {
-            requestHandler = new BeatmapRequestHandler(this);
             base.Content.AddRange(new Drawable[]
             {
                 new OsuContextMenuContainer
@@ -122,6 +121,8 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void TestCardHand()
         {
+            BeatmapRequestHandler requestHandler = null!;
+            AddStep("setup ruleset", () => requestHandler = new BeatmapRequestHandler(rulesetStore.GetRuleset(0)!));
             AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
 
             AddStep("add cards", () =>
@@ -143,9 +144,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
                 }
             });
         }
-
-        [Resolved]
-        private RulesetStore rulesetStore { get; set; } = null!;
 
         [Test]
         public void TestRulesets()
