@@ -4,7 +4,6 @@
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
-using osu.Framework.Allocation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -19,8 +18,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
 {
     public abstract partial class RankedPlayTestScene : MultiplayerTestScene
     {
-        [Resolved]
-        private RulesetStore rulesetStore { get; set; } = null!;
         /// <summary>
         /// Returns 5 sample of the chosen ruleset <see cref="APIBeatmap"/>s.
         /// </summary>
@@ -54,7 +51,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
         /// </summary>
         public class BeatmapRequestHandler
         {
-            public APIBeatmap[] APIBeatmaps = null!;
+            public APIBeatmap[] APIBeatmaps;
 
             public BeatmapRequestHandler(RulesetInfo ri)
             {

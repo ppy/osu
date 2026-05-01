@@ -15,6 +15,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
     public partial class TestSceneDiscardScreen : RankedPlayTestScene
     {
         private RankedPlayScreen screen = null!;
+
         [Resolved]
         private RulesetStore rulesetStore { get; set; } = null!;
 

@@ -20,6 +20,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
 {
     public partial class TestScenePickScreen : RankedPlayTestScene
     {
+
         [Resolved]
         private RulesetStore rulesetStore { get; set; } = null!;
         private RankedPlayScreen screen = null!;
@@ -35,6 +36,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
             AddUntilStep("screen loaded", () => screen.IsLoaded);
         }
+
         [Test]
         public void Standard()
         {
@@ -84,6 +86,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                 InputManager.Click(MouseButton.Left);
             });
         }
+
         [Test]
         public void Mania()
         {

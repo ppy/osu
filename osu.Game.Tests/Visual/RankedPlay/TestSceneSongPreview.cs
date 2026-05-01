@@ -27,12 +27,12 @@ namespace osu.Game.Tests.Visual.RankedPlay
             base.SetUpSteps();
             BeatmapRequestHandler requestHandler = null!;
             AddStep("setup ruleset", () => requestHandler = new BeatmapRequestHandler(rulesetStore.GetRuleset(0)!));
+
             AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
 
             AddStep("add cards", () =>
             {
                 PlayerHandOfCards handOfCards;
-
                 Child = handOfCards = new PlayerHandOfCards
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -40,6 +40,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     Origin = Anchor.BottomCentre,
                     Size = new Vector2(0.5f),
                 };
+
                 foreach (var beatmap in requestHandler.APIBeatmaps.Take(3))
                 {
                     handOfCards.AddCard(new RevealedRankedPlayCardWithPlaylistItem(beatmap), handCard =>
