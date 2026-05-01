@@ -20,9 +20,9 @@ namespace osu.Game.Tests.Visual.RankedPlay
 {
     public partial class TestScenePickScreen : RankedPlayTestScene
     {
-
         [Resolved]
         private RulesetStore rulesetStore { get; set; } = null!;
+
         private RankedPlayScreen screen = null!;
         public override void SetUpSteps()
         {

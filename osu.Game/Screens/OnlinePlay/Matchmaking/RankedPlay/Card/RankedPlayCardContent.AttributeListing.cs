@@ -97,12 +97,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                                 },
                             ]
                         },
-                        ..ruleset.GetBeatmapAttributesForDisplayRankedPlayCard(beatmap, [])
-                                .Select(attribute =>
-                                    {
-                                        return new AttributeRow(attribute);
-                                    }
-                        )
+                        ..ruleset.GetBeatmapAttributesForDisplayRankedPlayCard(beatmap, []).Select(attribute =>new AttributeRow(attribute))
                     ]
                 };
             }
@@ -112,12 +107,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
         private partial class AttributeRow(RulesetBeatmapAttribute attribute) : CompositeDrawable
         {
             private float normalizedValue => float.Clamp(attribute.AdjustedValue / attribute.MaxValue, 0, 1);
+
             private string getAdjustedValuestring()
             {
                 switch (attribute.Acronym)
                 {
                     case "LN Ratio":
                         return attribute.AdjustedValue.ToString("P1");
+
                     default:
                         return attribute.AdjustedValue.ToStandardFormattedString(maxDecimalDigits: 1);
                 }
