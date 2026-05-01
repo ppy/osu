@@ -485,7 +485,7 @@ namespace osu.Game.Rulesets.Mania
             };
         }
 
-        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods, int SliderCount)
+        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplayRankedPlayCard(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods, int SliderCount)
         {
             // a special touch-up of key count is required to the original difficulty, since key conversion mods are not `IApplicableToDifficulty`
             var originalDifficulty = new BeatmapDifficulty(beatmapInfo.Difficulty)

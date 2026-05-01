@@ -432,7 +432,7 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// Overload of <see cref="GetAdjustedDisplayDifficulty"/> for display on Ranked Cards
         /// </summary>
-        public virtual IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods, int SliderCount)
+        public virtual IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplayRankedPlayCard(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods, int SliderCount)
         {
             var originalDifficulty = beatmapInfo.Difficulty;
             var adjustedDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
