@@ -55,7 +55,12 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnClick(e);
         }
 
-        public void PlayClickSample() =>
+        public void PlayClickSample()
+        {
+            if (MuteSounds.Value)
+                return;
+
             SamplePlaybackHelper.PlayWithRandomPitch(Enabled.Value ? sampleClick : sampleClickDisabled, pitchVariation: 0.01);
+        }
     }
 }
