@@ -96,6 +96,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                     effectiveRatio = Math.Min(sliderEffectiveRatio, effectiveRatio);
                 }
 
+                bool isSpeedingUp = prevDelta > currDelta + deltaDifferenceEpsilon;
+
                 if (firstDeltaSwitch)
                 {
                     if (Math.Abs(prevDelta - currDelta) < deltaDifferenceEpsilon)
@@ -122,6 +124,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                         if (previousIsland.DeltaCount == island.DeltaCount)
                             effectiveRatio *= 0.5;
 
+                        if (isSpeedingUp)
+                            effectiveRatio *= 0.5;
+
                         var islandCount = islandCounts.FirstOrDefault(x => x.Island.Equals(island));
 
                         if (islandCount != default)
@@ -140,7 +145,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                         }
                         else
                         {
-                            islandCounts.Add((island, 1));
+                            if (island.DeltaCount > 0)
+                            {
+                                islandCounts.Add((island, 1));
+                            }
                         }
 
                         // scale down the difficulty if the object is doubletappable
