@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            config.BindWith(OsuSetting.DashboardFriendStatusFilter, Current);
+            config.BindWith(OsuSetting.DashboardStatusFilter, Current);
         }
 
         protected override void LoadComplete()
