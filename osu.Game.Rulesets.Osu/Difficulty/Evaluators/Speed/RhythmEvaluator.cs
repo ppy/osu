@@ -70,6 +70,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                 double prevDelta = Math.Max(prevObj.DeltaTime, 1e-7);
                 double lastDelta = Math.Max(lastObj.DeltaTime, 1e-7);
 
+                // Make sure to always have the current island initialised - if we don't do it here it will only initialise on the next rhythm change
+                if (island.Delta == int.MaxValue)
+                    island = new Island((int)currDelta, deltaDifferenceEpsilon);
+
                 // calculate how much current delta difference deserves a rhythm bonus
                 // this function is meant to reduce rhythm bonus for deltas that are multiples of each other (i.e 100 and 200)
                 double deltaDifference = Math.Max(prevDelta, currDelta) / Math.Min(prevDelta, currDelta);
@@ -98,14 +102,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
 
                 bool isSpeedingUp = prevDelta > currDelta + deltaDifferenceEpsilon;
 
+                if (Math.Abs(prevDelta - currDelta) < deltaDifferenceEpsilon)
+                {
+                    // island is still progressing
+                    island.AddDelta((int)currDelta);
+                }
+
                 if (firstDeltaSwitch)
                 {
-                    if (Math.Abs(prevDelta - currDelta) < deltaDifferenceEpsilon)
-                    {
-                        // island is still progressing
-                        island.AddDelta((int)currDelta);
-                    }
-                    else
+                    if (Math.Abs(prevDelta - currDelta) > deltaDifferenceEpsilon)
                     {
                         // bpm change is into slider, this is easy acc window
                         if (currObj.BaseObject is Slider)
