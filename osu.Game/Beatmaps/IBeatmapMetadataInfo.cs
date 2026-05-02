@@ -62,6 +62,16 @@ namespace osu.Game.Beatmaps
         /// </summary>
         string BackgroundFile { get; }
 
+        /// <summary>
+        /// Horizontal offset in pixels of the legacy Background event (fourth column in <c>[Events]</c>).
+        /// </summary>
+        float BackgroundOffsetX { get; }
+
+        /// <summary>
+        /// Vertical offset in pixels of the legacy Background event (fifth column in <c>[Events]</c>).
+        /// </summary>
+        float BackgroundOffsetY { get; }
+
         bool IEquatable<IBeatmapMetadataInfo>.Equals(IBeatmapMetadataInfo? other)
         {
             if (other == null)
@@ -76,7 +86,9 @@ namespace osu.Game.Beatmaps
                    && Tags == other.Tags
                    && PreviewTime == other.PreviewTime
                    && AudioFile == other.AudioFile
-                   && BackgroundFile == other.BackgroundFile;
+                   && BackgroundFile == other.BackgroundFile
+                   && BackgroundOffsetX.Equals(other.BackgroundOffsetX)
+                   && BackgroundOffsetY.Equals(other.BackgroundOffsetY);
         }
     }
 }

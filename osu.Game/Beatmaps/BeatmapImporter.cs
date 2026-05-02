@@ -433,6 +433,8 @@ namespace osu.Game.Beatmaps
                         PreviewTime = decoded.Metadata.PreviewTime,
                         AudioFile = decoded.Metadata.AudioFile,
                         BackgroundFile = decoded.Metadata.BackgroundFile,
+                        BackgroundOffsetX = decoded.Metadata.BackgroundOffsetX,
+                        BackgroundOffsetY = decoded.Metadata.BackgroundOffsetY,
                     };
 
                     var beatmap = new BeatmapInfo(ruleset, difficulty, metadata)
