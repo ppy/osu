@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -186,11 +185,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private void onMatchmakingDuelIssued(MatchmakingDuelIssuedParams duel)
         {
-            users.GetUserAsync(duel.UserId)
-                 .ContinueWith(u => Scheduler.Add(() =>
-                 {
-                     notifications?.Post(new DuelNotification(this, u.GetResultSafely()!, duel));
-                 }), TaskContinuationOptions.OnlyOnRanToCompletion);
+            handleDuelRequestAsync().FireAndForget();
+
+            async Task handleDuelRequestAsync()
+            {
+                APIUser? user = await users.GetUserAsync(duel.UserId).ConfigureAwait(false);
+
+                if (user == null)
+                    return;
+
+                Scheduler.Add(() => notifications?.Post(new DuelNotification(this, user, duel)));
+            }
         }
 
         private void onMatchmakingRoomReady(long roomId, string password) => Scheduler.Add(() =>
