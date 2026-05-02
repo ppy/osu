@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
@@ -33,6 +34,12 @@ namespace osu.Game.Overlays.Dashboard.Friends
                 OnlineStatus.Online,
                 OnlineStatus.Offline
             ];
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.DashboardFriendStatusFilter, Current);
         }
 
         protected override void LoadComplete()
