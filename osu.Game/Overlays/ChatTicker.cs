@@ -30,13 +30,10 @@ namespace osu.Game.Overlays
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
 
-            AddRange(new Drawable[]
+            Add(new Box
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(0.1f),
-                }
+                RelativeSizeAxes = Axes.Both,
+                Colour = OsuColour.Gray(0.1f),
             });
 
             config.BindWith(OsuSetting.ChatTicker, showChatTicker);
@@ -59,9 +56,9 @@ namespace osu.Game.Overlays
             }
 
             if (tickerLine != null)
-                RemoveInternal(tickerLine, false);
+                Remove(tickerLine, false);
 
-            AddInternal(tickerLine = new TickerLine(message));
+            Add(tickerLine = new TickerLine(message));
 
             State.Value = Visibility.Visible;
             var seq = this.FadeOutFromOne(10000);
