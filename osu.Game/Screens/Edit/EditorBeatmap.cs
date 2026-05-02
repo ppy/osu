@@ -11,6 +11,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Lists;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
@@ -18,6 +19,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Edit
@@ -525,6 +527,99 @@ namespace osu.Game.Screens.Edit
         }
 
         public double SnapTime(double time, double? referenceTime) => ControlPointInfo.GetClosestSnappedTime(time, BeatDivisor, referenceTime);
+
+        /// <summary>
+        /// Snaps every hit object's start time (and end time when applicable) to the current beat divisor grid.
+        /// </summary>
+        public void SnapAllHitObjectsToCurrentGrid()
+        {
+            if (HitObjects.Count == 0)
+                return;
+
+            BeginChange();
+
+            foreach (var hitObject in HitObjects.ToArray())
+            {
+                double oldStart = hitObject.StartTime;
+                double oldEnd = hitObject.GetEndTime();
+
+                double newStart = SnapTime(oldStart, null);
+                double newEnd = SnapTime(oldEnd, null);
+                double minBeatStep = GetBeatLengthAtTime(newStart);
+
+                if (newEnd < newStart + minBeatStep)
+                    newEnd = newStart + minBeatStep;
+
+                bool changed = false;
+
+                switch (hitObject)
+                {
+                    // Sliders and juice streams: end time comes from path length and velocity, so scale slider velocity to match the snapped duration.
+                    case IHasPathWithRepeats and IHasSliderVelocity sv:
+                    {
+                        double oldDuration = oldEnd - oldStart;
+                        double newDurationTarget = newEnd - newStart;
+
+                        if (!Precision.AlmostEquals(oldStart, newStart))
+                        {
+                            hitObject.StartTime = newStart;
+                            changed = true;
+                        }
+
+                        if (oldDuration > 0 && !Precision.AlmostEquals(oldDuration, newDurationTarget))
+                        {
+                            double scaledMultiplier = sv.SliderVelocityMultiplier * (oldDuration / newDurationTarget);
+                            scaledMultiplier = Math.Clamp(scaledMultiplier, sv.SliderVelocityMultiplierBindable.MinValue, sv.SliderVelocityMultiplierBindable.MaxValue);
+
+                            if (!Precision.AlmostEquals(sv.SliderVelocityMultiplier, scaledMultiplier))
+                            {
+                                sv.SliderVelocityMultiplier = scaledMultiplier;
+                                changed = true;
+                            }
+                        }
+
+                        break;
+                    }
+
+                    // Long notes with a real duration (spinners, hold notes, swells, etc.).
+                    case IHasDuration hasDuration:
+                    {
+                        if (!Precision.AlmostEquals(oldStart, newStart))
+                        {
+                            hitObject.StartTime = newStart;
+                            changed = true;
+                        }
+
+                        double newDuration = newEnd - newStart;
+
+                        if (!Precision.AlmostEquals(hasDuration.Duration, newDuration))
+                        {
+                            hasDuration.Duration = newDuration;
+                            changed = true;
+                        }
+
+                        break;
+                    }
+
+                    // Hit circles and other objects: only the start time is snapped.
+                    default:
+                    {
+                        if (!Precision.AlmostEquals(oldStart, newStart))
+                        {
+                            hitObject.StartTime = newStart;
+                            changed = true;
+                        }
+
+                        break;
+                    }
+                }
+
+                if (changed)
+                    Update(hitObject);
+            }
+
+            EndChange();
+        }
 
         public double GetBeatLengthAtTime(double referenceTime) => ControlPointInfo.TimingPointAt(referenceTime).BeatLength / BeatDivisor;
 
