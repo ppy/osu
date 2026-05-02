@@ -28,16 +28,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             IncludeSliders = includeSliders;
         }
 
+        protected override double DecayWeight => 0.91;
         protected override double MaxStoredSections => 10000;
 
         private double currentStrain;
 
         private double skillMultiplierSnap => 70.9;
         private double skillMultiplierAgility => 2.35;
-        private double skillMultiplierFlow => 252.0;
+        private double skillMultiplierFlow => 277.0;
         private double skillMultiplierTotal => 1.12;
-        private double combinedSnapNormExponent => 1.2;
-        private double lengthBonus => 1.1;
+        private double combinedSnapNormExponent => 1.0;
+        private double lengthBonus => 1.5;
+        private double strainWeightSum;
 
         private readonly List<double> sliderStrains = new List<double>();
 
@@ -133,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (sliderStrains.Count == 0)
                 return 0;
 
-            double consistentTopStrain = difficultyValue * (1 - DecayWeight); // What would the top strain be if all strain values were identical
+            double consistentTopStrain = difficultyValue / strainWeightSum; // What would the top strain be if all strain values were identical
 
             if (consistentTopStrain == 0)
                 return 0;
@@ -174,6 +176,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 double weight = (Math.Pow(DecayWeight, startTime) - Math.Pow(DecayWeight, endTime)) / Math.Log(1 / DecayWeight)
                                 + lengthBonus * (Math.Log(1 / (startTime + 50)) - Math.Log(1 / (endTime + 50)));
 
+                strainWeightSum += weight;
+
                 difficulty += strain.Value * weight;
                 time = endTime;
             }
@@ -194,6 +198,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             List<StrainPeak> strains = peaks.OrderByDescending(p => p.Value).ToList();
 
             return strains.OrderByDescending(p => p.Value);
+        }
+
+        public override double CountTopWeightedStrains(double difficultyValue)
+        {
+            if (ObjectDifficulties.Count == 0)
+                return 0.0;
+
+            double consistentTopStrain = difficultyValue / strainWeightSum; // What would the top strain be if all strain values were identical
+
+            if (consistentTopStrain == 0)
+                return ObjectDifficulties.Count;
+
+            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
+            return ObjectDifficulties.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
         }
     }
 }
