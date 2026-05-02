@@ -203,8 +203,6 @@ namespace osu.Game
 
         private FPSCounter fpsCounter;
 
-        private ChatTicker chatTicker;
-
         private VolumeOverlay volume;
 
         private OsuLogo osuLogo;
@@ -1208,7 +1206,7 @@ namespace osu.Game
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(API), Add, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(chatTicker = new ChatTicker(), topMostOverlayContent.Add, true);
+            loadComponentSingleFile(new ChatTicker(), topMostOverlayContent.Add, true);
             loadComponentSingleFile(new MessageNotifier(), Add, true);
             loadComponentSingleFile(Settings = new SettingsOverlay(), leftFloatingOverlayContent.Add, true);
             loadComponentSingleFile(changelogOverlay = new ChangelogOverlay(), overlayContent.Add, true);
