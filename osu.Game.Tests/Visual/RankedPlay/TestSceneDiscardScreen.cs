@@ -1,11 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
 
 namespace osu.Game.Tests.Visual.RankedPlay
@@ -13,6 +15,9 @@ namespace osu.Game.Tests.Visual.RankedPlay
     public partial class TestSceneDiscardScreen : RankedPlayTestScene
     {
         private RankedPlayScreen screen = null!;
+
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; } = null!;
 
         public override void SetUpSteps()
         {
@@ -26,7 +31,8 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
             AddUntilStep("screen loaded", () => screen.IsLoaded);
 
-            var requestHandler = new BeatmapRequestHandler();
+            BeatmapRequestHandler requestHandler = null!;
+            AddStep("setup ruleset", () => requestHandler = new BeatmapRequestHandler(rulesetStore.GetRuleset(0)!));
 
             AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
 
@@ -42,7 +48,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     MultiplayerClient.RankedPlayRevealCard(hand => hand[i2], new MultiplayerPlaylistItem
                     {
                         ID = i2,
-                        BeatmapID = requestHandler.Beatmaps[i2].OnlineID
+                        BeatmapID = requestHandler.APIBeatmaps[i2].OnlineID
                     }).WaitSafely();
                 }
             });

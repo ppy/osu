@@ -97,17 +97,28 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                                 },
                             ]
                         },
-                        ..ruleset.GetBeatmapAttributesForDisplay(beatmap, [])
-                                 .Select(attribute => new AttributeRow(attribute))
+                        ..ruleset.GetBeatmapAttributesForDisplayRankedPlayCard(beatmap, []).Select(attribute => new AttributeRow(attribute))
                     ]
                 };
             }
         }
 
+
         private partial class AttributeRow(RulesetBeatmapAttribute attribute) : CompositeDrawable
         {
             private float normalizedValue => float.Clamp(attribute.AdjustedValue / attribute.MaxValue, 0, 1);
 
+            private string getAdjustedValuestring()
+            {
+                switch (attribute.Acronym)
+                {
+                    case "LN Ratio":
+                        return attribute.AdjustedValue.ToString("P1");
+
+                    default:
+                        return attribute.AdjustedValue.ToStandardFormattedString(maxDecimalDigits: 1);
+                }
+            }
             [BackgroundDependencyLoader]
             private void load(CardColours colours)
             {
@@ -126,7 +137,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                     new OsuSpriteText
                     {
                         RelativePositionAxes = Axes.X,
-                        Text = attribute.AdjustedValue.ToStandardFormattedString(maxDecimalDigits: 1),
+                        Text = getAdjustedValuestring(),
                         Font = OsuFont.GetFont(size: 9, weight: FontWeight.SemiBold),
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreRight,

@@ -3,10 +3,12 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Online.API;
+using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand;
 using osuTK;
@@ -17,18 +19,20 @@ namespace osu.Game.Tests.Visual.RankedPlay
     {
         private readonly Bindable<bool> previewEnabled = new BindableBool(true);
 
-        private readonly BeatmapRequestHandler requestHandler = new BeatmapRequestHandler();
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; } = null!;
 
         public override void SetUpSteps()
         {
             base.SetUpSteps();
+            BeatmapRequestHandler requestHandler = null!;
+            AddStep("setup ruleset", () => requestHandler = new BeatmapRequestHandler(rulesetStore.GetRuleset(0)!));
 
             AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
 
             AddStep("add cards", () =>
             {
                 PlayerHandOfCards handOfCards;
-
                 Child = handOfCards = new PlayerHandOfCards
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -37,7 +41,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     Size = new Vector2(0.5f),
                 };
 
-                foreach (var beatmap in requestHandler.Beatmaps.Take(3))
+                foreach (var beatmap in requestHandler.APIBeatmaps.Take(3))
                 {
                     handOfCards.AddCard(new RevealedRankedPlayCardWithPlaylistItem(beatmap), handCard =>
                     {

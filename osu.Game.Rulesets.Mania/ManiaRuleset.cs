@@ -14,6 +14,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
@@ -484,6 +485,41 @@ namespace osu.Game.Rulesets.Mania
                 Description = "Affects the harshness of health drain and the health penalties for missing."
             };
         }
+
+        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplayRankedPlayCard(APIBeatmap beatmapInfo, IReadOnlyCollection<Mod> mods)
+        {
+            // a special touch-up of key count is required to the original difficulty, since key conversion mods are not `IApplicableToDifficulty`
+            var originalDifficulty = new BeatmapDifficulty(beatmapInfo.Difficulty)
+            {
+                CircleSize = ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), [])
+            };
+            var adjustedDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+            var colours = new OsuColour();
+
+            yield return new RulesetBeatmapAttribute("LN Ratio", @"LN Ratio", (float)beatmapInfo.SliderCount / beatmapInfo.TotalObjectCount, (float)beatmapInfo.SliderCount / beatmapInfo.TotalObjectCount, 1);
+
+            var hitWindows = new ManiaHitWindows();
+            hitWindows.SetDifficulty(adjustedDifficulty.OverallDifficulty);
+            hitWindows.IsConvert = !beatmapInfo.Ruleset.Equals(RulesetInfo);
+            hitWindows.ClassicModActive = mods.Any(m => m is ManiaModClassic);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10)
+            {
+                Description = "Affects timing requirements for notes.",
+                AdditionalMetrics = hitWindows.GetAllAvailableWindows()
+                                              .Reverse()
+                                              .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
+                                                  $"{window.result.GetDescription().ToUpperInvariant()} hit window",
+                                                  LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result):0.##} ms"),
+                                                  colours.ForHitResult(window.result)
+                                              )).ToArray()
+            };
+
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10)
+            {
+                Description = "Affects the harshness of health drain and the health penalties for missing."
+            };
+        }
+
 
         public override IRulesetFilterCriteria CreateRulesetFilterCriteria()
         {

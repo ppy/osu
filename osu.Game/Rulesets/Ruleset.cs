@@ -19,6 +19,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Localisation;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
@@ -428,6 +429,14 @@ namespace osu.Game.Rulesets
             yield return new RulesetBeatmapAttribute(SongSelectStrings.ApproachRate, @"AR", originalDifficulty.ApproachRate, adjustedDifficulty.ApproachRate, 10);
             yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10);
             yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10);
+        }
+
+        /// <summary>
+        /// Overload of <see cref="GetAdjustedDisplayDifficulty"/> for display on Ranked Cards
+        /// </summary>
+        public virtual IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplayRankedPlayCard(APIBeatmap beatmapInfo, IReadOnlyCollection<Mod> mods)
+        {
+            return GetBeatmapAttributesForDisplay(beatmapInfo, mods);
         }
 
         /// <summary>
