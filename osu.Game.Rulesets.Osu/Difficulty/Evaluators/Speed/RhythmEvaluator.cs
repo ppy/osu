@@ -190,7 +190,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                 prevObj = currObj;
             }
 
-            return Math.Sqrt(4 + rhythmComplexitySum * rhythm_overall_multiplier) / 2.0; // produces multiplier that can be applied to strain. range [1, infinity) (not really though);
+            return Math.Sqrt(4 + rhythmComplexitySum * 0.9) / 2.0; // produces multiplier that can be applied to strain. range [1, infinity) (not really though);
         }
 
         private static double getEffectiveRatio(double deltaDifference)
@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
             // Take only the fractional part of the value since we're only interested in punishing multiples
             double deltaDifferenceFraction = deltaDifference - Math.Truncate(deltaDifference);
 
-            return 1.0 + rhythm_ratio_multiplier * Math.Min(0.5, DifficultyCalculationUtils.SmoothstepBellCurve(deltaDifferenceFraction));
+            return 1.0 + 28 * Math.Min(0.5, DifficultyCalculationUtils.SmoothstepBellCurve(deltaDifferenceFraction));
         }
 
         private class Island : IEquatable<Island>
