@@ -231,6 +231,16 @@ namespace osu.Game.Overlays.Chat
             profileOverlay?.ShowUser(user);
         }
 
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (!Enabled.Value)
+            {
+                return false;
+            }
+
+            return base.OnClick(e);
+        }
+
         protected override bool OnHover(HoverEvent e)
         {
             if (Enabled.Value)
