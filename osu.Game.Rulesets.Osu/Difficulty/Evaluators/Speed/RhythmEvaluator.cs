@@ -196,7 +196,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
             }
 
             // If the current island is long we don't want the sum to have as big of an effect
-            rhythmComplexitySum *= Math.Clamp(1.1 - 0.05 * island.DeltaCount, 0, 1);
+            rhythmComplexitySum *= DifficultyCalculationUtils.ReverseLerp(island.DeltaCount, 22, 3);
 
             return Math.Sqrt(4 + rhythmComplexitySum * rhythm_overall_multiplier) / 2.0; // produces multiplier that can be applied to strain. range [1, infinity) (not really though);
         }
