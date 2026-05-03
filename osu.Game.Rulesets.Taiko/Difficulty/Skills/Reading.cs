@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Objects;
 using System;
-using System.Linq;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
@@ -23,10 +22,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
         private double currentPatternLength;
         private double currentPatternDifficultySum;
-        public double weightedTotalDifficultySum;
+        public double WeightedTotalDifficultySum;
 
         private double currentStrain;
-        private Mod[] mods;
+        private readonly Mod[] mods;
 
         public Reading(Mod[] mods)
             : base(mods)
@@ -59,7 +58,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             // Add the average reading difficulty of the previous pattern to the sum when a new pattern is started.
             if (isNewPattern)
             {
-                weightedTotalDifficultySum += currentPatternDifficultySum / Math.Max(currentPatternLength, 1);
+                WeightedTotalDifficultySum += currentPatternDifficultySum / Math.Max(currentPatternLength, 1);
 
                 currentPatternLength = 0;
                 currentPatternDifficultySum = 0;

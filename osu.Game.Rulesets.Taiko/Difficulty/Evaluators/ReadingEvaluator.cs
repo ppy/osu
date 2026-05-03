@@ -14,15 +14,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
     {
         private readonly struct VelocityRange
         {
-            public double Min { get; }
-            public double Max { get; }
-            public double Center => (Max + Min) / 2;
-            public double Range => Max - Min;
+            private double min { get; }
+            private double max { get; }
+            public double Center => (max + min) / 2;
+            public double Range => max - min;
 
             public VelocityRange(double min, double max)
             {
-                Min = min;
-                Max = max;
+                this.min = min;
+                this.max = max;
             }
         }
 
@@ -80,16 +80,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             bool isHidden = mods.Any(m => m is TaikoModHidden);
 
             // With hidden, notes that stay invisible for longer before being hit are harder to read
-            if (isHidden) 
-            {
-                var lowVelocity = new VelocityRange(280, 140);
+            if (!isHidden) return Math.Max(highVelocityDifficulty, timeInvisibleDifficulty);
 
-                timeInvisibleDifficulty = DifficultyCalculationUtils.Logistic(
-                    noteObject.EffectiveBPM * calculateTimeInvisibleModMultiplier(mods),
-                    lowVelocity.Center,
-                    10.0 / lowVelocity.Range
-                );
-            }
+            var lowVelocity = new VelocityRange(280, 140);
+
+            timeInvisibleDifficulty = DifficultyCalculationUtils.Logistic(
+                noteObject.EffectiveBPM * calculateTimeInvisibleModMultiplier(mods),
+                lowVelocity.Center,
+                10.0 / lowVelocity.Range
+            );
 
             return Math.Max(highVelocityDifficulty, timeInvisibleDifficulty);
         }
@@ -126,7 +125,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             double multiplier = 1.0;
 
             if (isHidden)
-            {	
+            {
                 // With hidden enabled, the playfield is limited from the expected 1560px wide (equivalent to 16:9) to only 1080px (4:3)
                 // This is not the case with the classic mod enabled, but due to current limitations this is penalised in performance calculation instead
                 // Considerations for HDHRCL are currently out of scope
