@@ -19,6 +19,8 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;
 
+        public bool StopRollingOnLoad { get; init; } = true;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -47,7 +49,8 @@ namespace osu.Game.Screens.Play.HUD
             // then its initial value is 0%, rather than the 100% that the base PercentageCounter assumes.
             // to counteract this, manually finish transforms on DisplayedCount once after the initial callback above
             // to stop it from rolling down from 100% to 0%.
-            FinishTransforms(targetMember: nameof(DisplayedCount));
+            if (StopRollingOnLoad)
+                StopRolling();
         }
 
         public enum AccuracyDisplayMode
