@@ -57,21 +57,37 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
+            if (Mods.Any(m => m is OsuModAutopilot))
+                return 0;
+
             double decay = strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
 
+            currentStrain *= decay;
+            currentStrain += calculateAdjustedDifficulty(current) * (1 - decay);
+
+            if (current.BaseObject is Slider)
+                sliderStrains.Add(currentStrain);
+
+            return currentStrain;
+        }
+
+        private double calculateAdjustedDifficulty(DifficultyHitObject current)
+        {
             double snapDifficulty = SnapAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierSnap;
             double agilityDifficulty = AgilityEvaluator.EvaluateDifficultyOf(current) * skillMultiplierAgility;
             double flowDifficulty = FlowAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierFlow;
 
             double totalDifficulty = calculateTotalValue(snapDifficulty, agilityDifficulty, flowDifficulty);
 
-            currentStrain *= decay;
-            currentStrain += totalDifficulty * (1 - decay);
+            if (Mods.Any(m => m is OsuModMagnetised))
+            {
+                float magnetisedStrength = Mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
+                totalDifficulty *= 1.0 - magnetisedStrength;
+            }
 
-            if (current.BaseObject is Slider)
-                sliderStrains.Add(currentStrain);
+            totalDifficulty *= 0.99 + Math.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2) / 5500;
 
-            return currentStrain;
+            return totalDifficulty;
         }
 
         private double calculateTotalValue(double snapDifficulty, double agilityDifficulty, double flowDifficulty)
