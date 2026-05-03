@@ -24,11 +24,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             // Find the previous hit object hit by the current finger, which is n notes prior, n being the number of
             // available fingers.
             TaikoDifficultyHitObject taikoCurrent = (TaikoDifficultyHitObject)current;
-            TaikoDifficultyHitObject? taikoPrevious = current.Previous(1) as TaikoDifficultyHitObject;
             TaikoDifficultyHitObject? previousMono = taikoCurrent.PreviousMono(availableFingersFor(taikoCurrent) - 1);
 
             double objectStrain = 0.5; // Add a base strain to all objects
-            if (taikoPrevious == null) return objectStrain;
+            if (current.Previous(1) is not TaikoDifficultyHitObject taikoPrevious) return objectStrain;
 
             if (previousMono != null)
                 objectStrain += speedBonus(taikoCurrent.StartTime - previousMono.StartTime) + 0.5 * speedBonus(taikoCurrent.StartTime - taikoPrevious.StartTime);

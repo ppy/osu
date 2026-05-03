@@ -102,15 +102,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
             // Single note gaps in otherwise dense sections would overly award the bonus for low density
             // As a result, the higher density out of both the current and previous note is used
-            var prevNoteObject = (TaikoDifficultyHitObject) noteObject.Previous(0);
+            var prevNoteObject = (TaikoDifficultyHitObject)noteObject.Previous(0);
 
-            if (prevNoteObject != null)
-            {
-                double prevDensity = calculateObjectDensity(prevNoteObject);
-                return DifficultyCalculationUtils.Smoothstep(Math.Max(density, prevDensity), 0.9, 0.35);
-            }
+            if (prevNoteObject == null) return DifficultyCalculationUtils.Smoothstep(density, 0.9, 0.35);
 
-            return DifficultyCalculationUtils.Smoothstep(density, 0.9, 0.35);
+            double prevDensity = calculateObjectDensity(prevNoteObject);
+            return DifficultyCalculationUtils.Smoothstep(Math.Max(density, prevDensity), 0.9, 0.35);
         }
 
         /// <summary>
