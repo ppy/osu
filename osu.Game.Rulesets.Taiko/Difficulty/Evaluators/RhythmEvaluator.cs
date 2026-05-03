@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             if (previousOrNull == null)
                 return 1.0;
 
-            SameRhythmHitObjectGrouping previous = (SameRhythmHitObjectGrouping) previousOrNull;
+            SameRhythmHitObjectGrouping previous = previousOrNull;
 
             double gapInterval = previous.FirstHitObject.DeltaTime;
             double rhythmInterval = previous.HitObjectInterval ?? gapInterval;
