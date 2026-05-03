@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual float UsernameWidth => 150;
 
-        protected bool UsernameIsClickable { get; init; }
+        protected bool UsernameIsClickable { get; init; } = true;
 
         [Resolved]
         private ChannelManager? chatManager { get; set; }
