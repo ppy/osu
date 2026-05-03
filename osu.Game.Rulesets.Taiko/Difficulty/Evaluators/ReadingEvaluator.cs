@@ -59,7 +59,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// </summary>
         private static double calculateVelocityDifficulty(TaikoDifficultyHitObject noteObject, Mod[] mods)
         {
-            double highVelocityDifficulty = 0.0;
             double timeInvisibleDifficulty = 0.0;
 
             // To allow high velocity sections at lower actual BPM to award similar difficulty to high BPM sections with more frequent objects,
@@ -71,7 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                 1000 - 275 * densityBonus
             );
 
-            highVelocityDifficulty = DifficultyCalculationUtils.Logistic(
+            double highVelocityDifficulty = DifficultyCalculationUtils.Logistic(
                 noteObject.EffectiveBPM * calculateHighVelocityModMultiplier(mods),
                 highVelocity.Center,
                 10.0 / highVelocity.Range
