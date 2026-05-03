@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
+using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
@@ -40,12 +41,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double decay = strainDecay(current.DeltaTime);
 
             currentStrain *= decay;
-            currentStrain += calculateModAdjustedDifficulty(current) * (1 - decay) * skillMultiplier;
+            currentStrain += calculateAdjustedDifficulty(current) * (1 - decay) * skillMultiplier;
 
             return currentStrain;
         }
 
-        private double calculateModAdjustedDifficulty(DifficultyHitObject current)
+        private double calculateAdjustedDifficulty(DifficultyHitObject current)
         {
             double difficulty = ReadingEvaluator.EvaluateDifficultyOf(current, hasHiddenMod);
 
@@ -63,6 +64,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (Mods.Any(m => m is OsuModAutopilot))
                 difficulty *= 0.1;
+
+            difficulty *= 0.755 + Math.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2.2) / 900;
 
             return difficulty;
         }

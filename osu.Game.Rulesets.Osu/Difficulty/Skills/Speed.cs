@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double decay = strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
 
             currentStrain *= decay;
-            currentStrain += calculateModAdjustedDifficulty(current) * (1 - decay) * skillMultiplier;
+            currentStrain += calculateAdjustedDifficulty(current) * (1 - decay) * skillMultiplier;
 
             double currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
 
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return totalStrain;
         }
 
-        private double calculateModAdjustedDifficulty(DifficultyHitObject current)
+        private double calculateAdjustedDifficulty(DifficultyHitObject current)
         {
             double difficulty = SpeedEvaluator.EvaluateDifficultyOf(current);
 
