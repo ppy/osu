@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -655,7 +656,8 @@ namespace osu.Game.Database
 
             if (metadataSourceFetchDate <= lastPopulation)
             {
-                Logger.Log($@"Skipping user tag population because the local metadata source hasn't been updated since the last time user tags were checked ({lastPopulation.Value:d})");
+                Logger.Log(
+                    $@"Skipping user tag population because the local metadata source hasn't been updated since the last time user tags were checked ({lastPopulation.Value.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)})");
                 return;
             }
 
@@ -675,9 +677,11 @@ namespace osu.Game.Database
 
             Logger.Log($@"Found {beatmapIds.Count} beatmaps with missing user tags.");
 
-            var notification = showProgressNotification(beatmapIds.Count, @"Populating missing user tags", @"beatmaps have had their tags updated.");
+            var notification = showProgressNotification(beatmapIds.Count, @"Populating missing user tags",
+                @"beatmaps have had their tags updated. This runs once a month to allow searching user tags.");
 
             int processedCount = 0;
+            int updatedCount = 0;
             int failedCount = 0;
 
             foreach (var id in beatmapIds)
@@ -691,33 +695,37 @@ namespace osu.Game.Database
 
                 try
                 {
-                    // Can't use async overload because we're not on the update thread.
-                    // ReSharper disable once MethodHasAsyncOverload
-                    realmAccess.Write(r =>
+                    var beatmap = realmAccess.Run(r => r.Find<BeatmapInfo>(id)?.Detach());
+
+                    if (beatmap == null) continue;
+
+                    bool lookupSucceeded = localMetadataSource.TryLookup(beatmap, out var result);
+
+                    if (lookupSucceeded)
                     {
-                        BeatmapInfo beatmap = r.Find<BeatmapInfo>(id)!;
+                        Debug.Assert(result != null);
 
-                        bool lookupSucceeded = localMetadataSource.TryLookup(beatmap, out var result);
+                        HashSet<string> userTags = result.UserTags.ToHashSet();
 
-                        if (lookupSucceeded)
+                        if (!userTags.SetEquals(beatmap.Metadata.UserTags))
                         {
-                            Debug.Assert(result != null);
-
-                            var userTags = result.UserTags.ToHashSet();
-
-                            if (!userTags.SetEquals(beatmap.Metadata.UserTags))
+                            ++updatedCount;
+                            realmAccess.Write(r =>
                             {
+                                beatmap = r.Find<BeatmapInfo>(id);
+
+                                if (beatmap == null)
+                                    return;
+
                                 beatmap.Metadata.UserTags.Clear();
                                 beatmap.Metadata.UserTags.AddRange(userTags);
-                                return true;
-                            }
-
-                            return false;
+                            });
                         }
-
+                    }
+                    else
+                    {
                         Logger.Log(@$"Could not find {beatmap.GetDisplayString()} in local cache while backpopulating missing user tags");
-                        return false;
-                    });
+                    }
 
                     ++processedCount;
                 }
@@ -732,7 +740,9 @@ namespace osu.Game.Database
                 }
             }
 
-            completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
+            // Report the updated item count rather than the total processed. Users don't really care about noops here.
+            completeNotification(notification, updatedCount, updatedCount, failedCount);
+
             config.SetValue(OsuSetting.LastOnlineTagsPopulation, metadataSourceFetchDate);
         }
 
@@ -753,7 +763,11 @@ namespace osu.Game.Database
             if (notification == null)
                 return;
 
-            if (processedCount == totalCount)
+            if (totalCount == 0)
+            {
+                notification.CompleteSilently();
+            }
+            else if (processedCount == totalCount)
             {
                 notification.CompletionText = $"{processedCount} {notification.CompletionText}";
                 notification.Progress = 1;

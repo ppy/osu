@@ -75,6 +75,13 @@ namespace osu.Game.Beatmaps
 
             currentMods.BindValueChanged(mods =>
             {
+                // A change in bindable here doesn't guarantee that mods have actually changed.
+                // However, we *do* want to make sure that the mod *references* are the same;
+                // `SequenceEqual()` without a comparer would fall back to `IEquatable`.
+                // Failing to ensure reference equality can cause setting change tracking to fail later.
+                if (mods.OldValue.SequenceEqual(mods.NewValue, ReferenceEqualityComparer.Instance))
+                    return;
+
                 modSettingChangeTracker?.Dispose();
 
                 Scheduler.AddOnce(updateTrackedBindables);
@@ -82,15 +89,37 @@ namespace osu.Game.Beatmaps
                 modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
                 modSettingChangeTracker.SettingChanged += _ =>
                 {
-                    debouncedModSettingsChange?.Cancel();
-                    debouncedModSettingsChange = Scheduler.AddDelayed(updateTrackedBindables, 100);
+                    lock (bindableUpdateLock)
+                    {
+                        debouncedModSettingsChange?.Cancel();
+                        debouncedModSettingsChange = Scheduler.AddDelayed(updateTrackedBindables, 100);
+                    }
                 };
             }, true);
         }
 
-        public void Invalidate(IBeatmapInfo beatmap)
+        /// <summary>
+        /// Notify this cache that a beatmap has been invalidated/updated.
+        /// </summary>
+        /// <param name="oldBeatmap">The old beatmap model.</param>
+        /// <param name="newBeatmap">The updated beatmap model.</param>
+        public void Invalidate(IBeatmapInfo oldBeatmap, IBeatmapInfo newBeatmap)
         {
-            base.Invalidate(lookup => lookup.BeatmapInfo.Equals(beatmap));
+            base.Invalidate(lookup => lookup.BeatmapInfo.Equals(oldBeatmap));
+
+            lock (bindableUpdateLock)
+            {
+                bool trackedBindablesRefreshRequired = false;
+
+                foreach (var bsd in trackedBindables.Where(bsd => bsd.BeatmapInfo.Equals(oldBeatmap)))
+                {
+                    bsd.BeatmapInfo = newBeatmap;
+                    trackedBindablesRefreshRequired = true;
+                }
+
+                if (trackedBindablesRefreshRequired)
+                    Scheduler.AddOnce(updateTrackedBindables);
+            }
         }
 
         /// <summary>
@@ -108,10 +137,15 @@ namespace osu.Game.Beatmaps
                 Value = new StarDifficulty(beatmapInfo.StarRating, 0)
             };
 
-            updateBindable(bindable, currentRuleset.Value, currentMods.Value, cancellationToken, computationDelay);
-
             lock (bindableUpdateLock)
+            {
+                var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(trackedUpdateCancellationSource.Token, cancellationToken);
+                linkedCancellationSources.Add(linkedSource);
+
+                updateBindable(bindable, currentRuleset.Value, currentMods.Value, linkedSource, computationDelay);
+
                 trackedBindables.Add(bindable);
+            }
 
             return bindable;
         }
@@ -183,7 +217,7 @@ namespace osu.Game.Beatmaps
                     var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(trackedUpdateCancellationSource.Token, b.CancellationToken);
                     linkedCancellationSources.Add(linkedSource);
 
-                    updateBindable(b, currentRuleset.Value, currentMods.Value, linkedSource.Token);
+                    updateBindable(b, currentRuleset.Value, currentMods.Value, linkedSource);
                 }
             }
         }
@@ -195,6 +229,9 @@ namespace osu.Game.Beatmaps
         {
             lock (bindableUpdateLock)
             {
+                debouncedModSettingsChange?.Cancel();
+                debouncedModSettingsChange = null;
+
                 trackedUpdateCancellationSource.Cancel();
                 trackedUpdateCancellationSource = new CancellationTokenSource();
 
@@ -211,27 +248,45 @@ namespace osu.Game.Beatmaps
         /// <param name="bindable">The <see cref="BindableStarDifficulty"/> to update.</param>
         /// <param name="rulesetInfo">The <see cref="IRulesetInfo"/> to update with.</param>
         /// <param name="mods">The <see cref="Mod"/>s to update with.</param>
-        /// <param name="cancellationToken">A token that may be used to cancel this update.</param>
+        /// <param name="linkedCancellationTokenSource">
+        /// A cancellation token source that may be used to cancel this update.
+        /// This token will be cancelled in one of two scenarios:
+        /// <list type="bullet">
+        /// <item>The owner of the bindable has requested the cancellation.</item>
+        /// <item>An <see cref="Invalidate"/> call has been issued, and as such ongoing calculations must be aborted to avoid stale values being potentially written to bindables.</item>
+        /// </list>
+        /// </param>
         /// <param name="computationDelay">In the case a cached lookup was not possible, a value in milliseconds of to wait until performing potentially intensive lookup.</param>
-        private void updateBindable(BindableStarDifficulty bindable, IRulesetInfo? rulesetInfo, IEnumerable<Mod>? mods, CancellationToken cancellationToken = default, int computationDelay = 0)
+        private void updateBindable(BindableStarDifficulty bindable, IRulesetInfo? rulesetInfo, IEnumerable<Mod>? mods, CancellationTokenSource linkedCancellationTokenSource, int computationDelay = 0)
         {
             // GetDifficultyAsync will fall back to existing data from IBeatmapInfo if not locally available
             // (contrary to GetAsync)
-            GetDifficultyAsync(bindable.BeatmapInfo, rulesetInfo, mods, cancellationToken, computationDelay)
+            GetDifficultyAsync(bindable.BeatmapInfo, rulesetInfo, mods, linkedCancellationTokenSource.Token, computationDelay)
                 .ContinueWith(task =>
-                {
-                    // We're on a threadpool thread, but we should exit back to the update thread so consumers can safely handle value-changed events.
-                    Schedule(() =>
                     {
-                        if (cancellationToken.IsCancellationRequested)
-                            return;
+                        // We're on a threadpool thread, but we should exit back to the update thread so consumers can safely handle value-changed events.
+                        Schedule(() =>
+                        {
+                            if (!linkedCancellationTokenSource.IsCancellationRequested)
+                            {
+                                StarDifficulty? starDifficulty = task.GetResultSafely();
 
-                        StarDifficulty? starDifficulty = task.GetResultSafely();
+                                if (starDifficulty != null)
+                                    bindable.Value = starDifficulty.Value;
+                            }
 
-                        if (starDifficulty != null)
-                            bindable.Value = starDifficulty.Value;
-                    });
-                }, cancellationToken);
+                            // Once the linked cancellation token source is of no remaining use to anybody, clean it up.
+                            lock (bindableUpdateLock)
+                            {
+                                linkedCancellationSources.Remove(linkedCancellationTokenSource);
+                                linkedCancellationTokenSource.Dispose();
+                            }
+                        });
+                    },
+                    // This continuation MUST run even if the antecedent `GetDifficultyAsync()` call was canceled in order to clean up `linkedCancellationTokenSource`.
+                    // Due to this, `ContinueWith()` CANNOT accept `linkedCancellationTokenSource.Token` here, because if it did, then in an event of a cancellation,
+                    // the continuation would never be scheduled for execution.
+                    CancellationToken.None);
         }
 
         /// <summary>
@@ -348,7 +403,7 @@ namespace osu.Game.Beatmaps
 
         private class BindableStarDifficulty : Bindable<StarDifficulty>
         {
-            public readonly IBeatmapInfo BeatmapInfo;
+            public IBeatmapInfo BeatmapInfo;
             public readonly CancellationToken CancellationToken;
 
             public BindableStarDifficulty(IBeatmapInfo beatmapInfo, CancellationToken cancellationToken)
@@ -392,7 +447,7 @@ namespace osu.Game.Beatmaps
             Stream IWorkingBeatmap.GetStream(string storagePath) => working.GetStream(storagePath);
             void IWorkingBeatmap.BeginAsyncLoad() => working.BeginAsyncLoad();
             void IWorkingBeatmap.CancelAsyncLoad() => working.CancelAsyncLoad();
-            void IWorkingBeatmap.PrepareTrackForPreview(bool looping, double offsetFromPreviewPoint) => working.PrepareTrackForPreview(looping, offsetFromPreviewPoint);
+            void IWorkingBeatmap.PrepareTrackForPreview(bool looping, double? offsetFromPreviewPoint) => working.PrepareTrackForPreview(looping, offsetFromPreviewPoint);
         }
     }
 }

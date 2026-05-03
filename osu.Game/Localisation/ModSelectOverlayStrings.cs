@@ -20,6 +20,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Mods(int count) => new TranslatableString(getKey(@"mods"), @"{0} mods", count);
 
         /// <summary>
+        /// "all mods"
+        /// </summary>
+        public static LocalisableString AllMods => new TranslatableString(getKey(@"all_mods"), @"all mods");
+
+        /// <summary>
         /// "Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play. Others are just for fun."
         /// </summary>
         public static LocalisableString ModSelectDescription => new TranslatableString(getKey(@"mod_select_description"),

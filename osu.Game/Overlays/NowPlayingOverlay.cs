@@ -29,7 +29,7 @@ namespace osu.Game.Overlays
 {
     public partial class NowPlayingOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
-        public const double TRACK_DRAG_SEEK_DEBOUNCE = 200;
+        public const double TRACK_DRAG_SEEK_DEBOUNCE = 40;
 
         public IconUsage Icon => OsuIcon.Music;
         public LocalisableString Title => NowPlayingStrings.HeaderTitle;
@@ -37,7 +37,7 @@ namespace osu.Game.Overlays
 
         private const float player_width = 400;
         private const float player_height = 130;
-        private const float transition_length = 800;
+        private const float transition_length = 500;
         private const float progress_height = 10;
         private const float bottom_black_area_height = 55;
         private const float margin = 10;
@@ -224,21 +224,27 @@ namespace osu.Game.Overlays
             };
         }
 
-        private double? lastSeekTime;
+        private double? lastSeekGameTime;
+        private double? lastSeekAudioTargetTime;
 
         private void onSeek(double progress)
         {
-            if (!musicController.IsPlaying || lastSeekTime == null || Time.Current - lastSeekTime > TRACK_DRAG_SEEK_DEBOUNCE)
+            if (!musicController.IsPlaying || lastSeekGameTime == null || Time.Current - lastSeekGameTime > TRACK_DRAG_SEEK_DEBOUNCE)
             {
                 musicController.SeekTo(progress);
-                lastSeekTime = Time.Current;
+                lastSeekGameTime = Time.Current;
+                lastSeekAudioTargetTime = progress;
             }
         }
 
         private void onCommit(double progress)
         {
-            musicController.SeekTo(progress);
-            lastSeekTime = null;
+            // Avoid a second seek to the same location, which could occur when using keyboard navigation from `OnSeek` and subsequent `OnCommit` calls.
+            if (progress != lastSeekAudioTargetTime)
+                musicController.SeekTo(progress);
+
+            lastSeekGameTime = null;
+            lastSeekAudioTargetTime = null;
         }
 
         private void togglePlaylist()
@@ -283,7 +289,7 @@ namespace osu.Game.Overlays
         protected override void PopIn()
         {
             this.FadeIn(transition_length, Easing.OutQuint);
-            dragContainer.ScaleTo(1, transition_length, Easing.OutElastic);
+            dragContainer.ScaleTo(1, transition_length, Easing.OutElasticHalf);
         }
 
         protected override void PopOut()
@@ -518,6 +524,8 @@ namespace osu.Game.Overlays
 
         private partial class HoverableProgressBar : ProgressBar
         {
+            public override bool HandleNonPositionalInput => IsHovered;
+
             public HoverableProgressBar()
                 : base(true)
             {

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Logging;
+using osu.Game.Utils;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -20,13 +21,21 @@ namespace osu.Game.Online.Multiplayer
                     Debug.Assert(t.Exception != null);
                     Exception exception = t.Exception.AsSingular();
 
+                    onError?.Invoke(exception);
+
+                    // OnlineStatusNotifier is already letting users know about interruptions to connections.
+                    // Silence these because it gets very spammy otherwise.
+                    if (SentryLogger.IsLocalUserConnectivityException(exception))
+                        return;
+
                     if (exception.GetHubExceptionMessage() is string message)
+                    {
                         // Hub exceptions generally contain something we can show the user directly.
                         Logger.Log(message, level: LogLevel.Important);
-                    else
-                        Logger.Error(exception, $"Unobserved exception occurred via {nameof(FireAndForget)} call: {exception.Message}");
+                        return;
+                    }
 
-                    onError?.Invoke(exception);
+                    Logger.Error(exception, $"Unobserved exception occurred via {nameof(FireAndForget)} call: {exception.Message}");
                 }
                 else
                 {

@@ -38,7 +38,7 @@ namespace osu.Game.Database
         {
             var zipWriterOptions = new ZipWriterOptions(CompressionType.Deflate)
             {
-                ArchiveEncoding = UseFixedEncoding ? ZipArchiveReader.DEFAULT_ENCODING : new ArchiveEncoding(Encoding.UTF8, Encoding.UTF8)
+                ArchiveEncoding = UseFixedEncoding ? ZipArchiveReader.DEFAULT_ENCODING : new ArchiveEncoding { Default = Encoding.UTF8, Password = Encoding.UTF8 }
             };
 
             using (var writer = new ZipWriter(outputStream, zipWriterOptions))

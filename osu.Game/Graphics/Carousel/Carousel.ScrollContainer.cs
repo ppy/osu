@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
@@ -31,8 +32,13 @@ namespace osu.Game.Graphics.Carousel
         /// Implementation of scroll container which handles very large vertical lists by internally using <c>double</c> precision
         /// for pre-display Y values.
         /// </summary>
-        protected partial class ScrollContainer : UserTrackingScrollContainer, IKeyBindingHandler<GlobalAction>
+        protected partial class ScrollContainer : UserTrackingScrollContainer, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>
         {
+            public Action? OnPageUp { get; init; }
+            public Action? OnPageDown { get; init; }
+            public Action? OnListStart { get; init; }
+            public Action? OnListEnd { get; init; }
+
             public readonly Container Panels;
 
             public void SetLayoutHeight(float height) => Panels.Height = height;
@@ -127,6 +133,41 @@ namespace osu.Game.Graphics.Carousel
 
             protected override bool IsDragging => base.IsDragging || AbsoluteScrolling;
 
+            protected override bool OnKeyDown(KeyDownEvent e)
+            {
+                switch (e.Key)
+                {
+                    case Key.PageUp:
+                        OnPageUp?.Invoke();
+                        return true;
+
+                    case Key.PageDown:
+                        OnPageDown?.Invoke();
+                        return true;
+                }
+
+                return base.OnKeyDown(e);
+            }
+
+            public new bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+            {
+                if (IsHandlingKeyboardScrolling)
+                {
+                    switch (e.Action)
+                    {
+                        case PlatformAction.MoveBackwardLine:
+                            OnListStart?.Invoke();
+                            return true;
+
+                        case PlatformAction.MoveForwardLine:
+                            OnListEnd?.Invoke();
+                            return true;
+                    }
+                }
+
+                return base.OnPressed(e);
+            }
+
             public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {
                 switch (e.Action)
@@ -201,6 +242,8 @@ namespace osu.Game.Graphics.Carousel
 
                 private readonly Drawable box;
 
+                private bool capturingMouseDown;
+
                 protected override float MinimumDimSize => SCROLL_BAR_WIDTH * 3;
 
                 private const float expanded_size_ratio = 2;
@@ -261,6 +304,7 @@ namespace osu.Game.Graphics.Carousel
                 {
                     if (!base.OnMouseDown(e)) return false;
 
+                    capturingMouseDown = true;
                     updateVisuals(e);
                     return true;
                 }
@@ -275,13 +319,14 @@ namespace osu.Game.Graphics.Carousel
                 {
                     if (e.Button != MouseButton.Left) return;
 
+                    capturingMouseDown = false;
                     updateVisuals(e);
                     base.OnMouseUp(e);
                 }
 
                 private void updateVisuals(MouseEvent e)
                 {
-                    if (IsDragged || e.PressedButtons.Contains(MouseButton.Left))
+                    if (capturingMouseDown)
                         box.FadeColour(highlightColour, 100);
                     else if (IsHovered)
                         box.FadeColour(hoverColour, 100);

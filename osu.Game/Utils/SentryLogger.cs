@@ -14,6 +14,7 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
+using osu.Framework.Development;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
@@ -46,12 +47,18 @@ namespace osu.Game.Utils
         {
             this.game = game;
 
+            if (Environment.GetEnvironmentVariable("OSU_DISABLE_ERROR_REPORTING") == "1")
+                return;
+
+            if (DebugUtils.IsNUnitRunning)
+                return;
+
             if (!game.IsDeployedBuild || !game.CreateEndpoints().WebsiteUrl.EndsWith(@".ppy.sh", StringComparison.Ordinal))
                 return;
 
             sentrySession = SentrySdk.Init(options =>
             {
-                options.Dsn = "https://ad9f78529cef40ac874afb95a9aca04e@sentry.ppy.sh/2";
+                options.Dsn = "https://localhost";
                 options.AutoSessionTracking = true;
                 options.IsEnvironmentUser = false;
                 options.IsGlobalModeEnabled = true;
@@ -176,6 +183,7 @@ namespace osu.Game.Utils
                     scope.SetTag(@"beatmap", $"{beatmap.OnlineID}");
                     scope.SetTag(@"ruleset", ruleset.ShortName);
                     scope.SetTag(@"os", $"{RuntimeInfo.OS} ({Environment.OSVersion})");
+                    scope.SetTag(@"version hash", game.VersionHash);
                     scope.SetTag(@"processor count", Environment.ProcessorCount.ToString());
                 });
             }
@@ -235,6 +243,9 @@ namespace osu.Game.Utils
 
         private bool shouldSubmitException(Exception exception)
         {
+            if (IsLocalUserConnectivityException(exception))
+                return false;
+
             switch (exception)
             {
                 // disk I/O failures, invalid formats, etc.
@@ -249,33 +260,32 @@ namespace osu.Game.Utils
                 case SharpCompress.Common.InvalidFormatException:
                     return false;
 
-                // connectivity failures
-
-                case TimeoutException te:
-                    return !te.Message.Contains(@"elapsed without receiving a message from the server");
-
-                case WebException we:
-                    switch (we.Status)
-                    {
-                        // more statuses may need to be blocked as we come across them.
-                        case WebExceptionStatus.Timeout:
-                            return false;
-                    }
-
-                    break;
-
-                case WebSocketException:
-                case SocketException:
-                    return false;
-
                 // stuff that should really never make it to sentry
-
                 case APIAccess.WebRequestFlushedException:
                 case TaskCanceledException:
                     return false;
             }
 
             return true;
+        }
+
+        public static bool IsLocalUserConnectivityException(Exception exception)
+        {
+            switch (exception)
+            {
+                case TimeoutException te:
+                    return te.Message.Contains(@"elapsed without receiving a message from the server");
+
+                case WebException we:
+                    // more statuses may need to be blocked as we come across them.
+                    return we.Status == WebExceptionStatus.Timeout;
+
+                case WebSocketException:
+                case SocketException:
+                    return true;
+            }
+
+            return false;
         }
 
         #region Disposal

@@ -9,8 +9,8 @@ namespace osu.Game.Configuration
     {
         protected override string Filename => base.Filename.Replace(".ini", ".dev.ini");
 
-        public DevelopmentOsuConfigManager(Storage storage)
-            : base(storage)
+        public DevelopmentOsuConfigManager(Storage storage, GameHost? host = null)
+            : base(storage, host)
         {
         }
     }

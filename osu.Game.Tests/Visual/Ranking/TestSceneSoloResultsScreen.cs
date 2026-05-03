@@ -19,8 +19,8 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Ranking;
-using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Ranking
@@ -132,6 +132,7 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        [FlakyTest]
         public void TestOnlineLeaderboardWithLessThan50Scores()
         {
             ScoreInfo localScore = null!;

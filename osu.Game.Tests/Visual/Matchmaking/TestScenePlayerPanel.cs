@@ -122,5 +122,51 @@ namespace osu.Game.Tests.Visual.Matchmaking
             AddStep("set download progress 90%", () => MultiplayerClient.ChangeUserBeatmapAvailability(2, BeatmapAvailability.Downloading(0.9f)));
             AddStep("set locally available", () => MultiplayerClient.ChangeUserBeatmapAvailability(2, BeatmapAvailability.LocallyAvailable()));
         }
+
+        [Test]
+        public void TestLongUsername()
+        {
+            AddStep("set long username", () =>
+            {
+                MultiplayerClient.ChangeMatchRoomState(new MatchmakingRoomState
+                {
+                    Users =
+                    {
+                        UserDictionary =
+                        {
+                            {
+                                2, new MatchmakingUser
+                                {
+                                    UserId = 2,
+                                    Placement = 1
+                                }
+                            }
+                        }
+                    }
+                }).WaitSafely();
+
+                Child = panel = new PlayerPanel(new MultiplayerRoomUser(2)
+                {
+                    User = new APIUser
+                    {
+                        Username = @"ThisIsALongUsername",
+                        Id = 2,
+                        Colour = "99EB47",
+                        CountryCode = CountryCode.AU,
+                        CoverUrl = @"https://assets.ppy.sh/user-profile-covers/2/baba245ef60834b769694178f8f6d4f6166c5188c740de084656ad2b80f1eea7.jpeg",
+                        Statistics = new UserStatistics { GlobalRank = null, CountryRank = null }
+                    }
+                })
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
+                };
+            });
+
+            foreach (var layout in Enum.GetValues<PlayerPanelDisplayMode>())
+            {
+                AddStep($"set layout to {layout}", () => panel.DisplayMode = layout);
+            }
+        }
     }
 }

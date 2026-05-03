@@ -6,9 +6,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osuTK;
@@ -69,7 +71,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 AddRange(new Drawable[]
                 {
                     new CardContentBeatmap(playlistItem.Beatmap, playlistItem.Mods),
-                    flashLayer,
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        CornerRadius = BeatmapCard.CORNER_RADIUS,
+                        Child = flashLayer
+                    }
                 });
 
                 foreach (var user in users)

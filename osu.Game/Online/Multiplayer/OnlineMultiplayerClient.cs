@@ -15,6 +15,10 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Localisation;
 using osu.Game.Online.Matchmaking;
+using osu.Game.Online.Matchmaking.Requests;
+using osu.Game.Online.Matchmaking.Responses;
+using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
+using osu.Game.Online.RankedPlay;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -75,12 +79,18 @@ namespace osu.Game.Online.Multiplayer
 
                     connection.On(nameof(IMatchmakingClient.MatchmakingQueueJoined), ((IMatchmakingClient)this).MatchmakingQueueJoined);
                     connection.On(nameof(IMatchmakingClient.MatchmakingQueueLeft), ((IMatchmakingClient)this).MatchmakingQueueLeft);
-                    connection.On(nameof(IMatchmakingClient.MatchmakingRoomInvited), ((IMatchmakingClient)this).MatchmakingRoomInvited);
+                    connection.On<MatchmakingRoomInvitationParams>(nameof(IMatchmakingClient.MatchmakingRoomInvitedWithParams), ((IMatchmakingClient)this).MatchmakingRoomInvitedWithParams);
+                    connection.On<MatchmakingDuelIssuedParams>(nameof(IMatchmakingClient.MatchmakingDuelIssued), ((IMatchmakingClient)this).MatchmakingDuelIssued);
                     connection.On<long, string>(nameof(IMatchmakingClient.MatchmakingRoomReady), ((IMatchmakingClient)this).MatchmakingRoomReady);
                     connection.On<MatchmakingLobbyStatus>(nameof(IMatchmakingClient.MatchmakingLobbyStatusChanged), ((IMatchmakingClient)this).MatchmakingLobbyStatusChanged);
                     connection.On<MatchmakingQueueStatus>(nameof(IMatchmakingClient.MatchmakingQueueStatusChanged), ((IMatchmakingClient)this).MatchmakingQueueStatusChanged);
                     connection.On<int, long>(nameof(IMatchmakingClient.MatchmakingItemSelected), ((IMatchmakingClient)this).MatchmakingItemSelected);
                     connection.On<int, long>(nameof(IMatchmakingClient.MatchmakingItemDeselected), ((IMatchmakingClient)this).MatchmakingItemDeselected);
+
+                    connection.On<int, RankedPlayCardItem>(nameof(IRankedPlayClient.RankedPlayCardAdded), ((IRankedPlayClient)this).RankedPlayCardAdded);
+                    connection.On<int, RankedPlayCardItem>(nameof(IRankedPlayClient.RankedPlayCardRemoved), ((IRankedPlayClient)this).RankedPlayCardRemoved);
+                    connection.On<RankedPlayCardItem, MultiplayerPlaylistItem>(nameof(IRankedPlayClient.RankedPlayCardRevealed), ((IRankedPlayClient)this).RankedPlayCardRevealed);
+                    connection.On<RankedPlayCardItem>(nameof(IRankedPlayClient.RankedPlayCardPlayed), ((IRankedPlayClient)this).RankedPlayCardPlayed);
 
                     connection.On(nameof(IStatefulUserHubClient.DisconnectRequested), ((IMultiplayerClient)this).DisconnectRequested);
                 };
@@ -333,22 +343,42 @@ namespace osu.Game.Online.Multiplayer
             return connector.Disconnect();
         }
 
-        public override Task<MatchmakingPool[]> GetMatchmakingPools()
-        {
-            if (!IsConnected.Value)
-                return Task.FromResult(Array.Empty<MatchmakingPool>());
-
-            Debug.Assert(connection != null);
-            return connection.InvokeAsync<MatchmakingPool[]>(nameof(IMatchmakingServer.GetMatchmakingPools));
-        }
-
-        public override Task MatchmakingJoinLobby()
+        public override Task DiscardCards(RankedPlayCardItem[] cards)
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
             Debug.Assert(connection != null);
-            return connection.InvokeAsync(nameof(IMatchmakingServer.MatchmakingJoinLobby));
+
+            return connection.InvokeAsync(nameof(IRankedPlayServer.DiscardCards), cards);
+        }
+
+        public override Task PlayCard(RankedPlayCardItem card)
+        {
+            if (!IsConnected.Value)
+                return Task.CompletedTask;
+
+            Debug.Assert(connection != null);
+
+            return connection.InvokeAsync(nameof(IRankedPlayServer.PlayCard), card);
+        }
+
+        public override Task<MatchmakingPool[]> GetMatchmakingPoolsOfType(MatchmakingPoolType type)
+        {
+            if (!IsConnected.Value)
+                return Task.FromResult(Array.Empty<MatchmakingPool>());
+
+            Debug.Assert(connection != null);
+            return connection.InvokeAsync<MatchmakingPool[]>(nameof(IMatchmakingServer.GetMatchmakingPoolsOfType), type);
+        }
+
+        public override Task<MatchmakingJoinLobbyResponse> MatchmakingJoinLobbyWithParams(MatchmakingJoinLobbyRequest request)
+        {
+            if (!IsConnected.Value)
+                return Task.FromResult(new MatchmakingJoinLobbyResponse());
+
+            Debug.Assert(connection != null);
+            return connection.InvokeAsync<MatchmakingJoinLobbyResponse>(nameof(IMatchmakingServer.MatchmakingJoinLobbyWithParams), request);
         }
 
         public override Task MatchmakingLeaveLobby()
@@ -385,6 +415,24 @@ namespace osu.Game.Online.Multiplayer
 
             Debug.Assert(connection != null);
             return connection.InvokeAsync(nameof(IMatchmakingServer.MatchmakingAcceptInvitation));
+        }
+
+        public override Task<MatchmakingIssueDuelResponse> MatchmakingIssueDuel(MatchmakingIssueDuelRequest request)
+        {
+            if (!IsConnected.Value)
+                return Task.FromResult(new MatchmakingIssueDuelResponse());
+
+            Debug.Assert(connection != null);
+            return connection.InvokeAsync<MatchmakingIssueDuelResponse>(nameof(IMatchmakingServer.MatchmakingIssueDuel), request);
+        }
+
+        public override Task<MatchmakingAcceptDuelResponse> MatchmakingAcceptDuel(MatchmakingAcceptDuelRequest request)
+        {
+            if (!IsConnected.Value)
+                return Task.FromResult(new MatchmakingAcceptDuelResponse());
+
+            Debug.Assert(connection != null);
+            return connection.InvokeAsync<MatchmakingAcceptDuelResponse>(nameof(IMatchmakingServer.MatchmakingAcceptDuel), request);
         }
 
         public override Task MatchmakingDeclineInvitation()

@@ -147,7 +147,7 @@ namespace osu.Game.Tests.NonVisual
 
                     foreach (string file in osuStorage.IgnoreFiles)
                     {
-                        if (!file.Contains(".realm", StringComparison.Ordinal))
+                        if (!file.Contains(".realm", StringComparison.Ordinal) && !file.Contains("AuthNative", StringComparison.Ordinal))
                         {
                             Assert.That(File.Exists(Path.Combine(originalDirectory, file)));
                             Assert.That(storage.Exists(file), Is.False, () => $"{file} exists in destination when it was expected to be ignored");

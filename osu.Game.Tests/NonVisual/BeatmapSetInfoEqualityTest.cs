@@ -6,6 +6,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Models;
@@ -22,8 +23,8 @@ namespace osu.Game.Tests.NonVisual
             var ourInfo = new BeatmapSetInfo { OnlineID = 123 };
             var otherInfo = new BeatmapSetInfo { OnlineID = 123 };
 
-            Assert.AreNotEqual(ourInfo, otherInfo);
-            Assert.IsTrue(ourInfo.MatchesOnlineID(otherInfo));
+            ClassicAssert.AreNotEqual(ourInfo, otherInfo);
+            ClassicAssert.True(ourInfo.MatchesOnlineID(otherInfo));
         }
 
         [Test]
@@ -32,8 +33,8 @@ namespace osu.Game.Tests.NonVisual
             var beatmapSetA = TestResources.CreateTestBeatmapSetInfo(1);
             var beatmapSetB = TestResources.CreateTestBeatmapSetInfo(1);
 
-            Assert.AreNotEqual(beatmapSetA, beatmapSetB);
-            Assert.IsTrue(beatmapSetA.Beatmaps.Single().AudioEquals(beatmapSetB.Beatmaps.Single()));
+            ClassicAssert.AreNotEqual(beatmapSetA, beatmapSetB);
+            ClassicAssert.True(beatmapSetA.Beatmaps.Single().AudioEquals(beatmapSetB.Beatmaps.Single()));
         }
 
         [Test]
@@ -49,8 +50,8 @@ namespace osu.Game.Tests.NonVisual
             addAudioFile(beatmapSetA, "abc", "AuDiO.mP3");
             addAudioFile(beatmapSetB, "abc", "audio.mp3");
 
-            Assert.AreNotEqual(beatmapSetA, beatmapSetB);
-            Assert.IsTrue(beatmapSetA.Beatmaps.Single().AudioEquals(beatmapSetB.Beatmaps.Single()));
+            ClassicAssert.AreNotEqual(beatmapSetA, beatmapSetB);
+            ClassicAssert.True(beatmapSetA.Beatmaps.Single().AudioEquals(beatmapSetB.Beatmaps.Single()));
         }
 
         [Test]
@@ -62,8 +63,8 @@ namespace osu.Game.Tests.NonVisual
             addAudioFile(beatmapSetA, "abc");
             addAudioFile(beatmapSetB, "abc");
 
-            Assert.AreNotEqual(beatmapSetA, beatmapSetB);
-            Assert.IsTrue(beatmapSetA.Beatmaps.Single().AudioEquals(beatmapSetB.Beatmaps.Single()));
+            ClassicAssert.AreNotEqual(beatmapSetA, beatmapSetB);
+            ClassicAssert.True(beatmapSetA.Beatmaps.Single().AudioEquals(beatmapSetB.Beatmaps.Single()));
         }
 
         [Test]
@@ -75,8 +76,8 @@ namespace osu.Game.Tests.NonVisual
             addAudioFile(beatmapSetA);
             addAudioFile(beatmapSetB);
 
-            Assert.AreNotEqual(beatmapSetA, beatmapSetB);
-            Assert.IsTrue(beatmapSetA.Beatmaps.Single().AudioEquals(beatmapSetB.Beatmaps.Single()));
+            ClassicAssert.AreNotEqual(beatmapSetA, beatmapSetB);
+            ClassicAssert.True(beatmapSetA.Beatmaps.Single().AudioEquals(beatmapSetB.Beatmaps.Single()));
         }
 
         [Test]
@@ -89,8 +90,8 @@ namespace osu.Game.Tests.NonVisual
             var beatmap1 = beatmapSet.Beatmaps.First();
             var beatmap2 = beatmapSet.Beatmaps.Last();
 
-            Assert.AreNotEqual(beatmap1, beatmap2);
-            Assert.IsTrue(beatmap1.AudioEquals(beatmap2));
+            ClassicAssert.AreNotEqual(beatmap1, beatmap2);
+            ClassicAssert.True(beatmap1.AudioEquals(beatmap2));
         }
 
         [Test]
@@ -107,12 +108,12 @@ namespace osu.Game.Tests.NonVisual
             var beatmap1 = beatmapSet.Beatmaps.First();
             var beatmap2 = beatmapSet.Beatmaps.Last();
 
-            Assert.AreNotEqual(beatmap1, beatmap2);
+            ClassicAssert.AreNotEqual(beatmap1, beatmap2);
 
             beatmap1.Metadata.AudioFile = filename1;
             beatmap2.Metadata.AudioFile = filename2;
 
-            Assert.IsFalse(beatmap1.AudioEquals(beatmap2));
+            ClassicAssert.False(beatmap1.AudioEquals(beatmap2));
         }
 
         private static void addAudioFile(BeatmapSetInfo beatmapSetInfo, string hash = null, string filename = null)
@@ -128,7 +129,7 @@ namespace osu.Game.Tests.NonVisual
             var ourInfo = new BeatmapSetInfo { ID = guid };
             var otherInfo = new BeatmapSetInfo { ID = guid };
 
-            Assert.AreEqual(ourInfo, otherInfo);
+            ClassicAssert.AreEqual(ourInfo, otherInfo);
         }
 
         [Test]
@@ -137,8 +138,8 @@ namespace osu.Game.Tests.NonVisual
             var ourInfo = new BeatmapSetInfo { ID = Guid.NewGuid(), OnlineID = 12 };
             var otherInfo = new BeatmapSetInfo { OnlineID = 12 };
 
-            Assert.AreNotEqual(ourInfo, otherInfo);
-            Assert.IsTrue(ourInfo.MatchesOnlineID(otherInfo));
+            ClassicAssert.AreNotEqual(ourInfo, otherInfo);
+            ClassicAssert.True(ourInfo.MatchesOnlineID(otherInfo));
         }
 
         [Test]
@@ -147,7 +148,7 @@ namespace osu.Game.Tests.NonVisual
             var ourInfo = new BeatmapSetInfo { Hash = "1" };
             var otherInfo = new BeatmapSetInfo { Hash = "2" };
 
-            Assert.AreNotEqual(ourInfo, otherInfo);
+            ClassicAssert.AreNotEqual(ourInfo, otherInfo);
         }
     }
 }

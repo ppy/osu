@@ -259,6 +259,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString NoMatchingBeatmapsDescription => new TranslatableString(getKey(@"no_matching_beatmaps_description"), @"No beatmaps match your filter criteria!");
 
+        /// <summary>
+        /// "Temporarily showing all beatmaps in"
+        /// </summary>
+        public static LocalisableString TemporarilyShowingAllBeatmapsIn => new TranslatableString(getKey(@"temporarily_showing_all_beatmaps_in"), @"Temporarily showing all beatmaps in");
+
+        /// <summary>
+        /// "mostly {0}"
+        /// </summary>
+        public static LocalisableString MostlyBPM(int mostCommonBPM) => new TranslatableString(getKey(@"mostly_bpm"), @"mostly {0}", mostCommonBPM);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

@@ -2,13 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Screens.OnlinePlay.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 {
-    public partial class ParticipantsListHeader : OverlinedHeader
+    public partial class ParticipantsListHeader : SectionHeader
     {
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
@@ -26,7 +26,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             if (room == null)
                 return;
 
-            Details.Value = room.Users.Count.ToString();
+            DetailsText.Value = $"{room.Users.Count}";
         }
     }
 }
