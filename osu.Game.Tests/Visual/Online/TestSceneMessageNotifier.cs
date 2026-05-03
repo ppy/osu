@@ -293,10 +293,10 @@ namespace osu.Game.Tests.Visual.Online
             };
 
             [Cached]
-            public ChatOverlay ChatOverlay { get; } = new ChatOverlay();
+            public ChatTicker ChatTicker { get; } = new ChatTicker();
 
             [Cached]
-            public ChatTicker ChatTicker { get; } = new ChatTicker();
+            public ChatOverlay ChatOverlay { get; } = new ChatOverlay();
 
             private readonly MessageNotifier messageNotifier = new MessageNotifier();
 

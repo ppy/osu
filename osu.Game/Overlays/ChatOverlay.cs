@@ -66,6 +66,9 @@ namespace osu.Game.Overlays
         [Resolved]
         private ChannelManager channelManager { get; set; } = null!;
 
+        [Resolved]
+        private ChatTicker chatTicker { get; set; } = null!;
+
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
@@ -200,6 +203,8 @@ namespace osu.Game.Overlays
 
             textBar.OnSearchTermsChanged += searchTerms => channelListing.SearchTerm = searchTerms;
             textBar.OnChatMessageCommitted += handleChatMessage;
+
+            State.BindValueChanged(_ => chatTicker.PostMessage(null));
         }
 
         /// <summary>

@@ -19,9 +19,6 @@ namespace osu.Game.Overlays
 
         private TickerLine? tickerLine;
 
-        [Resolved]
-        private ChatOverlay chatOverlay { get; set; } = null!;
-
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
@@ -43,8 +40,6 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            chatOverlay.State.BindValueChanged(_ => PostMessage(null));
-
             showChatTicker.BindValueChanged(showTicker =>
             {
                 PostMessage(null);
@@ -54,7 +49,7 @@ namespace osu.Game.Overlays
 
         public void PostMessage(Message? message)
         {
-            if (message == null || chatOverlay.IsPresent || !showChatTicker.Value)
+            if (message == null || !showChatTicker.Value)
             {
                 PopOut();
                 return;

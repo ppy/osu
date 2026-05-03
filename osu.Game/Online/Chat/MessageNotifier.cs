@@ -104,7 +104,7 @@ namespace osu.Game.Online.Chat
 
             var sortedMessages = messages.OrderByDescending(m => m.Id);
 
-            if (channelManager.CurrentChannel.Value == channel)
+            if (!chatOverlay.IsPresent && channelManager.CurrentChannel.Value == channel)
                 chatTicker.PostMessage(sortedMessages.First());
 
             // Only send notifications if ChatOverlay or the target channel aren't visible, or if the window is unfocused
