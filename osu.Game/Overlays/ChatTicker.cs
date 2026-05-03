@@ -82,7 +82,7 @@ namespace osu.Game.Overlays
             public TickerLine(Message message)
                 : base(message)
             {
-                UsernameIsClickable = true;
+                UsernameIsClickable = false;
             }
         }
     }
