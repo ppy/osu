@@ -61,8 +61,7 @@ namespace osu.Game.Overlays
             Add(tickerLine = new TickerLine(message));
 
             State.Value = Visibility.Visible;
-            var seq = this.FadeOutFromOne(10000);
-            seq.OnComplete(_ => PostMessage(null));
+            this.FadeOutFromOne(10000).OnComplete(_ => State.Value = Visibility.Hidden);
         }
 
         protected override void PopIn() => this.FadeIn(100);
