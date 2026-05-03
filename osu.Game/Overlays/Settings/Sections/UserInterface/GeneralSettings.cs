@@ -51,6 +51,11 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     Keywords = [@"delay"],
                     ApplyClassicDefault = c => ((IHasCurrentValue<double>)c).Current.Value = 0,
                 },
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = UserInterfaceStrings.HideToolbarWhenLaunching,
+                    Current = config.GetBindable<bool>(OsuSetting.HideToolbarWhenLaunching)
+                }),
             };
         }
     }

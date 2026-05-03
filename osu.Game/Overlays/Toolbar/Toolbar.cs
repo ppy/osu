@@ -4,20 +4,21 @@
 #nullable disable
 
 using System;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
-using osuTK;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Input.Events;
-using osu.Game.Rulesets;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
+using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets;
+using osuTK;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -63,7 +64,7 @@ namespace osu.Game.Overlays.Toolbar
         private Bindable<RulesetInfo> ruleset { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osuGame)
+        private void load(OsuGame osuGame, OsuConfigManager config)
         {
             ToolbarBackground background;
             HoverInterceptor interceptor;
@@ -194,6 +195,8 @@ namespace osu.Game.Overlays.Toolbar
 
             if (osuGame != null)
                 OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
+
+            hiddenByUser = config.Get<bool>(OsuSetting.HideToolbarWhenLaunching);
         }
 
         protected override void LoadComplete()
@@ -201,6 +204,7 @@ namespace osu.Game.Overlays.Toolbar
             base.LoadComplete();
 
             rulesetSelector.Current.BindTo(ruleset);
+            if (hiddenByUser) Hide();
         }
 
         public partial class ToolbarBackground : Container
