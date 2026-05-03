@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             int totalHits = beatmap.HitObjects.Count;
 
             double sliderFactor = aimDifficultyValue > 0
-                ? calculateDifficultyRating(aimNoSlidersDifficultyValue) / calculateDifficultyRating(aimDifficultyValue) // TODO: this is intentionally left incorrect
+                ? calculateAimDifficultyRating(aimNoSlidersDifficultyValue) / calculateAimDifficultyRating(aimDifficultyValue)
                 : 1;
 
             double aimRating = calculateAimDifficultyRating(aimDifficultyValue);
