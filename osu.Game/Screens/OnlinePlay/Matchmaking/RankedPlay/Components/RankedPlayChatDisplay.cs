@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -41,7 +42,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         private ChatTextBox textbox = null!;
         private BubbleChatHistory chatHistory = null!;
 
-        private Channel? channel;
+        [Cached]
+        private Bindable<Channel?> channel = new Bindable<Channel?>();
 
         private const float width = 320;
 
@@ -49,6 +51,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         {
             Size = new Vector2(width, 160);
             this.room = room;
+
+            channel.BindValueChanged(channelChanged);
         }
 
         [BackgroundDependencyLoader]
@@ -90,9 +94,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             resetPlaceholderText();
             textbox.OnCommit += onCommit;
 
-            channel = channelManager?.JoinChannel(new Channel { Id = room.ChannelID, Type = ChannelType.Multiplayer, Name = $"#lazermp_{room.RoomID}" });
-            if (channel != null)
-                channel.NewMessagesArrived += onNewMessagesArrived;
+            channel.Value = channelManager?.JoinChannel(new Channel { Id = room.ChannelID, Type = ChannelType.Multiplayer, Name = $"#lazermp_{room.RoomID}" });
+            if (channel.Value != null)
+                channel.Value.NewMessagesArrived += onNewMessagesArrived;
         }
 
         private void onCommit(TextBox sender, bool newText)
@@ -103,9 +107,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 return;
 
             if (text[0] == '/')
-                channelManager?.PostCommand(text[1..], channel);
+                channelManager?.PostCommand(text[1..], channel.Value);
             else
-                channelManager?.PostMessage(text, target: channel);
+                channelManager?.PostMessage(text, target: channel.Value);
 
             textbox.Text = string.Empty;
         }
@@ -159,6 +163,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             return false;
         }
 
+        private void channelChanged(ValueChangedEvent<Channel?> e)
+        {
+            if (e.OldValue != null)
+                textbox.Current.UnbindFrom(e.OldValue.TextBoxMessage);
+
+            if (e.NewValue == null) return;
+
+            textbox.Current.BindTo(e.NewValue.TextBoxMessage);
+        }
+
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
@@ -185,8 +199,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         {
             base.Dispose(isDisposing);
 
-            if (channel != null)
-                channel.NewMessagesArrived -= onNewMessagesArrived;
+            if (channel.Value != null)
+                channel.Value.NewMessagesArrived -= onNewMessagesArrived;
         }
 
         private partial class ChatTextBox : StandAloneChatDisplay.ChatTextBox
