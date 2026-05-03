@@ -44,14 +44,19 @@ namespace osu.Game.Overlays
             base.LoadComplete();
 
             chatOverlay.State.BindValueChanged(_ => PostMessage(null));
-            showChatTicker.BindValueChanged(_ => PostMessage(null), true);
+
+            showChatTicker.BindValueChanged(showTicker =>
+            {
+                PostMessage(null);
+                State.Value = showTicker.NewValue ? Visibility.Visible : Visibility.Hidden;
+            }, true);
         }
 
         public void PostMessage(Message? message)
         {
             if (message == null || chatOverlay.IsPresent || !showChatTicker.Value)
             {
-                State.Value = Visibility.Hidden;
+                PopOut();
                 return;
             }
 
@@ -60,11 +65,12 @@ namespace osu.Game.Overlays
 
             Add(tickerLine = new TickerLine(message));
 
-            State.Value = Visibility.Visible;
-            this.FadeOutFromOne(10000).OnComplete(_ => State.Value = Visibility.Hidden);
+            this.FadeOutFromOne(10000);
         }
 
-        protected override void PopIn() => this.FadeIn(100);
+        protected override void PopIn()
+        {
+        }
 
         protected override void PopOut() => this.FadeOut(100);
 

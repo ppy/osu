@@ -98,8 +98,6 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("switch to public channel", () => testContainer.ChannelManager.CurrentChannel.Value = publicChannel);
 
-            AddToggleStep("toggle show ticker", b => config.SetValue(OsuSetting.ChatTicker, b));
-
             AddStep("receive public message", () => receiveMessage(friend, publicChannel, "Hello everyone"));
 
             AddStep("receive message containing mention", () => receiveMessage(friend, publicChannel, $"Hello {API.LocalUser.Value.Username.ToLowerInvariant()}!"));
@@ -109,6 +107,8 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("receive message from VIP containing mention", () => receiveMessage(importantPerson, publicChannel, $"Hello {API.LocalUser.Value.Username.ToLowerInvariant()}!"));
 
             AddStep("receive very long message", () => receiveMessage(importantPerson, publicChannel, string.Concat(Enumerable.Repeat("Hello everyone! ", 50))));
+
+            AddToggleStep("toggle show ticker", b => config.SetValue(OsuSetting.ChatTicker, b));
         }
 
         private void receiveMessage(APIUser sender, Channel channel, string content) => channel.AddNewMessages(createMessage(sender, channel, content));

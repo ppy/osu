@@ -48,6 +48,8 @@ namespace osu.Game.Tests.Visual.Online
             publicChannel = new Channel { Id = 1, Name = "#osu" };
             privateMessageChannel = new Channel(friend) { Id = 2, Name = friend.Username, Type = ChannelType.PM };
 
+            config.SetValue(OsuSetting.ChatTicker, false);
+
             Schedule(() =>
             {
                 Child = testContainer = new TestContainer(API, new[] { publicChannel, privateMessageChannel })
@@ -232,20 +234,20 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("switch to public channel", () => testContainer.ChannelManager.CurrentChannel.Value = publicChannel);
 
             AddStep("receive message on channel", () => receiveMessage(friend, publicChannel, "Hello everyone!"));
-            AddAssert("ticker is hidden", () => testContainer.ChatTicker.State.Value == Visibility.Hidden);
+            AddAssert("ticker is hidden", () => !testContainer.ChatTicker.IsPresent);
 
             AddStep("toggle show ticker on", () => config.SetValue(OsuSetting.ChatTicker, true));
 
             AddStep("receive message on channel", () => receiveMessage(friend, publicChannel, "Hello everyone!"));
-            AddAssert("ticker is hidden", () => testContainer.ChatTicker.State.Value == Visibility.Hidden);
+            AddAssert("ticker is hidden", () => !testContainer.ChatTicker.IsPresent);
 
             AddStep("close overlay", () => testContainer.ChatOverlay.Hide());
 
             AddStep("receive PM", () => receiveMessage(friend, privateMessageChannel, "hey hey"));
-            AddAssert("ticker is hidden", () => testContainer.ChatTicker.State.Value == Visibility.Hidden);
+            AddAssert("ticker is hidden", () => !testContainer.ChatTicker.IsPresent);
 
             AddStep("receive message on channel", () => receiveMessage(friend, publicChannel, "Hello everyone!"));
-            AddAssert("ticker is present", () => testContainer.ChatTicker.State.Value == Visibility.Visible);
+            AddAssert("ticker is present", () => testContainer.ChatTicker.IsPresent);
 
             AddStep("receive last message only", () =>
             {
@@ -255,10 +257,10 @@ namespace osu.Game.Tests.Visual.Online
 
                 publicChannel.AddNewMessages(messages.ToArray());
             });
-            AddAssert("ticker is present", () => testContainer.ChatTicker.State.Value == Visibility.Visible);
+            AddAssert("ticker is present", () => testContainer.ChatTicker.IsPresent);
 
             AddStep("toggle show ticker off", () => config.SetValue(OsuSetting.ChatTicker, false));
-            AddAssert("ticker is hidden", () => testContainer.ChatTicker.State.Value == Visibility.Hidden);
+            AddAssert("ticker is hidden", () => !testContainer.ChatTicker.IsPresent);
         }
 
         private void receiveMessage(APIUser sender, Channel channel, string content) => channel.AddNewMessages(createMessage(sender, channel, content));
