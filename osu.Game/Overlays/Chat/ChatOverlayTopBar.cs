@@ -8,13 +8,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Localisation;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
-using ChatStrings = osu.Game.Resources.Localisation.Web.ChatStrings;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -23,7 +20,7 @@ namespace osu.Game.Overlays.Chat
         public Drawable DragBar { get; private set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuConfigManager config)
+        private void load(OverlayColourProvider colourProvider)
         {
             Children = new[]
             {
@@ -69,17 +66,7 @@ namespace osu.Game.Overlays.Chat
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Colour = colourProvider.Background4,
-                },
-                new OsuCheckbox
-                {
-                    LabelText = OnlineSettingsStrings.ChatTicker,
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
-                    RelativeSizeAxes = Axes.None,
-                    Padding = new MarginPadding { Horizontal = 10, },
-                    Width = 150,
-                    Current = config.GetBindable<bool>(OsuSetting.ChatTicker)
-                },
+                }
             };
         }
 
