@@ -72,11 +72,11 @@ namespace osu.Game.Overlays
         {
             protected override float Spacing => 5;
             protected override float UsernameWidth => 90;
-            protected override bool UsernameIsClickable => false;
 
             public TickerLine(Message message)
                 : base(message)
             {
+                UsernameIsClickable = true;
             }
         }
     }
