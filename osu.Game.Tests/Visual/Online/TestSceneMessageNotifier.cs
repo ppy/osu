@@ -12,6 +12,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -31,6 +32,9 @@ namespace osu.Game.Tests.Visual.Online
         private TestContainer testContainer;
 
         private int messageIdCounter;
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -222,6 +226,41 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("no notifications fired", () => testContainer.NotificationOverlay.UnreadCount.Value == 0);
         }
 
+        [Test]
+        public void TestChatTicker()
+        {
+            AddStep("switch to public channel", () => testContainer.ChannelManager.CurrentChannel.Value = publicChannel);
+
+            AddStep("receive message on channel", () => receiveMessage(friend, publicChannel, "Hello everyone!"));
+            AddAssert("ticker is hidden", () => testContainer.ChatTicker.State.Value == Visibility.Hidden);
+
+            AddStep("toggle show ticker on", () => config.SetValue(OsuSetting.ChatTicker, true));
+
+            AddStep("receive message on channel", () => receiveMessage(friend, publicChannel, "Hello everyone!"));
+            AddAssert("ticker is hidden", () => testContainer.ChatTicker.State.Value == Visibility.Hidden);
+
+            AddStep("close overlay", () => testContainer.ChatOverlay.Hide());
+
+            AddStep("receive PM", () => receiveMessage(friend, privateMessageChannel, "hey hey"));
+            AddAssert("ticker is hidden", () => testContainer.ChatTicker.State.Value == Visibility.Hidden);
+
+            AddStep("receive message on channel", () => receiveMessage(friend, publicChannel, "Hello everyone!"));
+            AddAssert("ticker is present", () => testContainer.ChatTicker.State.Value == Visibility.Visible);
+
+            AddStep("receive last message only", () =>
+            {
+                List<Message> messages = new List<Message> { createMessage(friend, publicChannel, "This should be my first message") };
+                messages.AddRange(Enumerable.Range(0, 10).Select(i => createMessage(friend, publicChannel, $"Hey hey {i}")));
+                messages.Add(createMessage(friend, publicChannel, "This should be my last message."));
+
+                publicChannel.AddNewMessages(messages.ToArray());
+            });
+            AddAssert("ticker is present", () => testContainer.ChatTicker.State.Value == Visibility.Visible);
+
+            AddStep("toggle show ticker off", () => config.SetValue(OsuSetting.ChatTicker, false));
+            AddAssert("ticker is hidden", () => testContainer.ChatTicker.State.Value == Visibility.Hidden);
+        }
+
         private void receiveMessage(APIUser sender, Channel channel, string content) => channel.AddNewMessages(createMessage(sender, channel, content));
 
         private Message createMessage(APIUser sender, Channel channel, string content) => new Message(messageIdCounter++)
@@ -254,6 +293,9 @@ namespace osu.Game.Tests.Visual.Online
             [Cached]
             public ChatOverlay ChatOverlay { get; } = new ChatOverlay();
 
+            [Cached]
+            public ChatTicker ChatTicker { get; } = new ChatTicker();
+
             private readonly MessageNotifier messageNotifier = new MessageNotifier();
 
             private readonly Channel[] channels;
@@ -271,6 +313,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     ChannelManager,
                     ChatOverlay,
+                    ChatTicker,
                     NotificationOverlay,
                     messageNotifier,
                 };
