@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -10,13 +9,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         private const double difficulty_multiplier = 0.0675;
 
-        private readonly Mod[] mods;
         private readonly int totalHits;
         private readonly double overallDifficulty;
 
-        public OsuRatingCalculator(Mod[] mods, int totalHits, double overallDifficulty)
+        public OsuRatingCalculator(int totalHits, double overallDifficulty)
         {
-            this.mods = mods;
             this.totalHits = totalHits;
             this.overallDifficulty = overallDifficulty;
         }
