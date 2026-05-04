@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Mods;
@@ -116,6 +117,40 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 new OsuReplayFrame(900, new Vector2(200, 100)),
                 new OsuReplayFrame(1500, new Vector2(300, 100), OsuAction.LeftButton),
                 new OsuReplayFrame(1501, new Vector2(300, 100)),
+            }
+        });
+
+        [Test]
+        public void TestPressBlockedByAlternateIsNotCountedAsExtra() => CreateModTest(new ModTestData
+        {
+            Mods = new Mod[] { new OsuModAlternate(), new OsuModPreciseTapping() },
+            PassCondition = () => Player.ScoreProcessor.Statistics.GetValueOrDefault(HitResult.Great) == 2
+                                  && Player.ScoreProcessor.Statistics.GetValueOrDefault(HitResult.Miss) == 0,
+            Autoplay = false,
+            CreateBeatmap = () => new Beatmap
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new HitCircle
+                    {
+                        StartTime = 500,
+                        Position = new Vector2(100),
+                    },
+                    new HitCircle
+                    {
+                        StartTime = 1000,
+                        Position = new Vector2(200, 100),
+                    },
+                },
+            },
+            ReplayFrames = new List<ReplayFrame>
+            {
+                new OsuReplayFrame(500, new Vector2(100), OsuAction.LeftButton),
+                new OsuReplayFrame(501, new Vector2(100)),
+                new OsuReplayFrame(700, new Vector2(150, 100), OsuAction.LeftButton),
+                new OsuReplayFrame(701, new Vector2(150, 100)),
+                new OsuReplayFrame(1000, new Vector2(200, 100), OsuAction.RightButton),
+                new OsuReplayFrame(1001, new Vector2(200, 100)),
             }
         });
     }

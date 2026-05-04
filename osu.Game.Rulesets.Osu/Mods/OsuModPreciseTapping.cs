@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             ruleset = (DrawableOsuRuleset)drawableRuleset;
-            ruleset.KeyBindingInputManager.Add(new InputInterceptor(this));
+            ruleset.Playfield.AttachInputInterceptor(new InputInterceptor(this));
 
             var periods = new List<Period>();
 
