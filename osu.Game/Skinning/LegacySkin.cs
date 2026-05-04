@@ -443,9 +443,6 @@ namespace osu.Game.Skinning
                                     songProgress.Y = container.ToLocalSpace(accuracy.ScreenSpaceDrawQuad.TopLeft).Y + (accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).Y / 2);
                                 }
 
-                                // perform delayed accuracy counter update
-                                accuracy?.StopRolling();
-
                                 var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
 
                                 if (hitError != null)
@@ -462,12 +459,7 @@ namespace osu.Game.Skinning
                                 Children = new Drawable[]
                                 {
                                     new LegacyScoreCounter(),
-                                    new LegacyAccuracyCounter
-                                    {
-                                        // prevent the counter from updating
-                                        // until legacy song progress position is determined
-                                        StopRollingOnLoad = false,
-                                    },
+                                    new LegacyAccuracyCounter(),
                                     new LegacySongProgress(),
                                     new LegacyHealthDisplay(),
                                     new BarHitErrorMeter(),
