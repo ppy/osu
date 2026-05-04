@@ -65,8 +65,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (Mods.Any(m => m is OsuModAutopilot))
                 difficulty *= 0.1;
 
-            difficulty *= 0.755 + Math.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2.2) / 900;
-
             return difficulty;
         }
 
@@ -119,6 +117,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0;
 
             return ObjectDifficulties.Sum(d => DifficultyCalculationUtils.Logistic(d / consistentTopNote, 1.15, 5, 1.1));
+        }
+
+        public override double DifficultyValue()
+        {
+            double difficulty = base.DifficultyValue();
+
+            // TODO: this should be replaced with a per-object adjustment, but it requires extra considerations
+            if (objectList.Count > 0)
+                difficulty *= 0.825 + Math.Pow(Math.Max(0, ((OsuDifficultyHitObject)objectList.First()).OverallDifficulty), 2.2) / 1125.0;
+
+            return difficulty;
         }
     }
 }
