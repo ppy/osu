@@ -7,7 +7,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit
 {
-    public partial class CreateNewDifficultyDialog : PopupDialog
+    public partial class CreateNewDifficultyDialog : ButtonPopupDialog
     {
         /// <summary>
         /// Delegate used to create new difficulties.

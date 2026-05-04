@@ -8,7 +8,7 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Edit
 {
-    public partial class DiscardUnsavedChangesDialog : PopupDialog
+    public partial class DiscardUnsavedChangesDialog : ButtonPopupDialog
     {
         public DiscardUnsavedChangesDialog(Action exit)
         {

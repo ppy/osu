@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("release button", () => InputManager.ReleaseButton(MouseButton.Left));
         }
 
-        private partial class TestPopupDialog : PopupDialog
+        private partial class TestPopupDialog : ButtonPopupDialog
         {
             public PopupDialogDangerousButton DangerousButton { get; }
 
