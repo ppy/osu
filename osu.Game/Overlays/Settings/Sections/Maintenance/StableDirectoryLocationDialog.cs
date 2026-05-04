@@ -11,7 +11,7 @@ using osu.Game.Screens;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public partial class StableDirectoryLocationDialog : PopupDialog
+    public partial class StableDirectoryLocationDialog : ButtonPopupDialog
     {
         [Resolved]
         private IPerformFromScreenRunner performer { get; set; } = null!;

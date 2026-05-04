@@ -36,7 +36,7 @@ namespace osu.Game
 
         private readonly ScheduledDelegate task;
 
-        private PopupDialog lastEncounteredDialog;
+        private ButtonPopupDialog lastEncounteredDialog;
         private IScreen lastEncounteredDialogScreen;
 
         /// <summary>

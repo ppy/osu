@@ -6,7 +6,7 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Tournament.Components
 {
-    public partial class IPCErrorDialog : PopupDialog
+    public partial class IPCErrorDialog : ButtonPopupDialog
     {
         public IPCErrorDialog(string headerText, string bodyText)
         {

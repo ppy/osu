@@ -26,7 +26,7 @@ namespace osu.Game.Overlays
         [Resolved]
         private MusicController musicController { get; set; }
 
-        public PopupDialog CurrentDialog { get; private set; }
+        public ButtonPopupDialog CurrentDialog { get; private set; }
 
         public override bool IsPresent => Scheduler.HasPendingTasks
                                           || dialogContainer.Children.Count > 0;
@@ -56,7 +56,7 @@ namespace osu.Game.Overlays
             duckOperation?.Dispose();
         }
 
-        public void Push(PopupDialog dialog)
+        public void Push(ButtonPopupDialog dialog)
         {
             if (dialog == CurrentDialog || dialog.State.Value == Visibility.Hidden) return;
 
@@ -85,7 +85,7 @@ namespace osu.Game.Overlays
                     if (state.NewValue != Visibility.Hidden) return;
 
                     // Trigger the demise of the dialog as soon as it hides.
-                    dialog.Delay(PopupDialog.EXIT_DURATION).Expire();
+                    dialog.Delay(ButtonPopupDialog.EXIT_DURATION).Expire();
 
                     dismiss();
                 });

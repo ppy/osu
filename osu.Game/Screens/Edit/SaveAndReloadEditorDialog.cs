@@ -8,7 +8,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit
 {
-    public partial class SaveAndReloadEditorDialog : PopupDialog
+    public partial class SaveAndReloadEditorDialog : ButtonPopupDialog
     {
         public SaveAndReloadEditorDialog(Action reload, Action cancel)
         {
