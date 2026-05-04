@@ -4,12 +4,12 @@
 #nullable disable
 
 using System;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
-using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Events;
@@ -26,7 +26,7 @@ namespace osu.Game.Overlays
         [Resolved]
         private MusicController musicController { get; set; }
 
-        public ButtonPopupDialog CurrentDialog { get; private set; }
+        public PopupDialog CurrentDialog { get; private set; }
 
         public override bool IsPresent => Scheduler.HasPendingTasks
                                           || dialogContainer.Children.Count > 0;
@@ -56,7 +56,7 @@ namespace osu.Game.Overlays
             duckOperation?.Dispose();
         }
 
-        public void Push(ButtonPopupDialog dialog)
+        public void Push(PopupDialog dialog)
         {
             if (dialog == CurrentDialog || dialog.State.Value == Visibility.Hidden) return;
 
@@ -85,7 +85,7 @@ namespace osu.Game.Overlays
                     if (state.NewValue != Visibility.Hidden) return;
 
                     // Trigger the demise of the dialog as soon as it hides.
-                    dialog.Delay(ButtonPopupDialog.EXIT_DURATION).Expire();
+                    dialog.Delay(PopupDialog.EXIT_DURATION).Expire();
 
                     dismiss();
                 });
@@ -129,12 +129,15 @@ namespace osu.Game.Overlays
             if (e.Repeat)
                 return false;
 
+            if (CurrentDialog is not ButtonPopupDialog buttonPopupDialog)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.Select:
                     var clickableButton =
-                        CurrentDialog?.Buttons.OfType<PopupDialogOkButton>().FirstOrDefault() ??
-                        CurrentDialog?.Buttons.First();
+                        buttonPopupDialog.Buttons.OfType<PopupDialogOkButton>().FirstOrDefault() ??
+                        buttonPopupDialog.Buttons.First();
 
                     clickableButton?.TriggerClick();
                     return true;
