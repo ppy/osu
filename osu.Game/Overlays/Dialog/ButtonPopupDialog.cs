@@ -9,12 +9,10 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -23,18 +21,14 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Dialog
 {
-    public abstract partial class ButtonPopupDialog : VisibilityContainer
+    public abstract partial class ButtonPopupDialog : PopupDialog
     {
-        public const float ENTER_DURATION = 500;
-        public const float EXIT_DURATION = 500;
-
         private readonly Vector2 ringSize = new Vector2(100f);
         private readonly Vector2 ringMinifiedSize = new Vector2(20f);
 
         private readonly Box flashLayer;
         private Sample? flashSample;
 
-        private readonly Container content;
         private readonly Container ring;
         private readonly FillFlowContainer<PopupDialogButton> buttonsContainer;
         private readonly SpriteIcon icon;
@@ -110,35 +104,19 @@ namespace osu.Game.Overlays.Dialog
 
         protected ButtonPopupDialog()
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
-
             Children = new Drawable[]
             {
-                content = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Alpha = 0f,
                     Children = new Drawable[]
                     {
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            CornerRadius = 20,
-                            CornerExponent = 2.5f,
-                            EdgeEffect = new EdgeEffectParameters
-                            {
-                                Type = EdgeEffectType.Shadow,
-                                Colour = Color4.Black.Opacity(0.2f),
-                                Radius = 14,
-                            },
                             Children = new Drawable[]
                             {
                                 new Box
@@ -236,14 +214,10 @@ namespace osu.Game.Overlays.Dialog
                     },
                 },
             };
-
-            // It's important we start in a visible state so our state fires on hide, even before load.
-            // This is used by the dialog overlay to know when the dialog was dismissed.
-            Show();
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
+        private void load(AudioManager audio)
         {
             flashSample = audio.Samples.Get(@"UI/default-select-disabled");
         }
@@ -295,19 +269,16 @@ namespace osu.Game.Overlays.Dialog
 
         protected override void PopIn()
         {
+            base.PopIn();
+
             actionInvoked = false;
 
             // Reset various animations but only if the dialog animation fully completed
-            if (content.Alpha == 0)
+            if (Dialog.Alpha == 0)
             {
-                content.ScaleTo(0.7f);
                 ring.ResizeTo(ringMinifiedSize);
                 icon.ScaleTo(0f);
             }
-
-            content
-                .ScaleTo(1, 750, Easing.OutElasticHalf)
-                .FadeIn(ENTER_DURATION, Easing.OutQuint);
 
             ring.ResizeTo(ringSize, ENTER_DURATION * 1.5f, Easing.OutQuint);
             icon.Delay(100).ScaleTo(1, ENTER_DURATION * 1.5f, Easing.OutQuint);
@@ -315,14 +286,12 @@ namespace osu.Game.Overlays.Dialog
 
         protected override void PopOut()
         {
+            base.PopOut();
+
             if (!actionInvoked)
                 // In the case a user did not choose an action before a hide was triggered, press the last button.
                 // This is presumed to always be a sane default "cancel" action.
                 buttonsContainer.Last().TriggerClick();
-
-            content
-                .ScaleTo(0.7f, EXIT_DURATION, Easing.Out)
-                .FadeOut(EXIT_DURATION, Easing.OutQuint);
         }
 
         private void pressButtonAtIndex(int index)
