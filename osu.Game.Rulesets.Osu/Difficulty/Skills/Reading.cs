@@ -40,10 +40,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double decay = strainDecay(current.DeltaTime);
 
             currentStrain *= decay;
-
-            currentStrain += ReadingEvaluator.EvaluateDifficultyOf(current, hasHiddenMod) * (1 - decay) * skillMultiplier;
+            currentStrain += calculateModAdjustedDifficulty(current) * (1 - decay) * skillMultiplier;
 
             return currentStrain;
+        }
+
+        private double calculateModAdjustedDifficulty(DifficultyHitObject current)
+        {
+            double difficulty = ReadingEvaluator.EvaluateDifficultyOf(current, hasHiddenMod);
+
+            if (Mods.Any(m => m is OsuModTouchDevice))
+                difficulty = Math.Pow(difficulty, 0.89);
+
+            if (Mods.Any(m => m is OsuModMagnetised))
+            {
+                float magnetisedStrength = Mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
+                difficulty *= 1.0 - magnetisedStrength;
+            }
+
+            if (Mods.Any(m => m is OsuModRelax))
+                difficulty *= 0.4;
+
+            if (Mods.Any(m => m is OsuModAutopilot))
+                difficulty *= 0.1;
+
+            return difficulty;
         }
 
         protected override void ApplyDifficultyTransformation(double[] difficulties)
