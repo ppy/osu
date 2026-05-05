@@ -13,6 +13,8 @@ namespace osu.Game.Overlays.Comments
     {
         private readonly Comment comment;
 
+        protected override bool IsCommentRequired(CommentReportReason reason) => reason == CommentReportReason.Other;
+
         public ReportCommentPopover(Comment comment)
             : base(ReportStrings.CommentTitle(comment.User?.Username ?? comment.LegacyName ?? @"Someone"), false)
         {
