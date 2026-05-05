@@ -340,10 +340,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
-                        RequiredMods = new[]
-                        {
-                            new APIMod(new OsuModSuddenDeath() { FailOnSliderTail = { Value = true }}),
-                        },
+                        RequiredMods =
+                        [
+                            new APIMod(new OsuModSuddenDeath() { FailOnSliderTail = { Value = true } }),
+                        ],
                         AllowedMods = [],
                         Freestyle = true
                     }
