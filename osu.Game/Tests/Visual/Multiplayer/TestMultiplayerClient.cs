@@ -824,9 +824,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return MessagePackSerializer.Deserialize<T>(serialized, SignalRUnionWorkaroundResolver.OPTIONS);
         }
 
-        public override Task DisconnectInternal()
+        protected override Task DisconnectInternal()
         {
-            isConnected.Value = false;
+            Disconnect();
+            return Task.CompletedTask;
+        }
+
+        public override Task Reconnect()
+        {
             return Task.CompletedTask;
         }
 
