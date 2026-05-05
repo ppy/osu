@@ -36,15 +36,12 @@ namespace osu.Game.Overlays
 
         public DialogOverlay()
         {
-            AutoSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.Both;
 
             Child = dialogContainer = new Container
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
+                AutoSizeAxes = Axes.Both,
             };
-
-            Width = 500;
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;

@@ -11,6 +11,7 @@ namespace osu.Game.Overlays.Dialog
 {
     public abstract partial class PopupDialog : VisibilityContainer
     {
+        public const int DEFAULT_WIDTH = 500;
         public const float ENTER_DURATION = 500;
         public const float EXIT_DURATION = 500;
 
@@ -21,7 +22,7 @@ namespace osu.Game.Overlays.Dialog
 
         protected PopupDialog()
         {
-            RelativeSizeAxes = Axes.X;
+            Width = DEFAULT_WIDTH;
             AutoSizeAxes = Axes.Y;
 
             Anchor = Anchor.Centre;
