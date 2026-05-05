@@ -342,7 +342,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                         RequiredMods =
                         [
-                            new APIMod(new OsuModSuddenDeath() { FailOnSliderTail = { Value = true } }),
+                            new APIMod(new OsuModSuddenDeath { FailOnSliderTail = { Value = true } }),
                         ],
                         AllowedMods = [],
                         Freestyle = true
