@@ -5,7 +5,9 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.ExceptionExtensions;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Logging;
 using osu.Game.Utils;
 
@@ -42,6 +44,43 @@ namespace osu.Game.Online.Multiplayer
                     onSuccess?.Invoke();
                 }
             });
+
+        /// <summary>
+        /// Start a background process to disconnect/reconnect as soon as a specific condition is met.
+        /// </summary>
+        /// <remarks>
+        /// If a reconnect happens via another means, this will abort attempts.
+        /// We only want to reconnect once.
+        /// </remarks>
+        /// <param name="client">The client to operate on.</param>
+        /// <param name="isConnected">Connected state of client.</param>
+        /// <param name="readyFunction">The condition which should be <c>true</c> to continue with the shutdown.</param>
+        /// <param name="reconnectFunction">The method to run to perform the reconnect.</param>
+        public static void ReconnectWhenReady(this IStatefulUserHubClient client, IBindable<bool> isConnected, Func<bool> readyFunction, Func<Task> reconnectFunction)
+        {
+            Task.Run(async () =>
+            {
+                bool didReconnect = false;
+                var connected = isConnected.GetBoundCopy();
+                connected.ValueChanged += _ => didReconnect = true;
+
+                string clientName = client.GetType().ReadableName();
+
+                Logger.Log($"{clientName} has signalled shutdown");
+
+                while (!readyFunction())
+                {
+                    Logger.Log($"{clientName} shutdown waiting for idle conditions...");
+                    await Task.Delay(10000).ConfigureAwait(false);
+                }
+
+                Logger.Log($"{clientName} disconnecting due to shutdown signal");
+                if (!didReconnect)
+                    await reconnectFunction().ConfigureAwait(false);
+
+                connected.UnbindAll();
+            }).FireAndForget();
+        }
 
         public static string? GetHubExceptionMessage(this Exception exception)
         {
