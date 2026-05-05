@@ -331,6 +331,33 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestModSelectOverlayNonDefaultSettings()
+        {
+            AddStep("add playlist item", () =>
+            {
+                room.Playlist =
+                [
+                    new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        RequiredMods = new[]
+                        {
+                            new APIMod(new OsuModSuddenDeath() { FailOnSliderTail = { Value = true }}),
+                        },
+                        AllowedMods = [],
+                        Freestyle = true
+                    }
+                ];
+            });
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            ClickButtonWhenEnabled<UserModSelectButton>();
+            AddAssert("sudden death not visible", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().ChildrenOfType<ModPanel>().Single(m => m.Mod is ModSuddenDeath).Visible == false);
+        }
+
+        [Test]
         public void TestChangeSettingsButtonVisibleForHost()
         {
             AddStep("add playlist item", () =>
