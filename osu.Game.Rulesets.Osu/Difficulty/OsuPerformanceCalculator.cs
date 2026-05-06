@@ -399,7 +399,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double missedComboPercent = 1.0 - (double)scoreMaxCombo / attributes.MaxCombo;
             double estimatedSliderBreaks = Math.Min(nonMissMistakes, effectiveMissCount * topWeightedSliderFactor);
 
-            // Scores with more Oks are more likely to have slider breaks.
+            // Scores with more Oks and Mehs are more likely to have slider breaks.
+            // We add an arbitrary value to both sides of the division to make it more stable on extreme ends.
             double nonMissMistakeAdjustment = (nonMissMistakes - estimatedSliderBreaks + 4.5) / (nonMissMistakes + 4);
 
             // There is a low probability of extra slider breaks on effective miss counts close to 1, as score based calculations are good at indicating if only a single break occurred.
