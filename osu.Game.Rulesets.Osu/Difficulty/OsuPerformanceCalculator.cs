@@ -122,6 +122,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             effectiveMissCount = Math.Max(countMiss, effectiveMissCount);
             effectiveMissCount = Math.Min(totalHits, effectiveMissCount);
 
+            if (effectiveMissCount > 0)
+            {
+                aimEstimatedSliderBreaks = calculateEstimatedSliderBreaks(osuAttributes.AimTopWeightedSliderFactor, osuAttributes);
+                speedEstimatedSliderBreaks = calculateEstimatedSliderBreaks(osuAttributes.SpeedTopWeightedSliderFactor, osuAttributes);
+            }
+
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
 
             if (score.Mods.Any(m => m is OsuModNoFail))
@@ -207,8 +213,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (effectiveMissCount > 0)
             {
-                aimEstimatedSliderBreaks = calculateEstimatedSliderBreaks(attributes.AimTopWeightedSliderFactor, attributes);
-
                 double relevantMissCount = Math.Min(effectiveMissCount + aimEstimatedSliderBreaks, totalImperfectHits + countSliderTickMiss);
 
                 aimValue *= calculateMissPenalty(relevantMissCount, attributes.AimDifficultStrainCount);
@@ -236,8 +240,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (effectiveMissCount > 0)
             {
-                speedEstimatedSliderBreaks = calculateEstimatedSliderBreaks(attributes.SpeedTopWeightedSliderFactor, attributes);
-
                 double relevantMissCount = Math.Min(effectiveMissCount + speedEstimatedSliderBreaks, totalImperfectHits + countSliderTickMiss);
 
                 speedValue *= calculateMissPenalty(relevantMissCount, attributes.SpeedDifficultStrainCount);
