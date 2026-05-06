@@ -25,6 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// <summary>
         /// The difficulty corresponding to the reading skill.
         /// </summary>
+        [JsonProperty("reading_difficulty")]
         public double ReadingDifficulty { get; set; }
 
         /// <summary>
