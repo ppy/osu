@@ -1,21 +1,30 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Extensions;
+using System;
+using System.Linq;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Comments;
 using osu.Game.Tests.Visual.UserInterface;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
 {
     public partial class TestSceneCommentReportButton : ThemeComparisonTestScene
     {
+        private DialogOverlay dialogOverlay = null!;
+
+        public TestSceneCommentReportButton()
+            :base(false)
+        {
+        }
+
         [SetUpSteps]
         public void SetUpSteps()
         {
@@ -32,15 +41,27 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        protected override Drawable CreateContent() => new PopoverContainer
+        protected override Drawable CreateContent() => new DependencyProvidingContainer
         {
             RelativeSizeAxes = Axes.Both,
-            Child = new CommentReportButton(new Comment { User = new APIUser { Username = "Someone" } })
+            CachedDependencies = new (Type, object)[]
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Scale = new Vector2(2f),
-            }.With(b => Schedule(b.ShowPopover)),
-        };
+                (typeof(IDialogOverlay), dialogOverlay = new DialogOverlay()),
+            },
+            Children = new Drawable[]
+            {
+                new CommentReportButton(new Comment { User = new APIUser { Username = "Someone" } })
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Scale = new Vector2(2f),
+                },
+                dialogOverlay,
+            }
+        }.With(c => c.OnLoadComplete += _ =>
+        {
+            InputManager.MoveMouseTo(c.ChildrenOfType<CommentReportButton>().First());
+            InputManager.Click(MouseButton.Left);
+        });
     }
 }
