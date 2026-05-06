@@ -16,6 +16,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
@@ -26,8 +27,8 @@ using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
-using osu.Game.Screens.Select;
 using osu.Game.Tests.Resources;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -64,7 +65,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
-            AddStep("create room", () => room = CreateDefaultRoom());
+            AddStep("create room", () =>
+            {
+                Ruleset.Value = new OsuRuleset().RulesetInfo;
+                room = CreateDefaultRoom();
+            });
             AddStep("join room", () => JoinRoom(room));
             WaitForJoined();
         }
@@ -80,7 +85,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 LoadScreen(songSelect = new TestMultiplayerMatchSongSelect(room));
             });
 
-            AddUntilStep("wait for present", () => songSelect.IsCurrentScreen() && songSelect.BeatmapSetsLoaded);
+            AddUntilStep("wait for present", () => songSelect.IsCurrentScreen() && !songSelect.IsFiltering);
         }
 
         [Test]
@@ -101,19 +106,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
             setUp();
 
             AddStep("change ruleset", () => Ruleset.Value = new TaikoRuleset().RulesetInfo);
+
+            AddUntilStep("wait for filtering", () => !songSelect.IsFiltering);
             AddStep("select beatmap",
-                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.First(beatmap => beatmap.Ruleset.OnlineID == new TaikoRuleset().LegacyID)));
+                () => songSelect.SelectBeatmap(selectedBeatmap = beatmaps.First(beatmap => beatmap.Ruleset.OnlineID == new TaikoRuleset().LegacyID)));
 
             AddUntilStep("wait for selection", () => Beatmap.Value.BeatmapInfo.Equals(selectedBeatmap));
             AddUntilStep("wait for ongoing operation to complete", () => !OnlinePlayDependencies.OngoingOperationTracker.InProgress.Value);
 
             AddStep("set mods", () => SelectedMods.Value = new[] { new TaikoModDoubleTime() });
 
-            AddStep("confirm selection", () => songSelect.FinaliseSelection());
+            AddStep("confirm selection", () => InputManager.Key(Key.Enter));
 
             AddUntilStep("song select exited", () => !songSelect.IsCurrentScreen());
 
-            AddAssert("beatmap not changed", () => Beatmap.Value.BeatmapInfo.Equals(selectedBeatmap));
+            AddAssert("beatmap not changed", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo((selectedBeatmap)));
             AddAssert("ruleset not changed", () => Ruleset.Value.Equals(new TaikoRuleset().RulesetInfo));
             AddAssert("mods not changed", () => SelectedMods.Value.Single() is TaikoModDoubleTime);
         }
@@ -133,8 +140,40 @@ namespace osu.Game.Tests.Visual.Multiplayer
             // A previous test's mod overlay could still be fading out.
             AddUntilStep("wait for only one freemod overlay", () => this.ChildrenOfType<FreeModSelectOverlay>().Count() == 1);
 
+            AddStep("open free mod overlay", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonFreeMods>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
             assertFreeModNotShown(allowedMod);
             assertFreeModNotShown(requiredMod);
+        }
+
+        [Test]
+        public void TestFreeModsDisplayedOnEnter()
+        {
+            AddStep("set room freemods", () =>
+            {
+                var editedItem = MultiplayerClient.ClientRoom!.CurrentPlaylistItem.Clone();
+
+                editedItem.AllowedMods =
+                [
+                    new APIMod(new OsuModHardRock()),
+                ];
+
+                MultiplayerClient.EditPlaylistItem(editedItem);
+            });
+
+            setUp();
+
+            AddStep("open free mod overlay", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<FooterButtonFreeMods>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            assertFreeModShown(typeof(OsuModHardRock));
         }
 
         [Test]
@@ -154,16 +193,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 songSelect.OnLoadComplete += _ => Ruleset.Value = new TaikoRuleset().RulesetInfo;
                 LoadScreen(songSelect);
             });
-            AddUntilStep("wait for present", () => songSelect.IsCurrentScreen() && songSelect.BeatmapSetsLoaded);
 
-            AddStep("confirm selection", () => songSelect.FinaliseSelection());
+            AddUntilStep("wait for present", () => songSelect.IsCurrentScreen() && !songSelect.IsFiltering);
+
+            AddStep("confirm selection", () => InputManager.Key(Key.Enter));
             AddAssert("beatmap is taiko", () => Beatmap.Value.BeatmapInfo.Ruleset.OnlineID, () => Is.EqualTo(1));
             AddAssert("ruleset is taiko", () => Ruleset.Value.OnlineID, () => Is.EqualTo(1));
         }
 
+        private void assertFreeModShown(Type type)
+        {
+            AddUntilStep($"{type.ReadableName()} displayed in freemod overlay",
+                () => this.ChildrenOfType<FreeModSelectOverlay>()
+                          .Single()
+                          .ChildrenOfType<ModPanel>()
+                          .Where(panel => panel.Visible)
+                          .Any(b => b.Mod.GetType() == type));
+        }
+
         private void assertFreeModNotShown(Type type)
         {
-            AddAssert($"{type.ReadableName()} not displayed in freemod overlay",
+            AddUntilStep($"{type.ReadableName()} not displayed in freemod overlay",
                 () => this.ChildrenOfType<FreeModSelectOverlay>()
                           .Single()
                           .ChildrenOfType<ModPanel>()
@@ -185,12 +235,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             public new Bindable<IReadOnlyList<Mod>> FreeMods => base.FreeMods;
 
-            public new BeatmapCarousel Carousel => base.Carousel;
-
             public TestMultiplayerMatchSongSelect(Room room, PlaylistItem? itemToEdit = null)
                 : base(room, itemToEdit)
             {
             }
+
+            public void SelectBeatmap(BeatmapInfo beatmap) => SelectAndRun(beatmap, () => { });
         }
     }
 }

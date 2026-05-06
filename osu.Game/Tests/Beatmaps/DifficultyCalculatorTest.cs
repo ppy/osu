@@ -23,16 +23,16 @@ namespace osu.Game.Tests.Beatmaps
 
         protected abstract string ResourceAssembly { get; }
 
-        protected void Test(double expectedStarRating, int expectedMaxCombo, string name, params Mod[] mods)
+        protected void Test(double? expectedStarRating, int expectedMaxCombo, string name, params Mod[] mods)
         {
-            var attributes = CreateDifficultyCalculator(getBeatmap(name)).Calculate(mods);
+            var attributes = CreateDifficultyCalculator(GetBeatmap(name)).Calculate(mods);
 
             // Platform-dependent math functions (Pow, Cbrt, Exp, etc) may result in minute differences.
             Assert.That(attributes.StarRating, Is.EqualTo(expectedStarRating).Within(0.00001));
             Assert.That(attributes.MaxCombo, Is.EqualTo(expectedMaxCombo));
         }
 
-        private IWorkingBeatmap getBeatmap(string name)
+        protected IWorkingBeatmap GetBeatmap(string name)
         {
             using (var resStream = openResource($"{resource_namespace}.{name}.osu"))
             using (var stream = new LineBufferedReader(resStream))

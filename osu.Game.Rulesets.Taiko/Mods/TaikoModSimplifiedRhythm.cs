@@ -122,6 +122,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     }
                 }
             }
+
+            taikoBeatmap.HitObjects.Sort((a, b) => a.StartTime.CompareTo(b.StartTime));
         }
 
         private int getSnapBetweenNotes(ControlPointInfo controlPointInfo, Hit currentNote, Hit nextNote)

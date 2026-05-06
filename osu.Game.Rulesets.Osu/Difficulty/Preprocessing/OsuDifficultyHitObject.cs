@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -117,6 +118,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double? Angle { get; private set; }
 
         /// <summary>
+        /// Angle of the vector created between current and current-1
+        /// normalised to consider symmetrical vectors in any axis to be the same angle.
+        /// </summary>
+        public double? NormalisedVectorAngle { get; private set; }
+
+        /// <summary>
         /// Selective bonus for maps with higher circle size.
         /// </summary>
         public double SmallCircleBonus { get; private set; }
@@ -188,7 +195,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
                 double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / HitWindow(HitResult.Great)), 5);
 
-                return 1.0 - Math.Pow(speedRatio, 1 - windowRatio);
+                // Can't doubletap if circles don't intersect
+                double distanceFactor = Math.Pow(DifficultyCalculationUtils.ReverseLerp(LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS), 2);
+
+                return 1.0 - Math.Pow(speedRatio, distanceFactor * (1 - windowRatio));
             }
 
             return 0;
@@ -258,6 +268,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                 double angle = calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition);
                 double sliderAngle = calculateSliderAngle(lastDifficultyObject!, lastLastCursorPosition);
+
+                Vector2 v = BaseObject.StackedPosition - lastCursorPosition;
+                NormalisedVectorAngle = Math.Atan2(Math.Abs(v.Y), Math.Abs(v.X));
 
                 Angle = Math.Min(angle, sliderAngle);
             }

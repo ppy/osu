@@ -13,12 +13,14 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Screens.Edit;
 using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Screens.Backgrounds
 {
     public partial class EditorBackgroundScreen : BackgroundScreen
     {
+        private readonly EditorBeatmap editorBeatmap;
         private readonly Container dimContainer;
 
         private CancellationTokenSource? cancellationTokenSource;
@@ -36,8 +38,9 @@ namespace osu.Game.Screens.Backgrounds
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
-        public EditorBackgroundScreen()
+        public EditorBackgroundScreen(EditorBeatmap editorBeatmap)
         {
+            this.editorBeatmap = editorBeatmap;
             InternalChild = dimContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -58,10 +61,11 @@ namespace osu.Game.Screens.Backgrounds
         private IEnumerable<Drawable> createContent() =>
         [
             new BeatmapBackground(beatmap.Value) { RelativeSizeAxes = Axes.Both, },
-            // this kooky container nesting is here because the storyboard needs a custom clock
+            // one reason for this kooky container nesting being here is that the storyboard needs a custom clock
             // but also needs it on an isolated-enough level that doesn't break screen stack expiry logic (which happens if the clock was put on `this`),
             // or doesn't make it literally impossible to fade the storyboard in/out in real time (which happens if the fade transforms were to be applied directly to the storyboard).
-            new Container
+            // another is that we need `EditorSkinProvidingContainer` so that storyboard sample lookups succeed.
+            new EditorSkinProvidingContainer(editorBeatmap)
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = new DrawableStoryboard(beatmap.Value.Storyboard)
