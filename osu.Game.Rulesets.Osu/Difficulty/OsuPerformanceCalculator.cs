@@ -303,9 +303,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 accuracyValue *= 1 + 0.08 * DifficultyCalculationUtils.ReverseLerp(approachRate, 11.5, 10);
             }
 
-            if (score.Mods.Any(m => m is OsuModFlashlight))
-                accuracyValue *= 1.02;
-
             return accuracyValue;
         }
 
