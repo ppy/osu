@@ -10,15 +10,15 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Chat
 {
-    public partial class ReportChatPopover : ReportPopover<ChatReportReason>
+    public partial class ChatReportDialog : ReportDialog<ChatReportReason>
     {
         [Resolved]
         private ChannelManager channelManager { get; set; } = null!;
 
         private readonly Message message;
 
-        public ReportChatPopover(Message message)
-            : base(ReportStrings.UserTitle(message.Sender?.Username ?? @"Someone"), false)
+        public ChatReportDialog(Message message, OverlayColourProvider? colourProvider = null)
+            : base(ReportStrings.UserTitle(message.Sender?.Username ?? @"Someone"), false, colourProvider)
         {
             this.message = message;
         }

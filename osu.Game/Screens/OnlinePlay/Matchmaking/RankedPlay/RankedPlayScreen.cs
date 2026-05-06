@@ -25,6 +25,7 @@ using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -153,6 +154,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                             new HamburgerMenu
                             {
                                 Size = new Vector2(56),
+                                ReportRequested = () => dialogOverlay.Push(new UserReportDialog(opponentUser, new OverlayColourProvider(OverlayColourScheme.Pink))),
                             }
                         }
                     }

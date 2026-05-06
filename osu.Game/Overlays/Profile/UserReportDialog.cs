@@ -9,12 +9,12 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile
 {
-    public partial class ReportUserPopover : ReportPopover<UserReportReason>
+    public partial class UserReportDialog : ReportDialog<UserReportReason>
     {
         private readonly APIUser user;
 
-        public ReportUserPopover(APIUser user)
-            : base(ReportStrings.UserTitle(user.Username))
+        public UserReportDialog(APIUser user, OverlayColourProvider? colourProvider = null)
+            : base(ReportStrings.UserTitle(user.Username), true, colourProvider)
         {
             this.user = user;
         }
