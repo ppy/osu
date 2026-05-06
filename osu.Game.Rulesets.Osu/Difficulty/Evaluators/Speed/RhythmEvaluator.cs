@@ -16,8 +16,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
     {
         private const int history_time_max = 5 * 1000; // 5 seconds
         private const int history_objects_max = 32;
-        private const double rhythm_overall_multiplier = 0.8;
-        private const double rhythm_ratio_multiplier = 32.0;
+        private const double rhythm_overall_multiplier = 0.95;
+        private const double rhythm_ratio_multiplier = 26.0;
 
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
@@ -70,6 +70,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                 double prevDelta = Math.Max(prevObj.DeltaTime, 1e-7);
                 double lastDelta = Math.Max(lastObj.DeltaTime, 1e-7);
 
+                // Make sure to always have the current island initialised - if we don't do it here it will only initialise on the next rhythm change
+                if (island.Delta == int.MaxValue)
+                    island = new Island((int)currDelta, deltaDifferenceEpsilon);
+
                 // calculate how much current delta difference deserves a rhythm bonus
                 // this function is meant to reduce rhythm bonus for deltas that are multiples of each other (i.e 100 and 200)
                 double deltaDifference = Math.Max(prevDelta, currDelta) / Math.Min(prevDelta, currDelta);
@@ -96,14 +100,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                     effectiveRatio = Math.Min(sliderEffectiveRatio, effectiveRatio);
                 }
 
+                bool isSpeedingUp = prevDelta > currDelta + deltaDifferenceEpsilon;
+
+                if (Math.Abs(prevDelta - currDelta) < deltaDifferenceEpsilon)
+                {
+                    // island is still progressing
+                    island.AddDelta((int)currDelta);
+                }
+
                 if (firstDeltaSwitch)
                 {
-                    if (Math.Abs(prevDelta - currDelta) < deltaDifferenceEpsilon)
-                    {
-                        // island is still progressing
-                        island.AddDelta((int)currDelta);
-                    }
-                    else
+                    if (Math.Abs(prevDelta - currDelta) > deltaDifferenceEpsilon)
                     {
                         // bpm change is into slider, this is easy acc window
                         if (currObj.BaseObject is Slider)
@@ -121,6 +128,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                         // TODO: remove this nerf since its staying here only for balancing purposes because of the flawed ratio calculation
                         if (previousIsland.DeltaCount == island.DeltaCount)
                             effectiveRatio *= 0.5;
+
+                        if (isSpeedingUp)
+                            effectiveRatio *= 0.65;
 
                         var islandCount = islandCounts.FirstOrDefault(x => x.Island.Equals(island));
 
@@ -140,7 +150,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                         }
                         else
                         {
-                            islandCounts.Add((island, 1));
+                            if (island.DeltaCount > 0)
+                            {
+                                islandCounts.Add((island, 1));
+                            }
                         }
 
                         // scale down the difficulty if the object is doubletappable
@@ -181,6 +194,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                 lastObj = prevObj;
                 prevObj = currObj;
             }
+
+            // If the current island is long we don't want the sum to have as big of an effect
+            rhythmComplexitySum *= DifficultyCalculationUtils.ReverseLerp(island.DeltaCount, 22, 3);
 
             return Math.Sqrt(4 + rhythmComplexitySum * rhythm_overall_multiplier) / 2.0; // produces multiplier that can be applied to strain. range [1, infinity) (not really though);
         }
