@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Online
         private DialogOverlay dialogOverlay = null!;
 
         public TestSceneCommentReportButton()
-            :base(false)
+            : base(false)
         {
         }
 
