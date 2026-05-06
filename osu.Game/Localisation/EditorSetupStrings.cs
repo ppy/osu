@@ -138,7 +138,7 @@ namespace osu.Game.Localisation
             @"Determines how many ""ticks"" are generated within long hit objects. A tick rate of 1 will generate ticks on each beat, 2 would be twice per beat, etc.");
 
         /// <summary>
-        /// "Tick Rate"
+        /// "Stack Leniency"
         /// </summary>
         public static LocalisableString StackLeniency => new TranslatableString(getKey(@"stack_leniency"), @"Stack Leniency");
 
