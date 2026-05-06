@@ -154,7 +154,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                             new HamburgerMenu
                             {
                                 Size = new Vector2(56),
-                                ReportRequested = () => dialogOverlay.Push(new UserReportDialog(opponentUser)),
+                                ReportRequested = () => dialogOverlay.Push(new UserReportDialog(opponentUser, new OverlayColourProvider(OverlayColourScheme.Pink))),
                             }
                         }
                     }
