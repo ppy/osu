@@ -145,6 +145,12 @@ namespace osu.Game.Screens.Play
 
         public BreakOverlay BreakOverlay;
 
+        public LegacyBreakOverlay LegacyBreakOverlay;
+
+        private readonly Bindable<bool> useLegacyBreakOverlay = new BindableBool();
+
+        public Container BreakOverlayContainer;
+
         private LetterboxOverlay letterboxOverlay;
 
         /// <summary>
@@ -368,7 +374,7 @@ namespace osu.Game.Screens.Play
             {
                 HUDOverlay.ShowHud.Value = false;
                 HUDOverlay.ShowHud.Disabled = true;
-                BreakOverlay.Hide();
+                BreakOverlayContainer.Hide();
             }
 
             DrawableRuleset.FrameStableClock.WaitingOnFrames.BindValueChanged(waiting =>
@@ -427,6 +433,14 @@ namespace osu.Game.Screens.Play
 
             IsBreakTime.BindTo(breakTracker.IsBreakTime);
             IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
+
+            config.BindWith(OsuSetting.LegacyBreakOverlay, useLegacyBreakOverlay);
+            useLegacyBreakOverlay.BindValueChanged(useLegacy =>
+            {
+                bool isOsuOrFruits = ruleset.ShortName == "osu" || ruleset.ShortName == "fruits";
+                BreakOverlay.Alpha = useLegacy.NewValue ? 0 : 1;
+                LegacyBreakOverlay.Alpha = useLegacy.NewValue && isOsuOrFruits ? 1 : 0;
+            }, true);
         }
 
         protected virtual GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart);
@@ -495,11 +509,24 @@ namespace osu.Game.Screens.Play
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     },
-                    BreakOverlay = new BreakOverlay(ScoreProcessor)
+                    BreakOverlayContainer = new Container
                     {
-                        Clock = DrawableRuleset.FrameStableClock,
-                        ProcessCustomClock = false,
-                        BreakTracker = breakTracker,
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
+                        {
+                            BreakOverlay = new BreakOverlay(ScoreProcessor)
+                            {
+                                Clock = DrawableRuleset.FrameStableClock,
+                                ProcessCustomClock = false,
+                                BreakTracker = breakTracker,
+                            },
+                            LegacyBreakOverlay = new LegacyBreakOverlay(HealthProcessor)
+                            {
+                                Clock = DrawableRuleset.FrameStableClock,
+                                ProcessCustomClock = false,
+                                BreakTracker = breakTracker,
+                            },
+                        }
                     },
                     // display the cursor above some HUD elements.
                     DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),

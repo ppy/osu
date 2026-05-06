@@ -32,6 +32,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsItemV2(new FormCheckBox
                 {
+                    Caption = GameplaySettingsStrings.LegacyBreakOverlay,
+                    Current = config.GetBindable<bool>(OsuSetting.LegacyBreakOverlay),
+                }),
+                new SettingsItemV2(new FormCheckBox
+                {
                     Caption = GraphicsSettingsStrings.HitLighting,
                     Current = config.GetBindable<bool>(OsuSetting.HitLighting)
                 }),
