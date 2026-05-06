@@ -29,15 +29,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             Action = this.ShowPopover;
         }
 
-        public Framework.Graphics.UserInterface.Popover GetPopover() => new Popover() { ReportRequested = ReportRequested };
+        public Framework.Graphics.UserInterface.Popover GetPopover() => new Popover { ReportRequested = ReportRequested };
 
         private partial class Popover : OsuPopover
         {
             [Resolved]
             private RankedPlayScreen? rankedPlayScreen { get; set; }
-
-            [Resolved]
-            private IDialogOverlay? dialogOverlay { get; set; }
 
             public Action? ReportRequested;
 
