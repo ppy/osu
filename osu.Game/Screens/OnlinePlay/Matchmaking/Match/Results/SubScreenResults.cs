@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Overlays;
@@ -92,7 +93,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
                                         {
                                             Anchor = Anchor.TopCentre,
                                             Origin = Anchor.TopCentre,
-                                            Text = "How you played",
+                                            Text = MatchmakingStrings.HowYouPlayed,
                                             Font = OsuFont.Style.Heading2,
                                             Margin = new MarginPadding { Vertical = 15 },
                                         },
@@ -108,7 +109,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
                                         {
                                             Anchor = Anchor.TopCentre,
                                             Origin = Anchor.TopCentre,
-                                            Text = "Room Awards",
+                                            Text = MatchmakingStrings.RoomAwards,
                                             Font = OsuFont.Style.Heading2,
                                             Margin = new MarginPadding { Vertical = 15 },
                                         },
@@ -148,7 +149,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Results
                                             {
                                                 Anchor = Anchor.TopCentre,
                                                 Origin = Anchor.TopCentre,
-                                                Text = "Your final placement",
+                                                Text = MatchmakingStrings.FinalPlacement,
                                                 Font = OsuFont.Style.Heading2.With(size: 36),
                                             },
                                             placementText = new OsuSpriteText

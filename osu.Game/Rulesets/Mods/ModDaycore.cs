@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Rulesets.Mods
@@ -17,7 +18,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "DC";
         public override IconUsage? Icon => OsuIcon.ModDaycore;
         public override ModType Type => ModType.DifficultyReduction;
-        public override LocalisableString Description => "Whoaaaaa...";
+        public override LocalisableString Description => ModSelectOverlayStrings.ModDaycoreDescription;
         public override bool Ranked => UsesDefaultConfiguration;
 
         [SettingSource("Speed decrease", "The actual decrease to apply", SettingControlType = typeof(MultiplierSettingsSlider))]

@@ -18,6 +18,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
 using osu.Game.Rulesets.Objects;
@@ -84,7 +85,7 @@ namespace osu.Game.Rulesets.Edit
                         KeyboardStep = adjust_step,
                         // Manual binding in LoadComplete to handle one-way event flow.
                         Current = DistanceSpacingMultiplier.GetUnboundCopy(),
-                        ExpandedLabelText = "Distance spacing",
+                        ExpandedLabelText = EditorComposeStrings.SnappingExpandedLabelText,
                     },
                     currentDistanceSpacingButton = new ExpandableButton
                     {
@@ -198,7 +199,7 @@ namespace osu.Game.Rulesets.Edit
             new DrawableTernaryButton
             {
                 Current = DistanceSnapToggle,
-                Description = "Distance Snap",
+                Description = EditorComposeStrings.DistanceSnapButtonTitle,
                 CreateIcon = () => new SpriteIcon { Icon = OsuIcon.EditorDistanceSnap },
             }
         };

@@ -10,6 +10,71 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.RankingStatisticsStrings";
 
         /// <summary>
+        /// "slider tick"
+        /// </summary>
+        public static LocalisableString OsuSliderTick => new TranslatableString(getKey(@"osu_slider_tick"), @"slider tick");
+
+        /// <summary>
+        /// "slider end"
+        /// </summary>
+        public static LocalisableString OsuSliderEnd => new TranslatableString(getKey(@"osu_slider_end"), @"slider end");
+
+        /// <summary>
+        /// "spinner spin"
+        /// </summary>
+        public static LocalisableString OsuSpinnerSpin => new TranslatableString(getKey(@"osu_spinner_spin"), @"spinner spin");
+
+        /// <summary>
+        /// "spinner bonus"
+        /// </summary>
+        public static LocalisableString OsuSpinnerBonus => new TranslatableString(getKey(@"osu_spinner_bonus"), @"spinner bonus");
+
+        /// <summary>
+        /// "Large droplet"
+        /// </summary>
+        public static LocalisableString CatchLargeDroplet => new TranslatableString(getKey(@"catch_large_droplet"), @"Large droplet");
+
+        /// <summary>
+        /// "Small droplet"
+        /// </summary>
+        public static LocalisableString CatchSmallDroplet => new TranslatableString(getKey(@"catch_small_droplet"), @"Small droplet");
+
+        /// <summary>
+        /// "Banana"
+        /// </summary>
+        public static LocalisableString CatchBanana => new TranslatableString(getKey(@"catch_banana"), @"Banana");
+
+        /// <summary>
+        /// "drum tick"
+        /// </summary>
+        public static LocalisableString TaikoDrumTick => new TranslatableString(getKey(@"taiko_drum_tick"), @"drum tick");
+
+        /// <summary>
+        /// "bonus"
+        /// </summary>
+        public static LocalisableString TaikoBonus => new TranslatableString(getKey(@"taiko_bonus"), @"bonus");
+
+        /// <summary>
+        /// "Performance Breakdown"
+        /// </summary>
+        public static LocalisableString PerformanceBreakdownTitle => new TranslatableString(getKey(@"performance_breakdown_title"), @"Performance Breakdown");
+
+        /// <summary>
+        /// "Timing Distribution"
+        /// </summary>
+        public static LocalisableString TimingDistributionTitle => new TranslatableString(getKey(@"timing_distribution_title"), @"Timing Distribution");
+
+        /// <summary>
+        /// "Accuracy Heatmap"
+        /// </summary>
+        public static LocalisableString AccuracyHeatmapTitle => new TranslatableString(getKey(@"accuracy_heatmap_title"), @"Accuracy Heatmap");
+
+        /// <summary>
+        /// "Statistics"
+        /// </summary>
+        public static LocalisableString StatisticsTitle => new TranslatableString(getKey(@"statistics_title"), @"Statistics");
+
+        /// <summary>
         /// "Average Hit Error"
         /// </summary>
         public static LocalisableString AverageHitErrorTitle => new TranslatableString(getKey(@"average_hit_error_title"), @"Average Hit Error");
@@ -38,6 +103,11 @@ namespace osu.Game.Localisation
         /// "Classic scoring mode is always used for this statistic."
         /// </summary>
         public static LocalisableString ClassicScoringAlwaysUsed => new TranslatableString(getKey(@"classic_scoring_always_used"), @"Classic scoring mode is always used for this statistic.");
+
+        /// <summary>
+        /// "More statistics available after watching a replay!"
+        /// </summary>
+        public static LocalisableString StatisticsAvailableAfterReplay => new TranslatableString(getKey(@"statistics_available_after_replay"), @"More statistics available after watching a replay!");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

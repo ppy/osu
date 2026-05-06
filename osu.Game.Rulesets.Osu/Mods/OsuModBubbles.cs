@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -32,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override string Acronym => "BU";
 
-        public override LocalisableString Description => "Don't let their popping distract you!";
+        public override LocalisableString Description => ModSelectOverlayStrings.OsuModBubblesDescription;
 
         public override double ScoreMultiplier => 1;
 

@@ -404,17 +404,17 @@ namespace osu.Game.Rulesets.Mania
 
         public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
         {
-            new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
+            new StatisticItem(RankingStatisticsStrings.PerformanceBreakdownTitle, () => new PerformanceBreakdownChart(score, playableBeatmap)
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y
             }),
-            new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(score.HitEvents)
+            new StatisticItem(RankingStatisticsStrings.TimingDistributionTitle, () => new HitEventTimingDistributionGraph(score.HitEvents)
             {
                 RelativeSizeAxes = Axes.X,
                 Height = 250
             }, true),
-            new StatisticItem("Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
+            new StatisticItem(RankingStatisticsStrings.StatisticsTitle, () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
             {
                 new AverageHitError(score.HitEvents),
                 new UnstableRate(score.HitEvents)

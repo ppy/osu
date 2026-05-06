@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
@@ -69,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 {
                     distanceSnapInput = new FormSliderBar<double>
                     {
-                        Caption = "Distance snap",
+                        Caption = EditorComposeStrings.GenerateDistanceSnap,
                         Current = new BindableNumber<double>(1)
                         {
                             MinValue = 0.1,
@@ -81,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     },
                     offsetAngleInput = new FormSliderBar<int>
                     {
-                        Caption = "Offset angle",
+                        Caption = EditorComposeStrings.GenerateOffsetAngle,
                         Current = new BindableNumber<int>
                         {
                             MinValue = 0,
@@ -92,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     },
                     repeatCountInput = new FormSliderBar<int>
                     {
-                        Caption = "Repeats",
+                        Caption = EditorComposeStrings.GenerateRepeatCount,
                         Current = new BindableNumber<int>(1)
                         {
                             MinValue = 1,
@@ -103,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     },
                     pointInput = new FormSliderBar<int>
                     {
-                        Caption = "Vertices",
+                        Caption = EditorComposeStrings.GeneratePoint,
                         Current = new BindableNumber<int>(3)
                         {
                             MinValue = 3,
@@ -115,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     commitButton = new RoundedButton
                     {
                         RelativeSizeAxes = Axes.X,
-                        Text = "Create",
+                        Text = EditorComposeStrings.GenerateCreate,
                         Action = commit
                     }
                 }

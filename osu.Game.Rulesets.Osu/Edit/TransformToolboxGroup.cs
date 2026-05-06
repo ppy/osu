@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
@@ -51,13 +52,13 @@ namespace osu.Game.Rulesets.Osu.Edit
                 Spacing = new Vector2(5),
                 Children = new Drawable[]
                 {
-                    moveButton = new EditorToolButton("Move",
+                    moveButton = new EditorToolButton(EditorComposeStrings.TransformMove,
                         () => new SpriteIcon { Icon = FontAwesome.Solid.ArrowsAlt },
                         () => new PreciseMovementPopover()),
-                    rotateButton = new EditorToolButton("Rotate",
+                    rotateButton = new EditorToolButton(EditorComposeStrings.TransformRotate,
                         () => new SpriteIcon { Icon = FontAwesome.Solid.Undo },
                         () => new PreciseRotationPopover(RotationHandler, GridToolbox)),
-                    scaleButton = new EditorToolButton("Scale",
+                    scaleButton = new EditorToolButton(EditorComposeStrings.TransformScale,
                         () => new SpriteIcon { Icon = FontAwesome.Solid.ExpandArrowsAlt },
                         () => new PreciseScalePopover(ScaleHandler, GridToolbox))
                 }

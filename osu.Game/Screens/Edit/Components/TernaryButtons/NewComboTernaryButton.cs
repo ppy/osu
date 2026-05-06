@@ -20,6 +20,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -60,7 +61,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
                     Child = mainButton = new DrawableTernaryButton
                     {
                         Current = Current,
-                        Description = "New combo",
+                        Description = EditorComposeStrings.NewComboButtonTitle,
                         CreateIcon = () => new SpriteIcon { Icon = OsuIcon.EditorNewCombo },
                     },
                 },

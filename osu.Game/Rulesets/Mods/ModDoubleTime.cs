@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Rulesets.Mods
@@ -18,7 +19,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "DT";
         public override IconUsage? Icon => OsuIcon.ModDoubleTime;
         public override ModType Type => ModType.DifficultyIncrease;
-        public override LocalisableString Description => "Zoooooooooom...";
+        public override LocalisableString Description => ModSelectOverlayStrings.ModDoubleTimeDescription;
         public override bool Ranked => SpeedChange.IsDefault;
 
         [SettingSource("Speed increase", "The actual increase to apply", SettingControlType = typeof(MultiplierSettingsSlider))]

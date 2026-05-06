@@ -19,6 +19,7 @@ using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
 using osu.Game.Rulesets.Mods;
@@ -190,7 +191,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                             Origin = Anchor.TopCentre,
                             Children = new Drawable[]
                             {
-                                new MessagePlaceholder("More statistics available after watching a replay!"),
+                                new MessagePlaceholder(RankingStatisticsStrings.StatisticsAvailableAfterReplay),
                                 new ReplayDownloadButton(newScore)
                                 {
                                     Scale = new Vector2(1.5f),
