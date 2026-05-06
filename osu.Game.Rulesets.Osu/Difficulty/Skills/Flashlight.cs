@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
         }
 
-        private double skillMultiplier => 0.056;
+        private double skillMultiplier => 0.058;
         private double strainDecayBase => 0.15;
 
         private double currentStrain;
