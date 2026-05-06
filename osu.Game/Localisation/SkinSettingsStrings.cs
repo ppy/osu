@@ -30,6 +30,26 @@ namespace osu.Game.Localisation
         public static LocalisableString SkinLayoutEditor => new TranslatableString(getKey(@"skin_layout_editor"), @"Skin layout editor");
 
         /// <summary>
+        /// "Pin"
+        /// </summary>
+        public static LocalisableString PinSkin => new TranslatableString(getKey(@"pin_skin"), @"Pin");
+
+        /// <summary>
+        /// "Unpin"
+        /// </summary>
+        public static LocalisableString UnpinSkin => new TranslatableString(getKey(@"unpin_skin"), @"Unpin");
+
+        /// <summary>
+        /// "Cycle through favourites only"
+        /// </summary>
+        public static LocalisableString CycleSkinsThroughFavoritesOnly => new TranslatableString(getKey(@"cycle_skins_through_favorites_only"), @"Cycle through favourites only");
+
+        /// <summary>
+        /// "Restrict the next/previous skin keybinds to pinned skins only."
+        /// </summary>
+        public static LocalisableString CycleSkinsThroughFavoritesOnlyDescription => new TranslatableString(getKey(@"cycle_skins_through_favorites_only_description"), @"Restrict the next/previous skin keybinds to pinned skins only.");
+
+        /// <summary>
         /// "Gameplay cursor size"
         /// </summary>
         public static LocalisableString GameplayCursorSize => new TranslatableString(getKey(@"gameplay_cursor_size"), @"Gameplay cursor size");

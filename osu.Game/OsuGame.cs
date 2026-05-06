@@ -1566,14 +1566,14 @@ namespace osu.Game
                     if (skinEditor.State.Value == Visibility.Visible)
                         return false;
 
-                    SkinManager.SelectNextSkin();
+                    SkinManager.SelectNextSkin(LocalConfig.Get<bool>(OsuSetting.CycleSkinsThroughFavoritesOnly));
                     return true;
 
                 case GlobalAction.PreviousSkin:
                     if (skinEditor.State.Value == Visibility.Visible)
                         return false;
 
-                    SkinManager.SelectPreviousSkin();
+                    SkinManager.SelectPreviousSkin(LocalConfig.Get<bool>(OsuSetting.CycleSkinsThroughFavoritesOnly));
                     return true;
             }
 
