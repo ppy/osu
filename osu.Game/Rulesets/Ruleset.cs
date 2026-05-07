@@ -19,7 +19,6 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Localisation;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
@@ -434,7 +433,7 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// Overload of <see cref="GetAdjustedDisplayDifficulty"/> for display on Ranked Cards
         /// </summary>
-        public virtual IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplayRankedPlayCard(APIBeatmap beatmapInfo, IReadOnlyCollection<Mod> mods)
+        public virtual IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForRankedPlayCard(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
         {
             return GetBeatmapAttributesForDisplay(beatmapInfo, mods);
         }
