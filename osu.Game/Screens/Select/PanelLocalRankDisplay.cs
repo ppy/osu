@@ -76,11 +76,7 @@ namespace osu.Game.Screens.Select
             if (beatmap == null)
                 return;
 
-            scoreSubscription = realm.RegisterForNotifications(r =>
-                    r.GetAllLocalScoresForUser(api.LocalUser.Value.Id)
-                     .Filter($@"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0"
-                             + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $1", beatmap.ID, ruleset.Value.ShortName),
-                localScoresChanged);
+            scoreSubscription = realm.RegisterForNotifications(r => r.All<ScoreInfo>().Where(s => s.BeatmapHash == beatmap.Hash && !s.DeletePending), localScoresChanged);
         }
 
         private void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes)
@@ -90,7 +86,11 @@ namespace osu.Game.Screens.Select
             if (changes?.HasCollectionChanges() == false)
                 return;
 
-            ScoreInfo? topScore = sender.MaxBy(info => (info.TotalScore, -info.Date.UtcDateTime.Ticks));
+            ScoreInfo? topScore = sender
+                                  // doing these post realm filter is most efficient.
+                                  .Where(s => s.UserID == api.LocalUser.Value.Id || s.UserID <= 1)
+                                  .Where(s => s.Ruleset.ShortName == ruleset.Value.ShortName)
+                                  .MaxBy(info => (info.TotalScore, -info.Date.UtcDateTime.Ticks));
             updateable.Rank = topScore?.Rank;
             updateable.Alpha = topScore != null ? 1 : 0;
         }
