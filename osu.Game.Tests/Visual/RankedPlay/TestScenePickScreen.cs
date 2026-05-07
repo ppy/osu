@@ -3,7 +3,6 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
@@ -11,7 +10,8 @@ using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Rooms;
-using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand;
 using osuTK.Input;
@@ -20,10 +20,8 @@ namespace osu.Game.Tests.Visual.RankedPlay
 {
     public partial class TestScenePickScreen : RankedPlayTestScene
     {
-        [Resolved]
-        private RulesetStore rulesetStore { get; set; } = null!;
-
         private RankedPlayScreen screen = null!;
+
         public override void SetUpSteps()
         {
             base.SetUpSteps();
@@ -38,10 +36,10 @@ namespace osu.Game.Tests.Visual.RankedPlay
         }
 
         [Test]
-        public void Standard()
+        public void TestOsu()
         {
             BeatmapRequestHandler requestHandler = null!;
-            AddStep("setup ruleset", () => requestHandler = new BeatmapRequestHandler(rulesetStore.GetRuleset(0)!));
+            AddStep("setup ruleset", () => requestHandler = new BeatmapRequestHandler(new OsuRuleset().RulesetInfo));
 
             AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
 
@@ -88,10 +86,10 @@ namespace osu.Game.Tests.Visual.RankedPlay
         }
 
         [Test]
-        public void Mania()
+        public void TestMania()
         {
             BeatmapRequestHandler requestHandler = null!;
-            AddStep("setup ruleset", () => requestHandler = new BeatmapRequestHandler(rulesetStore.GetRuleset(0)!));
+            AddStep("setup ruleset", () => requestHandler = new BeatmapRequestHandler(new ManiaRuleset().RulesetInfo));
 
             AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
 

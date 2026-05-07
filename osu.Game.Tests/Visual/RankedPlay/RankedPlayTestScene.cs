@@ -21,18 +21,11 @@ namespace osu.Game.Tests.Visual.RankedPlay
         /// <summary>
         /// Returns 5 sample of the chosen ruleset <see cref="APIBeatmap"/>s.
         /// </summary>
-        protected static APIBeatmap[] GetSampleBeatmaps(RulesetInfo ri)
+        protected static APIBeatmap[] GetSampleBeatmaps(RulesetInfo ruleset)
         {
-            switch (ri.ShortName)
+            switch (ruleset.OnlineID)
             {
-                case "osu!":
-                {
-                    using var resourceStream = TestResources.OpenResource("Requests/api-beatmaps-rankedplay.json");
-                    using var reader = new StreamReader(resourceStream);
-                    return JsonConvert.DeserializeObject<APIBeatmap[]>(reader.ReadToEnd())!;
-                }
-
-                case "mania":
+                case 3:
                 {
                     using var resourceStream = TestResources.OpenResource("Requests/api-beatmaps-rankedplay-mania4k.json");
                     using var reader = new StreamReader(resourceStream);
@@ -55,10 +48,11 @@ namespace osu.Game.Tests.Visual.RankedPlay
         {
             public APIBeatmap[] APIBeatmaps;
 
-            public BeatmapRequestHandler(RulesetInfo ri)
+            public BeatmapRequestHandler(RulesetInfo ruleset)
             {
-                APIBeatmaps = GetSampleBeatmaps(ri);
+                APIBeatmaps = GetSampleBeatmaps(ruleset);
             }
+
             public bool HandleRequest(APIRequest request)
             {
                 switch (request)
@@ -89,7 +83,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
                 return false;
             }
         }
-
 
         public class RevealedRankedPlayCardWithPlaylistItem : RankedPlayCardWithPlaylistItem
         {

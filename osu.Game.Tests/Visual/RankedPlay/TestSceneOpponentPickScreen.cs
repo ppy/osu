@@ -1,15 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Rooms;
-using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
-
 
 namespace osu.Game.Tests.Visual.RankedPlay
 {
@@ -17,8 +15,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
     {
         private RankedPlayScreen screen = null!;
 
-        [Resolved]
-        private RulesetStore rulesetStore { get; set; } = null!;
         public override void SetUpSteps()
         {
             base.SetUpSteps();
@@ -32,7 +28,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddUntilStep("screen loaded", () => screen.IsLoaded);
 
             BeatmapRequestHandler requestHandler = null!;
-            AddStep("setup ruleset", () => requestHandler = new BeatmapRequestHandler(rulesetStore.GetRuleset(0)!));
+            AddStep("setup ruleset", () => requestHandler = new BeatmapRequestHandler(new OsuRuleset().RulesetInfo));
 
             AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
 
