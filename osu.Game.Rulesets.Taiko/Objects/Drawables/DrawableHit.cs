@@ -36,11 +36,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             private set;
         }
 
-        private bool validActionPressed;
+        [Resolved(CanBeNull = true)]
+        private TaikoRulesetConfigManager taikoConfig { get; set; }
 
-        private double? lastPressHandleTime;
-
+        private readonly Bindable<bool> rateAdjustedHitAnimations = new Bindable<bool>(true);
         private readonly Bindable<HitType> type = new Bindable<HitType>();
+
+        private bool validActionPressed;
+        private double? lastPressHandleTime;
 
         public DrawableHit()
             : this(null)
@@ -51,6 +54,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             : base(hit)
         {
             FillMode = FillMode.Fit;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            taikoConfig?.BindWith(TaikoRulesetSetting.RateAdjustedHitAnimation, rateAdjustedHitAnimations);
         }
 
         protected override void OnApply()
@@ -144,9 +153,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             base.OnReleased(e);
         }
 
-        [Resolved]
-        private TaikoRulesetConfigManager taikoConfig { get; set; }
-
         protected override void UpdateHitStateTransforms(ArmedState state)
         {
             Debug.Assert(HitObject.HitWindows != null);
@@ -174,7 +180,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         MainPiece.MoveToX(-X);
 
                     // Rate independent to match stable.
-                    double length = gravity_time * (taikoConfig.Get<bool>(TaikoRulesetSetting.RateAdjustedHitAnimation) ? 1 : Clock.Rate);
+                    double length = gravity_time * (rateAdjustedHitAnimations.Value ? 1 : Clock.Rate);
 
                     this.ScaleTo(0.8f, length * 2, Easing.OutQuad);
 
