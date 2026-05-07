@@ -149,12 +149,6 @@ namespace osu.Game.Overlays.Dashboard.UserSearch
                 return;
             }
 
-            if (string.IsNullOrEmpty(searchTextBox.Current.Value))
-            {
-                loading.Value = false;
-                return;
-            }
-
             queryChangedDebounce = Scheduler.AddDelayed(performSearch, 500);
         }
 
