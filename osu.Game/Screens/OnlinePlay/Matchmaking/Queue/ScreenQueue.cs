@@ -80,7 +80,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private readonly IBindable<MatchmakingScreenState> currentState = new Bindable<MatchmakingScreenState>();
 
-        private readonly Bindable<MatchmakingPool[]> availablePools = new Bindable<MatchmakingPool[]>([]);
+        private readonly Bindable<MatchmakingPool[]?> availablePools = new Bindable<MatchmakingPool[]?>();
         private readonly Bindable<MatchmakingPool?> selectedPool = new Bindable<MatchmakingPool?>();
 
         private readonly MatchmakingPoolType poolType;
@@ -98,6 +98,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private int? userRating;
 
         private GridContainer mainGrid = null!;
+
+        private IBindable<bool> isConnected = null!;
 
         public ScreenQueue(MatchmakingPoolType poolType)
         {
@@ -339,9 +341,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             currentState.BindValueChanged(s => SetState(s.NewValue));
 
             selectedPool.BindTo(queue.SelectedPool);
-            selectedPool.BindValueChanged(onSelectedPoolChanged, true);
+            selectedPool.BindValueChanged(e => refreshLobbyData());
 
-            populateAvailablePools().FireAndForget();
+            isConnected = client.IsConnected.GetBoundCopy();
+            isConnected.BindValueChanged(connected => Schedule(() =>
+            {
+                if (connected.NewValue)
+                {
+                    populateAvailablePools().FireAndForget();
+                    refreshLobbyData();
+                }
+                else
+                {
+                    availablePools.Value = null;
+                    clearLobbyData();
+                }
+            }), true);
         }
 
         private async Task populateAvailablePools()
@@ -367,7 +382,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                            {
                                APIUser?[] users = result.GetResultSafely();
                                if (!cancellation.IsCancellationRequested)
-                                   Users = users.OfType<APIUser>().ToArray();
+                                   cloud.Users = users.OfType<APIUser>().ToArray();
                            }), cancellation.Token);
 
             // Global (incremental) updates will not contain the user rating, so keep the one we already received from initial status data.
@@ -402,15 +417,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             });
         }
 
-        private void onSelectedPoolChanged(ValueChangedEvent<MatchmakingPool?> e)
+        private void refreshLobbyData()
         {
-            userRating = null;
-            ratingGraph.SetData([], null);
+            clearLobbyData();
 
-            resultPanelContainer.Clear();
-            resultPanelContainer.LayoutDuration = 0;
-
-            if (e.NewValue == null)
+            if (selectedPool.Value == null)
             {
                 client.MatchmakingLeaveLobby().FireAndForget();
                 return;
@@ -418,8 +429,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             client.MatchmakingJoinLobbyWithParams(new MatchmakingJoinLobbyRequest
             {
-                PoolId = e.NewValue.Id
+                PoolId = selectedPool.Value.Id
             }).FireAndForget();
+        }
+
+        private void clearLobbyData()
+        {
+            resultPanelContainer.Clear();
+            resultPanelContainer.LayoutDuration = 0;
+            userRating = null;
+            ratingGraph.SetData([], null);
+
+            cloud.Users = Array.Empty<APIUser>();
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -470,11 +491,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             }
         }
 
-        public APIUser[] Users
-        {
-            set => cloud.Users = value;
-        }
-
         public void SetState(MatchmakingScreenState newState)
         {
             mainContent.FadeInFromZero(500, Easing.OutQuint);
@@ -515,6 +531,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Width = 200,
+                                Enabled = { BindTarget = isConnected },
                                 SelectedPool = { BindTarget = selectedPool },
                                 Action = () =>
                                 {
