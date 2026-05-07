@@ -50,42 +50,31 @@ namespace osu.Game.Screens.Edit.Setup
         [BackgroundDependencyLoader]
         private void load(SetupScreen? setupScreen)
         {
-            ArtistTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Artist);
-            RomanisedArtistTextBox = createTextBox<FormRomanisedTextBox>(EditorSetupStrings.RomanisedArtist);
-            TitleTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Title);
-            RomanisedTitleTextBox = createTextBox<FormRomanisedTextBox>(EditorSetupStrings.RomanisedTitle);
-            creatorTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Creator);
-            difficultyTextBox = createTextBox<FormTextBox>(EditorSetupStrings.DifficultyName);
-            sourceTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoSource);
-            tagsTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoMapperTags);
-
-            var syncMetadataButton = new RoundedButton
-            {
-                RelativeSizeAxes = Axes.X,
-                Text = EditorSetupStrings.SyncMetadataWithAllDifficulties,
-                TooltipText = EditorSetupStrings.SyncMetadataWithAllDifficultiesTooltip,
-                Margin = new MarginPadding { Top = 10 },
-                Action = () =>
-                {
-                    if (working.Value.BeatmapSetInfo.Beatmaps.Count <= 1)
-                        return;
-
-                    dialogOverlay?.Push(new SyncMetadataConfirmationDialog(syncMetadataToAllOtherDifficulties));
-                },
-            };
-            syncMetadataButton.Enabled.Value = working.Value.BeatmapSetInfo.Beatmaps.Count > 1;
-
             Children = new Drawable[]
             {
-                ArtistTextBox,
-                RomanisedArtistTextBox,
-                TitleTextBox,
-                RomanisedTitleTextBox,
-                creatorTextBox,
-                difficultyTextBox,
-                sourceTextBox,
-                tagsTextBox,
-                syncMetadataButton,
+                ArtistTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Artist),
+                RomanisedArtistTextBox = createTextBox<FormRomanisedTextBox>(EditorSetupStrings.RomanisedArtist),
+                TitleTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Title),
+                RomanisedTitleTextBox = createTextBox<FormRomanisedTextBox>(EditorSetupStrings.RomanisedTitle),
+                creatorTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Creator),
+                difficultyTextBox = createTextBox<FormTextBox>(EditorSetupStrings.DifficultyName),
+                sourceTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoSource),
+                tagsTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoMapperTags),
+                new RoundedButton
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Text = EditorSetupStrings.SyncMetadataWithAllDifficulties,
+                    TooltipText = EditorSetupStrings.SyncMetadataWithAllDifficultiesTooltip,
+                    Margin = new MarginPadding { Top = 10 },
+                    Action = () =>
+                    {
+                        if (working.Value.BeatmapSetInfo.Beatmaps.Count <= 1)
+                            return;
+
+                        dialogOverlay?.Push(new SyncMetadataConfirmationDialog(syncMetadataToAllOtherDifficulties));
+                    },
+                    Enabled = { Value = working.Value.BeatmapSetInfo.Beatmaps.Count > 1 }
+                }
             };
 
             if (setupScreen != null)
