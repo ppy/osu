@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                 AddStep("reveal card", () => MultiplayerClient.RankedPlayRevealCard(hand => hand[i2], new MultiplayerPlaylistItem
                 {
                     ID = i2,
-                    BeatmapID = requestHandler.APIBeatmaps[i2].OnlineID
+                    BeatmapID = requestHandler.Beatmaps[i2].OnlineID
                 }).WaitSafely());
             }
         }
@@ -238,7 +238,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                 AddStep("reveal card", () => MultiplayerClient.RankedPlayRevealCard(hand => hand[i2], new MultiplayerPlaylistItem
                 {
                     ID = i2,
-                    BeatmapID = requestHandler.APIBeatmaps[i2].OnlineID
+                    BeatmapID = requestHandler.Beatmaps[i2].OnlineID
                 }).WaitSafely());
             }
 

@@ -46,11 +46,11 @@ namespace osu.Game.Tests.Visual.RankedPlay
         /// </summary>
         public class BeatmapRequestHandler
         {
-            public APIBeatmap[] APIBeatmaps;
+            public APIBeatmap[] Beatmaps;
 
             public BeatmapRequestHandler(RulesetInfo ruleset)
             {
-                APIBeatmaps = GetSampleBeatmaps(ruleset);
+                Beatmaps = GetSampleBeatmaps(ruleset);
             }
 
             public bool HandleRequest(APIRequest request)
@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                 switch (request)
                 {
                     case GetBeatmapRequest beatmapRequest:
-                        var beatmap = APIBeatmaps.FirstOrDefault(it => it.OnlineID == beatmapRequest.OnlineID);
+                        var beatmap = Beatmaps.FirstOrDefault(it => it.OnlineID == beatmapRequest.OnlineID);
 
                         if (beatmap != null)
                         {
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                         {
                             Beatmaps = beatmapsRequest
                                        .BeatmapIds
-                                       .Select(id => APIBeatmaps.FirstOrDefault(it => it.OnlineID == id))
+                                       .Select(id => Beatmaps.FirstOrDefault(it => it.OnlineID == id))
                                        .ToList()
                         });
 

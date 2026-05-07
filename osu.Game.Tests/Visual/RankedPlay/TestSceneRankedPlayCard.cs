@@ -140,7 +140,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     SelectionMode = HandSelectionMode.Single
                 };
 
-                foreach (var beatmap in requestHandler.APIBeatmaps)
+                foreach (var beatmap in requestHandler.Beatmaps)
                 {
                     handOfCards.AddCard(new RevealedRankedPlayCardWithPlaylistItem(beatmap));
                 }

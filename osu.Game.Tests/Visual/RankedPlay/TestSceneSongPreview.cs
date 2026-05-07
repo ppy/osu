@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     Size = new Vector2(0.5f),
                 };
 
-                foreach (var beatmap in requestHandler.APIBeatmaps.Take(3))
+                foreach (var beatmap in requestHandler.Beatmaps.Take(3))
                 {
                     handOfCards.AddCard(new RevealedRankedPlayCardWithPlaylistItem(beatmap), handCard =>
                     {
