@@ -160,6 +160,12 @@ namespace osu.Game.Overlays.Dashboard.UserSearch
 
         private void performSearch()
         {
+            if (string.IsNullOrEmpty(searchTextBox.Current.Value))
+            {
+                loading.Value = false;
+                return;
+            }
+
             loading.Value = true;
             var getUsersRequest = new SearchUsersRequest(searchTextBox.Current.Value);
             getUsersRequest.Success += showResults;
