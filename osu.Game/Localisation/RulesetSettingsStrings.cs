@@ -82,7 +82,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Rate adjusted hit animations"
         /// </summary>
-        public static LocalisableString RateAdjustedHitAnimation => new TranslatableString(getKey(@"rate_adjusted_hit_animation"), @"Rate adjusted hit animations");
+        public static LocalisableString RateAdjustedHitAnimation => new TranslatableString(getKey(@"rate_adjusted_hit_animation"), @"Rate-adjusted hit animations");
 
         /// <summary>
         /// "Hits will fly faster or slower when beatmap rate is adjusted via mods."
