@@ -37,6 +37,8 @@ namespace osu.Game.Skinning
         /// </remarks>
         protected override bool AllowFallingBackToParent => false;
 
+        protected bool AllowSettingsLevelDisables { get; init; } = true;
+
         protected override Container<Drawable> Content { get; } = new Container
         {
             RelativeSizeAxes = Axes.Both,
@@ -54,6 +56,7 @@ namespace osu.Game.Skinning
         {
             InternalChild = new BeatmapSkinProvidingContainer(GetRulesetTransformedSkin(beatmapSkin), GetRulesetTransformedSkin(skinManager.DefaultClassicSkin))
             {
+                AllowSettingsLevelDisables = AllowSettingsLevelDisables,
                 Child = Content,
             };
         }
