@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             IncludeSliders = includeSliders;
         }
 
-        protected override double DecayWeight => 0.91;
+        protected override double DecayWeight => 0.92;
         protected override double MaxStoredSections => 10000;
 
         private double currentStrain;
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double skillMultiplierFlow => 277.0;
         private double skillMultiplierTotal => 1.12;
         private double combinedSnapNormExponent => 1.0;
-        private double lengthBonus => 1.5;
+        private double lengthBonus => 1.6;
         private double strainWeightSum;
 
         private readonly List<double> sliderStrains = new List<double>();
@@ -163,14 +163,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double difficulty = 0;
             double time = 0;
 
-            var strains = getStrainPeaks();
+            // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
+            // These sections will not contribute to the difficulty.
+            var peaks = GetCurrentStrainPeaks().Where(p => p.Value > 0);
+
+            List<StrainPeak> strains = peaks.OrderByDescending(p => p.Value).ToList();
 
             // Difficulty is a continuous weighted sum of the sorted strains
             foreach (StrainPeak strain in strains)
             {
                 /* Weighting function can be thought of as:
                         b
-                        ∫ DecayWeight^x dx
+                        ∫ DecayWeight^x + lengthBonus / (x + lengthOffset) dx
                         a
                     where a = startTime and b = endTime
 
@@ -187,8 +191,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 double startTime = time;
                 double endTime = time + strain.SectionLength / MaxSectionLength;
 
-                double weight = (Math.Pow(DecayWeight, startTime) - Math.Pow(DecayWeight, endTime)) / Math.Log(1 / DecayWeight)
-                                + lengthBonus * (Math.Log(1 / (startTime + 50)) - Math.Log(1 / (endTime + 50)));
+                double weight = (Math.Pow(DecayWeight, startTime) - Math.Pow(DecayWeight, endTime)) / (1 - DecayWeight)
+                                + lengthBonus * Math.Log((endTime + 50) / (startTime + 50));
 
                 strainWeightSum += weight;
 
@@ -197,21 +201,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             return difficulty;
-        }
-
-        /// <summary>
-        /// Returns a sorted enumerable of strain peaks.
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerable<StrainPeak> getStrainPeaks()
-        {
-            // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
-            // These sections will not contribute to the difficulty.
-            var peaks = GetCurrentStrainPeaks().Where(p => p.Value > 0);
-
-            List<StrainPeak> strains = peaks.OrderByDescending(p => p.Value).ToList();
-
-            return strains.OrderByDescending(p => p.Value);
         }
 
         public override double CountTopWeightedStrains(double difficultyValue)
