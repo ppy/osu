@@ -495,7 +495,7 @@ namespace osu.Game.Rulesets.Mania
             float holdNoteRatio = beatmapInfo.TotalObjectCount == 0 ? 0 : (float)beatmapInfo.EndTimeObjectCount / beatmapInfo.TotalObjectCount;
             attributes.Insert(0, new RulesetBeatmapAttribute("LN Ratio", @"LN", holdNoteRatio, holdNoteRatio, 1)
             {
-                ValueFormat = "P1"
+                ValueFormat = "P0"
             });
 
             return attributes;
