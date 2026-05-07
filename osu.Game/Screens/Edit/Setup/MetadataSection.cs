@@ -118,7 +118,8 @@ namespace osu.Game.Screens.Edit.Setup
             }
 
             // Persist the current difficulty and align with how resource changes re-save the current beatmap.
-            editor?.Save();
+            // The reload is a crude measure to ensure places like the verify tab do not continue showing problems with mismatching metadata.
+            editor?.SaveAndReload(withDialog: false);
         }
 
         private TTextBox createTextBox<TTextBox>(LocalisableString label)
