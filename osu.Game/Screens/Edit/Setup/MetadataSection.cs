@@ -113,7 +113,8 @@ namespace osu.Game.Screens.Edit.Setup
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, $"Failed to sync metadata to {b.GetDisplayTitle()}");
+                    Logger.Error(e, $@"Failed to sync metadata to {b.GetDisplayTitle()}");
+                    return;
                 }
             }
 
