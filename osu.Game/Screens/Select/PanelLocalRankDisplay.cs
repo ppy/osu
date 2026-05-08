@@ -77,11 +77,7 @@ namespace osu.Game.Screens.Select
             if (beatmap == null)
                 return;
 
-            scoreSubscription = realm.RegisterForNotifications(r =>
-                    r.GetAllLocalScoresForUser(api.LocalUser.Value.Id)
-                     .Filter($@"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0"
-                             + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $1", beatmap.ID, ruleset.Value.ShortName),
-                localScoresChanged);
+            scoreSubscription = realm.RegisterForNotifications(r => r.All<ScoreInfo>().Where(s => s.BeatmapHash == beatmap.Hash && !s.DeletePending), localScoresChanged);
         }
 
         private void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes)
