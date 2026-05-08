@@ -28,12 +28,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private TestBreakTracker? breakTracker;
 
-        private readonly IReadOnlyList<BreakPeriod> testBreaks = new List<BreakPeriod>
-        {
-            new BreakPeriod(1000, 5000),
-            new BreakPeriod(6000, 13500),
-        };
-
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
 
         [SetUp]
@@ -94,7 +88,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public readonly FramedClock FramedManualClock;
 
             private readonly ManualClock manualClock;
-            private IFrameBasedClock originalClock;
+            private IFrameBasedClock originalClock = null!;
 
             public double ManualClockTime
             {
