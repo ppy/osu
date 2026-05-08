@@ -541,7 +541,12 @@ namespace osu.Game.Rulesets.Edit
         public void CommitPlacement(HitObject hitObject)
         {
             EditorBeatmap.PlacementObject.Value = null;
+
+            EditorBeatmap.BeginChange();
+            foreach (var h in EditorBeatmap.HitObjects.Where(ho => HitObjectPlacementBlueprint.PlacementReplacesExisting(ho, hitObject)).ToArray())
+                EditorBeatmap.Remove(h);
             EditorBeatmap.Add(hitObject);
+            EditorBeatmap.EndChange();
 
             if (autoSeekOnPlacement.Value && EditorClock.CurrentTime < hitObject.StartTime)
                 EditorClock.SeekSmoothlyTo(hitObject.StartTime);
