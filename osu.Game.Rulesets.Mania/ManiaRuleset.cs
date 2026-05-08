@@ -489,11 +489,11 @@ namespace osu.Game.Rulesets.Mania
         {
             var attributes = GetBeatmapAttributesForDisplay(beatmapInfo, mods).ToList();
 
-            // Remove the key count attribute which isn't relevant to ranked play.
-            attributes.RemoveAt(0);
+            // Key count attribute isn't relevant to ranked play (it's decided by the pool).
+            attributes.RemoveAll(a => a.Acronym == "KC");
 
             float holdNoteRatio = beatmapInfo.TotalObjectCount == 0 ? 0 : (float)beatmapInfo.EndTimeObjectCount / beatmapInfo.TotalObjectCount;
-            attributes.Insert(0, new RulesetBeatmapAttribute("LN Ratio", @"LN", holdNoteRatio, holdNoteRatio, 1)
+            attributes.Insert(0, new RulesetBeatmapAttribute("Hold notes", @"HN", holdNoteRatio, holdNoteRatio, 1)
             {
                 ValueFormat = "P0"
             });

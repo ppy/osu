@@ -433,10 +433,8 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// Overload of <see cref="GetAdjustedDisplayDifficulty"/> for display on Ranked Cards
         /// </summary>
-        public virtual IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForRankedPlayCard(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
-        {
-            return GetBeatmapAttributesForDisplay(beatmapInfo, mods);
-        }
+        public virtual IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForRankedPlayCard(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods) =>
+            GetBeatmapAttributesForDisplay(beatmapInfo, mods);
 
         /// <summary>
         /// Creates ruleset-specific beatmap filter criteria to be used on the song select screen.
