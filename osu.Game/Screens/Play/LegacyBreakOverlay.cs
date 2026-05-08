@@ -123,10 +123,8 @@ namespace osu.Game.Screens.Play
             {
                 Schedule(() =>
                 {
-                    if (IsPresent
-                        && (Clock as IFrameStableClock)?.IsRewinding == false
-                        && (Clock as IFrameStableClock)?.IsPaused.Value == false
-                        && (Clock as IFrameStableClock)?.IsCatchingUp.Value == false)
+                    var clock = (IFrameStableClock)Clock;
+                    if (IsPresent && !clock.IsRewinding && !clock.IsPaused.Value && !clock.IsCatchingUp.Value)
                         resultSample?.Play();
                 });
             }
