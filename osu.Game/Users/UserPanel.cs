@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -131,6 +132,16 @@ namespace osu.Game.Users
             Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
             Shadow = false,
             Text = User.Username,
+        };
+
+        protected OsuSpriteText CreateRank() => new OsuSpriteText
+        {
+            Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold),
+            Shadow = false,
+            // We can't colour the properly because we don't have the required percentile data.
+
+            Colour = Colours.BlueLighter,
+            Text = User.Rank?.Rank?.ToLocalisableString("\\##,##0") ?? string.Empty,
         };
 
         protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar(User, false);
