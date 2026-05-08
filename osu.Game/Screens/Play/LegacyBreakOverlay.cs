@@ -5,7 +5,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
@@ -23,10 +22,8 @@ namespace osu.Game.Screens.Play
         private ISample? sectionFailSample;
         private ISample? sectionPassSample;
 
-        private Texture? sectionFailTexture;
-        private Texture? sectionPassTexture;
-
-        private readonly Sprite resultSprite;
+        private readonly Sprite sectionFailSprite;
+        private readonly Sprite sectionPassSprite;
         private readonly WarningArrows warningArrows;
 
         public required BreakTracker BreakTracker { get; init; }
@@ -40,7 +37,13 @@ namespace osu.Game.Screens.Play
 
             InternalChildren = new Drawable[]
             {
-                resultSprite = new Sprite
+                sectionFailSprite = new Sprite
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Alpha = 0,
+                },
+                sectionPassSprite = new Sprite
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -58,11 +61,11 @@ namespace osu.Game.Screens.Play
             sectionFailSample = skin.GetSample(new SampleInfo(@"Gameplay/sectionfail"));
             sectionPassSample = skin.GetSample(new SampleInfo(@"Gameplay/sectionpass"));
 
-            sectionFailTexture = skin.GetTexture(@"section-fail");
-            sectionPassTexture = skin.GetTexture(@"section-pass");
+            sectionFailSprite.Size = Vector2.Zero;
+            sectionFailSprite.Texture = skin.GetTexture(@"section-fail");
 
-            if (IsLoaded)
-                updateDisplay(currentPeriod.Value);
+            sectionPassSprite.Size = Vector2.Zero;
+            sectionPassSprite.Texture = skin.GetTexture(@"section-pass");
         }
 
         protected override void LoadComplete()
@@ -81,23 +84,20 @@ namespace osu.Game.Screens.Play
                 return;
 
             ISample? resultSample;
-            Texture? resultTexture;
+            Sprite resultSprite;
 
             if (healthProcessor.Health.Value >= 0.5)
             {
                 resultSample = sectionPassSample;
-                resultTexture = sectionPassTexture;
+                resultSprite = sectionPassSprite;
             }
             else
             {
                 resultSample = sectionFailSample;
-                resultTexture = sectionFailTexture;
+                resultSprite = sectionFailSprite;
             }
 
             var b = period.Value;
-
-            resultSprite.Size = Vector2.Zero;
-            resultSprite.Texture = resultTexture;
 
             // TODO Improve blinking behavior while rewinding
             using (BeginAbsoluteSequence(b.Start))
