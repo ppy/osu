@@ -163,8 +163,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             }
             if (LastWinner != null && LastWinnerPersonalMultiplier != null)
             {
-                text += $", extra {LastWinnerPersonalMultiplier.Value.ToStandardFormattedString(maxDecimalDigits: 1)}x damage multiplier for";
-                text += $" {LastWinner.Username}";
+                text += $", extra {LastWinnerPersonalMultiplier.Value.ToStandardFormattedString(maxDecimalDigits: 1)}x multiplicative factor for";
+                text += $" {LastWinner.Username}.";
             }
             detailsContainer.Add(new OsuSpriteText
             {
