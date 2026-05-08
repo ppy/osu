@@ -120,6 +120,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("change collection name", () =>
             {
                 placeholderItem.ChildrenOfType<TextBox>().First().Text = "test text";
+            });
+
+            AddStep("press escape", () =>
+            {
                 InputManager.Key(Key.Escape);
             });
 
