@@ -186,9 +186,12 @@ namespace osu.Game.Collections
 
             public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {
-                // Only respond to GlobalAction.Back
-                if (!base.OnPressed(e)) return false;
+                if (e.Action != GlobalAction.Back) return base.OnPressed(e);
 
+                // kill focus to cancel collection creation
+                // we need to do this before killing focus, otherwise the `HasFocus` check will just return early and do nothing
+                // let the base class handle text clearing, sfx playing etc.
+                base.OnPressed(e);
                 KillFocus();
                 return true;
             }
