@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             });
             AddUntilStep("dialog visible", () => Game.ChildrenOfType<IDialogOverlay>().SingleOrDefault()?.CurrentDialog, Is.InstanceOf<SaveAndReloadEditorDialog>);
             AddStep("refuse", () => InputManager.Key(Key.Number2));
-            AddAssert("key count is 5", () => keyCount.Current.Value, () => Is.EqualTo(5));
+            AddUntilStep("key count is 5", () => keyCount.Current.Value, () => Is.EqualTo(5));
 
             AddStep("change key count to 8 again", () =>
             {
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             });
             AddUntilStep("dialog visible", () => Game.ChildrenOfType<IDialogOverlay>().SingleOrDefault()?.CurrentDialog, Is.InstanceOf<SaveAndReloadEditorDialog>);
             AddStep("refuse", () => InputManager.Key(Key.Number2));
-            AddAssert("key count is 5", () => keyCount.Current.Value, () => Is.EqualTo(5));
+            AddUntilStep("key count is 5", () => keyCount.Current.Value, () => Is.EqualTo(5));
 
             AddStep("set dual stages again", () =>
             {
