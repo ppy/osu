@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps;
@@ -29,9 +28,6 @@ namespace osu.Game.Tests.Skins
         private BeatmapSkinProvidingContainer beatmapSkinProvider;
         private BeatmapSkinSource beatmapSource;
         private SkinRequester requester;
-
-        [Resolved]
-        private OsuConfigManager config { get; set; }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
