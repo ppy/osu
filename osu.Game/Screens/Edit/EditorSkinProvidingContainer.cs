@@ -17,8 +17,6 @@ namespace osu.Game.Screens.Edit
             : base(editorBeatmap.PlayableBeatmap.BeatmapInfo.Ruleset.CreateInstance(), editorBeatmap.PlayableBeatmap, editorBeatmap.BeatmapSkin?.Skin)
         {
             beatmapSkin = editorBeatmap.BeatmapSkin;
-
-            AllowSettingsLevelDisables = false;
         }
 
         protected override void LoadComplete()

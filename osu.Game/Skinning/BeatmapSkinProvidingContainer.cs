@@ -19,17 +19,10 @@ namespace osu.Game.Skinning
         private Bindable<bool> beatmapColours = null!;
         private Bindable<bool> beatmapHitsounds = null!;
 
-        /// <summary>
-        /// Whether user settings (like "beatmap hitsounds) should be considered to allow disabling certain beatmap components.
-        /// </summary>
-        public bool AllowSettingsLevelDisables { get; init; } = true;
-
         protected override bool AllowConfigurationLookup
         {
             get
             {
-                if (!AllowSettingsLevelDisables) return true;
-
                 if (beatmapSkins == null)
                     throw new InvalidOperationException($"{nameof(BeatmapSkinProvidingContainer)} needs to be loaded before being consumed.");
 
@@ -41,8 +34,6 @@ namespace osu.Game.Skinning
         {
             get
             {
-                if (!AllowSettingsLevelDisables) return true;
-
                 if (beatmapColours == null)
                     throw new InvalidOperationException($"{nameof(BeatmapSkinProvidingContainer)} needs to be loaded before being consumed.");
 
@@ -52,8 +43,6 @@ namespace osu.Game.Skinning
 
         protected override bool AllowDrawableLookup(ISkinComponentLookup lookup)
         {
-            if (!AllowSettingsLevelDisables) return true;
-
             if (beatmapSkins == null)
                 throw new InvalidOperationException($"{nameof(BeatmapSkinProvidingContainer)} needs to be loaded before being consumed.");
 
@@ -62,8 +51,6 @@ namespace osu.Game.Skinning
 
         protected override bool AllowTextureLookup(string componentName)
         {
-            if (!AllowSettingsLevelDisables) return true;
-
             if (beatmapSkins == null)
                 throw new InvalidOperationException($"{nameof(BeatmapSkinProvidingContainer)} needs to be loaded before being consumed.");
 
@@ -72,8 +59,6 @@ namespace osu.Game.Skinning
 
         protected override bool AllowSampleLookup(ISampleInfo sampleInfo)
         {
-            if (!AllowSettingsLevelDisables) return true;
-
             if (beatmapSkins == null)
                 throw new InvalidOperationException($"{nameof(BeatmapSkinProvidingContainer)} needs to be loaded before being consumed.");
 
