@@ -53,6 +53,11 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         public AdditionalMetric[] AdditionalMetrics { get; init; } = [];
 
+        /// <summary>
+        /// An optional formatting specifier for the values of this attribute.
+        /// </summary>
+        public string ValueFormat { get; init; } = string.Empty;
+
         public RulesetBeatmapAttribute(LocalisableString label, string acronym, float originalValue, float adjustedValue, float maxValue)
         {
             Label = label;
