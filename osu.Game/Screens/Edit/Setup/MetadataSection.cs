@@ -66,13 +66,7 @@ namespace osu.Game.Screens.Edit.Setup
                     Text = EditorSetupStrings.SyncMetadataWithAllDifficulties,
                     TooltipText = EditorSetupStrings.SyncMetadataWithAllDifficultiesTooltip,
                     Margin = new MarginPadding { Top = 10 },
-                    Action = () =>
-                    {
-                        if (working.Value.BeatmapSetInfo.Beatmaps.Count <= 1)
-                            return;
-
-                        dialogOverlay?.Push(new SyncMetadataConfirmationDialog(syncMetadataToAllOtherDifficulties));
-                    },
+                    Action = () => dialogOverlay?.Push(new SyncMetadataConfirmationDialog(syncMetadataToAllOtherDifficulties)),
                     Enabled = { Value = working.Value.BeatmapSetInfo.Beatmaps.Count > 1 }
                 }
             };
@@ -108,8 +102,8 @@ namespace osu.Game.Screens.Edit.Setup
 
                 try
                 {
-                    var beatmapWorking = beatmaps.GetWorkingBeatmap(b);
-                    beatmaps.Save(b, beatmapWorking.GetPlayableBeatmap(b.Ruleset), beatmapWorking.GetSkin());
+                    var targetWorking = beatmaps.GetWorkingBeatmap(b);
+                    beatmaps.Save(b, targetWorking.GetPlayableBeatmap(b.Ruleset), targetWorking.GetSkin());
                 }
                 catch (Exception e)
                 {
