@@ -122,6 +122,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             effectiveMissCount = Math.Max(countMiss, effectiveMissCount);
             effectiveMissCount = Math.Min(totalHits, effectiveMissCount);
 
+            if (effectiveMissCount > 0)
+            {
+                aimEstimatedSliderBreaks = calculateEstimatedSliderBreaks(osuAttributes.AimTopWeightedSliderFactor, osuAttributes);
+                speedEstimatedSliderBreaks = calculateEstimatedSliderBreaks(osuAttributes.SpeedTopWeightedSliderFactor, osuAttributes);
+            }
+
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
 
             if (score.Mods.Any(m => m is OsuModNoFail))
@@ -207,8 +213,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (effectiveMissCount > 0)
             {
-                aimEstimatedSliderBreaks = calculateEstimatedSliderBreaks(attributes.AimTopWeightedSliderFactor, attributes);
-
                 double relevantMissCount = Math.Min(effectiveMissCount + aimEstimatedSliderBreaks, totalImperfectHits + countSliderTickMiss);
 
                 aimValue *= calculateMissPenalty(relevantMissCount, attributes.AimDifficultStrainCount);
@@ -236,22 +240,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (effectiveMissCount > 0)
             {
-                speedEstimatedSliderBreaks = calculateEstimatedSliderBreaks(attributes.SpeedTopWeightedSliderFactor, attributes);
-
                 double relevantMissCount = Math.Min(effectiveMissCount + speedEstimatedSliderBreaks, totalImperfectHits + countSliderTickMiss);
 
                 speedValue *= calculateMissPenalty(relevantMissCount, attributes.SpeedDifficultStrainCount);
             }
 
-            // TC bonuses are excluded when blinds is present as the increased visual difficulty is unimportant when notes cannot be seen.
             if (score.Mods.Any(m => m is OsuModBlinds))
             {
                 // Increasing the speed value by object count for Blinds isn't ideal, so the minimum buff is given.
                 speedValue *= 1.12;
-            }
-            else if (score.Mods.Any(m => m is OsuModTraceable))
-            {
-                speedValue *= 1.0 + calculateTraceableBonus();
             }
 
             double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
@@ -307,9 +304,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 // Decrease bonus for AR > 10
                 accuracyValue *= 1 + 0.08 * DifficultyCalculationUtils.ReverseLerp(approachRate, 11.5, 10);
             }
-
-            if (score.Mods.Any(m => m is OsuModFlashlight))
-                accuracyValue *= 1.02;
 
             return accuracyValue;
         }
@@ -396,19 +390,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateEstimatedSliderBreaks(double topWeightedSliderFactor, OsuDifficultyAttributes attributes)
         {
-            if (!usingClassicSliderAccuracy || countOk == 0)
+            int nonMissMistakes = countOk + countMeh;
+
+            if (!usingClassicSliderAccuracy || nonMissMistakes == 0)
                 return 0;
 
             double missedComboPercent = 1.0 - (double)scoreMaxCombo / attributes.MaxCombo;
-            double estimatedSliderBreaks = Math.Min(countOk, effectiveMissCount * topWeightedSliderFactor);
+            double estimatedSliderBreaks = Math.Min(nonMissMistakes, effectiveMissCount * topWeightedSliderFactor);
 
-            // Scores with more Oks are more likely to have slider breaks.
-            double okAdjustment = ((countOk - estimatedSliderBreaks) + 0.5) / countOk;
+            // Scores with more Oks and Mehs are more likely to have slider breaks.
+            // We add an arbitrary value to both sides of the division to make it more stable on extreme ends.
+            double nonMissMistakeAdjustment = (nonMissMistakes - estimatedSliderBreaks + 4.5) / (nonMissMistakes + 4);
 
             // There is a low probability of extra slider breaks on effective miss counts close to 1, as score based calculations are good at indicating if only a single break occurred.
             estimatedSliderBreaks *= DifficultyCalculationUtils.Smoothstep(effectiveMissCount, 1, 2);
 
-            return estimatedSliderBreaks * okAdjustment * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
+            return estimatedSliderBreaks * nonMissMistakeAdjustment * DifficultyCalculationUtils.Logistic(missedComboPercent, 0.33, 15);
         }
 
         /// <summary>
@@ -514,19 +511,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         private double calculateTraceableBonus(double sliderFactor = 1)
         {
-            // Start from normal curve, rewarding lower AR up to AR7
-            double traceableBonus = 0.025 * (12.0 - Math.Max(approachRate, 7));
+            // We want to reward slider aim less, more so at lower AR
+            double highApproachRateSliderVisibilityFactor = 0.5 + (Math.Pow(sliderFactor, 6) / 2);
+            double lowApproachRateSliderVisibilityFactor = Math.Pow(sliderFactor, 6);
 
-            // We want to reward slider aim on low AR less
-            double sliderVisibilityFactor = Math.Pow(sliderFactor, 3);
+            // Start from normal curve, rewarding lower AR up to AR7
+            double traceableBonus = 0.0275;
+            traceableBonus += 0.025 * (12.0 - Math.Max(approachRate, 7)) * highApproachRateSliderVisibilityFactor;
 
             // For AR up to 0 - reduce reward for very low ARs when object is visible
             if (approachRate < 7)
-                traceableBonus += 0.02 * (7.0 - Math.Max(approachRate, 0)) * sliderVisibilityFactor;
+                traceableBonus += 0.025 * (7.0 - Math.Max(approachRate, 0)) * lowApproachRateSliderVisibilityFactor;
 
             // Starting from AR0 - cap values so they won't grow to infinity
             if (approachRate < 0)
-                traceableBonus += 0.01 * (1 - Math.Pow(1.5, approachRate)) * sliderVisibilityFactor;
+                traceableBonus += 0.025 * (1 - Math.Pow(1.5, approachRate)) * lowApproachRateSliderVisibilityFactor;
 
             return traceableBonus;
         }

@@ -3,14 +3,15 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Objects;
 using System.Linq;
+using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private readonly List<double> sliderStrains = new List<double>();
 
-        private double currentDifficulty;
+        private double currentStrain;
 
         private double strainDecayBase => 0.3;
 
@@ -39,19 +40,32 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double ObjectDifficultyOf(DifficultyHitObject current)
         {
+            if (Mods.Any(m => m is OsuModRelax))
+                return 0;
+
             double decay = strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
 
-            currentDifficulty *= decay;
-            currentDifficulty += SpeedEvaluator.EvaluateDifficultyOf(current) * (1 - decay) * skillMultiplier;
+            currentStrain *= decay;
+            currentStrain += calculateModAdjustedDifficulty(current) * (1 - decay) * skillMultiplier;
 
             double currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
 
-            double totalDifficulty = currentDifficulty * currentRhythm;
+            double totalStrain = currentStrain * currentRhythm;
 
             if (current.BaseObject is Slider)
-                sliderStrains.Add(totalDifficulty);
+                sliderStrains.Add(totalStrain);
 
-            return totalDifficulty;
+            return totalStrain;
+        }
+
+        private double calculateModAdjustedDifficulty(DifficultyHitObject current)
+        {
+            double difficulty = SpeedEvaluator.EvaluateDifficultyOf(current);
+
+            if (Mods.Any(m => m is OsuModAutopilot))
+                difficulty *= 0.5;
+
+            return difficulty;
         }
 
         public double RelevantNoteCount()

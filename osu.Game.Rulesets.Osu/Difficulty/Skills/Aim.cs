@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double skillMultiplierSnap => 70.9;
         private double skillMultiplierAgility => 2.35;
-        private double skillMultiplierFlow => 243.0;
+        private double skillMultiplierFlow => 242.0;
         private double skillMultiplierTotal => 1.12;
         private double combinedSnapNormExponent => 1.2;
 
@@ -57,21 +57,35 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
+            if (Mods.Any(m => m is OsuModAutopilot))
+                return 0;
+
             double decay = strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
 
+            currentStrain *= decay;
+            currentStrain += calculateModAdjustedDifficulty(current) * (1 - decay);
+
+            if (current.BaseObject is Slider)
+                sliderStrains.Add(currentStrain);
+
+            return currentStrain;
+        }
+
+        private double calculateModAdjustedDifficulty(DifficultyHitObject current)
+        {
             double snapDifficulty = SnapAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierSnap;
             double agilityDifficulty = AgilityEvaluator.EvaluateDifficultyOf(current) * skillMultiplierAgility;
             double flowDifficulty = FlowAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierFlow;
 
             double totalDifficulty = calculateTotalValue(snapDifficulty, agilityDifficulty, flowDifficulty);
 
-            currentStrain *= decay;
-            currentStrain += totalDifficulty * (1 - decay);
+            if (Mods.Any(m => m is OsuModMagnetised))
+            {
+                float magnetisedStrength = Mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
+                totalDifficulty *= 1.0 - magnetisedStrength;
+            }
 
-            if (current.BaseObject is Slider)
-                sliderStrains.Add(currentStrain);
-
-            return currentStrain;
+            return totalDifficulty;
         }
 
         private double calculateTotalValue(double snapDifficulty, double agilityDifficulty, double flowDifficulty)
