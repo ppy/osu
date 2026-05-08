@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
 
             currentPeriod.BindTo(BreakTracker.CurrentPeriod);
-            currentPeriod.BindValueChanged(period => updateDisplay(period.NewValue), true);
+            currentPeriod.BindValueChanged(updateDisplay, true);
         }
 
         protected override void Update()
@@ -109,15 +109,15 @@ namespace osu.Game.Screens.Play
             warningArrows.Alpha = t > e - 1300 && t < e && (int)(e - t) / 100 % 2 == 0 ? 1 : 0;
         }
 
-        private void updateDisplay(Period? period)
+        private void updateDisplay(ValueChangedEvent<Period?> period)
         {
             Scheduler.CancelDelayedTasks();
 
-            if (period == null)
+            if (period.NewValue == null)
                 return;
 
             ISample? resultSample = healthProcessor.Health.Value >= 0.5 ? sectionPassSample : sectionFailSample;
-            var b = period.Value;
+            var b = period.NewValue.Value;
 
             using (BeginAbsoluteSequence(b.Start + b.Duration / 2))
             {
