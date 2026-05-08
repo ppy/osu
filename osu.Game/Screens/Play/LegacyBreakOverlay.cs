@@ -5,6 +5,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
@@ -76,6 +77,38 @@ namespace osu.Game.Screens.Play
             currentPeriod.BindValueChanged(period => updateDisplay(period.NewValue), true);
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            var b = currentPeriod.Value;
+
+            if (b == null)
+            {
+                sectionPassSprite.Alpha = 0;
+                sectionFailSprite.Alpha = 0;
+                warningArrows.Alpha = 0;
+                return;
+            }
+
+            double t = Time.Current;
+            double s = b.Value.Start;
+            double d = b.Value.Duration;
+            double e = b.Value.End;
+            double h = s + d / 2;
+
+            Sprite resultSprite = healthProcessor.Health.Value >= 0.5 ? sectionPassSprite : sectionFailSprite;
+
+            resultSprite.Alpha = (t > h && t < h + 100) || (t > h + 200 && t < h + 300) || (t > h + 400 && t < h + 1400) ? 1 : 0;
+
+            if (t > h + 1400 && t < h + 1600)
+            {
+                resultSprite.Alpha = Interpolation.ValueAt(t, 1f, 0f, h + 1400, h + 1600);
+            }
+
+            warningArrows.Alpha = t > e - 1300 && t < e && (int)(e - t) / 100 % 2 == 0 ? 1 : 0;
+        }
+
         private void updateDisplay(Period? period)
         {
             Scheduler.CancelDelayedTasks();
@@ -83,50 +116,19 @@ namespace osu.Game.Screens.Play
             if (period == null)
                 return;
 
-            ISample? resultSample;
-            Sprite resultSprite;
-
-            if (healthProcessor.Health.Value >= 0.5)
-            {
-                resultSample = sectionPassSample;
-                resultSprite = sectionPassSprite;
-            }
-            else
-            {
-                resultSample = sectionFailSample;
-                resultSprite = sectionFailSprite;
-            }
-
+            ISample? resultSample = healthProcessor.Health.Value >= 0.5 ? sectionPassSample : sectionFailSample;
             var b = period.Value;
 
-            // TODO Improve blinking behavior while rewinding
-            using (BeginAbsoluteSequence(b.Start))
+            using (BeginAbsoluteSequence(b.Start + b.Duration / 2))
             {
-                using (BeginDelayedSequence(b.Duration / 2))
+                Schedule(() =>
                 {
-                    Schedule(() =>
-                    {
-                        if (IsPresent
-                            && (Clock as IFrameStableClock)?.IsRewinding == false
-                            && (Clock as IFrameStableClock)?.IsPaused.Value == false
-                            && (Clock as IFrameStableClock)?.IsCatchingUp.Value == false)
-                            resultSample?.Play();
-                    });
-
-                    resultSprite.FadeIn().Delay(100).FadeOut().Delay(100).Loop(0, 1)
-                                .FadeIn().Delay(1000).FadeOut(200);
-                }
-
-                using (BeginDelayedSequence(b.Duration - 1300))
-                {
-                    warningArrows.FadeIn().Delay(100).FadeOut().Delay(100).Loop(0, 6);
-                }
-
-                using (BeginDelayedSequence(b.Duration))
-                {
-                    resultSprite.FadeOut();
-                    warningArrows.FadeOut();
-                }
+                    if (IsPresent
+                        && (Clock as IFrameStableClock)?.IsRewinding == false
+                        && (Clock as IFrameStableClock)?.IsPaused.Value == false
+                        && (Clock as IFrameStableClock)?.IsCatchingUp.Value == false)
+                        resultSample?.Play();
+                });
             }
         }
     }
