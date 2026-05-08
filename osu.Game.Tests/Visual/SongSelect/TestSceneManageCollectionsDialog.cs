@@ -130,6 +130,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             assertCollectionCount(0);
 
             AddAssert("last item is placeholder", () => !dialog.ChildrenOfType<DrawableCollectionListItem>().Last().Model.IsManaged);
+            AddAssert("textbox is not focused", () => !dialog.ChildrenOfType<FocusedTextBox>().Last().HasFocus);
         }
 
         [Test]
