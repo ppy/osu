@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -75,7 +76,7 @@ namespace osu.Game.Rulesets.Edit
         /// </remarks>
         public static bool PlacementReplacesExisting(HitObject existing, HitObject placement)
         {
-            if (System.Math.Abs(existing.StartTime - placement.StartTime) > placement_replace_start_time_leniency_ms)
+            if (!Precision.AlmostEquals(existing.StartTime, placement.StartTime, placement_replace_start_time_leniency_ms))
                 return false;
 
             if (placement is IHasColumn placementColumn && existing is IHasColumn existingColumn)
