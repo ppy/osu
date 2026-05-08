@@ -132,12 +132,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// Due to limitations of the current rhythm evaluation, these cases are targeted and penalised.
         /// The previous hit object grouping is used as often the rhythm change *two* rhythms after a long gap awards the unexpected difficulty.
         /// </summary>
-        private static double longGapPenalty(SameRhythmHitObjectGrouping? previousOrNull)
+        private static double longGapPenalty(SameRhythmHitObjectGrouping? previous)
         {
-            if (previousOrNull == null)
+            if (previous == null)
                 return 1.0;
-
-            SameRhythmHitObjectGrouping previous = previousOrNull;
 
             double gapInterval = previous.FirstHitObject.DeltaTime;
             double rhythmInterval = previous.HitObjectInterval ?? gapInterval;
