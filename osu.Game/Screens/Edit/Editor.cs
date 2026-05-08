@@ -1528,24 +1528,33 @@ namespace osu.Game.Screens.Edit
             loader?.CancelPendingDifficultySwitch();
         }
 
-        public Task<bool> SaveAndReload()
+        public Task<bool> SaveAndReload(bool withDialog = true)
         {
             var tcs = new TaskCompletionSource<bool>();
 
-            dialogOverlay.Push(new SaveAndReloadEditorDialog(
-                reload: () =>
+            void performReload()
+            {
+                bool reloadedSuccessfully = attemptMutationOperation(() =>
                 {
-                    bool reloadedSuccessfully = attemptMutationOperation(() =>
-                    {
-                        if (!Save())
-                            return false;
+                    if (!Save()) return false;
 
-                        SwitchToDifficulty(editorBeatmap.BeatmapInfo);
-                        return true;
-                    });
-                    tcs.SetResult(reloadedSuccessfully);
-                },
-                cancel: () => tcs.SetResult(false)));
+                    SwitchToDifficulty(editorBeatmap.BeatmapInfo);
+                    return true;
+                });
+                tcs.SetResult(reloadedSuccessfully);
+            }
+
+            if (withDialog)
+            {
+                dialogOverlay.Push(new SaveAndReloadEditorDialog(
+                    reload: performReload,
+                    cancel: () => tcs.SetResult(false)));
+            }
+            else
+            {
+                performReload();
+            }
+
             return tcs.Task;
         }
 
