@@ -550,7 +550,6 @@ namespace osu.Game.Rulesets.Objects.Legacy
             }
             else
             {
-                // Todo: This should set the normal SampleInfo if the specified sample file isn't found, but that's a pretty edge-case scenario
                 soundTypes.Add(new FileHitSampleInfo(bankInfo.Filename, bankInfo.Volume));
             }
 
@@ -680,14 +679,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), CustomSampleBank, IsLayered);
         }
 
-        private class FileHitSampleInfo : LegacyHitSampleInfo, IEquatable<FileHitSampleInfo>
+        public class FileHitSampleInfo : LegacyHitSampleInfo, IEquatable<FileHitSampleInfo>
         {
             public readonly string Filename;
 
             public FileHitSampleInfo(string filename, int volume)
                 // Force CSS=1 to make sure that the LegacyBeatmapSkin does not fall back to the user skin.
-                // Note that this does not change the lookup names, as they are overridden locally.
-                : base(string.Empty, customSampleBank: 1, volume: volume)
+                : base(HIT_NORMAL, SampleControlPoint.DEFAULT_BANK, customSampleBank: 1, volume: volume)
             {
                 Filename = filename;
             }
@@ -696,7 +694,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 Filename,
                 Path.ChangeExtension(Filename, null)
-            };
+            }.Concat(base.LookupNames);
 
             public sealed override LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<int> newVolume = default,
                                                             Optional<bool> newEditorAutoBank = default, Optional<int> newCustomSampleBank = default, Optional<bool> newIsLayered = default)

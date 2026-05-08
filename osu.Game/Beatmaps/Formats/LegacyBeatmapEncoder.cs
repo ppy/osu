@@ -400,7 +400,8 @@ namespace osu.Game.Beatmaps.Formats
 
                 case 3:
                     int totalColumns = (int)Math.Max(1, beatmap.Difficulty.CircleSize);
-                    position.X = (int)Math.Ceiling(((IHasXPosition)hitObject).X * (512f / totalColumns));
+                    // compare: https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameModes/Play/Rulesets/Mania/Stage/StageMania_Calculations.cs#L159
+                    position.X = (int)Math.Floor((((IHasXPosition)hitObject).X + 0.5f) * (512f / totalColumns));
                     break;
             }
 
@@ -544,7 +545,7 @@ namespace osu.Game.Beatmaps.Formats
             if (!banksOnly)
             {
                 int customSampleBank = toLegacyCustomSampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name)));
-                string sampleFilename = samples.FirstOrDefault(s => string.IsNullOrEmpty(s.Name))?.LookupNames.First() ?? string.Empty;
+                string sampleFilename = samples.FirstOrDefault(s => s is ConvertHitObjectParser.FileHitSampleInfo)?.LookupNames.First() ?? string.Empty;
                 int volume = samples.FirstOrDefault()?.Volume ?? 100;
 
                 // We want to ignore custom sample banks and volume when not encoding to the mania game mode,

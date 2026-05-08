@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -21,11 +20,8 @@ namespace osu.Game.Users
             CornerRadius = 6;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Background.FadeTo(0.2f);
-        }
+        // Matches osu!web styling.
+        protected override Drawable? CreateBackground() => Empty();
 
         protected override Drawable CreateLayout() => new FillFlowContainer
         {

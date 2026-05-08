@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                             continue;
 
                         double endTime = stackBaseObject.GetEndTime();
-                        double stackThreshold = objectN.TimePreempt * beatmap.StackLeniency;
+                        float stackThreshold = calculateStackThreshold(beatmap, objectN);
 
                         if (objectN.StartTime - endTime > stackThreshold)
                             // We are no longer within stacking range of the next object.
@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 OsuHitObject objectI = hitObjects[i];
                 if (objectI.StackHeight != 0 || objectI is Spinner) continue;
 
-                double stackThreshold = objectI.TimePreempt * beatmap.StackLeniency;
+                float stackThreshold = calculateStackThreshold(beatmap, objectI);
 
                 /* If this object is a hitcircle, then we enter this "special" case.
                  * It either ends with a stack of hitcircles only, or a stack of hitcircles that are underneath a slider.
@@ -151,7 +151,10 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 
                         double endTime = objectN.GetEndTime();
 
-                        if (objectI.StartTime - endTime > stackThreshold)
+                        // truncation to integer is required to match stable
+                        // compare https://github.com/peppy/osu-stable-reference/blob/08e3dafd525934cf48880b08e91c24ce4ad8b761/osu!/GameplayElements/HitObjectManager.cs#L1725
+                        // - both quantities being subtracted there are integers
+                        if ((int)objectI.StartTime - (int)endTime > stackThreshold)
                             // We are no longer within stacking range of the previous object.
                             break;
 
@@ -232,7 +235,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 
                 for (int j = i + 1; j < hitObjects.Count; j++)
                 {
-                    double stackThreshold = hitObjects[i].TimePreempt * beatmap.StackLeniency;
+                    float stackThreshold = calculateStackThreshold(beatmap, hitObjects[i]);
 
                     if (hitObjects[j].StartTime - stackThreshold > startTime)
                         break;
@@ -264,5 +267,17 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 }
             }
         }
+
+        /// <remarks>
+        /// Truncation of <see cref="OsuHitObject.TimePreempt"/> to <see cref="int"/>, as well as keeping the result as <see cref="float"/>, are both done
+        /// <a href="https://github.com/peppy/osu-stable-reference/blob/08e3dafd525934cf48880b08e91c24ce4ad8b761/osu!/GameplayElements/HitObjectManager.cs#L1652">
+        /// for the purposes of stable compatibility
+        /// </a>.
+        /// Note that for top-level objects <see cref="OsuHitObject.TimePreempt"/> is supposed to be integral anyway;
+        /// see <see cref="OsuHitObject.ApplyDefaultsToSelf"/> using <see cref="IBeatmapDifficultyInfo.DifficultyRangeInt"/> when calculating it.
+        /// Slider ticks and end circles are the exception to that, but they do not matter for stacking.
+        /// </remarks>
+        private static float calculateStackThreshold(IBeatmap beatmap, OsuHitObject hitObject)
+            => (int)hitObject.TimePreempt * beatmap.StackLeniency;
     }
 }

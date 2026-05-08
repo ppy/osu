@@ -145,7 +145,7 @@ namespace osu.Game.Online.API.Requests.Responses
         // Generally this is required because this model may be used by server-side components, but
         // we don't want to bother sending these fields in score submission requests, for instance.
         public bool ShouldSerializeEndedAt() => EndedAt != default;
-        public bool ShouldSerializeStartedAt() => StartedAt != default;
+        public bool ShouldSerializeStartedAt() => StartedAt != null;
         public bool ShouldSerializeLegacyScoreId() => LegacyScoreId != null;
         public bool ShouldSerializeLegacyTotalScore() => LegacyTotalScore != null;
         public bool ShouldSerializeMods() => Mods.Length > 0;

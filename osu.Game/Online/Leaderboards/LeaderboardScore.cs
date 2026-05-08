@@ -17,7 +17,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Framework.Platform;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -35,6 +34,7 @@ using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 using CommonStrings = osu.Game.Localisation.CommonStrings;
+using SongSelect = osu.Game.Screens.Select.SongSelect;
 using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Online.Leaderboards
@@ -76,7 +76,7 @@ namespace osu.Game.Online.Leaderboards
         private SongSelect songSelect { get; set; }
 
         [Resolved(canBeNull: true)]
-        private Clipboard clipboard { get; set; }
+        private OsuGame game { get; set; }
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -459,7 +459,7 @@ namespace osu.Game.Online.Leaderboards
                     items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = copyableMods));
 
                 if (Score.OnlineID > 0)
-                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.Endpoints.WebsiteUrl}/scores/{Score.OnlineID}")));
+                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyToClipboard($@"{api.Endpoints.WebsiteUrl}/scores/{Score.OnlineID}")));
 
                 if (Score.Files.Count > 0)
                 {

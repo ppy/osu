@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,6 +15,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -22,6 +26,8 @@ using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Resources.Localisation.Web;
+using osu.Game.Skinning;
 using osu.Game.Utils;
 
 namespace osu.Game.Screens.Play
@@ -75,10 +81,15 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, GameHost? host)
         {
             Children = new Drawable[]
             {
+                pauseLoop = new SkinnableSound(new SampleInfo("Gameplay/pause-loop"))
+                {
+                    Looping = true,
+                    Volume = { Value = 0 }
+                },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -141,6 +152,9 @@ namespace osu.Game.Screens.Play
             State.ValueChanged += _ => InternalButtons.Deselect();
 
             updateInfoText();
+
+            if (host != null)
+                windowActive.BindTo(host.IsActive);
         }
 
         private int retries;
@@ -163,9 +177,15 @@ namespace osu.Game.Screens.Play
         {
             this.FadeIn(TRANSITION_DURATION, Easing.In);
             updateInfoText();
+
+            startPauseLoop();
         }
 
-        protected override void PopOut() => this.FadeOut(TRANSITION_DURATION, Easing.In);
+        protected override void PopOut()
+        {
+            this.FadeOut(TRANSITION_DURATION, Easing.In);
+            stopPauseLoop();
+        }
 
         protected void AddButton(LocalisableString text, Color4 colour, Action? action)
         {
@@ -236,7 +256,7 @@ namespace osu.Game.Screens.Play
             if (gameplayState != null)
             {
                 playInfoText.NewLine();
-                playInfoText.AddText(SongSelectStrings.Accuracy);
+                playInfoText.AddText(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy);
                 playInfoText.AddText(": ");
                 playInfoText.AddText(gameplayState!.ScoreProcessor.Accuracy.Value.FormatAccuracy(), cp => cp.Font = cp.Font.With(weight: FontWeight.Bold));
             }
@@ -282,5 +302,44 @@ namespace osu.Game.Screens.Play
 
             return base.Handle(e);
         }
+
+        #region Pause loop sound handling
+
+        public override bool IsPresent => base.IsPresent || pauseLoop.IsPlaying;
+
+        private SkinnableSound pauseLoop = null!;
+
+        private readonly IBindable<bool> windowActive = new Bindable<bool>(true);
+
+        private float targetVolume => windowActive.Value && State.Value == Visibility.Visible ? 1.0f : 0;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Schedule required because host.IsActive doesn't seem to always run on the update thread.
+            windowActive.BindValueChanged(_ => Schedule(() => pauseLoop.VolumeTo(targetVolume, 1000, Easing.Out)));
+        }
+
+        public void StopAllSamples()
+        {
+            if (!IsLoaded)
+                return;
+
+            pauseLoop.Stop();
+        }
+
+        private void startPauseLoop()
+        {
+            pauseLoop.VolumeTo(targetVolume, TRANSITION_DURATION, Easing.InQuint);
+            pauseLoop.Play();
+        }
+
+        private void stopPauseLoop()
+        {
+            pauseLoop.VolumeTo(targetVolume, TRANSITION_DURATION, Easing.OutQuad).Finally(_ => pauseLoop.Stop());
+        }
+
+        #endregion
     }
 }

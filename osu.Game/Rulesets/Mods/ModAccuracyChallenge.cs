@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mods
             get
             {
                 if (!MinimumAccuracy.IsDefault)
-                    yield return ("Minimum accuracy", $"{MinimumAccuracy.Value:##%}");
+                    yield return ("Minimum accuracy", MinimumAccuracy.Value.ToLocalisableString(@"P1"));
 
                 if (!AccuracyJudgeMode.IsDefault)
                     yield return ("Accuracy mode", AccuracyJudgeMode.Value.ToLocalisableString());
@@ -53,12 +53,12 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        [SettingSource("Minimum accuracy", "Trigger a failure if your accuracy goes below this value.", SettingControlType = typeof(SettingsPercentageSlider<double>))]
+        [SettingSource("Minimum accuracy", "Trigger a failure if your accuracy goes below this value.", SettingControlType = typeof(MinimumAccuracySlider))]
         public BindableNumber<double> MinimumAccuracy { get; } = new BindableDouble
         {
             MinValue = 0.60,
-            MaxValue = 0.99,
-            Precision = 0.01,
+            MaxValue = 0.999,
+            Precision = 0.001,
             Default = 0.9,
             Value = 0.9,
         };
@@ -101,6 +101,14 @@ namespace osu.Game.Rulesets.Mods
 
             [LocalisableDescription(typeof(GameplayAccuracyCounterStrings), nameof(GameplayAccuracyCounterStrings.AccuracyDisplayModeStandard))]
             Standard,
+        }
+    }
+
+    public partial class MinimumAccuracySlider : SettingsPercentageSlider<double>
+    {
+        public MinimumAccuracySlider()
+        {
+            KeyboardStep = 0.001f;
         }
     }
 }

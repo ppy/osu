@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             AddStep("change seek setting to true", () => config.SetValue(OsuSetting.EditorAutoSeekOnPlacement, true));
             placeObject();
             AddUntilStep("wait for seek to complete", () => !EditorClock.IsSeeking);
-            AddAssert("seeked forward to object", () => EditorClock.CurrentTime, () => Is.GreaterThan(initialTime));
+            AddAssert("seeked forward to object", () => EditorClock.CurrentTime, () => Is.GreaterThan(initialTime!));
         }
 
         [Test]
@@ -55,6 +55,28 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             placeObject();
             AddAssert("not seeking", () => !EditorClock.IsSeeking);
             AddAssert("time is unchanged", () => EditorClock.CurrentTime, () => Is.EqualTo(initialTime));
+        }
+
+        [Test]
+        public void TestNoTwoObjectsAtSameTimeAndColumn()
+        {
+            AddStep("change seek setting to false", () => config.SetValue(OsuSetting.EditorAutoSeekOnPlacement, false));
+            AddStep("clear beatmap", () => EditorBeatmap.Clear());
+
+            AddStep("select note placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to centre of last column", () => InputManager.MoveMouseTo(this.ChildrenOfType<Column>().Last().ScreenSpaceDrawQuad.Centre));
+            AddStep("place note", () => InputManager.Click(MouseButton.Left));
+            AddAssert("beatmap has 1 object", () => EditorBeatmap.HitObjects, () => Has.Count.EqualTo(1));
+
+            AddStep("select note placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to centre of first column", () => InputManager.MoveMouseTo(this.ChildrenOfType<Column>().First().ScreenSpaceDrawQuad.Centre));
+            AddStep("place note", () => InputManager.Click(MouseButton.Left));
+            AddAssert("beatmap has 2 objects", () => EditorBeatmap.HitObjects, () => Has.Count.EqualTo(2));
+
+            AddStep("select note placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("move mouse to centre of last column", () => InputManager.MoveMouseTo(this.ChildrenOfType<Column>().Last().ScreenSpaceDrawQuad.Centre));
+            AddStep("place note", () => InputManager.Click(MouseButton.Left));
+            AddAssert("beatmap has 2 objects", () => EditorBeatmap.HitObjects, () => Has.Count.EqualTo(2));
         }
 
         private void placeObject()

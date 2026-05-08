@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
@@ -10,6 +11,7 @@ using osu.Framework.Input.States;
 using osu.Framework.Logging;
 using osu.Framework.Testing.Input;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -58,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                 foreach (var smokeContainer in smokeContainers)
                 {
-                    if (smokeContainer.Children.Count != 0)
+                    if (smokeContainer.Children.OfType<SkinnableDrawable>().Any())
                         return false;
                 }
 

@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 
@@ -26,13 +27,15 @@ namespace osu.Desktop.Security
 
             if (Environment.IsPrivilegedProcess)
                 notifications.Post(new ElevatedPrivilegesNotification());
+
+            Expire();
         }
 
         private partial class ElevatedPrivilegesNotification : SimpleNotification
         {
             public ElevatedPrivilegesNotification()
             {
-                Text = $"Running osu! as {(RuntimeInfo.IsUnix ? "root" : "administrator")} does not improve performance, may break integrations and poses a security risk. Please run the game as a normal user.";
+                Text = NotificationsStrings.ElevatedPrivileges(RuntimeInfo.IsUnix ? "root" : "Administrator");
             }
 
             [BackgroundDependencyLoader]

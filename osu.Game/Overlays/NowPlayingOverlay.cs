@@ -29,13 +29,15 @@ namespace osu.Game.Overlays
 {
     public partial class NowPlayingOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
+        public const double TRACK_DRAG_SEEK_DEBOUNCE = 40;
+
         public IconUsage Icon => OsuIcon.Music;
         public LocalisableString Title => NowPlayingStrings.HeaderTitle;
         public LocalisableString Description => NowPlayingStrings.HeaderDescription;
 
         private const float player_width = 400;
         private const float player_height = 130;
-        private const float transition_length = 800;
+        private const float transition_length = 500;
         private const float progress_height = 10;
         private const float bottom_black_area_height = 55;
         private const float margin = 10;
@@ -207,7 +209,8 @@ namespace osu.Game.Overlays
                                     Height = progress_height / 2,
                                     FillColour = colours.Yellow,
                                     BackgroundColour = colours.YellowDarker.Opacity(0.5f),
-                                    OnSeek = musicController.SeekTo
+                                    OnSeek = onSeek,
+                                    OnCommit = onCommit,
                                 }
                             },
                         },
@@ -219,6 +222,29 @@ namespace osu.Game.Overlays
                     }
                 },
             };
+        }
+
+        private double? lastSeekGameTime;
+        private double? lastSeekAudioTargetTime;
+
+        private void onSeek(double progress)
+        {
+            if (!musicController.IsPlaying || lastSeekGameTime == null || Time.Current - lastSeekGameTime > TRACK_DRAG_SEEK_DEBOUNCE)
+            {
+                musicController.SeekTo(progress);
+                lastSeekGameTime = Time.Current;
+                lastSeekAudioTargetTime = progress;
+            }
+        }
+
+        private void onCommit(double progress)
+        {
+            // Avoid a second seek to the same location, which could occur when using keyboard navigation from `OnSeek` and subsequent `OnCommit` calls.
+            if (progress != lastSeekAudioTargetTime)
+                musicController.SeekTo(progress);
+
+            lastSeekGameTime = null;
+            lastSeekAudioTargetTime = null;
         }
 
         private void togglePlaylist()
@@ -263,7 +289,7 @@ namespace osu.Game.Overlays
         protected override void PopIn()
         {
             this.FadeIn(transition_length, Easing.OutQuint);
-            dragContainer.ScaleTo(1, transition_length, Easing.OutElastic);
+            dragContainer.ScaleTo(1, transition_length, Easing.OutElasticHalf);
         }
 
         protected override void PopOut()
@@ -304,18 +330,21 @@ namespace osu.Game.Overlays
 
             var track = musicController.CurrentTrack;
 
-            if (!track.IsDummyDevice)
+            if (!progressBar.Seeking)
             {
-                progressBar.EndTime = track.Length;
-                progressBar.CurrentTime = track.CurrentTime;
+                if (!track.IsDummyDevice)
+                {
+                    progressBar.EndTime = track.Length;
+                    progressBar.CurrentTime = track.CurrentTime;
 
-                playButton.Icon = track.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
-            }
-            else
-            {
-                progressBar.CurrentTime = 0;
-                progressBar.EndTime = 1;
-                playButton.Icon = FontAwesome.Regular.PlayCircle;
+                    playButton.Icon = track.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
+                }
+                else
+                {
+                    progressBar.CurrentTime = 0;
+                    progressBar.EndTime = 1;
+                    playButton.Icon = FontAwesome.Regular.PlayCircle;
+                }
             }
         }
 
@@ -495,6 +524,8 @@ namespace osu.Game.Overlays
 
         private partial class HoverableProgressBar : ProgressBar
         {
+            public override bool HandleNonPositionalInput => IsHovered;
+
             public HoverableProgressBar()
                 : base(true)
             {

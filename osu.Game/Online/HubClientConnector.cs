@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -57,17 +57,9 @@ namespace osu.Game.Online
                 {
                     // Configuring proxies is not supported on iOS, see https://github.com/xamarin/xamarin-macios/issues/14632.
                     if (RuntimeInfo.OS != RuntimeInfo.Platform.iOS)
-                    {
-                        // Use HttpClient.DefaultProxy once on net6 everywhere.
-                        // The credential setter can also be removed at this point.
-                        options.Proxy = WebRequest.DefaultWebProxy;
-                        if (options.Proxy != null)
-                            options.Proxy.Credentials = CredentialCache.DefaultCredentials;
-                    }
+                        options.Proxy = HttpClient.DefaultProxy;
 
-                    options.Headers.Add(@"Authorization", @$"Bearer {API.AccessToken}");
-                    // non-standard header name kept for backwards compatibility, can be removed after server side has migrated to `VERSION_HASH_HEADER`
-                    options.Headers.Add(@"OsuVersionHash", versionHash);
+                    options.AccessTokenProvider = () => Task.FromResult<string?>(API.AccessToken);
                     options.Headers.Add(VERSION_HASH_HEADER, versionHash);
                     options.Headers.Add(CLIENT_SESSION_ID_HEADER, API.SessionIdentifier.ToString());
                 });
