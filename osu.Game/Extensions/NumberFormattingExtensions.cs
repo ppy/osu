@@ -37,7 +37,7 @@ namespace osu.Game.Extensions
                 return floatValue.ToString($@"0.{new string('0', Math.Max(0, significantDigits - 2))}%", CultureInfo.CurrentCulture);
             }
 
-            string negativeSign = Math.Round(floatValue, significantDigits) < 0 ? "-" : string.Empty;
+            string negativeSign = Math.Round(floatValue, significantDigits) < 0 ? CultureInfo.CurrentCulture.NumberFormat.NegativeSign : string.Empty;
 
             return $"{negativeSign}{Math.Abs(floatValue).ToString($"N{significantDigits}", CultureInfo.CurrentCulture)}";
         }
