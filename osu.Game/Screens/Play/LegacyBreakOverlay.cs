@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
 using osu.Game.Audio;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.Break;
@@ -145,8 +144,10 @@ namespace osu.Game.Screens.Play
             {
                 Schedule(() =>
                 {
-                    var clock = (IFrameStableClock)Clock;
-                    if (IsPresent && !clock.IsRewinding && !clock.IsPaused.Value && !clock.IsCatchingUp.Value)
+                    bool isRewinding = (Clock as IGameplayClock)?.IsRewinding ?? false;
+                    bool isPaused = (Clock as IGameplayClock)?.IsPaused.Value ?? false;
+                    bool isCatchingUp = (Clock as IFrameStableClock)?.IsCatchingUp.Value ?? false;
+                    if (IsPresent && !isRewinding && !isPaused && !isCatchingUp)
                         resultSample?.Play();
                 });
             }
