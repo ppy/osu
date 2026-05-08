@@ -113,13 +113,15 @@ namespace osu.Game.Tests.Visual.RankedPlay
         }
 
         [Test]
-        public void TestMultiplier()
+        public void TestGlobalMultiplier()
         {
             AddStep("set results state", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.Results, state =>
             {
                 int losingPlayer = state.Users.Keys.First();
 
-                state.DamageMultiplier = 2;
+                state.CurrentRound = 4;
+
+                state.GlobalMultiplier = 2;
 
                 foreach (var (id, userInfo) in state.Users)
                 {
@@ -134,6 +136,85 @@ namespace osu.Game.Tests.Visual.RankedPlay
                         };
 
                         userInfo.Life = 1_000_000 - 123_456 * 2;
+                    }
+                    else
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 0,
+                            Damage = 0,
+                            OldLife = 1_000_000,
+                            NewLife = 1_000_000,
+                        };
+                    }
+                }
+            }).WaitSafely());
+        }
+
+        [Test]
+        public void MatchSimulation1()
+        {
+            AddStep("set results state", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.Results, state =>
+            {
+                int first = state.Users.Keys.First();
+
+                state.CurrentRound = 6;
+
+                state.GlobalMultiplier = 3;
+
+                foreach (var (id, userInfo) in state.Users)
+                {
+                    if (id == first)
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 123_456,
+                            Damage = 123_456,
+                            OldLife = 1_000_000,
+                            NewLife = 1_000_000 - 123_456,
+                        };
+
+                        userInfo.Life = 1_000_000 - 123_456;
+                    }
+                    else
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 0,
+                            Damage = 0,
+                            OldLife = 1_000_000,
+                            NewLife = 1_000_000,
+                        };
+                    }
+                }
+            }).WaitSafely());
+        }
+
+        [Test]
+        public void MatchSimulation2()
+        {
+            AddStep("set results state", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.Results, state =>
+            {
+                int first = state.Users.Keys.First();
+
+                state.CurrentRound = 7;
+                state.GlobalMultiplier = 3.5;
+                state.Users.Last().Value.PersonalMultiplier = 1.5;
+                state.Users.Last().Value.WinStreak = 1;
+
+                foreach (var (id, userInfo) in state.Users)
+                {
+                    if (id == first)
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 123_456,
+                            Damage = (int)Math.Ceiling(123_456 * 1 * 1.5),
+                            OldLife = 1_000_000 - 123_456,
+                            NewLife = 1_000_000 - 123_456 - (int)Math.Ceiling(123_456 * 1 * 1.5),
+                        };
+
+                        userInfo.Life = 1_000_000 - 123_456 - (int)Math.Ceiling(123_456 * 1 * 1.5);
                     }
                     else
                     {
@@ -174,7 +255,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
             {
                 int losingPlayer = state.Users.Keys.First();
 
-                state.DamageMultiplier = 2;
+                state.GlobalMultiplier = 2;
 
                 foreach (var (id, userInfo) in state.Users)
                 {

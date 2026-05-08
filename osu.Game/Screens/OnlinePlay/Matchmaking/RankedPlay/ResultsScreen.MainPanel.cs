@@ -92,6 +92,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                             .Select(it => it.Value.DamageInfo)
                                             .OfType<RankedPlayDamageInfo>()
                                             .MaxBy(it => it.Damage)!;
+                if (OpponentScore.TotalScoreWithoutMods > PlayerScore.TotalScoreWithoutMods)
+                {
+                    matchInfo.LastWinner = OpponentScore.User;
+                }
+                else if (OpponentScore.TotalScoreWithoutMods < PlayerScore.TotalScoreWithoutMods)
+                {
+                    matchInfo.LastWinner = PlayerScore.User;
+                }
+                else
+                {
+                    matchInfo.LastWinner = null;
+                }
 
                 AddInternal(new Container
                 {
@@ -290,7 +302,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                     new OsuSpriteText
                                     {
                                         BypassAutoSizeAxes = Axes.Both,
-                                        Text = $"{matchInfo.RoomState.DamageMultiplier.ToStandardFormattedString(maxDecimalDigits: 1)}x",
+                                        Text = $"{(matchInfo.RoomState.GlobalMultiplier*matchInfo.RoomState.Users.Max(u=>u.Value.PersonalMultiplier)).ToStandardFormattedString(maxDecimalDigits: 1)}x",
                                         Anchor = Anchor.CentreRight,
                                         Origin = Anchor.Centre,
                                         Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 42),
@@ -302,9 +314,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                             },
                             new OsuSpriteText
                             {
-                                Text = Precision.AlmostEquals(matchInfo.RoomState.DamageMultiplier, 1)
+                                Text = (Precision.AlmostEquals(matchInfo.RoomState.GlobalMultiplier, 1)
                                     ? "Damage"
-                                    : $"Damage {matchInfo.RoomState.DamageMultiplier.ToStandardFormattedString(maxDecimalDigits: 1)}x",
+                                    : $"Damage {matchInfo.RoomState.GlobalMultiplier.ToStandardFormattedString(maxDecimalDigits: 1)}x"
+                                    )+
+                                    (matchInfo.RoomState.Users.All(u=>Precision.AlmostEquals(u.Value.WinStreak,0))
+                                    ? ""
+                                    : $"{matchInfo.RoomState.Users.Max(u=>u.Value.PersonalMultiplier).ToStandardFormattedString(maxDecimalDigits: 1)}={(matchInfo.RoomState.GlobalMultiplier*matchInfo.RoomState.Users.Max(u=>u.Value.PersonalMultiplier)).ToStandardFormattedString(maxDecimalDigits: 1)}x"
+                                    ),
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.Centre,
                                 Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 22),

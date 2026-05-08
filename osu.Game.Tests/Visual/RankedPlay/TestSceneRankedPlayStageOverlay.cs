@@ -50,7 +50,30 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     Id = 2,
                     Username = "peppy",
                 },
-                Multiplier = multiplier,
+                GlobalMultiplier = multiplier,
+            });
+        }
+
+        [Test]
+        public void TestMultiplier()
+        {
+            double multiplier = 1.0;
+
+            AddSliderStep<double>("set multiplier", 1, 5, 2, value => multiplier = value);
+            AddStep("create", () => Child = new RankedPlayStageOverlay("Pick Phase", RankedPlayColourScheme.BLUE)
+            {
+                PickingUser = new APIUser
+                {
+                    Id = 2,
+                    Username = "peppy",
+                },
+                GlobalMultiplier = multiplier,
+                LastWinnerPersonalMultiplier = 4.5,
+                LastWinner = new APIUser
+                {
+                    Id = 2,
+                    Username = "peppy",
+                },
             });
         }
 
@@ -64,7 +87,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     Id = 226597,
                     Username = "WWWWWWWWWWWWWWWWWWWW",
                 },
-                Multiplier = 2,
+                GlobalMultiplier = 2,
             });
         }
 
@@ -78,7 +101,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     Id = 2,
                     Username = "peppy",
                 },
-                Multiplier = 2,
+                GlobalMultiplier = 2,
             });
             AddStep("create red", () => Child = new RankedPlayStageOverlay("Pick Phase", RankedPlayColourScheme.RED)
             {
@@ -87,7 +110,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     Id = 2,
                     Username = "peppy",
                 },
-                Multiplier = 2,
+                GlobalMultiplier = 2,
             });
         }
     }
