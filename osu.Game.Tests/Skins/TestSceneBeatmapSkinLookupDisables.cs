@@ -26,6 +26,7 @@ namespace osu.Game.Tests.Skins
     public partial class TestSceneBeatmapSkinLookupDisables : OsuTestScene
     {
         private UserSkinSource userSource;
+        private BeatmapSkinProvidingContainer beatmapSkinProvider;
         private BeatmapSkinSource beatmapSource;
         private SkinRequester requester;
 
@@ -36,7 +37,7 @@ namespace osu.Game.Tests.Skins
         public void SetUp() => Schedule(() =>
         {
             Add(new SkinProvidingContainer(userSource = new UserSkinSource())
-                .WithChild(new BeatmapSkinProvidingContainer(beatmapSource = new BeatmapSkinSource())
+                .WithChild(beatmapSkinProvider = new BeatmapSkinProvidingContainer(beatmapSource = new BeatmapSkinSource())
                     .WithChild(requester = new SkinRequester())));
         });
 
@@ -44,7 +45,7 @@ namespace osu.Game.Tests.Skins
         [TestCase(true)]
         public void TestDrawableLookup(bool allowBeatmapLookups)
         {
-            AddStep($"Set beatmap skin enabled to {allowBeatmapLookups}", () => config.SetValue(OsuSetting.BeatmapSkins, allowBeatmapLookups));
+            AddStep($"Set beatmap skin enabled to {allowBeatmapLookups}", () => beatmapSkinProvider.BeatmapSkins.Value = allowBeatmapLookups);
 
             string expected = allowBeatmapLookups ? "beatmap" : "user";
 
@@ -55,7 +56,7 @@ namespace osu.Game.Tests.Skins
         [TestCase(true)]
         public void TestProviderLookup(bool allowBeatmapLookups)
         {
-            AddStep($"Set beatmap skin enabled to {allowBeatmapLookups}", () => config.SetValue(OsuSetting.BeatmapSkins, allowBeatmapLookups));
+            AddStep($"Set beatmap skin enabled to {allowBeatmapLookups}", () => beatmapSkinProvider.BeatmapSkins.Value = allowBeatmapLookups);
 
             ISkin expected() => allowBeatmapLookups ? beatmapSource : userSource;
 
