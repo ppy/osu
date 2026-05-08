@@ -12,6 +12,10 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand;
 using osuTK;
@@ -30,8 +34,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
 
         [Cached]
         private readonly SongPreviewParticleContainer particleContainer;
-
-        private readonly BeatmapRequestHandler requestHandler = new BeatmapRequestHandler();
 
         public TestSceneRankedPlayCard()
         {
@@ -121,6 +123,8 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void TestCardHand()
         {
+            BeatmapRequestHandler requestHandler = null!;
+            AddStep("setup ruleset", () => requestHandler = new BeatmapRequestHandler(new OsuRuleset().RulesetInfo));
             AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
 
             AddStep("add cards", () =>
@@ -143,13 +147,16 @@ namespace osu.Game.Tests.Visual.RankedPlay
             });
         }
 
-        [Resolved]
-        private RulesetStore rulesetStore { get; set; } = null!;
-
         [Test]
         public void TestRulesets()
         {
-            var rulesets = rulesetStore.AvailableRulesets.Where(it => it.OnlineID >= 0);
+            RulesetInfo[] rulesets =
+            [
+                new OsuRuleset().RulesetInfo,
+                new TaikoRuleset().RulesetInfo,
+                new CatchRuleset().RulesetInfo,
+                new ManiaRuleset().RulesetInfo
+            ];
 
             foreach (var ruleset in rulesets)
             {
