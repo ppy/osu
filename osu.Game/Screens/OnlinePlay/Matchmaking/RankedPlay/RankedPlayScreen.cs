@@ -92,7 +92,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         private readonly Container stageOverlayContainer;
         private readonly Container<RankedPlaySubScreen> screenContainer;
-        private readonly RankedPlayChatDisplay chat;
 
         private RankedPlayBottomOrnament ornament = null!;
         private IDisposable? ornamentOverlayRegistration;
@@ -103,6 +102,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         private readonly Bindable<Visibility> cornerPieceVisibility = new Bindable<Visibility>();
         private readonly Bindable<bool> showBeatmapBackground = new Bindable<bool>();
+
+        [Cached]
+        private readonly RankedPlayChatDisplay chat;
 
         [Cached]
         private readonly RankedPlayMatchInfo matchInfo;
