@@ -76,6 +76,12 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestLocalRank()
         {
+            AddStep("set null rank", () => this.ChildrenOfType<UpdateableRank>().ForEach(p =>
+            {
+                p.Hide();
+                p.Rank = null;
+            }));
+
             foreach (var rank in Enum.GetValues<ScoreRank>())
             {
                 AddStep($"set {rank.GetDescription()} rank", () => this.ChildrenOfType<UpdateableRank>().ForEach(p =>
