@@ -103,6 +103,25 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
+        public void TestRarelyHitsoundedLongWallTimeMostlySpinner()
+        {
+            var hitObjects = new List<HitObject>
+            {
+                new HitCircle { StartTime = 0, Samples = hitsounded },
+                new HitCircle { StartTime = 200, Samples = notHitsounded },
+                new HitCircle { StartTime = 400, Samples = notHitsounded },
+                new HitCircle { StartTime = 600, Samples = notHitsounded },
+                new HitCircle { StartTime = 800, Samples = notHitsounded },
+                new HitCircle { StartTime = 1000, Samples = notHitsounded },
+                new Spinner { StartTime = 1200, EndTime = 21200, Samples = notHitsounded },
+                new HitCircle { StartTime = 21400, Samples = hitsounded },
+            };
+
+            // 21.4s since last hitsound, but 20s overlap a spinner → 1.4s without hitsounds.
+            assertOk(hitObjects);
+        }
+
+        [Test]
         public void TestLightlyHitsounded()
         {
             var hitObjects = new List<HitObject>();

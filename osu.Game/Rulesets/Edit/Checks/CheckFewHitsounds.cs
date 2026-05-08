@@ -47,14 +47,20 @@ namespace osu.Game.Rulesets.Edit.Checks
         private bool mapHasHitsounds;
         private int objectsWithoutHitsounds;
         private double lastHitsoundTime;
-        private IReadOnlyList<BreakPeriod> breaks = Array.Empty<BreakPeriod>();
+        private IReadOnlyList<(double StartTime, double EndTime)> excludedTimeRanges = Array.Empty<(double StartTime, double EndTime)>();
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
             if (!context.CurrentDifficulty.Playable.HitObjects.Any())
                 yield break;
 
-            breaks = context.CurrentDifficulty.Playable.Breaks;
+            excludedTimeRanges = context.CurrentDifficulty.Playable.Breaks
+                                        .Select(b => (b.StartTime, b.EndTime))
+                                        .Concat(context.CurrentDifficulty.Playable.HitObjects
+                                                       .Where(IsExcludedFromHitsounding)
+                                                       .Select(h => (h.StartTime, EndTime: h.GetEndTime())))
+                                        .Where(period => period.EndTime > period.StartTime)
+                                        .ToList();
 
             mapHasHitsounds = false;
             objectsWithoutHitsounds = 0;
@@ -66,9 +72,13 @@ namespace osu.Game.Rulesets.Edit.Checks
             {
                 // Samples play on the end of objects. Some objects have nested objects to accomplish playing them elsewhere (e.g. slider head/repeat).
                 foreach (var nestedHitObject in hitObject.NestedHitObjects)
-                    hitObjectsIncludingNested.Add(nestedHitObject);
+                {
+                    if (!IsExcludedFromHitsounding(nestedHitObject))
+                        hitObjectsIncludingNested.Add(nestedHitObject);
+                }
 
-                hitObjectsIncludingNested.Add(hitObject);
+                if (!IsExcludedFromHitsounding(hitObject))
+                    hitObjectsIncludingNested.Add(hitObject);
             }
 
             var hitObjectsByEndTime = hitObjectsIncludingNested.OrderBy(o => o.GetEndTime()).ToList();
@@ -99,7 +109,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             // If there are no hitsounds we let the "No hitsounds" template take precedence.
             if (hasHitsound || (isLastObject && mapHasHitsounds))
             {
-                double timeWithoutHitsounds = getTimeWithoutHitsoundsExcludingBreaks(lastHitsoundTime, time);
+                double timeWithoutHitsounds = getTimeWithoutHitsounds(lastHitsoundTime, time);
 
                 if (timeWithoutHitsounds > problem_threshold_time && objectsWithoutHitsounds > problem_threshold_objects)
                     yield return new IssueTemplateLongPeriodProblem(this).Create(lastHitsoundTime, timeWithoutHitsounds);
@@ -120,19 +130,19 @@ namespace osu.Game.Rulesets.Edit.Checks
         }
 
         /// <summary>
-        /// Milliseconds between <paramref name="start"/> and <paramref name="end"/> that are not covered by a <see cref="BreakPeriod"/>.
+        /// Milliseconds between <paramref name="start"/> and <paramref name="end"/> that are not covered by a <see cref="BreakPeriod"/> or excluded object duration.
         /// </summary>
-        private double getTimeWithoutHitsoundsExcludingBreaks(double start, double end)
+        private double getTimeWithoutHitsounds(double start, double end)
         {
             if (end <= start)
                 return 0;
 
             double duration = end - start;
 
-            foreach (var b in breaks)
+            foreach (var period in excludedTimeRanges)
             {
-                double overlapStart = Math.Max(start, b.StartTime);
-                double overlapEnd = Math.Min(end, b.EndTime);
+                double overlapStart = Math.Max(start, period.StartTime);
+                double overlapEnd = Math.Min(end, period.EndTime);
 
                 if (overlapEnd > overlapStart)
                     duration -= overlapEnd - overlapStart;
@@ -140,6 +150,9 @@ namespace osu.Game.Rulesets.Edit.Checks
 
             return Math.Max(0, duration);
         }
+
+        // Intended to be overridden by ruleset-specific objects e.g. spinners, banana showers.
+        protected virtual bool IsExcludedFromHitsounding(HitObject hitObject) => false;
 
         private bool isHitsound(HitSampleInfo sample) => HitSampleInfo.ALL_ADDITIONS.Any(sample.Name.Contains);
         private bool isHitnormal(HitSampleInfo sample) => sample.Name.Contains(HitSampleInfo.HIT_NORMAL);
