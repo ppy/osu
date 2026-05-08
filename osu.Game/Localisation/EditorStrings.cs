@@ -229,6 +229,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString CheckEntireBeatmapSet => new TranslatableString(getKey(@"check_entire_beatmap_set"), @"Entire beatmap set");
 
+        /// <summary>
+        /// "Saving is not supported for this ruleset yet, sorry!"
+        /// </summary>
+        public static LocalisableString RulesetNotSupportSaving => new TranslatableString(getKey(@"ruleset_not_support_saving"), @"Saving is not supported for this ruleset yet, sorry!");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

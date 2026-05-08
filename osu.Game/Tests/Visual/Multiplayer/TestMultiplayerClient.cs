@@ -824,9 +824,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return MessagePackSerializer.Deserialize<T>(serialized, SignalRUnionWorkaroundResolver.OPTIONS);
         }
 
-        public override Task DisconnectInternal()
+        protected override Task DisconnectInternal()
         {
-            isConnected.Value = false;
+            Disconnect();
+            return Task.CompletedTask;
+        }
+
+        public override Task Reconnect()
+        {
             return Task.CompletedTask;
         }
 
@@ -914,6 +919,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public override Task MatchmakingAcceptInvitation()
         {
             return Task.CompletedTask;
+        }
+
+        public override Task<MatchmakingIssueDuelResponse> MatchmakingIssueDuel(MatchmakingIssueDuelRequest request)
+        {
+            return Task.FromResult(new MatchmakingIssueDuelResponse());
+        }
+
+        public override Task<MatchmakingAcceptDuelResponse> MatchmakingAcceptDuel(MatchmakingAcceptDuelRequest request)
+        {
+            return Task.FromResult(new MatchmakingAcceptDuelResponse());
         }
 
         public override Task MatchmakingDeclineInvitation()

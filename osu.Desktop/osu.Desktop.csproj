@@ -25,7 +25,8 @@
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="System.IO.Packaging" Version="10.0.5" />
-    <PackageReference Include="DiscordRichPresence" Version="1.6.1.70" />
+    <!-- Held back due to invite bug in newer versions. See https://github.com/Lachee/discord-rpc-csharp/issues/286-->
+    <PackageReference Include="DiscordRichPresence" Version="1.5.0.51" />
     <PackageReference Include="Velopack" Version="0.0.1298" />
   </ItemGroup>
   <ItemGroup Label="Resources">

@@ -60,6 +60,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Height => new TranslatableString(getKey(@"height"), @"Height");
 
         /// <summary>
+        /// "Download"
+        /// </summary>
+        public static LocalisableString Download => new TranslatableString(getKey(@"download"), @"Download");
+
+        /// <summary>
         /// "Downloading..."
         /// </summary>
         public static LocalisableString Downloading => new TranslatableString(getKey(@"downloading"), @"Downloading...");
