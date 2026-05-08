@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Configuration;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -180,7 +181,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         MainPiece.MoveToX(-X);
 
                     // Rate independent to match stable.
-                    double length = gravity_time * (rateAdjustedHitAnimations.Value ? 1 : Clock.Rate);
+                    double rate = (Clock as IGameplayClock)?.GetTrueGameplayRate() ?? Clock.Rate;
+                    double length = gravity_time * (rateAdjustedHitAnimations.Value ? 1 : rate);
 
                     this.ScaleTo(0.8f, length * 2, Easing.OutQuad);
 
