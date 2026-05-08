@@ -17,7 +17,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK;
@@ -130,6 +129,8 @@ namespace osu.Game.Collections
         {
             protected override float LeftRightPadding => item_height / 2;
 
+            protected override bool KillFocusOnBackKey => true;
+
             private const float count_text_size = 12;
 
             private readonly Live<BeatmapCollection> collection;
@@ -182,18 +183,6 @@ namespace osu.Game.Collections
                 {
                     PlaceholderText = CollectionsStrings.CreateNew;
                 }
-            }
-
-            public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
-            {
-                if (e.Action != GlobalAction.Back) return base.OnPressed(e);
-
-                // kill focus to cancel collection creation
-                // we need to do this before killing focus, otherwise the `HasFocus` check will just return early and do nothing
-                // let the base class handle text clearing, sfx playing etc.
-                base.OnPressed(e);
-                KillFocus();
-                return true;
             }
         }
 
