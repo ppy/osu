@@ -9,11 +9,11 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.Break
 {
-    public partial class WarningArrows : SkinReloadableDrawable
+    public partial class LegacyBreakArrows : SkinReloadableDrawable
     {
         private readonly Sprite[] sprites;
 
-        public WarningArrows()
+        public LegacyBreakArrows()
         {
             RelativeSizeAxes = Axes.Both;
 

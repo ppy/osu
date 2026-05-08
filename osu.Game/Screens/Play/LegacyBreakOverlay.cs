@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Play
 
         private readonly Sprite sectionFailSprite;
         private readonly Sprite sectionPassSprite;
-        private readonly WarningArrows warningArrows;
+        private readonly LegacyBreakArrows legacyBreakArrows;
 
         public required BreakTracker BreakTracker { get; init; }
 
@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.Centre,
                     Alpha = 0,
                 },
-                warningArrows = new WarningArrows
+                legacyBreakArrows = new LegacyBreakArrows
                 {
                     Alpha = 0,
                 },
@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Play
             {
                 sectionPassSprite.Alpha = 0;
                 sectionFailSprite.Alpha = 0;
-                warningArrows.Alpha = 0;
+                legacyBreakArrows.Alpha = 0;
                 return;
             }
 
@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Play
                 resultSprite.Alpha = Interpolation.ValueAt(t, 1f, 0f, h + 1400, h + 1600);
             }
 
-            warningArrows.Alpha = t > e - 1300 && t < e && (int)(e - t) / 100 % 2 == 0 ? 1 : 0;
+            legacyBreakArrows.Alpha = t > e - 1300 && t < e && (int)(e - t) / 100 % 2 == 0 ? 1 : 0;
         }
 
         private void updateDisplay(ValueChangedEvent<Period?> period)
