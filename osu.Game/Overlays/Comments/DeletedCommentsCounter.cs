@@ -7,8 +7,9 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osu.Framework.Bindables;
-using Humanizer;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -55,7 +56,7 @@ namespace osu.Game.Overlays.Comments
         {
             if (!ShowDeleted.Value && Count.Value != 0)
             {
-                countText.Text = @"deleted comment".ToQuantity(Count.Value);
+                countText.Text = CommentsStrings.DeletedCount(Count.Value.ToLocalisableString()).ToQuantity(Count.Value);
                 Show();
             }
             else
