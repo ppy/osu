@@ -50,6 +50,21 @@ namespace osu.Game.Localisation
         public static LocalisableString ScreenMode => new TranslatableString(getKey(@"screen_mode"), @"Screen mode");
 
         /// <summary>
+        /// "Windowed"
+        /// </summary>
+        public static LocalisableString ScreenModeWindowed => new TranslatableString(getKey(@"screen_mode_windowed"), @"Windowed");
+
+        /// <summary>
+        /// "Borderless"
+        /// </summary>
+        public static LocalisableString ScreenModeBorderless => new TranslatableString(getKey(@"screen_mode_borderless"), @"Borderless");
+
+        /// <summary>
+        /// "Fullscreen"
+        /// </summary>
+        public static LocalisableString ScreenModeFullscreen => new TranslatableString(getKey(@"screen_mode_fullscreen"), @"Fullscreen");
+
+        /// <summary>
         /// "Resolution"
         /// </summary>
         public static LocalisableString Resolution => new TranslatableString(getKey(@"resolution"), @"Resolution");

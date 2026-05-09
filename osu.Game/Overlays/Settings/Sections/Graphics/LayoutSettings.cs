@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             Children = new Drawable[]
             {
-                new SettingsItemV2(windowModeDropdown = new FormDropdown<WindowMode>
+                new SettingsItemV2(windowModeDropdown = new WindowModeDropdown
                 {
                     Caption = GraphicsSettingsStrings.ScreenMode,
                     Items = window?.SupportedWindowModes,
@@ -454,6 +454,27 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0.5f,
                 };
+            }
+        }
+
+        private partial class WindowModeDropdown : FormDropdown<WindowMode>
+        {
+            protected override LocalisableString GenerateItemText(WindowMode item)
+            {
+                switch (item)
+                {
+                    case WindowMode.Windowed:
+                        return GraphicsSettingsStrings.ScreenModeWindowed;
+
+                    case WindowMode.Borderless:
+                        return GraphicsSettingsStrings.ScreenModeBorderless;
+
+                    case WindowMode.Fullscreen:
+                        return GraphicsSettingsStrings.ScreenModeFullscreen;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
         }
 
