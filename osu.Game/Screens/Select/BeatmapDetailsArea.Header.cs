@@ -33,6 +33,8 @@ namespace osu.Game.Screens.Select
 
             public IBindable<BeatmapLeaderboardScope> Scope => scopeDropdown.Current;
 
+            private readonly Bindable<BeatmapLeaderboardScope> configLeaderboardScope = new Bindable<BeatmapLeaderboardScope>();
+
             private readonly Bindable<BeatmapDetailTab> configDetailTab = new Bindable<BeatmapDetailTab>();
 
             public IBindable<LeaderboardSortMode> Sorting => sortDropdown.Current;
@@ -105,6 +107,7 @@ namespace osu.Game.Screens.Select
                 };
 
                 config.BindWith(OsuSetting.BeatmapDetailTab, configDetailTab);
+                config.BindWith(OsuSetting.BeatmapLeaderboardScope, configLeaderboardScope);
                 config.BindWith(OsuSetting.BeatmapLeaderboardSortMode, configLeaderboardSortMode);
                 config.BindWith(OsuSetting.BeatmapDetailModsFilter, selectedModsToggle.Active);
             }
@@ -113,7 +116,7 @@ namespace osu.Game.Screens.Select
             {
                 base.LoadComplete();
 
-                scopeDropdown.Current.Value = tryMapDetailTabToLeaderboardScope(configDetailTab.Value) ?? scopeDropdown.Current.Value;
+                scopeDropdown.Current.Value = configLeaderboardScope.Value;
                 scopeDropdown.Current.BindValueChanged(_ => updateConfigDetailTab());
 
                 tabControl.Current.Value = configDetailTab.Value == BeatmapDetailTab.Details ? Selection.Details : Selection.Ranking;
@@ -152,59 +155,11 @@ namespace osu.Game.Screens.Select
                         return;
 
                     case Selection.Ranking:
-                        configDetailTab.Value = mapLeaderboardScopeToDetailTab(scopeDropdown.Current.Value);
+                        configLeaderboardScope.Value = scopeDropdown.Current.Value;
                         return;
 
                     default:
                         throw new ArgumentOutOfRangeException(nameof(tabControl.Current.Value), tabControl.Current.Value, null);
-                }
-            }
-
-            private static BeatmapLeaderboardScope? tryMapDetailTabToLeaderboardScope(BeatmapDetailTab tab)
-            {
-                switch (tab)
-                {
-                    case BeatmapDetailTab.Local:
-                        return BeatmapLeaderboardScope.Local;
-
-                    case BeatmapDetailTab.Country:
-                        return BeatmapLeaderboardScope.Country;
-
-                    case BeatmapDetailTab.Global:
-                        return BeatmapLeaderboardScope.Global;
-
-                    case BeatmapDetailTab.Friends:
-                        return BeatmapLeaderboardScope.Friend;
-
-                    case BeatmapDetailTab.Team:
-                        return BeatmapLeaderboardScope.Team;
-
-                    default:
-                        return null;
-                }
-            }
-
-            private static BeatmapDetailTab mapLeaderboardScopeToDetailTab(BeatmapLeaderboardScope scope)
-            {
-                switch (scope)
-                {
-                    case BeatmapLeaderboardScope.Local:
-                        return BeatmapDetailTab.Local;
-
-                    case BeatmapLeaderboardScope.Country:
-                        return BeatmapDetailTab.Country;
-
-                    case BeatmapLeaderboardScope.Global:
-                        return BeatmapDetailTab.Global;
-
-                    case BeatmapLeaderboardScope.Friend:
-                        return BeatmapDetailTab.Friends;
-
-                    case BeatmapLeaderboardScope.Team:
-                        return BeatmapDetailTab.Team;
-
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(scope), scope, null);
                 }
             }
 

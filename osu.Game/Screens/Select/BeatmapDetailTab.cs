@@ -11,28 +11,8 @@ namespace osu.Game.Screens.Select
         Details,
 
         /// <summary>
-        /// Local leaderboards.
+        /// Leaderboards.
         /// </summary>
-        Local,
-
-        /// <summary>
-        /// Country leaderboards.
-        /// </summary>
-        Country,
-
-        /// <summary>
-        /// Global leaderboards.
-        /// </summary>
-        Global,
-
-        /// <summary>
-        /// Friend leaderboards.
-        /// </summary>
-        Friends,
-
-        /// <summary>
-        /// Team leaderboards.
-        /// </summary>
-        Team
+        Leaderboards,
     }
 }
