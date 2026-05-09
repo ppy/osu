@@ -25,6 +25,21 @@ namespace osu.Game.Localisation
         public static LocalisableString Renderer => new TranslatableString(getKey(@"renderer"), @"Renderer");
 
         /// <summary>
+        /// "Automatic"
+        /// </summary>
+        public static LocalisableString RendererAutomatic => new TranslatableString(getKey(@"renderer_automatic"), @"Automatic");
+
+        /// <summary>
+        /// "Automatic ({0})"
+        /// </summary>
+        public static LocalisableString RendererAutomaticInUse(LocalisableString rendererName) => new TranslatableString(getKey(@"renderer_automatic_in_use"), @"Automatic ({0})", rendererName);
+
+        /// <summary>
+        /// "{0} (Experimental)"
+        /// </summary>
+        public static LocalisableString RendererExperimental(LocalisableString rendererName) => new TranslatableString(getKey(@"renderer_experimental"), @"{0} (Experimental)", rendererName);
+
+        /// <summary>
         /// "Frame limiter"
         /// </summary>
         public static LocalisableString FrameLimiter => new TranslatableString(getKey(@"frame_limiter"), @"Frame limiter");

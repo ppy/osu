@@ -101,10 +101,30 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             protected override LocalisableString GenerateItemText(RendererType item)
             {
-                if (item == RendererType.Automatic && automaticRendererInUse)
-                    return LocalisableString.Interpolate($"{base.GenerateItemText(item)} ({hostResolvedRenderer.GetDescription()})");
+                switch (item)
+                {
+                    case RendererType.Automatic:
+                        // `hostResolvedRenderer != RendererType.Automatic` is used here to prevent recursion (I don't think it's possible at all, but just in case)
+                        if (automaticRendererInUse && hostResolvedRenderer != RendererType.Automatic)
+                            return GraphicsSettingsStrings.RendererAutomaticInUse(GenerateItemText(hostResolvedRenderer));
 
-                return base.GenerateItemText(item);
+                        return GraphicsSettingsStrings.RendererAutomatic;
+
+                    case RendererType.Deferred_Metal:
+                        return GraphicsSettingsStrings.RendererExperimental(GenerateItemText(RendererType.Metal));
+
+                    case RendererType.Deferred_Vulkan:
+                        return GraphicsSettingsStrings.RendererExperimental(GenerateItemText(RendererType.Vulkan));
+
+                    case RendererType.Deferred_Direct3D11:
+                        return GraphicsSettingsStrings.RendererExperimental(GenerateItemText(RendererType.Direct3D11));
+
+                    case RendererType.Deferred_OpenGL:
+                        return GraphicsSettingsStrings.RendererExperimental(GenerateItemText(RendererType.OpenGL));
+
+                    default:
+                        return item.GetDescription();
+                }
             }
         }
     }
