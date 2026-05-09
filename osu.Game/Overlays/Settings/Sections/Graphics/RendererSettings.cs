@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     Keywords = new[] { @"fps", @"framerate" },
                 },
-                new SettingsItemV2(new FormEnumDropdown<ExecutionMode>
+                new SettingsItemV2(new ExecutionModeDropdown
                 {
                     Caption = GraphicsSettingsStrings.ThreadingMode,
                     Current = config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode)
@@ -149,6 +149,24 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
                     case FrameSync.Unlimited:
                         return GraphicsSettingsStrings.FrameLimiterUnlimited;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
+        private partial class ExecutionModeDropdown : FormEnumDropdown<ExecutionMode>
+        {
+            protected override LocalisableString GenerateItemText(ExecutionMode item)
+            {
+                switch (item)
+                {
+                    case ExecutionMode.SingleThread:
+                        return GraphicsSettingsStrings.ThreadingModeSingleThread;
+
+                    case ExecutionMode.MultiThreaded:
+                        return GraphicsSettingsStrings.ThreadingModeMultiThreaded;
 
                     default:
                         throw new ArgumentOutOfRangeException();

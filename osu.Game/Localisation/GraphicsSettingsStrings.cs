@@ -65,6 +65,16 @@ namespace osu.Game.Localisation
         public static LocalisableString ThreadingMode => new TranslatableString(getKey(@"threading_mode"), @"Threading mode");
 
         /// <summary>
+        /// "Single thread"
+        /// </summary>
+        public static LocalisableString ThreadingModeSingleThread => new TranslatableString(getKey(@"threading_mode_single_thread"), @"Single thread");
+
+        /// <summary>
+        /// "Multithreaded"
+        /// </summary>
+        public static LocalisableString ThreadingModeMultiThreaded => new TranslatableString(getKey(@"threading_mode_multi_threaded"), @"Multithreaded");
+
+        /// <summary>
         /// "Show FPS"
         /// </summary>
         public static LocalisableString ShowFPS => new TranslatableString(getKey(@"show_fps"), @"Show FPS");
