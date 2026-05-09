@@ -45,6 +45,21 @@ namespace osu.Game.Localisation
         public static LocalisableString FrameLimiter => new TranslatableString(getKey(@"frame_limiter"), @"Frame limiter");
 
         /// <summary>
+        /// "VSync"
+        /// </summary>
+        public static LocalisableString FrameLimiterVSync => new TranslatableString(getKey(@"frame_limiter_vsync"), @"VSync");
+
+        /// <summary>
+        /// "{0}x refresh rate"
+        /// </summary>
+        public static LocalisableString FrameLimiterMultiplier(int multiplier) => new TranslatableString(getKey(@"frame_limiter_multiplier"), @"{0}x refresh rate", multiplier);
+
+        /// <summary>
+        /// "Basically unlimited"
+        /// </summary>
+        public static LocalisableString FrameLimiterUnlimited => new TranslatableString(getKey(@"frame_limiter_unlimited"), @"Basically unlimited");
+
+        /// <summary>
         /// "Threading mode"
         /// </summary>
         public static LocalisableString ThreadingMode => new TranslatableString(getKey(@"threading_mode"), @"Threading mode");

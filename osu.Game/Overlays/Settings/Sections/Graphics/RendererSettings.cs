@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -40,7 +41,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Keywords = new[] { @"compatibility", @"directx" },
                 },
                 // TODO: this needs to be a custom dropdown at some point
-                new SettingsItemV2(new FormEnumDropdown<FrameSync>
+                new SettingsItemV2(new FrameSyncDropdown
                 {
                     Caption = GraphicsSettingsStrings.FrameLimiter,
                     Current = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync),
@@ -124,6 +125,33 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
                     default:
                         return item.GetDescription();
+                }
+            }
+        }
+
+        private partial class FrameSyncDropdown : FormEnumDropdown<FrameSync>
+        {
+            protected override LocalisableString GenerateItemText(FrameSync item)
+            {
+                switch (item)
+                {
+                    case FrameSync.VSync:
+                        return GraphicsSettingsStrings.FrameLimiterVSync;
+
+                    case FrameSync.Limit2x:
+                        return GraphicsSettingsStrings.FrameLimiterMultiplier(2);
+
+                    case FrameSync.Limit4x:
+                        return GraphicsSettingsStrings.FrameLimiterMultiplier(4);
+
+                    case FrameSync.Limit8x:
+                        return GraphicsSettingsStrings.FrameLimiterMultiplier(8);
+
+                    case FrameSync.Unlimited:
+                        return GraphicsSettingsStrings.FrameLimiterUnlimited;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
         }
