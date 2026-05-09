@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Humanizer;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
@@ -12,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -70,7 +70,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
             {
                 Name = UsersStrings.ShowRankGlobalSimple,
                 Count = rank.ToLocalisableString("\\##,##0"),
-                Time = days == 0 ? "now" : $"{"day".ToQuantity(days)} ago",
+                Time = days == 0
+                    ? WebCommonStrings.TimeNow
+                    : WebCommonStrings.TimeDaysAgo(days.ToLocalisableString()).ToQuantity(days),
             };
         }
     }
