@@ -145,6 +145,11 @@ and {1} other operation(s).", ongoingOperationsText, count);
         /// </summary>
         public static LocalisableString ConfirmExitMultiplayerMatchBodyText => new TranslatableString(getKey(@"confirm_exit_multiplayer_match_body_text"), @"Are you sure you want to leave this multiplayer match?");
 
+        /// <summary>
+        /// "{0} ({1} beatmap)|{0} ({1} beatmaps)"
+        /// </summary>
+        public static LocalisableString DeleteCollectionBodyText(string collectionName, int beatmapsCount) => new PluralisableString(new TranslatableString(getKey(@"delete_collection_body_text"), @"{0} ({1} beatmap)|{0} ({1} beatmaps)", collectionName, beatmapsCount), beatmapsCount, '|');
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
