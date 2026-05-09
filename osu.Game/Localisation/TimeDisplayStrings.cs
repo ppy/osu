@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -17,17 +18,17 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "dy|dys"
         /// </summary>
-        public static LocalisableString CountDayShortUnit(int quantity) => new PluralisableString(new TranslatableString(getKey(@"count_day_short_unit"), @"dy|dys"), quantity, '|');
+        public static LocalisableString CountDayShortUnit(int quantity) => new TranslatableString(getKey(@"count_day_short_unit"), @"dy|dys").ToQuantity(quantity);
 
         /// <summary>
         /// "mo|mos"
         /// </summary>
-        public static LocalisableString CountMonthShortUnit(int quantity) => new PluralisableString(new TranslatableString(getKey(@"count_month_short_unit"), @"mo|mos"), quantity, '|');
+        public static LocalisableString CountMonthShortUnit(int quantity) => new TranslatableString(getKey(@"count_month_short_unit"), @"mo|mos").ToQuantity(quantity);
 
         /// <summary>
         /// "yr|yrs"
         /// </summary>
-        public static LocalisableString CountYearShortUnit(int quantity) => new PluralisableString(new TranslatableString(getKey(@"count_year_short_unit"), @"yr|yrs"), quantity, '|');
+        public static LocalisableString CountYearShortUnit(int quantity) => new TranslatableString(getKey(@"count_year_short_unit"), @"yr|yrs").ToQuantity(quantity);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

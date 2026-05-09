@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -52,7 +53,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "You currently have {0} beatmap loaded!|You currently have {0} beatmaps loaded!"
         /// </summary>
-        public static LocalisableString CurrentlyLoadedBeatmaps(int beatmaps) => new PluralisableString(new TranslatableString(getKey(@"currently_loaded_beatmaps"), @"You currently have {0} beatmap loaded!|You currently have {0} beatmaps loaded!", beatmaps), beatmaps, '|');
+        public static LocalisableString CurrentlyLoadedBeatmaps(int beatmapsCount) => new TranslatableString(getKey(@"currently_loaded_beatmaps"), @"You currently have {0} beatmap loaded!|You currently have {0} beatmaps loaded!", beatmapsCount).ToQuantity(beatmapsCount);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

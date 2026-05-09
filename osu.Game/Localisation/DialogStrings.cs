@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -148,7 +149,7 @@ and {1} other operation(s).", ongoingOperationsText, count);
         /// <summary>
         /// "{0} ({1} beatmap)|{0} ({1} beatmaps)"
         /// </summary>
-        public static LocalisableString DeleteCollectionBodyText(string collectionName, int beatmapsCount) => new PluralisableString(new TranslatableString(getKey(@"delete_collection_body_text"), @"{0} ({1} beatmap)|{0} ({1} beatmaps)", collectionName, beatmapsCount), beatmapsCount, '|');
+        public static LocalisableString DeleteCollectionBodyText(string collectionName, int beatmapsCount) => new TranslatableString(getKey(@"delete_collection_body_text"), @"{0} ({1} beatmap)|{0} ({1} beatmaps)", collectionName, beatmapsCount).ToQuantity(beatmapsCount);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
