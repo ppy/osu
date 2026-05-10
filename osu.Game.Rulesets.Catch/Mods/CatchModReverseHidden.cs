@@ -17,11 +17,11 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModHiddenAntiHD : ModHidden, IApplicableToDrawableRuleset<CatchHitObject>
+    public class CatchModReverseHidden : ModHidden, IApplicableToDrawableRuleset<CatchHitObject>
     {
-        public override string Name => "Anti-Hidden";
-        public override string Acronym => "AH";
-        public override LocalisableString Description => "Play with fruits that fade in late.";
+        public override string Name => "Reverse Hidden";
+        public override string Acronym => "RH";
+        public override LocalisableString Description => "Reduce reaction time.";
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
         public override Type[] IncompatibleMods => new[] { typeof(CatchModHidden), typeof(CatchModFlashlight) };
 
@@ -30,10 +30,10 @@ namespace osu.Game.Rulesets.Catch.Mods
         private readonly Dictionary<DrawableHitObject, HitObject> nestedHitObjects = new Dictionary<DrawableHitObject, HitObject>();
 
         [SettingSource("Reveal height", "How far down the playfield fruits should begin fading in.")]
-        public BindableDouble RevealHeight { get; } = new BindableDouble(50)
+        public BindableDouble RevealHeight { get; } = new BindableDouble(5)
         {
-            MinValue = 30,
-            MaxValue = 70,
+            MinValue = 3,
+            MaxValue = 7,
             Precision = 1,
         };
 
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         {
             var hitObject = drawable.HitObject;
 
-            double offset = hitObject.TimePreempt * (1 - RevealHeight.Value / 100);
+            double offset = hitObject.TimePreempt * (1 - RevealHeight.Value / 10);
             double duration = Math.Min(hitObject.TimePreempt * fade_in_duration_multiplier, offset);
 
             drawable.Hide();

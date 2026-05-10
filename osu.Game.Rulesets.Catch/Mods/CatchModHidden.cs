@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Mods
     {
         public override LocalisableString Description => @"Play with fading fruits.";
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
-        public override Type[] IncompatibleMods => new[] { typeof(CatchModHiddenAntiHD) };
+        public override Type[] IncompatibleMods => new[] { typeof(CatchModReverseHidden) };
 
         private const double fade_out_offset_multiplier = 0.6;
         private const double fade_out_duration_multiplier = 0.44;

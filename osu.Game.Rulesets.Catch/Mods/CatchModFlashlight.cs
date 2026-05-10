@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Catch.Mods
     public partial class CatchModFlashlight : ModFlashlight<CatchHitObject>
     {
         public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
-        public override Type[] IncompatibleMods => new[] { typeof(CatchModHiddenAntiHD) };
+        public override Type[] IncompatibleMods => new[] { typeof(CatchModReverseHidden) };
 
         public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)
         {
