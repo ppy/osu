@@ -7,11 +7,13 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Configuration;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
@@ -39,6 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private double? lastPressHandleTime;
 
         private readonly Bindable<HitType> type = new Bindable<HitType>();
+        private readonly Bindable<bool> configHitAnimation = new BindableBool();
 
         public DrawableHit()
             : this(null)
@@ -49,6 +52,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             : base(hit)
         {
             FillMode = FillMode.Fit;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(TaikoRulesetConfigManager rulesetConfig)
+        {
+            rulesetConfig.BindWith(TaikoRulesetSetting.HitAnimation, configHitAnimation);
         }
 
         protected override void OnApply()
@@ -159,6 +168,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     break;
 
                 case ArmedState.Hit:
+                    if (!configHitAnimation.Value)
+                    {
+                        // Make the object instantly invisible when hit
+                        Alpha = 0;
+                        this.Delay(StrongNestedHit.SECOND_HIT_WINDOW).Expire();
+                        break;
+                    }
+
                     // If we're far enough away from the left stage, we should bring ourselves in front of it
                     ProxyContent();
 
