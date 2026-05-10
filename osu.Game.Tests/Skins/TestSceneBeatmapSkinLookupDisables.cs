@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps;
@@ -26,17 +25,15 @@ namespace osu.Game.Tests.Skins
     public partial class TestSceneBeatmapSkinLookupDisables : OsuTestScene
     {
         private UserSkinSource userSource;
+        private BeatmapSkinProvidingContainer beatmapSkinProvider;
         private BeatmapSkinSource beatmapSource;
         private SkinRequester requester;
-
-        [Resolved]
-        private OsuConfigManager config { get; set; }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
             Add(new SkinProvidingContainer(userSource = new UserSkinSource())
-                .WithChild(new BeatmapSkinProvidingContainer(beatmapSource = new BeatmapSkinSource())
+                .WithChild(beatmapSkinProvider = new BeatmapSkinProvidingContainer(beatmapSource = new BeatmapSkinSource())
                     .WithChild(requester = new SkinRequester())));
         });
 
@@ -44,7 +41,7 @@ namespace osu.Game.Tests.Skins
         [TestCase(true)]
         public void TestDrawableLookup(bool allowBeatmapLookups)
         {
-            AddStep($"Set beatmap skin enabled to {allowBeatmapLookups}", () => config.SetValue(OsuSetting.BeatmapSkins, allowBeatmapLookups));
+            AddStep($"Set beatmap skin enabled to {allowBeatmapLookups}", () => beatmapSkinProvider.BeatmapSkins.Value = allowBeatmapLookups);
 
             string expected = allowBeatmapLookups ? "beatmap" : "user";
 
@@ -55,7 +52,7 @@ namespace osu.Game.Tests.Skins
         [TestCase(true)]
         public void TestProviderLookup(bool allowBeatmapLookups)
         {
-            AddStep($"Set beatmap skin enabled to {allowBeatmapLookups}", () => config.SetValue(OsuSetting.BeatmapSkins, allowBeatmapLookups));
+            AddStep($"Set beatmap skin enabled to {allowBeatmapLookups}", () => beatmapSkinProvider.BeatmapSkins.Value = allowBeatmapLookups);
 
             ISkin expected() => allowBeatmapLookups ? beatmapSource : userSource;
 

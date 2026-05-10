@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Online.API;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand;
 using osuTK;
@@ -17,18 +18,18 @@ namespace osu.Game.Tests.Visual.RankedPlay
     {
         private readonly Bindable<bool> previewEnabled = new BindableBool(true);
 
-        private readonly BeatmapRequestHandler requestHandler = new BeatmapRequestHandler();
-
         public override void SetUpSteps()
         {
             base.SetUpSteps();
+
+            BeatmapRequestHandler requestHandler = null!;
+            AddStep("setup ruleset", () => requestHandler = new BeatmapRequestHandler(new OsuRuleset().RulesetInfo));
 
             AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
 
             AddStep("add cards", () =>
             {
                 PlayerHandOfCards handOfCards;
-
                 Child = handOfCards = new PlayerHandOfCards
                 {
                     RelativeSizeAxes = Axes.Both,
