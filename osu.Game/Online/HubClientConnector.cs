@@ -64,8 +64,6 @@ namespace osu.Game.Online
                     options.Headers.Add(CLIENT_SESSION_ID_HEADER, API.SessionIdentifier.ToString());
                 });
 
-            builder.WithStatefulReconnect();
-
             builder.AddMessagePackProtocol(options =>
             {
                 options.SerializerOptions = SignalRUnionWorkaroundResolver.OPTIONS;
