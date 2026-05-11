@@ -99,7 +99,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private GridContainer mainGrid = null!;
 
         private IBindable<bool> isConnected = null!;
-        private OsuSpriteText? queueingText = null;
+        private OsuSpriteText? queueingText;
 
         public ScreenQueue(MatchmakingPoolType poolType)
         {
