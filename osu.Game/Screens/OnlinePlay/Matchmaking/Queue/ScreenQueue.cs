@@ -99,7 +99,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private GridContainer mainGrid = null!;
 
         private IBindable<bool> isConnected = null!;
-        private OsuSpriteText queueingText = null!;
+        private OsuSpriteText? queueingText = null;
 
         public ScreenQueue(MatchmakingPoolType poolType)
         {
@@ -420,6 +420,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         protected override void Update()
         {
             base.Update();
+
             if (currentState.Value == MatchmakingScreenState.Queueing && queueingText != null)
             {
                 queueingText.Text = "Waiting for a game... " + queue.Timer.Elapsed.ToString(@"mm\:ss");
