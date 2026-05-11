@@ -579,7 +579,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Text =  "Waiting for a game... " + queue.Timer.Elapsed.ToString(@"mm\:ss"),
+                                Text =  "Waiting for a game... ",
                                 Font = OsuFont.GetFont(size: 32, weight: FontWeight.Light, typeface: Typeface.TorusAlternate),
                             },
                             new LoadingSpinner
