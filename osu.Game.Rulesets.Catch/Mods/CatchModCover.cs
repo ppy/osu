@@ -37,6 +37,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         [SettingSource("Position", "Where the cover should be placed.")]
         public Bindable<CatchCoverDirection> Direction { get; } = new Bindable<CatchCoverDirection>();
+
         private const double fade_fraction = 0.16;
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
