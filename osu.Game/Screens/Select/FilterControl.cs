@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -13,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
@@ -244,8 +244,20 @@ namespace osu.Game.Screens.Select
             });
 
             searchTextBox.Current.BindValueChanged(_ => updateCriteria());
-            difficultyRangeSlider.LowerBound.BindValueChanged(_ => updateCriteria());
-            difficultyRangeSlider.UpperBound.BindValueChanged(_ => updateCriteria());
+
+            ScheduledDelegate? sliderDebounce = null;
+
+            // For slider dragging (where input events can arrive very often), even creating criteria can have
+            // overhead, especially when a collection is selected (see ToImmutableHashSet() call).
+            void debouncedUpdateCriteria()
+            {
+                sliderDebounce?.Cancel();
+                sliderDebounce = Scheduler.AddDelayed(() => updateCriteria(), 50);
+            }
+
+            difficultyRangeSlider.LowerBound.BindValueChanged(_ => debouncedUpdateCriteria());
+            difficultyRangeSlider.UpperBound.BindValueChanged(_ => debouncedUpdateCriteria());
+
             showConvertedBeatmapsButton.Active.BindValueChanged(_ => updateCriteria());
             sortDropdown.Current.BindValueChanged(_ => updateCriteria());
             groupDropdown.Current.BindValueChanged(_ => updateCriteria());
@@ -258,7 +270,7 @@ namespace osu.Game.Screens.Select
 
                 updateCriteria();
             });
-            collectionsSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), (collections, changeSet) =>
+            collectionsSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), (_, changeSet) =>
             {
                 if (changeSet != null && groupDropdown.Current.Value.Value == GroupMode.Collections)
                     updateCriteria();
@@ -293,7 +305,7 @@ namespace osu.Game.Screens.Select
                 AllowConvertedBeatmaps = showConvertedBeatmapsButton.Active.Value,
                 Ruleset = ruleset.Value,
                 Mods = mods.Value,
-                CollectionBeatmapMD5Hashes = collectionDropdown.Current.Value?.Collection?.PerformRead(c => c.BeatmapMD5Hashes).ToImmutableHashSet(),
+                Collection = collectionDropdown.Current.Value?.Collection,
                 LocalUserId = isValidUser ? localUser.Value.Id : null,
                 LocalUserUsername = isValidUser ? localUser.Value.Username : null,
             };

@@ -38,7 +38,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             return base.CreateFilterControls().Append(categoryDropdown);
         }
 
-        protected override FilterCriteria CreateFilterCriteria()
+        protected override LoungeFilterCriteria CreateFilterCriteria()
         {
             var criteria = base.CreateFilterCriteria();
 

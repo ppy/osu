@@ -5,7 +5,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class FilterCriteria
+    public class LoungeFilterCriteria
     {
         public string SearchString = string.Empty;
         public RoomModeFilter Mode;
