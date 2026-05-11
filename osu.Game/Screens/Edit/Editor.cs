@@ -513,6 +513,7 @@ namespace osu.Game.Screens.Edit
         /// </param>
         public EditorState GetState([CanBeNull] RulesetInfo nextRuleset = null) => new EditorState
         {
+            Mode = Mode.Value,
             Time = clock.CurrentTimeAccurate,
             ClipboardContent = nextRuleset == null || editorBeatmap.BeatmapInfo.Ruleset.ShortName == nextRuleset.ShortName ? Clipboard.Content.Value : string.Empty
         };
@@ -523,6 +524,7 @@ namespace osu.Game.Screens.Edit
         /// <param name="state">The state to restore.</param>
         public void RestoreState([NotNull] EditorState state) => Schedule(() =>
         {
+            Mode.Value = state.Mode;
             clock.Seek(state.Time);
             Clipboard.Content.Value = state.ClipboardContent;
         });
@@ -1528,24 +1530,33 @@ namespace osu.Game.Screens.Edit
             loader?.CancelPendingDifficultySwitch();
         }
 
-        public Task<bool> SaveAndReload()
+        public Task<bool> SaveAndReload(bool withDialog = true)
         {
             var tcs = new TaskCompletionSource<bool>();
 
-            dialogOverlay.Push(new SaveAndReloadEditorDialog(
-                reload: () =>
+            void performReload()
+            {
+                bool reloadedSuccessfully = attemptMutationOperation(() =>
                 {
-                    bool reloadedSuccessfully = attemptMutationOperation(() =>
-                    {
-                        if (!Save())
-                            return false;
+                    if (!Save()) return false;
 
-                        SwitchToDifficulty(editorBeatmap.BeatmapInfo);
-                        return true;
-                    });
-                    tcs.SetResult(reloadedSuccessfully);
-                },
-                cancel: () => tcs.SetResult(false)));
+                    SwitchToDifficulty(editorBeatmap.BeatmapInfo);
+                    return true;
+                });
+                tcs.SetResult(reloadedSuccessfully);
+            }
+
+            if (withDialog)
+            {
+                dialogOverlay.Push(new SaveAndReloadEditorDialog(
+                    reload: performReload,
+                    cancel: () => tcs.SetResult(false)));
+            }
+            else
+            {
+                performReload();
+            }
+
             return tcs.Task;
         }
 
