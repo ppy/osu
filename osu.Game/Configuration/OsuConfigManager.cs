@@ -294,6 +294,40 @@ namespace osu.Game.Configuration
                 if (penHandler != null && mouseHandler != null && penHandler.Sensitivity.IsDefault)
                     penHandler.Sensitivity.Value = mouseHandler.Sensitivity.Value;
             }
+
+            if (combined < 20260513)
+            {
+                var beatmapDetailTab = Get<BeatmapDetailTab>(OsuSetting.BeatmapDetailTab);
+
+                if (beatmapDetailTab != BeatmapDetailTab.Details)
+                {
+                    var leaderboardScope = BeatmapLeaderboardScope.Local;
+
+                    switch (beatmapDetailTab)
+                    {
+#pragma warning disable CS0618 // Type or member is obsolete
+                        case BeatmapDetailTab.Country:
+                            leaderboardScope = BeatmapLeaderboardScope.Country;
+                            break;
+
+                        case BeatmapDetailTab.Friends:
+                            leaderboardScope = BeatmapLeaderboardScope.Friend;
+                            break;
+
+                        case BeatmapDetailTab.Team:
+                            leaderboardScope = BeatmapLeaderboardScope.Team;
+                            break;
+
+                        case BeatmapDetailTab.Global:
+#pragma warning restore CS0618 // Type or member is obsolete
+                            leaderboardScope = BeatmapLeaderboardScope.Global;
+                            break;
+                    }
+
+                    SetValue(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Leaderboards);
+                    SetValue(OsuSetting.BeatmapLeaderboardScope, leaderboardScope);
+                }
+            }
         }
 
         public override TrackedSettings CreateTrackedSettings()
