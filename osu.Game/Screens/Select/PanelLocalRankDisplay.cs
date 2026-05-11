@@ -27,6 +27,9 @@ namespace osu.Game.Screens.Select
             get => beatmap;
             set
             {
+                if (beatmap?.Equals(value) == true)
+                    return;
+
                 beatmap = value;
 
                 if (IsLoaded)
