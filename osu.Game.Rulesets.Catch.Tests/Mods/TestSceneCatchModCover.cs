@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
         {
             Mod = new CatchModCover
             {
-                Direction = { Value = CoverExpandDirection.AlongScroll },
+                Direction = { Value = CatchCoverDirection.Top },
                 Coverage = { Value = coverage }
             },
             PassCondition = () => true
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
         {
             Mod = new CatchModCover
             {
-                Direction = { Value = CoverExpandDirection.AgainstScroll },
+                Direction = { Value = CatchCoverDirection.Bottom },
                 Coverage = { Value = coverage }
             },
             PassCondition = () => true
