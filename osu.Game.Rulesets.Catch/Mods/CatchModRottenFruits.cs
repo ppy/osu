@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Framework.Audio;
@@ -16,6 +15,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
+using osu.Game.Rulesets.Objects;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Mods
@@ -111,19 +111,19 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
-            foreach (var obj in beatmap.HitObjects.OfType<PalpableCatchHitObject>())
-                disableHyperDashes(obj);
-
-            foreach (var obj in beatmap.HitObjects.OfType<JuiceStream>().SelectMany(js => js.NestedHitObjects.OfType<PalpableCatchHitObject>()))
+            foreach (var obj in beatmap.HitObjects)
                 disableHyperDashes(obj);
         }
 
-        private void disableHyperDashes(PalpableCatchHitObject palpableObject)
+        private void disableHyperDashes(HitObject hitObject)
         {
-            palpableObject.HyperDashTarget = null;
-            palpableObject.DistanceToHyperDash = 0;
+            if (hitObject is PalpableCatchHitObject palpableObject)
+            {
+                palpableObject.HyperDashTarget = null;
+                palpableObject.DistanceToHyperDash = 0;
+            }
 
-            foreach (var nested in palpableObject.NestedHitObjects.OfType<PalpableCatchHitObject>())
+            foreach (var nested in hitObject.NestedHitObjects)
                 disableHyperDashes(nested);
         }
     }
