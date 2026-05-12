@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
@@ -43,8 +44,7 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
+        private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
 
         private IDisposable? scoreSubscription;
 
@@ -65,11 +65,18 @@ namespace osu.Game.Screens.Select
             Beatmap = beatmap;
         }
 
+        [BackgroundDependencyLoader]
+        private void load(IAPIProvider api)
+        {
+            localUser.BindTo(api.LocalUser);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            ruleset.BindValueChanged(_ => updateSubscription(), true);
+            ruleset.BindValueChanged(_ => updateSubscription());
+            localUser.BindValueChanged(_ => updateSubscription(), true);
         }
 
         private void updateSubscription()
@@ -92,7 +99,7 @@ namespace osu.Game.Screens.Select
 
             ScoreInfo? topScore = sender
                                   // doing these post realm filter is most efficient.
-                                  .Where(s => s.UserID == api.LocalUser.Value.Id || s.UserID <= 1)
+                                  .Where(s => s.UserID == localUser.Value.Id || s.UserID <= 1)
                                   .Where(s => s.Ruleset.ShortName == ruleset.Value.ShortName)
                                   .MaxBy(info => (info.TotalScore, -info.Date.UtcDateTime.Ticks));
 
