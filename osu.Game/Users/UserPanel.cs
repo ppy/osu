@@ -141,7 +141,7 @@ namespace osu.Game.Users
             // We can't colour the properly because we don't have the required percentile data.
 
             Colour = Colours.BlueLighter,
-            Text = User.Rank?.Rank?.ToLocalisableString("\\##,##0") ?? string.Empty,
+            Text = (User.Rank?.Rank ?? User.Statistics.GlobalRank)?.ToLocalisableString("\\##,##0") ?? string.Empty,
         };
 
         protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar(User, false);
