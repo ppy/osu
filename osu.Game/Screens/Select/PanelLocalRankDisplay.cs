@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Select
             ScoreInfo? topScore = sender
                                   // doing these post realm filter is most efficient.
                                   .Where(s => s.UserID == api.LocalUser.Value.Id || s.UserID <= 1)
-                                  .Where(s => s.Ruleset.ShortName == ruleset.Value.ShortName)
+                                  .Where(s => ruleset.Value.Equals(s.Ruleset))
                                   .MaxBy(info => (info.TotalScore, -info.Date.UtcDateTime.Ticks));
 
             setRankFromScore(topScore);
