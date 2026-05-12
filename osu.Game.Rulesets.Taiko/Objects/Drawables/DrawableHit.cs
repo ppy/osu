@@ -181,7 +181,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         MainPiece.MoveToX(-X);
 
                     // Rate independent to match stable.
-                    double rate = (Clock as IGameplayClock)?.GetTrueGameplayRate() ?? Clock.Rate;
+                    double rate = Math.Abs((Clock as IGameplayClock)?.GetTrueGameplayRate() ?? Clock.Rate);
                     double length = gravity_time * (rateAdjustedHitAnimations.Value ? 1 : rate);
 
                     this.ScaleTo(0.8f, length * 2, Easing.OutQuad);
