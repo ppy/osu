@@ -475,6 +475,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             base.OnSuspending(e);
 
+            stopWaitingLoopPlayback();
             client.MatchmakingLeaveLobby().FireAndForget();
         }
 
@@ -482,6 +483,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             if (base.OnExiting(e))
                 return true;
+
+            stopWaitingLoopPlayback();
 
             switch (currentState.Value)
             {

@@ -80,6 +80,16 @@ namespace osu.Game.Localisation
         public static LocalisableString TimingBasedColouring => new TranslatableString(getKey(@"Timing_based_colouring"), @"Timing-based note colouring");
 
         /// <summary>
+        /// "Rate-adjusted hit animations"
+        /// </summary>
+        public static LocalisableString RateAdjustedHitAnimation => new TranslatableString(getKey(@"rate_adjusted_hit_animation"), @"Rate-adjusted hit animations");
+
+        /// <summary>
+        /// "Hits will fly faster or slower when beatmap rate is adjusted via mods."
+        /// </summary>
+        public static LocalisableString RateAdjustedHitAnimationTooltip => new TranslatableString(getKey(@"rate_adjusted_hit_animation_tooltip"), @"Hits will fly faster or slower when beatmap rate is adjusted via mods.");
+
+        /// <summary>
         /// "{0}ms (speed {1:N1})"
         /// </summary>
         public static LocalisableString ScrollSpeedTooltip(int scrollTime, double scrollSpeed) => new TranslatableString(getKey(@"ruleset"), @"{0}ms (speed {1:N1})", scrollTime, scrollSpeed);

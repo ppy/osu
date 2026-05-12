@@ -7,12 +7,15 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Configuration;
 using osu.Game.Rulesets.Taiko.Skinning.Default;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -34,11 +37,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             private set;
         }
 
-        private bool validActionPressed;
+        [Resolved(CanBeNull = true)]
+        private TaikoRulesetConfigManager taikoConfig { get; set; }
 
-        private double? lastPressHandleTime;
-
+        private readonly Bindable<bool> rateAdjustedHitAnimations = new Bindable<bool>(true);
         private readonly Bindable<HitType> type = new Bindable<HitType>();
+
+        private bool validActionPressed;
+        private double? lastPressHandleTime;
 
         public DrawableHit()
             : this(null)
@@ -49,6 +55,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             : base(hit)
         {
             FillMode = FillMode.Fit;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            taikoConfig?.BindWith(TaikoRulesetSetting.RateAdjustedHitAnimation, rateAdjustedHitAnimations);
         }
 
         protected override void OnApply()
@@ -168,11 +180,15 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     if (SnapJudgementLocation)
                         MainPiece.MoveToX(-X);
 
-                    this.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);
+                    // Rate independent to match stable.
+                    double rate = (Clock as IGameplayClock)?.GetTrueGameplayRate() ?? Clock.Rate;
+                    double length = gravity_time * (rateAdjustedHitAnimations.Value ? 1 : rate);
 
-                    this.MoveToY(-gravity_travel_height, gravity_time, Easing.Out)
+                    this.ScaleTo(0.8f, length * 2, Easing.OutQuad);
+
+                    this.MoveToY(-gravity_travel_height, length, Easing.Out)
                         .Then()
-                        .MoveToY(gravity_travel_height * 2, gravity_time * 2, Easing.In);
+                        .MoveToY(gravity_travel_height * 2, length * 2, Easing.In);
 
                     this.FadeOut(800);
                     break;
