@@ -85,6 +85,12 @@ namespace osu.Game.Screens.Play
 
         protected Task? DisposalTask { get; private set; }
 
+        /// <summary>
+        /// By default, the loader screen will block until the window is focused.
+        /// Can be overridden by setting this to <c>false</c>.
+        /// </summary>
+        protected bool WindowShouldBeActiveForGameplayStart { get; init; } = true;
+
         private FillFlowContainer disclaimers = null!;
         private GridContainer sideContent = null!;
 
@@ -125,7 +131,7 @@ namespace osu.Game.Screens.Play
         }
 
         protected virtual bool ReadyForGameplay =>
-            host.IsActive.Value &&
+            (!WindowShouldBeActiveForGameplayStart || host.IsActive.Value) &&
             // not ready if the user is hovering one of the panes (logo is excluded), unless they are idle.
             (IsHovered || osuLogo?.IsHovered == true || idleTracker.IsIdle.Value)
             // not ready if the user is dragging a slider or otherwise.
