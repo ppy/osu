@@ -50,7 +50,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Ruleset, string.Empty);
             SetDefault(OsuSetting.Skin, SkinInfo.ARGON_SKIN.ToString());
 
-            SetDefault(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Leaderboards);
+            SetDefault(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Ranking);
             SetDefault(OsuSetting.BeatmapLeaderboardScope, BeatmapLeaderboardScope.Local);
             SetDefault(OsuSetting.BeatmapLeaderboardSortMode, LeaderboardSortMode.Score);
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
@@ -324,7 +324,7 @@ namespace osu.Game.Configuration
                             break;
                     }
 
-                    SetValue(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Leaderboards);
+                    SetValue(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Ranking);
                     SetValue(OsuSetting.BeatmapLeaderboardScope, leaderboardScope);
                 }
             }

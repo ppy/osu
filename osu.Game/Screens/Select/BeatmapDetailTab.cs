@@ -13,9 +13,9 @@ namespace osu.Game.Screens.Select
         Details,
 
         /// <summary>
-        /// Leaderboards.
+        /// Ranking.
         /// </summary>
-        Leaderboards,
+        Ranking,
 
         /// <summary>
         /// Local leaderboards.
