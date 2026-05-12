@@ -165,6 +165,7 @@ namespace osu.Game.Screens.Select
 
             #endregion
 
+            // TODO: remove and replace with `BeatmapDetailTab` - 20261113.
             public enum Selection
             {
                 [LocalisableDescription(typeof(SongSelectStrings), nameof(SongSelectStrings.Details))]
