@@ -205,9 +205,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ImportFilesFromDirectory => new TranslatableString(getKey(@"import_files_from_directory"), @"Import all files from directory");
 
         /// <summary>
-        /// "Imports all osu files from selected directory"
+        /// "Imports all osu! files from selected directory"
         /// </summary>
-        public static LocalisableString ImportFilesFromDirectoryTooltip => new TranslatableString(getKey(@"import_files_from_directory_tooltip"), @"Imports all osu files from selected directory");
+        public static LocalisableString ImportFilesFromDirectoryTooltip => new TranslatableString(getKey(@"import_files_from_directory_tooltip"), @"Imports all osu! files from selected directory");
 
         /// <summary>
         /// "Select a file"
