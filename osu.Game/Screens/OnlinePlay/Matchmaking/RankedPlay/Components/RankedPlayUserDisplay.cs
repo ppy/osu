@@ -227,7 +227,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             if (!roomState.Users.TryGetValue(user.Id, out var userInfo))
                 return;
 
-            double totalMultiplier = roomState.DamageMultiplier * userInfo.DamageMultiplier;
+            double totalMultiplier = roomState.DamageMultiplier + userInfo.DamageMultiplier;
             damageMultiplierText.Text = $"{totalMultiplier.ToStandardFormattedString(maxDecimalDigits: 1)}x damage";
         }
 

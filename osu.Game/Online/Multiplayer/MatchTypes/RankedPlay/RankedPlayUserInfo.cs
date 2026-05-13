@@ -54,6 +54,6 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.RankedPlay
         /// This player's individual damage multiplier.
         /// </summary>
         [Key(6)]
-        public double DamageMultiplier { get; set; } = 1;
+        public double DamageMultiplier { get; set; } = 0.5;
     }
 }
