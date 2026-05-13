@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
+using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
@@ -40,12 +41,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double decay = strainDecay(current.DeltaTime);
 
             currentStrain *= decay;
-            currentStrain += calculateModAdjustedDifficulty(current) * (1 - decay) * skillMultiplier;
+            currentStrain += calculateAdjustedDifficulty(current) * (1 - decay) * skillMultiplier;
 
             return currentStrain;
         }
 
-        private double calculateModAdjustedDifficulty(DifficultyHitObject current)
+        private double calculateAdjustedDifficulty(DifficultyHitObject current)
         {
             double difficulty = ReadingEvaluator.EvaluateDifficultyOf(current, hasHiddenMod);
 
@@ -116,6 +117,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0;
 
             return ObjectDifficulties.Sum(d => DifficultyCalculationUtils.Logistic(d / consistentTopNote, 1.15, 5, 1.1));
+        }
+
+        public override double DifficultyValue()
+        {
+            double difficulty = base.DifficultyValue();
+
+            // TODO: this should be replaced with a per-object adjustment, but it requires extra considerations
+            if (objectList.Count > 0)
+                difficulty *= 0.825 + Math.Pow(Math.Max(0, ((OsuDifficultyHitObject)objectList.First()).OverallDifficulty), 2.2) / 1125.0;
+
+            return difficulty;
         }
     }
 }

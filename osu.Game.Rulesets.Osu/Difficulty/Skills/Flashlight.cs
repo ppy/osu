@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
+using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
@@ -17,9 +18,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Flashlight : StrainSkill
     {
-        public Flashlight(Mod[] mods)
+        private readonly int totalObjects;
+
+        public Flashlight(Mod[] mods, int totalObjects)
             : base(mods)
         {
+            this.totalObjects = totalObjects;
         }
 
         private double skillMultiplier => 0.058;
@@ -37,12 +41,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0;
 
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += calculateModAdjustedDifficulty(current) * skillMultiplier;
+            currentStrain += calculateAdjustedDifficulty(current) * skillMultiplier;
 
             return currentStrain;
         }
 
-        private double calculateModAdjustedDifficulty(DifficultyHitObject current)
+        private double calculateAdjustedDifficulty(DifficultyHitObject current)
         {
             double difficulty = FlashlightEvaluator.EvaluateDifficultyOf(current, Mods);
 
@@ -67,10 +71,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (Mods.Any(m => m is OsuModAutopilot))
                 difficulty *= 0.4;
 
+            difficulty *= 0.99 + Math.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2) / 5500;
+
             return difficulty;
         }
 
-        public override double DifficultyValue() => GetCurrentStrainPeaks().Sum();
+        public override double DifficultyValue()
+        {
+            double sum = GetCurrentStrainPeaks().Sum();
+
+            // Account for shorter maps having a higher ratio of 0 combo/100 combo flashlight radius.
+            sum *= Math.Sqrt(0.7 + 0.1 * Math.Min(1.0, totalObjects / 200.0) +
+                             (totalObjects > 200 ? 0.2 * Math.Min(1.0, (totalObjects - 200) / 200.0) : 0.0));
+
+            return sum;
+        }
 
         public static double DifficultyToPerformance(double difficulty) => 25 * Math.Pow(difficulty, 2);
     }
