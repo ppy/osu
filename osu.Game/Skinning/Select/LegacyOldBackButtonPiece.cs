@@ -22,11 +22,11 @@ namespace osu.Game.Skinning.Select
         {
             AutoSizeAxes = Axes.Both;
 
-            sprite = skin.GetAnimation("menu-back", true, true);
+            sprite = skin.GetAnimation("menu-back", true, true, applyConfigFrameRate: true);
 
             if (sprite != null)
             {
-                glow = skin.GetAnimation("menu-back", true, true)!;
+                glow = skin.GetAnimation("menu-back", true, true, applyConfigFrameRate: true)!;
                 glow.Alpha = 0f;
                 glow.Blending = BlendingParameters.Additive;
 
