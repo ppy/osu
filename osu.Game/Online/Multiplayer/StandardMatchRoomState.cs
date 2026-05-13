@@ -29,5 +29,11 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         [Key(2)]
         public int?[]? Slots { get; set; }
+
+        public static StandardMatchRoomState Create(byte? maxParticipants = null) =>
+            new StandardMatchRoomState
+            {
+                Slots = maxParticipants == null ? null : new int?[maxParticipants.Value]
+            };
     }
 }

@@ -429,6 +429,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                     break;
 
+                case ChangeSlotRequest changeSlot:
+                    if (ServerRoom.MatchState is not StandardMatchRoomState standardMatchRoomState || standardMatchRoomState.Slots is not int?[] slots)
+                        break;
+
+                    byte slotId = changeSlot.SlotID;
+                    if (slotId >= slots.Length || slots[slotId] != null)
+                        break;
+
+                    int previousSlotId = Array.IndexOf(slots, LocalUser.UserID);
+                    if (previousSlotId >= 0)
+                        slots[previousSlotId] = null;
+                    slots[slotId] = LocalUser.UserID;
+                    await ((IMultiplayerClient)this).MatchRoomStateChanged(clone(standardMatchRoomState)).ConfigureAwait(false);
+                    break;
+
                 case StartMatchCountdownRequest startCountdown:
                     await StartCountdown(new MatchStartCountdown { TimeRemaining = startCountdown.Duration }).ConfigureAwait(false);
                     break;
@@ -625,7 +640,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             switch (type)
             {
                 case MatchType.HeadToHead:
-                    ServerRoom.MatchState = null;
+                    ServerRoom.MatchState = StandardMatchRoomState.Create(ServerRoom.Settings.MaxParticipants);
                     await ((IMultiplayerClient)this).MatchRoomStateChanged(clone(ServerRoom.MatchState)).ConfigureAwait(false);
 
                     foreach (var user in ServerRoom.Users)
@@ -637,7 +652,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     break;
 
                 case MatchType.TeamVersus:
-                    ServerRoom.MatchState = TeamVersusRoomState.CreateDefault();
+                    ServerRoom.MatchState = TeamVersusRoomState.CreateDefault(ServerRoom.Settings.MaxParticipants);
                     await ((IMultiplayerClient)this).MatchRoomStateChanged(clone(ServerRoom.MatchState)).ConfigureAwait(false);
 
                     foreach (var user in ServerRoom.Users)

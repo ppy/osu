@@ -12,14 +12,15 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.TeamVersus
         [Key(0)]
         public List<MultiplayerTeam> Teams { get; set; } = new List<MultiplayerTeam>();
 
-        public static TeamVersusRoomState CreateDefault() =>
+        public static TeamVersusRoomState CreateDefault(byte? maxParticipants = null) =>
             new TeamVersusRoomState
             {
                 Teams =
                 {
                     new MultiplayerTeam { ID = 0, Name = "Team Red" },
                     new MultiplayerTeam { ID = 1, Name = "Team Blue" },
-                }
+                },
+                Slots = maxParticipants == null ? null : new int?[maxParticipants.Value]
             };
     }
 }
