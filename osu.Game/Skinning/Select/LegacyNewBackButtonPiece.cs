@@ -29,6 +29,8 @@ namespace osu.Game.Skinning.Select
         private OsuSpriteText text = null!;
         private Sprite rightLayer = null!;
 
+        private const float vertical_offset = 22;
+
         [BackgroundDependencyLoader]
         private void load(SkinManager skins)
         {
@@ -49,7 +51,7 @@ namespace osu.Game.Skinning.Select
                     Origin = Anchor.Centre,
                     Text = @"back",
                     Font = OsuFont.Default.With(size: 26),
-                    Y = -35,
+                    Y = -vertical_offset * 1.6f,
                     UseFullGlyphHeight = false,
                 },
                 leftLayer = new Sprite
@@ -65,7 +67,7 @@ namespace osu.Game.Skinning.Select
                     Origin = Anchor.Centre,
                     Icon = FontAwesome.Solid.ChevronCircleLeft,
                     Size = new Vector2(24),
-                    Y = -35,
+                    Y = -vertical_offset * 1.6f,
                     Shadow = true,
                 },
             };
@@ -109,27 +111,34 @@ namespace osu.Game.Skinning.Select
                 contract(600, Easing.OutElastic);
         }
 
-        private const float right_layer_idle = 95;
-        private const float right_layer_active = 140;
+        // stable reference: https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/Graphics/UserInterface/BackButton.cs#L18-L28
+        // some numbers are manually adjusted to better match stable.
 
         private const float centre_offset = 2.4f;
+        private const float text_allowance = 6 * 1.6f;
 
         private void expand(double duration, Easing easing)
         {
-            leftLayer.MoveToX(70, duration, easing);
+            const float left_layer_active = 40 * 1.6f;
+            const float right_layer_active = 86 * 1.6f;
+
+            leftLayer.MoveToX(left_layer_active, duration, easing);
             leftLayer.FadeColour(active_colour, duration, easing);
-            icon.MoveToX(70 / centre_offset, duration, easing);
-            rightLayer.MoveToX(right_layer_active + 10, duration, easing);
-            text.MoveToX((right_layer_active - 60) / centre_offset + 70, duration, easing);
+            icon.MoveToX(left_layer_active / centre_offset, duration, easing);
+            rightLayer.MoveToX(right_layer_active + text_allowance, duration, easing);
+            text.MoveToX((right_layer_active - left_layer_active + text_allowance) / centre_offset + left_layer_active, duration, easing);
         }
 
         private void contract(double duration, Easing easing)
         {
-            leftLayer.MoveToX(40, duration, easing);
+            const float left_layer_idle = 25 * 1.6f;
+            const float right_layer_idle = 60 * 1.6f;
+
+            leftLayer.MoveToX(left_layer_idle, duration, easing);
             leftLayer.FadeColour(idle_colour, duration, easing);
-            icon.MoveToX(40 / centre_offset, duration, easing);
-            rightLayer.MoveToX(right_layer_idle + 10, duration, easing);
-            text.MoveToX((right_layer_idle - 30) / centre_offset + 40, duration, easing);
+            icon.MoveToX(left_layer_idle / centre_offset, duration, easing);
+            rightLayer.MoveToX(right_layer_idle + text_allowance, duration, easing);
+            text.MoveToX((right_layer_idle - left_layer_idle + text_allowance) / centre_offset + left_layer_idle, duration, easing);
         }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
