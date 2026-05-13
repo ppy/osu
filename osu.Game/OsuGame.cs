@@ -1047,6 +1047,7 @@ namespace osu.Game
                 { FrameworkSetting.VolumeUniversal, 0.6 },
                 { FrameworkSetting.VolumeMusic, 0.6 },
                 { FrameworkSetting.VolumeEffect, 0.6 },
+                { FrameworkSetting.AudioUseExperimentalWasapi, true },
             };
         }
 
