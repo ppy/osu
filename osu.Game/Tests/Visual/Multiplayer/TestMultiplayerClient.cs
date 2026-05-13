@@ -258,7 +258,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     MatchType = ServerAPIRoom.Type,
                     Password = password ?? string.Empty,
                     QueueMode = ServerAPIRoom.QueueMode,
-                    AutoStartDuration = ServerAPIRoom.AutoStartDuration
+                    AutoStartDuration = ServerAPIRoom.AutoStartDuration,
+                    MaxParticipants = ServerAPIRoom.MaxParticipants,
                 },
                 Playlist = ServerAPIRoom.Playlist.Select(item => new MultiplayerPlaylistItem(item)).ToList(),
                 Users = { localUser },
@@ -636,31 +637,40 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private async Task changeMatchType(MatchType type)
         {
             Debug.Assert(ServerRoom != null);
+            int i = 0;
 
             switch (type)
             {
                 case MatchType.HeadToHead:
-                    ServerRoom.MatchState = StandardMatchRoomState.Create(ServerRoom.Settings.MaxParticipants);
-                    await ((IMultiplayerClient)this).MatchRoomStateChanged(clone(ServerRoom.MatchState)).ConfigureAwait(false);
+                    var headToHeadRoomState = StandardMatchRoomState.Create(ServerRoom.Settings.MaxParticipants);
 
                     foreach (var user in ServerRoom.Users)
                     {
+                        if (headToHeadRoomState.Slots != null)
+                            headToHeadRoomState.Slots[i++] = user.UserID;
+
                         user.MatchState = null;
                         await ((IMultiplayerClient)this).MatchUserStateChanged(clone(user.UserID), clone(user.MatchState)).ConfigureAwait(false);
                     }
 
+                    ServerRoom.MatchState = headToHeadRoomState;
+                    await ((IMultiplayerClient)this).MatchRoomStateChanged(clone(ServerRoom.MatchState)).ConfigureAwait(false);
                     break;
 
                 case MatchType.TeamVersus:
-                    ServerRoom.MatchState = TeamVersusRoomState.CreateDefault(ServerRoom.Settings.MaxParticipants);
-                    await ((IMultiplayerClient)this).MatchRoomStateChanged(clone(ServerRoom.MatchState)).ConfigureAwait(false);
+                    var teamVersusRoomState = TeamVersusRoomState.CreateDefault(ServerRoom.Settings.MaxParticipants);
 
                     foreach (var user in ServerRoom.Users)
                     {
+                        if (teamVersusRoomState.Slots != null)
+                            teamVersusRoomState.Slots[i++] = user.UserID;
+
                         user.MatchState = new TeamVersusUserState();
                         await ((IMultiplayerClient)this).MatchUserStateChanged(clone(user.UserID), clone(user.MatchState)).ConfigureAwait(false);
                     }
 
+                    ServerRoom.MatchState = teamVersusRoomState;
+                    await ((IMultiplayerClient)this).MatchRoomStateChanged(clone(ServerRoom.MatchState)).ConfigureAwait(false);
                     break;
 
                 case MatchType.Matchmaking:
