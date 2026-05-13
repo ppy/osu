@@ -209,7 +209,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             startPositionXSlider.Current.BindValueChanged(x =>
             {
-                StartPositionY.Value = x.NewValue + OsuPlayfield.BASE_SIZE.X / 2;
+                StartPositionX.Value = x.NewValue + OsuPlayfield.BASE_SIZE.X / 2;
             });
 
             startPositionYSlider.Current.BindValueChanged(y =>
