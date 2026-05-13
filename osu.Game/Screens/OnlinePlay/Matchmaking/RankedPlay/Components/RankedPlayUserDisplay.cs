@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -222,12 +221,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         private void updateDamageMultiplier()
         {
-            var userInfo = (client.Room?.MatchState as RankedPlayRoomState)?.Users.GetValueOrDefault(user.Id);
-
-            if (userInfo == null)
+            if (client.Room?.MatchState is not RankedPlayRoomState roomState)
                 return;
 
-            damageMultiplierText.Text = $"{userInfo.DamageMultiplier.ToStandardFormattedString(maxDecimalDigits: 1)}x damage";
+            if (!roomState.Users.TryGetValue(user.Id, out var userInfo))
+                return;
+
+            double totalMultiplier = roomState.DamageMultiplier * userInfo.DamageMultiplier;
+            damageMultiplierText.Text = $"{totalMultiplier.ToStandardFormattedString(maxDecimalDigits: 1)}x damage";
         }
 
         protected override void Dispose(bool isDisposing)
