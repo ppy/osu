@@ -179,6 +179,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestSetAndUnsetMaxParticipants()
+        {
+            RoomPanel panel = null!;
+            Room room = null!;
+
+            AddStep("create room", () => Child = panel = createLoungeRoom(room = new Room
+            {
+                Name = "A room",
+                Type = MatchType.HeadToHead,
+            }));
+
+            AddUntilStep("wait for panel load", () => panel.ChildrenOfType<DrawableRoomParticipantsList>().Any());
+            AddStep("set max participants", () => room.MaxParticipants = 5);
+            AddStep("unset max participants", () => room.MaxParticipants = null);
+        }
+
+        [Test]
         public void TestMultiplayerRooms()
         {
             AddStep("create rooms", () => Child = new FillFlowContainer
