@@ -119,7 +119,7 @@ namespace osu.Game.Online.Rooms
         /// <summary>
         /// The maximum number of users allowed in the room.
         /// </summary>
-        public int? MaxParticipants
+        public byte? MaxParticipants
         {
             get => maxParticipants;
             set => SetField(ref maxParticipants, value);
@@ -297,8 +297,8 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("ends_at")]
         private DateTimeOffset? endDate;
 
-        // Not yet serialised (not implemented).
-        private int? maxParticipants;
+        [JsonProperty("max_participants")]
+        private byte? maxParticipants;
 
         [JsonProperty("participant_count")]
         private int participantCount;
@@ -365,6 +365,7 @@ namespace osu.Game.Online.Rooms
             QueueMode = room.Settings.QueueMode;
             AutoStartDuration = room.Settings.AutoStartDuration;
             AutoSkip = room.Settings.AutoSkip;
+            MaxParticipants = room.Settings.MaxParticipants;
             Host = room.Host != null ? new APIUser { Id = room.Host.UserID } : null;
             Playlist = room.Playlist.Select(p => new PlaylistItem(p)).ToArray();
         }

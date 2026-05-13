@@ -7,13 +7,10 @@ using MessagePack;
 namespace osu.Game.Online.Multiplayer.MatchTypes.TeamVersus
 {
     [MessagePackObject]
-    public class TeamVersusRoomState : MatchRoomState
+    public class TeamVersusRoomState : StandardMatchRoomState
     {
         [Key(0)]
         public List<MultiplayerTeam> Teams { get; set; } = new List<MultiplayerTeam>();
-
-        [Key(1)]
-        public bool Locked { get; set; }
 
         public static TeamVersusRoomState CreateDefault() =>
             new TeamVersusRoomState
