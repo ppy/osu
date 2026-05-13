@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// or if <see cref="DifficultyValue"/> is overridden to not use the default geometric sum. This should be removed
         /// in the future when a better memory-saving technique is implemented.
         /// </summary>
-        private double maxStoredSections => 11 / (1 - DecayWeight);
+        protected virtual double MaxStoredSections => 11 / (1 - DecayWeight);
 
         private readonly List<StrainPeak> strainPeaks = new List<StrainPeak>();
 
@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             // Remove from the back of our strain peaks if there's any which are too deep to contribute to difficulty.
             // `maxStoredSections` dictates for us how many sections will preserve at least 99.999% of the difficulty value.
-            while (totalLength > maxStoredSections * MaxSectionLength)
+            while (totalLength > MaxStoredSections * MaxSectionLength)
             {
                 totalLength -= strainPeaks[0].SectionLength;
                 strainPeaks.RemoveAt(0);
