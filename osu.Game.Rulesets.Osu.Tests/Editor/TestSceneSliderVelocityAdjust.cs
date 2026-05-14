@@ -7,6 +7,9 @@ using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit;
@@ -129,6 +132,63 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddAssert("slider has correct velocity", () => slider!.Velocity, () => Is.EqualTo(velocityBefore));
             AddAssert("slider has correct duration", () => slider!.Duration, () => Is.EqualTo(durationBefore));
+        }
+
+        [Test]
+        public void TestVelocityToolbox()
+        {
+            ExpandableSlider<double> velocitySlider = null!;
+            ExpandableButton useLastSliderButton = null!;
+
+            AddStep("enter editor", () => Game.ScreenStack.Push(new EditorLoader()));
+            AddUntilStep("wait for editor load", () => editor?.ReadyForUse == true);
+            AddStep("retrieve controls", () =>
+            {
+                var toolbox = this.ChildrenOfType<OsuSliderVelocityToolboxGroup>().Single();
+                velocitySlider = toolbox.ChildrenOfType<ExpandableSlider<double>>().Single();
+                useLastSliderButton = toolbox.ChildrenOfType<ExpandableButton>().Single();
+            });
+
+            AddAssert("velocity slider at 1x", () => velocitySlider.Current.Value, () => Is.EqualTo(1));
+            AddAssert("use last slider button disabled", () => useLastSliderButton.Enabled.Value, () => Is.False);
+
+            AddStep("seek to 5000", () => editorClock.Seek(5000));
+            AddStep("set 2x velocity", () => velocitySlider.Current.Value = 2);
+            placeSlider();
+            AddAssert("placed slider has 2x velocity", () => editorBeatmap.HitObjects.OfType<Slider>().Last().SliderVelocityMultiplier, () => Is.EqualTo(2));
+            AddAssert("use last slider button disabled", () => useLastSliderButton.Enabled.Value, () => Is.False);
+
+            AddStep("seek to 6000", () => editorClock.Seek(6000));
+            placeSlider();
+            AddAssert("placed slider has 2x velocity", () => editorBeatmap.HitObjects.OfType<Slider>().Last().SliderVelocityMultiplier, () => Is.EqualTo(2));
+            AddAssert("use last slider button disabled", () => useLastSliderButton.Enabled.Value, () => Is.False);
+
+            AddStep("seek to 9000", () => editorClock.Seek(9000));
+            AddStep("set 3x velocity", () => velocitySlider.Current.Value = 3);
+            placeSlider();
+            AddAssert("placed slider has 3x velocity", () => editorBeatmap.HitObjects.OfType<Slider>().Last().SliderVelocityMultiplier, () => Is.EqualTo(3));
+            AddAssert("use last slider button disabled", () => useLastSliderButton.Enabled.Value, () => Is.False);
+
+            AddStep("seek to 10000", () => editorClock.Seek(10000));
+            AddStep("set 1x velocity", () => velocitySlider.Current.Value = 1);
+            AddStep("use last slider velocity instead", () => useLastSliderButton.TriggerClick());
+            placeSlider();
+            AddAssert("placed slider has 3x velocity", () => editorBeatmap.HitObjects.OfType<Slider>().Last().SliderVelocityMultiplier, () => Is.EqualTo(3));
+            AddAssert("use last slider button disabled", () => useLastSliderButton.Enabled.Value, () => Is.False);
+
+            AddStep("seek back to 7000", () => editorClock.Seek(7000));
+            placeSlider();
+            AddAssert("placed slider has 2x velocity", () => editorBeatmap.HitObjects.OfType<Slider>().ElementAt(2).SliderVelocityMultiplier, () => Is.EqualTo(2));
+            AddAssert("use last slider button disabled", () => useLastSliderButton.Enabled.Value, () => Is.False);
+
+            void placeSlider()
+            {
+                AddStep("enter slider placement mode", () => InputManager.Key(Key.Number3));
+                AddStep("move mouse to top left", () => InputManager.MoveMouseTo(editor.ChildrenOfType<Playfield>().First().ScreenSpaceDrawQuad.TopLeft + new Vector2(50)));
+                AddStep("start placement", () => InputManager.Click(MouseButton.Left));
+                AddStep("move mouse to bottom right", () => InputManager.MoveMouseTo(editor.ChildrenOfType<Playfield>().First().ScreenSpaceDrawQuad.BottomRight - new Vector2(50)));
+                AddStep("end placement", () => InputManager.Click(MouseButton.Right));
+            }
         }
     }
 }

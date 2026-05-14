@@ -76,6 +76,9 @@ namespace osu.Game.Rulesets.Osu.Edit
         public readonly OsuDistanceSnapProvider DistanceSnapProvider = new OsuDistanceSnapProvider();
 
         [Cached]
+        private readonly OsuSliderVelocityToolboxGroup sliderVelocityToolboxGroup = new OsuSliderVelocityToolboxGroup();
+
+        [Cached]
         protected readonly OsuGridToolboxGroup OsuGridToolboxGroup = new OsuGridToolboxGroup();
 
         [Cached]
@@ -111,6 +114,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             RightToolbox.AddRange(new Drawable[]
                 {
+                    sliderVelocityToolboxGroup,
                     OsuGridToolboxGroup,
                     new TransformToolboxGroup
                     {
@@ -484,6 +488,14 @@ namespace osu.Game.Rulesets.Osu.Edit
                 return null;
 
             return new OsuDistanceSnapGrid((OsuHitObject)sourceObject, (OsuHitObject)targetObject, sliderVelocitySource);
+        }
+
+        public override void CommitPlacement(HitObject hitObject)
+        {
+            base.CommitPlacement(hitObject);
+
+            if (hitObject is IHasSliderVelocity)
+                sliderVelocityToolboxGroup.UseLastSliderVelocity = true;
         }
     }
 }
