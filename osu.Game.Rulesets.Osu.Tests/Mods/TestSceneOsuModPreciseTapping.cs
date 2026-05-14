@@ -121,6 +121,38 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         });
 
         [Test]
+        public void TestMisaimOnLaterObjectDoesNotRegisterHit() => CreateModTest(new ModTestData
+        {
+            Mod = new OsuModPreciseTapping(),
+            PassCondition = () => Player.ScoreProcessor.Statistics.GetValueOrDefault(HitResult.Miss) == 1
+                                  && Player.ScoreProcessor.Statistics.GetValueOrDefault(HitResult.Great) == 1,
+            Autoplay = false,
+            CreateBeatmap = () => new Beatmap
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new HitCircle
+                    {
+                        StartTime = 500,
+                        Position = new Vector2(100),
+                    },
+                    new HitCircle
+                    {
+                        StartTime = 700,
+                        Position = new Vector2(200, 100),
+                    },
+                },
+            },
+            ReplayFrames = new List<ReplayFrame>
+            {
+                new OsuReplayFrame(595, new Vector2(200, 100), OsuAction.LeftButton),
+                new OsuReplayFrame(596, new Vector2(200, 100)),
+                new OsuReplayFrame(700, new Vector2(200, 100), OsuAction.LeftButton),
+                new OsuReplayFrame(701, new Vector2(200, 100)),
+            }
+        });
+
+        [Test]
         public void TestPressBlockedByAlternateIsNotCountedAsExtra() => CreateModTest(new ModTestData
         {
             Mods = new Mod[] { new OsuModAlternate(), new OsuModPreciseTapping() },

@@ -106,30 +106,20 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 var tappable = mod.getNextTappable();
 
-                if (tappable != null)
+                if (tappable == null)
+                    return true;
+
+                tappable.HitArea.OnPressed(e);
+
+                if (tappable.Result?.IsHit == true)
+                    mod.penaltyActive = true;
+                else if (tappable.Result?.HasResult != true && mod.penaltyActive)
                 {
-                    bool wasActive = mod.penaltyActive;
-
-                    Scheduler.Add(() =>
-                    {
-                        if (tappable.Result?.IsHit == true)
-                        {
-                            mod.penaltyActive = true;
-                            return;
-                        }
-
-                        if (tappable.Result?.HasResult == true)
-                            return;
-
-                        if (!wasActive)
-                            return;
-
-                        tappable.MissForcefully();
-                        mod.penaltyActive = false;
-                    });
+                    tappable.MissForcefully();
+                    mod.penaltyActive = false;
                 }
 
-                return false;
+                return true;
             }
 
             public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
