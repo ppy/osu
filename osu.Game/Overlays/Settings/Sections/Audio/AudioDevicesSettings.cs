@@ -26,8 +26,6 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
         private FormCheckBox? legacyAudio;
 
-        private Bindable<bool>? configExperimentalAudio;
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -44,28 +42,12 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
             {
-                configExperimentalAudio = audio.UseExperimentalWasapi.GetBoundCopy();
-
-                Add(new SettingsItemV2(legacyAudio = new FormCheckBox
-                {
-                    Caption = AudioSettingsStrings.LegacyAudioLabel,
-                    HintText = AudioSettingsStrings.LegacyAudioTooltip,
-                })
+                Add(new SettingsItemV2(legacyAudio = new LegacyAudioCheckbox())
                 {
                     Keywords = new[] { "wasapi", "latency", "exclusive", "legacy", "experimental" },
                 });
 
-                // Manual two-way binding because we're inversing what the framework exposes.
-                legacyAudio.Current.ValueChanged += legacy =>
-                {
-                    configExperimentalAudio.Value = !legacy.NewValue;
-                    onDeviceChanged(string.Empty);
-                };
-
-                configExperimentalAudio.BindValueChanged(experimental =>
-                {
-                    legacyAudio.Current.Value = !experimental.NewValue;
-                }, true);
+                legacyAudio.Current.ValueChanged += _ => onDeviceChanged(string.Empty);
             }
 
             audio.OnNewDevice += onDeviceChanged;
@@ -75,7 +57,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             onDeviceChanged(string.Empty);
         }
 
-        private void onDeviceChanged(string _) => updateItems();
+        private void onDeviceChanged(string _) => Scheduler.AddOnce(updateItems);
 
         private void updateItems()
         {
@@ -114,6 +96,39 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         {
             protected override LocalisableString GenerateItemText(string item)
                 => string.IsNullOrEmpty(item) ? CommonStrings.Default : base.GenerateItemText(item);
+        }
+    }
+
+    public partial class LegacyAudioCheckbox : FormCheckBox
+    {
+        private Bindable<bool> configExperimentalAudio = null!;
+
+        public LegacyAudioCheckbox()
+        {
+            Caption = AudioSettingsStrings.LegacyAudioLabel;
+            HintText = AudioSettingsStrings.LegacyAudioTooltip;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            configExperimentalAudio = audio.UseExperimentalWasapi.GetBoundCopy();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Manual two-way binding because we're inversing what the framework exposes.
+            Current.ValueChanged += legacy =>
+            {
+                configExperimentalAudio.Value = !legacy.NewValue;
+            };
+
+            configExperimentalAudio.BindValueChanged(experimental =>
+            {
+                Current.Value = !experimental.NewValue;
+            }, true);
         }
     }
 }

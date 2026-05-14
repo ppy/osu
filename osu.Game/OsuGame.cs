@@ -161,6 +161,8 @@ namespace osu.Game
 
         private OnScreenDisplay onScreenDisplay;
 
+        private DialogOverlay dialogOverlay;
+
         [Resolved]
         private FrameworkConfigManager frameworkConfig { get; set; }
 
@@ -1237,7 +1239,7 @@ namespace osu.Game
             }, rightFloatingOverlayContent.Add, true);
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
-            loadComponentSingleFile<IDialogOverlay>(new DialogOverlay(), topMostOverlayContent.Add, true);
+            loadComponentSingleFile<IDialogOverlay>(dialogOverlay = new DialogOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile(new MedalOverlay(), topMostOverlayContent.Add);
 
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
@@ -1353,6 +1355,8 @@ namespace osu.Game
                     LocalConfig.SetValue(OsuSetting.AudioOffset, LocalConfig.Get<double>(OsuSetting.AudioOffset) - FramedBeatmapClock.WINDOWS_EXPERIMENTAL_AUDIO_OFFSET);
 
                 Audio.UseExperimentalWasapi.Value = true;
+
+                dialogOverlay.Push(new MigrateNewAudioDialog());
             }
         }
 
