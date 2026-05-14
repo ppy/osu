@@ -153,7 +153,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 var relevantObjects = (beatmap.SelectedHitObjects.Contains(hitObject) ? beatmap.SelectedHitObjects : hitObject.Yield()).Where(o => o is IHasSliderVelocity).ToArray();
 
-                if (!(relevantObjects.Length > 1))
+                // if all selected sliders have the same velocity, it should be treated as if only one slider was selected
+                bool sameVelocity = true;
+
+                for (int i = 1; i < relevantObjects.Length; i++)
+                {
+                    if (!(((IHasSliderVelocity)relevantObjects[i - 1]).SliderVelocityMultiplier.Equals(((IHasSliderVelocity)relevantObjects[i]).SliderVelocityMultiplier)))
+                    {
+                        sameVelocity = false;
+                        break;
+                    }
+                }
+
+                if (!(relevantObjects.Length > 1) || sameVelocity)
                 {
                     sliderVelocitySlider.Current.Value += adjust;
                 }
@@ -169,8 +181,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                     beatmap.EndChange();
                 }
-
-                // sliderVelocitySlider.Current.Value += adjust;
             }
         }
     }
