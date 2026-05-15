@@ -22,27 +22,46 @@ namespace osu.Game.Beatmaps.Formats
             this.storyboard = storyboard;
         }
 
-        public void EncodeGeneral(TextWriter writer)
+        #region Storyboards embedded in beatmaps
+
+        public void EncodeGeneralToBeatmap(TextWriter writer)
         {
             writer.WriteLine(FormattableString.Invariant($@"UseSkinSprites: {(storyboard.UseSkinSprites ? '1' : '0')}"));
             writer.WriteLine(FormattableString.Invariant($@"WidescreenStoryboard: {(storyboard.Beatmap.WidescreenStoryboard ? '1' : '0')}"));
         }
 
-        public void EncodeEvents(TextWriter writer)
+        public void EncodeEventsToBeatmap(TextWriter writer)
+            => encodeEvents(writer, StoryboardElementSource.Beatmap);
+
+        #endregion
+
+        #region Standalone storyboards
+
+        public void EncodeStandaloneStoryboard(TextWriter writer)
         {
-            // TODO: these are never written to .osb
+            writer.WriteLine(@"[Events]");
+            encodeEvents(writer, StoryboardElementSource.SharedStoryboard);
+        }
+
+        #endregion
+
+        private void encodeEvents(TextWriter writer, StoryboardElementSource target)
+        {
             // https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameModes/Edit/Modes/EditorModeDesign.cs#L189
             // https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameplayElements/Events/EventManager.cs#L368
             writer.WriteLine(@"// Background and Video events");
 
-            // https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameplayElements/HitObjectManager_LoadSave.cs#L1499
-            // TODO: handle nonzero background offset (https://github.com/ppy/osu/issues/14238)
-            writer.WriteLine(string.Format(CultureInfo.InvariantCulture,
-                @"{0},{1},""{2}"",{3},{4}",
-                (int)LegacyEventType.Background, 0, storyboard.BeatmapInfo.Metadata.BackgroundFile, 0, 0));
+            if (target == StoryboardElementSource.Beatmap)
+            {
+                // https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameplayElements/HitObjectManager_LoadSave.cs#L1499
+                // TODO: handle nonzero background offset (https://github.com/ppy/osu/issues/14238)
+                writer.WriteLine(string.Format(CultureInfo.InvariantCulture,
+                    @"{0},{1},""{2}"",{3},{4}",
+                    (int)LegacyEventType.Background, 0, storyboard.BeatmapInfo.Metadata.BackgroundFile, 0, 0));
+            }
 
             // https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameplayElements/HitObjectManager_LoadSave.cs#L1496
-            foreach (var video in storyboard.GetLayer(@"Video").Elements.OfType<StoryboardVideo>())
+            foreach (var video in storyboard.GetLayer(@"Video").Elements.OfType<StoryboardVideo>().Where(v => v.Source == target))
             {
                 writer.WriteLine(string.Format(CultureInfo.InvariantCulture,
                     @"{0},{1},""{2}""",
@@ -58,7 +77,7 @@ namespace osu.Game.Beatmaps.Formats
                     legacyLayer));
                 string layerName = legacyLayer.ToString();
                 var layer = storyboard.GetLayer(layerName);
-                encodeSpritesFromLayer(writer, layer);
+                encodeSpritesFromLayer(writer, layer, target);
             }
 
             // https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameplayElements/HitObjectManager_LoadSave.cs#L1478-L1481
@@ -69,7 +88,7 @@ namespace osu.Game.Beatmaps.Formats
                 string layerName = legacyLayer.ToString();
                 var layer = storyboard.GetLayer(layerName);
 
-                foreach (var sample in layer.Elements.OfType<StoryboardSampleInfo>())
+                foreach (var sample in layer.Elements.OfType<StoryboardSampleInfo>().Where(s => s.Source == target))
                 {
                     writer.WriteLine(string.Format(CultureInfo.InvariantCulture,
                         @"{0},{1},{2},""{3}"",{4}",
@@ -82,9 +101,9 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void encodeSpritesFromLayer(TextWriter writer, StoryboardLayer layer)
+        private void encodeSpritesFromLayer(TextWriter writer, StoryboardLayer layer, StoryboardElementSource target)
         {
-            foreach (var element in layer.Elements)
+            foreach (var element in layer.Elements.Where(elem => elem.Source == target))
             {
                 LegacyOrigins origin;
 

@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 using osuTK;
 using osuTK.Graphics;
 
@@ -24,8 +25,8 @@ namespace osu.Game.Beatmaps.Formats
         public const int FIRST_LAZER_VERSION = 128;
 
         private readonly IBeatmap beatmap;
-
         private readonly ISkin? skin;
+        private readonly LegacyStoryboardEncoder? storyboardEncoder;
 
         private readonly int onlineRulesetID;
 
@@ -34,10 +35,17 @@ namespace osu.Game.Beatmaps.Formats
         /// </summary>
         /// <param name="beatmap">The beatmap to encode.</param>
         /// <param name="skin">The beatmap's skin, used for encoding combo colours.</param>
-        public LegacyBeatmapEncoder(IBeatmap beatmap, ISkin? skin)
+        /// <param name="storyboard">
+        /// The combined storyboard, loaded from both the <c>.osu</c> and the <c>.osz</c>.
+        /// Only elements from the <c>.osu</c> (marked via <see cref="StoryboardElementSource.Beatmap"/>) will be encoded to the beatmap.
+        /// </param>
+        public LegacyBeatmapEncoder(IBeatmap beatmap, ISkin? skin, Storyboard? storyboard)
         {
             this.beatmap = beatmap;
             this.skin = skin;
+
+            if (storyboard != null)
+                storyboardEncoder = new LegacyStoryboardEncoder(storyboard);
 
             onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
 
@@ -101,7 +109,12 @@ namespace osu.Game.Beatmaps.Formats
                 writer.WriteLine(FormattableString.Invariant($@"CountdownOffset: {beatmap.CountdownOffset}"));
             if (onlineRulesetID == 3)
                 writer.WriteLine(FormattableString.Invariant($"SpecialStyle: {(beatmap.SpecialStyle ? '1' : '0')}"));
-            writer.WriteLine(FormattableString.Invariant($"WidescreenStoryboard: {(beatmap.WidescreenStoryboard ? '1' : '0')}"));
+
+            if (storyboardEncoder != null)
+                storyboardEncoder.EncodeGeneralToBeatmap(writer);
+            else
+                writer.WriteLine(FormattableString.Invariant($"WidescreenStoryboard: {(beatmap.WidescreenStoryboard ? '1' : '0')}"));
+
             if (beatmap.SamplesMatchPlaybackRate)
                 writer.WriteLine(@"SamplesMatchPlaybackRate: 1");
         }
@@ -151,8 +164,15 @@ namespace osu.Game.Beatmaps.Formats
         {
             writer.WriteLine("[Events]");
 
-            if (!string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
-                writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Background},0,\"{beatmap.BeatmapInfo.Metadata.BackgroundFile}\",0,0"));
+            if (storyboardEncoder != null)
+            {
+                storyboardEncoder.EncodeEventsToBeatmap(writer);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
+                    writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Background},0,\"{beatmap.BeatmapInfo.Metadata.BackgroundFile}\",0,0"));
+            }
 
             writer.WriteLine("// Break Periods");
             foreach (var b in beatmap.Breaks)
