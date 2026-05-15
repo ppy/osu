@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using MessagePack;
 
 namespace osu.Game.Online.Multiplayer.MatchTypes.RankedPlay
@@ -35,79 +34,27 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.RankedPlay
         [Key(3)]
         public int NewLife { get; set; }
 
-        /// <summary>
-        /// Describes each source of damage.
-        /// </summary>
         [Key(4)]
-        public List<RankedPlayDamageSource> Sources { get; set; } = [];
+        public int DirectDamage { get; set; }
+
+        [Key(5)]
+        public double Multiplier { get; set; } = 1;
+
+        [Key(6)]
+        public int BonusDamage { get; set; }
 
         public bool Equals(RankedPlayDamageInfo? other)
         {
             if (other == null)
                 return false;
 
-            if (Damage != other.Damage || RawDamage != other.RawDamage || OldLife != other.OldLife || NewLife != other.NewLife)
-                return false;
-
-            if (Sources.Count != other.Sources.Count)
-                return false;
-
-            for (int i = 0; i < Sources.Count; i++)
-            {
-                if (!Sources[i].Equals(other.Sources[i]))
-                    return false;
-            }
-
-            return true;
+            return Damage == other.Damage
+                   && Damage == other.RawDamage
+                   && OldLife == other.OldLife
+                   && NewLife == other.NewLife
+                   && DirectDamage == other.DirectDamage
+                   && Multiplier == other.Multiplier
+                   && BonusDamage == other.BonusDamage;
         }
-    }
-
-    [Serializable]
-    [MessagePackObject]
-    public class RankedPlayDamageSource : IEquatable<RankedPlayDamageSource>
-    {
-        /// <summary>
-        /// The damage source.
-        /// </summary>
-        [Key(0)]
-        public RankedPlayDamageType Type { get; set; }
-
-        /// <summary>
-        /// Raw value of this damage source (e.g. multiplier, score, etc).
-        /// </summary>
-        [Key(1)]
-        public double RawValue { get; set; }
-
-        /// <summary>
-        /// Total amount of damage dealt from this source.
-        /// </summary>
-        [Key(2)]
-        public int Damage { get; set; }
-
-        public bool Equals(RankedPlayDamageSource? other)
-        {
-            if (other == null)
-                return false;
-
-            return Type == other.Type && RawValue == other.RawValue && Damage == other.Damage;
-        }
-    }
-
-    public enum RankedPlayDamageType
-    {
-        /// <summary>
-        /// Score damage dealt directly by the opposing player.
-        /// </summary>
-        Attack,
-
-        /// <summary>
-        /// Damage inflicted through the damage multiplier.
-        /// </summary>
-        Multiplier,
-
-        /// <summary>
-        /// Base damage dealt for winning a round.
-        /// </summary>
-        Bonus
     }
 }

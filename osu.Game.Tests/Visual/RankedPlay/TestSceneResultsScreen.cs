@@ -56,27 +56,47 @@ namespace osu.Game.Tests.Visual.RankedPlay
                             Damage = 1_100_000,
                             OldLife = 1_000_000,
                             NewLife = 1,
-                            Sources =
-                            [
-                                new RankedPlayDamageSource
-                                {
-                                    Type = RankedPlayDamageType.Attack,
-                                    RawValue = 500_000,
-                                    Damage = 500_000
-                                },
-                                new RankedPlayDamageSource
-                                {
-                                    Type = RankedPlayDamageType.Multiplier,
-                                    RawValue = 2,
-                                    Damage = 500_000
-                                },
-                                new RankedPlayDamageSource
-                                {
-                                    Type = RankedPlayDamageType.Bonus,
-                                    RawValue = 100_000,
-                                    Damage = 100_000
-                                }
-                            ]
+                            DirectDamage = 500_000,
+                            Multiplier = 2,
+                            BonusDamage = 100_000
+                        };
+
+                        userInfo.Life = 653_088;
+                    }
+                    else
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 0,
+                            Damage = 0,
+                            OldLife = 1_000_000,
+                            NewLife = 1_000_000,
+                        };
+                    }
+                }
+            }).WaitSafely());
+        }
+
+        [Test]
+        public void TestDamageBreakdownWithNegativeValues()
+        {
+            AddStep("set results state", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.Results, state =>
+            {
+                int losingPlayer = state.Users.Keys.First();
+
+                foreach (var (id, userInfo) in state.Users)
+                {
+                    if (id == losingPlayer)
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 500_000,
+                            Damage = 200_000,
+                            OldLife = 1_000_000,
+                            NewLife = 800_000,
+                            DirectDamage = 600_000,
+                            Multiplier = 0.5,
+                            BonusDamage = -100_000
                         };
 
                         userInfo.Life = 653_088;

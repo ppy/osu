@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -61,7 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             private OsuSpriteText flyingDamageText = null!;
 
             private FillFlowContainer damageBreakdownContainer = null!;
-            private OsuSpriteText damageBreakdownDamageText = null!;
+            private OsuSpriteText damageBreakdownValueText = null!;
             private OsuSpriteText damageBreakdownSourceText = null!;
 
             private ScoreBar playerScoreBar = null!;
@@ -303,7 +304,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                 Alpha = 0,
                                 Children =
                                 [
-                                    damageBreakdownDamageText = new OsuSpriteText
+                                    damageBreakdownValueText = new OsuSpriteText
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
@@ -405,17 +406,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     playerScoreCounter.TransformValueTo(PlayerScore.TotalScore, score_text_duration - 500);
                     opponentScoreCounter.TransformValueTo(OpponentScore.TotalScore, score_text_duration - 500);
 
-                    int attackDamage;
-
-                    if (losingDamageInfo.Sources.Count == 0)
-                    {
-                        // This fallback only exists for if the client and server are slightly out-of-date. It can be removed momentarily.
-                        attackDamage = losingDamageInfo.Damage;
-                    }
-                    else
-                        attackDamage = losingDamageInfo.Sources.SingleOrDefault(b => b.Type == RankedPlayDamageType.Attack)?.Damage ?? 0;
-
-                    damageCounter.TransformValueTo(attackDamage, score_text_duration - 500);
+                    damageCounter.TransformValueTo(losingDamageInfo.DirectDamage, score_text_duration - 500);
 
                     long maxAchievableScore = Math.Max(
                         Math.Max(PlayerScore.TotalScore, OpponentScore.TotalScore),
@@ -504,32 +495,34 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
                 delay += 800;
 
-                bool displayedBreakdown = false;
+                List<(int rawDamage, string displayValue, string source)> damageBreakdowns = [];
 
-                foreach (var breakdown in losingDamageInfo.Sources)
+                if (!Precision.AlmostEquals(1, losingDamageInfo.Multiplier))
                 {
-                    if (breakdown.Type == RankedPlayDamageType.Attack)
-                    {
-                        // Displayed as part of the initial animation.
-                        continue;
-                    }
+                    damageBreakdowns.Add((
+                        (int)Math.Ceiling(losingDamageInfo.DirectDamage * (losingDamageInfo.Multiplier - 1)),
+                        $"x{losingDamageInfo.Multiplier.ToStandardFormattedString(maxDecimalDigits: 1)}",
+                        "multiplier"
+                    ));
+                }
 
+                if (losingDamageInfo.BonusDamage != 0)
+                {
+                    damageBreakdowns.Add((
+                        losingDamageInfo.BonusDamage,
+                        $"{losingDamageInfo.BonusDamage:+#,##0;-#,##0}",
+                        "bonus"
+                    ));
+                }
+
+                foreach (var breakdown in damageBreakdowns)
+                {
                     using (BeginDelayedSequence(delay))
                     {
                         Schedule(() =>
                         {
-                            switch (breakdown.Type)
-                            {
-                                case RankedPlayDamageType.Multiplier:
-                                    damageBreakdownDamageText.Text = $"x{breakdown.RawValue.ToStandardFormattedString(maxDecimalDigits: 1)}";
-                                    damageBreakdownSourceText.Text = "multiplier";
-                                    break;
-
-                                case RankedPlayDamageType.Bonus:
-                                    damageBreakdownDamageText.Text = $"+{breakdown.Damage:N0}";
-                                    damageBreakdownSourceText.Text = "bonus";
-                                    break;
-                            }
+                            damageBreakdownValueText.Text = breakdown.displayValue;
+                            damageBreakdownSourceText.Text = breakdown.source;
                         });
 
                         damageBreakdownContainer.MoveToX(120)
@@ -542,7 +535,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
                             Schedule(() =>
                             {
-                                damageCounter.SetValueInstantly(damageCounter.Value + breakdown.Damage);
+                                damageCounter.SetValueInstantly(damageCounter.Value + breakdown.rawDamage);
                                 damageCounter
                                     .ScaleTo(new Vector2(1.25f), 200, Easing.OutQuint)
                                     .Then()
@@ -552,10 +545,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     }
 
                     delay += 1400;
-                    displayedBreakdown = true;
                 }
 
-                if (displayedBreakdown)
+                if (damageBreakdowns.Count > 0)
                     delay += 600;
 
                 bool playerTookDamage = OpponentScore.TotalScore > PlayerScore.TotalScore;
