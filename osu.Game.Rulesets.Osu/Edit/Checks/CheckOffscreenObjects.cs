@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            foreach (var hitobject in context.Beatmap.HitObjects)
+            foreach (var hitobject in context.CurrentDifficulty.Playable.HitObjects)
             {
                 switch (hitobject)
                 {

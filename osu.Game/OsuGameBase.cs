@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -25,6 +26,7 @@ using osu.Framework.Input.Handlers;
 using osu.Framework.Input.Handlers.Joystick;
 using osu.Framework.Input.Handlers.Midi;
 using osu.Framework.Input.Handlers.Mouse;
+using osu.Framework.Input.Handlers.Pen;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Input.Handlers.Touch;
 using osu.Framework.IO.Stores;
@@ -90,7 +92,7 @@ namespace osu.Game
 
         public const int SAMPLE_CONCURRENCY = 6;
 
-        public const double SFX_STEREO_STRENGTH = 0.75;
+        public const double SFX_STEREO_STRENGTH = 0.6;
 
         /// <summary>
         /// Length of debounce (in milliseconds) for commonly occuring sample playbacks that could stack.
@@ -305,6 +307,7 @@ namespace osu.Game
 
             MessageFormatter.WebsiteRootUrl = endpoints.WebsiteUrl;
 
+            // Initialise localisation
             frameworkLocale = frameworkConfig.GetBindable<string>(FrameworkSetting.Locale);
             frameworkLocale.BindValueChanged(_ => updateLanguage());
 
@@ -467,8 +470,6 @@ namespace osu.Game
 
         protected virtual void InitialiseFonts()
         {
-            AddFont(Resources, @"Fonts/osuFont");
-
             AddFont(Resources, @"Fonts/Torus/Torus-Regular");
             AddFont(Resources, @"Fonts/Torus/Torus-Light");
             AddFont(Resources, @"Fonts/Torus/Torus-SemiBold");
@@ -489,9 +490,10 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Inter/Inter-BoldItalic");
 
             AddFont(Resources, @"Fonts/Noto/Noto-Basic");
-            AddFont(Resources, @"Fonts/Noto/Noto-Hangul");
+            AddFont(Resources, @"Fonts/Noto/Noto-Bopomofo");
             AddFont(Resources, @"Fonts/Noto/Noto-CJK-Basic");
             AddFont(Resources, @"Fonts/Noto/Noto-CJK-Compatibility");
+            AddFont(Resources, @"Fonts/Noto/Noto-Hangul");
             AddFont(Resources, @"Fonts/Noto/Noto-Thai");
 
             AddFont(Resources, @"Fonts/Venera/Venera-Light");
@@ -499,6 +501,33 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Venera/Venera-Black");
 
             Fonts.AddStore(new OsuIcon.OsuIconStore(Textures));
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            var localeMappings = Enum.GetValues<Language>().Select(language =>
+            {
+#if DEBUG
+                if (language == Language.debug)
+                    return new LocaleMapping("debug", new DebugLocalisationStore());
+#endif
+
+                string cultureCode = language.ToCultureCode();
+
+                try
+                {
+                    return new LocaleMapping(new ResourceManagerLocalisationStore(cultureCode));
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Could not load localisations for language \"{cultureCode}\"");
+                    return null;
+                }
+            }).Where(m => m != null);
+
+            Localisation.AddLocaleMappings(localeMappings);
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
@@ -512,11 +541,13 @@ namespace osu.Game
             Storage ??= host.Storage;
 
             LocalConfig ??= UseDevelopmentServer
-                ? new DevelopmentOsuConfigManager(Storage)
-                : new OsuConfigManager(Storage);
+                ? new DevelopmentOsuConfigManager(Storage, host)
+                : new OsuConfigManager(Storage, host);
 
             host.ExceptionThrown += onExceptionThrown;
         }
+
+        #region Exit handling
 
         /// <summary>
         /// Use to programatically exit the game as if the user was triggering via alt-f4.
@@ -532,10 +563,26 @@ namespace osu.Game
         }
 
         /// <summary>
+        /// An action that restarts the application after it has exited.
+        /// </summary>
+        [CanBeNull]
+        public Action RestartOnExitAction { private get; set; }
+
+        /// <summary>
+        /// Signals that the application should not be restarted after it is exited.
+        /// </summary>
+        public void CancelRestartOnExit()
+        {
+            RestartOnExitAction = null;
+        }
+
+        /// <summary>
         /// If supported by the platform, the game will automatically restart after the next exit.
         /// </summary>
         /// <returns>Whether a restart operation was queued.</returns>
         public virtual bool RestartAppWhenExited() => false;
+
+        #endregion
 
         /// <summary>
         /// Perform migration of user data to a specified path.
@@ -625,8 +672,11 @@ namespace osu.Game
                 case TouchHandler th:
                     return new TouchSettings(th);
 
+                case PenHandler ph:
+                    return new PenSettings(ph);
+
                 case MidiHandler:
-                    return new InputSection.HandlerSection(handler);
+                    return new InputSubsection(handler);
 
                 // return null for handlers that shouldn't have settings.
                 default:
@@ -649,16 +699,16 @@ namespace osu.Game
 
             Ruleset instance = null;
 
-            try
+            if (r.NewValue?.Available == true)
             {
-                if (r.NewValue?.Available == true)
+                try
                 {
                     instance = r.NewValue.CreateInstance();
                 }
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, "Ruleset load failed and has been rolled back");
+                catch (Exception e)
+                {
+                    Rulesets.RulesetStore.LogRulesetFailure(r.NewValue, e);
+                }
             }
 
             if (instance == null)
@@ -683,7 +733,7 @@ namespace osu.Game
             }
             catch (Exception e)
             {
-                Logger.Error(e, $"Could not load mods for \"{instance.RulesetInfo.Name}\" ruleset. Current ruleset has been rolled back.");
+                Rulesets.RulesetStore.LogRulesetFailure(r.NewValue, e);
                 revertRulesetChange();
                 return;
             }
@@ -743,6 +793,8 @@ namespace osu.Game
 
             if (Host != null)
                 Host.ExceptionThrown -= onExceptionThrown;
+
+            RestartOnExitAction?.Invoke();
         }
 
         ControlPointInfo IBeatSyncProvider.ControlPoints => Beatmap.Value.BeatmapLoaded ? Beatmap.Value.Beatmap.ControlPointInfo : null;

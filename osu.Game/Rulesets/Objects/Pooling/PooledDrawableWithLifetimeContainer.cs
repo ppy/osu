@@ -160,8 +160,8 @@ namespace osu.Game.Rulesets.Objects.Pooling
             if (!IsPresent)
                 return false;
 
-            bool aliveChanged = base.CheckChildrenLife();
-            aliveChanged |= lifetimeManager.Update(Time.Current - PastLifetimeExtension, Time.Current + FutureLifetimeExtension);
+            bool aliveChanged = lifetimeManager.Update(Time.Current - PastLifetimeExtension, Time.Current + FutureLifetimeExtension);
+            aliveChanged |= base.CheckChildrenLife();
             return aliveChanged;
         }
     }

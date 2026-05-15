@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Menu
 
                     Schedule(() =>
                     {
-                        heart?.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
+                        heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
                     });
                 });
             }, true);

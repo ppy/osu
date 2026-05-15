@@ -62,24 +62,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    spin = new Sprite
-                    {
-                        Alpha = 0,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.Centre,
-                        Texture = source.GetTexture("spinner-spin"),
-                        Scale = new Vector2(SPRITE_SCALE),
-                        Y = SPINNER_TOP_OFFSET + 335,
-                    },
-                    clear = new Sprite
-                    {
-                        Alpha = 0,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.Centre,
-                        Texture = source.GetTexture("spinner-clear"),
-                        Scale = new Vector2(SPRITE_SCALE),
-                        Y = SPINNER_TOP_OFFSET + 115,
-                    },
                     bonusCounter = new LegacySpriteText(LegacyFont.Score)
                     {
                         Alpha = 0,
@@ -102,6 +84,24 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Origin = Anchor.TopRight,
                         Scale = new Vector2(SPRITE_SCALE * 0.9f),
                         Position = new Vector2(80, 448 + spm_hide_offset),
+                    },
+                    spin = new Sprite
+                    {
+                        Alpha = 0,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-spin"),
+                        Scale = new Vector2(SPRITE_SCALE),
+                        Y = SPINNER_TOP_OFFSET + 335,
+                    },
+                    clear = new Sprite
+                    {
+                        Alpha = 0,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-clear"),
+                        Scale = new Vector2(SPRITE_SCALE),
+                        Y = SPINNER_TOP_OFFSET + 115,
                     },
                 }
             });

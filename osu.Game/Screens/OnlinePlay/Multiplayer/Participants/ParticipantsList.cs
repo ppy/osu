@@ -22,7 +22,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         private MultiplayerClient client { get; set; } = null!;
 
         public ParticipantsList()
-            : base(ParticipantPanel.HEIGHT, initialPoolSize: 20)
+            : base(ParticipantPanel.HEIGHT + 1, initialPoolSize: 20)
         {
         }
 

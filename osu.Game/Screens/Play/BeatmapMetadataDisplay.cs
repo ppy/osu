@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -15,10 +16,12 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
+using CommonStrings = osu.Game.Localisation.CommonStrings;
 
 namespace osu.Game.Screens.Play
 {
@@ -31,6 +34,7 @@ namespace osu.Game.Screens.Play
         private readonly Bindable<IReadOnlyList<Mod>> mods;
         private readonly Drawable logoFacade;
         private LoadingSpinner loading;
+        private Drawable blockingLoadLayer;
 
         public IBindable<IReadOnlyList<Mod>> Mods => mods;
 
@@ -42,6 +46,35 @@ namespace osu.Game.Screens.Play
                     loading.Show();
                 else
                     loading.Hide();
+            }
+        }
+
+        private bool userBlocked;
+
+        public bool UserBlocked
+        {
+            set
+            {
+                if (value == userBlocked)
+                    return;
+
+                userBlocked = value;
+
+                if (userBlocked)
+                {
+                    using (BeginDelayedSequence(500))
+                    {
+                        blockingLoadLayer
+                            // Slight delay to avoid this flashing briefly during multiplayer load and other scenarios where
+                            // load may be blocked for a short period.
+                            .FadeIn(300, Easing.Out)
+                            .Then()
+                            .FadeTo(0.6f, 1000, Easing.In)
+                            .Loop();
+                    }
+                }
+                else
+                    blockingLoadLayer.FadeOut(500, Easing.OutQuint);
             }
         }
 
@@ -60,7 +93,7 @@ namespace osu.Game.Screens.Play
         private StarRatingDisplay starRatingDisplay;
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapDifficultyCache difficultyCache)
+        private void load(BeatmapDifficultyCache difficultyCache, OsuColour colours)
         {
             var metadata = beatmap.BeatmapInfo.Metadata;
 
@@ -103,7 +136,7 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.TopCentre,
                             CornerRadius = 10,
                             Masking = true,
-                            Children = new Drawable[]
+                            Children = new[]
                             {
                                 new Sprite
                                 {
@@ -113,7 +146,31 @@ namespace osu.Game.Screens.Play
                                     Anchor = Anchor.Centre,
                                     FillMode = FillMode.Fill,
                                 },
-                                loading = new LoadingLayer(dimBackground: true, blockInput: false)
+                                loading = new LoadingLayer(dimBackground: true)
+                                {
+                                    BlockPositionalInput = false,
+                                },
+                                blockingLoadLayer = new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0,
+                                    Children = new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            Colour = colours.PinkDarker,
+                                            Alpha = 0.5f,
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Font = OsuFont.Style.Heading2,
+                                            Text = PlayerLoaderStrings.LoadingPaused
+                                        }
+                                    }
+                                },
                             }
                         },
                         versionFlow = new FillFlowContainer
@@ -165,7 +222,7 @@ namespace osu.Game.Screens.Play
                                 },
                                 new Drawable[]
                                 {
-                                    new MetadataLineLabel("Mapper"),
+                                    new MetadataLineLabel(CommonStrings.Mapper),
                                     new MetadataLineInfo(metadata.Author.Username)
                                 }
                             }

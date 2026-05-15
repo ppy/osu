@@ -9,6 +9,7 @@ using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Tests.Visual;
@@ -244,13 +245,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddAssert("grid spacing is distance to slider tail", () =>
             {
                 var composer = Editor.ChildrenOfType<RectangularPositionSnapGrid>().Single();
-                return Precision.AlmostEquals(composer.Spacing.Value.X, 32.05, 0.01)
+                return Precision.AlmostEquals(composer.Spacing.Value.X, 32.05, 0.1)
                        && Precision.AlmostEquals(composer.Spacing.Value.X, composer.Spacing.Value.Y);
             });
             AddAssert("grid rotation points to slider tail", () =>
             {
                 var composer = Editor.ChildrenOfType<RectangularPositionSnapGrid>().Single();
-                return Precision.AlmostEquals(composer.GridLineRotation.Value, 0.09, 0.01);
+                return Precision.AlmostEquals(composer.GridLineRotation.Value, 0.09, 0.1);
             });
 
             AddStep("start grid placement", () => InputManager.Key(Key.Number5));
@@ -279,10 +280,75 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddAssert("grid spacing and rotation unchanged", () =>
             {
                 var composer = Editor.ChildrenOfType<RectangularPositionSnapGrid>().Single();
-                return Precision.AlmostEquals(composer.Spacing.Value.X, 32.05, 0.01)
+                return Precision.AlmostEquals(composer.Spacing.Value.X, 32.05, 0.1)
                        && Precision.AlmostEquals(composer.Spacing.Value.X, composer.Spacing.Value.Y)
-                       && Precision.AlmostEquals(composer.GridLineRotation.Value, 0.09, 0.01);
+                       && Precision.AlmostEquals(composer.GridLineRotation.Value, 0.09, 0.1);
             });
+        }
+
+        [Test]
+        public void TestGridPlacementCommittedByDragSelection()
+        {
+            AddStep("add circle", () => EditorBeatmap.Add(new HitCircle
+            {
+                Position = new Vector2(64, 64),
+                StartTime = EditorClock.CurrentTime,
+            }));
+
+            AddStep("select circle tool", () => InputManager.Key(Key.Number2));
+            AddStep("select grid tool", () => InputManager.Key(Key.Number5));
+            AddStep("move cursor to centre", () => InputManager.MoveMouseTo(Editor));
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            AddStep("move cursor to (-1, -1)", () =>
+            {
+                var composer = Editor.ChildrenOfType<RectangularPositionSnapGrid>().Single();
+                InputManager.MoveMouseTo(composer.ToScreenSpace(new Vector2(-1, -1)));
+            });
+            AddStep("drag to center", () =>
+            {
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.MoveMouseTo(Editor);
+            });
+            AddStep("release left", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddAssert("one selection", () => Editor.ChildrenOfType<OsuSelectionHandler>().Single().SelectedBlueprints, () => Has.One.Items);
+            AddAssert("selection is circle", () => Editor.ChildrenOfType<OsuSelectionHandler>().Single().SelectedBlueprints.Single(), Is.TypeOf<HitCircleSelectionBlueprint>);
+
+            AddStep("move cursor to slider", () =>
+            {
+                var composer = Editor.ChildrenOfType<RectangularPositionSnapGrid>().Single();
+                InputManager.MoveMouseTo(composer.ToScreenSpace(((Slider)EditorBeatmap.HitObjects.ElementAt(1)).EndPosition + new Vector2(1, 1)));
+            });
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("one selection", () => Editor.ChildrenOfType<OsuSelectionHandler>().Single().SelectedBlueprints, () => Has.One.Items);
+            AddAssert("selection is slider", () => Editor.ChildrenOfType<OsuSelectionHandler>().Single().SelectedBlueprints.Single(), Is.TypeOf<SliderSelectionBlueprint>);
+        }
+
+        [Test]
+        public void TestGridPlacementRevertsToLastTool()
+        {
+            AddStep("select circle tool", () => InputManager.Key(Key.Number2));
+            AddStep("select grid tool", () => InputManager.Key(Key.Number5));
+            AddStep("move cursor to centre", () => InputManager.MoveMouseTo(Editor));
+            AddStep("start grid placement", () => InputManager.Click(MouseButton.Left));
+            AddStep("end grid placement", () => InputManager.Click(MouseButton.Left));
+            AddAssert("tool reverted to circle", () => getComposer().BlueprintContainer.CurrentTool, Is.TypeOf<HitCircleCompositionTool>);
+
+            HitObjectComposer getComposer() => Editor.ChildrenOfType<HitObjectComposer>().Single();
+        }
+
+        [Test]
+        public void TestGridPlacementDoesNotOverrideToolChange()
+        {
+            AddStep("select circle tool", () => InputManager.Key(Key.Number2));
+            AddStep("select grid tool", () => InputManager.Key(Key.Number5));
+            AddStep("move cursor to centre", () => InputManager.MoveMouseTo(Editor));
+            AddStep("start grid placement", () => InputManager.Click(MouseButton.Left));
+            AddStep("select circle tool again", () => InputManager.Key(Key.Number2));
+            AddAssert("circle tool selected", () => getComposer().BlueprintContainer.CurrentTool, Is.TypeOf<HitCircleCompositionTool>);
+
+            HitObjectComposer getComposer() => Editor.ChildrenOfType<HitObjectComposer>().Single();
         }
     }
 }

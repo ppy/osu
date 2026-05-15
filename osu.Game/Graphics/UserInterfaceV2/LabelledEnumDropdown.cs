@@ -9,6 +9,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
     public partial class LabelledEnumDropdown<TEnum> : LabelledDropdown<TEnum>
         where TEnum : struct, Enum
     {
+        public LabelledEnumDropdown(bool padded)
+            : base(padded)
+        {
+        }
+
         protected override OsuDropdown<TEnum> CreateDropdown() => new OsuEnumDropdown<TEnum>();
     }
 }

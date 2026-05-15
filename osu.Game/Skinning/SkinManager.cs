@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -64,6 +65,14 @@ namespace osu.Game.Skinning
 
         private Skin trianglesSkin { get; }
 
+        private Skin retroSkin { get; }
+
+        private static readonly Live<SkinInfo> random_skin_info = new SkinInfo
+        {
+            ID = SkinInfo.RANDOM_SKIN,
+            Name = "<Random Skin>",
+        }.ToLiveUnmanaged();
+
         public override bool PauseImports
         {
             get => base.PauseImports;
@@ -91,6 +100,7 @@ namespace osu.Game.Skinning
 
             var defaultSkins = new[]
             {
+                retroSkin = new RetroSkin(this),
                 DefaultClassicSkin = new DefaultLegacySkin(this),
                 trianglesSkin = new TrianglesSkin(this),
                 argonSkin = new ArgonSkin(this),
@@ -127,6 +137,38 @@ namespace osu.Game.Skinning
             };
         }
 
+        /// <summary>
+        /// Returns the dropdown ordering for use mainly by the skin selection UI.
+        /// Inserts the defaults first, then 'random skin', then custom ones.
+        /// Returns a list of <see cref="Live{SkinInfo}"/> items.
+        /// </summary>
+        public IList<Live<SkinInfo>> GetAllUsableSkins()
+        {
+            var skins = new List<Live<SkinInfo>>();
+
+            Realm.Run(realm =>
+            {
+                skins.Add(realm.Find<SkinInfo>(SkinInfo.ARGON_SKIN).ToLive(Realm));
+                skins.Add(realm.Find<SkinInfo>(SkinInfo.ARGON_PRO_SKIN).ToLive(Realm));
+                skins.Add(realm.Find<SkinInfo>(SkinInfo.TRIANGLES_SKIN).ToLive(Realm));
+                skins.Add(realm.Find<SkinInfo>(SkinInfo.CLASSIC_SKIN).ToLive(Realm));
+                skins.Add(realm.Find<SkinInfo>(SkinInfo.RETRO_SKIN).ToLive(Realm));
+
+                skins.Add(random_skin_info);
+
+                var userSkins = realm.All<SkinInfo>()
+                                     .Where(s => !s.DeletePending && !s.Protected)
+                                     .AsEnumerable()
+                                     .OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase)
+                                     .Select(s => s.ToLive(Realm));
+
+                foreach (var s in userSkins)
+                    skins.Add(s);
+            });
+
+            return skins;
+        }
+
         public void SelectRandomSkin()
         {
             Realm.Run(r =>
@@ -154,6 +196,40 @@ namespace osu.Game.Skinning
                 CurrentSkinInfo.Value = chosen.ToLive(Realm);
             });
         }
+
+        private void cycleSkins(int direction)
+        {
+            Debug.Assert(direction != 0);
+
+            // don't change selection if current skin is externally disabled/mounted for editing.
+            if (CurrentSkinInfo.Disabled)
+                return;
+
+            var skins = GetAllUsableSkins();
+
+            int i = skins.IndexOf(CurrentSkinInfo.Value);
+
+            // If the current skin isn't selectable anymore, start from the top.
+            if (i < 0 && direction < 0)
+                i = 0;
+
+            do
+            {
+                i = (i + direction + skins.Count) % skins.Count;
+            } while (skins[i].ID == SkinInfo.RANDOM_SKIN);
+
+            CurrentSkinInfo.Value = skins[i];
+        }
+
+        /// <summary>
+        /// Cycle one skin backward.
+        /// </summary>
+        public void SelectPreviousSkin() => cycleSkins(-1);
+
+        /// <summary>
+        /// Cycle one skin forward.
+        /// </summary>
+        public void SelectNextSkin() => cycleSkins(1);
 
         /// <summary>
         /// Retrieve a <see cref="Skin"/> instance for the provided <see cref="SkinInfo"/>
@@ -349,6 +425,15 @@ namespace osu.Game.Skinning
             });
         }
 
+        public void Rename(Live<SkinInfo> skin, string newName)
+        {
+            skin.PerformWrite(s =>
+            {
+                s.Name = newName;
+                skinImporter.UpdateSkinIniMetadata(s, s.Realm!);
+            });
+        }
+
         public void SetSkinFromConfiguration(string guidString)
         {
             Live<SkinInfo> skinInfo = null;
@@ -360,6 +445,9 @@ namespace osu.Game.Skinning
             {
                 if (guid == SkinInfo.CLASSIC_SKIN)
                     skinInfo = DefaultClassicSkin.SkinInfo;
+
+                if (guid == SkinInfo.RETRO_SKIN)
+                    skinInfo = retroSkin.SkinInfo;
             }
 
             CurrentSkinInfo.Value = skinInfo ?? trianglesSkin.SkinInfo;

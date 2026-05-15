@@ -26,8 +26,8 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.GameplayTest;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
-using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
 
@@ -112,6 +112,27 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is SoloSongSelect songSelect
                                                        && songSelect.Beatmap.Value is DummyWorkingBeatmap);
+        }
+
+        [Test]
+        public void TestEditorRestoresModeOnReload()
+        {
+            prepareBeatmap();
+            openEditor();
+
+            makeMetadataChange(commit: false);
+
+            Editor editor1 = null!;
+
+            AddStep("store current editor", () => editor1 = getEditor());
+
+            AddStep("reload", () => getEditor().SwitchToDifficulty(getEditorBeatmap().BeatmapInfo));
+            AddUntilStep("save dialog displayed", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault()?.CurrentDialog is PromptForSaveDialog);
+            AddStep("confirm", () => InputManager.Key(Key.Number1));
+
+            AddUntilStep("wait for editor open", () => Game.ScreenStack.CurrentScreen is Editor editor && editor.ReadyForUse);
+            AddAssert("editor is new instance", () => getEditor() != editor1);
+            AddAssert("mode is still song setup", () => getEditor().Mode.Value == EditorScreenMode.SongSetup);
         }
 
         [Test]

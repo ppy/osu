@@ -61,8 +61,6 @@ namespace osu.Game.Screens.Play
 
         private void updateDisplay(ValueChangedEvent<Period?> period)
         {
-            FinishTransforms(true);
-
             if (period.NewValue == null)
                 return;
 
@@ -71,7 +69,7 @@ namespace osu.Game.Screens.Play
             using (BeginAbsoluteSequence(b.Start))
             {
                 fadeContainer.FadeInFromZero(BreakOverlay.BREAK_FADE_DURATION);
-                using (BeginDelayedSequence(b.Duration - BreakOverlay.BREAK_FADE_DURATION))
+                using (BeginDelayedSequence(b.Duration))
                     fadeContainer.FadeOut(BreakOverlay.BREAK_FADE_DURATION);
             }
         }

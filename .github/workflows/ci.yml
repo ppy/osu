@@ -6,6 +6,7 @@ concurrency:
 
 permissions:
   contents: read # to fetch code (actions/checkout)
+  security-events: write # for reporting InspectCode issues
 
 jobs:
   inspect-code:
@@ -13,10 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install .NET 8.0.x
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: "8.0.x"
 
@@ -27,7 +28,7 @@ jobs:
         run: dotnet restore osu.Desktop.slnf
 
       - name: Restore inspectcode cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ github.workspace }}/inspectcode
           key: inspectcode-${{ hashFiles('.config/dotnet-tools.json', '.github/workflows/ci.yml', 'osu.sln*', 'osu*.slnf', '.editorconfig', '.globalconfig', 'CodeAnalysis/*', '**/*.csproj', '**/*.props') }}
@@ -49,10 +50,14 @@ jobs:
           exit $exit_code
 
       - name: InspectCode
-        run: dotnet jb inspectcode $(pwd)/osu.Desktop.slnf --no-build --output="inspectcodereport.xml" --caches-home="inspectcode" --verbosity=WARN
-
-      - name: NVika
-        run: dotnet nvika parsereport "${{github.workspace}}/inspectcodereport.xml" --treatwarningsaserrors
+        uses: JetBrains/ReSharper-InspectCode@v0.12
+        with:
+          # this is WTF tier but if you don't specify *both* of these the defaults assume `build: true`
+          build: false
+          no-build: true
+          solution: ./osu.Desktop.slnf
+          caches-home: inspectcode
+          verbosity: WARN
 
   test:
     name: Test
@@ -71,10 +76,10 @@ jobs:
     timeout-minutes: 120
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install .NET 8.0.x
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: "8.0.x"
 
@@ -96,13 +101,41 @@ jobs:
           NUnit.ConsoleOut=0
 
       # Attempt to upload results even if test fails.
-      # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#always
+      # https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#cancelled
       - name: Upload Test Results
-        uses: actions/upload-artifact@v4
-        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
         with:
           name: osu-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
           path: ${{github.workspace}}/TestResults/TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx
+
+  test-results:
+    name: Test results
+    runs-on: ubuntu-latest
+    # we want to wait for the `test` job to complete, but run regardless of whether it succeeds or fails
+    # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#example-not-requiring-successful-dependent-jobs
+    if: ${{ !cancelled() }}
+    needs: test
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Download results
+        uses: actions/download-artifact@v8
+        with:
+          pattern: osu-test-results-*
+          merge-multiple: true
+
+      - name: Add test results summary to workflow run
+        uses: dorny/test-reporter@v3.0.0
+        with:
+          name: Results
+          path: "*.trx"
+          reporter: dotnet-trx
+          list-suites: 'failed'
+          list-tests: 'failed'
+          use-actions-summary: 'true'
 
   build-only-android:
     name: Build only (Android)
@@ -110,16 +143,16 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup JDK 11
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: microsoft
           java-version: 11
 
       - name: Install .NET 8.0.x
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: "8.0.x"
 
@@ -131,19 +164,24 @@ jobs:
 
   build-only-ios:
     name: Build only (iOS)
-    runs-on: macos-latest
+    runs-on: macos-15
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install .NET 8.0.x
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: "8.0.x"
 
       - name: Install .NET Workloads
-        run: dotnet workload install ios --from-rollback-file https://raw.githubusercontent.com/ppy/osu-framework/refs/heads/master/workloads.json
+        run: dotnet workload install ios
+
+      # https://github.com/dotnet/macios/issues/19157
+      # https://github.com/actions/runner-images/issues/12758
+      - name: Use Xcode 16.4
+        run: sudo xcode-select -switch /Applications/Xcode_16.4.app
 
       - name: Build
         run: dotnet build -c Debug osu.iOS.slnf

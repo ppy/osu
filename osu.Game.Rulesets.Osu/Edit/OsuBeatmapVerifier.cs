@@ -14,6 +14,9 @@ namespace osu.Game.Rulesets.Osu.Edit
     {
         private readonly List<ICheck> checks = new List<ICheck>
         {
+            // Audio
+            new CheckOsuFewHitsounds(),
+
             // Compose
             new CheckOffscreenObjects(),
             new CheckTooShortSpinners(),
@@ -23,6 +26,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             new CheckTimeDistanceEquality(),
             new CheckLowDiffOverlaps(),
             new CheckTooShortSliders(),
+            new CheckOsuLowestDiffDrainTime(),
 
             // Settings
             new CheckOsuAbnormalDifficultySettings(),

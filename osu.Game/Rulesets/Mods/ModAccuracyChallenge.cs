@@ -6,8 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Localisation.HUD;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Scoring;
@@ -24,6 +26,8 @@ namespace osu.Game.Rulesets.Mods
 
         public override LocalisableString Description => "Fail if your accuracy drops too low!";
 
+        public override IconUsage? Icon => OsuIcon.ModAccuracyChallenge;
+
         public override ModType Type => ModType.DifficultyIncrease;
 
         public override double ScoreMultiplier => 1.0;
@@ -39,7 +43,7 @@ namespace osu.Game.Rulesets.Mods
             get
             {
                 if (!MinimumAccuracy.IsDefault)
-                    yield return ("Minimum accuracy", $"{MinimumAccuracy.Value:##%}");
+                    yield return ("Minimum accuracy", MinimumAccuracy.Value.ToLocalisableString(@"P1"));
 
                 if (!AccuracyJudgeMode.IsDefault)
                     yield return ("Accuracy mode", AccuracyJudgeMode.Value.ToLocalisableString());
@@ -49,12 +53,12 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        [SettingSource("Minimum accuracy", "Trigger a failure if your accuracy goes below this value.", SettingControlType = typeof(SettingsPercentageSlider<double>))]
+        [SettingSource("Minimum accuracy", "Trigger a failure if your accuracy goes below this value.", SettingControlType = typeof(MinimumAccuracySlider))]
         public BindableNumber<double> MinimumAccuracy { get; } = new BindableDouble
         {
             MinValue = 0.60,
-            MaxValue = 0.99,
-            Precision = 0.01,
+            MaxValue = 0.999,
+            Precision = 0.001,
             Default = 0.9,
             Value = 0.9,
         };
@@ -97,6 +101,14 @@ namespace osu.Game.Rulesets.Mods
 
             [LocalisableDescription(typeof(GameplayAccuracyCounterStrings), nameof(GameplayAccuracyCounterStrings.AccuracyDisplayModeStandard))]
             Standard,
+        }
+    }
+
+    public partial class MinimumAccuracySlider : SettingsPercentageSlider<double>
+    {
+        public MinimumAccuracySlider()
+        {
+            KeyboardStep = 0.001f;
         }
     }
 }

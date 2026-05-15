@@ -5,7 +5,9 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -47,8 +49,16 @@ namespace osu.Game.Rulesets.Edit
 
         private HitObject? getPreviousHitObject() => beatmap.HitObjects.TakeWhile(h => h.StartTime <= startTimeBindable.Value).LastOrDefault();
 
+        protected override bool IsValidForPlacement => HitObject.StartTime >= beatmap.ControlPointInfo.TimingPoints.FirstOrDefault()?.Time;
+
         [Resolved]
         private IPlacementHandler placementHandler { get; set; } = null!;
+
+        /// <summary>
+        /// Acceptable leniency to account for rounding errors and minor unsnaps that we generally
+        /// don't consider a problem, but still need to account for in certain operations.
+        /// </summary>
+        private const double placement_replace_start_time_leniency_ms = 2;
 
         protected HitObjectPlacementBlueprint(HitObject hitObject)
         {
@@ -56,6 +66,23 @@ namespace osu.Game.Rulesets.Edit
 
             // adding the default hit sample should be the case regardless of the ruleset.
             HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL));
+        }
+
+        /// <summary>
+        /// Whether <paramref name="existing"/> should be removed because <paramref name="placement"/> is being placed on top of it.
+        /// </summary>
+        /// <remarks>
+        /// Matches when start times are within ±<see cref="placement_replace_start_time_leniency_ms"/> ms of each other.
+        /// </remarks>
+        public static bool PlacementReplacesExisting(HitObject existing, HitObject placement)
+        {
+            if (!Precision.AlmostEquals(existing.StartTime, placement.StartTime, placement_replace_start_time_leniency_ms))
+                return false;
+
+            if (placement is IHasColumn placementColumn && existing is IHasColumn existingColumn)
+                return existingColumn.Column == placementColumn.Column;
+
+            return true;
         }
 
         [BackgroundDependencyLoader]
@@ -87,6 +114,13 @@ namespace osu.Game.Rulesets.Edit
                 placementHandler.HidePlacement();
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            Colour = IsValidForPlacement ? Colour4.White : Colour4.Red;
+        }
+
         /// <summary>
         /// Updates the time and position of this <see cref="PlacementBlueprint"/>.
         /// </summary>
@@ -103,25 +137,28 @@ namespace osu.Game.Rulesets.Edit
             var lastHitObject = getPreviousHitObject();
             var lastHitNormal = lastHitObject?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
 
-            if (AutomaticAdditionBankAssignment)
-            {
-                // Inherit the addition bank from the previous hit object
-                // If there is no previous addition, inherit from the normal sample
-                var lastAddition = lastHitObject?.Samples?.FirstOrDefault(o => o.Name != HitSampleInfo.HIT_NORMAL) ?? lastHitNormal;
-
-                if (lastAddition != null)
-                    HitObject.Samples = HitObject.Samples.Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? s.With(newBank: lastAddition.Bank) : s).ToList();
-            }
+            if (lastHitNormal != null && AutomaticBankAssignment)
+                // Inherit the bank from the previous hit object
+                HitObject.Samples = HitObject.Samples.Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: lastHitNormal.Bank, newEditorAutoBank: true) : s).ToList();
+            else
+                HitObject.Samples = HitObject.Samples.Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newEditorAutoBank: false) : s).ToList();
 
             if (lastHitNormal != null)
             {
-                if (AutomaticBankAssignment)
-                    // Inherit the bank from the previous hit object
-                    HitObject.Samples = HitObject.Samples.Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: lastHitNormal.Bank) : s).ToList();
-
-                // Inherit the volume from the previous hit object
-                HitObject.Samples = HitObject.Samples.Select(s => s.With(newVolume: lastHitNormal.Volume)).ToList();
+                // Inherit the volume and sample set info from the previous hit object
+                HitObject.Samples = HitObject.Samples.Select(s => s.With(
+                    newVolume: lastHitNormal.Volume,
+                    newSuffix: lastHitNormal.Suffix,
+                    newUseBeatmapSamples: lastHitNormal.UseBeatmapSamples)).ToList();
             }
+
+            if (AutomaticAdditionBankAssignment)
+            {
+                string bank = HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank ?? HitSampleInfo.BANK_SOFT;
+                HitObject.Samples = HitObject.Samples.Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? s.With(newBank: bank, newEditorAutoBank: true) : s).ToList();
+            }
+            else
+                HitObject.Samples = HitObject.Samples.Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? s.With(newEditorAutoBank: false) : s).ToList();
 
             if (HitObject is IHasRepeats hasRepeats)
             {

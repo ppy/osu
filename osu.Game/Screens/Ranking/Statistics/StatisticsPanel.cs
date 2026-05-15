@@ -19,9 +19,9 @@ using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Models;
 using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics.User;
 using osuTK;
@@ -68,10 +68,10 @@ namespace osu.Game.Screens.Ranking.Statistics
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding
                 {
-                    Left = ScorePanel.EXPANDED_WIDTH + SIDE_PADDING * 3,
+                    Left = ScorePanel.EXPANDED_WIDTH + SIDE_PADDING * 2,
                     Right = SIDE_PADDING,
-                    Top = SIDE_PADDING,
-                    Bottom = 50 // Approximate padding to the bottom of the score panel.
+                    Top = ScorePanel.EXPANDED_TOP_LAYER_HEIGHT,
+                    Bottom = 15 // Approximate padding to the bottom of the score panel.
                 },
                 Children = new Drawable[]
                 {
@@ -156,7 +156,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Spacing = new Vector2(30, 15),
+                                Spacing = new Vector2(30, 10),
                                 Direction = FillDirection.Full,
                             }
                         }
@@ -246,11 +246,8 @@ namespace osu.Game.Screens.Ranking.Statistics
                 // We may want to iterate on the following conditions further in the future
 
                 var localUserScore = AchievedScore ?? realm.Run(r =>
-                    r.All<ScoreInfo>()
-                     .Filter($@"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
-                             + $@" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $1"
-                             + $@" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.Hash)} == {nameof(ScoreInfo.BeatmapHash)}"
-                             + $@" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, newScore.BeatmapInfo.ID, newScore.BeatmapInfo.Ruleset.ShortName)
+                    r.GetAllLocalScoresForUser(api.LocalUser.Value.Id)
+                     .Filter($@"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0", newScore.BeatmapInfo.ID)
                      .AsEnumerable()
                      .OrderByDescending(score => score.Ruleset.MatchesOnlineID(newScore.BeatmapInfo.Ruleset))
                      .ThenByDescending(score => score.Rank)
@@ -262,11 +259,14 @@ namespace osu.Game.Screens.Ranking.Statistics
                     preventTaggingReason = "Play the beatmap in its original ruleset to contribute to beatmap tags!";
                 else if (localUserScore.Rank < ScoreRank.C)
                     preventTaggingReason = "Set a better score to contribute to beatmap tags!";
+                else if (localUserScore.Mods.Any(m => (m.Type == ModType.Conversion) && !(m is ModClassic)))
+                    preventTaggingReason = "Play this beatmap without conversion mods to contribute to beatmap tags!";
 
                 if (preventTaggingReason == null)
                 {
                     yield return new StatisticItem("Tag the beatmap!", () => new UserTagControl(newScore.BeatmapInfo)
                     {
+                        Writable = true,
                         RelativeSizeAxes = Axes.X,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -274,12 +274,31 @@ namespace osu.Game.Screens.Ranking.Statistics
                 }
                 else
                 {
-                    yield return new StatisticItem("Tag the beatmap!", () => new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold))
+                    yield return new StatisticItem("Tag the beatmap!", () => new FillFlowContainer<CompositeDrawable>
                     {
+                        Children = new CompositeDrawable[]
+                        {
+                            new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold))
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                TextAnchor = Anchor.Centre,
+                                Text = preventTaggingReason,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            },
+                            new UserTagControl(newScore.BeatmapInfo)
+                            {
+                                Writable = false,
+                                RelativeSizeAxes = Axes.X,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            }
+                        },
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        TextAnchor = Anchor.Centre,
-                        Text = preventTaggingReason,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(4),
                     });
                 }
             }

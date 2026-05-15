@@ -3,6 +3,8 @@
 
 using System;
 using MessagePack;
+using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
+using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 
 namespace osu.Game.Online.Multiplayer
@@ -14,6 +16,8 @@ namespace osu.Game.Online.Multiplayer
     [Serializable]
     [MessagePackObject]
     [Union(0, typeof(TeamVersusRoomState))] // IMPORTANT: Add rules to SignalRUnionWorkaroundResolver for new derived types.
+    [Union(1, typeof(MatchmakingRoomState))]
+    [Union(2, typeof(RankedPlayRoomState))]
     public abstract class MatchRoomState
     {
     }

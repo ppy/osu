@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Depth";
         public override string Acronym => "DP";
-        public override IconUsage? Icon => FontAwesome.Solid.Cube;
+        public override IconUsage? Icon => OsuIcon.ModDepth;
         public override ModType Type => ModType.Fun;
         public override LocalisableString Description => "3D. Almost.";
         public override double ScoreMultiplier => 1;

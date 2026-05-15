@@ -16,7 +16,7 @@ namespace osu.Game.Screens.OnlinePlay
 {
     public partial class Header : Container
     {
-        public const float HEIGHT = 80;
+        public const float HEIGHT = 50;
 
         private readonly ScreenStack? stack;
         private readonly MultiHeaderTitle title;
@@ -43,7 +43,18 @@ namespace osu.Game.Screens.OnlinePlay
             }
         }
 
-        private void updateSubScreenTitle() => title.Screen = stack?.CurrentScreen as IOnlinePlaySubScreen;
+        private void updateSubScreenTitle()
+        {
+            IOnlinePlaySubScreen? screen = stack?.CurrentScreen as IOnlinePlaySubScreen;
+
+            if (screen?.ShowHeaderLine == true)
+            {
+                title.FadeIn(200, Easing.OutQuint);
+                title.Screen = screen;
+            }
+            else
+                title.FadeOut(200, Easing.OutQuint);
+        }
 
         private partial class MultiHeaderTitle : CompositeDrawable
         {

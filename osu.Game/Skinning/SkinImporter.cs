@@ -157,17 +157,17 @@ namespace osu.Game.Skinning
             // Regardless of whether this is an import or not, let's write the skin.ini if non-existing or non-matching.
             // This is (weirdly) done inside ComputeHash to avoid adding a new method to handle this case. After switching to realm it can be moved into another place.
             if (skinIniSourcedName != item.Name)
-                updateSkinIniMetadata(item, realm);
+                UpdateSkinIniMetadata(item, realm);
         }
 
-        private void updateSkinIniMetadata(SkinInfo item, Realm realm)
+        public void UpdateSkinIniMetadata(SkinInfo item, Realm realm)
         {
             string nameLine = @$"Name: {item.Name}";
             string authorLine = @$"Author: {item.Creator}";
 
             List<string> newLines = new List<string>
             {
-                @"// The following content was automatically added by osu! during import, based on filename / folder metadata.",
+                @"// The following content was automatically added by osu! in order to use metadata that more closely matches user expectations.",
                 @"[General]",
                 nameLine,
                 authorLine,
@@ -177,9 +177,10 @@ namespace osu.Game.Skinning
 
             if (existingFile == null)
             {
-                // skins without a skin.ini are supposed to import using the "latest version" spec.
+                // skins without a skin.ini are supposed to import using the "latest version" spec, unless we're making a copy of the retro skin which specifies 1.0.
                 // see https://github.com/peppy/osu-stable-reference/blob/1531237b63392e82c003c712faa028406073aa8f/osu!/Graphics/Skinning/SkinManager.cs#L297-L298
-                newLines.Add(FormattableString.Invariant($"Version: {SkinConfiguration.LATEST_VERSION}"));
+                decimal version = item.InstantiationInfo == typeof(RetroSkin).GetInvariantInstantiationInfo() ? 1.0M : SkinConfiguration.LATEST_VERSION;
+                newLines.Add(FormattableString.Invariant($"Version: {version}"));
 
                 // In the case a skin doesn't have a skin.ini yet, let's create one.
                 writeNewSkinIni();

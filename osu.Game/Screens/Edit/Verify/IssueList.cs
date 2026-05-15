@@ -33,6 +33,9 @@ namespace osu.Game.Screens.Edit.Verify
         [Resolved]
         private VerifyScreen verify { get; set; }
 
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; }
+
         private IBeatmapVerifier rulesetVerifier;
         private BeatmapVerifier generalVerifier;
         private BeatmapVerifierContext context;
@@ -43,7 +46,13 @@ namespace osu.Game.Screens.Edit.Verify
             generalVerifier = new BeatmapVerifier();
             rulesetVerifier = beatmap.BeatmapInfo.Ruleset.CreateInstance().CreateBeatmapVerifier();
 
-            context = new BeatmapVerifierContext(beatmap, workingBeatmap.Value, verify.InterpretedDifficulty.Value);
+            context = BeatmapVerifierContext.Create(
+                beatmap,
+                workingBeatmap.Value,
+                verify.InterpretedDifficulty.Value,
+                beatmapManager
+            );
+
             verify.InterpretedDifficulty.BindValueChanged(difficulty => context.InterpretedDifficulty = difficulty.NewValue);
 
             RelativeSizeAxes = Axes.Both;
@@ -85,6 +94,7 @@ namespace osu.Game.Screens.Edit.Verify
             base.LoadComplete();
 
             verify.InterpretedDifficulty.BindValueChanged(_ => Refresh());
+            verify.VerifyChecksScope.BindValueChanged(_ => Refresh());
             verify.HiddenIssueTypes.BindCollectionChanged((_, _) => Refresh());
 
             Refresh();
@@ -107,7 +117,9 @@ namespace osu.Game.Screens.Edit.Verify
 
         private IEnumerable<Issue> filter(IEnumerable<Issue> issues)
         {
-            return issues.Where(issue => !verify.HiddenIssueTypes.Contains(issue.Template.Type));
+            return issues.Where(issue =>
+                !verify.HiddenIssueTypes.Contains(issue.Template.Type) &&
+                issue.Check.Metadata.Scope == verify.VerifyChecksScope.Value);
         }
     }
 }

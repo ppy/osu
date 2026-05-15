@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Scoring;
@@ -20,7 +21,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "No Scope";
         public override string Acronym => "NS";
         public override ModType Type => ModType.Fun;
-        public override IconUsage? Icon => FontAwesome.Solid.EyeSlash;
+        public override IconUsage? Icon => OsuIcon.ModNoScope;
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
 
@@ -61,10 +62,28 @@ namespace osu.Game.Rulesets.Mods
                 ComboBasedAlpha = Math.Max(MIN_ALPHA, 1 - (float)combo.NewValue / HiddenComboCount.Value);
             }, true);
         }
+
+        protected override LocalisableString GetSettingTooltipText(IBindable bindable)
+        {
+            if (ReferenceEquals(bindable, HiddenComboCount))
+                return HiddenComboSlider.FormatHiddenComboValue(HiddenComboCount.Value);
+
+            return base.GetSettingTooltipText(bindable);
+        }
     }
 
     public partial class HiddenComboSlider : RoundedSliderBar<int>
     {
-        public override LocalisableString TooltipText => Current.Value == 0 ? "always hidden" : base.TooltipText;
+        public HiddenComboSlider()
+        {
+            KeyboardStep = 1;
+        }
+
+        public override LocalisableString TooltipText => FormatHiddenComboValue(Current.Value);
+
+        public static LocalisableString FormatHiddenComboValue(int value)
+        {
+            return value == 0 ? "always hidden" : value.ToString();
+        }
     }
 }

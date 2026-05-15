@@ -73,7 +73,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         private IDisposable? joiningRoomOperation;
 
-        private readonly Bindable<FilterCriteria?> filter = new Bindable<FilterCriteria?>();
+        private readonly Bindable<LoungeFilterCriteria?> filter = new Bindable<LoungeFilterCriteria?>();
         private readonly Bindable<bool> hasListingResults = new Bindable<bool>();
         private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
         private readonly IBindable<bool> isIdle = new BindableBool();
@@ -173,7 +173,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                         {
                                             d.Anchor = Anchor.BottomLeft;
                                             d.Origin = Anchor.BottomLeft;
-                                            d.Size = new Vector2(150, 37.5f);
+                                            d.Size = new Vector2(150, 30f);
                                             d.Action = () => Open();
                                         })),
                                         new FillFlowContainer
@@ -262,7 +262,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             filter.Value = CreateFilterCriteria();
         }
 
-        protected virtual FilterCriteria CreateFilterCriteria() => new FilterCriteria
+        protected virtual LoungeFilterCriteria CreateFilterCriteria() => new LoungeFilterCriteria
         {
             SearchString = searchTextBox.Current.Value,
             Ruleset = ruleset.Value,

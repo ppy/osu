@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -18,7 +16,7 @@ namespace osu.Game.Overlays.Changelog
 {
     public partial class ChangelogBuild : FillFlowContainer
     {
-        public Action<APIChangelogBuild> SelectBuild;
+        public required Action<APIChangelogBuild> SelectBuild { get; init; }
 
         protected readonly APIChangelogBuild Build;
 
@@ -79,7 +77,7 @@ namespace osu.Game.Overlays.Changelog
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
-                    Action = () => SelectBuild?.Invoke(Build),
+                    Action = () => SelectBuild.Invoke(Build),
                     Child = new FillFlowContainer<SpriteText>
                     {
                         AutoSizeAxes = Axes.Both,

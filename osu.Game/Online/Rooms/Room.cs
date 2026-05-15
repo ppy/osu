@@ -263,6 +263,12 @@ namespace osu.Game.Online.Rooms
             set => SetField(ref availability, value);
         }
 
+        public bool Pinned
+        {
+            get => pinned;
+            set => SetField(ref pinned, value);
+        }
+
         [JsonProperty("id")]
         private long? roomId;
 
@@ -339,6 +345,9 @@ namespace osu.Game.Online.Rooms
         [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
         private RoomStatus status;
 
+        [JsonProperty("pinned")]
+        private bool pinned;
+
         // Not yet serialised (not implemented).
         private RoomAvailability availability;
 
@@ -349,6 +358,7 @@ namespace osu.Game.Online.Rooms
         public Room(MultiplayerRoom room)
         {
             RoomID = room.RoomID;
+            ChannelId = room.ChannelID;
             Name = room.Settings.Name;
             Password = room.Settings.Password;
             Type = room.Settings.MatchType;

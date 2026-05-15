@@ -2,19 +2,24 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Input.Handlers.Mouse;
+using osu.Framework.Input.Handlers.Pen;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Dashboard.Friends;
 using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -28,9 +33,13 @@ namespace osu.Game.Configuration
 {
     public class OsuConfigManager : IniConfigManager<OsuSetting>, IGameplaySettings
     {
-        public OsuConfigManager(Storage storage)
+        private readonly GameHost? host;
+
+        public OsuConfigManager(Storage storage, GameHost? host = null)
             : base(storage)
         {
+            this.host = host;
+
             Migrate();
         }
 
@@ -41,6 +50,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Skin, SkinInfo.ARGON_SKIN.ToString());
 
             SetDefault(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Local);
+            SetDefault(OsuSetting.BeatmapLeaderboardSortMode, LeaderboardSortMode.Score);
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
 
             SetDefault(OsuSetting.ShowConvertedBeatmaps, true);
@@ -105,6 +115,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.MenuTips, true);
 
             SetDefault(OsuSetting.AudioOffset, 0, -500.0, 500.0, 1);
+
+            SetDefault(OsuSetting.AutomaticallyAdjustBeatmapOffset, false);
 
             // Input
             SetDefault(OsuSetting.MenuCursorSize, 1.0f, 0.5f, 2f, 0.01f);
@@ -193,7 +205,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
 
-            SetDefault(OsuSetting.EditorDim, 0.25f, 0f, 0.75f, 0.25f);
+            SetDefault(OsuSetting.EditorDim, 0.25f, 0f, 1f, 0.25f);
             SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f, 0f, 1f, 0.25f);
             SetDefault(OsuSetting.EditorShowHitMarkers, true);
             SetDefault(OsuSetting.EditorAutoSeekOnPlacement, true);
@@ -227,6 +239,12 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorSubmissionLoadInBrowserAfterSubmission, true);
 
             SetDefault(OsuSetting.WasSupporter, false);
+
+            // intentionally uses `DateTime?` and not `DateTimeOffset?` because the latter fails due to `DateTimeOffset` not implementing `IConvertible`
+            SetDefault(OsuSetting.LastOnlineTagsPopulation, (DateTime?)null);
+
+            SetDefault(OsuSetting.DashboardSortMode, UserSortCriteria.LastVisit);
+            SetDefault(OsuSetting.DashboardDisplayStyle, OverlayPanelDisplayStyle.Card);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -262,6 +280,17 @@ namespace osu.Game.Configuration
                 // UI scaling on mobile platforms has been internally adjusted such that 1x UI scale looks correctly zoomed in than before.
                 if (RuntimeInfo.IsMobile)
                     GetBindable<float>(OsuSetting.UIScale).SetDefault();
+            }
+
+            if (combined < 20250428)
+            {
+                // Pen tablet sensitivity is now separated from cursor sensitivity.
+                // Most users will want the default to be what they already had set on cursor sensitivity so let's transfer it.
+                var mouseHandler = host?.AvailableInputHandlers.OfType<MouseHandler>().SingleOrDefault();
+                var penHandler = host?.AvailableInputHandlers.OfType<PenHandler>().SingleOrDefault();
+
+                if (penHandler != null && mouseHandler != null && penHandler.Sensitivity.IsDefault)
+                    penHandler.Sensitivity.Value = mouseHandler.Sensitivity.Value;
             }
         }
 
@@ -382,6 +411,7 @@ namespace osu.Game.Configuration
         MenuParallax,
         Prefer24HourTime,
         BeatmapDetailTab,
+        BeatmapLeaderboardSortMode,
         BeatmapDetailModsFilter,
         Username,
         ReleaseStream,
@@ -473,6 +503,13 @@ namespace osu.Game.Configuration
         /// Cached state of whether local user is a supporter.
         /// Used to allow early checks (ie for startup samples) to be in the correct state, even if the API authentication process has not completed.
         /// </summary>
-        WasSupporter
+        WasSupporter,
+
+        LastOnlineTagsPopulation,
+
+        AutomaticallyAdjustBeatmapOffset,
+
+        DashboardSortMode,
+        DashboardDisplayStyle,
     }
 }

@@ -10,6 +10,7 @@ using AutoMapper;
 using AutoMapper.Internal;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
 using osu.Game.Rulesets;
@@ -170,6 +171,7 @@ namespace osu.Game.Database
             });
 
             c.CreateMap<RealmKeyBinding, RealmKeyBinding>();
+            c.CreateMap<BeatmapCollection, BeatmapCollection>();
             c.CreateMap<BeatmapMetadata, BeatmapMetadata>();
             c.CreateMap<BeatmapUserSettings, BeatmapUserSettings>();
             c.CreateMap<BeatmapDifficulty, BeatmapDifficulty>();
@@ -297,7 +299,7 @@ namespace osu.Game.Database
                 throw new InvalidOperationException($"Make sure to call {nameof(RealmAccess)}.{nameof(RealmAccess.RegisterForNotifications)}");
 
             bool initial = true;
-            return collection.SubscribeForNotifications(((sender, changes) =>
+            return collection.SubscribeForNotifications((sender, changes) =>
             {
                 if (initial)
                 {
@@ -313,7 +315,7 @@ namespace osu.Game.Database
                 }
 
                 callback(sender, changes);
-            }));
+            });
         }
 
         /// <summary>

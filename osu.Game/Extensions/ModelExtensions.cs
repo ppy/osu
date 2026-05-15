@@ -8,7 +8,7 @@ using osu.Game.IO;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Users;
 
 namespace osu.Game.Extensions
@@ -175,6 +175,7 @@ namespace osu.Game.Extensions
         /// DO NOT CHANGE THE SEMANTICS OF THIS METHOD unless you know well what you are doing.
         /// </para>
         /// </remarks>
+        /// <seealso href="https://github.com/peppy/osu-stable-reference/blob/67795dba3c308e7d0493b296149dcb073ca47ecb/osu!common/Helpers/GeneralHelper.cs#L41-L46"/>
         public static string GetValidFilename(this string filename)
         {
             foreach (char c in invalid_filename_chars)

@@ -23,10 +23,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public partial class DrawableRoomParticipantsList : CompositeDrawable
     {
-        public const float SHEAR_WIDTH = 12f;
-        private const float avatar_size = 36;
-        private const float height = 60f;
-        private static readonly Vector2 shear = new Vector2(SHEAR_WIDTH / height, 0);
+        private const float avatar_size = 30;
+        private const float height = 40f;
 
         private readonly Room room;
 
@@ -54,7 +52,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
                     CornerRadius = 10,
-                    Shear = shear,
+                    Shear = OsuGame.SHEAR,
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -71,10 +69,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         {
                             RelativeSizeAxes = Axes.Y,
                             AutoSizeAxes = Axes.X,
-                            Spacing = new Vector2(8),
+                            Spacing = new Vector2(4),
                             Padding = new MarginPadding
                             {
-                                Left = 8,
+                                Left = 4,
                                 Right = 16
                             },
                             Children = new Drawable[]
@@ -84,7 +82,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                 },
-                                hostText = new LinkFlowContainer
+                                hostText = new LinkFlowContainer(s => s.Font = OsuFont.Style.Caption2)
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
@@ -103,7 +101,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     RelativeSizeAxes = Axes.Both,
                                     Masking = true,
                                     CornerRadius = 10,
-                                    Shear = shear,
+                                    Shear = OsuGame.SHEAR,
                                     Child = new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
@@ -128,12 +126,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
-                                            Size = new Vector2(16),
+                                            Size = new Vector2(12),
                                             Icon = FontAwesome.Solid.User,
                                         },
                                         totalCount = new OsuSpriteText
                                         {
-                                            Font = OsuFont.Default.With(weight: FontWeight.Bold),
+                                            Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold),
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                         },

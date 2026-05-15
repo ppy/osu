@@ -1,0 +1,29 @@
+osu file format v5
+
+[General]
+StackLeniency: 0.7
+Mode: 3
+
+[Difficulty]
+HPDrainRate:2
+CircleSize:5
+OverallDifficulty:2
+SliderMultiplier:1
+SliderTickRate:2
+
+[Events]
+//Background and Video events
+//Break Periods
+//Storyboard Layer 0 (Background)
+//Storyboard Layer 1 (Failing)
+//Storyboard Layer 2 (Passing)
+//Storyboard Layer 3 (Foreground)
+//Storyboard Sound Samples
+//Background Colour Transformations
+3,100,163,162,255
+
+[TimingPoints]
+355,476.190476190476,4,2,1,60,1,0
+
+[HitObjects]
+256,352,500,2,0,L|256:208,3,140

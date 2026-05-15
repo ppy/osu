@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -150,7 +151,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             List<SkinBlueprint> blueprints = new List<SkinBlueprint>();
 
-            AddStep("clear list", () => blueprints.Clear());
+            AddStep("clear list", blueprints.Clear);
 
             for (int i = 0; i < 3; i++)
             {
@@ -378,6 +379,23 @@ namespace osu.Game.Tests.Visual.Gameplay
                 () => Is.EqualTo(3));
         }
 
+        [Test]
+        public void TestCopyPasteIdempotency()
+        {
+            string state = null!;
+            AddStep("select everything", () => InputManager.Keys(PlatformAction.SelectAll));
+            AddStep("dump state", () =>
+            {
+                state = JsonConvert.SerializeObject(skinEditor.SelectedComponents.Cast<Drawable>().Select(s => s.CreateSerialisedInfo()).ToArray());
+            });
+            AddStep("copy", () => InputManager.Keys(PlatformAction.Copy));
+            AddStep("delete", () => InputManager.Keys(PlatformAction.Delete));
+            AddStep("paste", () => InputManager.Keys(PlatformAction.Paste));
+            AddAssert("pasted state equals dumped",
+                () => JsonConvert.SerializeObject(skinEditor.SelectedComponents.Cast<Drawable>().Select(s => s.CreateSerialisedInfo()).ToArray()),
+                () => Is.EqualTo(state));
+        }
+
         private SkinnableContainer globalHUDTarget => Player.ChildrenOfType<SkinnableContainer>()
                                                             .Single(c => c.Lookup.Lookup == GlobalSkinnableContainers.MainHUDComponents && c.Lookup.Ruleset == null);
 
@@ -485,27 +503,27 @@ namespace osu.Game.Tests.Visual.Gameplay
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddStep("Right-click TopLeft anchor", () =>
+            AddStep("Click TopLeft anchor", () =>
             {
                 InputManager.MoveMouseTo(getMenuItemByText("TopLeft"));
-                InputManager.Click(MouseButton.Right);
+                InputManager.Click(MouseButton.Left);
             });
 
             AddAssert("TopLeft item checked", () => (getMenuItemByText("TopLeft").Item as TernaryStateRadioMenuItem)?.State.Value == TernaryState.True);
 
-            AddStep("Right-click Centre anchor", () =>
+            AddStep("Click Centre anchor", () =>
             {
                 InputManager.MoveMouseTo(getMenuItemByText("Centre"));
-                InputManager.Click(MouseButton.Right);
+                InputManager.Click(MouseButton.Left);
             });
 
             AddAssert("Centre item checked", () => (getMenuItemByText("Centre").Item as TernaryStateRadioMenuItem)?.State.Value == TernaryState.True);
             AddAssert("TopLeft item unchecked", () => (getMenuItemByText("TopLeft").Item as TernaryStateRadioMenuItem)?.State.Value == TernaryState.False);
 
-            AddStep("Right-click Closest anchor", () =>
+            AddStep("Click Closest anchor", () =>
             {
                 InputManager.MoveMouseTo(getMenuItemByText("Closest"));
-                InputManager.Click(MouseButton.Right);
+                InputManager.Click(MouseButton.Left);
             });
 
             AddAssert("Closest item checked", () => (getMenuItemByText("Closest").Item as TernaryStateRadioMenuItem)?.State.Value == TernaryState.True);

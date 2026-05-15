@@ -6,7 +6,8 @@
 using System;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Game.Resources.Localisation.Web;
+using osu.Game.Localisation;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Overlays.Dialog
 {
@@ -24,7 +25,7 @@ namespace osu.Game.Overlays.Dialog
         public ConfirmDialog(LocalisableString message, Action onConfirm, Action onCancel = null)
         {
             HeaderText = message;
-            BodyText = "Last chance to turn back";
+            BodyText = DialogStrings.ConfirmDialogBodyText;
 
             Icon = FontAwesome.Solid.ExclamationTriangle;
 
@@ -32,12 +33,12 @@ namespace osu.Game.Overlays.Dialog
             {
                 new PopupDialogOkButton
                 {
-                    Text = @"Yes",
+                    Text = DialogStrings.Confirm,
                     Action = onConfirm
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = CommonStrings.ButtonsCancel,
+                    Text = WebCommonStrings.ButtonsCancel,
                     Action = onCancel
                 },
             };

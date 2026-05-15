@@ -60,6 +60,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Height => new TranslatableString(getKey(@"height"), @"Height");
 
         /// <summary>
+        /// "Download"
+        /// </summary>
+        public static LocalisableString Download => new TranslatableString(getKey(@"download"), @"Download");
+
+        /// <summary>
         /// "Downloading..."
         /// </summary>
         public static LocalisableString Downloading => new TranslatableString(getKey(@"downloading"), @"Downloading...");
@@ -183,6 +188,26 @@ namespace osu.Game.Localisation
         /// "Copy link"
         /// </summary>
         public static LocalisableString CopyLink => new TranslatableString(getKey(@"copy_link"), @"Copy link");
+
+        /// <summary>
+        /// "Manage..."
+        /// </summary>
+        public static LocalisableString Manage => new TranslatableString(getKey(@"manage"), @"Manage...");
+
+        /// <summary>
+        /// "Details..."
+        /// </summary>
+        public static LocalisableString Details => new TranslatableString(getKey(@"details"), @"Details...");
+
+        /// <summary>
+        /// "Mapper"
+        /// </summary>
+        public static LocalisableString Mapper => new TranslatableString(getKey(@"mapper"), @"Mapper");
+
+        /// <summary>
+        /// "Delete..."
+        /// </summary>
+        public static LocalisableString DeleteWithConfirmation => new TranslatableString(getKey(@"delete_with_confrmation"), @"Delete...");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

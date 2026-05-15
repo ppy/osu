@@ -81,6 +81,35 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestNumericHotkeys()
+        {
+            AddStep("set osu! ruleset", () => Ruleset.Value = rulesets.GetRuleset(0));
+            AddStep("create content", () => Child = new ModPresetColumn
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
+
+            AddUntilStep("3 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 3);
+
+            AddStep("select first preset", () => InputManager.Key(Key.Number1));
+            AddAssert("first panel selected", () => this.ChildrenOfType<ModPresetPanel>().ElementAt(0).Active.Value);
+
+            AddAssert("selected mods match correct preset", () => SelectedMods.Value, () => Is.EquivalentTo(createTestPresets().ElementAt(1).Mods));
+
+            AddStep("select third preset", () => InputManager.Key(Key.Number3));
+            AddAssert("first panel not selected", () => !this.ChildrenOfType<ModPresetPanel>().ElementAt(0).Active.Value);
+            AddAssert("third panel selected", () => this.ChildrenOfType<ModPresetPanel>().ElementAt(2).Active.Value);
+
+            AddAssert("selected mods match correct preset", () => SelectedMods.Value, () => Is.EquivalentTo(createTestPresets().ElementAt(2).Mods));
+
+            AddStep("deselect third preset", () => InputManager.Key(Key.Number3));
+            AddAssert("third panel not selected", () => !this.ChildrenOfType<ModPresetPanel>().ElementAt(2).Active.Value);
+
+            AddAssert("no selected mods", () => SelectedMods.Value.Count == 0);
+        }
+
+        [Test]
         public void TestBasicOperation()
         {
             AddStep("set osu! ruleset", () => Ruleset.Value = rulesets.GetRuleset(0));
@@ -469,5 +498,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Ruleset = rulesets.GetRuleset(3).AsNonNull()
             }
         };
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
+        }
     }
 }

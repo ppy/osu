@@ -14,9 +14,15 @@ namespace osu.Game.Rulesets.Catch.Edit
     {
         private readonly List<ICheck> checks = new List<ICheck>
         {
+            // Audio
+            new CheckCatchFewHitsounds(),
+
             // Compose
             new CheckBananaShowerGap(),
             new CheckConcurrentObjects(),
+
+            // Spread
+            new CheckCatchLowestDiffDrainTime(),
 
             // Settings
             new CheckCatchAbnormalDifficultySettings(),

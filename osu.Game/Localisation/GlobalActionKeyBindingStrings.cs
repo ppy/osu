@@ -230,6 +230,16 @@ namespace osu.Game.Localisation
         public static LocalisableString RandomSkin => new TranslatableString(getKey(@"random_skin"), @"Random skin");
 
         /// <summary>
+        /// "Previous skin"
+        /// </summary>
+        public static LocalisableString PreviousSkin => new TranslatableString(getKey(@"previous_skin"), @"Previous skin");
+
+        /// <summary>
+        /// "Next skin"
+        /// </summary>
+        public static LocalisableString NextSkin => new TranslatableString(getKey(@"next_skin"), @"Next skin");
+
+        /// <summary>
         /// "Pause / resume replay"
         /// </summary>
         public static LocalisableString TogglePauseReplay => new TranslatableString(getKey(@"toggle_pause_replay"), @"Pause / resume replay");
@@ -345,9 +355,9 @@ namespace osu.Game.Localisation
         public static LocalisableString SeekReplayBackward => new TranslatableString(getKey(@"seek_replay_backward"), @"Seek replay backward");
 
         /// <summary>
-        /// "Seek replay forward one frame"
+        /// "Step replay forward one frame"
         /// </summary>
-        public static LocalisableString StepReplayForward => new TranslatableString(getKey(@"step_replay_forward"), @"Seek replay forward one frame");
+        public static LocalisableString StepReplayForward => new TranslatableString(getKey(@"step_replay_forward"), @"Step replay forward one frame");
 
         /// <summary>
         /// "Step replay backward one frame"

@@ -100,9 +100,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ModCustomisationSettings => new TranslatableString(getKey(@"mod_customisation_settings"), @"Many mods have customisation settings that drastically change how they function. Click the Customise button in mod select to view settings!");
 
         /// <summary>
-        /// "Press {0} to switch to a random skin!"
+        /// "Press {0} to switch to a random skin! You can also use {1} and {2} to cycle through skins."
         /// </summary>
-        public static LocalisableString RandomSkinShortcut(LocalisableString keybind) => new TranslatableString(getKey(@"random_skin_shortcut"), @"Press {0} to switch to a random skin!", keybind);
+        public static LocalisableString SkinChangeShortcuts(LocalisableString[] keybind) => new TranslatableString(getKey(@"random_skin_shortcut"), @"Press {0} to switch to a random skin! You can also use {1} and {2} to cycle through skins.", keybind[0], keybind[1], keybind[2]);
 
         /// <summary>
         /// "While watching a replay, press {0} to toggle replay settings!"
@@ -153,6 +153,11 @@ namespace osu.Game.Localisation
         /// "Try holding your right mouse button near the beatmap carousel to quickly scroll to an absolute position!"
         /// </summary>
         public static LocalisableString RightMouseAbsoluteScroll => new TranslatableString(getKey(@"right_mouse_absolute_scroll"), @"Try holding your right mouse button near the beatmap carousel to quickly scroll to an absolute position!");
+
+        /// <summary>
+        /// "Shift-click on a beatmap panel in the beatmap listing overlay to quickly download or view the beatmap in song select!"
+        /// </summary>
+        public static LocalisableString ShiftClickInBeatmapOverlay => new TranslatableString(getKey(@"shift_click_in_beatmap_overlay"), @"Shift-click on a beatmap panel in the beatmap listing overlay to quickly download or view the beatmap in song select!");
 
         /// <summary>
         /// "a tip for you:"

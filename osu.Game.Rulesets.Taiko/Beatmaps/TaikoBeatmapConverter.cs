@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
                 case IHasDuration endTimeData:
                 {
-                    double hitMultiplier = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.OverallDifficulty, 3, 5, 7.5) * swell_hit_multiplier;
+                    double hitMultiplier = RequiredSwellHitsPerSecond(beatmap.Difficulty.OverallDifficulty);
 
                     yield return new Swell
                     {
@@ -171,6 +171,9 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 }
             }
         }
+
+        public static double RequiredSwellHitsPerSecond(double overallDifficulty)
+            => IBeatmapDifficultyInfo.DifficultyRange(overallDifficulty, 3, 5, 7.5) * swell_hit_multiplier;
 
         private bool shouldConvertSliderToHits(HitObject obj, IBeatmap beatmap, IHasPath pathData, out int taikoDuration, out double tickSpacing)
         {

@@ -68,6 +68,25 @@ namespace osu.Game.Tests.Visual.Editing
                         progress.SetInProgress(incrementingProgress += RNG.NextSingle(0.08f));
                 }, 0, true);
             });
+            AddStep("increase progress slowly then fail", () =>
+            {
+                incrementingProgress = 0;
+
+                ScheduledDelegate? task = null;
+
+                task = Scheduler.AddDelayed(() =>
+                {
+                    if (incrementingProgress >= 1)
+                    {
+                        progress.SetFailed("nope");
+                        // ReSharper disable once AccessToModifiedClosure
+                        task?.Cancel();
+                        return;
+                    }
+
+                    progress.SetInProgress(incrementingProgress += RNG.NextSingle(0.001f));
+                }, 0, true);
+            });
 
             AddUntilStep("wait for completed", () => incrementingProgress >= 1);
             AddStep("completed", () => progress.SetCompleted());

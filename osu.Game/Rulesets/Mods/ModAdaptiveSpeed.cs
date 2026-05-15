@@ -6,10 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -26,6 +28,8 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "AS";
 
         public override LocalisableString Description => "Let track speed adapt to you.";
+
+        public override IconUsage? Icon => OsuIcon.ModAdaptiveSpeed;
 
         public override ModType Type => ModType.Fun;
 

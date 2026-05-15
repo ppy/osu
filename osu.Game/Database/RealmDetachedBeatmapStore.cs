@@ -82,6 +82,34 @@ namespace osu.Game.Database
                 return;
             }
 
+            if (changes.InsertedIndices.Length == 1 && changes.DeletedIndices.Length == 1)
+            {
+                lock (detachedBeatmapSets)
+                {
+                    var deletedSet = detachedBeatmapSets[changes.DeletedIndices[0]];
+                    var insertedSet = sender[changes.InsertedIndices[0]];
+
+                    // this handles beatmap updates using a heuristic that a beatmap update will preserve the online ID.
+                    // it relies on the fact that updates are performed by removing the old set and adding a new one, in a single transaction.
+                    // instead of removing the old set and adding a new one to the collection too, which would trigger consumers' logic related to set removals,
+                    // move the deleted set to the index occupied by the new one and then replace it in-place.
+                    // due to this, the operation can be presented to consumer in a manner that permits them to actually handle this as a replace operation
+                    // and not trigger any set removal logic that may result in selections changing or similar undesirable side effects.
+                    if (deletedSet.OnlineID == insertedSet.OnlineID)
+                    {
+                        pendingOperations.Enqueue(new OperationArgs
+                        {
+                            Type = OperationType.MoveAndReplace,
+                            BeatmapSet = insertedSet.Detach(),
+                            Index = changes.DeletedIndices[0],
+                            NewIndex = changes.InsertedIndices[0],
+                        });
+
+                        return;
+                    }
+                }
+            }
+
             foreach (int i in changes.DeletedIndices.OrderDescending())
             {
                 pendingOperations.Enqueue(new OperationArgs
@@ -138,6 +166,11 @@ namespace osu.Game.Database
                             detachedBeatmapSets.ReplaceRange(op.Index, 1, new[] { op.BeatmapSet! });
                             break;
 
+                        case OperationType.MoveAndReplace:
+                            detachedBeatmapSets.Move(op.Index, op.NewIndex!.Value);
+                            detachedBeatmapSets.ReplaceRange(op.NewIndex!.Value, 1, [op.BeatmapSet!]);
+                            break;
+
                         case OperationType.Remove:
                             detachedBeatmapSets.RemoveAt(op.Index);
                             break;
@@ -160,13 +193,15 @@ namespace osu.Game.Database
             public OperationType Type;
             public BeatmapSetInfo? BeatmapSet;
             public int Index;
+            public int? NewIndex;
         }
 
         private enum OperationType
         {
             Insert,
             Update,
-            Remove
+            Remove,
+            MoveAndReplace,
         }
     }
 }

@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Objects;
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Muted";
         public override string Acronym => "MU";
-        public override IconUsage? Icon => FontAwesome.Solid.VolumeMute;
+        public override IconUsage? Icon => OsuIcon.ModMuted;
         public override LocalisableString Description => "Can you still feel the rhythm without music?";
         public override ModType Type => ModType.Fun;
         public override double ScoreMultiplier => 1;
@@ -95,10 +96,28 @@ namespace osu.Game.Rulesets.Mods
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
+
+        protected override LocalisableString GetSettingTooltipText(IBindable bindable)
+        {
+            if (ReferenceEquals(bindable, MuteComboCount))
+                return MuteComboSlider.FormatMuteComboValue(MuteComboCount.Value);
+
+            return base.GetSettingTooltipText(bindable);
+        }
     }
 
     public partial class MuteComboSlider : RoundedSliderBar<int>
     {
-        public override LocalisableString TooltipText => Current.Value == 0 ? "always muted" : base.TooltipText;
+        public MuteComboSlider()
+        {
+            KeyboardStep = 1;
+        }
+
+        public override LocalisableString TooltipText => FormatMuteComboValue(Current.Value);
+
+        public static LocalisableString FormatMuteComboValue(int value)
+        {
+            return value == 0 ? "always muted" : value.ToString();
+        }
     }
 }

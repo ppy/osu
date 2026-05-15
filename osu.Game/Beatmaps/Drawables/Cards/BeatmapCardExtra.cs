@@ -1,14 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps.Drawables.Cards.Statistics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
@@ -42,6 +46,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             : base(beatmapSet, allowExpansion)
         {
             content = new BeatmapCardContent(height);
+
+            Action = DefaultAction;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -274,8 +280,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             }
 
             createStatistics();
-
-            Action = () => beatmapSetOverlay?.FetchAndShowBeatmapSet(BeatmapSet.OnlineID);
         }
 
         private LocalisableString createArtistText()
@@ -292,20 +296,20 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 return original;
             }
 
-            statisticsContainer.Content[0][0] = withMargin(new FavouritesStatistic(BeatmapSet)
-            {
-                Current = FavouriteState,
-            });
-
-            statisticsContainer.Content[1][0] = withMargin(new PlayCountStatistic(BeatmapSet));
-
             var hypesStatistic = HypesStatistic.CreateFor(BeatmapSet);
             if (hypesStatistic != null)
-                statisticsContainer.Content[0][1] = withMargin(hypesStatistic);
+                statisticsContainer.Content[0][0] = withMargin(hypesStatistic);
 
             var nominationsStatistic = NominationsStatistic.CreateFor(BeatmapSet);
             if (nominationsStatistic != null)
-                statisticsContainer.Content[1][1] = withMargin(nominationsStatistic);
+                statisticsContainer.Content[1][0] = withMargin(nominationsStatistic);
+
+            statisticsContainer.Content[0][1] = withMargin(new PlayCountStatistic(BeatmapSet));
+
+            statisticsContainer.Content[1][1] = withMargin(new FavouritesStatistic(BeatmapSet)
+            {
+                Current = FavouriteState,
+            });
 
             var dateStatistic = BeatmapCardDateStatistic.CreateFor(BeatmapSet);
             if (dateStatistic != null)
@@ -320,6 +324,22 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
             buttonContainer.ShowDetails.Value = showDetails;
             thumbnail.Dimmed.Value = showDetails;
+        }
+
+        public override MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                var items = base.ContextMenuItems.ToList();
+
+                foreach (var button in buttonContainer.Buttons)
+                {
+                    if (button.Enabled.Value)
+                        items.Add(new OsuMenuItem(button.TooltipText.ToSentence(), MenuItemType.Standard, () => button.TriggerClick()));
+                }
+
+                return items.ToArray();
+            }
         }
     }
 }

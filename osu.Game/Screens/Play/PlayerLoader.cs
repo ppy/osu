@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
@@ -31,9 +32,11 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Volume;
 using osu.Game.Performance;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Play.PlayerSettings;
-using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Skinning;
 using osu.Game.Users;
 using osu.Game.Utils;
@@ -82,8 +85,14 @@ namespace osu.Game.Screens.Play
 
         protected Task? DisposalTask { get; private set; }
 
+        /// <summary>
+        /// By default, the loader screen will block until the window is focused.
+        /// Can be overridden by setting this to <c>false</c>.
+        /// </summary>
+        protected bool WindowShouldBeActiveForGameplayStart { get; init; } = true;
+
         private FillFlowContainer disclaimers = null!;
-        private OsuScrollContainer settingsScroll = null!;
+        private GridContainer sideContent = null!;
 
         private Bindable<bool> showStoryboards = null!;
 
@@ -103,6 +112,9 @@ namespace osu.Game.Screens.Play
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
+        [Resolved]
+        private GameHost host { get; set; } = null!;
+
         private const double quick_restart_initial_delay = 500;
 
         protected bool BackgroundBrightnessReduction
@@ -118,14 +130,8 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private bool readyForPush =>
-            !playerConsumed
-            // don't push unless the player is completely loaded
-            && CurrentPlayer?.LoadState == LoadState.Ready
-            // don't push unless the player is ready to start gameplay
-            && ReadyForGameplay;
-
         protected virtual bool ReadyForGameplay =>
+            (!WindowShouldBeActiveForGameplayStart || host.IsActive.Value) &&
             // not ready if the user is hovering one of the panes (logo is excluded), unless they are idle.
             (IsHovered || osuLogo?.IsHovered == true || idleTracker.IsIdle.Value)
             // not ready if the user is dragging a slider or otherwise.
@@ -134,6 +140,8 @@ namespace osu.Game.Screens.Play
             && inputManager.FocusedDrawable is not OsuFocusedOverlayContainer
             // or if a child of a focused overlay is focused, like settings' search textbox.
             && inputManager.FocusedDrawable?.FindClosestParent<OsuFocusedOverlayContainer>() == null;
+
+        private bool holdForMenuExitButton => !AllowUserExit;
 
         private readonly Func<Player> createPlayer;
 
@@ -225,27 +233,72 @@ namespace osu.Game.Screens.Play
                     Padding = new MarginPadding(padding),
                     Spacing = new Vector2(20),
                 },
-                settingsScroll = new OsuScrollContainer
+                sideContent = new GridContainer
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Y,
                     Width = SettingsToolboxGroup.CONTAINER_WIDTH + padding * 2,
-                    Padding = new MarginPadding { Vertical = padding },
-                    Masking = false,
-                    Child = PlayerSettings = new FillFlowContainer<PlayerSettingsGroup>
+                    Padding = new MarginPadding
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 20),
-                        Padding = new MarginPadding { Horizontal = padding },
-                        Children = new PlayerSettingsGroup[]
-                        {
-                            VisualSettings = new VisualSettings(),
-                            AudioSettings = new AudioSettings(),
-                            new InputSettings()
-                        }
+                        Bottom = ScreenFooter.HEIGHT
                     },
+                    RowDimensions =
+                    [
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize)
+                    ],
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            new OsuScrollContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Child = PlayerSettings = new FillFlowContainer<PlayerSettingsGroup>
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(0, 20),
+                                    Padding = new MarginPadding
+                                    {
+                                        Horizontal = padding,
+                                        Vertical = padding,
+                                    },
+                                    Children = new PlayerSettingsGroup[]
+                                    {
+                                        VisualSettings = new VisualSettings(),
+                                        AudioSettings = new AudioSettings(),
+                                        new InputSettings()
+                                    }
+                                },
+                            }
+                        },
+                        new Drawable[]
+                        {
+                            new Container
+                            {
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                Alpha = holdForMenuExitButton ? 1 : 0,
+                                AutoSizeAxes = Axes.Both,
+                                Child = new HoldForMenuButton(true)
+                                {
+                                    Margin = new MarginPadding
+                                    {
+                                        Top = 20,
+                                        Horizontal = padding,
+                                        Bottom = padding,
+                                    },
+                                    Action = () =>
+                                    {
+                                        if (this.IsCurrentScreen())
+                                            this.Exit();
+                                    }
+                                }
+                            }
+                        }
+                    }
                 },
                 idleTracker = new IdleTracker(1500),
                 sampleRestart = new SkinnableSound(new SampleInfo(@"Gameplay/restart", @"pause-retry-click"))
@@ -277,11 +330,22 @@ namespace osu.Game.Screens.Play
             showStoryboards.BindValueChanged(val => epilepsyWarning?.FadeTo(val.NewValue ? 1 : 0, 250, Easing.OutQuint), true);
             epilepsyWarning?.FinishTransforms(true);
 
+            // this re-fetch has two purposes:
+            // - is a safety against potential unexpected screen transitions, making sure that the leaderboard
+            //   displayed during gameplay definitely matches the beatmap and ruleset being played
+            //   (as the solo gameplay leaderboard provider uses the global leaderboard manager to populate itself)
+            // - the sort mode is not specified and defaults to `Score` which is good because gameplay leaderboards only support sorting by score.
+            //   this may change at some point in the future, at which point specifying a sort mode should be considered.
+            refetchLeaderboard(force: false);
+        }
+
+        private void refetchLeaderboard(bool force)
+        {
             leaderboardManager?.FetchWithCriteria(new LeaderboardCriteria(
                 Beatmap.Value.BeatmapInfo,
                 Ruleset.Value,
                 leaderboardManager?.CurrentCriteria?.Scope ?? BeatmapLeaderboardScope.Global,
-                leaderboardManager?.CurrentCriteria?.ExactMods));
+                leaderboardManager?.CurrentCriteria?.ExactMods), force);
         }
 
         #region Screen handling
@@ -294,7 +358,7 @@ namespace osu.Game.Screens.Play
 
             // Start side content off-screen.
             disclaimers.MoveToX(-disclaimers.DrawWidth);
-            settingsScroll.MoveToX(settingsScroll.DrawWidth);
+            sideContent.MoveToX(sideContent.DrawWidth);
 
             content.ScaleTo(0.7f);
 
@@ -430,6 +494,8 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
+            MetadataInfo.UserBlocked = !ReadyForGameplay && CurrentPlayer?.LoadState == LoadState.Ready;
+
             // We need to perform this check here rather than in OnHover as any number of children of VisualSettings
             // may also be handling the hover events.
             if (inputManager.HoveredDrawables.Contains(VisualSettings) || QuickRestart)
@@ -491,6 +557,11 @@ namespace osu.Game.Screens.Play
             QuickRestart = quickRestartRequested;
             hideOverlays = true;
             ValidForResume = true;
+            // when retrying, it is desired to refetch the global state leaderboard so that the user's previous score can show up on the leaderboard, if it needs to.
+            // that said, only do this when the user is *not* quick-retrying.
+            // this avoids the quick retry becoming longer than it needs to (because an extra API request has to complete before gameplay can start),
+            // and if the user is quick-retrying, their last score is most likely not important for global leaderboards, or the user won't care.
+            refetchLeaderboard(force: !quickRestartRequested);
         }
 
         private void contentIn(double delayBeforeSideDisplays = 0)
@@ -535,8 +606,8 @@ namespace osu.Game.Screens.Play
 
                 using (BeginDelayedSequence(delayBeforeSideDisplays))
                 {
-                    settingsScroll.FadeInFromZero(500, Easing.Out)
-                                  .MoveToX(0, 500, Easing.OutQuint);
+                    sideContent.FadeInFromZero(500, Easing.Out)
+                               .MoveToX(0, 500, Easing.OutQuint);
 
                     disclaimers.FadeInFromZero(500, Easing.Out)
                                .MoveToX(0, 500, Easing.OutQuint);
@@ -576,8 +647,8 @@ namespace osu.Game.Screens.Play
 
             disclaimers.FadeOut(CONTENT_OUT_DURATION, Easing.Out)
                        .MoveToX(-disclaimers.DrawWidth, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
-            settingsScroll.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint)
-                          .MoveToX(settingsScroll.DrawWidth, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
+            sideContent.FadeOut(CONTENT_OUT_DURATION, Easing.OutQuint)
+                       .MoveToX(sideContent.DrawWidth, CONTENT_OUT_DURATION * 2, Easing.OutQuint);
 
             lowPassFilter?.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, CONTENT_OUT_DURATION);
             highPassFilter?.CutoffTo(0, CONTENT_OUT_DURATION);
@@ -588,6 +659,13 @@ namespace osu.Game.Screens.Play
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
             if (!this.IsCurrentScreen()) return;
+
+            bool readyForPush =
+                !playerConsumed
+                // don't push unless the player is completely loaded
+                && CurrentPlayer?.LoadState == LoadState.Ready
+                // don't push unless the player is ready to start gameplay
+                && ReadyForGameplay;
 
             if (!readyForPush)
             {

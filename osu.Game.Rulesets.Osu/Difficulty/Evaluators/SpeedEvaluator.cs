@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double single_spacing_threshold = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25; // 1.25 circles distance between centers
         private const double min_speed_bonus = 200; // 200 BPM 1/4th
         private const double speed_balancing_factor = 40;
-        private const double distance_multiplier = 0.9;
+        private const double distance_multiplier = 0.8;
 
         /// <summary>
         /// Evaluates the difficulty of tapping the current object, based on:
@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuPrevObj = current.Index > 0 ? (OsuDifficultyHitObject)current.Previous(0) : null;
 
-            double strainTime = osuCurrObj.StrainTime;
+            double strainTime = osuCurrObj.AdjustedDeltaTime;
             double doubletapness = 1.0 - osuCurrObj.GetDoubletapness((OsuDifficultyHitObject?)osuCurrObj.Next(0));
 
             // Cap deltatime to the OD 300 hitwindow.
@@ -59,6 +59,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Max distance bonus is 1 * `distance_multiplier` at single_spacing_threshold
             double distanceBonus = Math.Pow(distance / single_spacing_threshold, 3.95) * distance_multiplier;
+
+            // Apply reduced small circle bonus because flow aim difficulty on small circles doesn't scale as hard as jumps
+            distanceBonus *= Math.Sqrt(osuCurrObj.SmallCircleBonus);
 
             if (mods.OfType<OsuModAutopilot>().Any())
                 distanceBonus = 0;

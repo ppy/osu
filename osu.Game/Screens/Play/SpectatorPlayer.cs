@@ -7,37 +7,24 @@ using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
-using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.Play
 {
     public abstract partial class SpectatorPlayer : Player
     {
-        // TODO: maybe consider giving this proper scores.
-        // `SoloGameplayLeaderboardProvider` doesn't immediately work because there's no guarantee that `LeaderboardManager` global state matches the currently spectated beatmap.
-        [Cached(typeof(IGameplayLeaderboardProvider))]
-        private readonly EmptyGameplayLeaderboardProvider leaderboardProvider = new EmptyGameplayLeaderboardProvider();
-
         [Resolved]
         protected SpectatorClient SpectatorClient { get; private set; } = null!;
 
         private readonly Score score;
 
-        protected override bool CheckModsAllowFailure()
-        {
-            if (!allowFail)
-                return false;
-
-            return base.CheckModsAllowFailure();
-        }
-
-        private bool allowFail;
+        public bool ShowSettingsOverlay { get; init; } = true;
 
         protected SpectatorPlayer(Score score, PlayerConfiguration? configuration = null)
             : base(configuration)
@@ -48,14 +35,27 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(new OsuSpriteText
+            if (ShowSettingsOverlay && GameplayClockContainer != null)
             {
-                Text = $"Watching {score.ScoreInfo.User.Username} playing live!",
-                Font = OsuFont.Default.With(size: 30),
-                Y = 100,
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-            });
+                var replayOverlay = new ReplayOverlay();
+                GameplayClockContainer.Add(replayOverlay);
+
+                // TODO: This should be customised for `MultiplayerSpectatorPlayer` to be static and only show the player name.
+                // Or maybe we should completely redesign this to show the user avatar and other things if that happens.
+                OsuTextFlowContainer message = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Body) { AutoSizeAxes = Axes.Both };
+                message.AddText("Watching ");
+                message.AddText(Score.ScoreInfo.User.Username, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+                message.AddText(" play ");
+                message.AddText(Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(), s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+                message.AddText(" live", s => s.Font = s.Font.With(weight: FontWeight.Bold));
+
+                replayOverlay.SetMessage(new ScrollingMessage(message)
+                {
+                    Y = 96,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                });
+            }
         }
 
         protected override void LoadComplete()
@@ -71,12 +71,6 @@ namespace osu.Game.Screens.Play
                 }
             }, true);
         }
-
-        /// <summary>
-        /// Should be called when it is apparent that the player being spectated has failed.
-        /// This will subsequently stop blocking the fail screen from displaying (usually done out of safety).
-        /// </summary>
-        public void AllowFail() => allowFail = true;
 
         protected override void StartGameplay()
         {

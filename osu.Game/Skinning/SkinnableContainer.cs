@@ -21,6 +21,11 @@ namespace osu.Game.Skinning
     /// </remarks>
     public partial class SkinnableContainer : SkinReloadableDrawable, ISerialisableDrawableContainer
     {
+        /// <summary>
+        /// Invoked when the skinnable components of this container finish loading.
+        /// </summary>
+        public event Action<Drawable>? OnComponentsLoaded;
+
         private Container? content;
 
         /// <summary>
@@ -67,6 +72,7 @@ namespace osu.Game.Skinning
                 AddInternal(wrapper);
                 components.AddRange(wrapper.Children.OfType<ISerialisableDrawable>());
                 ComponentsLoaded = true;
+                OnComponentsLoaded?.Invoke(this);
             }, (cancellationSource = new CancellationTokenSource()).Token);
         }
 
@@ -105,6 +111,13 @@ namespace osu.Game.Skinning
             base.SkinChanged(skin);
 
             Reload();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            OnComponentsLoaded = null;
         }
     }
 }

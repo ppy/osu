@@ -1,0 +1,121 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System;
+using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
+using osu.Game.Database;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Leaderboards;
+using osu.Game.Rulesets;
+using osu.Game.Scoring;
+using osuTK;
+using Realms;
+
+namespace osu.Game.Screens.Select
+{
+    public partial class PanelLocalRankDisplay : CompositeDrawable
+    {
+        private BeatmapInfo? beatmap;
+
+        public BeatmapInfo? Beatmap
+        {
+            get => beatmap;
+            set
+            {
+                if (beatmap?.Equals(value) == true)
+                    return;
+
+                beatmap = value;
+
+                if (IsLoaded)
+                    updateSubscription();
+            }
+        }
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
+        private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
+
+        private IDisposable? scoreSubscription;
+
+        private readonly UpdateableRank updateable;
+
+        public bool HasRank => updateable.Rank != null;
+
+        public PanelLocalRankDisplay(BeatmapInfo? beatmap = null)
+        {
+            AutoSizeAxes = Axes.Both;
+
+            InternalChild = updateable = new UpdateableRank(animate: false)
+            {
+                Size = new Vector2(40, 20),
+                Alpha = 0,
+            };
+
+            Beatmap = beatmap;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(IAPIProvider api)
+        {
+            localUser.BindTo(api.LocalUser);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            ruleset.BindValueChanged(_ => updateSubscription());
+            localUser.BindValueChanged(_ => updateSubscription(), true);
+        }
+
+        private void updateSubscription()
+        {
+            scoreSubscription?.Dispose();
+            setRankFromScore(null);
+
+            if (beatmap == null)
+                return;
+
+            scoreSubscription = realm.RegisterForNotifications(r => r.All<ScoreInfo>().Where(s => s.BeatmapHash == beatmap.Hash && !s.DeletePending), localScoresChanged);
+        }
+
+        private void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes)
+        {
+            // This subscription may fire from changes to linked beatmaps, which we don't care about.
+            // It's currently not possible for a score to be modified after insertion, so we can safely ignore callbacks with only modifications.
+            if (changes?.HasCollectionChanges() == false)
+                return;
+
+            ScoreInfo? topScore = sender
+                                  // doing these post realm filter is most efficient.
+                                  .Where(s => s.UserID == localUser.Value.Id || s.UserID <= 1)
+                                  .Where(s => ruleset.Value.Equals(s.Ruleset))
+                                  .MaxBy(info => (info.TotalScore, -info.Date.UtcDateTime.Ticks));
+
+            setRankFromScore(topScore);
+        }
+
+        private void setRankFromScore(ScoreInfo? topScore)
+        {
+            updateable.Rank = topScore?.Rank;
+            updateable.Alpha = topScore != null ? 1 : 0;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            scoreSubscription?.Dispose();
+        }
+    }
+}

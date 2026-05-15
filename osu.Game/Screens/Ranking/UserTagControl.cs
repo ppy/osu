@@ -43,7 +43,12 @@ namespace osu.Game.Screens.Ranking
 
         private readonly Bindable<APIBeatmap?> apiBeatmap = new Bindable<APIBeatmap?>();
 
-        private AddNewTagUserTag addNewTagUserTag = null!;
+        private AddNewTagUserTag? addNewTagUserTag;
+
+        /// <summary>
+        /// Determines whether the user can modify the contained tags
+        /// </summary>
+        public bool Writable { private get; init; }
 
         private InputManager inputManager = null!;
 
@@ -91,12 +96,17 @@ namespace osu.Game.Screens.Ranking
                                         AutoSizeAxes = Axes.Y,
                                         Direction = FillDirection.Full,
                                         Spacing = new Vector2(4),
-                                        Child = addNewTagUserTag = new AddNewTagUserTag
-                                        {
-                                            AvailableTags = { BindTarget = relevantTagsById },
-                                            OnTagSelected = toggleVote,
-                                        },
-                                    },
+                                        Children = Writable
+                                            ?
+                                            [
+                                                addNewTagUserTag = new AddNewTagUserTag
+                                                {
+                                                    AvailableTags = { BindTarget = relevantTagsById },
+                                                    OnTagSelected = toggleVote,
+                                                }
+                                            ]
+                                            : []
+                                    }
                                 },
                             },
                         }
@@ -196,7 +206,7 @@ namespace osu.Game.Screens.Ranking
                 case NotifyCollectionChangedAction.Reset:
                 {
                     tagFlow.Clear();
-                    tagFlow.Add(addNewTagUserTag);
+                    if (Writable) tagFlow.Add(addNewTagUserTag!);
                     break;
                 }
             }
@@ -204,6 +214,9 @@ namespace osu.Game.Screens.Ranking
 
         private void toggleVote(UserTag tag)
         {
+            if (!Writable)
+                return;
+
             if (tag.Updating.Value)
                 return;
 

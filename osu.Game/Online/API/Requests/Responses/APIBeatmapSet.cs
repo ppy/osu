@@ -84,11 +84,26 @@ namespace osu.Game.Online.API.Requests.Responses
         /// The creator of this beatmap set.
         /// </summary>
         /// <remarks>
-        /// This is not included when the set is retrieved via <see cref="SearchBeatmapSetsRequest"/>,
-        /// but the creator's ID and username will be filled in this property from the <see cref="AuthorID"/> and <see cref="AuthorString"/> properties.
+        /// This property is set differently depending on the API endpoint. When retrieved via <see cref="SearchBeatmapSetsRequest"/>,
+        /// detailed user info is not included and the creator's ID and username are filled from the <see cref="AuthorID"/> and
+        /// <see cref="AuthorString"/> properties. For other API endpoints, this property is set by the <see cref="author"/> setter.
+        /// </remarks>
+        public APIUser Author = new APIUser();
+
+        /// <summary>
+        /// Helper property to deserialize the detailed user info to <see cref="Author"/>
+        /// </summary>
+        /// <remarks>
+        /// This setter implements special handling for deleted users. When received a user with ID 1, it indicates
+        /// the original user has been deleted. In such cases, the existing <see cref="Author"/> data
+        /// (filled from <see cref="AuthorID"/> and <see cref="AuthorString"/>) is preserved. For valid user,
+        /// the provided user info replaces the existing <see cref="Author"/>.
         /// </remarks>
         [JsonProperty(@"user")]
-        public APIUser Author = new APIUser();
+        private APIUser author
+        {
+            set => Author = value.Id != 1 ? value : Author;
+        }
 
         /// <summary>
         /// The ID of the beatmap set's creator.

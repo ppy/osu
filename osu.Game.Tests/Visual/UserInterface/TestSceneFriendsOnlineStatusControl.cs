@@ -50,8 +50,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("set 10 friends", () =>
             {
                 DummyAPIAccess api = (DummyAPIAccess)API;
-                api.Friends.Clear();
-                api.Friends.AddRange(Enumerable.Range(1, 10).Select(i => new APIRelation
+                api.LocalUserState.Friends.Clear();
+                api.LocalUserState.Friends.AddRange(Enumerable.Range(1, 10).Select(i => new APIRelation
                 {
                     RelationType = RelationType.Friend,
                     TargetID = i,
@@ -62,8 +62,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("set 20 friends", () =>
             {
                 DummyAPIAccess api = (DummyAPIAccess)API;
-                api.Friends.Clear();
-                api.Friends.AddRange(Enumerable.Range(1, 20).Select(i => new APIRelation
+                api.LocalUserState.Friends.Clear();
+                api.LocalUserState.Friends.AddRange(Enumerable.Range(1, 20).Select(i => new APIRelation
                 {
                     RelationType = RelationType.Friend,
                     TargetID = i,
@@ -78,8 +78,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("set 10 friends", () =>
             {
                 DummyAPIAccess api = (DummyAPIAccess)API;
-                api.Friends.Clear();
-                api.Friends.AddRange(Enumerable.Range(1, 10).Select(i => new APIRelation
+                api.LocalUserState.Friends.Clear();
+                api.LocalUserState.Friends.AddRange(Enumerable.Range(1, 10).Select(i => new APIRelation
                 {
                     RelationType = RelationType.Friend,
                     TargetID = i,

@@ -7,10 +7,12 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Localisation;
+using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
@@ -24,6 +26,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko.Mods;
+using osu.Game.Screens;
 using osu.Game.Screens.Footer;
 using osu.Game.Tests.Mods;
 using osuTK;
@@ -32,16 +35,18 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public partial class TestSceneModSelectOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneModSelectOverlay : ScreenTestScene
     {
         protected override bool UseFreshStoragePerRun => true;
 
         private RulesetStore rulesetStore = null!;
 
-        private TestModSelectOverlay modSelectOverlay = null!;
+        private TestModSelectOverlayScreen screen = null!;
 
         [Resolved]
         private OsuConfigManager configManager { get; set; } = null!;
+
+        private ModSelectOverlay modSelectOverlay => screen.Overlay;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -51,9 +56,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [SetUpSteps]
-        public void SetUpSteps()
+        public override void SetUpSteps()
         {
-            AddStep("clear contents", Clear);
+            base.SetUpSteps();
+
             AddStep("reset ruleset", () => Ruleset.Value = rulesetStore.GetRuleset(0));
             AddStep("reset mods", () => SelectedMods.SetDefault());
             AddStep("reset config", () => configManager.SetValue(OsuSetting.ModSelectTextSearchStartsActive, true));
@@ -96,29 +102,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void createScreen()
         {
-            AddStep("create screen", () =>
-            {
-                var receptor = new ScreenFooter.BackReceptor();
-                var footer = new ScreenFooter(receptor);
-
-                Child = new DependencyProvidingContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    CachedDependencies = new[] { (typeof(ScreenFooter), (object)footer) },
-                    Children = new Drawable[]
-                    {
-                        receptor,
-                        modSelectOverlay = new TestModSelectOverlay
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            State = { Value = Visibility.Visible },
-                            Beatmap = { Value = Beatmap.Value },
-                            SelectedMods = { BindTarget = SelectedMods },
-                        },
-                        footer,
-                    }
-                };
-            });
+            AddStep("create screen", () => LoadScreen(screen = new TestModSelectOverlayScreen { SelectedMods = { BindTarget = SelectedMods } }));
+            AddUntilStep("wait until screen is loaded", () => screen.IsLoaded, () => Is.True);
             waitForColumnLoad();
         }
 
@@ -305,29 +290,30 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestSettingsNotCrossPolluting()
         {
+            TestScreenWithTwoOverlays screenWithTwoOverlays = null!;
             Bindable<IReadOnlyList<Mod>> selectedMods2 = null!;
-            ModSelectOverlay modSelectOverlay2 = null!;
 
-            createScreen();
+            AddStep("push screen", () =>
+            {
+                selectedMods2 = new Bindable<IReadOnlyList<Mod>>(new Mod[] { new OsuModDifficultyAdjust() });
+
+                LoadScreen(screen = screenWithTwoOverlays = new TestScreenWithTwoOverlays
+                {
+                    SelectedMods = { BindTarget = SelectedMods },
+                    SelectedMods2 = { BindTarget = selectedMods2 },
+                });
+            });
+            AddStep("wait until screen is loaded", () => screenWithTwoOverlays.IsCurrentScreen());
+            waitForColumnLoad();
+
             AddStep("select difficulty adjust via panel", () => getPanelForMod(typeof(OsuModDifficultyAdjust)).TriggerClick());
 
-            AddStep("set setting", () => modSelectOverlay.ChildrenOfType<RoundedSliderBar<float>>().First().Current.Value = 8);
+            AddStep("set setting", () => screenWithTwoOverlays.Overlay.ChildrenOfType<RoundedSliderBar<float>>().First().Current.Value = 8);
 
             AddAssert("ensure setting is propagated", () => SelectedMods.Value.OfType<OsuModDifficultyAdjust>().Single().CircleSize.Value == 8);
 
-            AddStep("create second bindable", () => selectedMods2 = new Bindable<IReadOnlyList<Mod>>(new Mod[] { new OsuModDifficultyAdjust() }));
-
-            AddStep("create second overlay", () =>
-            {
-                Add(modSelectOverlay2 = new UserModSelectOverlay().With(d =>
-                {
-                    d.Origin = Anchor.TopCentre;
-                    d.Anchor = Anchor.TopCentre;
-                    d.SelectedMods.BindTarget = selectedMods2;
-                }));
-            });
-
-            AddStep("show", () => modSelectOverlay2.Show());
+            AddStep("hide first overlay", () => screenWithTwoOverlays.Overlay.Hide());
+            AddStep("show second overlay", () => screenWithTwoOverlays.SecondOverlay.Show());
 
             AddAssert("ensure first is unchanged", () => SelectedMods.Value.OfType<OsuModDifficultyAdjust>().Single().CircleSize.Value == 8);
             AddAssert("ensure second is default", () => selectedMods2.Value.OfType<OsuModDifficultyAdjust>().Single().CircleSize.Value == null);
@@ -480,6 +466,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("set customized mod externally", () => SelectedMods.Value = new[] { new OsuModDoubleTime { SpeedChange = { Value = 1.01 } } });
             AddAssert("setting remains", () => (SelectedMods.Value.SingleOrDefault() as OsuModDoubleTime)?.SpeedChange.Value == 1.01);
 
+            AddStep("exit screen", () => Stack.Exit());
             createScreen();
             AddAssert("setting remains", () => (SelectedMods.Value.SingleOrDefault() as OsuModDoubleTime)?.SpeedChange.Value == 1.01);
         }
@@ -712,6 +699,35 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestTouchDeviceDoesNotInterfereWithDeselectAll()
+        {
+            createScreen();
+            changeRuleset(0);
+
+            AddAssert("deselect all button disabled", () => !this.ChildrenOfType<DeselectAllModsButton>().Single().Enabled.Value);
+
+            AddStep("select TD", () => SelectedMods.Value = new Mod[] { new OsuModTouchDevice() });
+            AddAssert("deselect all button still disabled", () => !this.ChildrenOfType<DeselectAllModsButton>().Single().Enabled.Value);
+
+            AddStep("click deselect all button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<DeselectAllModsButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("touch mod still present", () => SelectedMods.Value, () => Is.EqualTo(new Mod[] { new OsuModTouchDevice() }));
+
+            AddStep("select NC + TD", () => SelectedMods.Value = new Mod[] { new OsuModTouchDevice(), new OsuModNightcore() });
+            AddStep("click deselect all button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<DeselectAllModsButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("touch mod still present", () => SelectedMods.Value, () => Is.EqualTo(new Mod[] { new OsuModTouchDevice() }));
+        }
+
+        [Test]
         public void TestDeselectAllViaButton()
         {
             createScreen();
@@ -796,15 +812,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestColumnHidingOnIsValidChange()
         {
-            AddStep("create screen", () => Child = modSelectOverlay = new TestModSelectOverlay
-            {
-                RelativeSizeAxes = Axes.Both,
-                State = { Value = Visibility.Visible },
-                SelectedMods = { BindTarget = SelectedMods },
-                IsValidMod = mod => mod.Type == ModType.DifficultyIncrease || mod.Type == ModType.Conversion
-            });
-            waitForColumnLoad();
+            createScreen();
             changeRuleset(0);
+
+            AddStep("set filter for 2 columns", () => modSelectOverlay.IsValidMod = mod => mod.Type is ModType.DifficultyIncrease or ModType.Conversion);
 
             AddAssert("two columns visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 2);
 
@@ -815,9 +826,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("no columns visible", () => this.ChildrenOfType<ModColumn>().All(col => !col.IsPresent));
 
             AddStep("hide", () => modSelectOverlay.Hide());
-            AddStep("set filter for 3 columns", () => modSelectOverlay.IsValidMod = mod => mod.Type == ModType.DifficultyReduction
-                                                                                           || mod.Type == ModType.Automation
-                                                                                           || mod.Type == ModType.Conversion);
+            AddStep("set filter for 3 columns", () => modSelectOverlay.IsValidMod = mod => mod.Type is ModType.DifficultyReduction or ModType.Automation or ModType.Conversion);
 
             AddStep("show", () => modSelectOverlay.Show());
             AddUntilStep("3 columns visible", () => this.ChildrenOfType<ModColumn>().Count(col => col.IsPresent) == 3);
@@ -829,13 +838,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestColumnHidingOnTextFilterChange()
         {
-            AddStep("create screen", () => Child = modSelectOverlay = new TestModSelectOverlay
-            {
-                RelativeSizeAxes = Axes.Both,
-                State = { Value = Visibility.Visible },
-                SelectedMods = { BindTarget = SelectedMods }
-            });
-            waitForColumnLoad();
+            createScreen();
             changeRuleset(0);
 
             AddAssert("all columns visible", () => this.ChildrenOfType<ModColumn>().All(col => col.IsPresent));
@@ -853,13 +856,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestHidingOverlayClearsTextSearch()
         {
-            AddStep("create screen", () => Child = modSelectOverlay = new TestModSelectOverlay
-            {
-                RelativeSizeAxes = Axes.Both,
-                State = { Value = Visibility.Visible },
-                SelectedMods = { BindTarget = SelectedMods }
-            });
-            waitForColumnLoad();
+            createScreen();
             changeRuleset(0);
 
             AddAssert("all columns visible", () => this.ChildrenOfType<ModColumn>().All(col => col.IsPresent));
@@ -1018,8 +1015,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 selectedMods = new Bindable<IReadOnlyList<Mod>>([]);
 
-                modSelectOverlay.SelectedMods.UnbindFrom(SelectedMods);
-                modSelectOverlay.SelectedMods.BindTo(selectedMods);
+                screen.SelectedMods.UnbindFrom(SelectedMods);
+                screen.SelectedMods.BindTo(selectedMods);
             });
 
             AddStep("activate PF", () => selectedMods.Value = [new OsuModPerfect()]);
@@ -1057,11 +1054,87 @@ namespace osu.Game.Tests.Visual.UserInterface
         private ModPanel getPanelForMod(Type modType)
             => modSelectOverlay.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.GetType() == modType);
 
-        private partial class TestModSelectOverlay : UserModSelectOverlay
+        protected override void Dispose(bool isDisposing)
         {
-            public TestModSelectOverlay()
+            base.Dispose(isDisposing);
+
+            if (rulesetStore.IsNotNull())
+                rulesetStore.Dispose();
+        }
+
+        private partial class TestModSelectOverlayScreen : OsuScreen
+        {
+            public readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>();
+
+            public override bool ShowFooter => true;
+
+            public ModSelectOverlay Overlay = null!;
+
+            private IDisposable? firstOverlayRegistration;
+
+            [Cached]
+            private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
+            [Resolved]
+            protected IOverlayManager? OverlayManager { get; private set; }
+
+            [BackgroundDependencyLoader]
+            private void load()
             {
-                ShowPresets = true;
+                LoadComponent(Overlay = new UserModSelectOverlay
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    State = { Value = Visibility.Visible },
+                    Beatmap = { Value = Beatmap.Value },
+                    SelectedMods = { BindTarget = SelectedMods },
+                    ShowPresets = true,
+                });
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                firstOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(Overlay);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                firstOverlayRegistration?.Dispose();
+            }
+        }
+
+        private partial class TestScreenWithTwoOverlays : TestModSelectOverlayScreen
+        {
+            public readonly Bindable<IReadOnlyList<Mod>> SelectedMods2 = new Bindable<IReadOnlyList<Mod>>([]);
+
+            public ModSelectOverlay SecondOverlay = null!;
+
+            private IDisposable? secondOverlayRegistration;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                LoadComponent(SecondOverlay = new UserModSelectOverlay
+                {
+                    Origin = Anchor.TopCentre,
+                    Anchor = Anchor.TopCentre,
+                    SelectedMods = { BindTarget = SelectedMods2 },
+                });
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                secondOverlayRegistration = OverlayManager?.RegisterBlockingOverlay(SecondOverlay);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                secondOverlayRegistration?.Dispose();
             }
         }
 

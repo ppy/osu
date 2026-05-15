@@ -13,19 +13,19 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
         public override LocalisableString Description => @"More forgiving HP drain, less accuracy required, and extra lives!";
 
+        public const double HIT_WINDOW_DIFFICULTY_MULTIPLIER = 1 / 1.4;
+
         void IApplicableToHitObject.ApplyToHitObject(HitObject hitObject)
         {
-            const double multiplier = 1 / 1.4;
-
             switch (hitObject)
             {
                 case Note:
-                    ((ManiaHitWindows)hitObject.HitWindows).DifficultyMultiplier = multiplier;
+                    ((ManiaHitWindows)hitObject.HitWindows).DifficultyMultiplier = HIT_WINDOW_DIFFICULTY_MULTIPLIER;
                     break;
 
                 case HoldNote hold:
-                    ((ManiaHitWindows)hold.Head.HitWindows).DifficultyMultiplier = multiplier;
-                    ((ManiaHitWindows)hold.Tail.HitWindows).DifficultyMultiplier = multiplier;
+                    ((ManiaHitWindows)hold.Head.HitWindows).DifficultyMultiplier = HIT_WINDOW_DIFFICULTY_MULTIPLIER;
+                    ((ManiaHitWindows)hold.Tail.HitWindows).DifficultyMultiplier = HIT_WINDOW_DIFFICULTY_MULTIPLIER;
                     break;
             }
         }

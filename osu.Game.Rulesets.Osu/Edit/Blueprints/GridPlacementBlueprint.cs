@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
         {
             this.gridToolboxGroup = gridToolboxGroup;
             originalOrigin = gridToolboxGroup.StartPosition.Value;
-            originalSpacing = gridToolboxGroup.Spacing.Value;
+            originalSpacing = gridToolboxGroup.GridLineSpacing.Value;
             originalRotation = gridToolboxGroup.GridLinesRotation.Value;
         }
 
@@ -36,9 +36,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
 
             base.EndPlacement(commit);
 
-            // You typically only place the grid once, so we switch back to the last tool after placement.
-            if (commit && hitObjectComposer is OsuHitObjectComposer osuHitObjectComposer)
-                osuHitObjectComposer.SetLastTool();
+            // You typically only place the grid once, so we switch back to the last tool after placement -
+            // but only if the tool hasn't changed from under us (which is possible, as external tool changes will commit any ongoing placements, including this one)
+            if (commit && hitObjectComposer?.BlueprintContainer.CurrentTool is GridFromPointsTool)
+                hitObjectComposer.SetLastTool();
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -66,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
             {
                 // Reset the grid to the default values.
                 gridToolboxGroup.StartPosition.Value = gridToolboxGroup.StartPosition.Default;
-                gridToolboxGroup.Spacing.Value = gridToolboxGroup.Spacing.Default;
+                gridToolboxGroup.GridLineSpacing.Value = gridToolboxGroup.GridLineSpacing.Default;
                 if (!gridToolboxGroup.GridLinesRotation.Disabled)
                     gridToolboxGroup.GridLinesRotation.Value = gridToolboxGroup.GridLinesRotation.Default;
                 EndPlacement(true);
@@ -111,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
                 // Default to the original spacing and rotation if the distance is too small.
                 if (Vector2.Distance(gridToolboxGroup.StartPosition.Value, pos) < 2)
                 {
-                    gridToolboxGroup.Spacing.Value = originalSpacing;
+                    gridToolboxGroup.GridLineSpacing.Value = originalSpacing;
                     if (!gridToolboxGroup.GridLinesRotation.Disabled)
                         gridToolboxGroup.GridLinesRotation.Value = originalRotation;
                 }
@@ -133,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
         private void resetGridState()
         {
             gridToolboxGroup.StartPosition.Value = originalOrigin;
-            gridToolboxGroup.Spacing.Value = originalSpacing;
+            gridToolboxGroup.GridLineSpacing.Value = originalSpacing;
             if (!gridToolboxGroup.GridLinesRotation.Disabled)
                 gridToolboxGroup.GridLinesRotation.Value = originalRotation;
         }

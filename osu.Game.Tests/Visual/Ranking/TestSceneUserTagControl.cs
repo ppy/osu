@@ -28,11 +28,16 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
+        private int writeRequestCount;
+
         [SetUpSteps]
         public void SetUpSteps()
         {
+            AddStep("reset mouse position", () => InputManager.MoveMouseTo(Vector2.Zero));
+
             AddStep("set up network requests", () =>
             {
+                writeRequestCount = 0;
                 dummyAPI.HandleRequest = request =>
                 {
                     switch (request)
@@ -66,9 +71,9 @@ namespace osu.Game.Tests.Visual.Ranking
                             var beatmapSet = CreateAPIBeatmapSet(Beatmap.Value.BeatmapInfo);
                             beatmapSet.Beatmaps.Single().TopTags =
                             [
-                                new APIBeatmapTag { TagId = 3, VoteCount = 9 },
-                                new APIBeatmapTag { TagId = 2, VoteCount = 8 },
-                                new APIBeatmapTag { TagId = 0, VoteCount = 7 },
+                                new APIBeatmapTag { TagId = 3, VoteCount = 4 },
+                                new APIBeatmapTag { TagId = 2, VoteCount = 3 },
+                                new APIBeatmapTag { TagId = 0, VoteCount = 2 },
                             ];
                             Scheduler.AddDelayed(() => getBeatmapSetRequest.TriggerSuccess(beatmapSet), 500);
                             return true;
@@ -77,6 +82,7 @@ namespace osu.Game.Tests.Visual.Ranking
                         case AddBeatmapTagRequest:
                         case RemoveBeatmapTagRequest:
                         {
+                            writeRequestCount++;
                             Scheduler.AddDelayed(request.TriggerSuccess, 500);
                             return true;
                         }
@@ -108,6 +114,31 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        public void TestNotWritable()
+        {
+            AddStep("show", () =>
+            {
+                var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+                working.BeatmapInfo.OnlineID = 42;
+                Beatmap.Value = working;
+                recreateControl(writable: false);
+            });
+
+            AddUntilStep("click tag", () =>
+            {
+                var tag = this.ChildrenOfType<UserTagControl.DrawableUserTag>().FirstOrDefault(t => t.UserTag.Id == 2);
+                if (tag == null)
+                    return false;
+
+                InputManager.MoveMouseTo(tag);
+                InputManager.Click(MouseButton.Left);
+                return true;
+            });
+
+            AddAssert("no vote requests send", () => writeRequestCount, () => Is.Zero);
+        }
+
+        [Test]
         public void TestTagsDoNotMoveUntilMouseMovesAway()
         {
             AddStep("show", () =>
@@ -124,14 +155,14 @@ namespace osu.Game.Tests.Visual.Ranking
                 InputManager.MoveMouseTo(getDrawableTagById(2));
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("tag 2 voted for", () => getDrawableTagById(2).UserTag.VoteCount.Value, () => Is.EqualTo(9));
+            AddUntilStep("tag 2 voted for", () => getDrawableTagById(2).UserTag.VoteCount.Value, () => Is.EqualTo(4));
 
             AddStep("remove vote for tag 2", () =>
             {
                 InputManager.MoveMouseTo(getDrawableTagById(2));
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("tag 2 not voted for", () => getDrawableTagById(2).UserTag.VoteCount.Value, () => Is.EqualTo(8));
+            AddUntilStep("tag 2 not voted for", () => getDrawableTagById(2).UserTag.VoteCount.Value, () => Is.EqualTo(3));
             AddAssert("tag 2 is still second", () => getTagFlow().GetLayoutPosition(getDrawableTagById(2)), () => Is.EqualTo(1));
 
             AddStep("vote for tag 2", () =>
@@ -139,7 +170,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 InputManager.MoveMouseTo(getDrawableTagById(2));
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("tag 2 voted for", () => getDrawableTagById(2).UserTag.VoteCount.Value, () => Is.EqualTo(9));
+            AddUntilStep("tag 2 voted for", () => getDrawableTagById(2).UserTag.VoteCount.Value, () => Is.EqualTo(4));
             AddStep("move mouse away", () => InputManager.MoveMouseTo(Vector2.Zero));
             AddAssert("tag 2 reordered to first", () => getTagFlow().GetLayoutPosition(getDrawableTagById(2)), () => Is.EqualTo(0));
 
@@ -148,13 +179,14 @@ namespace osu.Game.Tests.Visual.Ranking
             UserTagControl.DrawableUserTag getDrawableTagById(long id) => getTagFlow().Single(t => t.UserTag.Id == id);
         }
 
-        private void recreateControl()
+        private void recreateControl(bool writable = true)
         {
             Child = new PopoverContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = new UserTagControl(Beatmap.Value.BeatmapInfo)
                 {
+                    Writable = writable,
                     Width = 700,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

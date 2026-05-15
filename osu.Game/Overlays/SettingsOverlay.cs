@@ -3,11 +3,11 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -44,10 +44,12 @@ namespace osu.Game.Overlays
                 new GraphicsSection(),
                 new OnlineSection(),
                 new MaintenanceSection(),
+                new DebugSection()
             };
 
-            if (DebugUtils.IsDebugBuild)
-                sections.Add(new DebugSection());
+            var today = DateTimeOffset.Now;
+            if (today.Month == 4 && today.Day == 1)
+                sections.Insert(9, new AfToggleSection());
 
             return sections;
         }

@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             foreach (var drawableItem in objectsInRotation)
             {
-                var rotatedPosition = GeometryUtils.RotatePointAroundOrigin(originalPositions[drawableItem], actualOrigin, rotation);
+                var rotatedPosition = GeometryUtils.RotatePointAroundOrigin(originalPositions[drawableItem], ToScreenSpace(actualOrigin), rotation);
                 UpdatePosition(drawableItem, rotatedPosition);
 
                 drawableItem.Rotation = originalRotations[drawableItem] + rotation;

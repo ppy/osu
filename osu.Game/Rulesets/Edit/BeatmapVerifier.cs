@@ -19,17 +19,18 @@ namespace osu.Game.Rulesets.Edit
             new CheckBackgroundPresence(),
             new CheckBackgroundQuality(),
             new CheckVideoResolution(),
+            new CheckVideoUsage(),
 
             // Audio
             new CheckAudioPresence(),
             new CheckAudioQuality(),
             new CheckMutedObjects(),
-            new CheckFewHitsounds(),
             new CheckTooShortAudioFiles(),
             new CheckAudioInVideo(),
             new CheckDelayedHitsounds(),
             new CheckSongFormat(),
             new CheckHitsoundsFormat(),
+            new CheckInconsistentAudio(),
 
             // Files
             new CheckZeroByteFiles(),
@@ -42,12 +43,18 @@ namespace osu.Game.Rulesets.Edit
 
             // Timing
             new CheckPreviewTime(),
+            new CheckInconsistentTimingControlPoints(),
 
             // Events
             new CheckBreaks(),
 
             // Metadata
             new CheckTitleMarkers(),
+            new CheckInconsistentMetadata(),
+            new CheckMissingGenreLanguage(),
+
+            // Settings
+            new CheckInconsistentSettings(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
