@@ -177,9 +177,6 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine("// Break Periods");
             foreach (var b in beatmap.Breaks)
                 writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Break},{b.StartTime},{b.EndTime}"));
-
-            foreach (string l in beatmap.UnhandledEventLines)
-                writer.WriteLine(l);
         }
 
         private void handleControlPoints(TextWriter writer)

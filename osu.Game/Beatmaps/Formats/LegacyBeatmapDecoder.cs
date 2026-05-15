@@ -430,10 +430,6 @@ namespace osu.Game.Beatmaps.Formats
         {
             string[] split = line.Split(',');
 
-            // Until we have full storyboard encoder coverage, let's track any lines which aren't handled
-            // and store them to a temporary location such that they aren't lost on editor save / export.
-            bool lineSupportedByEncoder = false;
-
             if (Enum.TryParse(split[0], out LegacyEventType type))
             {
                 switch (type)
@@ -445,7 +441,6 @@ namespace osu.Game.Beatmaps.Formats
                         if (string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
                         {
                             beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[3]);
-                            lineSupportedByEncoder = true;
                         }
 
                         break;
@@ -459,14 +454,12 @@ namespace osu.Game.Beatmaps.Formats
                         if (!SupportedExtensions.VIDEO_EXTENSIONS.Contains(Path.GetExtension(filename).ToLowerInvariant()))
                         {
                             beatmap.BeatmapInfo.Metadata.BackgroundFile = filename;
-                            lineSupportedByEncoder = true;
                         }
 
                         break;
 
                     case LegacyEventType.Background:
                         beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[2]);
-                        lineSupportedByEncoder = true;
                         break;
 
                     case LegacyEventType.Break:
@@ -474,13 +467,9 @@ namespace osu.Game.Beatmaps.Formats
                         double end = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split[2])));
 
                         beatmap.Breaks.Add(new BreakPeriod(start, end));
-                        lineSupportedByEncoder = true;
                         break;
                 }
             }
-
-            if (!lineSupportedByEncoder)
-                beatmap.UnhandledEventLines.Add(line);
         }
 
         private void handleTimingPoint(string line)
