@@ -108,7 +108,9 @@ namespace osu.Game.Tests.Visual.RankedPlay
                         Retries = Enumerable.Range(-2, 100).Select(x => x % 12 - 6).ToArray(),
                     };
 
-                    beatmap.StarRating = i + 1;
+                    // the .009 part exercises behaviour of truncating star rating to 2dp
+                    // it should be discarded completely on display
+                    beatmap.StarRating = i + 1.009;
 
                     flow.Add(new RankedPlayCardContent(beatmap)
                     {
