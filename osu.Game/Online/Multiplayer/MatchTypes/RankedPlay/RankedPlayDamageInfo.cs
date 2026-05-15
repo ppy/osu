@@ -60,7 +60,7 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.RankedPlay
                 return false;
 
             return Damage == other.Damage
-                   && Damage == other.RawDamage
+                   && RawDamage == other.RawDamage
                    && OldLife == other.OldLife
                    && NewLife == other.NewLife
                    && DirectDamage == other.DirectDamage
