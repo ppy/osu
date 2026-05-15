@@ -16,6 +16,7 @@ namespace osu.Game.Storyboards
         public readonly List<StoryboardLoopingGroup> LoopingGroups = new List<StoryboardLoopingGroup>();
         public readonly List<StoryboardTriggerGroup> TriggerGroups = new List<StoryboardTriggerGroup>();
 
+        public StoryboardElementSource Source { get; }
         public string Path { get; }
         public virtual bool IsDrawable => HasCommands;
 
@@ -110,8 +111,9 @@ namespace osu.Game.Storyboards
 
         public bool HasCommands => Commands.HasCommands || LoopingGroups.Any(l => l.HasCommands);
 
-        public StoryboardSprite(string path, Anchor origin, Vector2 initialPosition)
+        public StoryboardSprite(StoryboardElementSource source, string path, Anchor origin, Vector2 initialPosition)
         {
+            Source = source;
             Path = path;
             Origin = origin;
             InitialPosition = initialPosition;

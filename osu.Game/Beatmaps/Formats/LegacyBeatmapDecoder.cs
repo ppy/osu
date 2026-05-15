@@ -81,7 +81,7 @@ namespace osu.Game.Beatmaps.Formats
             return templateBeatmap;
         }
 
-        protected override void ParseStreamInto(LineBufferedReader stream, Beatmap beatmap)
+        protected override void ParseStreamInto(LineBufferedReader stream, bool isPrimaryStream, Beatmap beatmap)
         {
             this.beatmap = beatmap;
             this.beatmap.BeatmapVersion = FormatVersion;
@@ -89,7 +89,7 @@ namespace osu.Game.Beatmaps.Formats
 
             ApplyLegacyDefaults(this.beatmap);
 
-            base.ParseStreamInto(stream, beatmap);
+            base.ParseStreamInto(stream, isPrimaryStream, beatmap);
 
             applyDifficultyRestrictions(beatmap.Difficulty, beatmap);
 
@@ -204,7 +204,7 @@ namespace osu.Game.Beatmaps.Formats
             beatmap.BeatmapInfo.Ruleset = RulesetStore?.GetRuleset(0) ?? beatmap.BeatmapInfo.Ruleset;
         }
 
-        protected override void ParseLine(Beatmap beatmap, Section section, string line)
+        protected override void ParseLine(Beatmap beatmap, Section section, string line, bool isPrimaryStream)
         {
             switch (section)
             {
@@ -237,7 +237,7 @@ namespace osu.Game.Beatmaps.Formats
                     return;
             }
 
-            base.ParseLine(beatmap, section, line);
+            base.ParseLine(beatmap, section, line, isPrimaryStream);
         }
 
         private void handleGeneral(string line)
