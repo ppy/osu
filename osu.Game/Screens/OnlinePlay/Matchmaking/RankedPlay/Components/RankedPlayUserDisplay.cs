@@ -47,6 +47,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         private BufferedContainer grayScaleContainer = null!;
         private OsuSpriteText beatmapState = null!;
         private OsuSpriteText damageMultiplierText = null!;
+        private OsuSpriteText lastStandText = null!;
 
         private BeatmapAvailability availability = BeatmapAvailability.Unknown();
 
@@ -119,13 +120,25 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                             RelativeSizeAxes = Axes.X,
                             Height = 16,
                             Padding = new MarginPadding { Horizontal = 4, Vertical = 6 },
-                            Child = damageMultiplierText = new OsuSpriteText
-                            {
-                                Anchor = damageMultiplierAnchor,
-                                Origin = damageMultiplierAnchor,
-                                Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                                UseFullGlyphHeight = false,
-                            }
+                            Children =
+                            [
+                                damageMultiplierText = new OsuSpriteText
+                                {
+                                    Anchor = damageMultiplierAnchor,
+                                    Origin = damageMultiplierAnchor,
+                                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
+                                    UseFullGlyphHeight = false,
+                                },
+                                lastStandText = new OsuSpriteText
+                                {
+                                    Anchor = contentAnchor,
+                                    Origin = contentAnchor,
+                                    Text = "Last Stand!",
+                                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
+                                    Alpha = 0,
+                                    AlwaysPresent = true
+                                }
+                            ]
                         },
                         HealthDisplay = new HealthBar(colourScheme, (contentAnchor & Anchor.x0) != 0, shear)
                         {
@@ -176,6 +189,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             {
                 grayScaleContainer.GrayscaleTo(e.NewValue <= 0 ? 1 : 0, 300);
                 cornerPiece?.OnHealthChanged(e.NewValue);
+
+                if (e.NewValue == 1)
+                    lastStandText.FadeIn(100).Delay(3000).FadeOut(400);
             });
 
             client.RoomUpdated += onRoomUpdated;

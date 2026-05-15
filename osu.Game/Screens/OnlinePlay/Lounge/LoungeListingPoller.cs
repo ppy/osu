@@ -22,7 +22,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private IAPIProvider api { get; set; } = null!;
 
         public required Action<Room[]> RoomsReceived { get; init; }
-        public readonly IBindable<FilterCriteria?> Filter = new Bindable<FilterCriteria?>();
+        public readonly IBindable<LoungeFilterCriteria?> Filter = new Bindable<LoungeFilterCriteria?>();
 
         private GetRoomsRequest? lastPollRequest;
 

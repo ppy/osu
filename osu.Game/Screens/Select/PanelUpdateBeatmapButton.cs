@@ -20,7 +20,7 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
-using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.Select
 {
@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Select
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
-                            Text = CommonStrings.ButtonsUpdate,
+                            Text = WebCommonStrings.ButtonsUpdate,
                         }
                     }
                 },
