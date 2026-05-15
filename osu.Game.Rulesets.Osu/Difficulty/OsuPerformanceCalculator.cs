@@ -379,7 +379,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 double fullComboThreshold = attributes.MaxCombo - countSliderEndsDropped;
 
                 if (scoreMaxCombo < fullComboThreshold)
-                    missCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
+                    missCount = (fullComboThreshold - countSliderTickMiss - countMiss) / Math.Max(1.0, scoreMaxCombo);
 
                 // Combine regular misses with tick misses since tick misses break combo as well
                 missCount = Math.Min(missCount, countSliderTickMiss + countMiss);
