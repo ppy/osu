@@ -79,6 +79,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 ? Anchor.CentreRight
                 : Anchor.CentreLeft;
 
+            var lastStandAnchor = (contentAnchor & Anchor.x0) != 0
+                ? Anchor.CentreLeft
+                : Anchor.CentreRight;
+
             InternalChildren =
             [
                 new CircularContainer
@@ -131,12 +135,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                 },
                                 lastStandText = new OsuSpriteText
                                 {
-                                    Anchor = contentAnchor,
-                                    Origin = contentAnchor,
+                                    Anchor = lastStandAnchor,
+                                    Origin = lastStandAnchor,
                                     Text = "Last Stand!",
                                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                                     Alpha = 0,
-                                    AlwaysPresent = true
                                 }
                             ]
                         },
