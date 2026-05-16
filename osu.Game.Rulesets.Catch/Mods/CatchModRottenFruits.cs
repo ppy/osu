@@ -34,15 +34,16 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         private readonly BindableNumber<double> hitSoundVolume = new BindableDouble(0);
 
-        [SettingSource("Miss indicator size", "Size of the Hyperdash afterimage when catching objects.", 0)]
-        public BindableFloat AfterImageSetting { get; } = new BindableFloat(1.5f)
-        {
-            Precision = 0.1f,
-            MinValue = 0.5f,
-            MaxValue = 2f
-        };
-
         private CatcherArea catcherArea = null!;
+        private BeatmapDifficulty difficulty = null!;
+
+        public void ApplyToBeatmap(IBeatmap beatmap)
+        {
+            difficulty = beatmap.Difficulty;
+
+            foreach (var obj in beatmap.HitObjects)
+                disableHyperDashes(obj);
+        }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
@@ -70,10 +71,10 @@ namespace osu.Game.Rulesets.Catch.Mods
 
                     if (caught)
                     {
-                        var afterImageSize = new Vector2(AfterImageSetting.Value);
+                        var scaledCircleSize = new Vector2(1.1f - (difficulty.CircleSize - 0.1f) + 0.3f);
 
                         // Since hyperdashes don't exist in this mode, creatively reuse hyperdash trail afterimages as miss indicators.
-                        catcherArea.CatcherTrails.Add(new CatcherTrailEntry(catcherArea.Time.Current, CatcherAnimationState.Fail, catcherArea.Catcher.X, afterImageSize,
+                        catcherArea.CatcherTrails.Add(new CatcherTrailEntry(catcherArea.Time.Current, CatcherAnimationState.Fail, catcherArea.Catcher.X, scaledCircleSize,
                             CatcherTrailAnimation.HyperDashAfterImage));
                     }
 
@@ -107,12 +108,6 @@ namespace osu.Game.Rulesets.Catch.Mods
 
                 dho.Expire();
             };
-        }
-
-        public void ApplyToBeatmap(IBeatmap beatmap)
-        {
-            foreach (var obj in beatmap.HitObjects)
-                disableHyperDashes(obj);
         }
 
         private void disableHyperDashes(HitObject hitObject)
