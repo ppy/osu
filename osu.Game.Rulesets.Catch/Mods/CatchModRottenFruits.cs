@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 
                     if (caught)
                     {
-                        var scaledCircleSize = new Vector2(1.1f - (difficulty.CircleSize - 0.1f) + 0.3f);
+                        var scaledCircleSize = new Vector2(1.1f - ((difficulty.CircleSize / 10) - 0.1f) + 0.3f);
 
                         // Since hyperdashes don't exist in this mode, creatively reuse hyperdash trail afterimages as miss indicators.
                         catcherArea.CatcherTrails.Add(new CatcherTrailEntry(catcherArea.Time.Current, CatcherAnimationState.Fail, catcherArea.Catcher.X, scaledCircleSize,
