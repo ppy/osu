@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
@@ -29,12 +30,15 @@ namespace osu.Game.Rulesets.Edit
         /// Override this with any preconditions that should be double-checked on committing.
         /// If <c>false</c> is returned and a commit is attempted, the blueprint will be destroyed instead.
         /// </remarks>
-        protected virtual bool IsValidForPlacement => true;
+        protected virtual bool IsValidForPlacement => PlacementActive != PlacementState.Waiting || hitObjectComposer.CursorInPlacementArea;
 
         // the blueprint should still be considered for input even if it is hidden,
         // especially when such input is the reason for making the blueprint become visible.
         public override bool PropagatePositionalInputSubTree => true;
         public override bool PropagateNonPositionalInputSubTree => true;
+
+        [Resolved]
+        private HitObjectComposer hitObjectComposer { get; set; } = null!;
 
         protected PlacementBlueprint()
         {
@@ -69,6 +73,9 @@ namespace osu.Game.Rulesets.Edit
 
                 case PlacementState.Waiting:
                     // ensure placement was started before ending to make state handling simpler.
+                    if (!IsValidForPlacement)
+                        return;
+
                     BeginPlacement();
                     break;
             }
