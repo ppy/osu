@@ -9,6 +9,7 @@ using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.UI.Cursor;
@@ -25,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "BM";
         public override IconUsage? Icon => OsuIcon.ModBloom;
         public override ModType Type => ModType.Fun;
-        public override LocalisableString Description => "The cursor blooms into.. a larger cursor!";
+        public override LocalisableString Description => ModSelectOverlayStrings.OsuModBloomDescription;
         public override double ScoreMultiplier => 1;
         protected const float MIN_SIZE = 1;
         protected const float TRANSITION_DURATION = 100;

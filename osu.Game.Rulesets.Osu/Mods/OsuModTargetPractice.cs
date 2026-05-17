@@ -15,6 +15,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -38,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "TP";
         public override ModType Type => ModType.Conversion;
         public override IconUsage? Icon => OsuIcon.ModTargetPractice;
-        public override LocalisableString Description => @"Practice keeping up with the beat of the song.";
+        public override LocalisableString Description => ModSelectOverlayStrings.OsuModTargetPracticeDescription;
         public override double ScoreMultiplier => 0.1;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]

@@ -242,10 +242,10 @@ namespace osu.Game.Rulesets.Taiko
             switch (result)
             {
                 case HitResult.SmallBonus:
-                    return "drum tick";
+                    return RankingStatisticsStrings.TaikoDrumTick;
 
                 case HitResult.LargeBonus:
-                    return "bonus";
+                    return RankingStatisticsStrings.TaikoBonus;
             }
 
             return base.GetDisplayNameForHitResult(result);
@@ -257,17 +257,17 @@ namespace osu.Game.Rulesets.Taiko
 
             return new[]
             {
-                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
+                new StatisticItem(RankingStatisticsStrings.PerformanceBreakdownTitle, () => new PerformanceBreakdownChart(score, playableBeatmap)
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 }),
-                new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
+                new StatisticItem(RankingStatisticsStrings.TimingDistributionTitle, () => new HitEventTimingDistributionGraph(timedHitEvents)
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 250
                 }, true),
-                new StatisticItem("Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
+                new StatisticItem(RankingStatisticsStrings.StatisticsTitle, () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
                 {
                     new AverageHitError(timedHitEvents),
                     new UnstableRate(timedHitEvents)

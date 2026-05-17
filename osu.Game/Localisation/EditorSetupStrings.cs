@@ -138,6 +138,17 @@ namespace osu.Game.Localisation
             @"Determines how many ""ticks"" are generated within long hit objects. A tick rate of 1 will generate ticks on each beat, 2 would be twice per beat, etc.");
 
         /// <summary>
+        /// "Stack Leniency"
+        /// </summary>
+        public static LocalisableString StackLeniency => new TranslatableString(getKey(@"stack_leniency"), @"Stack Leniency");
+
+        /// <summary>
+        /// "In play mode, osu! automatically stacks notes which occur at the same location. Increasing this value means it is more likely to snap notes of further time-distance."
+        /// </summary>
+        public static LocalisableString StackLeniencyDescription => new TranslatableString(getKey(@"stack_leniency_description"),
+            @"In play mode, osu! automatically stacks notes which occur at the same location. Increasing this value means it is more likely to snap notes of further time-distance.");
+
+        /// <summary>
         /// "Base Velocity"
         /// </summary>
         public static LocalisableString BaseVelocity => new TranslatableString(getKey(@"base_velocity"), @"Base Velocity");

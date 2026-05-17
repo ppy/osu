@@ -14,6 +14,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit;
@@ -132,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                         Precision = 0.1f,
                     },
                     KeyboardStep = 1,
-                    ExpandedLabelText = "X offset",
+                    ExpandedLabelText = EditorComposeStrings.GridXOffset,
                 },
                 startPositionYSlider = new ExpandableSlider<float>
                 {
@@ -143,19 +144,19 @@ namespace osu.Game.Rulesets.Osu.Edit
                         Precision = 0.1f,
                     },
                     KeyboardStep = 1,
-                    ExpandedLabelText = "Y offset",
+                    ExpandedLabelText = EditorComposeStrings.GridYOffset,
                 },
                 spacingSlider = new ExpandableSlider<float>
                 {
                     Current = GridLineSpacing,
                     KeyboardStep = 1,
-                    ExpandedLabelText = "Spacing",
+                    ExpandedLabelText = EditorComposeStrings.GridSpacing,
                 },
                 gridLinesRotationSlider = new ExpandableSlider<float>
                 {
                     Current = GridLinesRotation,
                     KeyboardStep = 1,
-                    ExpandedLabelText = "Rotation",
+                    ExpandedLabelText = EditorComposeStrings.GridRotation,
                 },
                 new FillFlowContainer
                 {

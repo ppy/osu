@@ -3,13 +3,14 @@
 
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModEasy : ModEasyWithExtraLives
     {
-        public override LocalisableString Description => @"Larger circles, more forgiving HP drain, less accuracy required, and extra lives!";
+        public override LocalisableString Description => ModSelectOverlayStrings.OsuModEasyDescription;
 
         public override void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {

@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Game.Localisation;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 
@@ -22,7 +23,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
-            Text = "Create room";
+            Text = MultiplayerMatchStrings.CreateRoom;
 
             isConnected = multiplayerClient.IsConnected.GetBoundCopy();
             operationInProgress = ongoingOperationTracker.InProgress.GetBoundCopy();

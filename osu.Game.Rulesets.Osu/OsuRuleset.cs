@@ -303,17 +303,17 @@ namespace osu.Game.Rulesets.Osu
             switch (result)
             {
                 case HitResult.LargeTickHit:
-                    return "slider tick";
+                    return RankingStatisticsStrings.OsuSliderTick;
 
                 case HitResult.SliderTailHit:
                 case HitResult.SmallTickHit:
-                    return "slider end";
+                    return RankingStatisticsStrings.OsuSliderEnd;
 
                 case HitResult.SmallBonus:
-                    return "spinner spin";
+                    return RankingStatisticsStrings.OsuSpinnerSpin;
 
                 case HitResult.LargeBonus:
-                    return "spinner bonus";
+                    return RankingStatisticsStrings.OsuSpinnerBonus;
             }
 
             return base.GetDisplayNameForHitResult(result);
@@ -325,22 +325,22 @@ namespace osu.Game.Rulesets.Osu
 
             return new[]
             {
-                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
+                new StatisticItem(RankingStatisticsStrings.PerformanceBreakdownTitle, () => new PerformanceBreakdownChart(score, playableBeatmap)
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 }),
-                new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
+                new StatisticItem(RankingStatisticsStrings.TimingDistributionTitle, () => new HitEventTimingDistributionGraph(timedHitEvents)
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 250
                 }, true),
-                new StatisticItem("Accuracy Heatmap", () => new AccuracyHeatmap(score, playableBeatmap)
+                new StatisticItem(RankingStatisticsStrings.AccuracyHeatmapTitle, () => new AccuracyHeatmap(score, playableBeatmap)
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 250
                 }, true),
-                new StatisticItem("Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
+                new StatisticItem(RankingStatisticsStrings.StatisticsTitle, () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
                 {
                     new AverageHitError(timedHitEvents),
                     new UnstableRate(timedHitEvents)

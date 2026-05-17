@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Mods
@@ -17,7 +18,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "NF";
         public override IconUsage? Icon => OsuIcon.ModNoFail;
         public override ModType Type => ModType.DifficultyReduction;
-        public override LocalisableString Description => "You can't fail, no matter what.";
+        public override LocalisableString Description => ModSelectOverlayStrings.ModNoFailDescription;
         public override double ScoreMultiplier => 0.5;
         public override Type[] IncompatibleMods => new[] { typeof(ModFailCondition), typeof(ModCinema) };
         public override bool Ranked => UsesDefaultConfiguration;
