@@ -28,7 +28,6 @@ using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Components;
-using osu.Game.Screens.OnlinePlay.Matchmaking.Match.Gameplay;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
@@ -292,7 +291,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private void onLoadRequested() => Scheduler.Add(() =>
         {
             sampleStart?.Play();
-            this.Push(new MultiplayerPlayerLoader(() => new ScreenGameplay(new Room(room), new PlaylistItem(client.Room!.CurrentPlaylistItem), room.Users.ToArray())));
+
+            var localRoomUser = room.Users.Single(u => u.UserID == localUser.OnlineID);
+            var opponentRoomUser = room.Users.Single(u => u.UserID == opponentUser.OnlineID);
+
+            this.Push(new MultiplayerPlayerLoader(() => new RankedPlayPlayer(
+                new Room(room),
+                new PlaylistItem(client.Room!.CurrentPlaylistItem),
+                localRoomUser,
+                opponentRoomUser
+            )));
         });
 
         private void onStageChanged(RankedPlayStage stage)
