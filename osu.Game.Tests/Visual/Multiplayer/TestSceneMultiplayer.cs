@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -40,6 +41,7 @@ using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
+using osu.Game.Users;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Spectate;
@@ -154,7 +156,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void addRandomPlayer()
         {
             int id = TestResources.GetNextTestID();
-            multiplayerClient.AddUser(new APIUser { Id = id, Username = $"user {id}" });
+            multiplayerClient.AddUser(new APIUser { Id = id, Username = $"User {id}" });
         }
 
         private void removeLastUser()
@@ -217,6 +219,71 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     markNextPlayerIdle();
                     break;
             }
+        }
+
+        [Test]
+        public void TestParticipantSorting()
+        {
+            createRoom(() => new Room
+            {
+                Name = "Participant Sorting Test Room",
+                Playlist =
+                [
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ]
+            });
+
+            // Clear any initial users (except local user)
+            AddStep("clear existing players", () =>
+            {
+                var players = multiplayerClient.ServerRoom?.Users.ToList();
+                if (players == null) return;
+
+                foreach (var player in players)
+                {
+                    if (player.UserID != API.LocalUser.Value.Id && player.User != null)
+                    {
+                        multiplayerClient.RemoveUser(player.User);
+                    }
+                }
+            });
+
+            // Add players with specific details for sorting tests
+            AddStep("add player A (rank #1000)", () => addPlayerWithDetails(1, "Alice", CountryCode.JP, 1000, false));
+            AddStep("add player C (rank #500)", () => addPlayerWithDetails(2, "Charlie", CountryCode.UG, 500, false));
+            AddStep("add player B (rank #2000)", () => addPlayerWithDetails(3, "Bob", CountryCode.JP, 2000, false));
+            AddStep("add player D (rank #100)", () => addPlayerWithDetails(4, "David", CountryCode.US, 100, false));
+            AddStep("add ready player Z (rank #50)", () => addPlayerWithDetails(6, "Zack", CountryCode.UG, 50, true));
+            AddStep("add player E (no rank)", () => addPlayerWithDetails(5, "Eve", CountryCode.PT, null, false));
+        }
+
+        private void addPlayerWithDetails(int id, string username, CountryCode country, int? rank, bool ready)
+        {
+            // Create detailed user with rank info
+            var user = new APIUser
+            {
+                Id = id,
+                Username = username,
+                CountryCode = country,
+                RulesetsStatistics = new Dictionary<string, UserStatistics>
+                {
+                    ["osu"] = new UserStatistics
+                    {
+                        GlobalRank = rank,
+                        PP = rank.HasValue ? 10000 - rank.Value : 0,
+                        RankedScore = 1000000
+                    }
+                }
+            };
+            // Add to room
+            multiplayerClient.AddUser(user);
+
+            // Set ready status if needed
+            if (ready)
+                multiplayerClient.ChangeUserState(id, MultiplayerUserState.Ready);
         }
 
         [Test]
@@ -861,7 +928,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("set other user ready", () => multiplayerClient.ChangeUserState(1234, MultiplayerUserState.Ready));
 
             pressReadyButton(1234);
-            AddUntilStep("wait for gameplay", () => (multiplayerComponents.CurrentScreen as MultiSpectatorScreen)?.IsLoaded == true);
+            AddUntilStep("wait for gameplay", () => multiplayerComponents.CurrentScreen is MultiSpectatorScreen screen && screen.IsLoaded);
 
             AddStep("press back button and exit", () =>
             {
@@ -897,7 +964,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("set other user ready", () => multiplayerClient.ChangeUserState(1234, MultiplayerUserState.Ready));
 
             pressReadyButton(1234);
-            AddUntilStep("wait for gameplay", () => (multiplayerComponents.CurrentScreen as MultiSpectatorScreen)?.IsLoaded == true);
+            AddUntilStep("wait for gameplay", () => multiplayerComponents.CurrentScreen is MultiSpectatorScreen screen && screen.IsLoaded);
             AddStep("set other user loaded", () => multiplayerClient.ChangeUserState(1234, MultiplayerUserState.Loaded));
             AddStep("set other user finished play", () => multiplayerClient.ChangeUserState(1234, MultiplayerUserState.FinishedPlay));
 
