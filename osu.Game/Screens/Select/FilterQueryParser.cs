@@ -125,6 +125,9 @@ namespace osu.Game.Screens.Select
                     criteria.UserTags.Add(tagFilter);
                     return true;
 
+                case "rank":
+                    return TryUpdateCriteriaSet(ref criteria.Rank, op, value);
+
                 default:
                     return criteria.RulesetCriteria?.TryParseCustomKeywordCriteria(key, op, value) ?? false;
             }

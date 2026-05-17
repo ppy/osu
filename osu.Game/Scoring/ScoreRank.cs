@@ -8,6 +8,8 @@ namespace osu.Game.Scoring
 {
     public enum ScoreRank
     {
+        None = -2,
+
         // TODO: Localisable?
         F = -1,
 
