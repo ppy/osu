@@ -57,6 +57,6 @@ namespace osu.Game.Rulesets.Mods
             rateAdjustHelper.ApplyToTrack(track);
         }
 
-        public override double ScoreMultiplier => rateAdjustHelper.ScoreMultiplier;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => rateAdjustHelper.ScoreMultiplier;
     }
 }

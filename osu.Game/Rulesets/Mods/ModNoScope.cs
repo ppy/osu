@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "NS";
         public override ModType Type => ModType.Fun;
         public override IconUsage? Icon => OsuIcon.ModNoScope;
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1;
         public override bool Ranked => true;
 
         /// <summary>

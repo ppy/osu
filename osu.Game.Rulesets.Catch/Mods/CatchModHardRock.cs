@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Beatmaps;
@@ -10,7 +11,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModHardRock : ModHardRock, IApplicableToBeatmapProcessor
     {
-        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
+        public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => UsesDefaultConfiguration ? 1.12 : 1;
 
         public void ApplyToBeatmapProcessor(IBeatmapProcessor beatmapProcessor)
         {

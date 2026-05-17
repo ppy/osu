@@ -209,7 +209,7 @@ namespace osu.Game.Rulesets.Scoring
                 scoreMultiplier = 1;
 
                 foreach (var m in mods.NewValue)
-                    scoreMultiplier *= m.ScoreMultiplier;
+                    scoreMultiplier *= m.ScoreMultiplier(mods.NewValue);
 
                 updateScore();
                 updateRank();

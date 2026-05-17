@@ -185,7 +185,7 @@ namespace osu.Game.Tests.Online
             public override string Name => "Test Mod";
             public override string Acronym => "TM";
             public override LocalisableString Description => "This is a test mod.";
-            public override double ScoreMultiplier => 1;
+            public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1;
 
             [SettingSource("Test")]
             public BindableNumber<double> TestSetting { get; } = new BindableDouble
@@ -202,7 +202,7 @@ namespace osu.Game.Tests.Online
             public override string Name => "Test Mod";
             public override string Acronym => "TMTR";
             public override LocalisableString Description => "This is a test mod.";
-            public override double ScoreMultiplier => 1;
+            public override double ScoreMultiplier(IReadOnlyCollection<Mod> mods) => 1;
 
             [SettingSource("Initial rate", "The starting speed of the track")]
             public override BindableNumber<double> InitialRate { get; } = new BindableDouble(1.5)
