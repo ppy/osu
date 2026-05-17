@@ -26,6 +26,11 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         protected virtual bool ClearTextOnBackKey => true;
 
+        /// <summary>
+        /// Whether the text box should be unfocused on the first "back" key press.
+        /// </summary>
+        protected virtual bool KillFocusOnBackKey => false;
+
         public void TakeFocus()
         {
             if (!allowImmediateFocus)
@@ -83,17 +88,25 @@ namespace osu.Game.Graphics.UserInterface
 
             if (!HasFocus) return false;
 
+            bool handled = false;
+
             if (ClearTextOnBackKey && e.Action == GlobalAction.Back)
             {
                 if (Text.Length > 0)
                 {
                     Text = string.Empty;
                     PlayFeedbackSample(FeedbackSampleType.TextRemove);
-                    return true;
+                    handled = true;
                 }
             }
 
-            return false;
+            if (KillFocusOnBackKey && e.Action == GlobalAction.Back)
+            {
+                KillFocus();
+                handled = true;
+            }
+
+            return handled;
         }
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
