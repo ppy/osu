@@ -21,6 +21,8 @@ namespace osu.Game.Graphics.UserInterface
     {
         public readonly Bindable<bool> Enabled = new Bindable<bool>(true);
 
+        public readonly Bindable<bool> MuteSounds = new Bindable<bool>();
+
         private Sample sampleHover;
 
         protected readonly HoverSampleSet SampleSet;
@@ -40,7 +42,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public override void PlayHoverSample()
         {
-            if (!Enabled.Value)
+            if (!Enabled.Value || MuteSounds.Value)
                 return;
 
             SamplePlaybackHelper.PlayWithRandomPitch(sampleHover, pitchVariation: 0.02);

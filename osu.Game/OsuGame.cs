@@ -1148,6 +1148,8 @@ namespace osu.Game
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
 
+            loadComponentSingleFile(new ChatTicker(), topMostOverlayContent.Add, true);
+
             loadComponentSingleFile(fpsCounter = new FPSCounter
             {
                 Anchor = Anchor.BottomRight,
