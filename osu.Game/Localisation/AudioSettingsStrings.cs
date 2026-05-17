@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -70,14 +71,14 @@ namespace osu.Game.Localisation
         public static LocalisableString SuggestedOffsetNote => new TranslatableString(getKey(@"suggested_offset_note"), @"Play a few beatmaps to receive a suggested offset!");
 
         /// <summary>
-        /// "Based on the last {0} play(s), your offset is set correctly!"
+        /// "Based on the last {0} play, your offset is set correctly!|Based on the last {0} plays, your offset is set correctly!"
         /// </summary>
-        public static LocalisableString SuggestedOffsetCorrect(int plays) => new TranslatableString(getKey(@"suggested_offset_correct"), @"Based on the last {0} play(s), your offset is set correctly!", plays);
+        public static LocalisableString SuggestedOffsetCorrect(int playcount) => new TranslatableString(getKey(@"suggested_offset_correct"), @"Based on the last {0} play, your offset is set correctly!|Based on the last {0} plays, your offset is set correctly!", playcount).ToQuantity(playcount);
 
         /// <summary>
-        /// "Based on the last {0} play(s), the suggested offset is {1} ms."
+        /// "Based on the last {0} play, the suggested offset is {1} ms.|Based on the last {0} plays, the suggested offset is {1} ms."
         /// </summary>
-        public static LocalisableString SuggestedOffsetValueReceived(int plays, LocalisableString value) => new TranslatableString(getKey(@"suggested_offset_value_received"), @"Based on the last {0} play(s), the suggested offset is {1} ms.", plays, value);
+        public static LocalisableString SuggestedOffsetValueReceived(int playcount, LocalisableString value) => new TranslatableString(getKey(@"suggested_offset_value_received"), @"Based on the last {0} play, the suggested offset is {1} ms.|Based on the last {0} plays, the suggested offset is {1} ms.", playcount, value).ToQuantity(playcount);
 
         /// <summary>
         /// "Apply suggested offset"

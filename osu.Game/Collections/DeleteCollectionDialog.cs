@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using Humanizer;
 using osu.Game.Database;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Collections
@@ -12,7 +12,7 @@ namespace osu.Game.Collections
     {
         public DeleteCollectionDialog(Live<BeatmapCollection> collection, Action deleteAction)
         {
-            BodyText = collection.PerformRead(c => $"{c.Name} ({"beatmap".ToQuantity(c.BeatmapMD5Hashes.Count)})");
+            BodyText = collection.PerformRead(c => DialogStrings.DeleteCollectionBodyText(c.Name, c.BeatmapMD5Hashes.Count));
             DangerousAction = deleteAction;
         }
     }

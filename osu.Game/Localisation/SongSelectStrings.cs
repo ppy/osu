@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -268,6 +269,11 @@ namespace osu.Game.Localisation
         /// "mostly {0}"
         /// </summary>
         public static LocalisableString MostlyBPM(int mostCommonBPM) => new TranslatableString(getKey(@"mostly_bpm"), @"mostly {0}", mostCommonBPM);
+
+        /// <summary>
+        /// "{0:#,0} match|{0:#,0} matches"
+        /// </summary>
+        public static LocalisableString MatchUnit(int matchesCount) => new TranslatableString(getKey(@"match_unit"), @"{0:#,0} match|{0:#,0} matches", matchesCount).ToQuantity(matchesCount);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

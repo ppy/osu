@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
@@ -208,6 +209,11 @@ namespace osu.Game.Localisation
         /// "Delete..."
         /// </summary>
         public static LocalisableString DeleteWithConfirmation => new TranslatableString(getKey(@"delete_with_confrmation"), @"Delete...");
+
+        /// <summary>
+        /// "{0:#,0} item|{0:#,0} items"
+        /// </summary>
+        public static LocalisableString ItemUnit(int itemsCount) => new TranslatableString(getKey(@"item_unit"), @"{0:#,0} item|{0:#,0} items", itemsCount).ToQuantity(itemsCount);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
