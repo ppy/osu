@@ -114,6 +114,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString WasapiNotice => new TranslatableString(getKey(@"wasapi_notice"), @"Due to reduced latency, your audio offset will need to be adjusted when enabling this setting. Generally expect to subtract 20 - 60 ms from your known value.");
 
+        /// <summary>
+        /// "Note that you've selected a device with an exclusive-access driver, which means that you won't be able to hear sounds from other apps while in use by osu!. Also, to initialize it correctly, first ensure it's not being actively used by other applications. You may need to restart osu! and wait a moment to for it de-initialize if you've just used it through other audio driver."
+        /// </summary>
+        public static LocalisableString AlsaExclusiveNotice => new TranslatableString(getKey(@"alsa_exclusive_notice"), @"Note that you've selected a device with an exclusive-access driver, which means that you won't be able to hear sounds from other apps while in use by osu!. Also, to initialize it correctly, first ensure it's not being actively used by other applications. You may need to restart osu! and wait a moment to for it de-initialize if you've just used it through other audio driver.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
