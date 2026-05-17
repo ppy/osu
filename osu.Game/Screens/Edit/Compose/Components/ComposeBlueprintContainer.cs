@@ -46,6 +46,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved(canBeNull: true)]
         private EditorScreenWithTimeline editorScreen { get; set; }
 
+        protected override bool AllowSelectionMovement => NoteLock.Value == TernaryState.False;
+
         /// <remarks>
         /// Positional input must be received outside the container's bounds,
         /// in order to handle composer blueprints which are partially offscreen.
@@ -174,6 +176,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public readonly Bindable<TernaryState> NewCombo = new Bindable<TernaryState> { Description = "New Combo" };
 
+        public readonly Bindable<TernaryState> NoteLock = new Bindable<TernaryState> { Description = "Note Lock" };
+
         /// <summary>
         /// A collection of states which will be displayed to the user in the toolbox.
         /// </summary>
@@ -198,6 +202,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     CreateIcon = () => GetIconForSample(kvp.Key),
                 };
             }
+
+            yield return new DrawableTernaryButton
+            {
+                Current = NoteLock,
+                Description = "Note lock",
+                TooltipText = "Lock time and position of note",
+                CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.Lock }
+            };
         }
 
         private IEnumerable<SampleBankTernaryButton> createSampleBankTernaryButtons()
