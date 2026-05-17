@@ -56,6 +56,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.OSD;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Overlays.Toolbar;
+using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
@@ -1183,6 +1184,7 @@ namespace osu.Game
             }, topMostOverlayContent.Add);
 
             loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
+            topMostOverlayContent.Add(new GlobalAltScrollAdjustsVolume());
 
             onScreenDisplay = new OnScreenDisplay();
 
