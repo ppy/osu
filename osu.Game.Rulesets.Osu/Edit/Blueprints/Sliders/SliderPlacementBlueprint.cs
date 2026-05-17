@@ -54,6 +54,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         [Resolved]
         private EditorClock? editorClock { get; set; }
 
+        [Resolved]
+        private OsuSliderVelocityToolboxGroup? sliderVelocityToolbox { get; set; }
+
         private Bindable<bool> limitedDistanceSnap { get; set; } = null!;
 
         private readonly IncrementalBSplineBuilder bSplineBuilder = new IncrementalBSplineBuilder { Degree = 4 };
@@ -111,9 +114,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             }
         }
 
-        [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; } = null!;
-
         public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime)
         {
             var result = composer?.TrySnapToNearbyObjects(screenSpacePosition, fallbackTime);
@@ -129,11 +129,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case SliderPlacementState.Initial:
                     BeginPlacement();
 
-                    double? nearestSliderVelocity = (editorBeatmap
-                                                     .HitObjects
-                                                     .LastOrDefault(h => h is Slider && h.GetEndTime() < HitObject.StartTime) as Slider)?.SliderVelocityMultiplier;
-
-                    HitObject.SliderVelocityMultiplier = nearestSliderVelocity ?? 1;
+                    HitObject.SliderVelocityMultiplier = sliderVelocityToolbox?.SliderVelocity.Value ?? 1;
                     HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
 
                     // Replacing the DifficultyControlPoint above doesn't trigger any kind of invalidation.
