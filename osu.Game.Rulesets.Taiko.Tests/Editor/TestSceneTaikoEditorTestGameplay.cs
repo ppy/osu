@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
             });
             AddUntilStep("save prompt shown", () => DialogOverlay.CurrentDialog is SaveRequiredPopupDialog);
 
-            AddStep("save changes", () => DialogOverlay.CurrentDialog!.PerformOkAction());
+            AddStep("save changes", () => (DialogOverlay.CurrentDialog as SaveRequiredPopupDialog)!.PerformOkAction());
             AddUntilStep("player pushed", () => Stack.CurrentScreen is EditorPlayer);
             AddUntilStep("wait for return to editor", () => Stack.CurrentScreen is Screens.Edit.Editor);
         }

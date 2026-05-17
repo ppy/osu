@@ -164,7 +164,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddUntilStep("delete dialog shown", () => DialogOverlay.CurrentDialog, Is.InstanceOf<BeatmapDeleteDialog>);
-            AddStep("confirm deletion", () => DialogOverlay.CurrentDialog!.PerformAction<PopupDialogDangerousButton>());
+            AddStep("confirm deletion", () => (DialogOverlay.CurrentDialog as BeatmapDeleteDialog)!.PerformAction<PopupDialogDangerousButton>());
 
             AddAssert("beatmap set deleted", () => Beatmaps.GetAllUsableBeatmapSets().Any(), () => Is.False);
         }

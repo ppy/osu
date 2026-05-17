@@ -3,13 +3,10 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -20,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Comments
 {
-    public partial class CommentReportButton : CompositeDrawable, IHasPopover, IHasLineBaseHeight
+    public partial class CommentReportButton : CompositeDrawable, IHasLineBaseHeight
     {
         private readonly Comment comment;
 
@@ -29,6 +26,9 @@ namespace osu.Game.Overlays.Comments
 
         [Resolved]
         private OverlayColourProvider? colourProvider { get; set; }
+
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
 
         public CommentReportButton(Comment comment)
         {
@@ -52,20 +52,20 @@ namespace osu.Game.Overlays.Comments
                 }
             };
 
-            link.AddLink(ReportStrings.CommentButton.ToLower(), this.ShowPopover);
+            link.AddLink(ReportStrings.CommentButton.ToLower(), () => dialogOverlay?.Push(createDialog()));
         }
 
-        public Popover GetPopover()
+        private CommentReportDialog createDialog()
         {
-            var popover = new ReportCommentPopover(comment);
+            var dialog = new CommentReportDialog(comment, colourProvider);
 
-            popover.Submitted += () =>
+            dialog.Submitted += () =>
             {
                 link.Hide();
                 loading.Show();
             };
 
-            popover.Success += () => Schedule(() =>
+            dialog.Success += () => Schedule(() =>
             {
                 loading.Hide();
 
@@ -76,13 +76,13 @@ namespace osu.Game.Overlays.Comments
                 this.FadeOut(2000, Easing.InQuint).Expire();
             });
 
-            popover.Failure += () => Schedule(() =>
+            dialog.Failure += () => Schedule(() =>
             {
                 loading.Hide();
                 link.Show();
             });
 
-            return popover;
+            return dialog;
         }
 
         public float LineBaseHeight => link.ChildrenOfType<IHasLineBaseHeight>().FirstOrDefault()?.LineBaseHeight ?? DrawHeight;
