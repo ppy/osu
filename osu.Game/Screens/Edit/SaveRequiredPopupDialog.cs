@@ -8,7 +8,7 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Edit
 {
-    public partial class SaveRequiredPopupDialog : PopupDialog
+    public partial class SaveRequiredPopupDialog : ButtonPopupDialog
     {
         public SaveRequiredPopupDialog(Action saveAndAction)
         {

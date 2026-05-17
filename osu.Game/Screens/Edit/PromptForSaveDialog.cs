@@ -8,7 +8,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit
 {
-    public partial class PromptForSaveDialog : PopupDialog
+    public partial class PromptForSaveDialog : ButtonPopupDialog
     {
         public PromptForSaveDialog(Action exit, Action saveAndExit, Action cancel)
         {

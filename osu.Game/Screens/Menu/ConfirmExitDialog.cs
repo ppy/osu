@@ -12,7 +12,7 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Menu
 {
-    public partial class ConfirmExitDialog : PopupDialog
+    public partial class ConfirmExitDialog : ButtonPopupDialog
     {
         private readonly Action onConfirm;
         private readonly Action? onCancel;
