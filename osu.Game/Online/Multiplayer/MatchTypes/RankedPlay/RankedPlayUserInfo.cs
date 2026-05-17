@@ -49,5 +49,11 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.RankedPlay
         /// </summary>
         [Key(5)]
         public int RoundsWon { get; set; }
+
+        [Key(6)]
+        public int WinStreak { get; set; } = 0;
+
+        [Key(7)]
+        public double PersonalMultiplier { get; set; } = 1;
     }
 }

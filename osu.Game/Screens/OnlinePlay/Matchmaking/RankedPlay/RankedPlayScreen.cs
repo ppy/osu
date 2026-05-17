@@ -87,8 +87,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         private readonly MultiplayerRoom room;
 
-        private APIUser localUser = null!;
-        private APIUser opponentUser = null!;
+        protected APIUser LocalUser = null!;
+        protected APIUser OpponentUser = null!;
 
         private readonly Container stageOverlayContainer;
         private readonly Container<RankedPlaySubScreen> screenContainer;
@@ -195,14 +195,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             int localUserId = api.LocalUser.Value.OnlineID;
             int opponentUserId = ((RankedPlayRoomState)client.Room!.MatchState!).Users.Keys.Single(it => it != localUserId);
 
-            localUser = users.GetUserAsync(localUserId).GetResultSafely() ?? api.LocalUser.Value;
-            opponentUser = users.GetUserAsync(opponentUserId).GetResultSafely() ?? APIUser.UnknownUser(opponentUserId);
+            LocalUser = users.GetUserAsync(localUserId).GetResultSafely() ?? api.LocalUser.Value;
+            OpponentUser = users.GetUserAsync(opponentUserId).GetResultSafely() ?? APIUser.UnknownUser(opponentUserId);
 
             AddRangeInternal([
                 new RankedPlayCornerPiece(RankedPlayColourScheme.BLUE, Anchor.BottomLeft)
                 {
                     State = { BindTarget = cornerPieceVisibility },
-                    Child = new RankedPlayUserDisplay(localUser, Anchor.BottomLeft, RankedPlayColourScheme.BLUE)
+                    Child = new RankedPlayUserDisplay(LocalUser, Anchor.BottomLeft, RankedPlayColourScheme.BLUE)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Health = { BindTarget = matchInfo.PlayerHealth }
@@ -211,7 +211,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 new RankedPlayCornerPiece(RankedPlayColourScheme.RED, Anchor.TopRight)
                 {
                     State = { BindTarget = cornerPieceVisibility },
-                    Child = new RankedPlayUserDisplay(opponentUser, Anchor.TopRight, RankedPlayColourScheme.RED)
+                    Child = new RankedPlayUserDisplay(OpponentUser, Anchor.TopRight, RankedPlayColourScheme.RED)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Health = { BindTarget = matchInfo.OpponentHealth }
@@ -249,19 +249,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 if (screen.ShowStageOverlay)
                 {
                     APIUser? pickingUser = null;
-                    double? multiplier = matchInfo.Stage.Value < RankedPlayStage.CardPlay ? null : matchInfo.RoomState.DamageMultiplier;
+                    double? globalMultiplier = matchInfo.Stage.Value < RankedPlayStage.CardPlay ? null : matchInfo.RoomState.GlobalMultiplier;
+                    double? lastWinnerPersonalMultiplier = matchInfo.Stage.Value < RankedPlayStage.CardPlay ? null : matchInfo.RoomState.Users.MaxBy(u => u.Value.WinStreak).Value.PersonalMultiplier;
                     RankedPlayColourScheme colourScheme = RankedPlayColourScheme.BLUE;
 
                     if (matchInfo.Stage.Value == RankedPlayStage.CardPlay && matchInfo.RoomState.ActiveUser != null)
                     {
-                        pickingUser = matchInfo.IsOwnTurn ? localUser : opponentUser;
+                        pickingUser = matchInfo.IsOwnTurn ? LocalUser : OpponentUser;
                         colourScheme = matchInfo.IsOwnTurn ? RankedPlayColourScheme.BLUE : RankedPlayColourScheme.RED;
                     }
 
                     stageOverlayContainer.Add(new RankedPlayStageOverlay(screen.StageHeading, colourScheme)
                     {
                         PickingUser = pickingUser,
-                        Multiplier = multiplier,
+                        GlobalMultiplier = globalMultiplier,
+                        LastWinner = matchInfo.LastWinner,
+                        LastWinnerPersonalMultiplier = lastWinnerPersonalMultiplier
                     });
 
                     rankedPlayBackground.ColourScheme = colourScheme;

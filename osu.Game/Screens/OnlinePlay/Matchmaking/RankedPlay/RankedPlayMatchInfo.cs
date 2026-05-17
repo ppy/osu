@@ -70,11 +70,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         /// </summary>
         public readonly BindableInt OpponentHealth = new BindableInt { MinValue = 0, MaxValue = 1_000_000, Value = 1_000_000 };
 
+
         public RankedPlayRoomState RoomState { get; private set; } = null!;
 
         public bool IsOwnTurn => RoomState.ActiveUserId == client.LocalUser?.UserID;
 
         public bool IsOpponentTurn => RoomState.ActiveUserId == OpponentId;
+
 
         public int CurrentRound => RoomState.CurrentRound;
 
@@ -86,6 +88,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
+        public APIUser? LastWinner { get; internal set; }
 
         private APIUser player = null!;
 

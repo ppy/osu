@@ -13,6 +13,7 @@ using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Overlays;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -25,7 +26,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private readonly RankedPlayColourScheme colourScheme;
 
         public APIUser? PickingUser { get; init; }
-        public double? Multiplier { get; init; }
+        public double? GlobalMultiplier { get; init; }
 
         private FillFlowContainer displayContainer = null!;
         private FillFlowContainer detailsContainer = null!;
@@ -35,6 +36,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         [Resolved]
         private MusicController musicController { get; set; } = null!;
+        public double? LastWinnerPersonalMultiplier { get; set; }
+        public RankedPlayUserInfo? WinstreakingUserInfo { get; set; }
+
+        public APIUser? LastWinner { get; init; }
 
         public RankedPlayStageOverlay(LocalisableString stageName, RankedPlayColourScheme colourScheme)
         {
@@ -150,19 +155,25 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     },
                 });
             }
+            string text = "";
 
-            if (Multiplier != null)
+            if (GlobalMultiplier != null)
             {
-                detailsContainer.Add(new OsuSpriteText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    UseFullGlyphHeight = false,
-                    Font = OsuFont.Torus.With(size: 32),
-                    Text = $"{Multiplier.Value.ToStandardFormattedString(maxDecimalDigits: 1)}x damage",
-                });
+                text += $"{GlobalMultiplier.Value.ToStandardFormattedString(maxDecimalDigits: 1)}x damage";
             }
-
+            if (LastWinner != null && LastWinnerPersonalMultiplier != null)
+            {
+                text += $", extra {LastWinnerPersonalMultiplier.Value.ToStandardFormattedString(maxDecimalDigits: 1)}x multiplicative factor for";
+                text += $" {LastWinner.Username}.";
+            }
+            detailsContainer.Add(new OsuSpriteText
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                UseFullGlyphHeight = false,
+                Font = OsuFont.Torus.With(size: 24),
+                Text = text
+            });
             stageChangeSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/stage-change");
         }
 
