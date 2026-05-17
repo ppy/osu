@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Screens.Utility.SampleComponents;
 using osuTK.Input;
@@ -62,7 +63,7 @@ namespace osu.Game.Screens.Utility
                 },
                 new ButtonWithKeyBind(key)
                 {
-                    Text = "Feels better",
+                    Text = LatencyCertifierStrings.ButtonFeelsBetter,
                     Y = 20,
                     Width = 0.8f,
                     Anchor = Anchor.TopCentre,
