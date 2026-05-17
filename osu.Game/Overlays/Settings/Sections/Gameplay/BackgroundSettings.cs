@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -33,6 +34,14 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 }),
+                new SettingsItemV2(new FormEnumDropdown<BackgroundScaleMode>
+                {
+                    Caption = GameplaySettingsStrings.BackgroundScaleMode,
+                    Current = config.GetBindable<BackgroundScaleMode>(OsuSetting.BackgroundScaleMode),
+                })
+                {
+                    ApplyClassicDefault = c => ((IHasCurrentValue<BackgroundScaleMode>)c).Current.Value = BackgroundScaleMode.ScaleToFit,
+                },
                 new SettingsItemV2(new FormCheckBox
                 {
                     Caption = GameplaySettingsStrings.LightenDuringBreaks,
