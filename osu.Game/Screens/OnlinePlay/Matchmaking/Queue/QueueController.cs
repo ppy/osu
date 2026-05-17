@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -45,6 +46,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         [Resolved]
         private INotificationOverlay? notifications { get; set; }
 
+        public Stopwatch Timer = new Stopwatch();
+
         private BackgroundQueueNotification? backgroundNotification;
 
         private bool isBackgrounded = true;
@@ -72,6 +75,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             lastDuelUser = null;
             lastDuelPool = null;
+            Timer.Restart();
 
             client.MatchmakingJoinQueue(pool.Id).FireAndForget();
         }
@@ -91,6 +95,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             lastDuelUser = userId;
             lastDuelPool = pool;
+            Timer.Restart();
 
             client.MatchmakingIssueDuel(new MatchmakingIssueDuelRequest
             {

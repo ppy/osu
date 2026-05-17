@@ -86,7 +86,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private readonly Bindable<MatchmakingPool[]?> availablePools = new Bindable<MatchmakingPool[]?>();
         private readonly Bindable<MatchmakingPool?> selectedPool = new Bindable<MatchmakingPool?>();
-
         private readonly MatchmakingPoolType poolType;
 
         private CancellationTokenSource userLookupCancellation = new CancellationTokenSource();
@@ -104,6 +103,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private GridContainer mainGrid = null!;
 
         private IBindable<bool> isConnected = null!;
+        private OsuSpriteText? queueingText;
 
         public ScreenQueue(MatchmakingPoolType poolType)
         {
@@ -464,6 +464,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             });
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (currentState.Value == MatchmakingScreenState.Queueing && queueingText != null)
+            {
+                queueingText.Text = "Waiting for a game... " + queue.Timer.Elapsed.ToString(@"mm\:ss");
+            }
+        }
+
         private void refreshLobbyData()
         {
             clearLobbyData();
@@ -615,11 +625,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         Spacing = new Vector2(15),
                         Children = new Drawable[]
                         {
-                            new OsuSpriteText
+                            queueingText = new OsuSpriteText
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Text = "Waiting for a game...",
+                                Text =  "Waiting for a game... ",
                                 Font = OsuFont.GetFont(size: 32, weight: FontWeight.Light, typeface: Typeface.TorusAlternate),
                             },
                             new LoadingSpinner
