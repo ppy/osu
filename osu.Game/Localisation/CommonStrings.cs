@@ -165,6 +165,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Clone => new TranslatableString(getKey(@"clone"), @"Clone");
 
         /// <summary>
+        /// "Invert selection"
+        /// </summary>
+        public static LocalisableString InvertSelection => new TranslatableString(getKey(@"invert_selection"), @"Invert selection");
+
+        /// <summary>
         /// "Exit"
         /// </summary>
         public static LocalisableString Exit => new TranslatableString(getKey(@"exit"), @"Exit");
