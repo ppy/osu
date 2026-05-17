@@ -24,6 +24,7 @@ using osu.Game.Overlays.Mods.Input;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Skinning;
@@ -49,7 +50,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Ruleset, string.Empty);
             SetDefault(OsuSetting.Skin, SkinInfo.ARGON_SKIN.ToString());
 
-            SetDefault(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Local);
+            SetDefault(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Ranking);
+            SetDefault(OsuSetting.BeatmapLeaderboardScope, BeatmapLeaderboardScope.Local);
             SetDefault(OsuSetting.BeatmapLeaderboardSortMode, LeaderboardSortMode.Score);
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
 
@@ -292,6 +294,40 @@ namespace osu.Game.Configuration
                 if (penHandler != null && mouseHandler != null && penHandler.Sensitivity.IsDefault)
                     penHandler.Sensitivity.Value = mouseHandler.Sensitivity.Value;
             }
+
+            if (combined < 20260513)
+            {
+                var beatmapDetailTab = Get<BeatmapDetailTab>(OsuSetting.BeatmapDetailTab);
+
+                if (beatmapDetailTab != BeatmapDetailTab.Details)
+                {
+                    var leaderboardScope = BeatmapLeaderboardScope.Local;
+
+                    switch (beatmapDetailTab)
+                    {
+#pragma warning disable CS0618 // Type or member is obsolete
+                        case BeatmapDetailTab.Country:
+                            leaderboardScope = BeatmapLeaderboardScope.Country;
+                            break;
+
+                        case BeatmapDetailTab.Friends:
+                            leaderboardScope = BeatmapLeaderboardScope.Friend;
+                            break;
+
+                        case BeatmapDetailTab.Team:
+                            leaderboardScope = BeatmapLeaderboardScope.Team;
+                            break;
+
+                        case BeatmapDetailTab.Global:
+#pragma warning restore CS0618 // Type or member is obsolete
+                            leaderboardScope = BeatmapLeaderboardScope.Global;
+                            break;
+                    }
+
+                    SetValue(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Ranking);
+                    SetValue(OsuSetting.BeatmapLeaderboardScope, leaderboardScope);
+                }
+            }
         }
 
         public override TrackedSettings CreateTrackedSettings()
@@ -411,6 +447,7 @@ namespace osu.Game.Configuration
         MenuParallax,
         Prefer24HourTime,
         BeatmapDetailTab,
+        BeatmapLeaderboardScope,
         BeatmapLeaderboardSortMode,
         BeatmapDetailModsFilter,
         Username,
