@@ -152,7 +152,10 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine("[Events]");
 
             if (!string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
-                writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Background},0,\"{beatmap.BeatmapInfo.Metadata.BackgroundFile}\",0,0"));
+            {
+                var metadata = beatmap.BeatmapInfo.Metadata;
+                writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Background},0,\"{metadata.BackgroundFile}\",{metadata.BackgroundOffsetX},{metadata.BackgroundOffsetY}"));
+            }
 
             foreach (var b in beatmap.Breaks)
                 writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Break},{b.StartTime},{b.EndTime}"));

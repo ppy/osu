@@ -217,6 +217,25 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestBackgroundOffsetsRoundTrip()
+        {
+            var beatmap = new Beatmap();
+            var meta = beatmap.BeatmapInfo.Metadata;
+            meta.BackgroundFile = "test bg.jpg";
+            meta.BackgroundOffsetX = 10.25f;
+            meta.BackgroundOffsetY = -42f;
+
+            var encoded = EncodeToLegacy((beatmap, new TestLegacySkin(beatmaps_resource_store, string.Empty)));
+            encoded.Position = 0;
+
+            var decoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(new LineBufferedReader(encoded));
+
+            Assert.That(decoded.BeatmapInfo.Metadata.BackgroundFile, Is.EqualTo(meta.BackgroundFile));
+            Assert.That(decoded.BeatmapInfo.Metadata.BackgroundOffsetX, Is.EqualTo(meta.BackgroundOffsetX));
+            Assert.That(decoded.BeatmapInfo.Metadata.BackgroundOffsetY, Is.EqualTo(meta.BackgroundOffsetY));
+        }
+
+        [Test]
         public void TestEncodeStabilityOfSliderWithFractionalCoordinates()
         {
             Slider originalSlider = new Slider
