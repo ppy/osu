@@ -29,6 +29,7 @@ using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
@@ -271,6 +272,12 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <returns>A performance calculator instance for the provided score.</returns>
         public virtual PerformanceCalculator? CreatePerformanceCalculator() => null;
+
+        /// <summary>
+        /// Optionally creates a <see cref="ILegacyScoreProcessor"/> to simulate behaviour of legacy score.
+        /// </summary>
+        /// <returns>The <see cref="ILegacyScoreProcessor"/>.</returns>
+        public virtual ILegacyScoreProcessor? CreateLegacyScoreProcessor() => null;
 
         public virtual HitObjectComposer? CreateHitObjectComposer() => null;
 
