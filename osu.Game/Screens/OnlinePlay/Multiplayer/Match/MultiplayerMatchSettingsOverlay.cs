@@ -52,8 +52,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         protected partial class MatchSettings : CompositeDrawable
         {
-            private const float disabled_alpha = 0.2f;
-
             public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
             public Action? SettingsApplied;
@@ -223,12 +221,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                             {
                                                                 new Section("Max participants")
                                                                 {
-                                                                    Alpha = disabled_alpha,
                                                                     Child = MaxParticipantsField = new OsuNumberBox
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
-                                                                        ReadOnly = true,
+                                                                        PlaceholderText = "No limit"
                                                                     },
                                                                 },
                                                                 new Section("Password (optional)")
@@ -442,6 +439,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 if (!ApplyButton.Enabled.Value)
                     return;
 
+                byte? maxParticipants = !string.IsNullOrWhiteSpace(MaxParticipantsField.Text) && byte.TryParse(MaxParticipantsField.Text, out byte max) ? max : null;
+
                 ErrorText.FadeOut(50);
 
                 Debug.Assert(applyingSettingsOperation == null);
@@ -457,7 +456,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                               matchType: TypePicker.Current.Value,
                               queueMode: QueueModeDropdown.Current.Value,
                               autoStartDuration: TimeSpan.FromSeconds((int)startModeDropdown.Current.Value),
-                              autoSkip: AutoSkipCheckbox.Current.Value)
+                              autoSkip: AutoSkipCheckbox.Current.Value,
+                              maxParticipants: maxParticipants)
                           .ContinueWith(t => Schedule(() =>
                           {
                               if (t.IsCompletedSuccessfully)
@@ -475,6 +475,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     room.AutoStartDuration = TimeSpan.FromSeconds((int)startModeDropdown.Current.Value);
                     room.AutoSkip = AutoSkipCheckbox.Current.Value;
                     room.Playlist = drawablePlaylist.Items.ToArray();
+                    room.MaxParticipants = maxParticipants;
 
                     client.CreateRoom(room).ContinueWith(t => Schedule(() =>
                     {
