@@ -178,6 +178,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                     break;
 
                 case UserActivity.InSoloGame:
+                case UserActivity.PlayingDailyChallenge:
                 case UserActivity.InMultiplayerGame:
                 case UserActivity.InPlaylistGame:
                     userPanel.CanSpectate.Value = true;
