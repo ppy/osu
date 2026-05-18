@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (ShowSettingsOverlay)
+            if (ShowSettingsOverlay && GameplayClockContainer != null)
             {
                 var replayOverlay = new ReplayOverlay();
                 GameplayClockContainer.Add(replayOverlay);

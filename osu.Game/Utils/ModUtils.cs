@@ -63,7 +63,7 @@ namespace osu.Game.Utils
                 {
                     var m = mods[j];
 
-                    if (candidate.Equals(m))
+                    if (candidate.GetType() == m.GetType())
                     {
                         invalidMods ??= new List<Mod>();
                         invalidMods.Add(m);

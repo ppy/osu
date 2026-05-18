@@ -51,7 +51,15 @@ namespace osu.Game.Tests.Extensions
         [TestCase(0.4, true, 2, ExpectedResult = "40%")]
         [TestCase(1e-6, false, 6, ExpectedResult = "0,000001")]
         [TestCase(0.48333, true, 4, ExpectedResult = "48,33%")]
-        public string TestCultureSensitivity(double input, bool percent, int decimalDigits)
+        public string TestCultureSensitivityDecimalPoint(double input, bool percent, int decimalDigits)
+        {
+            return input.ToStandardFormattedString(decimalDigits, percent);
+        }
+
+        [Test]
+        [SetCulture("sv-SE")]
+        [TestCase(-1e-6, false, 6, ExpectedResult = "−0,000001")]
+        public string TestCultureSensitivityNegativeSign(double input, bool percent, int decimalDigits)
         {
             return input.ToStandardFormattedString(decimalDigits, percent);
         }
