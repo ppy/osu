@@ -173,7 +173,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The total score multiplier.
         /// </summary>
-        private double scoreMultiplier = 1;
+        public double ScoreMultiplier { get; private set; } = 1;
 
         public Dictionary<HitResult, int> MaximumStatistics
         {
@@ -206,10 +206,10 @@ namespace osu.Game.Rulesets.Scoring
 
             Mods.ValueChanged += mods =>
             {
-                scoreMultiplier = 1;
+                ScoreMultiplier = 1;
 
                 foreach (var m in mods.NewValue)
-                    scoreMultiplier *= m.ScoreMultiplier;
+                    ScoreMultiplier *= m.ScoreMultiplier;
 
                 updateScore();
                 updateRank();
@@ -384,7 +384,7 @@ namespace osu.Game.Rulesets.Scoring
             double accuracyProgress = maximumAccuracyJudgementCount > 0 ? (double)currentAccuracyJudgementCount / maximumAccuracyJudgementCount : 1;
 
             TotalScoreWithoutMods.Value = (long)Math.Round(ComputeTotalScore(comboProgress, accuracyProgress, currentBonusPortion));
-            TotalScore.Value = (long)Math.Round(TotalScoreWithoutMods.Value * scoreMultiplier);
+            TotalScore.Value = (long)Math.Round(TotalScoreWithoutMods.Value * ScoreMultiplier);
         }
 
         private void updateRank()
