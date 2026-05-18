@@ -14,6 +14,10 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.RankedPlay
         /// Total amount of damage dealt.
         /// Calculated as <see cref="DirectDamage"/> * <see cref="Multiplier"/> + <see cref="BonusDamage"/>.
         /// </summary>
+        /// <remarks>
+        /// Not required since adding additional properties (<see cref="DirectDamage"/> / <see cref="BonusDamage"/> / <see cref="Multiplier"/>).
+        /// Could potentially be replaced with a property doing the above calculation.
+        /// </remarks>
         [Key(0)]
         public int Damage { get; set; }
 
@@ -21,6 +25,10 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.RankedPlay
         /// Damage dealt before multipliers are applied.
         /// Calculated as <see cref="DirectDamage"/> + <see cref="BonusDamage"/>.
         /// </summary>
+        /// <remarks>
+        /// Not required since adding additional properties (<see cref="DirectDamage"/> / <see cref="BonusDamage"/> / <see cref="Multiplier"/>).
+        /// Can potentially be removed in the future.
+        /// </remarks>
         [Key(1)]
         public int RawDamage { get; set; }
 
