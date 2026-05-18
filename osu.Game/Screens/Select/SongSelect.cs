@@ -283,7 +283,8 @@ namespace osu.Game.Screens.Select
                                                             },
                                                             noResultsPlaceholder = new NoResultsPlaceholder
                                                             {
-                                                                RequestClearFilterText = () => FilterControl.Search(string.Empty)
+                                                                RequestClearFilterText = () => FilterControl.Search(string.Empty),
+                                                                RequestClearStarsFilter = () => FilterControl.ClearStarsFilter()
                                                             }
                                                         }
                                                     },

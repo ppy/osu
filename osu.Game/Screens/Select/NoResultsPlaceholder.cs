@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Select
     public partial class NoResultsPlaceholder : VisibilityContainer
     {
         public Action? RequestClearFilterText { get; init; }
-
+        public Action? RequestClearStarsFilter { get; set; }
         private FilterCriteria? filter;
 
         private LinkFlowContainer textFlow = null!;
@@ -168,8 +168,13 @@ namespace osu.Game.Screens.Select
                     textFlow.AddText("Try ");
                     textFlow.AddLink("removing", () =>
                     {
-                        config.SetValue(OsuSetting.DisplayStarsMinimum, 0.0);
-                        config.SetValue(OsuSetting.DisplayStarsMaximum, 10.1);
+                        if (RequestClearStarsFilter != null)
+                            RequestClearStarsFilter.Invoke();
+                        else
+                        {
+                            config.SetValue(OsuSetting.DisplayStarsMinimum, 0.0);
+                            config.SetValue(OsuSetting.DisplayStarsMaximum, 10.1);
+                        }
                     });
 
                     string lowerStar = $"{filter.UserStarDifficulty.Min ?? 0:N1}";

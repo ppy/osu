@@ -29,6 +29,11 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 {
                     Keywords = new[] { "converts", "converted" }
                 },
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = UserInterfaceStrings.PerRulesetStarFilter,
+                    Current = config.GetBindable<bool>(OsuSetting.UsePerRulesetStarFilter),
+                }),
                 new SettingsItemV2(new FormEnumDropdown<RandomSelectAlgorithm>
                 {
                     Caption = UserInterfaceStrings.RandomSelectionAlgorithm,

@@ -81,6 +81,49 @@ namespace osu.Game.Screens.Select
 
         private FilterCriteria currentCriteria = null!;
 
+        private readonly Bindable<bool> usePerRulesetStarFilter = new BindableBool();
+        private BindableDouble configDisplayStarsMinimum = null!;
+        private BindableDouble configDisplayStarsMaximum = null!;
+
+        private static readonly Dictionary<string, StarFilter> per_ruleset_star_filters = new Dictionary<string, StarFilter>();
+
+        private struct StarFilter
+        {
+            public double Min;
+            public double Max;
+        }
+
+        private StarFilter getStarFilter(RulesetInfo ruleset)
+        {
+            if (usePerRulesetStarFilter.Value && per_ruleset_star_filters.TryGetValue(ruleset.ShortName, out var filter))
+                return filter;
+
+            return new StarFilter
+            {
+                Min = configDisplayStarsMinimum.Value,
+                Max = configDisplayStarsMaximum.Value
+            };
+        }
+
+        private void setStarFilter(RulesetInfo ruleset, StarFilter value)
+        {
+            if (usePerRulesetStarFilter.Value)
+            {
+                per_ruleset_star_filters[ruleset.ShortName] = value;
+            }
+            else
+            {
+                configDisplayStarsMinimum.Value = value.Min;
+                configDisplayStarsMaximum.Value = value.Max;
+            }
+        }
+
+        public void ClearStarsFilter()
+        {
+            difficultyRangeSlider.LowerBound.SetDefault();
+            difficultyRangeSlider.UpperBound.SetDefault();
+        }
+
         private IDisposable? collectionsSubscription;
 
         [BackgroundDependencyLoader]
@@ -221,12 +264,33 @@ namespace osu.Game.Screens.Select
         {
             base.LoadComplete();
 
-            difficultyRangeSlider.LowerBound = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum);
-            difficultyRangeSlider.UpperBound = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum);
+            config.BindWith(OsuSetting.UsePerRulesetStarFilter, usePerRulesetStarFilter);
+            configDisplayStarsMinimum = (BindableDouble)config.GetBindable<double>(OsuSetting.DisplayStarsMinimum);
+            configDisplayStarsMaximum = (BindableDouble)config.GetBindable<double>(OsuSetting.DisplayStarsMaximum);
+
+            difficultyRangeSlider.LowerBound = new BindableDouble { MinValue = configDisplayStarsMinimum.MinValue, MaxValue = configDisplayStarsMinimum.MaxValue, Default = configDisplayStarsMinimum.Default };
+            difficultyRangeSlider.UpperBound = new BindableDouble { MinValue = configDisplayStarsMaximum.MinValue, MaxValue = configDisplayStarsMaximum.MaxValue, Default = configDisplayStarsMaximum.Default };
+
+            void applyFilterToSlider()
+            {
+                var filter = getStarFilter(ruleset.Value);
+                difficultyRangeSlider.LowerBound.Value = filter.Min;
+                difficultyRangeSlider.UpperBound.Value = filter.Max;
+            }
+
+            configDisplayStarsMinimum.BindValueChanged(_ => { if (!usePerRulesetStarFilter.Value) applyFilterToSlider(); });
+            configDisplayStarsMaximum.BindValueChanged(_ => { if (!usePerRulesetStarFilter.Value) applyFilterToSlider(); });
+
             config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConvertedBeatmapsButton.Active);
             config.BindWith(OsuSetting.SongSelectSortingMode, sortDropdown.Current);
 
-            ruleset.BindValueChanged(_ => updateCriteria());
+            usePerRulesetStarFilter.BindValueChanged(_ => applyFilterToSlider(), true);
+
+            ruleset.BindValueChanged(_ =>
+            {
+                applyFilterToSlider();
+                updateCriteria();
+            });
             mods.BindValueChanged(m =>
             {
                 // The following is a note carried from old song select and may not be a valid reason anymore:
@@ -255,8 +319,16 @@ namespace osu.Game.Screens.Select
                 sliderDebounce = Scheduler.AddDelayed(() => updateCriteria(), 50);
             }
 
-            difficultyRangeSlider.LowerBound.BindValueChanged(_ => debouncedUpdateCriteria());
-            difficultyRangeSlider.UpperBound.BindValueChanged(_ => debouncedUpdateCriteria());
+            difficultyRangeSlider.LowerBound.BindValueChanged(v =>
+            {
+                setStarFilter(ruleset.Value, new StarFilter { Min = v.NewValue, Max = difficultyRangeSlider.UpperBound.Value });
+                debouncedUpdateCriteria();
+            });
+            difficultyRangeSlider.UpperBound.BindValueChanged(v =>
+            {
+                setStarFilter(ruleset.Value, new StarFilter { Min = difficultyRangeSlider.LowerBound.Value, Max = v.NewValue });
+                debouncedUpdateCriteria();
+            });
 
             showConvertedBeatmapsButton.Active.BindValueChanged(_ => updateCriteria());
             sortDropdown.Current.BindValueChanged(_ => updateCriteria());

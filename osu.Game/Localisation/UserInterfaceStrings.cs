@@ -110,6 +110,11 @@ namespace osu.Game.Localisation
         public static LocalisableString StarsMaximum => new TranslatableString(getKey(@"stars_maximum"), @"up to");
 
         /// <summary>
+        /// "Star filter per gamemode"
+        /// </summary>
+        public static LocalisableString PerRulesetStarFilter => new TranslatableString(getKey(@"star_filter"), @"Star filter per gamemode");
+
+        /// <summary>
         /// "Random selection algorithm"
         /// </summary>
         public static LocalisableString RandomSelectionAlgorithm => new TranslatableString(getKey(@"random_selection_algorithm"), @"Random selection algorithm");

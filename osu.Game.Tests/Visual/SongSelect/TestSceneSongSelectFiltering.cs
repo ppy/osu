@@ -157,6 +157,20 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestPerRulesetStarFilter()
+        {
+            LoadSongSelect();
+
+            ImportBeatmapForRuleset(0);
+
+            AddStep("enable per-ruleset star filter", () => Config.SetValue(OsuSetting.UsePerRulesetStarFilter, true));
+
+            ChangeRuleset(0);
+            AddUntilStep("wait for filter", () => !Carousel.IsFiltering);
+            AddUntilStep("3 beatmaps shown", () => Carousel.MatchedBeatmapsCount, () => Is.EqualTo(3));
+        }
+
+        [Test]
         public void TestCutInFilterTextBox()
         {
             LoadSongSelect();
