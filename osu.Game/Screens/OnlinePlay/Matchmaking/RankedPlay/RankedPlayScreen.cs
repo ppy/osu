@@ -150,17 +150,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                     },
-                                    chat = new RankedPlayChatDisplay(room)
-                                    {
-                                        Anchor = Anchor.BottomRight,
-                                        Origin = Anchor.BottomRight,
-                                        Margin = new MarginPadding
-                                        {
-                                            Bottom = 10,
-                                            Right = 10
-                                        },
-                                        State = { Value = Visibility.Hidden }
-                                    },
                                     new HamburgerMenu
                                     {
                                         Size = new Vector2(56),
@@ -175,6 +164,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                         overlayContainer = new CardDetailsOverlayContainer(),
                         particleContainer = new SongPreviewParticleContainer(),
                     },
+                },
+                chat = new RankedPlayChatDisplay(room)
+                {
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    Margin = new MarginPadding
+                    {
+                        Bottom = 10,
+                        Right = 10
+                    },
+                    State = { Value = Visibility.Hidden }
                 },
             };
         }
