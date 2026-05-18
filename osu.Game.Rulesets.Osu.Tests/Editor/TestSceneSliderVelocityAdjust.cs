@@ -156,18 +156,18 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("set 2x velocity", () => velocitySlider.Current.Value = 2);
             placeSlider();
             AddAssert("placed slider has 2x velocity", () => editorBeatmap.HitObjects.OfType<Slider>().Last().SliderVelocityMultiplier, () => Is.EqualTo(2));
-            AddAssert("use last slider button disabled", () => useLastSliderButton.Enabled.Value, () => Is.False);
+            AddAssert("use last slider button enabled", () => useLastSliderButton.Enabled.Value, () => Is.True);
 
             AddStep("seek to 6000", () => editorClock.Seek(6000));
             placeSlider();
             AddAssert("placed slider has 2x velocity", () => editorBeatmap.HitObjects.OfType<Slider>().Last().SliderVelocityMultiplier, () => Is.EqualTo(2));
-            AddAssert("use last slider button disabled", () => useLastSliderButton.Enabled.Value, () => Is.False);
+            AddAssert("use last slider button enabled", () => useLastSliderButton.Enabled.Value, () => Is.True);
 
             AddStep("seek to 9000", () => editorClock.Seek(9000));
             AddStep("set 3x velocity", () => velocitySlider.Current.Value = 3);
             placeSlider();
             AddAssert("placed slider has 3x velocity", () => editorBeatmap.HitObjects.OfType<Slider>().Last().SliderVelocityMultiplier, () => Is.EqualTo(3));
-            AddAssert("use last slider button disabled", () => useLastSliderButton.Enabled.Value, () => Is.False);
+            AddAssert("use last slider button enabled", () => useLastSliderButton.Enabled.Value, () => Is.True);
 
             AddStep("seek to 10000", () => editorClock.Seek(10000));
             AddStep("set 1x velocity", () => velocitySlider.Current.Value = 1);

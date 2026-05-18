@@ -489,13 +489,5 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             return new OsuDistanceSnapGrid((OsuHitObject)sourceObject, (OsuHitObject)targetObject, sliderVelocitySource);
         }
-
-        public override void CommitPlacement(HitObject hitObject)
-        {
-            base.CommitPlacement(hitObject);
-
-            if (hitObject is IHasSliderVelocity)
-                sliderVelocityToolboxGroup.UseLastSliderVelocity = true;
-        }
     }
 }

@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// <summary>
         /// Whether the last slider's velocity should be used (if available).
         /// </summary>
-        public bool UseLastSliderVelocity;
+        private bool useLastSliderVelocity;
 
         /// <summary>
         /// The slider velocity to be used for new object placements.
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 useLastSliderButton = new ExpandableButton
                 {
                     RelativeSizeAxes = Axes.X,
-                    Action = () => UseLastSliderVelocity = true,
+                    Action = () => useLastSliderVelocity = true,
                 }
             };
         }
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             // set unconditionally to true initially.
             // if there is no object available to get the slider velocity from, the code in `Update()` will handle that.
-            UseLastSliderVelocity = true;
+            useLastSliderVelocity = true;
 
             sliderVelocity.BindValueChanged(_ => updateSliderFromVelocity(), true);
             slider.Current.BindValueChanged(_ =>
@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// <summary>
         /// Updates the displayed value of this toolbox's slider from a change to <see cref="SliderVelocity"/>
         /// (which is the source-of-truth used for new object placements).
-        /// This is only relevant when <see cref="UseLastSliderVelocity"/> is true,
+        /// This is only relevant when <see cref="useLastSliderVelocity"/> is true,
         /// in which case this code is responsible for propagating the velocity from <see cref="sliderVelocitySourceObject"/> to the slider.
         /// </summary>
         private void updateSliderFromVelocity()
@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (syncingBindables)
                 return;
 
-            if (!UseLastSliderVelocity)
+            if (!useLastSliderVelocity)
                 return;
 
             syncingBindables = true;
@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         /// <summary>
         /// Updates the value of <see cref="SliderVelocity"/> from a change to the slider's state.
-        /// This change is assumed to be user-provoked, and therefore <see cref="UseLastSliderVelocity"/> is switched unconditionally off
+        /// This change is assumed to be user-provoked, and therefore <see cref="useLastSliderVelocity"/> is switched unconditionally off
         /// as the presumed intent is to override the velocity from <see cref="sliderVelocitySourceObject"/>.
         /// </summary>
         private void updateVelocityFromSlider()
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 return;
 
             syncingBindables = true;
-            UseLastSliderVelocity = false;
+            useLastSliderVelocity = false;
             sliderVelocity.Value = slider.Current.Value;
             syncingBindables = false;
         }
@@ -165,11 +165,11 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
             else
             {
-                useLastSliderButton.Enabled.Value = !UseLastSliderVelocity;
-                useLastSliderButton.ExpandedLabelText = UseLastSliderVelocity
+                useLastSliderButton.Enabled.Value = !useLastSliderVelocity;
+                useLastSliderButton.ExpandedLabelText = useLastSliderVelocity
                     ? "Using last slider's velocity"
                     : LocalisableString.Interpolate($@"Use last slider's velocity ({lastSlider.SliderVelocityMultiplier.ToLocalisableString("N2")}x)");
-                if (UseLastSliderVelocity)
+                if (useLastSliderVelocity)
                     sliderVelocity.Value = lastSlider.SliderVelocityMultiplier;
             }
         }

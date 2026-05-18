@@ -538,7 +538,7 @@ namespace osu.Game.Rulesets.Edit
             EditorBeatmap.PlacementObject.Value = null;
         }
 
-        public virtual void CommitPlacement(HitObject hitObject)
+        public void CommitPlacement(HitObject hitObject)
         {
             EditorBeatmap.PlacementObject.Value = null;
 
