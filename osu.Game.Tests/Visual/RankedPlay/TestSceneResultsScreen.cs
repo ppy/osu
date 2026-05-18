@@ -81,30 +81,36 @@ namespace osu.Game.Tests.Visual.RankedPlay
             {
                 int losingPlayer = state.Users.Keys.First();
 
-                state.DamageMultiplier = 2;
+                state.DamageMultiplier = 1.5;
 
                 foreach (var (id, userInfo) in state.Users)
                 {
                     if (id == losingPlayer)
                     {
+                        userInfo.DamageMultiplier = 0.5;
                         userInfo.DamageInfo = new RankedPlayDamageInfo
                         {
                             RawDamage = 123_456,
                             Damage = 123_456 * 2,
                             OldLife = 1_000_000,
                             NewLife = 1_000_000 - 123_456 * 2,
+                            Multiplier = 2,
+                            DirectDamage = 123_456,
                         };
 
                         userInfo.Life = 1_000_000 - 123_456 * 2;
                     }
                     else
                     {
+                        userInfo.DamageMultiplier = 0.5;
                         userInfo.DamageInfo = new RankedPlayDamageInfo
                         {
                             RawDamage = 0,
                             Damage = 0,
                             OldLife = 1_000_000,
                             NewLife = 1_000_000,
+                            Multiplier = 2,
+                            DirectDamage = 0,
                         };
                     }
                 }
