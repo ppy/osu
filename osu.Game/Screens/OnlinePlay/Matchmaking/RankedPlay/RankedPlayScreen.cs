@@ -249,7 +249,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 if (screen.ShowStageOverlay)
                 {
                     APIUser? pickingUser = null;
-                    double? multiplier = matchInfo.Stage.Value < RankedPlayStage.CardPlay ? null : matchInfo.RoomState.DamageMultiplier;
                     RankedPlayColourScheme colourScheme = RankedPlayColourScheme.BLUE;
 
                     if (matchInfo.Stage.Value == RankedPlayStage.CardPlay && matchInfo.RoomState.ActiveUser != null)
@@ -261,7 +260,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     stageOverlayContainer.Add(new RankedPlayStageOverlay(screen.StageHeading, colourScheme)
                     {
                         PickingUser = pickingUser,
-                        Multiplier = multiplier,
                     });
 
                     rankedPlayBackground.ColourScheme = colourScheme;
