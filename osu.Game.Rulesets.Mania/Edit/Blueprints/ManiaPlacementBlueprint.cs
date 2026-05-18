@@ -98,10 +98,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             if (!base.PlacementReplacesExisting(existing, placement))
                 return false;
 
-            if (placement is IHasColumn placementColumn && existing is IHasColumn existingColumn)
-                return existingColumn.Column == placementColumn.Column;
-
-            return true;
+            return ((IHasColumn)placement).Column == ((IHasColumn)existing).Column;
         }
     }
 }
